@@ -1,16 +1,32 @@
-//
-//  ContentView.swift
-//  Shared
-//
-//  Created by Arkadiusz Fal on 09/06/2021.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var popular = PopluarVideosProvider()
+
+    var items: [GridItem] {
+        Array(repeating: .init(.flexible()), count: 4)
+    }
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            TabView {
+                Group {
+                    List {
+                        ForEach(popular.videos) { video in
+                            VideoThumbnailView(video: video)
+                                .listRowInsets(EdgeInsets(top: .zero, leading: .zero, bottom: .zero, trailing: 30))
+                        }
+                    }
+                    .listStyle(GroupedListStyle())
+                }
+                .tabItem { Text("Popular") }
+            }
+        }
+        .task {
+            async {
+                popular.load()
+            }
+        }
     }
 }
 
