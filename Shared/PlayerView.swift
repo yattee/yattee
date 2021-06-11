@@ -3,7 +3,14 @@ import Foundation
 import SwiftUI
 
 struct PlayerView: View {
-    @ObservedObject var provider: VideoDetailsProvider
+    @ObservedObject private var provider: VideoDetailsProvider
+
+    private var id: String
+
+    init(id: String) {
+        self.id = id
+        provider = VideoDetailsProvider(id)
+    }
 
     var body: some View {
         ZStack {

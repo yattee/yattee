@@ -1,14 +1,1 @@
 parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
-
-excluded:
-  - .build
-
-identifier_name:
-  excluded:
-    - db
-    - id
-    - vm
-
-type_name:
-  excluded:
-    - VM

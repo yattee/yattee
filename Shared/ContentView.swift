@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var popular = PopluarVideosProvider()
+    @ObservedObject private var popular = PopluarVideosProvider()
 
     var items: [GridItem] {
         Array(repeating: .init(.flexible()), count: 4)
