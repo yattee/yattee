@@ -7,26 +7,12 @@ struct ChannelView: View {
     @Binding var tabSelection: TabSelection
 
     var body: some View {
-        Group {
-            List {
-                ForEach(videos) { video in
-                    VideoThumbnailView(video: video)
-                        .contextMenu {
-                            Button("Close \(video.author) channel", action: {
-                                state.closeChannel()
-                                tabSelection = .popular
-                            })
-                        }
-                        .listRowInsets(listRowInsets)
+        VideosView(state: state, tabSelection: $tabSelection, videos: videos)
+            .task {
+                async {
+                    provider.load()
                 }
             }
-            .listStyle(GroupedListStyle())
-        }
-        .task {
-            async {
-                provider.load()
-            }
-        }
     }
 
     var listRowInsets: EdgeInsets {
@@ -43,10 +29,3 @@ struct ChannelView: View {
         return provider.videos
     }
 }
-
-//
-// struct ChannelView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ChannelView()
-//    }
-// }

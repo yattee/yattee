@@ -18,7 +18,7 @@ struct ContentView: View {
                         .tag(TabSelection.channel)
                 }
 
-                SearchView()
+                SearchView(state: state, tabSelection: $tabSelection)
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }

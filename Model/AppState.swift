@@ -5,7 +5,7 @@ class AppState: ObservableObject {
     @Published var channelID: String?
     @Published var channel: String?
 
-    func setChannel(from video: Video) {
+    func openChannel(from video: Video) {
         channel = video.author
         channelID = video.channelID
         showingChannel = true
