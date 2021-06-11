@@ -23,6 +23,12 @@
 		37AAF2952674086B007FC770 /* TabSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF2932674086B007FC770 /* TabSelection.swift */; };
 		37AAF2962674086B007FC770 /* TabSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF2932674086B007FC770 /* TabSelection.swift */; };
 		37AAF29A26740A01007FC770 /* VideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29926740A01007FC770 /* VideosView.swift */; };
+		37AAF29C26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */; };
+		37AAF29D26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */; };
+		37AAF29E26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */; };
+		37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
+		37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
+		37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37D4B0D92671614900C925CA /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0D82671614900C925CA /* Tests_iOS.swift */; };
 		37D4B0E32671614900C925CA /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0E22671614900C925CA /* Tests_macOS.swift */; };
 		37D4B0E42671614900C925CA /* PearvidiousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* PearvidiousApp.swift */; };
@@ -89,6 +95,8 @@
 		37AAF28F26740715007FC770 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		37AAF2932674086B007FC770 /* TabSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSelection.swift; sourceTree = "<group>"; };
 		37AAF29926740A01007FC770 /* VideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosView.swift; sourceTree = "<group>"; };
+		37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionVideosProvider.swift; sourceTree = "<group>"; };
+		37AAF29F26741C97007FC770 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		37D4B0C22671614700C925CA /* PearvidiousApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearvidiousApp.swift; sourceTree = "<group>"; };
 		37D4B0C32671614700C925CA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		37D4B0C42671614800C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -217,6 +225,7 @@
 		37D4B159267164AE00C925CA /* Apple TV */ = {
 			isa = PBXGroup;
 			children = (
+				37AAF29F26741C97007FC770 /* SubscriptionsView.swift */,
 				37AAF27D26737323007FC770 /* PopularVideosView.swift */,
 				37AAF2892673AB89007FC770 /* ChannelView.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
@@ -242,6 +251,7 @@
 			children = (
 				37AAF28F26740715007FC770 /* AppState.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
+				37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */,
 				37D4B19226717CE100C925CA /* PopularVideosProvider.swift */,
 				37AAF28B2673ABD3007FC770 /* ChannelVideosProvider.swift */,
 				37AAF2812673791F007FC770 /* SearchedVideosProvider.swift */,
@@ -481,6 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37D4B19326717CE100C925CA /* PopularVideosProvider.swift in Sources */,
+				37AAF29C26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37D4B0E62671614900C925CA /* ContentView.swift in Sources */,
 				37AAF2822673791F007FC770 /* SearchedVideosProvider.swift in Sources */,
 				37AAF29026740715007FC770 /* AppState.swift in Sources */,
@@ -488,6 +499,7 @@
 				37D4B1B02672A01000C925CA /* DataProvider.swift in Sources */,
 				37AAF28C2673ABD3007FC770 /* ChannelVideosProvider.swift in Sources */,
 				37D4B1B42672A30700C925CA /* VideoDetailsProvider.swift in Sources */,
+				37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37D4B19726717E1500C925CA /* Video.swift in Sources */,
 				37D4B0E42671614900C925CA /* PearvidiousApp.swift in Sources */,
 			);
@@ -498,6 +510,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37D4B19426717CE100C925CA /* PopularVideosProvider.swift in Sources */,
+				37AAF29D26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37D4B0E72671614900C925CA /* ContentView.swift in Sources */,
 				37AAF2832673791F007FC770 /* SearchedVideosProvider.swift in Sources */,
 				37AAF29126740715007FC770 /* AppState.swift in Sources */,
@@ -505,6 +518,7 @@
 				37D4B1B12672A01000C925CA /* DataProvider.swift in Sources */,
 				37AAF28D2673ABD3007FC770 /* ChannelVideosProvider.swift in Sources */,
 				37D4B1B52672A30700C925CA /* VideoDetailsProvider.swift in Sources */,
+				37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
 			);
@@ -532,6 +546,7 @@
 			files = (
 				37AAF28026737550007FC770 /* SearchView.swift in Sources */,
 				37D4B19526717CE100C925CA /* PopularVideosProvider.swift in Sources */,
+				37AAF29E26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37D4B1842671684E00C925CA /* PlayerView.swift in Sources */,
 				37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */,
 				37D4B1B22672A01000C925CA /* DataProvider.swift in Sources */,
@@ -544,6 +559,7 @@
 				37AAF28A2673AB89007FC770 /* ChannelView.swift in Sources */,
 				37AAF28E2673ABD3007FC770 /* ChannelVideosProvider.swift in Sources */,
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
+				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37D4B1812671653A00C925CA /* ContentView.swift in Sources */,
 				37AAF2842673791F007FC770 /* SearchedVideosProvider.swift in Sources */,
 			);

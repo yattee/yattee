@@ -3,18 +3,22 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var state = AppState()
 
-    @State var tabSelection: TabSelection = .popular
+    @State var tabSelection: TabSelection = .subscriptions
 
     var body: some View {
         NavigationView {
             TabView(selection: $tabSelection) {
+                SubscriptionsView(state: state, tabSelection: $tabSelection)
+                    .tabItem { Text("Subscriptions") }
+                    .tag(TabSelection.subscriptions)
+
                 PopularVideosView(state: state, tabSelection: $tabSelection)
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 
                 if state.showingChannel {
                     ChannelView(state: state, tabSelection: $tabSelection)
-                        .tabItem { Text("\(state.channel!) Channel") }
+                        .tabItem { Text("\(state.channel) Channel") }
                         .tag(TabSelection.channel)
                 }
 

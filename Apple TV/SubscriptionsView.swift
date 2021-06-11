@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct PopularVideosView: View {
-    @ObservedObject private var provider = PopularVideosProvider()
+struct SubscriptionsView: View {
+    @ObservedObject private var provider = SubscriptionVideosProvider()
     @ObservedObject var state: AppState
 
     @Binding var tabSelection: TabSelection
@@ -16,10 +16,6 @@ struct PopularVideosView: View {
     }
 
     var videos: [Video] {
-        if (provider.videos.isEmpty) {
-            provider.load()
-        }
-        
         return provider.videos
     }
 }

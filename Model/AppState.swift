@@ -2,8 +2,8 @@ import Foundation
 
 class AppState: ObservableObject {
     @Published var showingChannel = false
-    @Published var channelID: String?
-    @Published var channel: String?
+    @Published var channelID: String = ""
+    @Published var channel: String = ""
 
     func openChannel(from video: Video) {
         channel = video.author
@@ -13,7 +13,7 @@ class AppState: ObservableObject {
 
     func closeChannel() {
         showingChannel = false
-        channel = nil
-        channelID = nil
+        channel = ""
+        channelID = ""
     }
 }

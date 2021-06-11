@@ -8,7 +8,7 @@ struct VideosView: View {
     var videos: [Video]
 
     var body: some View {
-        Group {
+        Section {
             List {
                 ForEach(videos) { video in
                     VideoThumbnailView(video: video)
