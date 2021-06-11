@@ -1,14 +1,21 @@
-import Foundation
 import SwiftUI
 
 struct PopularVideosView: View {
-    @ObservedObject private var popular = PopluarVideosProvider()
+    @ObservedObject private var provider = PopularVideosProvider()
+    @ObservedObject var state: AppState
+    @Binding var tabSelection: TabSelection
 
     var body: some View {
         Group {
             List {
-                ForEach(popular.videos) { video in
+                ForEach(provider.videos) { video in
                     VideoThumbnailView(video: video)
+                        .contextMenu {
+                            Button("\(video.author) Channel", action: {
+                                state.setChannel(from: video)
+                                tabSelection = .channel
+                            })
+                        }
                         .listRowInsets(listRowInsets)
                 }
             }
@@ -16,11 +23,11 @@ struct PopularVideosView: View {
         }
         .task {
             async {
-                popular.load()
+                provider.load()
             }
         }
     }
-    
+
     var listRowInsets: EdgeInsets {
         EdgeInsets(top: .zero, leading: .zero, bottom: .zero, trailing: 30)
     }

@@ -3,6 +3,7 @@ import SwiftyJSON
 
 class SearchedVideosProvider: DataProvider {
     @Published var videos = [Video]()
+
     var query: String = ""
 
     func load() {

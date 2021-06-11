@@ -10,14 +10,21 @@ struct VideoThumbnailView: View {
     var body: some View {
         NavigationLink(destination: PlayerView(id: video.id)) {
             HStack(alignment: .top, spacing: 2) {
-                // to replace with AsyncImage when it is fixed with lazy views
-                URLImage(video.thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                Section {
+                    if let thumbnail = video.thumbnailURL {
+                        // to replace with AsyncImage when it is fixed with lazy views
+                        URLImage(thumbnail) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 320, height: 180)
+                        }
+                        .mask(RoundedRectangle(cornerRadius: 12))
                         .frame(width: 320, height: 180)
+                    } else {
+                        Image(systemName: "exclamationmark.square")
+                    }
                 }
-                .mask(RoundedRectangle(cornerRadius: 12))
                 .frame(width: 320, height: 180)
 
                 HStack {
@@ -68,7 +75,8 @@ struct VideoThumbnailView_Previews: PreviewProvider {
             thumbnailURL: URL(string: "https://invidious.home.arekf.net/vi/yXohcxCKqvo/maxres.jpg")!,
             author: "Bear",
             length: 240,
-            published: "2 days ago"
+            published: "2 days ago",
+            channelID: ""
         )).frame(maxWidth: 350)
     }
 }

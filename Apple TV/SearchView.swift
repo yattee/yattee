@@ -1,14 +1,13 @@
 import SwiftUI
 
 struct SearchView: View {
-    @State var query = "" 
     @ObservedObject private var provider = SearchedVideosProvider()
-    
+
+    @State var query = ""
+
     var body: some View {
-        VStack {
-            SearchedVideosView(provider: provider, query: $query)
-                .searchable(text: $query)
-        }
+        SearchedVideosView(provider: provider, query: $query)
+            .searchable(text: $query)
     }
 }
 

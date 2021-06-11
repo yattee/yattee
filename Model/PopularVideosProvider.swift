@@ -2,7 +2,7 @@ import Alamofire
 import Foundation
 import SwiftyJSON
 
-final class PopluarVideosProvider: DataProvider {
+final class PopularVideosProvider: DataProvider {
     @Published var videos = [Video]()
 
     func load() {
