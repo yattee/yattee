@@ -25,26 +25,34 @@ final class Video: Identifiable, ObservableObject {
     }
 
     init(_ json: JSON) {
+        func extractThumbnailURL(from details: JSON) -> URL {
+            if details["videoThumbnails"].arrayValue.isEmpty {
+                return URL(string: "https://invidious.home.arekf.net/vi/LuKwJyBNBsE/maxres.jpg")!
+            }
+            
+            return details["videoThumbnails"][0]["url"].url!
+        }
+        
+        func extractFormatStreamURL(from streams: [JSON]) -> URL? {
+            if streams.isEmpty {
+                error = true
+                return nil
+            }
+
+            let stream = streams.last!
+
+            return stream["url"].url
+        }
+        
         id = json["videoId"].stringValue
         title = json["title"].stringValue
-        thumbnailURL = json["videoThumbnails"][0]["url"].url!
+        thumbnailURL = extractThumbnailURL(from: json)
         author = json["author"].stringValue
         length = json["lengthSeconds"].doubleValue
         published = json["publishedText"].stringValue
         views = json["viewCount"].intValue
 
-        url = formatStreamURL(from: json["formatStreams"].arrayValue)
-    }
-
-    func formatStreamURL(from streams: [JSON]) -> URL? {
-        if streams.isEmpty {
-            error = true
-            return nil
-        }
-
-        let stream = streams.last!
-
-        return stream["url"].url
+        url = extractFormatStreamURL(from: json["formatStreams"].arrayValue)
     }
 
     var playTime: String? {
