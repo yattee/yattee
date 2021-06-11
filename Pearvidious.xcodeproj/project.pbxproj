@@ -243,10 +243,10 @@
 				37AAF28F26740715007FC770 /* AppState.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
 				37D4B19226717CE100C925CA /* PopularVideosProvider.swift */,
+				37AAF28B2673ABD3007FC770 /* ChannelVideosProvider.swift */,
+				37AAF2812673791F007FC770 /* SearchedVideosProvider.swift */,
 				37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */,
 				37D4B1AF2672A01000C925CA /* DataProvider.swift */,
-				37AAF2812673791F007FC770 /* SearchedVideosProvider.swift */,
-				37AAF28B2673ABD3007FC770 /* ChannelVideosProvider.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";

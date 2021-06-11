@@ -3,7 +3,7 @@ import SwiftUI
 struct PopularVideosView: View {
     @ObservedObject private var provider = PopularVideosProvider()
     @ObservedObject var state: AppState
-    
+
     @Binding var tabSelection: TabSelection
 
     var body: some View {

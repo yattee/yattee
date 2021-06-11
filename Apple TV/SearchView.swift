@@ -12,7 +12,7 @@ struct SearchView: View {
         VideosView(state: state, tabSelection: $tabSelection, videos: videos)
             .searchable(text: $query)
     }
-    
+
     var videos: [Video] {
         var newQuery = query
 

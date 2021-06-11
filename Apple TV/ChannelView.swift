@@ -8,11 +8,6 @@ struct ChannelView: View {
 
     var body: some View {
         VideosView(state: state, tabSelection: $tabSelection, videos: videos)
-            .task {
-                async {
-                    provider.load()
-                }
-            }
     }
 
     var listRowInsets: EdgeInsets {

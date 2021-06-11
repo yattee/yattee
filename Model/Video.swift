@@ -16,7 +16,16 @@ final class Video: Identifiable, ObservableObject {
     @Published var url: URL?
     @Published var error: Bool = false
 
-    init(id: String, title: String, thumbnailURL: URL?, author: String, length: TimeInterval, published: String, channelID: String, views: Int = 0) {
+    init(
+        id: String,
+        title: String,
+        thumbnailURL: URL?,
+        author: String,
+        length: TimeInterval,
+        published: String,
+        channelID: String,
+        views: Int = 0
+    ) {
         self.id = id
         self.title = title
         self.thumbnailURL = thumbnailURL
