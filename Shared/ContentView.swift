@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var state = AppState()
+    @StateObject private var state = AppState()
 
-    @State var tabSelection: TabSelection = .subscriptions
+    @State private var tabSelection: TabSelection = .subscriptions
 
     var body: some View {
         NavigationView {

@@ -27,17 +27,17 @@ struct VideosView: View {
     }
 
     func openChannelButton(from video: Video) -> some View {
-        Button("\(video.author) Channel", action: {
+        Button("\(video.author) Channel") {
             state.openChannel(from: video)
             tabSelection = .channel
-        })
+        }
     }
 
     func closeChannelButton(name: String) -> some View {
-        Button("Close \(name) Channel", action: {
+        Button("Close \(name) Channel") {
             tabSelection = .popular
             state.closeChannel()
-        })
+        }
     }
 
     var listRowInsets: EdgeInsets {

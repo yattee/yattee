@@ -16,10 +16,10 @@ struct PopularVideosView: View {
     }
 
     var videos: [Video] {
-        if (provider.videos.isEmpty) {
+        if provider.videos.isEmpty {
             provider.load()
         }
-        
+
         return provider.videos
     }
 }

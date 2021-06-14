@@ -16,6 +16,6 @@ struct SubscriptionsView: View {
     }
 
     var videos: [Video] {
-        return provider.videos
+        provider.videos
     }
 }

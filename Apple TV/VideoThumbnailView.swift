@@ -67,16 +67,16 @@ struct VideoThumbnailView: View {
     }
 }
 
-struct VideoThumbnailView_Previews: PreviewProvider {
-    static var previews: some View {
-        VideoThumbnailView(video: Video(
-            id: "A",
-            title: "A very very long text which",
-            thumbnailURL: URL(string: "https://invidious.home.arekf.net/vi/yXohcxCKqvo/maxres.jpg")!,
-            author: "Bear",
-            length: 240,
-            published: "2 days ago",
-            channelID: ""
-        )).frame(maxWidth: 350)
-    }
-}
+// struct VideoThumbnailView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        VideoThumbnailView(video: Video(
+//            id: "A",
+//            title: "A very very long text which",
+//            thumbnailURL: URL(string: "https://invidious.home.arekf.net/vi/yXohcxCKqvo/maxres.jpg")!,
+//            author: "Bear",
+//            length: 240,
+//            published: "2 days ago",
+//            channelID: ""
+//        )).frame(maxWidth: 350)
+//    }
+// }

@@ -2,7 +2,7 @@ import Alamofire
 import Foundation
 import SwiftyJSON
 
-class SubscriptionVideosProvider: DataProvider {
+final class SubscriptionVideosProvider: DataProvider {
     @Published var videos = [Video]()
 
     var sid: String = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="

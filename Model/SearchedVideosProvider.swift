@@ -1,13 +1,28 @@
 import Foundation
 import SwiftyJSON
 
-class SearchedVideosProvider: DataProvider {
+final class SearchedVideosProvider: DataProvider {
     @Published var videos = [Video]()
 
-    var query: String = ""
+    var currentQuery: String = ""
 
-    func load() {
-        let searchPath = "search?q=\(query.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!)"
+    func load(_ query: String) {
+        var newQuery = query
+
+        if let url = URLComponents(string: query),
+           let queryItem = url.queryItems?.first(where: { item in item.name == "v" }),
+           let id = queryItem.value
+        {
+            newQuery = id
+        }
+
+        if newQuery == currentQuery {
+            return
+        }
+
+        currentQuery = newQuery
+
+        let searchPath = "search?q=\(currentQuery.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!)"
         DataProvider.request(searchPath).responseJSON { response in
             switch response.result {
             case let .success(value):

@@ -1,4 +1,5 @@
 import Alamofire
+import AVKit
 import Foundation
 import SwiftyJSON
 
@@ -10,11 +11,9 @@ final class Video: Identifiable, ObservableObject {
     var length: TimeInterval
     var published: String
     var views: Int
-
     var channelID: String
 
-    @Published var url: URL?
-    @Published var error: Bool = false
+    var streams = [Stream]()
 
     init(
         id: String,
@@ -23,8 +22,8 @@ final class Video: Identifiable, ObservableObject {
         author: String,
         length: TimeInterval,
         published: String,
-        channelID: String,
-        views: Int = 0
+        views: Int,
+        channelID: String
     ) {
         self.id = id
         self.title = title
@@ -32,41 +31,22 @@ final class Video: Identifiable, ObservableObject {
         self.author = author
         self.length = length
         self.published = published
-        self.channelID = channelID
         self.views = views
+        self.channelID = channelID
     }
 
     init(_ json: JSON) {
-        func extractThumbnailURL(from details: JSON) -> URL? {
-            if details["videoThumbnails"].arrayValue.isEmpty {
-                return nil
-            }
-
-            let thumbnail = details["videoThumbnails"].arrayValue.first(where: { $0["quality"].stringValue == "medium" })!
-            return thumbnail["url"].url!
-        }
-
-        func extractFormatStreamURL(from streams: [JSON]) -> URL? {
-            if streams.isEmpty {
-                error = true
-                return nil
-            }
-
-            let stream = streams.last!
-
-            return stream["url"].url
-        }
-
         id = json["videoId"].stringValue
         title = json["title"].stringValue
-        thumbnailURL = extractThumbnailURL(from: json)
         author = json["author"].stringValue
         length = json["lengthSeconds"].doubleValue
         published = json["publishedText"].stringValue
         views = json["viewCount"].intValue
         channelID = json["authorId"].stringValue
+        thumbnailURL = extractThumbnailURL(from: json)
 
-        url = extractFormatStreamURL(from: json["formatStreams"].arrayValue)
+        streams = extractFormatStreams(from: json["formatStreams"].arrayValue)
+        streams.append(contentsOf: extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
     }
 
     var playTime: String? {
@@ -96,5 +76,61 @@ final class Video: Identifiable, ObservableObject {
         }
 
         return "\(formatter.string(from: number)!)\(unit)"
+    }
+
+    var selectableStreams: [Stream] {
+        let streams = streams.sorted { $0.resolution > $1.resolution }
+        var selectable = [Stream]()
+
+        StreamResolution.allCases.forEach { resolution in
+            if let stream = streams.filter({ $0.resolution == resolution }).min(by: { $0.type < $1.type }) {
+                selectable.append(stream)
+            }
+        }
+
+        return selectable
+    }
+
+    var defaultStream: Stream? {
+        selectableStreams.first { $0.type == .stream }
+    }
+
+    private func extractThumbnailURL(from details: JSON) -> URL? {
+        if details["videoThumbnails"].arrayValue.isEmpty {
+            return nil
+        }
+
+        let thumbnail = details["videoThumbnails"].arrayValue.first { $0["quality"].stringValue == "medium" }!
+        return thumbnail["url"].url!
+    }
+
+    private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
+        streams.map {
+            MuxedStream(
+                muxedAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
+                resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
+                type: .stream,
+                encoding: $0["encoding"].stringValue
+            )
+        }
+    }
+
+    private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
+        let audioAssetURL = streams.first { $0["type"].stringValue.starts(with: "audio/mp4") }
+        guard audioAssetURL != nil else {
+            return []
+        }
+
+        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/mp4") && $0["encoding"].stringValue == "h264" }
+
+        return videoAssetsURLs.map {
+            Stream(
+                audioAsset: AVURLAsset(url: DataProvider.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
+                videoAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
+                resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
+                type: .adaptive,
+                encoding: $0["encoding"].stringValue
+            )
+        }
     }
 }

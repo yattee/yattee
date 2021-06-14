@@ -14,19 +14,7 @@ struct SearchView: View {
     }
 
     var videos: [Video] {
-        var newQuery = query
-
-        if let url = URLComponents(string: query),
-           let queryItem = url.queryItems?.first(where: { item in item.name == "v" }),
-           let id = queryItem.value
-        {
-            newQuery = id
-        }
-
-        if newQuery != provider.query {
-            provider.query = newQuery
-            provider.load()
-        }
+        provider.load(query)
 
         return provider.videos
     }

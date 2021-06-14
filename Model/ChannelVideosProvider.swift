@@ -1,13 +1,15 @@
 import Foundation
 import SwiftyJSON
 
-class ChannelVideosProvider: DataProvider {
+final class ChannelVideosProvider: DataProvider {
     @Published var videos = [Video]()
 
     var channelID: String? = ""
 
     func load() {
-        guard channelID != nil else { return }
+        guard channelID != nil else {
+            return
+        }
 
         let searchPath = "channels/\(channelID!)"
         DataProvider.request(searchPath).responseJSON { response in

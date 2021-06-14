@@ -1,6 +1,7 @@
+import AVFoundation
 import Foundation
 
-class AppState: ObservableObject {
+final class AppState: ObservableObject {
     @Published var showingChannel = false
     @Published var channelID: String = ""
     @Published var channel: String = ""
