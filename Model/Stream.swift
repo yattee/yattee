@@ -31,6 +31,10 @@ class Stream: Equatable {
         assets.allSatisfy { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
     }
 
+    var loadedAssets: [AVURLAsset] {
+        assets.filter { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
+    }
+
     func cancelLoadingAssets() {
         assets.forEach { $0.cancelLoading() }
         audioAsset = AVURLAsset(url: audioAsset.url)

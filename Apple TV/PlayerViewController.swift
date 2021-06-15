@@ -4,33 +4,23 @@ import Logging
 import SwiftUI
 
 struct PlayerViewController: UIViewControllerRepresentable {
-    @ObservedObject private var state = PlayerState()
-    @ObservedObject var video: Video
-
-    var player = AVPlayer()
-    var composition = AVMutableComposition()
-
     let logger = Logger(label: "net.arekf.Pearvidious.pvc")
 
-    var playerItem: AVPlayerItem {
-        let playerItem = AVPlayerItem(asset: composition)
+    @ObservedObject private var state: PlayerState
 
-        playerItem.externalMetadata = [makeMetadataItem(.commonIdentifierTitle, value: video.title)]
-        playerItem.preferredForwardBufferDuration = 10
-
-        return playerItem
-    }
+    var video: Video
 
     init(video: Video) {
         self.video = video
+        state = PlayerState(video)
 
-        loadStream(video.defaultStream)
+        loadStream(video.defaultStream, loadBest: false)
     }
 
-    func loadStream(_ stream: Stream?) {
+    func loadStream(_ stream: Stream?, loadBest: Bool = false) {
         if stream != state.streamToLoad {
             state.loadStream(stream)
-            addTracksAndLoadAssets(state.streamToLoad, loadBest: true)
+            addTracksAndLoadAssets(stream!, loadBest: loadBest)
         }
     }
 
@@ -52,61 +42,48 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    func addTrack(_ asset: AVURLAsset, type: AVMediaType) {
-        guard let assetTrack = asset.tracks(withMediaType: type).first else {
-            return
+    func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
+        let types: [AVMediaType] = stream.type == .adaptive ? [type!] : [.video, .audio]
+
+        types.forEach { type in
+            guard let assetTrack = asset.tracks(withMediaType: type).first else {
+                return
+            }
+
+            if let track = state.composition.tracks(withMediaType: type).first {
+                logger.info("removing \(type) track")
+                state.composition.removeTrack(track)
+            }
+
+            let track = state.composition.addMutableTrack(withMediaType: type, preferredTrackID: kCMPersistentTrackID_Invalid)!
+
+            try! track.insertTimeRange(
+                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
+                of: assetTrack,
+                at: .zero
+            )
+
+            logger.info("inserted \(type) track")
         }
-
-        if let track = composition.tracks(withMediaType: type).first {
-            logger.info("removing \(type) track")
-            composition.removeTrack(track)
-        }
-
-        let track = composition.addMutableTrack(withMediaType: type, preferredTrackID: kCMPersistentTrackID_Invalid)!
-
-        try! track.insertTimeRange(
-            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
-            of: assetTrack,
-            at: .zero
-        )
-
-        logger.info("inserted \(type) track")
     }
 
     func handleAssetLoad(_ stream: Stream, type: AVMediaType, loadBest: Bool = false) {
         logger.info("handling asset load: \(stream.type), \(stream.description)")
+
         guard stream != state.currentStream else {
             logger.warning("IGNORING assets loaded: \(stream.type), \(stream.description)")
             return
         }
 
-        let loadedAssets = stream.assets.filter { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
-
-        loadedAssets.forEach { asset in
-            logger.info("both assets loaded: \(stream.type), \(stream.description)")
-
-            if stream.type == .stream {
-                addTrack(asset, type: .video)
-                addTrack(asset, type: .audio)
-            } else {
-                addTrack(asset, type: type)
-            }
+        stream.loadedAssets.forEach { asset in
+            addTrack(asset, stream: stream, type: type)
 
             if stream.assetsLoaded {
-                let resumeAt = player.currentTime()
-                if resumeAt.seconds > 0 {
-                    state.seekTo = resumeAt
+                DispatchQueue.main.async {
+                    logger.info("ALL assets loaded: \(stream.type), \(stream.description)")
+
+                    state.loadStreamIntoPlayer(stream)
                 }
-
-                logger.warning("replacing player item")
-                player.replaceCurrentItem(with: playerItem)
-                state.streamDidLoad(stream)
-
-                if let time = state.seekTo {
-                    player.seek(to: time)
-                }
-
-                player.play()
 
                 if loadBest {
                     loadBestStream()
@@ -115,22 +92,12 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
-        let item = AVMutableMetadataItem()
-
-        item.identifier = identifier
-        item.value = value as? NSCopying & NSObjectProtocol
-        item.extendedLanguageTag = "und"
-
-        return item.copy() as! AVMetadataItem
-    }
-
     func makeUIViewController(context _: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
 
         controller.transportBarCustomMenuItems = [streamingQualityMenu]
         controller.modalPresentationStyle = .fullScreen
-        controller.player = player
+        controller.player = state.player
         controller.player?.automaticallyWaitsToMinimizeStalling = true
 
         return controller
@@ -157,13 +124,11 @@ struct PlayerViewController: UIViewControllerRepresentable {
             let image = self.state.currentStream == stream ? UIImage(systemName: "checkmark") : nil
 
             return UIAction(title: stream.description, image: image) { _ in
-                DispatchQueue.main.async {
-                    guard state.currentStream != stream else {
-                        return
-                    }
-                    state.streamToLoad = stream
-                    addTracksAndLoadAssets(state.streamToLoad)
+                guard state.currentStream != stream else {
+                    return
                 }
+
+                loadStream(stream)
             }
         }
     }

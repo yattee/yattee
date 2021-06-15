@@ -9,8 +9,4 @@ final class AudioVideoStream: Stream {
 
         super.init(audioAsset: avAsset, videoAsset: avAsset, resolution: resolution, type: type, encoding: encoding)
     }
-
-    override var assets: [AVURLAsset] {
-        [videoAsset]
-    }
 }
