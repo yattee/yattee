@@ -1,5 +1,6 @@
 import AVKit
 import Foundation
+import Logging
 import SwiftUI
 
 struct PlayerViewController: UIViewControllerRepresentable {
@@ -9,93 +10,107 @@ struct PlayerViewController: UIViewControllerRepresentable {
     var player = AVPlayer()
     var composition = AVMutableComposition()
 
-    var audioTrack: AVMutableCompositionTrack {
-        composition.tracks(withMediaType: .audio).first ?? composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)!
-    }
-
-    var videoTrack: AVMutableCompositionTrack {
-        composition.tracks(withMediaType: .video).first ?? composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)!
-    }
+    let logger = Logger(label: "net.arekf.Pearvidious.pvc")
 
     var playerItem: AVPlayerItem {
         let playerItem = AVPlayerItem(asset: composition)
 
         playerItem.externalMetadata = [makeMetadataItem(.commonIdentifierTitle, value: video.title)]
+        playerItem.preferredForwardBufferDuration = 10
 
         return playerItem
     }
 
     init(video: Video) {
         self.video = video
-        state.currentStream = video.defaultStream
 
-        addTracksAndLoadAssets(state.currentStream!)
+        loadStream(video.defaultStream)
     }
 
-    func addTracksAndLoadAssets(_ stream: Stream) {
-        composition.removeTrack(audioTrack)
-        composition.removeTrack(videoTrack)
+    func loadStream(_ stream: Stream?) {
+        if stream != state.streamToLoad {
+            state.loadStream(stream)
+            addTracksAndLoadAssets(state.streamToLoad, loadBest: true)
+        }
+    }
 
-        let keys = ["playable"]
-
-        stream.audioAsset.loadValuesAsynchronously(forKeys: keys) {
-            DispatchQueue.main.async {
-                guard let track = stream.audioAsset.tracks(withMediaType: .audio).first else {
-                    return
-                }
-
-                try? audioTrack.insertTimeRange(
-                    CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
-                    of: track,
-                    at: .zero
-                )
-
-                handleAssetLoad(stream)
-            }
+    func loadBestStream() {
+        guard state.currentStream != video.bestStream else {
+            return
         }
 
-        stream.videoAsset.loadValuesAsynchronously(forKeys: keys) {
-            DispatchQueue.main.async {
-                guard let track = stream.videoAsset.tracks(withMediaType: .video).first else {
-                    return
-                }
+        loadStream(video.bestStream)
+    }
 
-                try? videoTrack.insertTimeRange(
-                    CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
-                    of: track,
-                    at: .zero
-                )
+    func addTracksAndLoadAssets(_ stream: Stream, loadBest: Bool = false) {
+        logger.info("adding tracks and loading assets for: \(stream.type), \(stream.description)")
 
-                handleAssetLoad(stream)
+        stream.assets.forEach { asset in
+            asset.loadValuesAsynchronously(forKeys: ["playable"]) {
+                handleAssetLoad(stream, type: asset == stream.videoAsset ? .video : .audio, loadBest: loadBest)
             }
         }
     }
 
-    func handleAssetLoad(_ stream: Stream) {
-        var error: NSError?
-        let status = stream.videoAsset.statusOfValue(forKey: "playable", error: &error)
+    func addTrack(_ asset: AVURLAsset, type: AVMediaType) {
+        guard let assetTrack = asset.tracks(withMediaType: type).first else {
+            return
+        }
 
-        switch status {
-        case .loaded:
-            let resumeAt = player.currentTime()
+        if let track = composition.tracks(withMediaType: type).first {
+            logger.info("removing \(type) track")
+            composition.removeTrack(track)
+        }
 
-            if resumeAt.seconds > 0 {
-                state.seekTo = resumeAt
+        let track = composition.addMutableTrack(withMediaType: type, preferredTrackID: kCMPersistentTrackID_Invalid)!
+
+        try! track.insertTimeRange(
+            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
+            of: assetTrack,
+            at: .zero
+        )
+
+        logger.info("inserted \(type) track")
+    }
+
+    func handleAssetLoad(_ stream: Stream, type: AVMediaType, loadBest: Bool = false) {
+        logger.info("handling asset load: \(stream.type), \(stream.description)")
+        guard stream != state.currentStream else {
+            logger.warning("IGNORING assets loaded: \(stream.type), \(stream.description)")
+            return
+        }
+
+        let loadedAssets = stream.assets.filter { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
+
+        loadedAssets.forEach { asset in
+            logger.info("both assets loaded: \(stream.type), \(stream.description)")
+
+            if stream.type == .stream {
+                addTrack(asset, type: .video)
+                addTrack(asset, type: .audio)
+            } else {
+                addTrack(asset, type: type)
             }
 
-            state.currentStream = stream
+            if stream.assetsLoaded {
+                let resumeAt = player.currentTime()
+                if resumeAt.seconds > 0 {
+                    state.seekTo = resumeAt
+                }
 
-            player.replaceCurrentItem(with: playerItem)
+                logger.warning("replacing player item")
+                player.replaceCurrentItem(with: playerItem)
+                state.streamDidLoad(stream)
 
-            if let time = state.seekTo {
-                player.seek(to: time)
-            }
+                if let time = state.seekTo {
+                    player.seek(to: time)
+                }
 
-            player.play()
+                player.play()
 
-        default:
-            if error != nil {
-                print("loading error: \(error!)")
+                if loadBest {
+                    loadBestStream()
+                }
             }
         }
     }
@@ -116,16 +131,25 @@ struct PlayerViewController: UIViewControllerRepresentable {
         controller.transportBarCustomMenuItems = [streamingQualityMenu]
         controller.modalPresentationStyle = .fullScreen
         controller.player = player
+        controller.player?.automaticallyWaitsToMinimizeStalling = true
 
         return controller
     }
 
     func updateUIViewController(_ controller: AVPlayerViewController, context _: Context) {
-        controller.transportBarCustomMenuItems = [streamingQualityMenu]
+        var items: [UIMenuElement] = []
+
+        if state.streamToLoad != nil {
+            items.append(actionsMenu)
+        }
+
+        items.append(streamingQualityMenu)
+
+        controller.transportBarCustomMenuItems = items
     }
 
     var streamingQualityMenu: UIMenu {
-        UIMenu(title: "Streaming quality", image: UIImage(systemName: "4k.tv"), children: streamingQualityMenuActions)
+        UIMenu(title: "Streaming quality", image: UIImage(systemName: "waveform"), children: streamingQualityMenuActions)
     }
 
     var streamingQualityMenuActions: [UIAction] {
@@ -134,8 +158,25 @@ struct PlayerViewController: UIViewControllerRepresentable {
 
             return UIAction(title: stream.description, image: image) { _ in
                 DispatchQueue.main.async {
-                    addTracksAndLoadAssets(stream)
+                    guard state.currentStream != stream else {
+                        return
+                    }
+                    state.streamToLoad = stream
+                    addTracksAndLoadAssets(state.streamToLoad)
                 }
+            }
+        }
+    }
+
+    var actionsMenu: UIMenu {
+        UIMenu(title: "Actions", image: UIImage(systemName: "bolt.horizontal.fill"), children: [cancelLoadingAction])
+    }
+
+    var cancelLoadingAction: UIAction {
+        UIAction(title: "Cancel loading \(state.streamToLoad.description) stream") { _ in
+            DispatchQueue.main.async {
+                state.streamToLoad.cancelLoadingAssets()
+                state.cancelLoadingStream(state.streamToLoad)
             }
         }
     }

@@ -23,6 +23,20 @@ class Stream: Equatable {
         "\(resolution.height)p"
     }
 
+    var assets: [AVURLAsset] {
+        [audioAsset, videoAsset]
+    }
+
+    var assetsLoaded: Bool {
+        assets.allSatisfy { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
+    }
+
+    func cancelLoadingAssets() {
+        assets.forEach { $0.cancelLoading() }
+        audioAsset = AVURLAsset(url: audioAsset.url)
+        videoAsset = AVURLAsset(url: videoAsset.url)
+    }
+
     static func == (lhs: Stream, rhs: Stream) -> Bool {
         lhs.resolution == rhs.resolution && lhs.type == rhs.type
     }

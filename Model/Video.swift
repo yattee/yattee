@@ -95,6 +95,10 @@ final class Video: Identifiable, ObservableObject {
         selectableStreams.first { $0.type == .stream }
     }
 
+    var bestStream: Stream? {
+        selectableStreams.min { $0.resolution > $1.resolution }
+    }
+
     private func extractThumbnailURL(from details: JSON) -> URL? {
         if details["videoThumbnails"].arrayValue.isEmpty {
             return nil
@@ -106,8 +110,8 @@ final class Video: Identifiable, ObservableObject {
 
     private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
-            MuxedStream(
-                muxedAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
+            AudioVideoStream(
+                avAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
                 resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
                 type: .stream,
                 encoding: $0["encoding"].stringValue
