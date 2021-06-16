@@ -7,15 +7,14 @@ final class PlayerState: ObservableObject {
 
     var video: Video
 
+    @Published private(set) var player: AVPlayer! = AVPlayer()
+    private(set) var composition = AVMutableComposition()
     @Published private(set) var currentStream: Stream!
-    @Published var streamToLoad: Stream!
 
-    @Published var savedTime: CMTime?
+    @Published private(set) var streamToLoad: Stream!
+    @Published private(set) var streamLoading = false
 
-    @Published var streamLoading = false
-
-    @Published var player = AVPlayer()
-    var composition = AVMutableComposition()
+    @Published private(set) var savedTime: CMTime?
 
     var playerItem: AVPlayerItem {
         let playerItem = AVPlayerItem(asset: composition)
@@ -30,15 +29,9 @@ final class PlayerState: ObservableObject {
         self.video = video
     }
 
-    func cancelLoadingStream(_ stream: Stream) {
-        guard streamToLoad == stream else {
-            return
-        }
-
-        streamToLoad = nil
-        streamLoading = false
-
-        logger.info("cancel streamToLoad: \(streamToLoad?.description ?? "nil"), streamLoading \(streamLoading)")
+    deinit {
+        print("destr deinit")
+        destroyPlayer()
     }
 
     func loadStream(_ stream: Stream?) {
@@ -57,7 +50,6 @@ final class PlayerState: ObservableObject {
 
     func streamDidLoad(_ stream: Stream?) {
         logger.info("didload stream: \(stream!.description)")
-        logger.info("before: toLoad: \(streamToLoad?.description ?? "nil"), current \(currentStream?.description ?? "nil"), loading \(streamLoading)")
 
         currentStream = stream
         streamLoading = streamToLoad != stream
@@ -65,22 +57,39 @@ final class PlayerState: ObservableObject {
         if streamToLoad == stream {
             streamToLoad = nil
         }
-
-        logger.info("after: toLoad: \(streamToLoad?.description ?? "nil"), current \(currentStream?.description ?? "nil"), loading \(streamLoading)")
     }
 
-    func loadStreamIntoPlayer(_ stream: Stream) {
+    func cancelLoadingStream(_ stream: Stream) {
+        guard streamToLoad == stream else {
+            return
+        }
+
+        streamToLoad = nil
+        streamLoading = false
+
+        logger.info("cancel streamToLoad: \(streamToLoad?.description ?? "nil"), streamLoading \(streamLoading)")
+    }
+
+    func playStream(_ stream: Stream) {
+        guard player != nil else {
+            return
+        }
+
         logger.warning("loading \(stream.description) to player")
 
-        beforeLoadStreamIntoPlayer()
+        saveTime()
 
         player.replaceCurrentItem(with: playerItem)
         streamDidLoad(stream)
 
-        afterLoadStreamIntoPlayer()
+        seekToSavedTime()
     }
 
-    func beforeLoadStreamIntoPlayer() {
+    func saveTime() {
+        guard player != nil else {
+            return
+        }
+
         let currentTime = player.currentTime()
 
         guard currentTime.seconds > 0 else {
@@ -90,12 +99,28 @@ final class PlayerState: ObservableObject {
         savedTime = currentTime
     }
 
-    func afterLoadStreamIntoPlayer() {
+    func seekToSavedTime() {
+        guard player != nil else {
+            return
+        }
+
         if let time = savedTime {
             player.seek(to: time)
         }
 
         player.play()
+    }
+
+    func destroyPlayer() {
+        logger.critical("destroying player")
+
+        player.currentItem?.tracks.forEach { $0.assetTrack?.asset?.cancelLoading() }
+
+        currentStream?.cancelLoadingAssets()
+        streamToLoad?.cancelLoadingAssets()
+
+        player.cancelPendingPrerolls()
+        player.replaceCurrentItem(with: nil)
     }
 
     private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {

@@ -14,25 +14,17 @@ struct PlayerViewController: UIViewControllerRepresentable {
         self.video = video
         state = PlayerState(video)
 
-        loadStream(video.defaultStream, loadBest: false)
+        loadStream(video.defaultStream, loadBest: true)
     }
 
-    func loadStream(_ stream: Stream?, loadBest: Bool = false) {
+    fileprivate func loadStream(_ stream: Stream?, loadBest: Bool = false) {
         if stream != state.streamToLoad {
             state.loadStream(stream)
             addTracksAndLoadAssets(stream!, loadBest: loadBest)
         }
     }
 
-    func loadBestStream() {
-        guard state.currentStream != video.bestStream else {
-            return
-        }
-
-        loadStream(video.bestStream)
-    }
-
-    func addTracksAndLoadAssets(_ stream: Stream, loadBest: Bool = false) {
+    fileprivate func addTracksAndLoadAssets(_ stream: Stream, loadBest: Bool = false) {
         logger.info("adding tracks and loading assets for: \(stream.type), \(stream.description)")
 
         stream.assets.forEach { asset in
@@ -42,7 +34,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
+    fileprivate func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
         let types: [AVMediaType] = stream.type == .adaptive ? [type!] : [.video, .audio]
 
         types.forEach { type in
@@ -67,7 +59,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    func handleAssetLoad(_ stream: Stream, type: AVMediaType, loadBest: Bool = false) {
+    fileprivate func handleAssetLoad(_ stream: Stream, type: AVMediaType, loadBest: Bool = false) {
         logger.info("handling asset load: \(stream.type), \(stream.description)")
 
         guard stream != state.currentStream else {
@@ -82,7 +74,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
                 DispatchQueue.main.async {
                     logger.info("ALL assets loaded: \(stream.type), \(stream.description)")
 
-                    state.loadStreamIntoPlayer(stream)
+                    state.playStream(stream)
                 }
 
                 if loadBest {
@@ -92,18 +84,28 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    func makeUIViewController(context _: Context) -> AVPlayerViewController {
-        let controller = AVPlayerViewController()
+    fileprivate func loadBestStream() {
+        guard state.currentStream != video.bestStream else {
+            return
+        }
 
-        controller.transportBarCustomMenuItems = [streamingQualityMenu]
+        loadStream(video.bestStream)
+    }
+
+    func makeUIViewController(context _: Context) -> StreamAVPlayerViewController {
+        let controller = StreamAVPlayerViewController()
+        controller.state = state
+
+        #if os(tvOS)
+            controller.transportBarCustomMenuItems = [streamingQualityMenu]
+        #endif
         controller.modalPresentationStyle = .fullScreen
         controller.player = state.player
-        controller.player?.automaticallyWaitsToMinimizeStalling = true
 
         return controller
     }
 
-    func updateUIViewController(_ controller: AVPlayerViewController, context _: Context) {
+    func updateUIViewController(_ controller: StreamAVPlayerViewController, context _: Context) {
         var items: [UIMenuElement] = []
 
         if state.streamToLoad != nil {
@@ -112,14 +114,16 @@ struct PlayerViewController: UIViewControllerRepresentable {
 
         items.append(streamingQualityMenu)
 
-        controller.transportBarCustomMenuItems = items
+        #if os(tvOS)
+            controller.transportBarCustomMenuItems = items
+        #endif
     }
 
-    var streamingQualityMenu: UIMenu {
+    fileprivate var streamingQualityMenu: UIMenu {
         UIMenu(title: "Streaming quality", image: UIImage(systemName: "waveform"), children: streamingQualityMenuActions)
     }
 
-    var streamingQualityMenuActions: [UIAction] {
+    fileprivate var streamingQualityMenuActions: [UIAction] {
         video.selectableStreams.map { stream in
             let image = self.state.currentStream == stream ? UIImage(systemName: "checkmark") : nil
 
@@ -133,11 +137,11 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
-    var actionsMenu: UIMenu {
+    fileprivate var actionsMenu: UIMenu {
         UIMenu(title: "Actions", image: UIImage(systemName: "bolt.horizontal.fill"), children: [cancelLoadingAction])
     }
 
-    var cancelLoadingAction: UIAction {
+    fileprivate var cancelLoadingAction: UIAction {
         UIAction(title: "Cancel loading \(state.streamToLoad.description) stream") { _ in
             DispatchQueue.main.async {
                 state.streamToLoad.cancelLoadingAssets()

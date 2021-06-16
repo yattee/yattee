@@ -37,8 +37,6 @@ class Stream: Equatable {
 
     func cancelLoadingAssets() {
         assets.forEach { $0.cancelLoading() }
-        audioAsset = AVURLAsset(url: audioAsset.url)
-        videoAsset = AVURLAsset(url: videoAsset.url)
     }
 
     static func == (lhs: Stream, rhs: Stream) -> Bool {

@@ -20,7 +20,6 @@ struct VideoThumbnailView: View {
                                 .frame(width: 320, height: 180)
                         }
                         .mask(RoundedRectangle(cornerRadius: 12))
-                        .frame(width: 320, height: 180)
                     } else {
                         Image(systemName: "exclamationmark.square")
                     }

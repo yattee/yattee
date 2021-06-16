@@ -10,16 +10,22 @@ struct PlayerView: View {
     }
 
     var body: some View {
-        ZStack {
-            if let video = provider.video {
-                PlayerViewController(video: video)
-                    .edgesIgnoringSafeArea(.all)
-            }
+        VStack {
+            pvc?
+                .edgesIgnoringSafeArea(.all)
         }
         .task {
             async {
                 provider.load()
             }
         }
+    }
+
+    var pvc: PlayerViewController? {
+        guard provider.video != nil else {
+            return nil
+        }
+
+        return PlayerViewController(video: provider.video!)
     }
 }
