@@ -50,6 +50,10 @@ final class Video: Identifiable, ObservableObject {
     }
 
     var playTime: String? {
+        guard !length.isZero else {
+            return nil
+        }
+
         let formatter = DateComponentsFormatter()
 
         formatter.unitsStyle = .positional

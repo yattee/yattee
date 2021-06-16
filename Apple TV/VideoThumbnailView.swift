@@ -42,8 +42,10 @@ struct VideoThumbnailView: View {
                             Image(systemName: "calendar")
                             Text(video.published)
 
-                            Image(systemName: "eye")
-                            Text(video.viewsCount)
+                            if video.views != 0 {
+                                Image(systemName: "eye")
+                                Text(video.viewsCount)
+                            }
                         }
                         .foregroundColor(.secondary)
                         .padding(.top)
@@ -53,10 +55,12 @@ struct VideoThumbnailView: View {
                     Spacer()
 
                     HStack(spacing: 8) {
-                        Image(systemName: "clock")
+                        if let time = video.playTime {
+                            Image(systemName: "clock")
 
-                        Text(video.playTime ?? "-")
-                            .fontWeight(.bold)
+                            Text(time)
+                                .fontWeight(.bold)
+                        }
                     }
                     .foregroundColor(.secondary)
                 }
