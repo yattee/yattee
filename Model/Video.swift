@@ -12,28 +12,10 @@ final class Video: Identifiable, ObservableObject {
     var published: String
     var views: Int
     var channelID: String
+    var description: String
+    var genre: String
 
     var streams = [Stream]()
-
-    init(
-        id: String,
-        title: String,
-        thumbnailURL: URL?,
-        author: String,
-        length: TimeInterval,
-        published: String,
-        views: Int,
-        channelID: String
-    ) {
-        self.id = id
-        self.title = title
-        self.thumbnailURL = thumbnailURL
-        self.author = author
-        self.length = length
-        self.published = published
-        self.views = views
-        self.channelID = channelID
-    }
 
     init(_ json: JSON) {
         id = json["videoId"].stringValue
@@ -43,6 +25,9 @@ final class Video: Identifiable, ObservableObject {
         published = json["publishedText"].stringValue
         views = json["viewCount"].intValue
         channelID = json["authorId"].stringValue
+        description = json["description"].stringValue
+        genre = json["genre"].stringValue
+
         thumbnailURL = extractThumbnailURL(from: json)
 
         streams = extractFormatStreams(from: json["formatStreams"].arrayValue)

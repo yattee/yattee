@@ -14,23 +14,34 @@ final class PlayerState: ObservableObject {
     @Published private(set) var streamToLoad: Stream!
     @Published private(set) var streamLoading = false
 
+    @Published private(set) var currentTime: CMTime?
     @Published private(set) var savedTime: CMTime?
+    @Published var currentSegment: Segment?
 
     var playerItem: AVPlayerItem {
         let playerItem = AVPlayerItem(asset: composition)
 
-        playerItem.externalMetadata = [makeMetadataItem(.commonIdentifierTitle, value: video.title)]
+        playerItem.externalMetadata = [
+            makeMetadataItem(.commonIdentifierTitle, value: video.title),
+            makeMetadataItem(.quickTimeMetadataGenre, value: video.genre),
+            makeMetadataItem(.commonIdentifierDescription, value: video.description)
+        ]
         playerItem.preferredForwardBufferDuration = 10
 
         return playerItem
     }
 
+    var segmentsProvider: SponsorBlockSegmentsProvider
+    var timeObserver: Any?
+
     init(_ video: Video) {
         self.video = video
+        segmentsProvider = SponsorBlockSegmentsProvider(video.id)
+
+        segmentsProvider.load()
     }
 
     deinit {
-        print("destr deinit")
         destroyPlayer()
     }
 
@@ -51,12 +62,15 @@ final class PlayerState: ObservableObject {
     func streamDidLoad(_ stream: Stream?) {
         logger.info("didload stream: \(stream!.description)")
 
+        currentStream?.cancelLoadingAssets()
         currentStream = stream
         streamLoading = streamToLoad != stream
 
         if streamToLoad == stream {
             streamToLoad = nil
         }
+
+        addTimeObserver()
     }
 
     func cancelLoadingStream(_ stream: Stream) {
@@ -121,6 +135,18 @@ final class PlayerState: ObservableObject {
 
         player.cancelPendingPrerolls()
         player.replaceCurrentItem(with: nil)
+
+        if timeObserver != nil {
+            player.removeTimeObserver(timeObserver!)
+        }
+    }
+
+    func addTimeObserver() {
+        let interval = CMTime(value: 1, timescale: 1)
+        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
+            self.currentTime = time
+            self.currentSegment = self.segmentsProvider.segments.first { $0.timeInSegment(time) }
+        }
     }
 
     private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {

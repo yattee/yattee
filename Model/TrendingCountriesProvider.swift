@@ -13,6 +13,6 @@ final class TrendingCountriesProvider: DataProvider {
         }
 
         self.query = query
-        countries = Country.searchByName(query)
+        countries = Country.search(query)
     }
 }

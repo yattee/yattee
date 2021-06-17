@@ -521,10 +521,18 @@ extension Country {
         return result
     }
 
-    static func searchByName(_ name: String) -> [Country] {
-        let countries = filteredCountries { stringFolding($0) == stringFolding(name) }
+    static func search(_ query: String) -> [Country] {
+        if let country = searchByCode(query) {
+            return [country]
+        }
 
-        return countries.isEmpty ? searchByPartialName(name) : countries
+        let countries = filteredCountries { stringFolding($0) == stringFolding(query) }
+
+        return countries.isEmpty ? searchByPartialName(query) : countries
+    }
+
+    static func searchByCode(_ code: String) -> Country? {
+        Country(rawValue: code.uppercased())
     }
 
     static func searchByPartialName(_ name: String) -> [Country] {
@@ -540,7 +548,8 @@ extension Country {
     }
 
     private static func filteredCountries(_ predicate: (String) -> Bool) -> [Country] {
-        Country.allCases.map { $0.name }
+        Country.allCases
+            .map { $0.name }
             .filter(predicate)
             .compactMap { string in Country.allCases.first { $0.name == string } }
     }

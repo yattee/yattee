@@ -82,6 +82,9 @@
 		37B767DC2677C3CA0098BAA8 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerState.swift */; };
 		37B767DD2677C3CA0098BAA8 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerState.swift */; };
 		37B767E02678C5BF0098BAA8 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 37B767DF2678C5BF0098BAA8 /* Logging */; };
+		37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
+		37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
+		37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
 		37C7A9042679059200E721B4 /* AVKeyValueStatus+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A9032679059200E721B4 /* AVKeyValueStatus+String.swift */; };
 		37C7A905267905AE00E721B4 /* AVKeyValueStatus+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A9032679059200E721B4 /* AVKeyValueStatus+String.swift */; };
 		37C7A906267905AF00E721B4 /* AVKeyValueStatus+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A9032679059200E721B4 /* AVKeyValueStatus+String.swift */; };
@@ -128,6 +131,12 @@
 		37D4B1B42672A30700C925CA /* VideoDetailsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */; };
 		37D4B1B52672A30700C925CA /* VideoDetailsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */; };
 		37D4B1B62672A30700C925CA /* VideoDetailsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */; };
+		37EAD86B267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift */; };
+		37EAD86C267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift */; };
+		37EAD86D267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift */; };
+		37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
+		37EAD870267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
+		37EAD871267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,6 +186,7 @@
 		37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionVideosProvider.swift; sourceTree = "<group>"; };
 		37AAF29F26741C97007FC770 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		37B767DA2677C3CA0098BAA8 /* PlayerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerState.swift; sourceTree = "<group>"; };
+		37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSegment.swift; sourceTree = "<group>"; };
 		37C7A9032679059200E721B4 /* AVKeyValueStatus+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVKeyValueStatus+String.swift"; sourceTree = "<group>"; };
 		37CEE4B42677B628005A1EFE /* StreamType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamType.swift; sourceTree = "<group>"; };
 		37CEE4B82677B63F005A1EFE /* StreamResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamResolution.swift; sourceTree = "<group>"; };
@@ -202,6 +212,8 @@
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37D4B1AF2672A01000C925CA /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetailsProvider.swift; sourceTree = "<group>"; };
+		37EAD86A267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSegmentsProvider.swift; sourceTree = "<group>"; };
+		37EAD86E267B9ED100D9E01B /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,16 +388,19 @@
 				37B767DA2677C3CA0098BAA8 /* PlayerState.swift */,
 				37D4B19226717CE100C925CA /* PopularVideosProvider.swift */,
 				37AAF2812673791F007FC770 /* SearchedVideosProvider.swift */,
+				37EAD86E267B9ED100D9E01B /* Segment.swift */,
+				37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */,
+				37EAD86A267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift */,
 				37CEE4C02677B697005A1EFE /* Stream.swift */,
 				37CEE4B82677B63F005A1EFE /* StreamResolution.swift */,
 				37CEE4B42677B628005A1EFE /* StreamType.swift */,
 				37AAF29B26741B5F007FC770 /* SubscriptionVideosProvider.swift */,
+				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 				3714167A267AA1CF006CA35D /* TrendingCountriesProvider.swift */,
 				37141676267A9AAD006CA35D /* TrendingState.swift */,
+				3714167E267AB55D006CA35D /* TrendingVideosProvider.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
 				37D4B1B32672A30700C925CA /* VideoDetailsProvider.swift */,
-				3714167E267AB55D006CA35D /* TrendingVideosProvider.swift */,
-				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -639,6 +654,7 @@
 				37D4B19326717CE100C925CA /* PopularVideosProvider.swift in Sources */,
 				37AAF29C26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37141668267A83F9006CA35D /* StreamAVPlayerViewController.swift in Sources */,
+				37EAD86B267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */,
 				377FC7E6267A085600A6BBAF /* PlayerView.swift in Sources */,
 				37CEE4C12677B697005A1EFE /* Stream.swift in Sources */,
 				37141677267A9AAD006CA35D /* TrendingState.swift in Sources */,
@@ -646,6 +662,7 @@
 				377FC7DC267A081800A6BBAF /* PopularVideosView.swift in Sources */,
 				3714167F267AB55D006CA35D /* TrendingVideosProvider.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
+				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
 				37CEE4B52677B628005A1EFE /* StreamType.swift in Sources */,
 				3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoThumbnailView.swift in Sources */,
@@ -657,6 +674,7 @@
 				377FC7E9267A085D00A6BBAF /* PlayerViewController.swift in Sources */,
 				377FC7E5267A084E00A6BBAF /* SearchView.swift in Sources */,
 				377FC7E1267A082600A6BBAF /* ChannelView.swift in Sources */,
+				37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37C7A9042679059200E721B4 /* AVKeyValueStatus+String.swift in Sources */,
 				37B767DB2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
 				37D4B1B42672A30700C925CA /* VideoDetailsProvider.swift in Sources */,
@@ -678,6 +696,7 @@
 				37D4B19426717CE100C925CA /* PopularVideosProvider.swift in Sources */,
 				37AAF29D26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37141669267A83F9006CA35D /* StreamAVPlayerViewController.swift in Sources */,
+				37EAD86C267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */,
 				377FC7E7267A085600A6BBAF /* PlayerView.swift in Sources */,
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
 				37141678267A9AAD006CA35D /* TrendingState.swift in Sources */,
@@ -685,6 +704,7 @@
 				377FC7DD267A081A00A6BBAF /* PopularVideosView.swift in Sources */,
 				37141680267AB55D006CA35D /* TrendingVideosProvider.swift in Sources */,
 				3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */,
+				37EAD870267B9ED100D9E01B /* Segment.swift in Sources */,
 				37CEE4B62677B628005A1EFE /* StreamType.swift in Sources */,
 				37141670267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				377FC7E2267A084A00A6BBAF /* VideoThumbnailView.swift in Sources */,
@@ -696,6 +716,7 @@
 				377FC7E8267A085D00A6BBAF /* PlayerViewController.swift in Sources */,
 				377FC7E4267A084E00A6BBAF /* SearchView.swift in Sources */,
 				377FC7E0267A082600A6BBAF /* ChannelView.swift in Sources */,
+				37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37C7A906267905AF00E721B4 /* AVKeyValueStatus+String.swift in Sources */,
 				37B767DC2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
 				37D4B1B52672A30700C925CA /* VideoDetailsProvider.swift in Sources */,
@@ -730,6 +751,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37AAF28026737550007FC770 /* SearchView.swift in Sources */,
+				37EAD871267B9ED100D9E01B /* Segment.swift in Sources */,
 				37CEE4BF2677B670005A1EFE /* AudioVideoStream.swift in Sources */,
 				37CEE4B72677B628005A1EFE /* StreamType.swift in Sources */,
 				3714166A267A83F9006CA35D /* StreamAVPlayerViewController.swift in Sources */,
@@ -742,6 +764,7 @@
 				37D4B1B22672A01000C925CA /* DataProvider.swift in Sources */,
 				37141671267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				37AAF29226740715007FC770 /* AppState.swift in Sources */,
+				37EAD86D267B9C5600D9E01B /* SponsorBlockSegmentsProvider.swift in Sources */,
 				3705B17C267B4D9A00704544 /* VisualEffectView.swift in Sources */,
 				3741B5302676213400125C5E /* PlayerViewController.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
@@ -751,6 +774,7 @@
 				37AAF27E26737323007FC770 /* PopularVideosView.swift in Sources */,
 				37AAF29A26740A01007FC770 /* VideosView.swift in Sources */,
 				37AAF2962674086B007FC770 /* TabSelection.swift in Sources */,
+				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				37AAF28A2673AB89007FC770 /* ChannelView.swift in Sources */,
 				37AAF28E2673ABD3007FC770 /* ChannelVideosProvider.swift in Sources */,

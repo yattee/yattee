@@ -117,6 +117,14 @@ struct PlayerViewController: UIViewControllerRepresentable {
         #if os(tvOS)
             controller.transportBarCustomMenuItems = items
         #endif
+
+        if let skip = skipSegmentAction {
+            if controller.contextualActions.isEmpty {
+                controller.contextualActions = [skip]
+            }
+        } else {
+            controller.contextualActions = []
+        }
     }
 
     fileprivate var streamingQualityMenu: UIMenu {
@@ -146,6 +154,18 @@ struct PlayerViewController: UIViewControllerRepresentable {
             DispatchQueue.main.async {
                 state.streamToLoad.cancelLoadingAssets()
                 state.cancelLoadingStream(state.streamToLoad)
+            }
+        }
+    }
+
+    private var skipSegmentAction: UIAction? {
+        if state.currentSegment == nil {
+            return nil
+        }
+
+        return UIAction(title: "Skip \(state.currentSegment!.title())") { _ in
+            DispatchQueue.main.async {
+                state.player.seek(to: state.currentSegment!.skipTo)
             }
         }
     }
