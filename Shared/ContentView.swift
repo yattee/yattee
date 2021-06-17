@@ -1,32 +1,39 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var state = AppState()
+    @ObservedObject private var state = AppState()
+    @StateObject private var trendingState = TrendingState()
 
-    @State private var tabSelection: TabSelection = .subscriptions
+    @State private var tabSelection = TabSelection.popular
 
     var body: some View {
         NavigationView {
             TabView(selection: $tabSelection) {
-                SubscriptionsView(state: state, tabSelection: $tabSelection)
+                SubscriptionsView(tabSelection: $tabSelection)
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
 
-                PopularVideosView(state: state, tabSelection: $tabSelection)
+                PopularVideosView(tabSelection: $tabSelection)
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 
                 if state.showingChannel {
-                    ChannelView(state: state, tabSelection: $tabSelection)
+                    ChannelView(tabSelection: $tabSelection)
                         .tabItem { Text("\(state.channel) Channel") }
                         .tag(TabSelection.channel)
                 }
 
-                SearchView(state: state, tabSelection: $tabSelection)
+                TrendingView(tabSelection: $tabSelection)
+                    .tabItem { Text("Trending") }
+                    .tag(TabSelection.trending)
+
+                SearchView(tabSelection: $tabSelection)
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }
         }
+        .environmentObject(state)
+        .environmentObject(trendingState)
     }
 }
 

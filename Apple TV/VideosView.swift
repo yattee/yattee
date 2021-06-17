@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct VideosView: View {
-    @ObservedObject var state: AppState
+    @EnvironmentObject private var state: AppState
 
     @Binding var tabSelection: TabSelection
 

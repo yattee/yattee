@@ -1,6 +1,6 @@
 import AVKit
 
-class StreamAVPlayerViewController: AVPlayerViewController {
+final class StreamAVPlayerViewController: AVPlayerViewController {
     var state: PlayerState?
 
     override func viewWillDisappear(_ animated: Bool) {

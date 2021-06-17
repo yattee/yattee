@@ -2,14 +2,14 @@ import SwiftUI
 
 struct SearchView: View {
     @ObservedObject private var provider = SearchedVideosProvider()
-    @ObservedObject var state: AppState
+    @EnvironmentObject private var state: AppState
 
     @Binding var tabSelection: TabSelection
 
-    @State var query = ""
+    @State private var query = ""
 
     var body: some View {
-        VideosView(state: state, tabSelection: $tabSelection, videos: videos)
+        VideosView(tabSelection: $tabSelection, videos: videos)
             .searchable(text: $query)
     }
 

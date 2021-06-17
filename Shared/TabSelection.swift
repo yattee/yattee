@@ -1,5 +1,5 @@
 import Foundation
 
 enum TabSelection {
-    case subscriptions, popular, channel, search
+    case subscriptions, popular, trending, channel, search
 }

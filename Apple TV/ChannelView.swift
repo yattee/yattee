@@ -2,12 +2,12 @@ import SwiftUI
 
 struct ChannelView: View {
     @ObservedObject private var provider = ChannelVideosProvider()
-    @ObservedObject var state: AppState
+    @EnvironmentObject private var state: AppState
 
     @Binding var tabSelection: TabSelection
 
     var body: some View {
-        VideosView(state: state, tabSelection: $tabSelection, videos: videos)
+        VideosView(tabSelection: $tabSelection, videos: videos)
     }
 
     var listRowInsets: EdgeInsets {
