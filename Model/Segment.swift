@@ -9,6 +9,18 @@ class Segment: ObservableObject, Hashable {
     let uuid: String
     let videoDuration: Int
 
+    var start: Double {
+        segment.first!
+    }
+
+    var end: Double {
+        segment.last!
+    }
+
+    var duration: Double {
+        end - start
+    }
+
     init(category: String, segment: [Double], uuid: String, videoDuration: Int) {
         self.category = category
         self.segment = segment
@@ -17,11 +29,11 @@ class Segment: ObservableObject, Hashable {
     }
 
     func timeInSegment(_ time: CMTime) -> Bool {
-        (segment.first! ... segment.last!).contains(time.seconds)
+        (start ... end).contains(time.seconds)
     }
 
     var skipTo: CMTime {
-        CMTime(seconds: segment.last!, preferredTimescale: 1)
+        CMTime(seconds: segment.last!, preferredTimescale: 1000)
     }
 
     func hash(into hasher: inout Hasher) {

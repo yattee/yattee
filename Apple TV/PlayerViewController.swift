@@ -18,7 +18,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
     }
 
     fileprivate func loadStream(_ stream: Stream?, loadBest: Bool = false) {
-        if stream != state.streamToLoad {
+        if stream != state.nextStream {
             state.loadStream(stream)
             addTracksAndLoadAssets(stream!, loadBest: loadBest)
         }
@@ -31,31 +31,6 @@ struct PlayerViewController: UIViewControllerRepresentable {
             asset.loadValuesAsynchronously(forKeys: ["playable"]) {
                 handleAssetLoad(stream, type: asset == stream.videoAsset ? .video : .audio, loadBest: loadBest)
             }
-        }
-    }
-
-    fileprivate func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
-        let types: [AVMediaType] = stream.type == .adaptive ? [type!] : [.video, .audio]
-
-        types.forEach { type in
-            guard let assetTrack = asset.tracks(withMediaType: type).first else {
-                return
-            }
-
-            if let track = state.composition.tracks(withMediaType: type).first {
-                logger.info("removing \(type) track")
-                state.composition.removeTrack(track)
-            }
-
-            let track = state.composition.addMutableTrack(withMediaType: type, preferredTrackID: kCMPersistentTrackID_Invalid)!
-
-            try! track.insertTimeRange(
-                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1)),
-                of: assetTrack,
-                at: .zero
-            )
-
-            logger.info("inserted \(type) track")
         }
     }
 
@@ -84,6 +59,12 @@ struct PlayerViewController: UIViewControllerRepresentable {
         }
     }
 
+    fileprivate func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
+        let types: [AVMediaType] = stream.type == .adaptive ? [type!] : [.video, .audio]
+
+        types.forEach { state.addTrackToNextComposition(asset, type: $0) }
+    }
+
     fileprivate func loadBestStream() {
         guard state.currentStream != video.bestStream else {
             return
@@ -108,7 +89,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ controller: StreamAVPlayerViewController, context _: Context) {
         var items: [UIMenuElement] = []
 
-        if state.streamToLoad != nil {
+        if state.nextStream != nil {
             items.append(actionsMenu)
         }
 
@@ -116,15 +97,15 @@ struct PlayerViewController: UIViewControllerRepresentable {
 
         #if os(tvOS)
             controller.transportBarCustomMenuItems = items
-        #endif
 
-        if let skip = skipSegmentAction {
-            if controller.contextualActions.isEmpty {
-                controller.contextualActions = [skip]
+            if let skip = skipSegmentAction {
+                if controller.contextualActions.isEmpty {
+                    controller.contextualActions = [skip]
+                }
+            } else {
+                controller.contextualActions = []
             }
-        } else {
-            controller.contextualActions = []
-        }
+        #endif
     }
 
     fileprivate var streamingQualityMenu: UIMenu {
@@ -150,10 +131,10 @@ struct PlayerViewController: UIViewControllerRepresentable {
     }
 
     fileprivate var cancelLoadingAction: UIAction {
-        UIAction(title: "Cancel loading \(state.streamToLoad.description) stream") { _ in
+        UIAction(title: "Cancel loading \(state.nextStream.description) stream") { _ in
             DispatchQueue.main.async {
-                state.streamToLoad.cancelLoadingAssets()
-                state.cancelLoadingStream(state.streamToLoad)
+                state.nextStream.cancelLoadingAssets()
+                state.cancelLoadingStream(state.nextStream)
             }
         }
     }
