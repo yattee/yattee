@@ -88,6 +88,14 @@ final class Video: Identifiable, ObservableObject {
         selectableStreams.min { $0.resolution > $1.resolution }
     }
 
+    func streamWithResolution(_ resolution: StreamResolution) -> Stream? {
+        selectableStreams.first { $0.resolution == resolution }
+    }
+
+    func defaultStreamForProfile(_ profile: Profile) -> Stream? {
+        streamWithResolution(profile.defaultStreamResolution.value)
+    }
+
     private func extractThumbnailURL(from details: JSON) -> URL? {
         if details["videoThumbnails"].arrayValue.isEmpty {
             return nil

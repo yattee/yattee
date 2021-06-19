@@ -5,10 +5,10 @@ import SwiftyJSON
 final class SubscriptionVideosProvider: DataProvider {
     @Published var videos = [Video]()
 
-    var sid: String = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
+    let profile = Profile()
 
     func load() {
-        let headers = HTTPHeaders([HTTPHeader(name: "Cookie", value: "SID=\(sid)")])
+        let headers = HTTPHeaders([HTTPHeader(name: "Cookie", value: "SID=\(profile.sid)")])
         DataProvider.request("auth/feed", headers: headers).responseJSON { response in
             switch response.result {
             case let .success(value):

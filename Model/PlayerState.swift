@@ -12,8 +12,6 @@ final class PlayerState: ObservableObject {
     @Published private(set) var composition = AVMutableComposition()
     @Published private(set) var nextComposition = AVMutableComposition()
 
-    private var comp: AVMutableComposition?
-
     @Published private(set) var currentStream: Stream!
 
     @Published private(set) var nextStream: Stream!
@@ -23,6 +21,11 @@ final class PlayerState: ObservableObject {
     @Published private(set) var savedTime: CMTime?
 
     @Published var currentSegment: Segment?
+
+    private var profile = Profile()
+
+    @Published private(set) var currentRate: Float = 0.0
+    static let availablePlaybackRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
     var playerItem: AVPlayerItem {
         let playerItem = AVPlayerItem(asset: composition)
@@ -115,6 +118,8 @@ final class PlayerState: ObservableObject {
         player.replaceCurrentItem(with: playerItem)
         streamDidLoad(stream)
 
+        player.play()
+
         seekToSavedTime()
     }
 
@@ -179,10 +184,9 @@ final class PlayerState: ObservableObject {
         }
 
         if let time = savedTime {
+            logger.info("seeking to \(time.seconds)")
             player.seek(to: time)
         }
-
-        player.play()
     }
 
     func destroyPlayer() {
@@ -205,7 +209,22 @@ final class PlayerState: ObservableObject {
         let interval = CMTime(value: 1, timescale: 1)
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
             self.currentTime = time
-            self.currentSegment = self.segmentsProvider.segments.first { $0.timeInSegment(time) }
+
+            let currentSegment = self.segmentsProvider.segments.first { $0.timeInSegment(time) }
+
+            if let segment = currentSegment {
+                if self.profile.skippedSegmentsCategories.contains(segment.category) {
+                    if segment.shouldSkip(self.currentTime!) {
+                        self.player.seek(to: segment.skipTo)
+                    }
+                }
+            }
+
+            if self.player.rate != self.currentRate, self.player.rate != 0, self.currentRate != 0 {
+                self.player.rate = self.currentRate
+            }
+
+            self.currentSegment = currentSegment
         }
     }
 
@@ -217,5 +236,10 @@ final class PlayerState: ObservableObject {
         item.extendedLanguageTag = "und"
 
         return item.copy() as! AVMetadataItem
+    }
+
+    func setPlayerRate(_ rate: Float) {
+        currentRate = rate
+        player.rate = rate
     }
 }

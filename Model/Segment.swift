@@ -47,4 +47,8 @@ class Segment: ObservableObject, Hashable {
     func title() -> String {
         category
     }
+
+    func shouldSkip(_ atTime: CMTime) -> Bool {
+        atTime.seconds - start < 2 && end - atTime.seconds > 2
+    }
 }

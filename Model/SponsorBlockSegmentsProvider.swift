@@ -3,7 +3,7 @@ import Foundation
 import SwiftyJSON
 
 final class SponsorBlockSegmentsProvider: ObservableObject {
-    let categories = ["sponsor", "selfpromo", "outro", "intro", "music_offtopic", "interaction"]
+    static let categories = ["sponsor", "selfpromo", "outro", "intro", "music_offtopic", "interaction"]
 
     @Published var video: Video?
 
@@ -29,7 +29,7 @@ final class SponsorBlockSegmentsProvider: ObservableObject {
     private var parameters: [String: String] {
         [
             "videoID": id,
-            "categories": JSON(categories).rawString(String.Encoding.utf8)!,
+            "categories": JSON(SponsorBlockSegmentsProvider.categories).rawString(String.Encoding.utf8)!,
         ]
     }
 }

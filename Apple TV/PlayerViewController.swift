@@ -8,13 +8,15 @@ struct PlayerViewController: UIViewControllerRepresentable {
 
     @ObservedObject private var state: PlayerState
 
+    @ObservedObject private var profile = Profile()
+
     var video: Video
 
     init(video: Video) {
         self.video = video
         state = PlayerState(video)
 
-        loadStream(video.defaultStream, loadBest: true)
+        loadStream(video.defaultStreamForProfile(profile), loadBest: profile.defaultStreamResolution == .hd720pFirstThenBest)
     }
 
     fileprivate func loadStream(_ stream: Stream?, loadBest: Bool = false) {
@@ -93,6 +95,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
             items.append(actionsMenu)
         }
 
+        items.append(playbackRateMenu)
         items.append(streamingQualityMenu)
 
         #if os(tvOS)
@@ -147,6 +150,30 @@ struct PlayerViewController: UIViewControllerRepresentable {
         return UIAction(title: "Skip \(state.currentSegment!.title())") { _ in
             DispatchQueue.main.async {
                 state.player.seek(to: state.currentSegment!.skipTo)
+            }
+        }
+    }
+
+    private var playbackRateMenu: UIMenu {
+        UIMenu(title: "Playback rate", image: UIImage(systemName: playbackRateMenuImageSystemName), children: playbackRateMenuActions)
+    }
+
+    private var playbackRateMenuImageSystemName: String {
+        if [0.0, 1.0].contains(state.player.rate) {
+            return "speedometer"
+        }
+
+        return state.player.rate < 1.0 ? "tortoise.fill" : "hare.fill"
+    }
+
+    private var playbackRateMenuActions: [UIAction] {
+        PlayerState.availablePlaybackRates.map { rate in
+            let image = state.currentRate == Float(rate) ? UIImage(systemName: "checkmark") : nil
+
+            return UIAction(title: "\(rate)x", image: image) { _ in
+                DispatchQueue.main.async {
+                    state.setPlayerRate(Float(rate))
+                }
             }
         }
     }

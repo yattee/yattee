@@ -1,7 +1,7 @@
 import Foundation
 
 enum StreamResolution: String, CaseIterable, Comparable {
-    case hd_1080p, hd_720p, sd_480p, sd_360p, sd_240p, sd_144p
+    case hd1080p, hd720p, sd480p, sd360p, sd240p, sd144p
 
     var height: Int {
         Int(rawValue.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())!
