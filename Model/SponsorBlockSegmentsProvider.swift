@@ -29,7 +29,7 @@ final class SponsorBlockSegmentsProvider: ObservableObject {
     private var parameters: [String: String] {
         [
             "videoID": id,
-            "categories": JSON(SponsorBlockSegmentsProvider.categories).rawString(String.Encoding.utf8)!,
+            "categories": JSON(SponsorBlockSegmentsProvider.categories).rawString(String.Encoding.utf8)!
         ]
     }
 }

@@ -6,7 +6,6 @@ struct TrendingView: View {
 
     @Binding var tabSelection: TabSelection
 
-    @ObservedObject private var countriesProvider = TrendingCountriesProvider()
     @ObservedObject private var videosProvider = TrendingVideosProvider()
 
     @State private var selectingCategory = false
@@ -32,7 +31,7 @@ struct TrendingView: View {
                         selectingCountry.toggle()
                     }
                     .fullScreenCover(isPresented: $selectingCountry) {
-                        TrendingCountrySelectionView(provider: countriesProvider, selectedCountry: $trendingState.country)
+                        TrendingCountrySelectionView(selectedCountry: $trendingState.country)
                     }
 
                     Spacer()

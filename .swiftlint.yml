@@ -1,1 +1,9 @@
 parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
+
+disabled_rules:
+  - opening_brace
+
+excluded:
+  - Tests Apple TV
+  - Tests iOS
+  - Tests macOS

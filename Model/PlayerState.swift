@@ -33,7 +33,7 @@ final class PlayerState: ObservableObject {
         var externalMetadata = [
             makeMetadataItem(.commonIdentifierTitle, value: video.title),
             makeMetadataItem(.quickTimeMetadataGenre, value: video.genre),
-            makeMetadataItem(.commonIdentifierDescription, value: video.description),
+            makeMetadataItem(.commonIdentifierDescription, value: video.description)
         ]
 
         if let thumbnailData = try? Data(contentsOf: video.thumbnailURL!),

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TrendingCountrySelectionView: View {
     @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var provider: TrendingCountriesProvider
+    @ObservedObject private var provider = TrendingCountriesProvider()
 
     @State private var query: String = ""
     @Binding var selectedCountry: Country
