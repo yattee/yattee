@@ -10,6 +10,7 @@ struct SearchView: View {
 
     var body: some View {
         VideosView(tabSelection: $tabSelection, videos: videos)
+            .environmentObject(state)
             .searchable(text: $query)
     }
 

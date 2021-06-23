@@ -7,7 +7,7 @@ struct ChannelView: View {
     @Binding var tabSelection: TabSelection
 
     var body: some View {
-        VideosView(tabSelection: $tabSelection, videos: videos)
+        VideosListView(tabSelection: $tabSelection, videos: videos)
     }
 
     var listRowInsets: EdgeInsets {

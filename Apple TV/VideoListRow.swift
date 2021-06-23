@@ -2,7 +2,7 @@ import SwiftUI
 import URLImage
 import URLImageStore
 
-struct VideoThumbnailView: View {
+struct VideoListRow: View {
     @Environment(\.isFocused) private var focused: Bool
 
     var video: Video

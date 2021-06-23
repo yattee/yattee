@@ -7,6 +7,14 @@ final class Profile: ObservableObject {
 
     // let sid = "B3_WzklziGu8JKefihLrCsTNavdj73KMiPUBfN5HW2M="
     let sid = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
+
+    let listing = VideoListing.cells
+
+    let cellsColumns = 3
+}
+
+enum VideoListing: String {
+    case list, cells
 }
 
 enum DefaultStreamResolution: String {

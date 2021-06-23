@@ -15,7 +15,7 @@ struct PlayerView: View {
                 .edgesIgnoringSafeArea(.all)
         }
         .task {
-            async {
+            Task.init {
                 provider.load()
             }
         }
