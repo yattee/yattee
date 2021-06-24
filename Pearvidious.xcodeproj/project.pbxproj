@@ -35,6 +35,9 @@
 		37141680267AB55D006CA35D /* TrendingVideosProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714167E267AB55D006CA35D /* TrendingVideosProvider.swift */; };
 		37141681267AB55D006CA35D /* TrendingVideosProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714167E267AB55D006CA35D /* TrendingVideosProvider.swift */; };
 		3741B5302676213400125C5E /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741B52F2676213400125C5E /* PlayerViewController.swift */; };
+		376578852685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
+		376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
+		376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
 		377FC7D3267A080300A6BBAF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D2267A080300A6BBAF /* Alamofire */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
 		377FC7D7267A080300A6BBAF /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D6267A080300A6BBAF /* URLImage */; };
@@ -191,6 +194,7 @@
 		3714167A267AA1CF006CA35D /* TrendingCountriesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountriesProvider.swift; sourceTree = "<group>"; };
 		3714167E267AB55D006CA35D /* TrendingVideosProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingVideosProvider.swift; sourceTree = "<group>"; };
 		3741B52F2676213400125C5E /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
+		376578842685429C00D4EA09 /* CaseIterable+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaseIterable+Next.swift"; sourceTree = "<group>"; };
 		37AAF27D26737323007FC770 /* PopularVideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopularVideosView.swift; sourceTree = "<group>"; };
 		37AAF27F26737550007FC770 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		37AAF2812673791F007FC770 /* SearchedVideosProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchedVideosProvider.swift; sourceTree = "<group>"; };
@@ -307,6 +311,7 @@
 			isa = PBXGroup;
 			children = (
 				37C7A9032679059200E721B4 /* AVKeyValueStatus+String.swift */,
+				376578842685429C00D4EA09 /* CaseIterable+Next.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -683,6 +688,7 @@
 				377FC7E6267A085600A6BBAF /* PlayerView.swift in Sources */,
 				37CEE4C12677B697005A1EFE /* Stream.swift in Sources */,
 				37F4AE7226828F0900BD60EA /* VideosCellsView.swift in Sources */,
+				376578852685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37141677267A9AAD006CA35D /* TrendingState.swift in Sources */,
 				37C7A1D9267CACE60010EAD6 /* VisualEffectView.swift in Sources */,
 				37D4B0E62671614900C925CA /* ContentView.swift in Sources */,
@@ -746,6 +752,7 @@
 				37AAF28D2673ABD3007FC770 /* ChannelVideosProvider.swift in Sources */,
 				377FC7E8267A085D00A6BBAF /* PlayerViewController.swift in Sources */,
 				377FC7E4267A084E00A6BBAF /* SearchView.swift in Sources */,
+				376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37F4AE7326828F0900BD60EA /* VideosCellsView.swift in Sources */,
 				377FC7E0267A082600A6BBAF /* ChannelView.swift in Sources */,
 				371231862683E7820000B307 /* VideosView.swift in Sources */,
@@ -794,6 +801,7 @@
 				37AAF29E26741B5F007FC770 /* SubscriptionVideosProvider.swift in Sources */,
 				37141679267A9AAD006CA35D /* TrendingState.swift in Sources */,
 				37F4AE7426828F0900BD60EA /* VideosCellsView.swift in Sources */,
+				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37D4B1842671684E00C925CA /* PlayerView.swift in Sources */,
 				37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */,
 				37141681267AB55D006CA35D /* TrendingVideosProvider.swift in Sources */,

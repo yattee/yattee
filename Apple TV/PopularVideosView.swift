@@ -8,7 +8,7 @@ struct PopularVideosView: View {
     var body: some View {
         VideosView(tabSelection: $tabSelection, videos: videos)
             .task {
-                Task.init {
+                Task {
                     provider.load()
                 }
             }

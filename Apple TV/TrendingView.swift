@@ -17,22 +17,9 @@ struct TrendingView: View {
                 HStack(alignment: .top) {
                     Spacer()
 
-                    Button(trendingState.category.name) {
-                        selectingCategory.toggle()
-                    }
-                    .fullScreenCover(isPresented: $selectingCategory) {
-                        TrendingCategorySelectionView(selectedCategory: $trendingState.category)
-                    }
-
-                    Text(trendingState.country.flag)
-                        .font(.system(size: 60))
-
-                    Button(trendingState.country.rawValue) {
-                        selectingCountry.toggle()
-                    }
-                    .fullScreenCover(isPresented: $selectingCountry) {
-                        TrendingCountrySelectionView(selectedCountry: $trendingState.country)
-                    }
+                    categoryButton
+                    countryFlag
+                    countryButton
 
                     Spacer()
                 }
@@ -47,5 +34,32 @@ struct TrendingView: View {
         videosProvider.load(category: trendingState.category, country: trendingState.country)
 
         return videosProvider.videos
+    }
+
+    var categoryButton: some View {
+        Button(trendingState.category.name) {
+            trendingState.category = trendingState.category.next()
+        }
+        .contextMenu {
+            ForEach(TrendingCategory.allCases) { category in
+                Button(category.name) {
+                    trendingState.category = category
+                }
+            }
+        }
+    }
+
+    var countryFlag: some View {
+        Text(trendingState.country.flag)
+            .font(.system(size: 60))
+    }
+
+    var countryButton: some View {
+        Button(trendingState.country.rawValue) {
+            selectingCountry.toggle()
+        }
+        .fullScreenCover(isPresented: $selectingCountry) {
+            TrendingCountrySelectionView(selectedCountry: $trendingState.country)
+        }
     }
 }
