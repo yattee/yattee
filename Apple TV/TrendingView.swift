@@ -3,8 +3,6 @@ import SwiftUI
 struct TrendingView: View {
     @EnvironmentObject private var state: AppState
 
-    @Binding var tabSelection: TabSelection
-
     @ObservedObject private var videosProvider = TrendingVideosProvider()
 
     @SceneStorage("category") var category: TrendingCategory = .default
@@ -26,7 +24,7 @@ struct TrendingView: View {
                 }
                 .scaleEffect(0.85)
 
-                VideosView(tabSelection: $tabSelection, videos: videos)
+                VideosView(videos: videos)
             }
         }
     }

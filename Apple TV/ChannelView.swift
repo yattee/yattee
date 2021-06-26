@@ -4,10 +4,8 @@ struct ChannelView: View {
     @ObservedObject private var provider = ChannelVideosProvider()
     @EnvironmentObject private var state: AppState
 
-    @Binding var tabSelection: TabSelection
-
     var body: some View {
-        VideosListView(tabSelection: $tabSelection, videos: videos)
+        VideosListView(videos: videos)
     }
 
     var listRowInsets: EdgeInsets {

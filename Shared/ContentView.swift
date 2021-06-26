@@ -1,37 +1,38 @@
+import Defaults
 import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var state = AppState()
     @ObservedObject private var profile = Profile()
 
-    @SceneStorage("tabSelection") var tabSelection = TabSelection.subscriptions
+    @Default(.tabSelection) var tabSelection
 
     var body: some View {
         NavigationView {
             TabView(selection: $tabSelection) {
-                SubscriptionsView(tabSelection: $tabSelection)
+                SubscriptionsView()
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
 
-                PopularVideosView(tabSelection: $tabSelection)
+                PopularVideosView()
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 
                 if state.showingChannel {
-                    ChannelView(tabSelection: $tabSelection)
+                    ChannelView()
                         .tabItem { Text("\(state.channel) Channel") }
                         .tag(TabSelection.channel)
                 }
 
-                TrendingView(tabSelection: $tabSelection)
+                TrendingView()
                     .tabItem { Text("Trending") }
                     .tag(TabSelection.trending)
 
-                PlaylistsView(tabSelection: $tabSelection)
+                PlaylistsView()
                     .tabItem { Text("Playlists") }
                     .tag(TabSelection.playlists)
 
-                SearchView(tabSelection: $tabSelection)
+                SearchView()
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }

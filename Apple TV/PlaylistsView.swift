@@ -3,8 +3,6 @@ import SwiftUI
 struct PlaylistsView: View {
     @EnvironmentObject private var state: AppState
 
-    @Binding var tabSelection: TabSelection
-
     @ObservedObject private var provider = PlaylistsProvider()
 
     @State private var selectedPlaylist: Playlist?
@@ -23,7 +21,7 @@ struct PlaylistsView: View {
 
                 VStack {
                     if selectedPlaylist != nil {
-                        VideosView(tabSelection: $tabSelection, videos: selectedPlaylist!.videos)
+                        VideosView(videos: selectedPlaylist!.videos)
                     }
                 }
             }

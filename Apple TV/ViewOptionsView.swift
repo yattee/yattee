@@ -1,32 +1,45 @@
+import Defaults
 import SwiftUI
 
 struct ViewOptionsView: View {
     @EnvironmentObject private var profile: Profile
 
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
+    @Default(.layout) var layout
 
     var body: some View {
-        ZStack {
-            VisualEffectView(effect: UIBlurEffect(style: .dark))
-
+        HStack {
             VStack {
                 Spacer()
 
-                ScrollView(.vertical) {
-                    Button(profile.listing == .list ? "Cells" : "List") {
-                        profile.listing = (profile.listing == .list ? .cells : .list)
-                        presentationMode.wrappedValue.dismiss()
+                HStack(alignment: .center) {
+                    Spacer()
+
+                    VStack {
+                        nextLayoutButton
+
+                        Button("Close") {
+                            dismiss()
+                        }
                     }
 
-                    Button("Close") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .frame(width: 800)
+                    Spacer()
                 }
+
                 Spacer()
             }
+
+            Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .edgesIgnoringSafeArea(.all)
+        .background(.thinMaterial)
+    }
+
+    var nextLayoutButton: some View {
+        Button(layout.next().name, action: nextLayout)
+    }
+
+    func nextLayout() {
+        Defaults[.layout] = layout.next()
+        dismiss()
     }
 }

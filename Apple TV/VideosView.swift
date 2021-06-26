@@ -1,17 +1,20 @@
+import Defaults
 import SwiftUI
 
 struct VideosView: View {
     @EnvironmentObject private var profile: Profile
 
-    @Binding var tabSelection: TabSelection
     var videos: [Video]
+
+    @Default(.layout) var layout
+    @Default(.tabSelection) var tabSelection
 
     @State private var showingViewOptions = false
 
     var body: some View {
         Section {
-            if self.profile.listing == .list {
-                VideosListView(tabSelection: $tabSelection, videos: videos)
+            if layout == .list {
+                VideosListView(videos: videos)
             } else {
                 VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
             }

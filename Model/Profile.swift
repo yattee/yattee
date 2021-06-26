@@ -1,20 +1,15 @@
+import Defaults
 import Foundation
 
 final class Profile: ObservableObject {
-    var defaultStreamResolution: DefaultStreamResolution = .hd720pFirstThenBest
+    var defaultStreamResolution: DefaultStreamResolution = .hd720p
 
     var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
 
     // var sid = "B3_WzklziGu8JKefihLrCsTNavdj73KMiPUBfN5HW2M="
     var sid = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
 
-    @Published var listing = VideoListing.cells
-
     var cellsColumns = 3
-}
-
-enum VideoListing: String {
-    case list, cells
 }
 
 enum DefaultStreamResolution: String {

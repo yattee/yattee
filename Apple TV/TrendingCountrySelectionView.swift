@@ -7,23 +7,20 @@ struct TrendingCountrySelectionView: View {
     @State private var query: String = ""
     @Binding var selectedCountry: Country
 
-    var body: some View {
-        ZStack {
-            VisualEffectView(effect: UIBlurEffect(style: .dark))
+    @Environment(\.dismiss) private var dismiss
 
-            ScrollView(.vertical) {
-                ForEach(countries) { country in
-                    Button(country.name) {
-                        selectedCountry = country
-                        presentationMode.wrappedValue.dismiss()
-                    }
+    var body: some View {
+        ScrollView(.vertical) {
+            ForEach(countries) { country in
+                Button(country.name) {
+                    selectedCountry = country
+                    presentationMode.wrappedValue.dismiss()
                 }
-                .frame(width: 800)
             }
-            .searchable(text: $query)
+            .frame(width: 800)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .edgesIgnoringSafeArea(.all)
+        .searchable(text: $query)
+        .background(.thinMaterial)
     }
 
     var countries: [Country] {

@@ -5,12 +5,10 @@ struct SearchView: View {
     @EnvironmentObject private var profile: Profile
     @EnvironmentObject private var state: AppState
 
-    @Binding var tabSelection: TabSelection
-
     @State private var query = ""
 
     var body: some View {
-        VideosView(tabSelection: $tabSelection, videos: videos)
+        VideosView(videos: videos)
             .environmentObject(state)
             .environmentObject(profile)
             .searchable(text: $query)

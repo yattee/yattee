@@ -1,9 +1,10 @@
+import Defaults
 import SwiftUI
 
 struct VideosListView: View {
     @EnvironmentObject private var state: AppState
 
-    @Binding var tabSelection: TabSelection
+    @Default(.tabSelection) var tabSelection
 
     var videos: [Video]
 
