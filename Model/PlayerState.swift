@@ -22,7 +22,7 @@ final class PlayerState: ObservableObject {
 
     @Published var currentSegment: Segment?
 
-    private var profile = Profile()
+    private(set) var profile = Profile()
 
     @Published private(set) var currentRate: Float = 0.0
     static let availablePlaybackRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]

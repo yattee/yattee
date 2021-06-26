@@ -6,8 +6,6 @@ final class AppState: ObservableObject {
     @Published var channelID: String = ""
     @Published var channel: String = ""
 
-    @Published var profile = Profile()
-
     func openChannel(from video: Video) {
         channel = video.author
         channelID = video.channelID

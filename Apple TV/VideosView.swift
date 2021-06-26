@@ -1,18 +1,22 @@
 import SwiftUI
 
 struct VideosView: View {
-    @EnvironmentObject private var state: AppState
+    @EnvironmentObject private var profile: Profile
 
     @Binding var tabSelection: TabSelection
     var videos: [Video]
 
+    @State private var showingViewOptions = false
+
     var body: some View {
-        Group {
-            if state.profile.listing == .list {
+        Section {
+            if self.profile.listing == .list {
                 VideosListView(tabSelection: $tabSelection, videos: videos)
             } else {
-                VideosCellsView(videos: videos, columns: state.profile.cellsColumns)
+                VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
             }
         }
+        .fullScreenCover(isPresented: $showingViewOptions) { ViewOptionsView() }
+        .onPlayPauseCommand { showingViewOptions.toggle() }
     }
 }

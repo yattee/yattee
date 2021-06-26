@@ -8,15 +8,13 @@ struct PlayerViewController: UIViewControllerRepresentable {
 
     @ObservedObject private var state: PlayerState
 
-    @ObservedObject private var profile = Profile()
-
     var video: Video
 
     init(video: Video) {
         self.video = video
         state = PlayerState(video)
 
-        loadStream(video.defaultStreamForProfile(profile), loadBest: profile.defaultStreamResolution == .hd720pFirstThenBest)
+        loadStream(video.defaultStreamForProfile(state.profile), loadBest: state.profile.defaultStreamResolution == .hd720pFirstThenBest)
     }
 
     fileprivate func loadStream(_ stream: Stream?, loadBest: Bool = false) {

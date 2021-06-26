@@ -1,16 +1,16 @@
 import Foundation
 
 final class Profile: ObservableObject {
-    let defaultStreamResolution: DefaultStreamResolution = .hd720pFirstThenBest
+    var defaultStreamResolution: DefaultStreamResolution = .hd720pFirstThenBest
 
-    let skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
+    var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
 
-    // let sid = "B3_WzklziGu8JKefihLrCsTNavdj73KMiPUBfN5HW2M="
-    let sid = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
+    // var sid = "B3_WzklziGu8JKefihLrCsTNavdj73KMiPUBfN5HW2M="
+    var sid = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
 
-    let listing = VideoListing.cells
+    @Published var listing = VideoListing.cells
 
-    let cellsColumns = 3
+    var cellsColumns = 3
 }
 
 enum VideoListing: String {

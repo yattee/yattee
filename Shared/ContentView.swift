@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var state = AppState()
+    @ObservedObject private var profile = Profile()
 
     @SceneStorage("tabSelection") var tabSelection = TabSelection.subscriptions
 
@@ -36,6 +37,7 @@ struct ContentView: View {
             }
         }
         .environmentObject(state)
+        .environmentObject(profile)
     }
 }
 

@@ -1,21 +1,19 @@
 import SwiftUI
 
 struct SubscriptionsView: View {
-    @ObservedObject private var provider = SubscriptionVideosProvider()
-    @EnvironmentObject private var state: AppState
-
     @Binding var tabSelection: TabSelection
+
+    @ObservedObject private var provider = SubscriptionVideosProvider()
 
     var body: some View {
         VideosView(tabSelection: $tabSelection, videos: videos)
-            .task {
-                Task {
-                    provider.load()
-                }
-            }
     }
 
     var videos: [Video] {
-        provider.videos
+        if provider.videos.isEmpty {
+            provider.load()
+        }
+
+        return provider.videos
     }
 }
