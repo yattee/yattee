@@ -13,7 +13,7 @@ struct VideosCellsView: View {
     var videos = [Video]()
 
     var body: some View {
-        ScrollView(.vertical) {
+        ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: items, spacing: 10) {
                 ForEach(videos) { video in
                     VideoCellView(video: video)

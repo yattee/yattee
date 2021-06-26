@@ -51,17 +51,21 @@ struct VideoCellView: View {
                         .frame(minHeight: 80, alignment: .top)
                         .truncationMode(.middle)
 
-                    HStack(spacing: 8) {
-                        Image(systemName: "calendar")
-                        Text(video.published)
+                    if !video.published.isEmpty || video.views != 0 {
+                        HStack(spacing: 8) {
+                            if !video.published.isEmpty {
+                                Image(systemName: "calendar")
+                                Text(video.published)
+                            }
 
-                        if video.views != 0 {
-                            Image(systemName: "eye")
-                            Text(video.viewsCount)
+                            if video.views != 0 {
+                                Image(systemName: "eye")
+                                Text(video.viewsCount)
+                            }
                         }
+                        .padding([.horizontal, .bottom])
+                        .foregroundColor(.secondary)
                     }
-                    .padding([.horizontal, .bottom])
-                    .foregroundColor(.secondary)
                 }
             }
             .frame(width: 550, alignment: .leading)

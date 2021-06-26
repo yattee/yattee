@@ -2,13 +2,14 @@ import SwiftUI
 
 struct TrendingView: View {
     @EnvironmentObject private var state: AppState
-    @EnvironmentObject private var trendingState: TrendingState
 
     @Binding var tabSelection: TabSelection
 
     @ObservedObject private var videosProvider = TrendingVideosProvider()
 
-    @State private var selectingCategory = false
+    @SceneStorage("category") var category: TrendingCategory = .default
+    @SceneStorage("country") var country: Country = .pl
+
     @State private var selectingCountry = false
 
     var body: some View {
@@ -31,35 +32,35 @@ struct TrendingView: View {
     }
 
     var videos: [Video] {
-        videosProvider.load(category: trendingState.category, country: trendingState.country)
+        videosProvider.load(category: category, country: country)
 
         return videosProvider.videos
     }
 
     var categoryButton: some View {
-        Button(trendingState.category.name) {
-            trendingState.category = trendingState.category.next()
+        Button(category.name) {
+            category = category.next()
         }
         .contextMenu {
             ForEach(TrendingCategory.allCases) { category in
                 Button(category.name) {
-                    trendingState.category = category
+                    self.category = category
                 }
             }
         }
     }
 
     var countryFlag: some View {
-        Text(trendingState.country.flag)
+        Text(country.flag)
             .font(.system(size: 60))
     }
 
     var countryButton: some View {
-        Button(trendingState.country.rawValue) {
+        Button(country.rawValue) {
             selectingCountry.toggle()
         }
         .fullScreenCover(isPresented: $selectingCountry) {
-            TrendingCountrySelectionView(selectedCountry: $trendingState.country)
+            TrendingCountrySelectionView(selectedCountry: $country)
         }
     }
 }

@@ -2,9 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var state = AppState()
-    @StateObject private var trendingState = TrendingState()
 
-    @State private var tabSelection = TabSelection.popular
+    @SceneStorage("tabSelection") var tabSelection = TabSelection.subscriptions
 
     var body: some View {
         NavigationView {
@@ -27,13 +26,16 @@ struct ContentView: View {
                     .tabItem { Text("Trending") }
                     .tag(TabSelection.trending)
 
+                PlaylistsView(tabSelection: $tabSelection)
+                    .tabItem { Text("Playlists") }
+                    .tag(TabSelection.playlists)
+
                 SearchView(tabSelection: $tabSelection)
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }
         }
         .environmentObject(state)
-        .environmentObject(trendingState)
     }
 }
 

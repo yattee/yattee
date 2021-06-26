@@ -1,5 +1,5 @@
 import Foundation
 
-enum TabSelection {
-    case subscriptions, popular, trending, channel, search
+enum TabSelection: String {
+    case subscriptions, popular, trending, playlists, channel, search
 }

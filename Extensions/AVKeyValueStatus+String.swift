@@ -1,5 +1,4 @@
 import AVFoundation
-import Foundation
 
 extension AVKeyValueStatus {
     var string: String {

@@ -38,17 +38,21 @@ struct VideoListRow: View {
                             .bold()
                             .lineLimit(1)
 
-                        HStack(spacing: 8) {
-                            Image(systemName: "calendar")
-                            Text(video.published)
+                        if !video.published.isEmpty || video.views != 0 {
+                            HStack(spacing: 8) {
+                                if !video.published.isEmpty {
+                                    Image(systemName: "calendar")
+                                    Text(video.published)
+                                }
 
-                            if video.views != 0 {
-                                Image(systemName: "eye")
-                                Text(video.viewsCount)
+                                if video.views != 0 {
+                                    Image(systemName: "eye")
+                                    Text(video.viewsCount)
+                                }
                             }
+                            .foregroundColor(.secondary)
+                            .padding(.top)
                         }
-                        .foregroundColor(.secondary)
-                        .padding(.top)
                     }
                     .padding()
 
