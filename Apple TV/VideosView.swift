@@ -12,11 +12,11 @@ struct VideosView: View {
     @State private var showingViewOptions = false
 
     var body: some View {
-        Section {
-            if layout == .list {
-                VideosListView(videos: videos)
-            } else {
+        VStack {
+            if layout == .cells {
                 VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
+            } else {
+                VideosListView(videos: videos)
             }
         }
         .fullScreenCover(isPresented: $showingViewOptions) { ViewOptionsView() }

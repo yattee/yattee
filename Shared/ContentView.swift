@@ -5,11 +5,9 @@ struct ContentView: View {
     @ObservedObject private var state = AppState()
     @ObservedObject private var profile = Profile()
 
-    @Default(.tabSelection) var tabSelection
-
     var body: some View {
         NavigationView {
-            TabView(selection: $tabSelection) {
+            TabView(selection: tabSelection) {
                 SubscriptionsView()
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
@@ -39,6 +37,13 @@ struct ContentView: View {
         }
         .environmentObject(state)
         .environmentObject(profile)
+    }
+
+    var tabSelection: Binding<TabSelection> {
+        Binding(
+            get: { Defaults[.tabSelection] },
+            set: { Defaults[.tabSelection] = $0 }
+        )
     }
 }
 
