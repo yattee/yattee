@@ -2,8 +2,6 @@ import Defaults
 import SwiftUI
 
 struct ViewOptionsView: View {
-    @EnvironmentObject private var profile: Profile
-
     @Environment(\.dismiss) private var dismiss
     @Default(.layout) var layout
 

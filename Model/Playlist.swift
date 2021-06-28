@@ -1,7 +1,7 @@
 import Foundation
 import SwiftyJSON
 
-final class Playlist: Identifiable, ObservableObject, Equatable, Hashable {
+struct Playlist: Identifiable, Equatable, Hashable {
     let id: String
     var title: String
     var description: String

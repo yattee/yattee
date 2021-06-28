@@ -3,7 +3,6 @@ import SwiftUI
 
 struct ContentView: View {
     @Default(.openChannel) var channel
-    @StateObject private var profile = Profile()
 
     var body: some View {
         NavigationView {
@@ -34,7 +33,6 @@ struct ContentView: View {
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }
-            .environmentObject(profile)
         }
     }
 

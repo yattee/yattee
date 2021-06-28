@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct VideosView: View {
-    @EnvironmentObject private var profile: Profile
+    @State private var profile = Profile()
 
     var videos: [Video]
 

@@ -5,11 +5,9 @@ import SwiftyJSON
 final class SponsorBlockAPI: ObservableObject {
     static let categories = ["sponsor", "selfpromo", "outro", "intro", "music_offtopic", "interaction"]
 
-    @Published var video: Video?
+    var id: String
 
     @Published var segments = [Segment]()
-
-    var id: String
 
     init(_ id: String) {
         self.id = id

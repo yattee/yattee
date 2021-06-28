@@ -3,7 +3,7 @@ import AVKit
 import Foundation
 import SwiftyJSON
 
-final class Video: Identifiable, ObservableObject {
+struct Video: Identifiable {
     let id: String
     var title: String
     var thumbnailURL: URL?

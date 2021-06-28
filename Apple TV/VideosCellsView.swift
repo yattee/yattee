@@ -1,6 +1,9 @@
+import Defaults
 import SwiftUI
 
 struct VideosCellsView: View {
+    @Default(.tabSelection) var tabSelection
+
     @State private var columns: Int
 
     init(videos: [Video], columns: Int = 3) {
@@ -15,6 +18,7 @@ struct VideosCellsView: View {
             LazyVGrid(columns: items, spacing: 10) {
                 ForEach(videos) { video in
                     VideoCellView(video: video)
+                        .contextMenu { VideoContextMenuView(video: video) }
                 }
             }
             .padding()

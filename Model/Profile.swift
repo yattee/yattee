@@ -1,7 +1,7 @@
 import Defaults
 import Foundation
 
-final class Profile: ObservableObject {
+struct Profile {
     var defaultStreamResolution: DefaultStreamResolution = .hd720p
 
     var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories

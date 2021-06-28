@@ -87,6 +87,9 @@
 		37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
+		37B17DA0268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */; };
+		37B17DA1268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */; };
+		37B17DA2268A1F8A006AEE9B /* VideoContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */; };
 		37B767DB2677C3CA0098BAA8 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerState.swift */; };
 		37B767DC2677C3CA0098BAA8 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerState.swift */; };
 		37B767DD2677C3CA0098BAA8 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerState.swift */; };
@@ -196,6 +199,7 @@
 		37AAF2932674086B007FC770 /* TabSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSelection.swift; sourceTree = "<group>"; };
 		37AAF29926740A01007FC770 /* VideosListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosListView.swift; sourceTree = "<group>"; };
 		37AAF29F26741C97007FC770 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
+		37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoContextMenuView.swift; sourceTree = "<group>"; };
 		37B767DA2677C3CA0098BAA8 /* PlayerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerState.swift; sourceTree = "<group>"; };
 		37B76E95268747C900CE5671 /* ViewOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewOptionsView.swift; sourceTree = "<group>"; };
 		37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSegment.swift; sourceTree = "<group>"; };
@@ -309,28 +313,28 @@
 		37D4B0BC2671614700C925CA = {
 			isa = PBXGroup;
 			children = (
+				37D4B159267164AE00C925CA /* Apple TV */,
+				37C7A9022679058300E721B4 /* Extensions */,
 				37D4B1B72672CFE300C925CA /* Model */,
 				37D4B0C12671614700C925CA /* Shared */,
-				37C7A9022679058300E721B4 /* Extensions */,
-				37D4B159267164AE00C925CA /* Apple TV */,
+				377FC7D1267A080300A6BBAF /* Frameworks */,
+				37D4B0CA2671614900C925CA /* Products */,
 				37D4B174267164B000C925CA /* Tests Apple TV */,
 				37D4B0D72671614900C925CA /* Tests iOS */,
 				37D4B0E12671614900C925CA /* Tests macOS */,
-				37D4B0CA2671614900C925CA /* Products */,
-				377FC7D1267A080300A6BBAF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		37D4B0C12671614700C925CA /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37D4B0C32671614700C925CA /* ContentView.swift */,
 				37141672267A8E10006CA35D /* Country.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
 				372915E92687EBA500F5A35B /* ListingLayout.swift */,
 				37D4B0C22671614700C925CA /* PearvidiousApp.swift */,
 				37AAF2932674086B007FC770 /* TabSelection.swift */,
-				37D4B0C42671614800C925CA /* Assets.xcassets */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -367,7 +371,9 @@
 		37D4B159267164AE00C925CA /* Apple TV */ = {
 			isa = PBXGroup;
 			children = (
+				37D4B15E267164AF00C925CA /* Assets.xcassets */,
 				37AAF2892673AB89007FC770 /* ChannelView.swift */,
+				37D4B1AE26729DEB00C925CA /* Info.plist */,
 				37D4B1822671681B00C925CA /* PlayerView.swift */,
 				3741B52F2676213400125C5E /* PlayerViewController.swift */,
 				376578902685490700D4EA09 /* PlaylistsView.swift */,
@@ -378,13 +384,12 @@
 				3705B17F267B4DFB00704544 /* TrendingCountrySelectionView.swift */,
 				3714166E267A8ACC006CA35D /* TrendingView.swift */,
 				37F4AE752682908700BD60EA /* VideoCellView.swift */,
+				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
 				37D4B18B26717B3800C925CA /* VideoListRowView.swift */,
 				37F4AE7126828F0900BD60EA /* VideosCellsView.swift */,
 				37AAF29926740A01007FC770 /* VideosListView.swift */,
 				371231832683E62F0000B307 /* VideosView.swift */,
 				37B76E95268747C900CE5671 /* ViewOptionsView.swift */,
-				37D4B15E267164AF00C925CA /* Assets.xcassets */,
-				37D4B1AE26729DEB00C925CA /* Info.plist */,
 			);
 			path = "Apple TV";
 			sourceTree = "<group>";
@@ -693,6 +698,7 @@
 				377FC7E9267A085D00A6BBAF /* PlayerViewController.swift in Sources */,
 				377FC7E5267A084E00A6BBAF /* SearchView.swift in Sources */,
 				376578912685490700D4EA09 /* PlaylistsView.swift in Sources */,
+				37B17DA2268A1F8A006AEE9B /* VideoContextMenuView.swift in Sources */,
 				379775932689365600DD52A8 /* Array+Next.swift in Sources */,
 				377FC7E1267A082600A6BBAF /* ChannelView.swift in Sources */,
 				37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
@@ -752,6 +758,7 @@
 				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
 				37CEE4BA2677B63F005A1EFE /* StreamResolution.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				37B17DA1268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -800,6 +807,7 @@
 				37AAF2962674086B007FC770 /* TabSelection.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,
+				37B17DA0268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
 				37AAF28A2673AB89007FC770 /* ChannelView.swift in Sources */,
