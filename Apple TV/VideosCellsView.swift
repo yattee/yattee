@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct VideosCellsView: View {
-    @EnvironmentObject private var state: AppState
-
     @State private var columns: Int
 
     init(videos: [Video], columns: Int = 3) {

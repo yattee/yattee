@@ -2,8 +2,6 @@ import Siesta
 import SwiftUI
 
 struct TrendingView: View {
-    @EnvironmentObject private var state: AppState
-
     @State private var category: TrendingCategory = .default
     @State private var country: Country = .pl
     @State private var selectingCountry = false

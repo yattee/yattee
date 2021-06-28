@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var state = AppState()
+    @Default(.openChannel) var channel
     @StateObject private var profile = Profile()
 
     var body: some View {
@@ -16,9 +16,9 @@ struct ContentView: View {
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 
-                if !state.channelID.isEmpty {
-                    ChannelView(id: state.channelID)
-                        .tabItem { Text("\(state.channel) Channel") }
+                if channel != nil {
+                    ChannelView(id: channel!.id)
+                        .tabItem { Text("\(channel!.name) Channel") }
                         .tag(TabSelection.channel)
                 }
 
@@ -34,9 +34,8 @@ struct ContentView: View {
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }
+            .environmentObject(profile)
         }
-        .environmentObject(state)
-        .environmentObject(profile)
     }
 
     var tabSelection: Binding<TabSelection> {
