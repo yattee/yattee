@@ -2,7 +2,7 @@ import Alamofire
 import Foundation
 import SwiftyJSON
 
-final class SponsorBlockSegmentsProvider: ObservableObject {
+final class SponsorBlockAPI: ObservableObject {
     static let categories = ["sponsor", "selfpromo", "outro", "intro", "music_offtopic", "interaction"]
 
     @Published var video: Video?
@@ -29,7 +29,7 @@ final class SponsorBlockSegmentsProvider: ObservableObject {
     private var parameters: [String: String] {
         [
             "videoID": id,
-            "categories": JSON(SponsorBlockSegmentsProvider.categories).rawString(String.Encoding.utf8)!
+            "categories": JSON(SponsorBlockAPI.categories).rawString(String.Encoding.utf8)!
         ]
     }
 }

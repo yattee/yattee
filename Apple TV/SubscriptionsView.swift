@@ -1,17 +1,18 @@
 import SwiftUI
 
 struct SubscriptionsView: View {
-    @ObservedObject private var provider = SubscriptionVideosProvider()
+    @ObservedObject private var store = Store<[Video]>()
 
-    var body: some View {
-        VideosView(videos: videos)
+    var resource = InvidiousAPI.shared.subscriptions
+
+    init() {
+        resource.addObserver(store)
     }
 
-    var videos: [Video] {
-        if provider.videos.isEmpty {
-            provider.load()
-        }
-
-        return provider.videos
+    var body: some View {
+        VideosView(videos: store.collection)
+            .onAppear {
+                resource.loadIfNeeded()
+            }
     }
 }

@@ -1,12 +1,16 @@
 import AVKit
 import Foundation
+import Siesta
 import SwiftUI
 
 struct PlayerView: View {
-    @ObservedObject private var provider: VideoDetailsProvider
+    @ObservedObject private var store = Store<Video>()
+
+    let resource: Resource
 
     init(id: String) {
-        provider = VideoDetailsProvider(id)
+        resource = InvidiousAPI.shared.video(id)
+        resource.addObserver(store)
     }
 
     var body: some View {
@@ -14,18 +18,16 @@ struct PlayerView: View {
             pvc?
                 .edgesIgnoringSafeArea(.all)
         }
-        .task {
-            Task {
-                provider.load()
-            }
+        .onAppear {
+            resource.loadIfNeeded()
         }
     }
 
     var pvc: PlayerViewController? {
-        guard provider.video != nil else {
+        guard store.item != nil else {
             return nil
         }
 
-        return PlayerViewController(video: provider.video!)
+        return PlayerViewController(video: store.item!)
     }
 }

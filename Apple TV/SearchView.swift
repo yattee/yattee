@@ -1,22 +1,29 @@
+import Siesta
 import SwiftUI
 
 struct SearchView: View {
-    @ObservedObject private var provider = SearchedVideosProvider()
-    @EnvironmentObject private var profile: Profile
-    @EnvironmentObject private var state: AppState
-
     @State private var query = ""
 
+    @ObservedObject private var store = Store<[Video]>()
+
     var body: some View {
-        VideosView(videos: videos)
-            .environmentObject(state)
-            .environmentObject(profile)
+        VideosView(videos: store.collection)
             .searchable(text: $query)
+            .onChange(of: query) { newQuery in
+                queryChanged(query, newQuery)
+            }
     }
 
-    var videos: [Video] {
-        provider.load(query)
+    func queryChanged(_ old: String, _ new: String) {
+        let oldResource = resource(old)
+        oldResource.removeObservers(ownedBy: store)
 
-        return provider.videos
+        let resource = resource(new)
+        resource.addObserver(store)
+        resource.loadIfNeeded()
+    }
+
+    func resource(_ query: String) -> Resource {
+        InvidiousAPI.shared.search(query)
     }
 }

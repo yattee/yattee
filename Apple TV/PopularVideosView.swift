@@ -1,17 +1,19 @@
+import Siesta
 import SwiftUI
 
 struct PopularVideosView: View {
-    @ObservedObject private var provider = PopularVideosProvider()
+    @ObservedObject private var store = Store<[Video]>()
 
-    var body: some View {
-        VideosView(videos: videos)
+    var resource = InvidiousAPI.shared.popular
+
+    init() {
+        resource.addObserver(store)
     }
 
-    var videos: [Video] {
-        if provider.videos.isEmpty {
-            provider.load()
-        }
-
-        return provider.videos
+    var body: some View {
+        VideosView(videos: store.collection)
+            .onAppear {
+                resource.loadIfNeeded()
+            }
     }
 }

@@ -108,7 +108,7 @@ final class Video: Identifiable, ObservableObject {
     private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
             AudioVideoStream(
-                avAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
+                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
                 resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
                 type: .stream,
                 encoding: $0["encoding"].stringValue
@@ -126,8 +126,8 @@ final class Video: Identifiable, ObservableObject {
 
         return videoAssetsURLs.map {
             Stream(
-                audioAsset: AVURLAsset(url: DataProvider.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
-                videoAsset: AVURLAsset(url: DataProvider.proxyURLForAsset($0["url"].stringValue)!),
+                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
+                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
                 resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
                 type: .adaptive,
                 encoding: $0["encoding"].stringValue

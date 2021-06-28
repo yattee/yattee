@@ -2,8 +2,8 @@ import Defaults
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject private var state = AppState()
-    @ObservedObject private var profile = Profile()
+    @StateObject private var state = AppState()
+    @StateObject private var profile = Profile()
 
     var body: some View {
         NavigationView {
@@ -16,8 +16,8 @@ struct ContentView: View {
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 
-                if state.showingChannel {
-                    ChannelView()
+                if !state.channelID.isEmpty {
+                    ChannelView(id: state.channelID)
                         .tabItem { Text("\(state.channel) Channel") }
                         .tag(TabSelection.channel)
                 }

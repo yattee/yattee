@@ -1,11 +1,18 @@
+import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
-    @EnvironmentObject private var state: AppState
-
-    @ObservedObject private var provider = PlaylistsProvider()
+    @ObservedObject private var store = Store<[Playlist]>()
 
     @State private var selectedPlaylist: Playlist?
+
+    var resource: Resource {
+        InvidiousAPI.shared.playlists
+    }
+
+    init() {
+        resource.addObserver(store)
+    }
 
     var body: some View {
         Section {
@@ -19,57 +26,38 @@ struct PlaylistsView: View {
                 }
                 .padding(.bottom, 5)
 
+                Spacer()
+
                 VStack {
-                    if selectedPlaylist != nil {
-                        VideosView(videos: selectedPlaylist!.videos)
+                    if currentPlaylist != nil {
+                        VideosView(videos: currentPlaylist!.videos)
                     }
                 }
             }
-        }.task {
-            Task {
-                provider.load { playlists in
-                    selectedPlaylist = playlists.first
-                }
-            }
+        }
+        .onAppear {
+            resource.loadIfNeeded()
         }
     }
 
-    var playlists: [Playlist] {
-        if provider.playlists.isEmpty {
-            provider.load()
-        }
-
-        return provider.playlists
+    var currentPlaylist: Playlist? {
+        selectedPlaylist ?? store.collection.first
     }
 
     var selectPlaylistButton: some View {
-        Button(selectedPlaylist?.title ?? "Select playlist") {
-            guard selectedPlaylist != nil else {
+        Button(currentPlaylist?.title ?? "Select playlist") {
+            guard currentPlaylist != nil else {
                 return
             }
 
-            selectedPlaylist = playlists.next(after: selectedPlaylist!)
+            selectedPlaylist = store.collection.next(after: currentPlaylist!)
         }
         .contextMenu {
-            ForEach(provider.playlists) { playlist in
+            ForEach(store.collection) { playlist in
                 Button(playlist.title) {
                     selectedPlaylist = playlist
                 }
             }
         }
-    }
-}
-
-extension Array where Element: Equatable {
-    func next(after element: Element) -> Element? {
-        let idx = firstIndex(of: element)
-
-        if idx == nil {
-            return first
-        }
-
-        let next = index(after: idx!)
-
-        return self[next == endIndex ? startIndex : next]
     }
 }

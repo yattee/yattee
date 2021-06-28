@@ -51,13 +51,13 @@ final class PlayerState: ObservableObject {
         return playerItem
     }
 
-    var segmentsProvider: SponsorBlockSegmentsProvider
+    var segmentsProvider: SponsorBlockAPI
     var timeObserver: Any?
 
     init(_ video: Video) {
         self.video = video
-        segmentsProvider = SponsorBlockSegmentsProvider(video.id)
 
+        segmentsProvider = SponsorBlockAPI(video.id)
         segmentsProvider.load()
     }
 

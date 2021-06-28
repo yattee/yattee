@@ -5,6 +5,7 @@ import SwiftUI
 
 struct VideoCellView: View {
     var video: Video
+
     var body: some View {
         NavigationLink(destination: PlayerView(id: video.id)) {
             VStack(alignment: .leading) {
