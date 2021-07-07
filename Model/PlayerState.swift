@@ -36,7 +36,7 @@ final class PlayerState: ObservableObject {
             makeMetadataItem(.commonIdentifierDescription, value: video.description)
         ]
 
-        if let thumbnailData = try? Data(contentsOf: video.thumbnailURL!),
+        if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: "high")!),
            let image = UIImage(data: thumbnailData),
            let pngData = image.pngData()
         {

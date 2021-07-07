@@ -3,6 +3,9 @@ import SwiftUI
 
 struct ContentView: View {
     @Default(.openChannel) var channel
+    @Default(.showingVideoDetails) var showDetails
+
+    @State private var showingOptions = false
 
     var body: some View {
         NavigationView {
@@ -33,6 +36,9 @@ struct ContentView: View {
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
             }
+            .fullScreenCover(isPresented: $showingOptions) { OptionsView() }
+            .onPlayPauseCommand { showingOptions.toggle() }
+            .background(videoDetailsViewNavigationLink)
         }
     }
 
@@ -41,6 +47,10 @@ struct ContentView: View {
             get: { Defaults[.tabSelection] },
             set: { Defaults[.tabSelection] = $0 }
         )
+    }
+
+    var videoDetailsViewNavigationLink: some View {
+        NavigationLink("", destination: VideoDetailsView(), isActive: $showDetails).hidden()
     }
 }
 

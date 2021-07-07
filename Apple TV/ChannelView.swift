@@ -16,7 +16,7 @@ struct ChannelView: View {
     }
 
     var body: some View {
-        VideosListView(videos: store.collection)
+        VideosView(videos: store.collection)
             .onAppear {
                 resource.loadIfNeeded()
             }

@@ -6,11 +6,19 @@ struct VideoContextMenuView: View {
 
     let video: Video
 
+    @Default(.openVideoID) var openVideoID
+    @Default(.showingVideoDetails) var showDetails
+
     var body: some View {
         if tabSelection == .channel {
             closeChannelButton(from: video)
         } else {
             openChannelButton(from: video)
+        }
+
+        Button("Open video details") {
+            openVideoID = video.id
+            showDetails = true
         }
     }
 

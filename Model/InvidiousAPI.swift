@@ -1,13 +1,7 @@
+import Defaults
 import Foundation
 import Siesta
 import SwiftyJSON
-
-extension TypedContentAccessors {
-    var json: JSON { typedContent(ifNone: JSON.null) }
-}
-
-let SwiftyJSONTransformer =
-    ResponseContentTransformer(transformErrors: true) { JSON($0.content as AnyObject) }
 
 final class InvidiousAPI: Service {
     static let shared = InvidiousAPI()
@@ -25,7 +19,10 @@ final class InvidiousAPI: Service {
     }
 
     init() {
-        SiestaLog.Category.enabled = .all
+        SiestaLog.Category.enabled = .common
+
+        let SwiftyJSONTransformer =
+            ResponseContentTransformer(transformErrors: true) { JSON($0.content as AnyObject) }
 
         super.init(baseURL: "\(InvidiousAPI.instance)/api/v1")
 
@@ -106,9 +103,20 @@ final class InvidiousAPI: Service {
         resource("/auth/playlists")
     }
 
-    func search(_ query: String) -> Resource {
-        resource("/search")
-            .withParam("q", searchQuery(query))
+    func search(_ query: SearchQuery) -> Resource {
+        var resource = resource("/search")
+            .withParam("q", searchQuery(query.query))
+            .withParam("sort_by", query.sortBy.parameter)
+
+        if let date = query.date {
+            resource = resource.withParam("date", date.rawValue)
+        }
+
+        if let duration = query.duration {
+            resource = resource.withParam("duration", duration.rawValue)
+        }
+
+        return resource
     }
 
     private func searchQuery(_ query: String) -> String {

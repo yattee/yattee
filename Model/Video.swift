@@ -6,7 +6,7 @@ import SwiftyJSON
 struct Video: Identifiable {
     let id: String
     var title: String
-    var thumbnailURL: URL?
+    var thumbnails: [Thumbnail]
     var author: String
     var length: TimeInterval
     var published: String
@@ -28,10 +28,10 @@ struct Video: Identifiable {
         description = json["description"].stringValue
         genre = json["genre"].stringValue
 
-        thumbnailURL = extractThumbnailURL(from: json)
+        thumbnails = Video.extractThumbnails(from: json)
 
-        streams = extractFormatStreams(from: json["formatStreams"].arrayValue)
-        streams.append(contentsOf: extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
+        streams = Video.extractFormatStreams(from: json["formatStreams"].arrayValue)
+        streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
     }
 
     var playTime: String? {
@@ -93,19 +93,20 @@ struct Video: Identifiable {
     }
 
     func defaultStreamForProfile(_ profile: Profile) -> Stream? {
-        streamWithResolution(profile.defaultStreamResolution.value)
+        streamWithResolution(profile.defaultStreamResolution.value) ?? streams.first
     }
 
-    private func extractThumbnailURL(from details: JSON) -> URL? {
-        if details["videoThumbnails"].arrayValue.isEmpty {
-            return nil
+    func thumbnailURL(quality: String) -> URL? {
+        thumbnails.first { $0.quality == quality }?.url
+    }
+
+    private static func extractThumbnails(from details: JSON) -> [Thumbnail] {
+        details["videoThumbnails"].arrayValue.map { json in
+            Thumbnail(json)
         }
-
-        let thumbnail = details["videoThumbnails"].arrayValue.first { $0["quality"].stringValue == "medium" }!
-        return thumbnail["url"].url!
     }
 
-    private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
+    private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
             AudioVideoStream(
                 avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
@@ -116,7 +117,7 @@ struct Video: Identifiable {
         }
     }
 
-    private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
+    private static func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
         let audioAssetURL = streams.first { $0["type"].stringValue.starts(with: "audio/mp4") }
         guard audioAssetURL != nil else {
             return []

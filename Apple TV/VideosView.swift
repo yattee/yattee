@@ -3,23 +3,19 @@ import SwiftUI
 
 struct VideosView: View {
     @State private var profile = Profile()
-
-    var videos: [Video]
-
+    
     @Default(.layout) var layout
     @Default(.tabSelection) var tabSelection
 
-    @State private var showingViewOptions = false
-
+    var videos: [Video]
+    
     var body: some View {
-        VStack {
+        Group {
             if layout == .cells {
                 VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
             } else {
                 VideosListView(videos: videos)
             }
         }
-        .fullScreenCover(isPresented: $showingViewOptions) { ViewOptionsView() }
-        .onPlayPauseCommand { showingViewOptions.toggle() }
     }
 }

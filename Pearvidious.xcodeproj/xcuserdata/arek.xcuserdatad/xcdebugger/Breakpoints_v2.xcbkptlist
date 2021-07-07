@@ -3,4 +3,70 @@
    uuid = "E30DA302-B258-4C14-8808-5E4CE238A4FF"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "032F98C7-06A6-4DC6-8913-771A5D007CE5"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Apple TV/SearchView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8A4F4C9F-7372-4E74-9535-16BB3F2A3493"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Apple TV/VideosView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "13"
+            endingLineNumber = "13"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "8A4F4C9F-7372-4E74-9535-16BB3F2A3493 - 5e5aadfff65b9d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Pearvidious__Apple_TV_.VideosView.body.getter : some"
+                  moduleName = "Pearvidious (Apple TV)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arek/Developer/Pearvidious/Apple%20TV/VideosView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "15"
+                  endingLineNumber = "15"
+                  offsetFromSymbolStart = "660">
+               </Location>
+               <Location
+                  uuid = "8A4F4C9F-7372-4E74-9535-16BB3F2A3493 - d2d1bd8291983832"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; Swift.Optional&lt;SwiftUI._ConditionalContent&lt;Pearvidious__Apple_TV_.VideosCellsView, Pearvidious__Apple_TV_.VideosListView&gt;&gt; in Pearvidious__Apple_TV_.VideosView.body.getter : some"
+                  moduleName = "Pearvidious (Apple TV)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/arek/Developer/Pearvidious/Apple%20TV/VideosView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "15"
+                  endingLineNumber = "15"
+                  offsetFromSymbolStart = "1920">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

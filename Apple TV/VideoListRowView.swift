@@ -11,7 +11,7 @@ struct VideoListRowView: View {
         NavigationLink(destination: PlayerView(id: video.id)) {
             HStack(alignment: .top, spacing: 2) {
                 Section {
-                    if let thumbnail = video.thumbnailURL {
+                    if let thumbnail = video.thumbnailURL(quality: "medium") {
                         // to replace with AsyncImage when it is fixed with lazy views
                         URLImage(thumbnail) { image in
                             image

@@ -10,7 +10,7 @@ struct VideoCellView: View {
         NavigationLink(destination: PlayerView(id: video.id)) {
             VStack(alignment: .leading) {
                 ZStack(alignment: .trailing) {
-                    if let thumbnail = video.thumbnailURL {
+                    if let thumbnail = video.thumbnailURL(quality: "high") {
                         // to replace with AsyncImage when it is fixed with lazy views
                         URLImage(thumbnail) { image in
                             image
