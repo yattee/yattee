@@ -16,22 +16,14 @@ struct PlaylistsView: View {
 
     var body: some View {
         Section {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .top) {
+            VStack(alignment: .center, spacing: 2) {
+                selectPlaylistButton
+                    .scaleEffect(0.85)
+
+                if currentPlaylist != nil {
+                    VideosView(videos: currentPlaylist!.videos)
+                } else {
                     Spacer()
-
-                    selectPlaylistButton
-
-                    Spacer()
-                }
-                .padding(.bottom, 5)
-
-                Spacer()
-
-                VStack {
-                    if currentPlaylist != nil {
-                        VideosView(videos: currentPlaylist!.videos)
-                    }
                 }
             }
         }

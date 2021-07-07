@@ -18,15 +18,11 @@ struct TrendingView: View {
 
     var body: some View {
         Section {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .top) {
-                    Spacer()
-
+            VStack(alignment: .center, spacing: 2) {
+                HStack {
                     categoryButton
                     countryFlag
                     countryButton
-
-                    Spacer()
                 }
                 .scaleEffect(0.85)
 
