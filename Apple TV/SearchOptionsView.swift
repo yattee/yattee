@@ -7,10 +7,10 @@ struct SearchOptionsView: View {
     @Default(.searchDuration) private var searchDuration
 
     var body: some View {
-        OptionsSectionView("Search Options") {
-            OptionRowView("Sort By") { searchSortOrderButton }
-            OptionRowView("Upload date") { searchDateButton }
-            OptionRowView("Duration") { searchDurationButton }
+        CoverSectionView("Search Options") {
+            CoverSectionRowView("Sort By") { searchSortOrderButton }
+            CoverSectionRowView("Upload date") { searchDateButton }
+            CoverSectionRowView("Duration") { searchDurationButton }
         }
     }
 
@@ -47,19 +47,17 @@ struct SearchOptionsView: View {
 
     var searchDurationButton: some View {
         Button(self.searchDuration?.name ?? "All") {
-            let duration = Defaults[.searchDuration]
-
-            Defaults[.searchDuration] = duration == nil ? SearchDuration.allCases.first : duration!.next(nilAtEnd: true)
+            self.searchDuration = self.searchDuration == nil ? SearchDuration.allCases.first : self.searchDuration!.next(nilAtEnd: true)
         }
         .contextMenu {
             ForEach(SearchDuration.allCases) { searchDuration in
                 Button(searchDuration.name) {
-                    Defaults[.searchDuration] = searchDuration
+                    self.searchDuration = searchDuration
                 }
             }
 
             Button("Reset") {
-                Defaults.reset(.searchDuration)
+                self.searchDuration = nil
             }
         }
     }

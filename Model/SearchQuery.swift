@@ -2,8 +2,8 @@ import Foundation
 
 final class SearchQuery: ObservableObject {
     @Published var query: String
-    @Published var sortBy = SearchSortOrder.relevance
-    @Published var date: SearchDate? = SearchDate.month
+    @Published var sortBy: SearchSortOrder = .relevance
+    @Published var date: SearchDate? = .month
     @Published var duration: SearchDuration?
 
     @Published var page = 1

@@ -6,6 +6,9 @@ struct PlaylistsView: View {
 
     @State private var selectedPlaylist: Playlist?
 
+    @State private var showingNewPlaylist = false
+    @State private var createdPlaylist: Playlist?
+
     var resource: Resource {
         InvidiousAPI.shared.playlists
     }
@@ -17,8 +20,12 @@ struct PlaylistsView: View {
     var body: some View {
         Section {
             VStack(alignment: .center, spacing: 2) {
-                selectPlaylistButton
-                    .scaleEffect(0.85)
+                HStack {
+                    selectPlaylistButton
+
+                    newPlaylistButton
+                }
+                .scaleEffect(0.85)
 
                 if currentPlaylist != nil {
                     VideosView(videos: currentPlaylist!.videos)
@@ -27,8 +34,21 @@ struct PlaylistsView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+            NewPlaylistView(createdPlaylist: $createdPlaylist)
+        }
         .onAppear {
             resource.loadIfNeeded()
+        }
+    }
+
+    func selectCreatedPlaylist() {
+        guard createdPlaylist != nil else {
+            return
+        }
+
+        resource.load().onSuccess { _ in
+            self.selectedPlaylist = store.collection.first { $0 == createdPlaylist }
         }
     }
 
@@ -50,6 +70,12 @@ struct PlaylistsView: View {
                     selectedPlaylist = playlist
                 }
             }
+        }
+    }
+
+    var newPlaylistButton: some View {
+        Button(action: { self.showingNewPlaylist = true }) {
+            Image(systemName: "plus")
         }
     }
 }

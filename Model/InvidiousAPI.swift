@@ -54,6 +54,11 @@ final class InvidiousAPI: Service {
             content.json.arrayValue.map(Playlist.init)
         }
 
+        configureTransformer("/auth/playlists", requestMethods: [.post]) { (content: Entity<Data>) -> Playlist in
+            // hacky, to verify if possible to get it in easier way
+            Playlist(JSON(parseJSON: String(data: content.content, encoding: .utf8)!))
+        }
+
         configureTransformer("/auth/feed", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let feedVideos = content.json.dictionaryValue["videos"] {
                 return feedVideos.arrayValue.map { Video($0) }
@@ -108,12 +113,12 @@ final class InvidiousAPI: Service {
             .withParam("q", searchQuery(query.query))
             .withParam("sort_by", query.sortBy.parameter)
 
-        if let date = query.date {
-            resource = resource.withParam("date", date.rawValue)
+        if let date = query.date?.rawValue {
+            resource = resource.withParam("date", date)
         }
 
-        if let duration = query.duration {
-            resource = resource.withParam("duration", duration.rawValue)
+        if let duration = query.duration?.rawValue {
+            resource = resource.withParam("duration", duration)
         }
 
         return resource
@@ -135,6 +140,6 @@ final class InvidiousAPI: Service {
             searchQuery = id
         }
 
-        return searchQuery.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!
+        return searchQuery
     }
 }

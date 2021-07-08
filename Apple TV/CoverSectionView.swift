@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct OptionsSectionView<Content: View>: View {
+struct CoverSectionView<Content: View>: View {
     let title: String?
 
     let rowsView: Content

@@ -18,12 +18,12 @@ struct OptionsView: View {
 
                         tabSelectionOptions
 
-                        OptionsSectionView("View Options") {
-                            OptionRowView("Show videos as") { nextLayoutButton }
+                        CoverSectionView("View Options") {
+                            CoverSectionRowView("Show videos as") { nextLayoutButton }
                         }
 
-                        OptionsSectionView(divider: false) {
-                            OptionRowView("Close View Options") { Button("Close") { dismiss() } }
+                        CoverSectionView(divider: false) {
+                            CoverSectionRowView("Close View Options") { Button("Close") { dismiss() } }
                         }
 
                         Spacer()
