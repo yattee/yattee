@@ -11,4 +11,6 @@ extension Defaults.Keys {
     static let searchDuration = Key<SearchDuration?>("searchDuration", default: nil)
     static let openVideoID = Key<String>("videoID", default: "")
     static let showingVideoDetails = Key<Bool>("showingVideoDetails", default: false)
+
+    static let selectedPlaylistID = Key<String?>("selectedPlaylistID")
 }

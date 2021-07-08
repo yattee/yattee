@@ -1,13 +1,18 @@
+import Defaults
 import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
     @ObservedObject private var store = Store<[Playlist]>()
 
+    @Default(.selectedPlaylistID) private var selectedPlaylistID
     @State private var selectedPlaylist: Playlist?
 
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
+
+    @State private var showingEditPlaylist = false
+    @State private var editedPlaylist: Playlist?
 
     var resource: Resource {
         InvidiousAPI.shared.playlists
@@ -23,6 +28,10 @@ struct PlaylistsView: View {
                 HStack {
                     selectPlaylistButton
 
+                    if currentPlaylist != nil {
+                        editPlaylistButton
+                    }
+
                     newPlaylistButton
                 }
                 .scaleEffect(0.85)
@@ -35,11 +44,21 @@ struct PlaylistsView: View {
             }
         }
         .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-            NewPlaylistView(createdPlaylist: $createdPlaylist)
+            PlaylistFormView(playlist: $createdPlaylist)
+        }
+        .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+            PlaylistFormView(playlist: $editedPlaylist)
         }
         .onAppear {
-            resource.loadIfNeeded()
+            resource.loadIfNeeded()?.onSuccess { _ in
+                selectPlaylist(selectedPlaylistID)
+            }
         }
+    }
+
+    func selectPlaylist(_ id: String?) {
+        selectedPlaylist = store.collection.first { $0.id == id }
+        selectedPlaylistID = id
     }
 
     func selectCreatedPlaylist() {
@@ -48,7 +67,21 @@ struct PlaylistsView: View {
         }
 
         resource.load().onSuccess { _ in
-            self.selectedPlaylist = store.collection.first { $0 == createdPlaylist }
+            self.selectPlaylist(createdPlaylist?.id)
+
+            self.createdPlaylist = nil
+        }
+    }
+
+    func selectEditedPlaylist() {
+        if editedPlaylist == nil {
+            selectPlaylist(nil)
+        }
+
+        resource.load().onSuccess { _ in
+            selectPlaylist(editedPlaylist?.id)
+
+            self.editedPlaylist = nil
         }
     }
 
@@ -62,14 +95,23 @@ struct PlaylistsView: View {
                 return
             }
 
-            selectedPlaylist = store.collection.next(after: currentPlaylist!)
+            selectPlaylist(store.collection.next(after: currentPlaylist!)?.id)
         }
         .contextMenu {
             ForEach(store.collection) { playlist in
                 Button(playlist.title) {
-                    selectedPlaylist = playlist
+                    selectPlaylist(playlist.id)
                 }
             }
+        }
+    }
+
+    var editPlaylistButton: some View {
+        Button(action: {
+            self.editedPlaylist = self.currentPlaylist
+            self.showingEditPlaylist = true
+        }) {
+            Image(systemName: "pencil")
         }
     }
 

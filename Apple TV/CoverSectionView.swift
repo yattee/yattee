@@ -3,22 +3,35 @@ import SwiftUI
 struct CoverSectionView<Content: View>: View {
     let title: String?
 
-    let rowsView: Content
+    let actionsView: Content
     let divider: Bool
+    let inline: Bool
 
-    init(_ title: String? = nil, divider: Bool = true, @ViewBuilder rowsView: @escaping () -> Content) {
+    init(_ title: String? = nil, divider: Bool = true, inline: Bool = false, @ViewBuilder actionsView: @escaping () -> Content) {
         self.title = title
         self.divider = divider
-        self.rowsView = rowsView()
+        self.inline = inline
+        self.actionsView = actionsView()
     }
 
     var body: some View {
         VStack(alignment: .leading) {
-            if title != nil {
+            if inline {
+                HStack {
+                    if title != nil {
+                        sectionTitle
+                    }
+
+                    Spacer()
+                    actionsView
+                }
+            } else if title != nil {
                 sectionTitle
             }
 
-            rowsView
+            if !inline {
+                actionsView
+            }
         }
 
         if divider {

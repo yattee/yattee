@@ -54,12 +54,12 @@
 		373CFADB269663F1003CB2C6 /* Thumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADA269663F1003CB2C6 /* Thumbnail.swift */; };
 		373CFADC269663F1003CB2C6 /* Thumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADA269663F1003CB2C6 /* Thumbnail.swift */; };
 		373CFADD269663F1003CB2C6 /* Thumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADA269663F1003CB2C6 /* Thumbnail.swift */; };
-		373CFADF2696F88B003CB2C6 /* NewPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADE2696F861003CB2C6 /* NewPlaylistView.swift */; };
-		373CFAE02696F88B003CB2C6 /* NewPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADE2696F861003CB2C6 /* NewPlaylistView.swift */; };
-		373CFAE12696F88B003CB2C6 /* NewPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADE2696F861003CB2C6 /* NewPlaylistView.swift */; };
 		373CFAE326974812003CB2C6 /* PlaylistVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAE226974812003CB2C6 /* PlaylistVisibility.swift */; };
 		373CFAE426974812003CB2C6 /* PlaylistVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAE226974812003CB2C6 /* PlaylistVisibility.swift */; };
 		373CFAE526974812003CB2C6 /* PlaylistVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAE226974812003CB2C6 /* PlaylistVisibility.swift */; };
+		373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
+		373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
+		373CFAED26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
 		3741B5302676213400125C5E /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741B52F2676213400125C5E /* PlayerViewController.swift */; };
 		376578852685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
 		376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
@@ -229,8 +229,8 @@
 		373CFAD2269662AB003CB2C6 /* SearchDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDate.swift; sourceTree = "<group>"; };
 		373CFAD6269662CD003CB2C6 /* SearchDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDuration.swift; sourceTree = "<group>"; };
 		373CFADA269663F1003CB2C6 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
-		373CFADE2696F861003CB2C6 /* NewPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPlaylistView.swift; sourceTree = "<group>"; };
 		373CFAE226974812003CB2C6 /* PlaylistVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistVisibility.swift; sourceTree = "<group>"; };
+		373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistFormView.swift; sourceTree = "<group>"; };
 		3741B52F2676213400125C5E /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		376578842685429C00D4EA09 /* CaseIterable+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaseIterable+Next.swift"; sourceTree = "<group>"; };
 		376578882685471400D4EA09 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
@@ -423,10 +423,10 @@
 				37AAF2892673AB89007FC770 /* ChannelView.swift */,
 				373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */,
 				373CFABD26966115003CB2C6 /* CoverSectionView.swift */,
-				373CFADE2696F861003CB2C6 /* NewPlaylistView.swift */,
 				37B76E95268747C900CE5671 /* OptionsView.swift */,
 				37D4B1822671681B00C925CA /* PlayerView.swift */,
 				3741B52F2676213400125C5E /* PlayerViewController.swift */,
+				373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */,
 				376578902685490700D4EA09 /* PlaylistsView.swift */,
 				37AAF27D26737323007FC770 /* PopularVideosView.swift */,
 				373CFAC52696617C003CB2C6 /* SearchOptionsView.swift */,
@@ -753,7 +753,6 @@
 				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
 				376578892685471400D4EA09 /* Playlist.swift in Sources */,
 				373CFADB269663F1003CB2C6 /* Thumbnail.swift in Sources */,
-				373CFAE12696F88B003CB2C6 /* NewPlaylistView.swift in Sources */,
 				37CEE4B52677B628005A1EFE /* StreamType.swift in Sources */,
 				37C7A1DC267CE9D90010EAD6 /* Profile.swift in Sources */,
 				373CFAC026966149003CB2C6 /* CoverSectionView.swift in Sources */,
@@ -778,6 +777,7 @@
 				37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				373CFAD7269662CD003CB2C6 /* SearchDuration.swift in Sources */,
 				373CFACF26966290003CB2C6 /* SearchSortOrder.swift in Sources */,
+				373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				377FC7DF267A082200A6BBAF /* VideosListView.swift in Sources */,
 				372915E62687E3B900F5A35B /* Defaults.swift in Sources */,
 				37D4B19726717E1500C925CA /* Video.swift in Sources */,
@@ -838,7 +838,7 @@
 				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
 				373CFAE426974812003CB2C6 /* PlaylistVisibility.swift in Sources */,
 				37CEE4BA2677B63F005A1EFE /* StreamResolution.swift in Sources */,
-				373CFAE02696F88B003CB2C6 /* NewPlaylistView.swift in Sources */,
+				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				37B17DA1268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
 				373CFAD4269662AB003CB2C6 /* SearchDate.swift in Sources */,
@@ -886,7 +886,6 @@
 				37EAD86D267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				3765788B2685471400D4EA09 /* Playlist.swift in Sources */,
 				373CFADD269663F1003CB2C6 /* Thumbnail.swift in Sources */,
-				373CFADF2696F88B003CB2C6 /* NewPlaylistView.swift in Sources */,
 				37C7A1DE267CE9D90010EAD6 /* Profile.swift in Sources */,
 				3741B5302676213400125C5E /* PlayerViewController.swift in Sources */,
 				373CFABE26966148003CB2C6 /* CoverSectionView.swift in Sources */,
@@ -911,6 +910,7 @@
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
 				373CFAD9269662CD003CB2C6 /* SearchDuration.swift in Sources */,
 				373CFAD126966290003CB2C6 /* SearchSortOrder.swift in Sources */,
+				373CFAED26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,

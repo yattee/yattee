@@ -54,7 +54,7 @@ final class InvidiousAPI: Service {
             content.json.arrayValue.map(Playlist.init)
         }
 
-        configureTransformer("/auth/playlists", requestMethods: [.post]) { (content: Entity<Data>) -> Playlist in
+        configureTransformer("/auth/playlists", requestMethods: [.post, .patch]) { (content: Entity<Data>) -> Playlist in
             // hacky, to verify if possible to get it in easier way
             Playlist(JSON(parseJSON: String(data: content.content, encoding: .utf8)!))
         }
@@ -106,6 +106,10 @@ final class InvidiousAPI: Service {
 
     var playlists: Resource {
         resource("/auth/playlists")
+    }
+
+    func playlist(_ id: String) -> Resource {
+        resource("/auth/playlists/\(id)")
     }
 
     func search(_ query: SearchQuery) -> Resource {
