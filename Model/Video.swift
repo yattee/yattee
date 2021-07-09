@@ -15,10 +15,21 @@ struct Video: Identifiable {
     var description: String
     var genre: String
 
+    let indexID: String?
+
     var streams = [Stream]()
 
     init(_ json: JSON) {
-        id = json["videoId"].stringValue
+        let videoID = json["videoId"].stringValue
+
+        if let id = json["indexId"].string {
+            indexID = id
+            self.id = videoID + id
+        } else {
+            indexID = nil
+            id = videoID
+        }
+
         title = json["title"].stringValue
         author = json["author"].stringValue
         length = json["lengthSeconds"].doubleValue

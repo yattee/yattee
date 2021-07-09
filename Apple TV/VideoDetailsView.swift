@@ -40,7 +40,7 @@ struct VideoDetailsView: View {
 
                             HStack {
                                 NavigationLink(destination: PlayerView(id: video.id)) {
-                                    HStack(spacing: 10) {
+                                    HStack(spacing: 8) {
                                         Image(systemName: "play.rectangle.fill")
 
                                         Text("Play")

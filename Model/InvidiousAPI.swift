@@ -112,6 +112,14 @@ final class InvidiousAPI: Service {
         resource("/auth/playlists/\(id)")
     }
 
+    func playlistVideos(_ id: String) -> Resource {
+        playlist(id).child("videos")
+    }
+
+    func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource {
+        playlist(playlistID).child("videos").child(videoID)
+    }
+
     func search(_ query: SearchQuery) -> Resource {
         var resource = resource("/search")
             .withParam("q", searchQuery(query.query))

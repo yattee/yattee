@@ -60,6 +60,9 @@
 		373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
 		373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
 		373CFAED26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */; };
+		373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
+		373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
+		373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
 		3741B5302676213400125C5E /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741B52F2676213400125C5E /* PlayerViewController.swift */; };
 		376578852685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
 		376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578842685429C00D4EA09 /* CaseIterable+Next.swift */; };
@@ -231,6 +234,7 @@
 		373CFADA269663F1003CB2C6 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
 		373CFAE226974812003CB2C6 /* PlaylistVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistVisibility.swift; sourceTree = "<group>"; };
 		373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistFormView.swift; sourceTree = "<group>"; };
+		373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToPlaylistView.swift; sourceTree = "<group>"; };
 		3741B52F2676213400125C5E /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		376578842685429C00D4EA09 /* CaseIterable+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaseIterable+Next.swift"; sourceTree = "<group>"; };
 		376578882685471400D4EA09 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
@@ -420,6 +424,7 @@
 		37D4B159267164AE00C925CA /* Apple TV */ = {
 			isa = PBXGroup;
 			children = (
+				373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */,
 				37AAF2892673AB89007FC770 /* ChannelView.swift */,
 				373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */,
 				373CFABD26966115003CB2C6 /* CoverSectionView.swift */,
@@ -442,8 +447,8 @@
 				37F4AE7126828F0900BD60EA /* VideosCellsView.swift */,
 				37AAF29926740A01007FC770 /* VideosListView.swift */,
 				371231832683E62F0000B307 /* VideosView.swift */,
-				37D4B15E267164AF00C925CA /* Assets.xcassets */,
 				37D4B1AE26729DEB00C925CA /* Info.plist */,
+				37D4B15E267164AF00C925CA /* Assets.xcassets */,
 			);
 			path = "Apple TV";
 			sourceTree = "<group>";
@@ -757,6 +762,7 @@
 				37C7A1DC267CE9D90010EAD6 /* Profile.swift in Sources */,
 				373CFAC026966149003CB2C6 /* CoverSectionView.swift in Sources */,
 				3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */,
+				373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoListRowView.swift in Sources */,
 				37AAF29026740715007FC770 /* Channel.swift in Sources */,
 				37AAF2942674086B007FC770 /* TabSelection.swift in Sources */,
@@ -843,6 +849,7 @@
 				37B17DA1268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
 				373CFAD4269662AB003CB2C6 /* SearchDate.swift in Sources */,
 				373CFADC269663F1003CB2C6 /* Thumbnail.swift in Sources */,
+				373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -890,6 +897,7 @@
 				3741B5302676213400125C5E /* PlayerViewController.swift in Sources */,
 				373CFABE26966148003CB2C6 /* CoverSectionView.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
+				373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				37D4B18E26717B3800C925CA /* VideoListRowView.swift in Sources */,
 				37AAF27E26737323007FC770 /* PopularVideosView.swift in Sources */,
 				37AAF29A26740A01007FC770 /* VideosListView.swift in Sources */,

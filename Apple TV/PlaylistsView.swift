@@ -6,7 +6,6 @@ struct PlaylistsView: View {
     @ObservedObject private var store = Store<[Playlist]>()
 
     @Default(.selectedPlaylistID) private var selectedPlaylistID
-    @State private var selectedPlaylist: Playlist?
 
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
@@ -26,18 +25,37 @@ struct PlaylistsView: View {
         Section {
             VStack(alignment: .center, spacing: 2) {
                 HStack {
-                    selectPlaylistButton
+                    if store.collection.isEmpty {
+                        Text("No Playlists")
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("Current Playlist")
+                            .foregroundColor(.secondary)
+
+                        selectPlaylistButton
+                    }
 
                     if currentPlaylist != nil {
                         editPlaylistButton
                     }
 
                     newPlaylistButton
+                        .padding(.leading, 40)
                 }
                 .scaleEffect(0.85)
 
                 if currentPlaylist != nil {
-                    VideosView(videos: currentPlaylist!.videos)
+                    if currentPlaylist!.videos.isEmpty {
+                        Spacer()
+
+                        Text("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        Spacer()
+                    } else {
+                        VideosView(videos: currentPlaylist!.videos)
+                    }
                 } else {
                     Spacer()
                 }
@@ -57,7 +75,6 @@ struct PlaylistsView: View {
     }
 
     func selectPlaylist(_ id: String?) {
-        selectedPlaylist = store.collection.first { $0.id == id }
         selectedPlaylistID = id
     }
 
@@ -86,7 +103,7 @@ struct PlaylistsView: View {
     }
 
     var currentPlaylist: Playlist? {
-        selectedPlaylist ?? store.collection.first
+        store.collection.first { $0.id == selectedPlaylistID } ?? store.collection.first
     }
 
     var selectPlaylistButton: some View {
@@ -111,13 +128,19 @@ struct PlaylistsView: View {
             self.editedPlaylist = self.currentPlaylist
             self.showingEditPlaylist = true
         }) {
-            Image(systemName: "pencil")
+            HStack(spacing: 8) {
+                Image(systemName: "pencil")
+                Text("Edit")
+            }
         }
     }
 
     var newPlaylistButton: some View {
         Button(action: { self.showingNewPlaylist = true }) {
-            Image(systemName: "plus")
+            HStack(spacing: 8) {
+                Image(systemName: "plus")
+                Text("New Playlist")
+            }
         }
     }
 }

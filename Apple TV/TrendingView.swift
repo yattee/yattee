@@ -20,7 +20,14 @@ struct TrendingView: View {
         Section {
             VStack(alignment: .center, spacing: 2) {
                 HStack {
+                    Text("Category")
+                        .foregroundColor(.secondary)
+
                     categoryButton
+
+                    Text("Country")
+                        .foregroundColor(.secondary)
+
                     countryFlag
                     countryButton
                 }
