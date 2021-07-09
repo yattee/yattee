@@ -15,7 +15,7 @@ struct VideosCellsView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: items, spacing: 10) {
+            LazyVGrid(columns: items, alignment: .center, spacing: 10) {
                 ForEach(videos) { video in
                     VideoCellView(video: video)
                         .contextMenu { VideoContextMenuView(video: video) }
@@ -26,6 +26,10 @@ struct VideosCellsView: View {
     }
 
     var items: [GridItem] {
-        Array(repeating: .init(.fixed(600)), count: columns)
+        Array(repeating: .init(.fixed(600)), count: gridColumns)
+    }
+    
+    var gridColumns: Int {
+        videos.count < columns ? videos.count : columns
     }
 }
