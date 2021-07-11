@@ -2,6 +2,7 @@ parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/m
 
 disabled_rules:
   - opening_brace
+  - multiline_arguments
 
 excluded:
   - Tests Apple TV

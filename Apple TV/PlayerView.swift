@@ -65,6 +65,7 @@ struct PlayerView: View {
         }
     }
 
+    // swiftlint:disable implicit_return
     #if !os(macOS)
         var pvc: PlayerViewController? {
             guard store.item != nil else {
@@ -74,4 +75,5 @@ struct PlayerView: View {
             return PlayerViewController(video: store.item!)
         }
     #endif
+    // swiftlint:enable implicit_return
 }

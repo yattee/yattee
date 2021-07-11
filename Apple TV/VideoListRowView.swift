@@ -12,50 +12,20 @@ struct VideoListRowView: View {
     var video: Video
 
     var body: some View {
-        #if os(tvOS)
+        #if os(tvOS) || os(macOS)
             NavigationLink(destination: PlayerView(id: video.id)) {
-                HStack(alignment: .top, spacing: 2) {
-                    roundedThumbnail
-
-                    HStack {
-                        VStack(alignment: .leading, spacing: 0) {
-                            videoDetail(video.title, bold: true)
-                            videoDetail(video.author, color: .secondary, bold: true)
-
-                            Spacer()
-
-                            additionalDetails
-                        }
-                        .padding()
-
-                        Spacer()
-                    }
-                    .frame(minHeight: 180)
-                }
-            }
-        #elseif os(macOS)
-            NavigationLink(destination: PlayerView(id: video.id)) {
-                verticalyAlignedDetails
+                #if os(tvOS)
+                    horizontalRow(detailsOnThumbnail: false)
+                #else
+                    verticalRow
+                #endif
             }
         #else
             ZStack {
                 if verticalSizeClass == .compact {
-                    HStack(alignment: .top) {
-                        thumbnailWithDetails
-                            .frame(minWidth: 0, maxWidth: 320, minHeight: 0, maxHeight: 180)
-                            .padding(4)
-
-                        VStack(alignment: .leading) {
-                            videoDetail(video.title, bold: true)
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                                .padding(.top, 10)
-
-                            additionalDetails
-                                .padding(.top, 4)
-                        }
-                    }
+                    horizontalRow(padding: 4)
                 } else {
-                    verticalyAlignedDetails
+                    verticalRow
                 }
 
                 NavigationLink(destination: PlayerView(id: video.id)) {
@@ -66,6 +36,66 @@ struct VideoListRowView: View {
                 .frame(height: 0)
             }
         #endif
+    }
+
+    func horizontalRow(detailsOnThumbnail: Bool = true, padding: Double = 0) -> some View {
+        HStack(alignment: .top, spacing: 2) {
+            if detailsOnThumbnail {
+                thumbnailWithDetails
+                    .padding(padding)
+            } else {
+                thumbnail
+                    .frame(width: 320, height: 180)
+            }
+
+            VStack(alignment: .leading, spacing: 0) {
+                videoDetail(video.title, bold: true)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+
+                if !detailsOnThumbnail {
+                    videoDetail(video.author, color: .secondary, bold: true)
+                }
+
+                Spacer()
+
+                additionalDetails
+            }
+            .padding()
+            .frame(minHeight: 180)
+
+            if !detailsOnThumbnail, let time = video.playTime {
+                Spacer()
+
+                VStack(alignment: .center) {
+                    Spacer()
+                    HStack(spacing: 8) {
+                        Image(systemName: "clock")
+                        Text(time)
+                            .fontWeight(.bold)
+                    }
+                    Spacer()
+                }
+                .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    var verticalRow: some View {
+        VStack(alignment: .leading) {
+            thumbnailWithDetails
+                .frame(minWidth: 0, maxWidth: 600)
+                .padding([.leading, .top, .trailing], 4)
+
+            VStack(alignment: .leading) {
+                videoDetail(video.title, bold: true)
+                    .padding(.bottom)
+
+                additionalDetails
+                    .padding(.bottom, 10)
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 8)
+        }
     }
 
     var additionalDetails: some View {
@@ -91,80 +121,46 @@ struct VideoListRowView: View {
         }
     }
 
-    var verticalyAlignedDetails: some View {
-        VStack(alignment: .leading) {
-            thumbnailWithDetails
-                .frame(minWidth: 0, maxWidth: 600)
-                .padding([.leading, .top, .trailing], 4)
-
-            VStack(alignment: .leading) {
-                videoDetail(video.title, bold: true)
-                    .padding(.bottom)
-
-                additionalDetails
-                    .padding(.bottom, 10)
-            }
-            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
-        }
-    }
-
     var thumbnailWithDetails: some View {
-        Group {
-            ZStack(alignment: .trailing) {
-                if let thumbnail = video.thumbnailURL(quality: "maxres") {
-                    // to replace with AsyncImage when it is fixed with lazy views
-                    URLImage(thumbnail) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(minWidth: 0, maxWidth: 600, minHeight: 0, maxHeight: .infinity)
-                            .background(Color.black)
-                    }
-                    .mask(RoundedRectangle(cornerRadius: 12))
-                } else {
-                    Image(systemName: "exclamationmark.square")
-                }
+        ZStack(alignment: .trailing) {
+            thumbnail
 
-                VStack(alignment: .trailing) {
-                    Text(video.author)
+            VStack(alignment: .trailing) {
+                Text(video.author)
+                    .padding(8)
+                    .background(.thinMaterial)
+                    .mask(RoundedRectangle(cornerRadius: 12))
+                    .offset(x: -5, y: 5)
+
+                Spacer()
+
+                if let time = video.playTime {
+                    Text(time)
+                        .fontWeight(.bold)
                         .padding(8)
                         .background(.thinMaterial)
                         .mask(RoundedRectangle(cornerRadius: 12))
-                        .offset(x: -5, y: 5)
-                        .truncationMode(.middle)
-
-                    Spacer()
-
-                    if let time = video.playTime {
-                        Text(time)
-                            .fontWeight(.bold)
-                            .padding(8)
-                            .background(.thinMaterial)
-                            .mask(RoundedRectangle(cornerRadius: 12))
-                            .offset(x: -5, y: -5)
-                    }
+                        .offset(x: -5, y: -5)
                 }
             }
         }
     }
 
-    var roundedThumbnail: some View {
-        Section {
-            if let thumbnail = video.thumbnailURL(quality: "high") {
+    var thumbnail: some View {
+        Group {
+            if let thumbnail = video.thumbnailURL(quality: "maxres") {
                 // to replace with AsyncImage when it is fixed with lazy views
                 URLImage(thumbnail) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(minWidth: 0, maxWidth: 320, minHeight: 0, maxHeight: 180)
                 }
                 .mask(RoundedRectangle(cornerRadius: 12))
             } else {
                 Image(systemName: "exclamationmark.square")
             }
         }
-        .frame(width: 320, height: 180)
+        .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
     }
 
     func videoDetail(_ text: String, color: Color? = .primary, bold: Bool = false) -> some View {

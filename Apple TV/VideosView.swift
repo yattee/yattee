@@ -25,7 +25,7 @@ struct VideosView: View {
             #else
                 VideosListView(videos: videos)
                 #if os(macOS)
-                    .frame(minWidth: 250, idealWidth: 350)
+                    .frame(minWidth: 400)
                 #endif
             #endif
         }
