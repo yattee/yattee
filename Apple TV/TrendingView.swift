@@ -19,23 +19,29 @@ struct TrendingView: View {
     var body: some View {
         Section {
             VStack(alignment: .center, spacing: 2) {
-                HStack {
-                    Text("Category")
-                        .foregroundColor(.secondary)
+                #if os(tvOS)
+                    HStack {
+                        Text("Category")
+                            .foregroundColor(.secondary)
 
-                    categoryButton
+                        categoryButton
 
-                    Text("Country")
-                        .foregroundColor(.secondary)
+                        Text("Country")
+                            .foregroundColor(.secondary)
 
-                    countryFlag
-                    countryButton
-                }
-                .scaleEffect(0.85)
+                        countryFlag
+                        countryButton
+                    }
+                    .scaleEffect(0.85)
+                #endif
 
                 VideosView(videos: store.collection)
             }
-        }.onAppear {
+        }
+        #if !os(tvOS)
+            .navigationTitle("Trending")
+        #endif
+        .onAppear {
             resource.loadIfNeeded()
         }
     }
@@ -61,9 +67,11 @@ struct TrendingView: View {
             selectingCountry.toggle()
             resource.removeObservers(ownedBy: store)
         }
-        .fullScreenCover(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
-            TrendingCountrySelectionView(selectedCountry: $country)
-        }
+        #if os(tvOS)
+            .fullScreenCover(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
+                TrendingCountrySelectionView(selectedCountry: $country)
+            }
+        #endif
     }
 
     fileprivate func setCategory(_ category: TrendingCategory) {

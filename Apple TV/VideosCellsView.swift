@@ -2,8 +2,6 @@ import Defaults
 import SwiftUI
 
 struct VideosCellsView: View {
-    @Default(.tabSelection) var tabSelection
-
     @State private var columns: Int
 
     init(videos: [Video], columns: Int = 3) {
@@ -15,7 +13,7 @@ struct VideosCellsView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: items, alignment: .center, spacing: 10) {
+            LazyVGrid(columns: items, alignment: .center) {
                 ForEach(videos) { video in
                     VideoCellView(video: video)
                         .contextMenu { VideoContextMenuView(video: video) }
@@ -28,7 +26,7 @@ struct VideosCellsView: View {
     var items: [GridItem] {
         Array(repeating: .init(.fixed(600)), count: gridColumns)
     }
-    
+
     var gridColumns: Int {
         videos.count < columns ? videos.count : columns
     }

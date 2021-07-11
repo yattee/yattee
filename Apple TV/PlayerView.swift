@@ -15,19 +15,63 @@ struct PlayerView: View {
 
     var body: some View {
         VStack {
-            pvc?
-                .edgesIgnoringSafeArea(.all)
+            #if os(tvOS)
+                pvc
+                    .edgesIgnoringSafeArea(.all)
+            #else
+                if let video = store.item {
+                    VStack(alignment: .leading) {
+                        Text(video.title)
+
+                            .bold()
+
+                        Text("\(video.author)")
+
+                            .foregroundColor(.secondary)
+                            .bold()
+
+                        if !video.published.isEmpty || video.views != 0 {
+                            HStack(spacing: 8) {
+                                #if os(iOS)
+                                    Text(video.playTime ?? "?")
+                                        .layoutPriority(1)
+                                #endif
+
+                                if !video.published.isEmpty {
+                                    Image(systemName: "calendar")
+                                    Text(video.published)
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                }
+
+                                if video.views != 0 {
+                                    Image(systemName: "eye")
+                                    Text(video.viewsCount)
+                                }
+                            }
+
+                            .padding(.top)
+                        }
+                    }
+                    #if os(tvOS)
+                        .padding()
+                    #else
+                    #endif
+                }
+            #endif
         }
         .onAppear {
             resource.loadIfNeeded()
         }
     }
 
-    var pvc: PlayerViewController? {
-        guard store.item != nil else {
-            return nil
-        }
+    #if !os(macOS)
+        var pvc: PlayerViewController? {
+            guard store.item != nil else {
+                return nil
+            }
 
-        return PlayerViewController(video: store.item!)
-    }
+            return PlayerViewController(video: store.item!)
+        }
+    #endif
 }

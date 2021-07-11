@@ -2,10 +2,11 @@ import Defaults
 import SwiftUI
 
 struct OptionsView: View {
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject<NavigationState> private var navigationState
 
     @Default(.layout) private var layout
-    @Default(.tabSelection) private var tabSelection
+
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         HStack {
@@ -41,7 +42,7 @@ struct OptionsView: View {
 
     var tabSelectionOptions: some View {
         VStack {
-            switch tabSelection {
+            switch navigationState.tabSelection {
             case .search:
                 SearchOptionsView()
 

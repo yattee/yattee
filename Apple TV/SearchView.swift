@@ -17,7 +17,7 @@ struct SearchView: View {
                 VideosView(videos: store.collection)
             }
 
-            if store.collection.isEmpty && !resource.isLoading {
+            if store.collection.isEmpty && !resource.isLoading && !query.isEmpty {
                 Text("No results")
 
                 if searchFiltersActive {
@@ -50,6 +50,9 @@ struct SearchView: View {
         .onChange(of: searchDuration) { duration in
             changeQuery { query.duration = duration }
         }
+        #if !os(tvOS)
+            .navigationTitle("Search")
+        #endif
     }
 
     func changeQuery(_ change: @escaping () -> Void = {}) {

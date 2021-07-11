@@ -14,5 +14,11 @@ struct SubscriptionsView: View {
             .onAppear {
                 resource.loadIfNeeded()
             }
+            .refreshable {
+                resource.load()
+            }
+        #if !os(tvOS)
+            .navigationTitle("Subscriptions")
+        #endif
     }
 }

@@ -12,8 +12,11 @@ struct PopularVideosView: View {
 
     var body: some View {
         VideosView(videos: store.collection)
-            .onAppear {
-                resource.loadIfNeeded()
-            }
+        #if !os(tvOS)
+            .navigationTitle("Popular")
+        #endif
+        .onAppear {
+            resource.loadIfNeeded()
+        }
     }
 }

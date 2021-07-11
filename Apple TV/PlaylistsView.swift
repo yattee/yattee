@@ -24,25 +24,27 @@ struct PlaylistsView: View {
     var body: some View {
         Section {
             VStack(alignment: .center, spacing: 2) {
-                HStack {
-                    if store.collection.isEmpty {
-                        Text("No Playlists")
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("Current Playlist")
-                            .foregroundColor(.secondary)
+                #if os(tvOS)
+                    HStack {
+                        if store.collection.isEmpty {
+                            Text("No Playlists")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Current Playlist")
+                                .foregroundColor(.secondary)
 
-                        selectPlaylistButton
+                            selectPlaylistButton
+                        }
+
+                        if currentPlaylist != nil {
+                            editPlaylistButton
+                        }
+
+                        newPlaylistButton
+                            .padding(.leading, 40)
                     }
-
-                    if currentPlaylist != nil {
-                        editPlaylistButton
-                    }
-
-                    newPlaylistButton
-                        .padding(.leading, 40)
-                }
-                .scaleEffect(0.85)
+                    .scaleEffect(0.85)
+                #endif
 
                 if currentPlaylist != nil {
                     if currentPlaylist!.videos.isEmpty {
@@ -61,17 +63,24 @@ struct PlaylistsView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-            PlaylistFormView(playlist: $createdPlaylist)
-        }
-        .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
-            PlaylistFormView(playlist: $editedPlaylist)
-        }
+        #if !os(macOS)
+            .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+                PlaylistFormView(playlist: $createdPlaylist)
+            }
+            .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+                PlaylistFormView(playlist: $editedPlaylist)
+            }
+        #endif
         .onAppear {
             resource.loadIfNeeded()?.onSuccess { _ in
                 selectPlaylist(selectedPlaylistID)
             }
         }
+        #if !os(tvOS)
+            .navigationTitle("Playlists")
+        #elseif os(iOS)
+            .navigationBarItems(trailing: newPlaylistButton)
+        #endif
     }
 
     func selectPlaylist(_ id: String?) {
@@ -139,7 +148,9 @@ struct PlaylistsView: View {
         Button(action: { self.showingNewPlaylist = true }) {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                Text("New Playlist")
+                #if os(tvOS)
+                    Text("New Playlist")
+                #endif
             }
         }
     }

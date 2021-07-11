@@ -4,6 +4,12 @@ import Logging
 import SwiftUI
 
 struct PlayerViewController: UIViewControllerRepresentable {
+    #if os(tvOS)
+        typealias PlayerController = StreamAVPlayerViewController
+    #else
+        typealias PlayerController = AVPlayerViewController
+    #endif
+
     let logger = Logger(label: "net.arekf.Pearvidious.pvc")
 
     @ObservedObject private var state: PlayerState
@@ -73,11 +79,11 @@ struct PlayerViewController: UIViewControllerRepresentable {
         loadStream(video.bestStream)
     }
 
-    func makeUIViewController(context _: Context) -> StreamAVPlayerViewController {
-        let controller = StreamAVPlayerViewController()
-        controller.state = state
+    func makeUIViewController(context _: Context) -> PlayerController {
+        let controller = PlayerController()
 
         #if os(tvOS)
+            controller.state = state
             controller.transportBarCustomMenuItems = [streamingQualityMenu]
         #endif
         controller.modalPresentationStyle = .fullScreen
@@ -86,7 +92,7 @@ struct PlayerViewController: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ controller: StreamAVPlayerViewController, context _: Context) {
+    func updateUIViewController(_ controller: PlayerController, context _: Context) {
         var items: [UIMenuElement] = []
 
         if state.nextStream != nil {

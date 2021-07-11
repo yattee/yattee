@@ -15,4 +15,8 @@ final class SearchQuery: ObservableObject {
         self.date = date
         self.duration = duration
     }
+
+    var isEmpty: Bool {
+        query.isEmpty
+    }
 }

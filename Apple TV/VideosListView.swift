@@ -10,10 +10,18 @@ struct VideosListView: View {
                 ForEach(videos) { video in
                     VideoListRowView(video: video)
                         .contextMenu { VideoContextMenuView(video: video) }
+                    #if os(tvOS)
                         .listRowInsets(listRowInsets)
+
+                    #elseif os(iOS)
+                        .listRowInsets(EdgeInsets(.zero))
+                        .listRowSeparator(.hidden)
+                    #endif
                 }
             }
-            .listStyle(GroupedListStyle())
+            #if os(tvOS)
+                .listStyle(GroupedListStyle())
+            #endif
         }
     }
 

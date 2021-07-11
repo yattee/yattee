@@ -1,7 +1,9 @@
 import AVFoundation
 import Foundation
 import Logging
-import UIKit
+#if !os(macOS)
+    import UIKit
+#endif
 
 final class PlayerState: ObservableObject {
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
@@ -36,15 +38,19 @@ final class PlayerState: ObservableObject {
             makeMetadataItem(.commonIdentifierDescription, value: video.description)
         ]
 
-        if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: "high")!),
-           let image = UIImage(data: thumbnailData),
-           let pngData = image.pngData()
-        {
-            let artworkItem = makeMetadataItem(.commonIdentifierArtwork, value: pngData)
-            externalMetadata.append(artworkItem)
-        }
+        #if !os(macOS)
 
-        playerItem.externalMetadata = externalMetadata
+            if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: "high")!),
+               let image = UIImage(data: thumbnailData),
+               let pngData = image.pngData()
+            {
+                let artworkItem = makeMetadataItem(.commonIdentifierArtwork, value: pngData)
+                externalMetadata.append(artworkItem)
+            }
+
+            playerItem.externalMetadata = externalMetadata
+
+        #endif
 
         playerItem.preferredForwardBufferDuration = 10
 

@@ -1,56 +1,26 @@
-import Defaults
 import SwiftUI
 
 struct ContentView: View {
-    @Default(.openChannel) var channel
-    @Default(.showingVideoDetails) var showDetails
+    @StateObject private var navigationState = NavigationState()
 
-    @State private var showingOptions = false
+    #if os(iOS)
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
 
     var body: some View {
-        NavigationView {
-            TabView(selection: tabSelection) {
-                SubscriptionsView()
-                    .tabItem { Text("Subscriptions") }
-                    .tag(TabSelection.subscriptions)
-
-                PopularVideosView()
-                    .tabItem { Text("Popular") }
-                    .tag(TabSelection.popular)
-
-                if channel != nil {
-                    ChannelView(id: channel!.id)
-                        .tabItem { Text("\(channel!.name) Channel") }
-                        .tag(TabSelection.channel)
+        Section {
+            #if os(iOS)
+                if horizontalSizeClass == .compact {
+                    AppTabNavigation()
+                } else {
+                    AppSidebarNavigation()
                 }
-
-                TrendingView()
-                    .tabItem { Text("Trending") }
-                    .tag(TabSelection.trending)
-
-                PlaylistsView()
-                    .tabItem { Text("Playlists") }
-                    .tag(TabSelection.playlists)
-
-                SearchView()
-                    .tabItem { Image(systemName: "magnifyingglass") }
-                    .tag(TabSelection.search)
-            }
-            .fullScreenCover(isPresented: $showingOptions) { OptionsView() }
-            .onPlayPauseCommand { showingOptions.toggle() }
-            .background(videoDetailsViewNavigationLink)
-        }
-    }
-
-    var tabSelection: Binding<TabSelection> {
-        Binding(
-            get: { Defaults[.tabSelection] },
-            set: { Defaults[.tabSelection] = $0 }
-        )
-    }
-
-    var videoDetailsViewNavigationLink: some View {
-        NavigationLink("", destination: VideoDetailsView(), isActive: $showDetails).hidden()
+            #elseif os(macOS)
+                AppSidebarNavigation()
+            #elseif os(tvOS)
+                TVNavigationView()
+            #endif
+        }.environmentObject(navigationState)
     }
 }
 

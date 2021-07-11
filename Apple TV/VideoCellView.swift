@@ -24,20 +24,24 @@ struct VideoCellView: View {
                             .frame(width: 550, height: 310)
                     }
 
-                    Text(video.author)
-                        .padding(8)
-                        .background(.thickMaterial)
-                        .mask(RoundedRectangle(cornerRadius: 12))
-                        .offset(x: -10, y: -120)
-                        .truncationMode(.middle)
-
-                    if let time = video.playTime {
-                        Text(time)
-                            .fontWeight(.bold)
+                    VStack(alignment: .trailing) {
+                        Text(video.author)
                             .padding(8)
                             .background(.thickMaterial)
                             .mask(RoundedRectangle(cornerRadius: 12))
-                            .offset(x: -10, y: 115)
+                            .offset(x: -5, y: 5)
+                            .truncationMode(.middle)
+
+                        Spacer()
+
+                        if let time = video.playTime {
+                            Text(time)
+                                .fontWeight(.bold)
+                                .padding(8)
+                                .background(.thickMaterial)
+                                .mask(RoundedRectangle(cornerRadius: 12))
+                                .offset(x: -5, y: -5)
+                        }
                     }
                 }
                 .frame(width: 550, height: 310)

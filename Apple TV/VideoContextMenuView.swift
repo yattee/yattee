@@ -2,18 +2,15 @@ import Defaults
 import SwiftUI
 
 struct VideoContextMenuView: View {
-    @Default(.tabSelection) var tabSelection
+    @EnvironmentObject<NavigationState> private var navigationState
 
     let video: Video
-
-    @Default(.openVideoID) var openVideoID
-    @Default(.showingVideoDetails) var showDetails
 
     @Default(.showingAddToPlaylist) var showingAddToPlaylist
     @Default(.videoIDToAddToPlaylist) var videoIDToAddToPlaylist
 
     var body: some View {
-        if tabSelection == .channel {
+        if navigationState.tabSelection == .channel {
             closeChannelButton(from: video)
         } else {
             openChannelButton(from: video)
@@ -21,7 +18,7 @@ struct VideoContextMenuView: View {
 
         openVideoDetailsButton
 
-        if tabSelection == .playlists {
+        if navigationState.tabSelection == .playlists {
             removeFromPlaylistButton
         } else {
             addToPlaylistButton
@@ -30,21 +27,19 @@ struct VideoContextMenuView: View {
 
     func openChannelButton(from video: Video) -> some View {
         Button("\(video.author) Channel") {
-            Defaults[.openChannel] = Channel.from(video: video)
-            tabSelection = .channel
+            navigationState.openChannel(Channel.from(video: video))
         }
     }
 
     func closeChannelButton(from video: Video) -> some View {
         Button("Close \(Channel.from(video: video).name) Channel") {
-            Defaults.reset(.openChannel)
+            navigationState.closeChannel()
         }
     }
 
     var openVideoDetailsButton: some View {
         Button("Open video details") {
-            openVideoID = video.id
-            showDetails = true
+            navigationState.openVideoDetails(video)
         }
     }
 

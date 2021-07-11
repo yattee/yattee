@@ -5,22 +5,35 @@ struct VideosView: View {
     @State private var profile = Profile()
 
     @Default(.layout) var layout
-    @Default(.tabSelection) var tabSelection
 
     @Default(.showingAddToPlaylist) var showingAddToPlaylist
+
+    #if os(iOS)
+        @Environment(\.verticalSizeClass) private var horizontalSizeClass
+    #endif
 
     var videos: [Video]
 
     var body: some View {
         VStack {
-            if layout == .cells {
-                VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
-            } else {
+            #if os(tvOS)
+                if layout == .cells {
+                    VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
+                } else {
+                    VideosListView(videos: videos)
+                }
+            #else
                 VideosListView(videos: videos)
+                #if os(macOS)
+                    .frame(minWidth: 250, idealWidth: 350)
+                #endif
+            #endif
+        }
+
+        #if os(tvOS)
+            .fullScreenCover(isPresented: $showingAddToPlaylist) {
+                AddToPlaylistView()
             }
-        }
-        .fullScreenCover(isPresented: $showingAddToPlaylist) {
-            AddToPlaylistView()
-        }
+        #endif
     }
 }

@@ -16,9 +16,21 @@ struct ChannelView: View {
     }
 
     var body: some View {
-        VideosView(videos: store.collection)
-            .onAppear {
-                resource.loadIfNeeded()
+        HStack {
+            Spacer()
+
+            VStack {
+                Spacer()
+                VideosView(videos: store.collection)
+                    .onAppear {
+                        resource.loadIfNeeded()
+                    }
+                Spacer()
             }
+
+            Spacer()
+        }
+        .edgesIgnoringSafeArea(.all)
+        .background(.ultraThickMaterial)
     }
 }
