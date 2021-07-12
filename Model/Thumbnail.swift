@@ -3,10 +3,10 @@ import SwiftyJSON
 
 struct Thumbnail {
     var url: URL
-    var quality: String
+    var quality: ThumbnailQuality
 
     init(_ json: JSON) {
         url = json["url"].url!
-        quality = json["quality"].string!
+        quality = ThumbnailQuality(rawValue: json["quality"].string!)!
     }
 }

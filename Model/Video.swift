@@ -107,7 +107,7 @@ struct Video: Identifiable {
         streamWithResolution(profile.defaultStreamResolution.value) ?? streams.first
     }
 
-    func thumbnailURL(quality: String) -> URL? {
+    func thumbnailURL(quality: ThumbnailQuality) -> URL? {
         thumbnails.first { $0.quality == quality }?.url
     }
 

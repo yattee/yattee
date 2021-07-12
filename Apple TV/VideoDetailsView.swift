@@ -31,7 +31,7 @@ struct VideoDetailsView: View {
                         VStack(alignment: .center) {
                             ZStack(alignment: .bottom) {
                                 Group {
-                                    if let thumbnail = video.thumbnailURL(quality: "maxres") {
+                                    if let thumbnail = video.thumbnailURL(quality: .maxres) {
                                         // to replace with AsyncImage when it is fixed with lazy views
                                         URLImage(thumbnail) { image in
                                             image

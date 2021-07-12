@@ -40,7 +40,7 @@ final class PlayerState: ObservableObject {
 
         #if !os(macOS)
 
-            if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: "high")!),
+            if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .high)!),
                let image = UIImage(data: thumbnailData),
                let pngData = image.pngData()
             {

@@ -187,6 +187,9 @@
 		37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B19C2671817900C925CA /* SwiftyJSON */; };
 		37D4B1AB2672580400C925CA /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B1AA2672580400C925CA /* URLImage */; };
 		37D4B1AD2672580400C925CA /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B1AC2672580400C925CA /* URLImageStore */; };
+		37D80701269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D80700269C74F8002ECBBA /* ThumbnailQuality.swift */; };
+		37D80702269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D80700269C74F8002ECBBA /* ThumbnailQuality.swift */; };
+		37D80703269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D80700269C74F8002ECBBA /* ThumbnailQuality.swift */; };
 		37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86D267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
@@ -292,6 +295,7 @@
 		37D4B18B26717B3800C925CA /* VideoListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoListRowView.swift; sourceTree = "<group>"; };
 		37D4B19626717E1500C925CA /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37D80700269C74F8002ECBBA /* ThumbnailQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailQuality.swift; sourceTree = "<group>"; };
 		37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockAPI.swift; sourceTree = "<group>"; };
 		37EAD86E267B9ED100D9E01B /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 		37F4AE7126828F0900BD60EA /* VideosCellsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosCellsView.swift; sourceTree = "<group>"; };
@@ -508,6 +512,7 @@
 				37CEE4B82677B63F005A1EFE /* StreamResolution.swift */,
 				37CEE4B42677B628005A1EFE /* StreamType.swift */,
 				373CFADA269663F1003CB2C6 /* Thumbnail.swift */,
+				37D80700269C74F8002ECBBA /* ThumbnailQuality.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
 			);
@@ -833,6 +838,7 @@
 				373CFAC226966159003CB2C6 /* CoverSectionRowView.swift in Sources */,
 				37141673267A8E10006CA35D /* Country.swift in Sources */,
 				37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */,
+				37D80701269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */,
 				373CFAD7269662CD003CB2C6 /* SearchDuration.swift in Sources */,
 				373CFACF26966290003CB2C6 /* SearchSortOrder.swift in Sources */,
 				373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
@@ -853,6 +859,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37CEE4BE2677B670005A1EFE /* AudioVideoStream.swift in Sources */,
+				37D80702269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */,
 				37F4AE772682908700BD60EA /* VideoCellView.swift in Sources */,
 				373CFABF26966149003CB2C6 /* CoverSectionView.swift in Sources */,
 				37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
@@ -957,6 +964,7 @@
 				37D4B18E26717B3800C925CA /* VideoListRowView.swift in Sources */,
 				37AAF27E26737323007FC770 /* PopularVideosView.swift in Sources */,
 				37AAF29A26740A01007FC770 /* VideosListView.swift in Sources */,
+				37D80703269C74F8002ECBBA /* ThumbnailQuality.swift in Sources */,
 				37AAF2962674086B007FC770 /* TabSelection.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,

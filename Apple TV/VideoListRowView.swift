@@ -16,7 +16,7 @@ struct VideoListRowView: View {
             NavigationLink(destination: PlayerView(id: video.id)) {
                 #if os(tvOS)
                     horizontalRow(detailsOnThumbnail: false)
-                #else
+                #elseif os(macOS)
                     verticalRow
                 #endif
             }
@@ -41,11 +41,10 @@ struct VideoListRowView: View {
     func horizontalRow(detailsOnThumbnail: Bool = true, padding: Double = 0) -> some View {
         HStack(alignment: .top, spacing: 2) {
             if detailsOnThumbnail {
-                thumbnailWithDetails
+                thumbnailWithDetails()
                     .padding(padding)
             } else {
-                thumbnail
-                    .frame(width: 320, height: 180)
+                thumbnail(.medium, maxWidth: 320, maxHeight: 180)
             }
 
             VStack(alignment: .leading, spacing: 0) {
@@ -82,8 +81,8 @@ struct VideoListRowView: View {
 
     var verticalRow: some View {
         VStack(alignment: .leading) {
-            thumbnailWithDetails
-                .frame(minWidth: 0, maxWidth: 600)
+            thumbnailWithDetails(minWidth: 250, maxWidth: 600, minHeight: 180)
+                .frame(idealWidth: 320)
                 .padding([.leading, .top, .trailing], 4)
 
             VStack(alignment: .leading) {
@@ -121,46 +120,67 @@ struct VideoListRowView: View {
         }
     }
 
-    var thumbnailWithDetails: some View {
+    func thumbnailWithDetails(
+        minWidth: Double = 250,
+        maxWidth: Double = .infinity,
+        minHeight: Double = 140,
+        maxHeight: Double = .infinity
+    ) -> some View {
         ZStack(alignment: .trailing) {
-            thumbnail
+            thumbnail(.maxres, minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
 
             VStack(alignment: .trailing) {
-                Text(video.author)
-                    .padding(8)
-                    .background(.thinMaterial)
-                    .mask(RoundedRectangle(cornerRadius: 12))
+                detailOnThinMaterial(video.author)
                     .offset(x: -5, y: 5)
 
                 Spacer()
 
                 if let time = video.playTime {
-                    Text(time)
-                        .fontWeight(.bold)
-                        .padding(8)
-                        .background(.thinMaterial)
-                        .mask(RoundedRectangle(cornerRadius: 12))
+                    detailOnThinMaterial(time, bold: true)
                         .offset(x: -5, y: -5)
                 }
             }
         }
     }
 
-    var thumbnail: some View {
+    func detailOnThinMaterial(_ text: String, bold: Bool = false) -> some View {
+        Text(text)
+            .fontWeight(bold ? .semibold : .regular)
+            .padding(8)
+            .background(.thinMaterial)
+            .mask(RoundedRectangle(cornerRadius: 12))
+    }
+
+    func thumbnail(
+        _ quality: ThumbnailQuality,
+        minWidth: Double = 320,
+        maxWidth: Double = .infinity,
+        minHeight: Double = 180,
+        maxHeight: Double = .infinity
+    ) -> some View {
         Group {
-            if let thumbnail = video.thumbnailURL(quality: "maxres") {
-                // to replace with AsyncImage when it is fixed with lazy views
-                URLImage(thumbnail) { image in
+            if let url = video.thumbnailURL(quality: quality) {
+                URLImage(url) {
+                    EmptyView()
+                } inProgress: { _ in
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                } failure: { _, retry in
+                    VStack {
+                        Button("Retry", action: retry)
+                    }
+                } content: { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
+                        .frame(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
                 }
                 .mask(RoundedRectangle(cornerRadius: 12))
             } else {
                 Image(systemName: "exclamationmark.square")
             }
         }
-        .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
+        .frame(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
     }
 
     func videoDetail(_ text: String, color: Color? = .primary, bold: Bool = false) -> some View {
