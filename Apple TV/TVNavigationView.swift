@@ -35,7 +35,9 @@ struct TVNavigationView: View {
                     VideoDetailsView(video)
                 }
             }
-            .fullScreenCover(isPresented: $navigationState.showingChannel) {
+            .fullScreenCover(isPresented: $navigationState.showingChannel, onDismiss: {
+                navigationState.showVideoDetailsIfNeeded()
+            }) {
                 if let channel = navigationState.channel {
                     ChannelView(id: channel.id)
                 }

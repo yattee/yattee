@@ -3,6 +3,8 @@ import URLImage
 import URLImageStore
 
 struct VideoListRowView: View {
+    @EnvironmentObject<NavigationState> private var navigationState
+
     @Environment(\.isFocused) private var focused: Bool
 
     #if os(iOS)
@@ -12,23 +14,27 @@ struct VideoListRowView: View {
     var video: Video
 
     var body: some View {
-        #if os(tvOS) || os(macOS)
-            NavigationLink(destination: PlayerView(id: video.id)) {
-                #if os(tvOS)
-                    horizontalRow(detailsOnThumbnail: false)
-                #elseif os(macOS)
-                    verticalRow
-                #endif
+        #if os(tvOS)
+            Button(action: { navigationState.playVideo(video) }) {
+                horizontalRow(detailsOnThumbnail: false)
+            }
+        #elseif os(macOS)
+            NavigationLink(destination: VideoPlayerView(video)) {
+                verticalRow
             }
         #else
             ZStack {
-                if verticalSizeClass == .compact {
-                    horizontalRow(padding: 4)
-                } else {
+                #if os(macOS)
                     verticalRow
-                }
+                #else
+                    if verticalSizeClass == .compact {
+                        horizontalRow(padding: 4)
+                    } else {
+                        verticalRow
+                    }
+                #endif
 
-                NavigationLink(destination: PlayerView(id: video.id)) {
+                NavigationLink(destination: VideoPlayerView(video)) {
                     EmptyView()
                 }
                 .buttonStyle(PlainButtonStyle())

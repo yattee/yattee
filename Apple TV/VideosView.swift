@@ -2,9 +2,13 @@ import Defaults
 import SwiftUI
 
 struct VideosView: View {
+    @EnvironmentObject<NavigationState> private var navigationState
+
     @State private var profile = Profile()
 
-    @Default(.layout) var layout
+    #if os(tvOS)
+        @Default(.layout) var layout
+    #endif
 
     @Default(.showingAddToPlaylist) var showingAddToPlaylist
 
@@ -31,9 +35,15 @@ struct VideosView: View {
         }
 
         #if os(tvOS)
+            .fullScreenCover(isPresented: $navigationState.showingVideo) {
+                if let video = navigationState.video {
+                    VideoPlayerView(video)
+                }
+            }
             .fullScreenCover(isPresented: $showingAddToPlaylist) {
                 AddToPlaylistView()
             }
+
         #endif
     }
 }

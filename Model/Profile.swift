@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 
 struct Profile {
-    var defaultStreamResolution: DefaultStreamResolution = .hd720p
+    var defaultStreamResolution: DefaultStreamResolution = .hd720pFirstThenBest
 
     var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
 

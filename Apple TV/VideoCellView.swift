@@ -4,10 +4,12 @@ import URLImageStore
 import SwiftUI
 
 struct VideoCellView: View {
+    @EnvironmentObject<NavigationState> private var navigationState
+
     var video: Video
 
     var body: some View {
-        NavigationLink(destination: PlayerView(id: video.id)) {
+        Button(action: { navigationState.playVideo(video) }) {
             VStack(alignment: .leading) {
                 ZStack(alignment: .trailing) {
                     if let thumbnail = video.thumbnailURL(quality: .high) {

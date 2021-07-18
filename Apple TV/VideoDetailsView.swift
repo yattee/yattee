@@ -10,6 +10,8 @@ struct VideoDetailsView: View {
 
     @ObservedObject private var store = Store<Video>()
 
+    @State private var playVideoLinkActive = false
+
     var resource: Resource {
         InvidiousAPI.shared.video(video.id)
     }
@@ -22,66 +24,80 @@ struct VideoDetailsView: View {
     }
 
     var body: some View {
-        HStack {
-            Spacer()
-            VStack {
+        NavigationView {
+            HStack {
                 Spacer()
-                ScrollView(.vertical, showsIndicators: false) {
-                    if let video = store.item {
-                        VStack(alignment: .center) {
-                            ZStack(alignment: .bottom) {
-                                Group {
-                                    if let thumbnail = video.thumbnailURL(quality: .maxres) {
-                                        // to replace with AsyncImage when it is fixed with lazy views
-                                        URLImage(thumbnail) { image in
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 1600, height: 800)
-                                        }
-                                    }
-                                }
-                                .frame(width: 1600, height: 800)
 
-                                VStack(alignment: .leading) {
-                                    Text(video.title)
-                                        .font(.system(size: 40))
+                VStack {
+                    Spacer()
 
-                                    HStack {
-                                        NavigationLink(destination: PlayerView(id: video.id)) {
-                                            HStack(spacing: 8) {
-                                                Image(systemName: "play.rectangle.fill")
-
-                                                Text("Play")
+                    ScrollView(.vertical, showsIndicators: false) {
+                        if let video = store.item {
+                            VStack(alignment: .center) {
+                                ZStack(alignment: .bottom) {
+                                    Group {
+                                        if let thumbnail = video.thumbnailURL(quality: .maxres) {
+                                            // to replace with AsyncImage when it is fixed with lazy views
+                                            URLImage(thumbnail) { image in
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 1600, height: 800)
                                             }
                                         }
-
-                                        openChannelButton
                                     }
+                                    .frame(width: 1600, height: 800)
+
+                                    VStack(alignment: .leading) {
+                                        Text(video.title)
+                                            .font(.system(size: 40))
+
+                                        HStack {
+                                            playVideoButton
+
+                                            openChannelButton
+                                        }
+                                    }
+                                    .padding(40)
+                                    .frame(width: 1600, alignment: .leading)
+                                    .background(.thinMaterial)
                                 }
-                                .padding(40)
-                                .frame(width: 1600, alignment: .leading)
-                                .background(.thinMaterial)
+                                .mask(RoundedRectangle(cornerRadius: 20))
+                                VStack {
+                                    Text(video.description)
+                                        .lineLimit(nil)
+                                        .focusable()
+                                }.frame(width: 1600, alignment: .leading)
                             }
-                            .mask(RoundedRectangle(cornerRadius: 20))
-                            VStack {
-                                Text(video.description)
-                                    .lineLimit(nil)
-                                    .focusable()
-                            }.frame(width: 1600, alignment: .leading)
                         }
                     }
+
+                    Spacer()
                 }
+
                 Spacer()
             }
-            Spacer()
         }
         .background(.thinMaterial)
 
         .onAppear {
             resource.loadIfNeeded()
         }
+
         .edgesIgnoringSafeArea(.all)
+    }
+
+    var playVideoButton: some View {
+        Button(action: {
+            navigationState.returnToDetails = true
+            playVideoLinkActive = true
+        }) {
+            HStack(spacing: 8) {
+                Image(systemName: "play.rectangle.fill")
+                Text("Play")
+            }
+        }
+        .background(NavigationLink(destination: VideoPlayerView(video), isActive: $playVideoLinkActive) { EmptyView() }.hidden())
     }
 
     var openChannelButton: some View {
@@ -89,6 +105,7 @@ struct VideoDetailsView: View {
 
         return Button("Open \(channel.name) channel") {
             navigationState.openChannel(channel)
+            navigationState.returnToDetails = true
             dismiss()
         }
     }

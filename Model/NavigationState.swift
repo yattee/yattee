@@ -8,9 +8,13 @@ final class NavigationState: ObservableObject {
     @Published var channel: Channel?
 
     @Published var showingVideoDetails = false
+    @Published var showingVideo = false
     @Published var video: Video?
 
+    @Published var returnToDetails = false
+
     func openChannel(_ channel: Channel) {
+        returnToDetails = false
         self.channel = channel
         showingChannel = true
     }
@@ -28,6 +32,16 @@ final class NavigationState: ObservableObject {
     func closeVideoDetails() {
         showingVideoDetails = false
         video = nil
+    }
+
+    func playVideo(_ video: Video) {
+        self.video = video
+        showingVideo = true
+    }
+
+    func showVideoDetailsIfNeeded() {
+        showingVideoDetails = returnToDetails
+        returnToDetails = false
     }
 
     var tabSelectionOptionalBinding: Binding<TabSelection?> {
