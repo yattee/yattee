@@ -2,9 +2,7 @@ import Defaults
 import SwiftUI
 
 struct AppTabNavigation: View {
-    @State private var showingOptions = false
-
-    @State private var tabSelection: TabSelection? = .subscriptions
+    @State private var tabSelection: TabSelection = .subscriptions
 
     var body: some View {
         TabView(selection: $tabSelection) {

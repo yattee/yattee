@@ -114,7 +114,7 @@ final class PlayerState: ObservableObject {
                         logger.info("ALL assets loaded: \(stream.type), \(stream.description)")
 
                         playStream(stream)
-                        
+
                         if loadBest {
                             await self.loadBestStream()
                         }
