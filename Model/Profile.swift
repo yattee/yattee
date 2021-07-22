@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 
 struct Profile {
-    var defaultStreamResolution: DefaultStreamResolution = .hd720pFirstThenBest
+    var defaultStreamResolution: DefaultStreamResolution = .hd1080p
 
     var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
 
@@ -15,12 +15,12 @@ struct Profile {
 enum DefaultStreamResolution: String {
     case hd720pFirstThenBest, hd1080p, hd720p, sd480p, sd360p, sd240p, sd144p
 
-    var value: StreamResolution {
+    var value: Stream.Resolution {
         switch self {
         case .hd720pFirstThenBest:
             return .hd720p
         default:
-            return StreamResolution(rawValue: rawValue)!
+            return Stream.Resolution(rawValue: rawValue)!
         }
     }
 }

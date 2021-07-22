@@ -2,9 +2,21 @@ import Foundation
 import SwiftyJSON
 
 struct Playlist: Identifiable, Equatable, Hashable {
+    enum Visibility: String, CaseIterable, Identifiable {
+        case `public`, unlisted, `private`
+
+        var id: String {
+            rawValue
+        }
+
+        var name: String {
+            rawValue.capitalized
+        }
+    }
+
     let id: String
     var title: String
-    var visibility: PlaylistVisibility
+    var visibility: Visibility
 
     var updated: TimeInterval
 

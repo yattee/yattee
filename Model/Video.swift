@@ -15,9 +15,44 @@ struct Video: Identifiable {
     var description: String
     var genre: String
 
+    // index used when in the Playlist
     let indexID: String?
 
+    var live: Bool
+    var upcoming: Bool
+
     var streams = [Stream]()
+    var hlsUrl: URL?
+
+    init(
+        id: String,
+        title: String,
+        author: String,
+        length: TimeInterval,
+        published: String,
+        views: Int,
+        channelID: String,
+        description: String,
+        genre: String,
+        thumbnails: [Thumbnail] = [],
+        indexID: String? = nil,
+        live: Bool = false,
+        upcoming: Bool = false
+    ) {
+        self.id = id
+        self.title = title
+        self.author = author
+        self.length = length
+        self.published = published
+        self.views = views
+        self.channelID = channelID
+        self.description = description
+        self.genre = genre
+        self.thumbnails = thumbnails
+        self.indexID = indexID
+        self.live = live
+        self.upcoming = upcoming
+    }
 
     init(_ json: JSON) {
         let videoID = json["videoId"].stringValue
@@ -41,8 +76,13 @@ struct Video: Identifiable {
 
         thumbnails = Video.extractThumbnails(from: json)
 
+        live = json["liveNow"].boolValue
+        upcoming = json["isUpcoming"].boolValue
+
         streams = Video.extractFormatStreams(from: json["formatStreams"].arrayValue)
         streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
+
+        hlsUrl = json["hlsUrl"].url
     }
 
     var playTime: String? {
@@ -57,6 +97,10 @@ struct Video: Identifiable {
         formatter.zeroFormattingBehavior = [.pad]
 
         return formatter.string(from: length)
+    }
+
+    var publishedDate: String? {
+        (published.isEmpty || published == "0 seconds ago") ? nil : published
     }
 
     var viewsCount: String {
@@ -82,8 +126,8 @@ struct Video: Identifiable {
         let streams = streams.sorted { $0.resolution > $1.resolution }
         var selectable = [Stream]()
 
-        StreamResolution.allCases.forEach { resolution in
-            if let stream = streams.filter({ $0.resolution == resolution }).min(by: { $0.type < $1.type }) {
+        Stream.Resolution.allCases.forEach { resolution in
+            if let stream = streams.filter({ $0.resolution == resolution }).min(by: { $0.kind < $1.kind }) {
                 selectable.append(stream)
             }
         }
@@ -92,14 +136,14 @@ struct Video: Identifiable {
     }
 
     var defaultStream: Stream? {
-        selectableStreams.first { $0.type == .stream }
+        selectableStreams.first { $0.kind == .stream }
     }
 
     var bestStream: Stream? {
         selectableStreams.min { $0.resolution > $1.resolution }
     }
 
-    func streamWithResolution(_ resolution: StreamResolution) -> Stream? {
+    func streamWithResolution(_ resolution: Stream.Resolution) -> Stream? {
         selectableStreams.first { $0.resolution == resolution }
     }
 
@@ -107,7 +151,7 @@ struct Video: Identifiable {
         streamWithResolution(profile.defaultStreamResolution.value) ?? streams.first
     }
 
-    func thumbnailURL(quality: ThumbnailQuality) -> URL? {
+    func thumbnailURL(quality: Thumbnail.Quality) -> URL? {
         thumbnails.first { $0.quality == quality }?.url
     }
 
@@ -117,12 +161,14 @@ struct Video: Identifiable {
         }
     }
 
+    static let options = [AVURLAssetPreferPreciseDurationAndTimingKey: false]
+
     private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
-            AudioVideoStream(
-                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
-                resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
-                type: .stream,
+            SingleAssetStream(
+                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!, options: options),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
+                kind: .stream,
                 encoding: $0["encoding"].stringValue
             )
         }
@@ -138,10 +184,10 @@ struct Video: Identifiable {
 
         return videoAssetsURLs.map {
             Stream(
-                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
-                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
-                resolution: StreamResolution.from(resolution: $0["resolution"].stringValue)!,
-                type: .adaptive,
+                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!, options: options),
+                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!, options: options),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
+                kind: .adaptive,
                 encoding: $0["encoding"].stringValue
             )
         }

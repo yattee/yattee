@@ -3,7 +3,7 @@ import SwiftUI
 
 struct PlaylistFormView: View {
     @State private var name = ""
-    @State private var visibility = PlaylistVisibility.public
+    @State private var visibility = Playlist.Visibility.public
 
     @State private var valid = false
     @State private var showingDeleteConfirmation = false
@@ -89,7 +89,7 @@ struct PlaylistFormView: View {
             self.visibility = self.visibility.next()
         }
         .contextMenu {
-            ForEach(PlaylistVisibility.allCases) { visibility in
+            ForEach(Playlist.Visibility.allCases) { visibility in
                 Button(visibility.name) {
                     self.visibility = visibility
                 }

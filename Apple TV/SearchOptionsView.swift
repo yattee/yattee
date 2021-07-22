@@ -19,7 +19,7 @@ struct SearchOptionsView: View {
             self.searchSortOrder = self.searchSortOrder.next()
         }
         .contextMenu {
-            ForEach(SearchSortOrder.allCases) { sortOrder in
+            ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
                 Button(sortOrder.name) {
                     self.searchSortOrder = sortOrder
                 }
@@ -29,11 +29,11 @@ struct SearchOptionsView: View {
 
     var searchDateButton: some View {
         Button(self.searchDate?.name ?? "All") {
-            self.searchDate = self.searchDate == nil ? SearchDate.allCases.first : self.searchDate!.next(nilAtEnd: true)
+            self.searchDate = self.searchDate == nil ? SearchQuery.Date.allCases.first : self.searchDate!.next(nilAtEnd: true)
         }
 
         .contextMenu {
-            ForEach(SearchDate.allCases) { searchDate in
+            ForEach(SearchQuery.Date.allCases) { searchDate in
                 Button(searchDate.name) {
                     self.searchDate = searchDate
                 }
@@ -47,10 +47,10 @@ struct SearchOptionsView: View {
 
     var searchDurationButton: some View {
         Button(self.searchDuration?.name ?? "All") {
-            self.searchDuration = self.searchDuration == nil ? SearchDuration.allCases.first : self.searchDuration!.next(nilAtEnd: true)
+            self.searchDuration = self.searchDuration == nil ? SearchQuery.Duration.allCases.first : self.searchDuration!.next(nilAtEnd: true)
         }
         .contextMenu {
-            ForEach(SearchDuration.allCases) { searchDuration in
+            ForEach(SearchQuery.Duration.allCases) { searchDuration in
                 Button(searchDuration.name) {
                     self.searchDuration = searchDuration
                 }

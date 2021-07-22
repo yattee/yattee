@@ -9,28 +9,139 @@ final class PlayerState: ObservableObject {
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
 
     var video: Video!
-    private(set) var composition = AVMutableComposition()
-    private(set) var nextComposition = AVMutableComposition()
 
-    private(set) var currentStream: Stream!
+    var player: AVPlayer!
 
-    private(set) var nextStream: Stream!
-    private(set) var streamLoading = false
+    private var compositions = [Stream: AVMutableComposition]()
 
     private(set) var currentTime: CMTime?
     private(set) var savedTime: CMTime?
 
-    var currentSegment: Segment?
-
-    private(set) var profile = Profile()
-
     private(set) var currentRate: Float = 0.0
-    static let availablePlaybackRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+    static let availableRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
-    var player: AVPlayer!
+    let maxResolution: Stream.Resolution?
+    var timeObserver: Any?
 
-    var playerItem: AVPlayerItem {
-        let playerItem = AVPlayerItem(asset: composition)
+    init(_ video: Video? = nil, maxResolution: Stream.Resolution? = nil) {
+        self.video = video
+        self.maxResolution = maxResolution
+    }
+
+    deinit {
+        destroyPlayer()
+    }
+
+    func loadVideo(_ video: Video?) {
+        guard video != nil else {
+            return
+        }
+
+        InvidiousAPI.shared.video(video!.id).load().onSuccess { response in
+            if let video: Video = response.typedContent() {
+                self.video = video
+
+                self.playVideo(video)
+            }
+        }
+    }
+
+    fileprivate func playVideo(_ video: Video) {
+        if video.hlsUrl != nil {
+            playHlsUrl()
+            return
+        }
+
+        let stream = maxResolution != nil ? video.streamWithResolution(maxResolution!) : video.defaultStream
+
+        guard stream != nil else {
+            return
+        }
+
+        Task {
+            await self.loadStream(stream!)
+
+            if stream != video.bestStream {
+                await self.loadBestStream()
+            }
+        }
+    }
+
+    fileprivate func playHlsUrl() {
+        player.replaceCurrentItem(with: playerItemWithMetadata())
+        player.playImmediately(atRate: 1.0)
+    }
+
+    fileprivate func loadStream(_ stream: Stream) async {
+        if stream.oneMeaningfullAsset {
+            DispatchQueue.main.async {
+                self.playStream(stream)
+            }
+
+            return
+        } else {
+            await playComposition(for: stream)
+        }
+    }
+
+    fileprivate func playStream(_ stream: Stream) {
+        logger.warning("loading \(stream.description) to player")
+
+        DispatchQueue.main.async {
+            self.saveTime()
+            self.player?.replaceCurrentItem(with: self.playerItemWithMetadata(for: stream))
+            self.player?.playImmediately(atRate: 1.0)
+            self.seekToSavedTime()
+        }
+    }
+
+    fileprivate func playComposition(for stream: Stream) async {
+        async let assetAudioTrack = stream.audioAsset.loadTracks(withMediaType: .audio)
+        async let assetVideoTrack = stream.videoAsset.loadTracks(withMediaType: .video)
+
+        if let audioTrack = composition(for: stream).addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid),
+           let assetTrack = try? await assetAudioTrack.first
+        {
+            try! audioTrack.insertTimeRange(
+                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
+                of: assetTrack,
+                at: .zero
+            )
+            logger.critical("audio loaded")
+        } else {
+            fatalError("no track")
+        }
+
+        if let videoTrack = composition(for: stream).addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
+           let assetTrack = try? await assetVideoTrack.first
+        {
+            try! videoTrack.insertTimeRange(
+                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
+                of: assetTrack,
+                at: .zero
+            )
+            logger.critical("video loaded")
+
+            playStream(stream)
+        } else {
+            fatalError("no track")
+        }
+    }
+
+    fileprivate func playerItem(for stream: Stream? = nil) -> AVPlayerItem {
+        if stream != nil {
+            if stream!.oneMeaningfullAsset {
+                return AVPlayerItem(asset: stream!.videoAsset, automaticallyLoadedAssetKeys: [.isPlayable])
+            } else {
+                return AVPlayerItem(asset: composition(for: stream!))
+            }
+        }
+
+        return AVPlayerItem(url: video.hlsUrl!)
+    }
+
+    fileprivate func playerItemWithMetadata(for stream: Stream? = nil) -> AVPlayerItem {
+        let playerItemWithMetadata = playerItem(for: stream)
 
         var externalMetadata = [
             makeMetadataItem(.commonIdentifierTitle, value: video.title),
@@ -47,196 +158,34 @@ final class PlayerState: ObservableObject {
                 externalMetadata.append(artworkItem)
             }
 
-            playerItem.externalMetadata = externalMetadata
+            playerItemWithMetadata.externalMetadata = externalMetadata
         #endif
 
-        playerItem.preferredForwardBufferDuration = 10
+        playerItemWithMetadata.preferredForwardBufferDuration = 10
 
-        return playerItem
+        return playerItemWithMetadata
     }
 
-    var segmentsProvider: SponsorBlockAPI?
-    var timeObserver: Any?
-
-    init(_ video: Video? = nil) {
-        self.video = video
-
-        if self.video != nil {
-            segmentsProvider = SponsorBlockAPI(self.video.id)
-            segmentsProvider!.load()
-        }
+    func setPlayerRate(_ rate: Float) {
+        currentRate = rate
+        player.rate = rate
     }
 
-    deinit {
-        destroyPlayer()
-    }
-
-    func loadVideo(_ video: Video?) {
-        guard video != nil else {
-            return
+    fileprivate func composition(for stream: Stream) -> AVMutableComposition {
+        if compositions[stream] == nil {
+            compositions[stream] = AVMutableComposition()
         }
 
-        InvidiousAPI.shared.video(video!.id).load().onSuccess { response in
-            if let video: Video = response.typedContent() {
-                self.video = video
-                Task {
-                    let loadBest = self.profile.defaultStreamResolution == .hd720pFirstThenBest
-                    await self.loadStream(video.defaultStreamForProfile(self.profile)!, loadBest: loadBest)
-                }
-            }
-        }
-    }
-
-    func loadStream(_ stream: Stream, loadBest: Bool = false) async {
-        nextStream?.cancelLoadingAssets()
-//        removeTracksFromNextComposition()
-
-        nextComposition = AVMutableComposition()
-
-        DispatchQueue.main.async {
-            self.streamLoading = true
-            self.nextStream = stream
-        }
-        logger.info("replace streamToLoad: \(nextStream?.description ?? "nil"), streamLoading \(streamLoading)")
-
-        await addTracksAndLoadAssets(stream, loadBest: loadBest)
-    }
-
-    fileprivate func addTracksAndLoadAssets(_ stream: Stream, loadBest: Bool = false) async {
-        logger.info("adding tracks and loading assets for: \(stream.type), \(stream.description)")
-
-        stream.assets.forEach { asset in
-            Task.init {
-                if try await asset.load(.isPlayable) {
-                    handleAssetLoad(stream, asset: asset, type: asset == stream.videoAsset ? .video : .audio, loadBest: loadBest)
-
-                    if stream.assetsLoaded {
-                        logger.info("ALL assets loaded: \(stream.type), \(stream.description)")
-
-                        playStream(stream)
-
-                        if loadBest {
-                            await self.loadBestStream()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fileprivate func handleAssetLoad(_ stream: Stream, asset: AVURLAsset, type: AVMediaType, loadBest _: Bool = false) {
-        logger.info("handling asset load: \(stream.type), \(type) \(stream.description)")
-
-        guard stream != currentStream else {
-            logger.warning("IGNORING assets loaded: \(stream.type), \(stream.description)")
-            return
-        }
-
-        addTrack(asset, stream: stream, type: type)
-    }
-
-    fileprivate func addTrack(_ asset: AVURLAsset, stream: Stream, type: AVMediaType? = nil) {
-        let types: [AVMediaType] = stream.type == .adaptive ? [type!] : [.video, .audio]
-
-        types.forEach { addTrackToNextComposition(asset, type: $0) }
+        return compositions[stream]!
     }
 
     fileprivate func loadBestStream() async {
-        guard currentStream != video.bestStream else {
-            return
-        }
-
         if let bestStream = video.bestStream {
             await loadStream(bestStream)
         }
     }
 
-    func streamDidLoad(_ stream: Stream?) {
-        logger.info("didload stream: \(stream!.description)")
-
-        currentStream?.cancelLoadingAssets()
-        currentStream = stream
-        streamLoading = nextStream != stream
-
-        if nextStream == stream {
-            nextStream = nil
-        }
-
-//        addTimeObserver()
-    }
-
-    func cancelLoadingStream(_ stream: Stream) {
-        guard nextStream == stream else {
-            return
-        }
-
-        nextStream = nil
-        streamLoading = false
-
-        logger.info("cancel streamToLoad: \(nextStream?.description ?? "nil"), streamLoading \(streamLoading)")
-    }
-
-    func playStream(_ stream: Stream) {
-//        guard player != nil else {
-//            fatalError("player does not exists for playing")
-//        }
-
-        logger.warning("loading \(stream.description) to player")
-
-        saveTime()
-        replaceCompositionTracks()
-
-        player!.replaceCurrentItem(with: playerItem)
-        streamDidLoad(stream)
-
-        DispatchQueue.main.async {
-            self.player?.play()
-            self.seekToSavedTime()
-        }
-    }
-
-    func addTrackToNextComposition(_ asset: AVURLAsset, type: AVMediaType) {
-        guard let assetTrack = asset.tracks(withMediaType: type).first else {
-            return
-        }
-
-        if let track = nextComposition.tracks(withMediaType: type).first {
-            logger.info("removing \(type) track")
-            nextComposition.removeTrack(track)
-        }
-
-        let track = nextComposition.addMutableTrack(withMediaType: type, preferredTrackID: kCMPersistentTrackID_Invalid)!
-
-        try! track.insertTimeRange(
-            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
-            of: assetTrack,
-            at: .zero
-        )
-
-        logger.info("inserted \(type) track")
-    }
-
-    func replaceCompositionTracks() {
-        logger.warning("replacing compositions")
-
-        composition = AVMutableComposition()
-
-        nextComposition.tracks.forEach { track in
-            let newTrack = composition.addMutableTrack(withMediaType: track.mediaType, preferredTrackID: kCMPersistentTrackID_Invalid)!
-
-            try? newTrack.insertTimeRange(
-                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
-                of: track,
-                at: .zero
-            )
-        }
-    }
-
-    func removeTracksFromNextComposition() {
-        nextComposition.tracks.forEach { nextComposition.removeTrack($0) }
-    }
-
-    func saveTime() {
+    fileprivate func saveTime() {
         guard player != nil else {
             return
         }
@@ -250,7 +199,7 @@ final class PlayerState: ObservableObject {
         savedTime = currentTime
     }
 
-    func seekToSavedTime() {
+    fileprivate func seekToSavedTime() {
         guard player != nil else {
             return
         }
@@ -261,51 +210,32 @@ final class PlayerState: ObservableObject {
         }
     }
 
-    func destroyPlayer() {
+    fileprivate func destroyPlayer() {
         logger.critical("destroying player")
 
         player?.currentItem?.tracks.forEach { $0.assetTrack?.asset?.cancelLoading() }
 
-        currentStream?.cancelLoadingAssets()
-        nextStream?.cancelLoadingAssets()
-
-        player?.cancelPendingPrerolls()
         player?.replaceCurrentItem(with: nil)
 
         if timeObserver != nil {
             player?.removeTimeObserver(timeObserver!)
             timeObserver = nil
         }
+
         player = nil
-        currentStream = nil
-        nextStream = nil
     }
 
-    func addTimeObserver() {
+    fileprivate func addTimeObserver() {
         let interval = CMTime(value: 1, timescale: 1)
-        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
-            guard self.player != nil else {
-                return
-            }
-            self.currentTime = time
 
-            self.currentSegment = self.segmentsProvider?.segments.first { $0.timeInSegment(time) }
-
-            if let segment = self.currentSegment {
-                if self.profile.skippedSegmentsCategories.contains(segment.category) {
-                    if segment.shouldSkip(self.currentTime!) {
-                        self.player.seek(to: segment.skipTo)
-                    }
-                }
-            }
-
+        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
             if self.player.rate != self.currentRate, self.player.rate != 0, self.currentRate != 0 {
                 self.player.rate = self.currentRate
             }
         }
     }
 
-    private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
+    fileprivate func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
         let item = AVMutableMetadataItem()
 
         item.identifier = identifier
@@ -313,10 +243,5 @@ final class PlayerState: ObservableObject {
         item.extendedLanguageTag = "und"
 
         return item.copy() as! AVMetadataItem
-    }
-
-    func setPlayerRate(_ rate: Float) {
-        currentRate = rate
-        player.rate = rate
     }
 }

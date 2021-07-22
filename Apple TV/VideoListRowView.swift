@@ -158,7 +158,7 @@ struct VideoListRowView: View {
     }
 
     func thumbnail(
-        _ quality: ThumbnailQuality,
+        _ quality: Thumbnail.Quality,
         minWidth: Double = 320,
         maxWidth: Double = .infinity,
         minHeight: Double = 180,

@@ -2,11 +2,20 @@ import Foundation
 import SwiftyJSON
 
 struct Thumbnail {
+    enum Quality: String, CaseIterable {
+        case maxres, maxresdefault, sddefault, high, medium, `default`, start, middle, end
+    }
+
     var url: URL
-    var quality: ThumbnailQuality
+    var quality: Quality
 
     init(_ json: JSON) {
         url = json["url"].url!
-        quality = ThumbnailQuality(rawValue: json["quality"].string!)!
+        quality = Quality(rawValue: json["quality"].string!)!
+    }
+
+    init(url: URL, quality: Quality) {
+        self.url = url
+        self.quality = quality
     }
 }

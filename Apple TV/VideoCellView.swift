@@ -11,7 +11,7 @@ struct VideoCellView: View {
     var body: some View {
         Button(action: { navigationState.playVideo(video) }) {
             VStack(alignment: .leading) {
-                ZStack(alignment: .trailing) {
+                ZStack {
                     if let thumbnail = video.thumbnailURL(quality: .high) {
                         // to replace with AsyncImage when it is fixed with lazy views
                         URLImage(thumbnail) { image in
@@ -26,24 +26,30 @@ struct VideoCellView: View {
                             .frame(width: 550, height: 310)
                     }
 
-                    VStack(alignment: .trailing) {
-                        Text(video.author)
-                            .padding(8)
-                            .background(.thickMaterial)
-                            .mask(RoundedRectangle(cornerRadius: 12))
-                            .offset(x: -5, y: 5)
-                            .truncationMode(.middle)
+                    VStack {
+                        HStack(alignment: .top) {
+                            if video.live {
+                                DetailBadge(text: "Live", style: .outstanding)
+                            } else if video.upcoming {
+                                DetailBadge(text: "Upcoming", style: .informational)
+                            }
+
+                            Spacer()
+
+                            DetailBadge(text: video.author, style: .prominent)
+                        }
+                        .padding(10)
 
                         Spacer()
 
-                        if let time = video.playTime {
-                            Text(time)
-                                .fontWeight(.bold)
-                                .padding(8)
-                                .background(.thickMaterial)
-                                .mask(RoundedRectangle(cornerRadius: 12))
-                                .offset(x: -5, y: -5)
+                        HStack(alignment: .top) {
+                            Spacer()
+
+                            if let time = video.playTime {
+                                DetailBadge(text: time, style: .prominent)
+                            }
                         }
+                        .padding(10)
                     }
                 }
                 .frame(width: 550, height: 310)
@@ -58,26 +64,47 @@ struct VideoCellView: View {
                         .frame(minHeight: 80, alignment: .top)
                         .truncationMode(.middle)
 
-                    if !video.published.isEmpty || video.views != 0 {
-                        HStack(spacing: 8) {
-                            if !video.published.isEmpty {
+                    HStack(spacing: 8) {
+                        if video.publishedDate != nil || video.views != 0 {
+                            if let date = video.publishedDate {
                                 Image(systemName: "calendar")
-                                Text(video.published)
+                                Text(date)
                             }
 
                             if video.views != 0 {
                                 Image(systemName: "eye")
                                 Text(video.viewsCount)
                             }
+                        } else {
+                            Section {
+                                if video.live {
+                                    Image(systemName: "camera.fill")
+                                    Text("Premiering now")
+                                } else {
+                                    Image(systemName: "questionmark.app.fill")
+                                    Text("date and views unavailable")
+                                }
+                            }
+                            .opacity(0.6)
                         }
-                        .padding([.horizontal, .bottom])
-                        .foregroundColor(.secondary)
                     }
+                    .padding([.horizontal, .bottom])
+                    .foregroundColor(.secondary)
                 }
             }
             .frame(width: 550, alignment: .leading)
         }
         .buttonStyle(.plain)
         .padding(.vertical)
+    }
+}
+
+struct VideoCellView_Preview: PreviewProvider {
+    static var previews: some View {
+        HStack {
+            VideoCellView(video: Video.fixture)
+            VideoCellView(video: Video.fixtureUpcomingWithoutPublishedOrViews)
+            VideoCellView(video: Video.fixtureLiveWithoutPublishedOrViews)
+        }
     }
 }
