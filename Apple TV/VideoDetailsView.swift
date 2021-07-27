@@ -1,7 +1,6 @@
 import Defaults
 import Siesta
 import SwiftUI
-import URLImage
 
 struct VideoDetailsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -36,13 +35,14 @@ struct VideoDetailsView: View {
                             VStack(alignment: .center) {
                                 ZStack(alignment: .bottom) {
                                     Group {
-                                        if let thumbnail = video.thumbnailURL(quality: .maxres) {
-                                            // to replace with AsyncImage when it is fixed with lazy views
-                                            URLImage(thumbnail) { image in
+                                        if let url = video.thumbnailURL(quality: .maxres) {
+                                            AsyncImage(url: url) { image in
                                                 image
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
                                                     .frame(width: 1600, height: 800)
+                                            } placeholder: {
+                                                ProgressView()
                                             }
                                         }
                                     }

@@ -20,7 +20,7 @@
         }
       },
       {
-        "package": "siesta",
+        "package": "Siesta",
         "repositoryURL": "https://github.com/bustoutsolutions/siesta",
         "state": {
           "branch": null,
@@ -38,7 +38,7 @@
         }
       },
       {
-        "package": "SwiftUI-Introspect",
+        "package": "Introspect",
         "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect.git",
         "state": {
           "branch": null,
@@ -53,15 +53,6 @@
           "branch": null,
           "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
           "version": "5.0.1"
-        }
-      },
-      {
-        "package": "url-image",
-        "repositoryURL": "https://github.com/dmytro-anokhin/url-image",
-        "state": {
-          "branch": null,
-          "revision": "a55b6597f6ce67dfbdc136ecfb8c8436b14ca41d",
-          "version": "3.1.0"
         }
       }
     ]

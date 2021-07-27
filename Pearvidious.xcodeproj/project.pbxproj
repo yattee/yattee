@@ -71,8 +71,6 @@
 		377A20AA2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */; };
 		377A20AB2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
-		377FC7D7267A080300A6BBAF /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D6267A080300A6BBAF /* URLImage */; };
-		377FC7D9267A080300A6BBAF /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D8267A080300A6BBAF /* URLImageStore */; };
 		377FC7DB267A080300A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7DA267A080300A6BBAF /* Logging */; };
 		377FC7DC267A081800A6BBAF /* PopularVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularVideosView.swift */; };
 		377FC7DD267A081A00A6BBAF /* PopularVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularVideosView.swift */; };
@@ -85,8 +83,6 @@
 		377FC7E4267A084E00A6BBAF /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27F26737550007FC770 /* SearchView.swift */; };
 		377FC7E5267A084E00A6BBAF /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27F26737550007FC770 /* SearchView.swift */; };
 		377FC7ED267A0A0800A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7EC267A0A0800A6BBAF /* SwiftyJSON */; };
-		377FC7EF267A0A0800A6BBAF /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7EE267A0A0800A6BBAF /* URLImage */; };
-		377FC7F1267A0A0800A6BBAF /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7F0267A0A0800A6BBAF /* URLImageStore */; };
 		377FC7F3267A0A0800A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7F2267A0A0800A6BBAF /* Logging */; };
 		3797757D268922D100DD52A8 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3797757C268922D100DD52A8 /* Siesta */; };
 		37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
@@ -175,8 +171,6 @@
 		37D4B19826717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19926717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B19C2671817900C925CA /* SwiftyJSON */; };
-		37D4B1AB2672580400C925CA /* URLImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B1AA2672580400C925CA /* URLImage */; };
-		37D4B1AD2672580400C925CA /* URLImageStore in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B1AC2672580400C925CA /* URLImageStore */; };
 		37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86D267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
@@ -294,10 +288,8 @@
 			files = (
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
 				37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */,
-				377FC7D9267A080300A6BBAF /* URLImageStore in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
-				377FC7D7267A080300A6BBAF /* URLImage in Frameworks */,
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
 				377FC7DB267A080300A6BBAF /* Logging in Frameworks */,
 			);
@@ -309,10 +301,8 @@
 			files = (
 				37BD07BE2698AC96003EBB87 /* Defaults in Frameworks */,
 				37BADCA7269A552E009BE4FB /* Alamofire in Frameworks */,
-				377FC7F1267A0A0800A6BBAF /* URLImageStore in Frameworks */,
 				377FC7ED267A0A0800A6BBAF /* SwiftyJSON in Frameworks */,
 				37BD07C02698AC97003EBB87 /* Siesta in Frameworks */,
-				377FC7EF267A0A0800A6BBAF /* URLImage in Frameworks */,
 				377FC7F3267A0A0800A6BBAF /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,10 +327,8 @@
 			files = (
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
-				37D4B1AD2672580400C925CA /* URLImageStore in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
-				37D4B1AB2672580400C925CA /* URLImage in Frameworks */,
 				37B767E02678C5BF0098BAA8 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -536,8 +524,6 @@
 			name = "Pearvidious (iOS)";
 			packageProductDependencies = (
 				377FC7D4267A080300A6BBAF /* SwiftyJSON */,
-				377FC7D6267A080300A6BBAF /* URLImage */,
-				377FC7D8267A080300A6BBAF /* URLImageStore */,
 				377FC7DA267A080300A6BBAF /* Logging */,
 				37BD07B62698AB2E003EBB87 /* Defaults */,
 				37BD07B82698AB2E003EBB87 /* Siesta */,
@@ -563,8 +549,6 @@
 			name = "Pearvidious (macOS)";
 			packageProductDependencies = (
 				377FC7EC267A0A0800A6BBAF /* SwiftyJSON */,
-				377FC7EE267A0A0800A6BBAF /* URLImage */,
-				377FC7F0267A0A0800A6BBAF /* URLImageStore */,
 				377FC7F2267A0A0800A6BBAF /* Logging */,
 				37BD07BD2698AC96003EBB87 /* Defaults */,
 				37BD07BF2698AC97003EBB87 /* Siesta */,
@@ -625,8 +609,6 @@
 			name = "Pearvidious (Apple TV)";
 			packageProductDependencies = (
 				37D4B19C2671817900C925CA /* SwiftyJSON */,
-				37D4B1AA2672580400C925CA /* URLImage */,
-				37D4B1AC2672580400C925CA /* URLImageStore */,
 				37B767DF2678C5BF0098BAA8 /* Logging */,
 				372915E32687E33E00F5A35B /* Defaults */,
 				3797757C268922D100DD52A8 /* Siesta */,
@@ -698,7 +680,6 @@
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
 				37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
-				37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */,
 				37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */,
 				372915E22687E33E00F5A35B /* XCRemoteSwiftPackageReference "Defaults" */,
 				3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */,
@@ -1558,14 +1539,6 @@
 				minimumVersion = 5.0.0;
 			};
 		};
-		37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/dmytro-anokhin/url-image";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1579,16 +1552,6 @@
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
 		};
-		377FC7D6267A080300A6BBAF /* URLImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImage;
-		};
-		377FC7D8267A080300A6BBAF /* URLImageStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImageStore;
-		};
 		377FC7DA267A080300A6BBAF /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
@@ -1598,16 +1561,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
-		};
-		377FC7EE267A0A0800A6BBAF /* URLImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImage;
-		};
-		377FC7F0267A0A0800A6BBAF /* URLImageStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImageStore;
 		};
 		377FC7F2267A0A0800A6BBAF /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1668,16 +1621,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
-		};
-		37D4B1AA2672580400C925CA /* URLImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImage;
-		};
-		37D4B1AC2672580400C925CA /* URLImageStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37D4B1A92672580400C925CA /* XCRemoteSwiftPackageReference "url-image" */;
-			productName = URLImageStore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

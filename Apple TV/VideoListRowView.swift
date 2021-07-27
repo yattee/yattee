@@ -1,6 +1,4 @@
 import SwiftUI
-import URLImage
-import URLImageStore
 
 struct VideoListRowView: View {
     @EnvironmentObject<NavigationState> private var navigationState
@@ -166,20 +164,13 @@ struct VideoListRowView: View {
     ) -> some View {
         Group {
             if let url = video.thumbnailURL(quality: quality) {
-                URLImage(url) {
-                    EmptyView()
-                } inProgress: { _ in
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                } failure: { _, retry in
-                    VStack {
-                        Button("Retry", action: retry)
-                    }
-                } content: { image in
+                AsyncImage(url: url) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
+                } placeholder: {
+                    ProgressView()
                 }
                 .mask(RoundedRectangle(cornerRadius: 12))
             } else {
@@ -198,6 +189,27 @@ struct VideoListRowView: View {
             .truncationMode(.middle)
         #elseif os(iOS) || os(macOS)
             .foregroundColor(focused ? .white : color)
+        #endif
+    }
+}
+
+struct VideoListRowPreview: PreviewProvider {
+    static var previews: some View {
+        List {
+            VideoListRowView(video: Video.fixture)
+            VideoListRowView(video: Video.fixtureUpcomingWithoutPublishedOrViews)
+            VideoListRowView(video: Video.fixtureLiveWithoutPublishedOrViews)
+        }
+        .frame(maxWidth: 400)
+
+        #if os(iOS)
+            List {
+                VideoListRowView(video: Video.fixture)
+                VideoListRowView(video: Video.fixtureUpcomingWithoutPublishedOrViews)
+                VideoListRowView(video: Video.fixtureLiveWithoutPublishedOrViews)
+            }
+            .environment(\.verticalSizeClass, .compact)
+            .frame(maxWidth: 800)
         #endif
     }
 }

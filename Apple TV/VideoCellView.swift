@@ -1,6 +1,3 @@
-import URLImage
-import URLImageStore
-
 import SwiftUI
 
 struct VideoCellView: View {
@@ -12,13 +9,14 @@ struct VideoCellView: View {
         Button(action: { navigationState.playVideo(video) }) {
             VStack(alignment: .leading) {
                 ZStack {
-                    if let thumbnail = video.thumbnailURL(quality: .high) {
-                        // to replace with AsyncImage when it is fixed with lazy views
-                        URLImage(thumbnail) { image in
+                    if let url = video.thumbnailURL(quality: .high) {
+                        AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 550, height: 310)
+                        } placeholder: {
+                            ProgressView()
                         }
                         .mask(RoundedRectangle(cornerRadius: 12))
                     } else {
