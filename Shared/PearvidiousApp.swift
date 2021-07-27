@@ -6,5 +6,10 @@ struct PearvidiousApp: App {
         WindowGroup {
             ContentView()
         }
+        #if !os(tvOS)
+            .commands {
+                SidebarCommands()
+            }
+        #endif
     }
 }

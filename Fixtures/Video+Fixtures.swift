@@ -37,4 +37,8 @@ extension Video {
 
         return video
     }
+
+    static var allFixtures: [Video] {
+        [fixture, fixtureLiveWithoutPublishedOrViews, fixtureUpcomingWithoutPublishedOrViews]
+    }
 }

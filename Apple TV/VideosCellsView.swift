@@ -15,7 +15,7 @@ struct VideosCellsView: View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: items, alignment: .center) {
                 ForEach(videos) { video in
-                    VideoCellView(video: video)
+                    VideoView(video: video)
                         .contextMenu { VideoContextMenuView(video: video) }
                 }
             }

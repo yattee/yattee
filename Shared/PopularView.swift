@@ -1,7 +1,7 @@
 import Siesta
 import SwiftUI
 
-struct PopularVideosView: View {
+struct PopularView: View {
     @ObservedObject private var store = Store<[Video]>()
 
     var resource = InvidiousAPI.shared.popular

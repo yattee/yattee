@@ -13,7 +13,7 @@ struct TVNavigationView: View {
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
 
-                PopularVideosView()
+                PopularView()
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
 

@@ -44,15 +44,54 @@ struct AppSidebarNavigation: View {
                 SubscriptionsView()
             }
             label: {
-                Label("Subscriptions", systemImage: "star")
+                Label("Subscriptions", systemImage: "play.rectangle.fill")
+                    .accessibility(label: Text("Subscriptions"))
             }
 
             NavigationLink(tag: TabSelection.popular, selection: navigationState.tabSelectionOptionalBinding) {
-                PopularVideosView()
+                PopularView()
             }
             label: {
                 Label("Popular", systemImage: "chart.bar")
+                    .accessibility(label: Text("Popular"))
+            }
+
+            NavigationLink(tag: TabSelection.trending, selection: navigationState.tabSelectionOptionalBinding) {
+                TrendingView()
+            }
+            label: {
+                Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+                    .accessibility(label: Text("Trending"))
+            }
+
+            NavigationLink(tag: TabSelection.playlists, selection: navigationState.tabSelectionOptionalBinding) {
+                PlaylistsView()
+            }
+            label: {
+                Label("Playlists", systemImage: "list.and.film")
+                    .accessibility(label: Text("Playlists"))
+            }
+
+            NavigationLink(tag: TabSelection.search, selection: navigationState.tabSelectionOptionalBinding) {
+                SearchView()
+            }
+            label: {
+                Label("Search", systemImage: "magnifyingglass")
+                    .accessibility(label: Text("Search"))
             }
         }
+        #if os(macOS)
+            .toolbar {
+                Button(action: toggleSidebar) {
+                    Image(systemName: "sidebar.left").help("Toggle Sidebar")
+                }
+            }
+        #endif
     }
+
+    #if os(macOS)
+        private func toggleSidebar() {
+            NSApp.keyWindow?.contentViewController?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+        }
+    #endif
 }

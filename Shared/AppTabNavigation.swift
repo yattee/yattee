@@ -16,7 +16,7 @@ struct AppTabNavigation: View {
             .tag(TabSelection.subscriptions)
 
             NavigationView {
-                PopularVideosView()
+                PopularView()
             }
             .tabItem {
                 Label("Popular", systemImage: "chart.bar")
