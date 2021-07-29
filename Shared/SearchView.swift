@@ -8,16 +8,13 @@ struct SearchView: View {
     @Default(.searchDate) private var searchDate
     @Default(.searchDuration) private var searchDuration
 
-    @ObservedObject private var store = Store<[Video]>()
-    @ObservedObject private var query = SearchQuery()
+    @EnvironmentObject<SearchState> private var state
 
     var body: some View {
         VStack {
-            if !store.collection.isEmpty {
-                VideosView(videos: store.collection)
-            }
+            VideosView(videos: state.store.collection)
 
-            if store.collection.isEmpty && !resource.isLoading && !query.isEmpty {
+            if state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty {
                 Text("No results")
 
                 if searchFiltersActive {
@@ -31,7 +28,7 @@ struct SearchView: View {
         }
         .searchable(text: $queryText)
         .onAppear {
-            changeQuery {
+            state.changeQuery { query in
                 query.query = queryText
                 query.sortBy = searchSortOrder
                 query.date = searchDate
@@ -39,32 +36,20 @@ struct SearchView: View {
             }
         }
         .onChange(of: queryText) { queryText in
-            changeQuery { query.query = queryText }
+            state.changeQuery { query in query.query = queryText }
         }
         .onChange(of: searchSortOrder) { order in
-            changeQuery { query.sortBy = order }
+            state.changeQuery { query in query.sortBy = order }
         }
         .onChange(of: searchDate) { date in
-            changeQuery { query.date = date }
+            state.changeQuery { query in query.date = date }
         }
         .onChange(of: searchDuration) { duration in
-            changeQuery { query.duration = duration }
+            state.changeQuery { query in query.duration = duration }
         }
         #if !os(tvOS)
             .navigationTitle("Search")
         #endif
-    }
-
-    func changeQuery(_ change: @escaping () -> Void = {}) {
-        resource.removeObservers(ownedBy: store)
-        change()
-
-        resource.addObserver(store)
-        resource.loadIfNeeded()
-    }
-
-    var resource: Resource {
-        InvidiousAPI.shared.search(query)
     }
 
     var searchFiltersActive: Bool {

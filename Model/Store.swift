@@ -7,6 +7,12 @@ final class Store<Data>: ResourceObserver, ObservableObject {
     var collection: Data { all ?? ([] as! Data) }
     var item: Data? { all }
 
+    init(_ data: Data? = nil) {
+        if data != nil {
+            replace(data!)
+        }
+    }
+
     func resourceChanged(_ resource: Resource, event _: ResourceEvent) {
         if let items: Data = resource.typedContent() {
             replace(items)

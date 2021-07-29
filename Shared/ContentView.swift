@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var navigationState = NavigationState()
+    @StateObject private var searchState = SearchState()
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -20,7 +21,9 @@ struct ContentView: View {
             #elseif os(tvOS)
                 TVNavigationView()
             #endif
-        }.environmentObject(navigationState)
+        }
+        .environmentObject(navigationState)
+        .environmentObject(searchState)
     }
 }
 
