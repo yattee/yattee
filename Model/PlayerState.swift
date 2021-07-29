@@ -37,11 +37,20 @@ final class PlayerState: ObservableObject {
             return
         }
 
+        loadExtendedVideoDetails(video) { video in
+            self.video = video
+            self.playVideo(video)
+        }
+    }
+
+    func loadExtendedVideoDetails(_ video: Video?, onSuccess: @escaping (Video) -> Void) {
+        guard video != nil else {
+            return
+        }
+
         InvidiousAPI.shared.video(video!.id).load().onSuccess { response in
             if let video: Video = response.typedContent() {
-                self.video = video
-
-                self.playVideo(video)
+                onSuccess(video)
             }
         }
     }
@@ -206,7 +215,7 @@ final class PlayerState: ObservableObject {
 
         if let time = savedTime {
             logger.info("seeking to \(time.seconds)")
-            player.seek(to: time)
+            player.seek(to: time, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         }
     }
 
