@@ -3,7 +3,7 @@ import SwiftUI
 
 struct TrendingView: View {
     @State private var category: TrendingCategory = .default
-    @State private var country: Country = .pl
+    @State private var country: Country! = .pl
     @State private var selectingCountry = false
 
     @ObservedObject private var store = Store<[Video]>()
@@ -16,62 +16,107 @@ struct TrendingView: View {
         resource.addObserver(store)
     }
 
+    var toolbar: some View {
+        HStack {
+            HStack {
+                Text("Category")
+                    .foregroundColor(.secondary)
+
+                categoryButton
+            }
+
+            #if os(iOS)
+                Spacer()
+            #endif
+
+            HStack {
+                Text("Country")
+                    .foregroundColor(.secondary)
+
+                countryButton
+            }
+        }
+    }
+
     var body: some View {
         Section {
             VStack(alignment: .center, spacing: 2) {
                 #if os(tvOS)
-                    HStack {
-                        Text("Category")
-                            .foregroundColor(.secondary)
-
-                        categoryButton
-
-                        Text("Country")
-                            .foregroundColor(.secondary)
-
-                        countryFlag
-                        countryButton
-                    }
-                    .scaleEffect(0.85)
+                    toolbar
+                        .scaleEffect(0.85)
                 #endif
 
                 VideosView(videos: store.collection)
+
+                #if os(iOS)
+                    toolbar
+                        .font(.system(size: 14))
+                        .animation(nil)
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                        .overlay(Divider().offset(x: 0, y: -2), alignment: .topTrailing)
+                #endif
             }
         }
-        #if !os(tvOS)
+        #if os(tvOS)
+            .fullScreenCover(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
+                TrendingCountrySelection(selectedCountry: $country)
+            }
+        #else
+            .sheet(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
+                TrendingCountrySelection(selectedCountry: $country)
+                #if os(macOS)
+                    .frame(minWidth: 400, minHeight: 400)
+                #endif
+            }
             .navigationTitle("Trending")
         #endif
+        #if os(macOS)
+            .toolbar {
+                ToolbarItemGroup {
+                    categoryButton
+                    countryButton
+                }
+            }
+        #endif
+
         .onAppear {
             resource.loadIfNeeded()
         }
     }
 
     var categoryButton: some View {
-        Button(category.name) {
-            setCategory(category.next())
-        }
-        .contextMenu {
-            ForEach(TrendingCategory.allCases) { category in
-                Button(category.name) { setCategory(category) }
+        #if os(tvOS)
+            Button(category.name) {
+                setCategory(category.next())
             }
-        }
-    }
-
-    var countryFlag: some View {
-        Text(country.flag)
-            .font(.system(size: 60))
+            .contextMenu {
+                ForEach(TrendingCategory.allCases) { category in
+                    Button(category.name) { setCategory(category) }
+                }
+            }
+        #else
+            Menu(category.name) {
+                ForEach(TrendingCategory.allCases) { category in
+                    Button(action: { setCategory(category) }) {
+                        if category == self.category {
+                            Label(category.name, systemImage: "checkmark")
+                        } else {
+                            Text(category.name)
+                        }
+                    }
+                }
+            }
+        #endif
     }
 
     var countryButton: some View {
-        Button(country.rawValue) {
+        Button(action: {
             selectingCountry.toggle()
             resource.removeObservers(ownedBy: store)
+        }) {
+            Text("\(country.flag) \(country.id)")
         }
-        #if os(tvOS)
-            .fullScreenCover(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
-                TrendingCountrySelectionView(selectedCountry: $country)
-            }
-        #endif
     }
 
     fileprivate func setCategory(_ category: TrendingCategory) {
@@ -85,5 +130,12 @@ struct TrendingView: View {
         self.country = country
         resource.addObserver(store)
         resource.loadIfNeeded()
+    }
+}
+
+struct TrendingView_Previews: PreviewProvider {
+    static var previews: some View {
+        TrendingView()
+            .environmentObject(NavigationState())
     }
 }

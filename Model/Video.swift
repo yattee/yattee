@@ -3,7 +3,7 @@ import AVKit
 import Foundation
 import SwiftyJSON
 
-struct Video: Identifiable {
+struct Video: Identifiable, Equatable {
     let id: String
     var title: String
     var thumbnails: [Thumbnail]
@@ -161,12 +161,10 @@ struct Video: Identifiable {
         }
     }
 
-    static let options = [AVURLAssetPreferPreciseDurationAndTimingKey: false]
-
     private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
             SingleAssetStream(
-                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!, options: options),
+                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
                 resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
                 kind: .stream,
                 encoding: $0["encoding"].stringValue
@@ -184,12 +182,16 @@ struct Video: Identifiable {
 
         return videoAssetsURLs.map {
             Stream(
-                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!, options: options),
-                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!, options: options),
+                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
+                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
                 resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
                 kind: .adaptive,
                 encoding: $0["encoding"].stringValue
             )
         }
+    }
+
+    static func == (lhs: Video, rhs: Video) -> Bool {
+        lhs.id == rhs.id
     }
 }

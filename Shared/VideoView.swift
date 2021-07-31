@@ -193,7 +193,7 @@ struct VideoView: View {
         minHeight: Double = 140,
         maxHeight: Double = .infinity
     ) -> some View {
-        ZStack(alignment: .trailing) {
+        ZStack(alignment: .leading) {
             thumbnail(.maxres, minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
 
             VStack {
@@ -222,6 +222,7 @@ struct VideoView: View {
                 .padding(10)
             }
         }
+        .frame(maxWidth: 600)
     }
 
     func thumbnail(

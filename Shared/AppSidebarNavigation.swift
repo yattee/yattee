@@ -31,9 +31,10 @@ struct AppSidebarNavigation: View {
     var content: some View {
         NavigationView {
             sidebar
+                .frame(minWidth: 180)
 
             Text("Select section")
-                .frame(maxWidth: 600)
+
             Text("Select video")
         }
     }
