@@ -3,7 +3,13 @@ import SwiftUI
     import Introspect
 #endif
 
+typealias TabSelection = AppSidebarNavigation.TabSelection
+
 struct AppSidebarNavigation: View {
+    enum TabSelection: String {
+        case subscriptions, popular, trending, playlists, channel, search
+    }
+
     @EnvironmentObject<NavigationState> private var navigationState
 
     @State private var didApplyPrimaryViewWorkAround = false

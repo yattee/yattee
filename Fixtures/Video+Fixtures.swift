@@ -1,9 +1,11 @@
+import Foundation
+
 extension Video {
     static var fixture: Video {
         let id = "D2sxamzaHkM"
 
         return Video(
-            id: id,
+            id: UUID().uuidString,
             title: "Relaxing Piano Music",
             author: "Fancy Videotuber",
             length: 582,

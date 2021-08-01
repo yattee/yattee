@@ -68,13 +68,9 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewController(
         _: AVPlayerViewController,
-        willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator
+        willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
     ) {
-        coordinator.animate(alongsideTransition: nil) { context in
-            if !context.isCancelled {
-                self.playingFullScreen = true
-            }
-        }
+        playingFullScreen = true
     }
 
     func playerViewController(

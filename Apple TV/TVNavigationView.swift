@@ -6,6 +6,8 @@ struct TVNavigationView: View {
 
     @State private var showingOptions = false
 
+    @Default(.showingAddToPlaylist) var showingAddToPlaylist
+
     var body: some View {
         NavigationView {
             TabView(selection: $navigationState.tabSelection) {
@@ -30,6 +32,7 @@ struct TVNavigationView: View {
                     .tag(TabSelection.search)
             }
             .fullScreenCover(isPresented: $showingOptions) { OptionsView() }
+            .fullScreenCover(isPresented: $showingAddToPlaylist) { AddToPlaylistView() }
             .fullScreenCover(isPresented: $navigationState.showingVideoDetails) {
                 if let video = navigationState.video {
                     VideoDetailsView(video)
@@ -42,7 +45,11 @@ struct TVNavigationView: View {
                     ChannelView(id: channel.id)
                 }
             }
-
+            .fullScreenCover(isPresented: $navigationState.showingVideo) {
+                if let video = navigationState.video {
+                    VideoPlayerView(video)
+                }
+            }
             .onPlayPauseCommand { showingOptions.toggle() }
         }
     }
