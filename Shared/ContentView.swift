@@ -22,8 +22,21 @@ struct ContentView: View {
                 TVNavigationView()
             #endif
         }
+        #if !os(tvOS)
+            .sheet(isPresented: $navigationState.showingVideo) {
+                if let video = navigationState.video {
+                    VideoPlayerView(video)
+                    #if !os(iOS)
+                        .frame(minWidth: 500, minHeight: 300)
+                        .onExitCommand {
+                            navigationState.showingVideo = false
+                        }
+                    #endif
+                }
+            }
+        #endif
         .environmentObject(navigationState)
-        .environmentObject(searchState)
+            .environmentObject(searchState)
     }
 }
 

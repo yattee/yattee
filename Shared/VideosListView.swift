@@ -10,13 +10,9 @@ struct VideosListView: View {
                 List {
                     ForEach(videos) { video in
                         VideoView(video: video, layout: .list)
+                            .frame(maxHeight: 200)
                             .contextMenu { VideoContextMenuView(video: video) }
-                        #if os(tvOS)
-                            .listRowInsets(listRowInsets)
-                        #elseif os(iOS)
-                            .listRowInsets(EdgeInsets(.zero))
-                            .listRowSeparator(.hidden)
-                        #endif
+                            .listRowInsets(EdgeInsets())
                     }
                     .onChange(of: videos) { videos in
                         guard let video = videos.first else {
@@ -27,14 +23,8 @@ struct VideosListView: View {
                     }
                 }
             }
-            #if os(tvOS)
-                .listStyle(GroupedListStyle())
-            #endif
+            .listStyle(GroupedListStyle())
         }
-    }
-
-    var listRowInsets: EdgeInsets {
-        EdgeInsets(top: .zero, leading: .zero, bottom: .zero, trailing: 30)
     }
 }
 

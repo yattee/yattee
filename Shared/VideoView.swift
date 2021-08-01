@@ -4,90 +4,43 @@ import SwiftUI
 struct VideoView: View {
     @EnvironmentObject<NavigationState> private var navigationState
 
-    @Environment(\.isFocused) private var focused: Bool
-
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    var layout: ListingLayout?
-
     var video: Video
-
-    init(video: Video, layout: ListingLayout? = nil) {
-        self.video = video
-        self.layout = layout
-
-        #if os(tvOS)
-            if self.layout == nil {
-                self.layout = Defaults[.layout]
-            }
-        #endif
-    }
+    var layout: ListingLayout
 
     var body: some View {
-        #if os(tvOS)
+        Button(action: { navigationState.playVideo(video) }) {
             if layout == .cells {
-                tvOSButton
-                    .buttonStyle(.plain)
-                    .padding(.vertical)
-            } else {
-                tvOSButton
-            }
-        #elseif os(macOS)
-            NavigationLink(destination: VideoPlayerView(video)) {
-                verticalRow
-            }
-        #else
-            ZStack {
-                #if os(macOS)
-                    verticalRow
-                #else
+                #if os(iOS)
                     if verticalSizeClass == .compact {
-                        horizontalRow(padding: 4)
+                        horizontalRow
+                            .padding(.vertical, 4)
                     } else {
                         verticalRow
                     }
+                #else
+                    verticalRow
                 #endif
-
-                NavigationLink(destination: VideoPlayerView(video)) {
-                    EmptyView()
-                }
-                .buttonStyle(PlainButtonStyle())
-                .opacity(0)
-                .frame(height: 0)
-            }
-        #endif
-    }
-
-    #if os(tvOS)
-        var tvOSButton: some View {
-            Button(action: { navigationState.playVideo(video) }) {
-                if layout == .cells {
-                    cellRow
-                } else {
-                    horizontalRow(detailsOnThumbnail: false)
-                }
+            } else {
+                horizontalRow
             }
         }
-    #endif
+        .buttonStyle(.plain)
+    }
 
-    func horizontalRow(detailsOnThumbnail: Bool = true, padding: Double = 0) -> some View {
+    var horizontalRow: some View {
         HStack(alignment: .top, spacing: 2) {
-            if detailsOnThumbnail {
-                thumbnailWithDetails()
-                    .padding(padding)
-            } else {
-                thumbnail(.medium, maxWidth: 320, maxHeight: 180)
-            }
+            thumbnailImage(quality: .medium)
+                .frame(maxWidth: 320)
 
             VStack(alignment: .leading, spacing: 0) {
-                videoDetail(video.title, bold: true)
+                videoDetail(video.title)
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                if !detailsOnThumbnail {
-                    videoDetail(video.author, color: .secondary, bold: true)
-                }
+                videoDetail(video.author)
 
                 Spacer()
 
@@ -96,60 +49,42 @@ struct VideoView: View {
             .padding()
             .frame(minHeight: 180)
 
-            if !detailsOnThumbnail {
-                if video.playTime != nil || video.live || video.upcoming {
+            if video.playTime != nil || video.live || video.upcoming {
+                Spacer()
+
+                VStack(alignment: .center) {
                     Spacer()
 
-                    VStack(alignment: .center) {
-                        Spacer()
-
-                        if let time = video.playTime {
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock")
-                                Text(time)
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.secondary)
-                        } else if video.live {
-                            DetailBadge(text: "Live", style: .outstanding)
-                        } else if video.upcoming {
-                            DetailBadge(text: "Upcoming", style: .informational)
+                    if let time = video.playTime {
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                            Text(time)
+                                .fontWeight(.bold)
                         }
-
-                        Spacer()
+                        .foregroundColor(.secondary)
+                    } else if video.live {
+                        DetailBadge(text: "Live", style: .outstanding)
+                    } else if video.upcoming {
+                        DetailBadge(text: "Upcoming", style: .informational)
                     }
+
+                    Spacer()
                 }
             }
         }
+        .padding(.trailing)
     }
 
     var verticalRow: some View {
         VStack(alignment: .leading) {
-            thumbnailWithDetails(minWidth: 250, maxWidth: 600, minHeight: 180)
-                .frame(idealWidth: 320)
-                .padding([.leading, .top, .trailing], 4)
+            thumbnail
 
             VStack(alignment: .leading) {
-                videoDetail(video.title, bold: true)
-                    .padding(.bottom)
-
-                additionalDetails
-                    .padding(.bottom, 10)
-            }
-            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
-        }
-    }
-
-    var cellRow: some View {
-        VStack(alignment: .leading) {
-            thumbnailWithDetails(minWidth: 550, maxWidth: 550, minHeight: 310, maxHeight: 310)
-                .padding([.leading, .top, .trailing], 4)
-
-            VStack(alignment: .leading) {
-                videoDetail(video.title, bold: true, lineLimit: additionalDetailsAvailable ? 2 : 3)
+                videoDetail(video.title, lineLimit: additionalDetailsAvailable ? 2 : 3)
                     .frame(minHeight: 80, alignment: .top)
+                #if os(tvOS)
                     .padding(.bottom)
+                #endif
 
                 if additionalDetailsAvailable {
                     additionalDetails
@@ -158,10 +93,11 @@ struct VideoView: View {
                     Spacer()
                 }
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 150, alignment: .leading)
-            .padding(10)
+            #if os(tvOS)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 150, alignment: .leading)
+                .padding(10)
+            #endif
         }
-        .frame(width: 558)
     }
 
     var additionalDetailsAvailable: Bool {
@@ -180,21 +116,12 @@ struct VideoView: View {
                 Text(video.viewsCount)
             }
         }
-        #if os(tvOS)
-            .foregroundColor(.secondary)
-        #else
-            .foregroundColor(focused ? .white : .secondary)
-        #endif
+        .foregroundColor(.secondary)
     }
 
-    func thumbnailWithDetails(
-        minWidth: Double = 250,
-        maxWidth: Double = .infinity,
-        minHeight: Double = 140,
-        maxHeight: Double = .infinity
-    ) -> some View {
+    var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnail(.maxres, minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
+            thumbnailImage(quality: .maxres)
 
             VStack {
                 HStack(alignment: .top) {
@@ -222,44 +149,34 @@ struct VideoView: View {
                 .padding(10)
             }
         }
+        .padding([.leading, .top, .trailing], 4)
         .frame(maxWidth: 600)
     }
 
-    func thumbnail(
-        _ quality: Thumbnail.Quality,
-        minWidth: Double = 320,
-        maxWidth: Double = .infinity,
-        minHeight: Double = 180,
-        maxHeight: Double = .infinity
-    ) -> some View {
+    func thumbnailImage(quality: Thumbnail.Quality) -> some View {
         Group {
             if let url = video.thumbnailURL(quality: quality) {
                 AsyncImage(url: url) { image in
                     image
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
                 } placeholder: {
                     ProgressView()
+                        .aspectRatio(contentMode: .fill)
                 }
                 .mask(RoundedRectangle(cornerRadius: 12))
             } else {
                 Image(systemName: "exclamationmark.square")
             }
         }
-        .frame(minWidth: minWidth, maxWidth: maxWidth, minHeight: minHeight, maxHeight: maxHeight)
+        .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
+        .aspectRatio(1.777, contentMode: .fit)
     }
 
-    func videoDetail(_ text: String, color: Color? = .primary, bold: Bool = false, lineLimit: Int = 1) -> some View {
+    func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
         Text(text)
-            .fontWeight(bold ? .bold : .regular)
-        #if os(tvOS)
-            .foregroundColor(color)
+            .fontWeight(.bold)
             .lineLimit(lineLimit)
             .truncationMode(.middle)
-        #elseif os(iOS) || os(macOS)
-            .foregroundColor(focused ? .white : color)
-        #endif
     }
 }
 

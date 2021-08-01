@@ -7,13 +7,7 @@ struct VideosView: View {
     @State private var profile = Profile()
 
     #if os(tvOS)
-        @Default(.layout) var layout
-    #endif
-
-    @Default(.showingAddToPlaylist) var showingAddToPlaylist
-
-    #if os(iOS)
-        @Environment(\.verticalSizeClass) private var horizontalSizeClass
+        @Default(.layout) private var layout
     #endif
 
     var videos: [Video]
@@ -22,28 +16,13 @@ struct VideosView: View {
         VStack {
             #if os(tvOS)
                 if layout == .cells {
-                    VideosCellsView(videos: videos, columns: self.profile.cellsColumns)
+                    VideosCellsView(videos: videos)
                 } else {
                     VideosListView(videos: videos)
                 }
             #else
-                VideosListView(videos: videos)
-                #if os(macOS)
-                    .frame(minWidth: 400)
-                #endif
+                VideosCellsView(videos: videos)
             #endif
         }
-
-        #if os(tvOS)
-            .fullScreenCover(isPresented: $navigationState.showingVideo) {
-                if let video = navigationState.video {
-                    VideoPlayerView(video)
-                }
-            }
-            .fullScreenCover(isPresented: $showingAddToPlaylist) {
-                AddToPlaylistView()
-            }
-
-        #endif
     }
 }

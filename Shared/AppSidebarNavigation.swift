@@ -40,8 +40,6 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: 180)
 
             Text("Select section")
-
-            Text("Select video")
         }
     }
 
