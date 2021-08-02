@@ -27,7 +27,7 @@ struct ContentView: View {
                 if let video = navigationState.video {
                     VideoPlayerView(video)
                     #if !os(iOS)
-                        .frame(minWidth: 500, minHeight: 300)
+                        .frame(minWidth: 590, minHeight: 500)
                         .onExitCommand {
                             navigationState.showingVideo = false
                         }

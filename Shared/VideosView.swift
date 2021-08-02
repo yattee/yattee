@@ -26,6 +26,7 @@ struct VideosView: View {
         }
         #if os(macOS)
             .background()
+            .frame(minWidth: 360)
         #endif
     }
 }
