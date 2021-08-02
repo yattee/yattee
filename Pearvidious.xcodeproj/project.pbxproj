@@ -373,10 +373,10 @@
 		37D4B0BC2671614700C925CA = {
 			isa = PBXGroup;
 			children = (
-				37D4B0C12671614700C925CA /* Shared */,
 				37BE0BD826A214500092E2DB /* macOS */,
+				37D4B159267164AE00C925CA /* tvOS */,
+				37D4B0C12671614700C925CA /* Shared */,
 				37D4B1B72672CFE300C925CA /* Model */,
-				37D4B159267164AE00C925CA /* Apple TV */,
 				37C7A9022679058300E721B4 /* Extensions */,
 				3748186426A762300084E870 /* Fixtures */,
 				377FC7D1267A080300A6BBAF /* Frameworks */,
@@ -445,7 +445,7 @@
 			path = "Tests macOS";
 			sourceTree = "<group>";
 		};
-		37D4B159267164AE00C925CA /* Apple TV */ = {
+		37D4B159267164AE00C925CA /* tvOS */ = {
 			isa = PBXGroup;
 			children = (
 				373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */,
@@ -461,7 +461,7 @@
 				37D4B15E267164AF00C925CA /* Assets.xcassets */,
 				37D4B1AE26729DEB00C925CA /* Info.plist */,
 			);
-			path = "Apple TV";
+			path = tvOS;
 			sourceTree = "<group>";
 		};
 		37D4B174267164B000C925CA /* Tests Apple TV */ = {
@@ -1299,7 +1299,7 @@
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Apple TV/Info.plist";
+				INFOPLIST_FILE = tvOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Pearvidious;
 				INFOPLIST_KEY_CFBundleExecutable = "Pearvidious (Apple TV)";
 				INFOPLIST_KEY_CFBundleName = "Pearvidious (Apple TV)";
@@ -1332,7 +1332,7 @@
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Apple TV/Info.plist";
+				INFOPLIST_FILE = tvOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Pearvidious;
 				INFOPLIST_KEY_CFBundleExecutable = "Pearvidious (Apple TV)";
 				INFOPLIST_KEY_CFBundleName = "Pearvidious (Apple TV)";
