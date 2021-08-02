@@ -24,5 +24,8 @@ struct VideosView: View {
                 VideosCellsView(videos: videos)
             #endif
         }
+        #if os(macOS)
+            .background()
+        #endif
     }
 }

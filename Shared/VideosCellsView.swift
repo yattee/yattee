@@ -14,7 +14,9 @@ struct VideosCellsView: View {
                 LazyVGrid(columns: items, alignment: .center) {
                     ForEach(videos) { video in
                         VideoView(video: video, layout: .cells)
-                            .contextMenu { VideoContextMenuView(video: video) }
+                        #if os(tvOS)
+                            .padding(.horizontal)
+                        #endif
                     }
                 }
                 .padding()
@@ -26,22 +28,30 @@ struct VideosCellsView: View {
 
                 scrollView.scrollTo(video.id, anchor: .top)
             }
+            #if os(tvOS)
+                .padding(.horizontal, 10)
+            #endif
         }
+        .edgesIgnoringSafeArea(.horizontal)
     }
 
     var items: [GridItem] {
-        [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize))]
+        #if os(tvOS)
+            videos.count < 3 ? Array(repeating: GridItem(.fixed(540)), count: videos.count) : adaptiveItem
+        #else
+            adaptiveItem
+        #endif
     }
 
-    var gridColumns: Int {
-        videos.count < 3 ? videos.count : 3
+    var adaptiveItem: [GridItem] {
+        [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize))]
     }
 
     var adaptiveGridItemMinimumSize: CGFloat {
         #if os(iOS)
             return verticalSizeClass == .regular ? 340 : 800
         #elseif os(tvOS)
-            return 560
+            return 540
         #else
             return 340
         #endif

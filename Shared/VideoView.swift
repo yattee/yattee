@@ -13,28 +13,41 @@ struct VideoView: View {
 
     var body: some View {
         Button(action: { navigationState.playVideo(video) }) {
-            if layout == .cells {
-                #if os(iOS)
-                    if verticalSizeClass == .compact {
-                        horizontalRow
-                            .padding(.vertical, 4)
-                    } else {
+            VStack {
+                if layout == .cells {
+                    #if os(iOS)
+                        if verticalSizeClass == .compact {
+                            horizontalRow
+                                .padding(.vertical, 4)
+                        } else {
+                            verticalRow
+                        }
+                    #else
                         verticalRow
-                    }
-                #else
-                    verticalRow
-                #endif
-            } else {
-                horizontalRow
+                    #endif
+                } else {
+                    horizontalRow
+                }
             }
+            #if os(macOS)
+                .background()
+            #endif
         }
-        .buttonStyle(.plain)
+        .modifier(ButtonStyleModifier(layout: layout))
+        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .contextMenu { VideoContextMenuView(video: video) }
     }
 
     var horizontalRow: some View {
         HStack(alignment: .top, spacing: 2) {
-            thumbnailImage(quality: .medium)
-                .frame(maxWidth: 320)
+            Section {
+                #if os(tvOS)
+                    thumbnailImage(quality: .medium)
+                #else
+                    thumbnail
+                #endif
+            }
+            .frame(maxWidth: 320)
 
             VStack(alignment: .leading, spacing: 0) {
                 videoDetail(video.title)
@@ -49,28 +62,30 @@ struct VideoView: View {
             .padding()
             .frame(minHeight: 180)
 
-            if video.playTime != nil || video.live || video.upcoming {
-                Spacer()
-
-                VStack(alignment: .center) {
+            #if os(tvOS)
+                if video.playTime != nil || video.live || video.upcoming {
                     Spacer()
 
-                    if let time = video.playTime {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock")
-                            Text(time)
-                                .fontWeight(.bold)
+                    VStack(alignment: .center) {
+                        Spacer()
+
+                        if let time = video.playTime {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                Text(time)
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.secondary)
+                        } else if video.live {
+                            DetailBadge(text: "Live", style: .outstanding)
+                        } else if video.upcoming {
+                            DetailBadge(text: "Upcoming", style: .informational)
                         }
-                        .foregroundColor(.secondary)
-                    } else if video.live {
-                        DetailBadge(text: "Live", style: .outstanding)
-                    } else if video.upcoming {
-                        DetailBadge(text: "Upcoming", style: .informational)
-                    }
 
-                    Spacer()
+                        Spacer()
+                    }
                 }
-            }
+            #endif
         }
         .padding(.trailing)
     }
@@ -81,10 +96,14 @@ struct VideoView: View {
 
             VStack(alignment: .leading) {
                 videoDetail(video.title, lineLimit: additionalDetailsAvailable ? 2 : 3)
-                    .frame(minHeight: 80, alignment: .top)
                 #if os(tvOS)
-                    .padding(.bottom)
+                    .frame(minHeight: additionalDetailsAvailable ? 80 : 120, alignment: .top)
+                #elseif os(macOS)
+                    .frame(minHeight: 30, alignment: .top)
+                #else
+                    .frame(minHeight: 50, alignment: .top)
                 #endif
+                .padding(.bottom)
 
                 if additionalDetailsAvailable {
                     additionalDetails
@@ -94,8 +113,7 @@ struct VideoView: View {
                 }
             }
             #if os(tvOS)
-                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 150, alignment: .leading)
-                .padding(10)
+                .padding(.horizontal, 8)
             #endif
         }
     }
@@ -169,6 +187,9 @@ struct VideoView: View {
             }
         }
         .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
+        #if os(tvOS)
+            .frame(minHeight: 320)
+        #endif
         .aspectRatio(1.777, contentMode: .fit)
     }
 
@@ -177,6 +198,24 @@ struct VideoView: View {
             .fontWeight(.bold)
             .lineLimit(lineLimit)
             .truncationMode(.middle)
+    }
+
+    struct ButtonStyleModifier: ViewModifier {
+        var layout: ListingLayout
+
+        func body(content: Content) -> some View {
+            Section {
+                #if os(tvOS)
+                    if layout == .cells {
+                        content.buttonStyle(.plain)
+                    } else {
+                        content
+                    }
+                #else
+                    content.buttonStyle(.plain)
+                #endif
+            }
+        }
     }
 }
 

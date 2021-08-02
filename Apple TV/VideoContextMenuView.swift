@@ -10,11 +10,7 @@ struct VideoContextMenuView: View {
     @Default(.videoIDToAddToPlaylist) var videoIDToAddToPlaylist
 
     var body: some View {
-        if navigationState.tabSelection == .channel {
-            closeChannelButton(from: video)
-        } else {
-            openChannelButton(from: video)
-        }
+        openChannelButton(from: video)
 
         openVideoDetailsButton
 

@@ -10,8 +10,6 @@ struct VideosListView: View {
                 List {
                     ForEach(videos) { video in
                         VideoView(video: video, layout: .list)
-                            .frame(maxHeight: 200)
-                            .contextMenu { VideoContextMenuView(video: video) }
                             .listRowInsets(EdgeInsets())
                     }
                     .onChange(of: videos) { videos in
