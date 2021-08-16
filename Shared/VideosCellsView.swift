@@ -49,11 +49,11 @@ struct VideosCellsView: View {
 
     var adaptiveGridItemMinimumSize: CGFloat {
         #if os(iOS)
-            return verticalSizeClass == .regular ? 340 : 800
+            return verticalSizeClass == .regular ? 320 : 800
         #elseif os(tvOS)
             return 540
         #else
-            return 340
+            return 320
         #endif
     }
 
