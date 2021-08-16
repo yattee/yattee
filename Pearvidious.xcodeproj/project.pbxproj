@@ -174,6 +174,9 @@
 		37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
 		37EAD870267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
 		37EAD871267B9ED100D9E01B /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86E267B9ED100D9E01B /* Segment.swift */; };
+		37F49BA326CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */; };
+		37F49BA426CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */; };
+		37F49BA526CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */; };
 		37F4AE7226828F0900BD60EA /* VideosCellsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VideosCellsView.swift */; };
 		37F4AE7326828F0900BD60EA /* VideosCellsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VideosCellsView.swift */; };
 		37F4AE7426828F0900BD60EA /* VideosCellsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VideosCellsView.swift */; };
@@ -270,6 +273,7 @@
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockAPI.swift; sourceTree = "<group>"; };
 		37EAD86E267B9ED100D9E01B /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
+		37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Playlist+Fixtures.swift"; sourceTree = "<group>"; };
 		37F4AE7126828F0900BD60EA /* VideosCellsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosCellsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -340,6 +344,7 @@
 			children = (
 				3748186926A764FB0084E870 /* Thumbnail+Fixtures.swift */,
 				3748186526A7627F0084E870 /* Video+Fixtures.swift */,
+				37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */,
 			);
 			path = Fixtures;
 			sourceTree = "<group>";
@@ -394,11 +399,14 @@
 				37D4B0C32671614700C925CA /* AppTabNavigation.swift */,
 				37BD07B42698AA4D003EBB87 /* ContentView.swift */,
 				37141672267A8E10006CA35D /* Country.swift */,
+				373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */,
+				373CFABD26966115003CB2C6 /* CoverSectionView.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
 				3748186D26A769D60084E870 /* DetailBadge.swift */,
 				37D4B0C22671614700C925CA /* PearvidiousApp.swift */,
 				37BE0BD226A1D4780092E2DB /* Player.swift */,
 				37BE0BD526A1D4A90092E2DB /* PlayerViewController.swift */,
+				373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */,
 				376578902685490700D4EA09 /* PlaylistsView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
@@ -450,10 +458,7 @@
 			children = (
 				373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */,
 				37AAF2892673AB89007FC770 /* ChannelView.swift */,
-				373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */,
-				373CFABD26966115003CB2C6 /* CoverSectionView.swift */,
 				37B76E95268747C900CE5671 /* OptionsView.swift */,
-				373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */,
 				373CFAC52696617C003CB2C6 /* SearchOptionsView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
 				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
@@ -778,6 +783,7 @@
 				379775932689365600DD52A8 /* Array+Next.swift in Sources */,
 				377FC7E1267A082600A6BBAF /* ChannelView.swift in Sources */,
 				37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
+				37F49BA326CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				37B767DB2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				373CFAC226966159003CB2C6 /* CoverSectionRowView.swift in Sources */,
@@ -808,6 +814,7 @@
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
 				3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */,
+				37F49BA426CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				37EAD870267B9ED100D9E01B /* Segment.swift in Sources */,
 				37141670267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				377FC7E2267A084A00A6BBAF /* VideoView.swift in Sources */,
@@ -872,6 +879,7 @@
 				37754C9F26B7500000DBD602 /* VideosView.swift in Sources */,
 				37AAF28026737550007FC770 /* SearchView.swift in Sources */,
 				37EAD871267B9ED100D9E01B /* Segment.swift in Sources */,
+				37F49BA526CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				37CEE4BF2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				37BE0BD426A1D47D0092E2DB /* Player.swift in Sources */,
 				37977585268922F600DD52A8 /* InvidiousAPI.swift in Sources */,

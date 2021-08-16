@@ -22,6 +22,13 @@ struct Playlist: Identifiable, Equatable, Hashable {
 
     var videos = [Video]()
 
+    init(id: String, title: String, visibility: Visibility, updated: TimeInterval) {
+        self.id = id
+        self.title = title
+        self.visibility = visibility
+        self.updated = updated
+    }
+
     init(_ json: JSON) {
         id = json["playlistId"].stringValue
         title = json["title"].stringValue

@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct CoverSectionRowView<Content: View>: View {
+struct CoverSectionRowView<ControlContent: View>: View {
     let label: String?
-    let controlView: Content
+    let controlView: ControlContent
 
-    init(_ label: String? = nil, @ViewBuilder controlView: @escaping () -> Content) {
+    init(_ label: String? = nil, @ViewBuilder controlView: @escaping () -> ControlContent) {
         self.label = label
         self.controlView = controlView()
     }
@@ -12,6 +12,7 @@ struct CoverSectionRowView<Content: View>: View {
     var body: some View {
         HStack {
             Text(label ?? "")
+
             Spacer()
             controlView
         }

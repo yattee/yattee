@@ -188,7 +188,7 @@ struct VideoView: View {
         }
         .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
         #if os(tvOS)
-            .frame(minHeight: 320)
+            .frame(minHeight: layout == .cells ? 320 : 200)
         #endif
         .aspectRatio(1.777, contentMode: .fit)
     }

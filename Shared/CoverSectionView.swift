@@ -42,7 +42,11 @@ struct CoverSectionView<Content: View>: View {
 
     var sectionTitle: some View {
         Text(title ?? "")
-            .font(.title3)
-            .padding(.bottom)
+
+            .font(.title2)
+        #if os(macOS)
+            .bold()
+        #endif
+        .padding(.bottom)
     }
 }

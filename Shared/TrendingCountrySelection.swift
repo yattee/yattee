@@ -18,7 +18,10 @@ struct TrendingCountrySelection: View {
                 HStack {
                     TextField("Country", text: $query, prompt: Text(TrendingCountrySelection.prompt))
                         .focused($countryIsFocused)
+
                     Button("Done") { selectCountryAndDismiss() }
+                        .keyboardShortcut(.defaultAction)
+                        .keyboardShortcut(.cancelAction)
                 }
                 .padding([.horizontal, .top])
 

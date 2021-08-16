@@ -22,11 +22,13 @@ struct VideosCellsView: View {
                 .padding()
             }
             .onChange(of: videos) { [videos] newVideos in
-                guard !videos.isEmpty, let video = newVideos.first else {
-                    return
-                }
+                #if !os(tvOS)
+                    guard !videos.isEmpty, let video = newVideos.first else {
+                        return
+                    }
 
-                scrollView.scrollTo(video.id, anchor: .top)
+                    scrollView.scrollTo(video.id, anchor: .top)
+                #endif
             }
             #if os(tvOS)
                 .padding(.horizontal, 10)
@@ -37,7 +39,7 @@ struct VideosCellsView: View {
 
     var items: [GridItem] {
         #if os(tvOS)
-            videos.count < 3 ? Array(repeating: GridItem(.fixed(540)), count: videos.count) : adaptiveItem
+            videos.count < 3 ? Array(repeating: GridItem(.fixed(540)), count: [videos.count, 1].max()!) : adaptiveItem
         #else
             adaptiveItem
         #endif

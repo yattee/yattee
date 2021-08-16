@@ -13,11 +13,14 @@ struct VideosListView: View {
                             .listRowInsets(EdgeInsets())
                     }
                     .onChange(of: videos) { videos in
-                        guard let video = videos.first else {
-                            return
-                        }
+                        #if !os(tvOS)
 
-                        scrollView.scrollTo(video.id, anchor: .top)
+                            guard let video = videos.first else {
+                                return
+                            }
+
+                            scrollView.scrollTo(video.id, anchor: .top)
+                        #endif
                     }
                 }
             }
