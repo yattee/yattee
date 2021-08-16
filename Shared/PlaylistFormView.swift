@@ -8,6 +8,8 @@ struct PlaylistFormView: View {
     @State private var valid = false
     @State private var showingDeleteConfirmation = false
 
+    @FocusState private var focused: Bool
+
     @Binding var playlist: Playlist!
 
     @Environment(\.dismiss) private var dismiss
@@ -33,6 +35,7 @@ struct PlaylistFormView: View {
                     TextField("Name", text: $name, onCommit: validate)
                         .frame(maxWidth: 450)
                         .padding(.leading, 10)
+                        .focused($focused)
 
                     Picker("Visibility", selection: $visibility) {
                         ForEach(Playlist.Visibility.allCases, id: \.self) { visibility in
@@ -55,7 +58,7 @@ struct PlaylistFormView: View {
                 }
             }
             .onChange(of: name) { _ in validate() }
-            .onAppear(perform: setFieldsFromPlaylist)
+            .onAppear(perform: initializeForm)
             .padding(.horizontal)
             #if !os(iOS)
                 .frame(width: 400, height: 150)
@@ -106,7 +109,8 @@ struct PlaylistFormView: View {
         #endif
     }
 
-    func setFieldsFromPlaylist() {
+    func initializeForm() {
+        focused = true
         guard editing else {
             return
         }

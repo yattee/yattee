@@ -7,6 +7,8 @@ struct VideoPlayerView: View {
 
     @ObservedObject private var store = Store<Video>()
 
+    @Environment(\.dismiss) private var dismiss
+
     var resource: Resource {
         InvidiousAPI.shared.video(video.id)
     }
@@ -28,6 +30,11 @@ struct VideoPlayerView: View {
                     VStack(alignment: .leading) {
                         Text(video.title)
                         Text(video.author)
+
+                        Button("Done") {
+                            dismiss()
+                        }
+                        .keyboardShortcut(.cancelAction)
                     }
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 }
