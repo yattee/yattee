@@ -26,7 +26,7 @@ final class PlayerViewController: NSViewController {
         playerState.player = player
         playerView.player = playerState.player
 
-        playerView.controlsStyle = .floating
+        playerView.allowsPictureInPicturePlayback = true
         playerView.showsFullScreenToggleButton = true
 
         view = playerView

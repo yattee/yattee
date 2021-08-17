@@ -23,6 +23,8 @@ final class PlayerState: ObservableObject {
     let maxResolution: Stream.Resolution?
     var timeObserver: Any?
 
+    var playingOutsideViewController = false
+
     init(_ video: Video? = nil, maxResolution: Stream.Resolution? = nil) {
         self.video = video
         self.maxResolution = maxResolution
@@ -221,6 +223,11 @@ final class PlayerState: ObservableObject {
 
     fileprivate func destroyPlayer() {
         logger.critical("destroying player")
+
+        guard !playingOutsideViewController else {
+            logger.critical("cannot destroy, playing outside view controller")
+            return
+        }
 
         player?.currentItem?.tracks.forEach { $0.assetTrack?.asset?.cancelLoading() }
 

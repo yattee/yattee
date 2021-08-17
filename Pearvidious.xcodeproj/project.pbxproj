@@ -232,6 +232,7 @@
 		37977582268922F600DD52A8 /* InvidiousAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvidiousAPI.swift; sourceTree = "<group>"; };
 		3797758A2689345500DD52A8 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		379775922689365600DD52A8 /* Array+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Next.swift"; sourceTree = "<group>"; };
+		37992DC726CC50BC003D4C27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37AAF27D26737323007FC770 /* PopularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopularView.swift; sourceTree = "<group>"; };
 		37AAF27F26737550007FC770 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		37AAF2892673AB89007FC770 /* ChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
@@ -356,6 +357,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		37992DC826CC50CD003D4C27 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				37992DC726CC50BC003D4C27 /* Info.plist */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
 		37BE0BD826A214500092E2DB /* macOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -378,6 +387,7 @@
 		37D4B0BC2671614700C925CA = {
 			isa = PBXGroup;
 			children = (
+				37992DC826CC50CD003D4C27 /* iOS */,
 				37BE0BD826A214500092E2DB /* macOS */,
 				37D4B159267164AE00C925CA /* tvOS */,
 				37D4B0C12671614700C925CA /* Shared */,
@@ -1082,6 +1092,7 @@
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1112,6 +1123,7 @@
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

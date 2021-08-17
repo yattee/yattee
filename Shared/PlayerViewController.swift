@@ -6,8 +6,6 @@ final class PlayerViewController: UIViewController {
     var video: Video!
 
     var playerLoaded = false
-    var playingFullScreen = false
-
     var player = AVPlayer()
     var playerState: PlayerState! = PlayerState()
     var playerViewController = AVPlayerViewController()
@@ -15,19 +13,19 @@ final class PlayerViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if !playerLoaded {
-            loadPlayer()
-        }
+        loadPlayer()
 
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
         try? AVAudioSession.sharedInstance().setActive(true)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         #if os(iOS)
-            if !playingFullScreen {
+            if !playerState.playingOutsideViewController {
                 playerViewController.player?.replaceCurrentItem(with: nil)
                 playerViewController.player = nil
+
+                try? AVAudioSession.sharedInstance().setActive(false)
             }
         #endif
 
@@ -35,6 +33,10 @@ final class PlayerViewController: UIViewController {
     }
 
     func loadPlayer() {
+        guard !playerLoaded else {
+            return
+        }
+
         playerState.player = player
         playerViewController.player = playerState.player
         playerState.loadVideo(video)
@@ -42,6 +44,16 @@ final class PlayerViewController: UIViewController {
         #if os(tvOS)
             present(playerViewController, animated: false)
         #else
+            embedViewController()
+        #endif
+
+        playerViewController.allowsPictureInPicturePlayback = true
+        playerViewController.delegate = self
+        playerLoaded = true
+    }
+
+    #if !os(tvOS)
+        func embedViewController() {
             playerViewController.exitsFullScreenWhenPlaybackEnds = true
             playerViewController.view.frame = view.bounds
 
@@ -49,11 +61,8 @@ final class PlayerViewController: UIViewController {
             view.addSubview(playerViewController.view)
 
             playerViewController.didMove(toParent: self)
-        #endif
-
-        playerViewController.delegate = self
-        playerLoaded = true
-    }
+        }
+    #endif
 }
 
 extension PlayerViewController: AVPlayerViewControllerDelegate {
@@ -61,8 +70,12 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         true
     }
 
+    func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
+        false
+    }
+
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
-        playingFullScreen = false
+        playerState.playingOutsideViewController = false
         dismiss(animated: false)
     }
 
@@ -70,7 +83,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         _: AVPlayerViewController,
         willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
     ) {
-        playingFullScreen = true
+        playerState.playingOutsideViewController = true
     }
 
     func playerViewController(
@@ -79,8 +92,16 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     ) {
         coordinator.animate(alongsideTransition: nil) { context in
             if !context.isCancelled {
-                self.playingFullScreen = false
+                self.playerState.playingOutsideViewController = false
             }
         }
+    }
+
+    func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {
+        playerState.playingOutsideViewController = true
+    }
+
+    func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {
+        playerState.playingOutsideViewController = false
     }
 }
