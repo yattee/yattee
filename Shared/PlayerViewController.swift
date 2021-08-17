@@ -43,6 +43,9 @@ final class PlayerViewController: UIViewController {
 
         #if os(tvOS)
             present(playerViewController, animated: false)
+
+            addItemDidPlayToEndTimeObserver()
+
         #else
             embedViewController()
         #endif
@@ -52,7 +55,22 @@ final class PlayerViewController: UIViewController {
         playerLoaded = true
     }
 
-    #if !os(tvOS)
+    #if os(tvOS)
+        func addItemDidPlayToEndTimeObserver() {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(itemDidPlayToEndTime),
+                name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                object: nil
+            )
+        }
+
+        @objc func itemDidPlayToEndTime() {
+            playerViewController.dismiss(animated: true) {
+                self.dismiss(animated: false)
+            }
+        }
+    #else
         func embedViewController() {
             playerViewController.exitsFullScreenWhenPlaybackEnds = true
             playerViewController.view.frame = view.bounds
