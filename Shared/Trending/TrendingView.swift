@@ -51,20 +51,20 @@ struct TrendingView: View {
                 #if os(iOS)
                     toolbar
                         .font(.system(size: 14))
-                        .animation(nil)
                         .padding(.horizontal)
                         .padding(.vertical, 10)
                         .overlay(Divider().offset(x: 0, y: -2), alignment: .topTrailing)
+                        .transaction { t in t.animation = .none }
                 #endif
             }
         }
         #if os(tvOS)
             .fullScreenCover(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
-                TrendingCountrySelection(selectedCountry: $country)
+                TrendingCountry(selectedCountry: $country)
             }
         #else
             .sheet(isPresented: $selectingCountry, onDismiss: { setCountry(country) }) {
-                TrendingCountrySelection(selectedCountry: $country)
+                TrendingCountry(selectedCountry: $country)
                 #if os(macOS)
                     .frame(minWidth: 400, minHeight: 400)
                 #endif

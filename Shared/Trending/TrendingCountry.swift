@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TrendingCountrySelection: View {
+struct TrendingCountry: View {
     static let prompt = "Country Name or Code"
     @Binding var selectedCountry: Country?
 
@@ -16,7 +16,7 @@ struct TrendingCountrySelection: View {
         VStack {
             #if os(macOS)
                 HStack {
-                    TextField("Country", text: $query, prompt: Text(TrendingCountrySelection.prompt))
+                    TextField("Country", text: $query, prompt: Text(TrendingCountry.prompt))
                         .focused($countryIsFocused)
 
                     Button("Done") { selectCountryAndDismiss() }
@@ -45,7 +45,7 @@ struct TrendingCountrySelection: View {
         }
         .onSubmit { selectCountryAndDismiss() }
         #if !os(macOS)
-            .searchable(text: $query, placement: searchPlacement, prompt: Text(TrendingCountrySelection.prompt))
+            .searchable(text: $query, placement: searchPlacement, prompt: Text(TrendingCountry.prompt))
         #endif
         #if os(tvOS)
             .background(.thinMaterial)
@@ -97,8 +97,8 @@ struct TrendingCountrySelection: View {
     }
 }
 
-struct TrendingCountrySelection_Previews: PreviewProvider {
+struct TrendingCountry_Previews: PreviewProvider {
     static var previews: some View {
-        TrendingCountrySelection(selectedCountry: .constant(.pl))
+        TrendingCountry(selectedCountry: .constant(.pl))
     }
 }

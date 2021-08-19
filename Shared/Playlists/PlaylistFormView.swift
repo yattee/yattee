@@ -53,7 +53,8 @@ struct PlaylistFormView: View {
 
                     Spacer()
 
-                    Button("Save", action: submitForm).disabled(!valid)
+                    Button("Save", action: submitForm)
+                        .disabled(!valid)
                         .keyboardShortcut(.defaultAction)
                 }
             }
@@ -111,6 +112,7 @@ struct PlaylistFormView: View {
 
     func initializeForm() {
         focused = true
+        
         guard editing else {
             return
         }

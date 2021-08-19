@@ -51,10 +51,10 @@ struct PlaylistsView: View {
             #if os(iOS)
                 toolbar
                     .font(.system(size: 14))
-                    .animation(nil)
                     .padding(.horizontal)
                     .padding(.vertical, 10)
                     .overlay(Divider().offset(x: 0, y: -2), alignment: .topTrailing)
+                    .transaction { t in t.animation = .none }
             #endif
         }
         #if os(tvOS)

@@ -1,6 +1,7 @@
 parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
 
 disabled_rules:
+  - identifier_name
   - opening_brace
   - multiline_arguments
 
