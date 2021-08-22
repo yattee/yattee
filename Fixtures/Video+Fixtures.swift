@@ -6,17 +6,21 @@ extension Video {
 
         return Video(
             id: UUID().uuidString,
-            title: "Relaxing Piano Music",
+            title: "Relaxing Piano Music that will make you feel amazingly good",
             author: "Fancy Videotuber",
             length: 582,
             published: "7 years ago",
-            views: 1024,
+            views: 21534,
             channelID: "AbCdEFgHI",
             description: "Some relaxing live piano music",
             genre: "Music",
             thumbnails: Thumbnail.fixturesForAllQualities(videoId: id),
             live: false,
-            upcoming: false
+            upcoming: false,
+            publishedAt: Date.now,
+            likes: 37333,
+            dislikes: 30,
+            keywords: ["very", "cool", "video", "msfs 2020", "757", "747", "A380", "737-900", "MOD", "Zibo", "MD80", "MD11", "Rotate", "Laminar", "787", "A350", "MSFS", "MS2020", "Microsoft Flight Simulator", "Microsoft", "Flight", "Simulator", "SIM", "World", "Ortho", "Flying", "Boeing MAX"]
         )
     }
 

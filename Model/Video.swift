@@ -24,6 +24,11 @@ struct Video: Identifiable, Equatable {
     var streams = [Stream]()
     var hlsUrl: URL?
 
+    var publishedAt: Date?
+    var likes: Int?
+    var dislikes: Int?
+    var keywords = [String]()
+
     init(
         id: String,
         title: String,
@@ -37,7 +42,11 @@ struct Video: Identifiable, Equatable {
         thumbnails: [Thumbnail] = [],
         indexID: String? = nil,
         live: Bool = false,
-        upcoming: Bool = false
+        upcoming: Bool = false,
+        publishedAt: Date? = nil,
+        likes: Int? = nil,
+        dislikes: Int? = nil,
+        keywords: [String] = []
     ) {
         self.id = id
         self.title = title
@@ -52,6 +61,10 @@ struct Video: Identifiable, Equatable {
         self.indexID = indexID
         self.live = live
         self.upcoming = upcoming
+        self.publishedAt = publishedAt
+        self.likes = likes
+        self.dislikes = dislikes
+        self.keywords = keywords
     }
 
     init(_ json: JSON) {
@@ -79,6 +92,15 @@ struct Video: Identifiable, Equatable {
         live = json["liveNow"].boolValue
         upcoming = json["isUpcoming"].boolValue
 
+        likes = json["likeCount"].int
+        dislikes = json["dislikeCount"].int
+
+        keywords = json["keywords"].arrayValue.map { $0.stringValue }
+
+        if let publishedInterval = json["published"].double {
+            publishedAt = Date(timeIntervalSince1970: publishedInterval)
+        }
+
         streams = Video.extractFormatStreams(from: json["formatStreams"].arrayValue)
         streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
 
@@ -103,7 +125,23 @@ struct Video: Identifiable, Equatable {
         (published.isEmpty || published == "0 seconds ago") ? nil : published
     }
 
-    var viewsCount: String {
+    var viewsCount: String? {
+        views != 0 ? formattedCount(views) : nil
+    }
+
+    var likesCount: String? {
+        formattedCount(likes)
+    }
+
+    var dislikesCount: String? {
+        formattedCount(dislikes)
+    }
+
+    func formattedCount(_ count: Int!) -> String? {
+        guard count != nil else {
+            return nil
+        }
+
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 1
@@ -111,11 +149,13 @@ struct Video: Identifiable, Equatable {
         var number: NSNumber
         var unit: String
 
-        if views < 1_000_000 {
-            number = NSNumber(value: Double(views) / 1000.0)
+        if count < 1000 {
+            return "\(count!)"
+        } else if count < 1_000_000 {
+            number = NSNumber(value: Double(count) / 1000.0)
             unit = "K"
         } else {
-            number = NSNumber(value: Double(views) / 1_000_000.0)
+            number = NSNumber(value: Double(count) / 1_000_000.0)
             unit = "M"
         }
 

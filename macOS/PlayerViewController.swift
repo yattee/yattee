@@ -5,7 +5,8 @@ final class PlayerViewController: NSViewController {
     var video: Video!
 
     var player = AVPlayer()
-    var playerState: PlayerState! = PlayerState()
+    var playerState: PlayerState!
+    var playbackState: PlaybackState!
     var playerView = AVPlayerView()
 
     override func viewDidDisappear() {
@@ -19,6 +20,9 @@ final class PlayerViewController: NSViewController {
     }
 
     override func loadView() {
+        playerState = PlayerState()
+        playerState.playbackState = playbackState
+
         guard playerState.player == nil else {
             return
         }

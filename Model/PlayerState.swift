@@ -14,19 +14,21 @@ final class PlayerState: ObservableObject {
 
     private var compositions = [Stream: AVMutableComposition]()
 
-    private(set) var currentTime: CMTime?
     private(set) var savedTime: CMTime?
 
     private(set) var currentRate: Float = 0.0
     static let availableRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
-    let maxResolution: Stream.Resolution?
+    var playbackState: PlaybackState?
     var timeObserver: Any?
+
+    let maxResolution: Stream.Resolution?
 
     var playingOutsideViewController = false
 
-    init(_ video: Video? = nil, maxResolution: Stream.Resolution? = nil) {
+    init(_ video: Video? = nil, playbackState: PlaybackState? = nil, maxResolution: Stream.Resolution? = nil) {
         self.video = video
+        self.playbackState = playbackState
         self.maxResolution = maxResolution
     }
 
@@ -101,6 +103,10 @@ final class PlayerState: ObservableObject {
         DispatchQueue.main.async {
             self.saveTime()
             self.player?.replaceCurrentItem(with: self.playerItemWithMetadata(for: stream))
+            self.playbackState?.stream = stream
+            if self.timeObserver == nil {
+                self.addTimeObserver()
+            }
             self.player?.playImmediately(atRate: 1.0)
             self.seekToSavedTime()
         }
@@ -245,9 +251,15 @@ final class PlayerState: ObservableObject {
         let interval = CMTime(value: 1, timescale: 1)
 
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
+            guard self.player != nil else {
+                return
+            }
+
             if self.player.rate != self.currentRate, self.player.rate != 0, self.currentRate != 0 {
                 self.player.rate = self.currentRate
             }
+
+            self.playbackState?.time = self.player.currentTime()
         }
     }
 

@@ -131,7 +131,7 @@ struct VideoView: View {
 
             if video.views != 0 {
                 Image(systemName: "eye")
-                Text(video.viewsCount)
+                Text(video.viewsCount!)
             }
         }
         .foregroundColor(.secondary)
@@ -139,7 +139,7 @@ struct VideoView: View {
 
     var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnailImage(quality: .maxres)
+            thumbnailImage(quality: .maxresdefault)
 
             VStack {
                 HStack(alignment: .top) {
@@ -181,12 +181,13 @@ struct VideoView: View {
                     ProgressView()
                         .aspectRatio(contentMode: .fill)
                 }
-                .mask(RoundedRectangle(cornerRadius: 12))
             } else {
                 Image(systemName: "exclamationmark.square")
             }
         }
-        .frame(minWidth: 320, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
+        .frame(minWidth: 300, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
+        .background(.gray)
+        .mask(RoundedRectangle(cornerRadius: 12))
         #if os(tvOS)
             .frame(minHeight: layout == .cells ? 320 : 200)
         #endif

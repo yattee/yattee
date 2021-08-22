@@ -7,7 +7,8 @@ final class PlayerViewController: UIViewController {
 
     var playerLoaded = false
     var player = AVPlayer()
-    var playerState: PlayerState! = PlayerState()
+    var playerState: PlayerState!
+    var playbackState: PlaybackState!
     var playerViewController = AVPlayerViewController()
 
     override func viewWillAppear(_ animated: Bool) {
@@ -33,6 +34,9 @@ final class PlayerViewController: UIViewController {
     }
 
     func loadPlayer() {
+        playerState = PlayerState()
+        playerState.playbackState = playbackState
+
         guard !playerLoaded else {
             return
         }
@@ -45,7 +49,6 @@ final class PlayerViewController: UIViewController {
             present(playerViewController, animated: false)
 
             addItemDidPlayToEndTimeObserver()
-
         #else
             embedViewController()
         #endif
@@ -111,6 +114,12 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         coordinator.animate(alongsideTransition: nil) { context in
             if !context.isCancelled {
                 self.playerState.playingOutsideViewController = false
+
+                #if os(iOS)
+                    if self.traitCollection.verticalSizeClass == .compact {
+                        self.dismiss(animated: true)
+                    }
+                #endif
             }
         }
     }

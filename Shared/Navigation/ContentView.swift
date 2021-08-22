@@ -26,8 +26,9 @@ struct ContentView: View {
             .sheet(isPresented: $navigationState.showingVideo) {
                 if let video = navigationState.video {
                     VideoPlayerView(video)
+
                     #if !os(iOS)
-                        .frame(minWidth: 590, minHeight: 500)
+                        .frame(minWidth: 550, minHeight: 720)
                         .onExitCommand {
                             navigationState.showingVideo = false
                         }

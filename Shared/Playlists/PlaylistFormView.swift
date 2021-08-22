@@ -112,7 +112,7 @@ struct PlaylistFormView: View {
 
     func initializeForm() {
         focused = true
-        
+
         guard editing else {
             return
         }
