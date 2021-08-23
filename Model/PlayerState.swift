@@ -19,14 +19,14 @@ final class PlayerState: ObservableObject {
     private(set) var currentRate: Float = 0.0
     static let availableRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
-    var playbackState: PlaybackState?
+    var playbackState: PlaybackState
     var timeObserver: Any?
 
     let maxResolution: Stream.Resolution?
 
     var playingOutsideViewController = false
 
-    init(_ video: Video? = nil, playbackState: PlaybackState? = nil, maxResolution: Stream.Resolution? = nil) {
+    init(_ video: Video? = nil, playbackState: PlaybackState, maxResolution: Stream.Resolution? = nil) {
         self.video = video
         self.playbackState = playbackState
         self.maxResolution = maxResolution
@@ -40,6 +40,8 @@ final class PlayerState: ObservableObject {
         guard video != nil else {
             return
         }
+
+        playbackState.reset()
 
         loadExtendedVideoDetails(video) { video in
             self.video = video
@@ -98,12 +100,16 @@ final class PlayerState: ObservableObject {
     }
 
     fileprivate func playStream(_ stream: Stream) {
+        guard player != nil else {
+            return
+        }
+
         logger.warning("loading \(stream.description) to player")
 
         DispatchQueue.main.async {
             self.saveTime()
             self.player?.replaceCurrentItem(with: self.playerItemWithMetadata(for: stream))
-            self.playbackState?.stream = stream
+            self.playbackState.stream = stream
             if self.timeObserver == nil {
                 self.addTimeObserver()
             }
@@ -259,7 +265,7 @@ final class PlayerState: ObservableObject {
                 self.player.rate = self.currentRate
             }
 
-            self.playbackState?.time = self.player.currentTime()
+            self.playbackState.time = self.player.currentTime()
         }
     }
 

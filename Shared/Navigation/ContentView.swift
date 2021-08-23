@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var navigationState = NavigationState()
+    @StateObject private var playbackState = PlaybackState()
     @StateObject private var searchState = SearchState()
 
     #if os(iOS)
@@ -37,6 +38,7 @@ struct ContentView: View {
             }
         #endif
         .environmentObject(navigationState)
+            .environmentObject(playbackState)
             .environmentObject(searchState)
     }
 }

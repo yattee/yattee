@@ -22,4 +22,9 @@ final class PlaybackState: ObservableObject {
 
         return size.width / size.height
     }
+
+    func reset() {
+        stream = nil
+        time = nil
+    }
 }

@@ -2,25 +2,32 @@ import Foundation
 import SwiftUI
 
 struct PlaybackBar: View {
-    @Environment(\.dismiss) private var dismiss
-
-    @ObservedObject var playbackState: PlaybackState
     let video: Video
+
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var playbackState: PlaybackState
 
     var body: some View {
         HStack {
             closeButton
-                .frame(minWidth: 0, maxWidth: 60, alignment: .leading)
+                .frame(width: 60, alignment: .leading)
 
             Text(playbackFinishAtString)
                 .foregroundColor(.gray)
                 .font(.caption2)
-                .frame(minWidth: 0, maxWidth: .infinity)
+                .frame(minWidth: 60, maxWidth: .infinity)
 
-            Text(currentStreamString)
-                .foregroundColor(.gray)
-                .font(.caption2)
-                .frame(minWidth: 0, maxWidth: 60, alignment: .trailing)
+            VStack {
+                if playbackState.stream != nil {
+                    Text(currentStreamString)
+                } else {
+                    Image(systemName: "bolt.horizontal.fill")
+                }
+            }
+            .foregroundColor(.gray)
+            .font(.caption2)
+            .frame(width: 60, alignment: .trailing)
+            .fixedSize(horizontal: true, vertical: true)
         }
         .padding(4)
         .background(.black)
@@ -36,6 +43,10 @@ struct PlaybackBar: View {
         }
 
         let remainingSeconds = video.length - playbackState.time!.seconds
+
+        if remainingSeconds < 60 {
+            return "less than a minute"
+        }
 
         let timeFinishAt = Date.now.addingTimeInterval(remainingSeconds)
         let timeFinishAtString = timeFinishAt.formatted(date: .omitted, time: .shortened)

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct TVNavigationView: View {
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<PlaybackState> private var playbackState
 
     @State private var showingOptions = false
 
@@ -47,6 +48,7 @@ struct TVNavigationView: View {
         .fullScreenCover(isPresented: $navigationState.showingVideo) {
             if let video = navigationState.video {
                 VideoPlayerView(video)
+                    .environmentObject(playbackState)
             }
         }
         .onPlayPauseCommand { showingOptions.toggle() }

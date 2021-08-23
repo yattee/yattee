@@ -13,10 +13,9 @@ struct VideoPlayerView: View {
     }
 
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<PlaybackState> private var playbackState
 
     @ObservedObject private var store = Store<Video>()
-
-    @ObservedObject private var playbackState = PlaybackState()
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -36,19 +35,21 @@ struct VideoPlayerView: View {
     var body: some View {
         VStack(spacing: 0) {
             #if os(tvOS)
-                Player(playbackState: playbackState, video: video)
+                Player(video: video)
+                    .environmentObject(playbackState)
             #else
                 GeometryReader { geometry in
                     VStack(spacing: 0) {
                         #if os(iOS)
                             if verticalSizeClass == .regular {
-                                PlaybackBar(playbackState: playbackState, video: video)
+                                PlaybackBar(video: video)
                             }
                         #elseif os(macOS)
-                            PlaybackBar(playbackState: playbackState, video: video)
+                            PlaybackBar(video: video)
                         #endif
 
-                        Player(playbackState: playbackState, video: video)
+                        Player(video: video)
+                            .environmentObject(playbackState)
                             .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: playbackState.aspectRatio))
                     }
                     .background(.black)

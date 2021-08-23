@@ -34,8 +34,7 @@ final class PlayerViewController: UIViewController {
     }
 
     func loadPlayer() {
-        playerState = PlayerState()
-        playerState.playbackState = playbackState
+        playerState = PlayerState(playbackState: playbackState)
 
         guard !playerLoaded else {
             return
