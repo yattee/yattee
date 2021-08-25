@@ -10,7 +10,7 @@ struct AppTabNavigation: View {
                 SubscriptionsView()
             }
             .tabItem {
-                Label("Subscriptions", systemImage: "play.rectangle.fill")
+                Label("Subscriptions", systemImage: "star.circle.fill")
                     .accessibility(label: Text("Subscriptions"))
             }
             .tag(TabSelection.subscriptions)

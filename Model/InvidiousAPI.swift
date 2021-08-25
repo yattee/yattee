@@ -61,15 +61,19 @@ final class InvidiousAPI: Service {
 
         configureTransformer("/auth/feed", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let feedVideos = content.json.dictionaryValue["videos"] {
-                return feedVideos.arrayValue.map { Video($0) }
+                return feedVideos.arrayValue.map(Video.init)
             }
 
             return []
         }
 
+        configureTransformer("/auth/subscriptions", requestMethods: [.get]) { (content: Entity<JSON>) -> [Channel] in
+            content.json.arrayValue.map(Channel.init)
+        }
+
         configureTransformer("/channels/*", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let channelVideos = content.json.dictionaryValue["latestVideos"] {
-                return channelVideos.arrayValue.map { Video($0) }
+                return channelVideos.arrayValue.map(Video.init)
             }
 
             return []
@@ -92,8 +96,16 @@ final class InvidiousAPI: Service {
             .withParam("region", country.rawValue)
     }
 
-    var subscriptions: Resource {
+    var feed: Resource {
         resource("/auth/feed")
+    }
+
+    var subscriptions: Resource {
+        resource("/auth/subscriptions")
+    }
+
+    func channelSubscription(_ id: String) -> Resource {
+        resource("/auth/subscriptions").child(id)
     }
 
     func channelVideos(_ id: String) -> Resource {

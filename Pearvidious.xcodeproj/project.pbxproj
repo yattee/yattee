@@ -176,6 +176,9 @@
 		37D4B19826717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19926717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B19C2671817900C925CA /* SwiftyJSON */; };
+		37E64DD126D597EB00C71877 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* Subscriptions.swift */; };
+		37E64DD226D597EB00C71877 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* Subscriptions.swift */; };
+		37E64DD326D597EB00C71877 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* Subscriptions.swift */; };
 		37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
 		37EAD86D267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */; };
@@ -286,6 +289,7 @@
 		37D4B18B26717B3800C925CA /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		37D4B19626717E1500C925CA /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37E64DD026D597EB00C71877 /* Subscriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscriptions.swift; sourceTree = "<group>"; };
 		37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockAPI.swift; sourceTree = "<group>"; };
 		37EAD86E267B9ED100D9E01B /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 		37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Playlist+Fixtures.swift"; sourceTree = "<group>"; };
@@ -579,6 +583,7 @@
 				37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */,
 				3797758A2689345500DD52A8 /* Store.swift */,
 				37CEE4C02677B697005A1EFE /* Stream.swift */,
+				37E64DD026D597EB00C71877 /* Subscriptions.swift */,
 				373CFADA269663F1003CB2C6 /* Thumbnail.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
@@ -852,6 +857,7 @@
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
+				37E64DD126D597EB00C71877 /* Subscriptions.swift in Sources */,
 				376578892685471400D4EA09 /* Playlist.swift in Sources */,
 				37B81B0526D2CEDA00675966 /* PlaybackState.swift in Sources */,
 				373CFADB269663F1003CB2C6 /* Thumbnail.swift in Sources */,
@@ -928,6 +934,7 @@
 				379775942689365600DD52A8 /* Array+Next.swift in Sources */,
 				3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				37BE0BDA26A214630092E2DB /* PlayerViewController.swift in Sources */,
+				37E64DD226D597EB00C71877 /* Subscriptions.swift in Sources */,
 				37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37C7A1DD267CE9D90010EAD6 /* Profile.swift in Sources */,
 				37B767DC2677C3CA0098BAA8 /* PlayerState.swift in Sources */,
@@ -990,6 +997,7 @@
 				37B81B0726D2D6CF00675966 /* PlaybackState.swift in Sources */,
 				3765788B2685471400D4EA09 /* Playlist.swift in Sources */,
 				373CFADD269663F1003CB2C6 /* Thumbnail.swift in Sources */,
+				37E64DD326D597EB00C71877 /* Subscriptions.swift in Sources */,
 				37C7A1DE267CE9D90010EAD6 /* Profile.swift in Sources */,
 				373CFABE26966148003CB2C6 /* CoverSectionView.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerState.swift in Sources */,

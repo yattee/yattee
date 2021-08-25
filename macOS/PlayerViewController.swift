@@ -20,8 +20,7 @@ final class PlayerViewController: NSViewController {
     }
 
     override func loadView() {
-        playerState = PlayerState()
-        playerState.playbackState = playbackState
+        playerState = PlayerState(playbackState: playbackState)
 
         guard playerState.player == nil else {
             return

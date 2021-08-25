@@ -3,7 +3,7 @@ import SwiftUI
 struct SubscriptionsView: View {
     @ObservedObject private var store = Store<[Video]>()
 
-    var resource = InvidiousAPI.shared.subscriptions
+    var resource = InvidiousAPI.shared.feed
 
     init() {
         resource.addObserver(store)

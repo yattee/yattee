@@ -2,15 +2,75 @@ import Foundation
 import SwiftUI
 
 struct VideoDetails: View {
+    @EnvironmentObject<Subscriptions> private var subscriptions
+
+    @State private var subscribed = false
+    @State private var confirmationShown = false
+
     var video: Video
 
     var body: some View {
         VStack(alignment: .leading) {
             Text(video.title)
                 .font(.title2.bold())
+                .padding(.bottom, 0)
 
-            Text(video.author)
+            Divider()
+
+            HStack(alignment: .center) {
+                HStack(spacing: 4) {
+                    if subscribed {
+                        Image(systemName: "star.circle.fill")
+                    }
+                    VStack(alignment: .leading) {
+                        Text(video.channel.name)
+                            .font(.system(size: 13))
+                            .bold()
+                        if !video.channel.subscriptionsCount.isEmpty {
+                            Text("\(video.channel.subscriptionsCount) subscribers")
+                                .font(.caption2)
+                        }
+                    }
+                }
                 .foregroundColor(.secondary)
+
+                Spacer()
+
+                Section {
+                    if subscribed {
+                        Button("Unsubscribe") {
+                            confirmationShown = true
+                        }
+                        #if os(iOS)
+                            .tint(.gray)
+                        #endif
+                        .confirmationDialog("Are you you want to unsubscribe from \(video.channel.name)?", isPresented: $confirmationShown) {
+                            Button("Unsubscribe") {
+                                subscriptions.unsubscribe(video.channel.id)
+
+                                withAnimation {
+                                    subscribed.toggle()
+                                }
+                            }
+                        }
+                    } else {
+                        Button("Subscribe") {
+                            subscriptions.subscribe(video.channel.id)
+
+                            withAnimation {
+                                subscribed.toggle()
+                            }
+                        }
+                        .tint(.blue)
+                    }
+                }
+                .font(.system(size: 13))
+                .buttonStyle(.borderless)
+                .buttonBorderShape(.roundedRectangle)
+            }
+            .padding(.bottom, -1)
+
+            Divider()
 
             HStack(spacing: 4) {
                 if let published = video.publishedDate {
@@ -26,25 +86,37 @@ struct VideoDetails: View {
                     Text(publishedAt.formatted(date: .abbreviated, time: .omitted))
                 }
             }
-            .padding(.top, 4)
             .font(.system(size: 12))
+            .padding(.bottom, -1)
             .foregroundColor(.secondary)
 
+            Divider()
+
             HStack {
+                Spacer()
+
                 if let views = video.viewsCount {
-                    VideoDetail(title: "Views", detail: views)
+                    videoDetail(label: "Views", value: views, symbol: "eye.fill")
                 }
 
                 if let likes = video.likesCount {
-                    VideoDetail(title: "Likes", detail: likes, symbol: "hand.thumbsup.circle.fill", symbolColor: Color("VideoDetailLikesSymbolColor"))
+                    Divider()
+
+                    videoDetail(label: "Likes", value: likes, symbol: "hand.thumbsup.circle.fill")
                 }
 
                 if let dislikes = video.dislikesCount {
-                    VideoDetail(title: "Dislikes", detail: dislikes, symbol: "hand.thumbsdown.circle.fill", symbolColor: Color("VideoDetailDislikesSymbolColor"))
+                    Divider()
+
+                    videoDetail(label: "Dislikes", value: dislikes, symbol: "hand.thumbsdown.circle.fill")
                 }
+
+                Spacer()
             }
-            .padding(.horizontal, 1)
-            .padding(.vertical, 4)
+            .frame(maxHeight: 35)
+            .foregroundColor(.secondary)
+
+            Divider()
 
             #if os(macOS)
                 ScrollView(.vertical) {
@@ -81,6 +153,25 @@ struct VideoDetails: View {
         }
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .bottom])
+        .onAppear {
+            subscribed = subscriptions.subscribed(video.channel.id)
+        }
+    }
+
+    func videoDetail(label: String, value: String, symbol: String) -> some View {
+        VStack(spacing: 4) {
+            HStack(spacing: 2) {
+                Image(systemName: symbol)
+
+                Text(label.uppercased())
+            }
+            .font(.system(size: 9))
+            .opacity(0.6)
+
+            Text(value)
+        }
+
+        .frame(maxWidth: 100)
     }
 
     var showScrollIndicators: Bool {
@@ -92,41 +183,9 @@ struct VideoDetails: View {
     }
 }
 
-struct VideoDetail: View {
-    var title: String
-    var detail: String
-    var symbol = "eye.fill"
-    var symbolColor = Color.white
-
-    var body: some View {
-        VStack {
-            VStack(spacing: 0) {
-                HStack(alignment: .center, spacing: 4) {
-                    Image(systemName: symbol)
-                        .foregroundColor(symbolColor)
-
-                    Text(title.uppercased())
-
-                    Spacer()
-                }
-                .font(.caption2)
-                .padding([.leading, .top], 4)
-                .frame(alignment: .leading)
-
-                Divider()
-                    .background(.gray)
-                    .padding(.vertical, 4)
-
-                Text(detail)
-                    .shadow(radius: 1.0)
-                    .font(.title3.bold())
-            }
-        }
-        .foregroundColor(.white)
-        .background(Color("VideoDetailBackgroundColor"))
-        .cornerRadius(6)
-        .overlay(RoundedRectangle(cornerRadius: 6)
-            .stroke(Color("VideoDetailBorderColor"), lineWidth: 1))
-        .frame(maxWidth: 90)
+struct VideoDetails_Previews: PreviewProvider {
+    static var previews: some View {
+        VideoDetails(video: Video.fixture)
+            .environmentObject(Subscriptions())
     }
 }

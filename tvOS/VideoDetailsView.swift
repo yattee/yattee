@@ -101,7 +101,7 @@ struct VideoDetailsView: View {
     }
 
     var openChannelButton: some View {
-        let channel = Channel.from(video: store.item!)
+        let channel = video.channel
 
         return Button("Open \(channel.name) channel") {
             navigationState.openChannel(channel)

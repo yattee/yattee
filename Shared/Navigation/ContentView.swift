@@ -4,6 +4,7 @@ struct ContentView: View {
     @StateObject private var navigationState = NavigationState()
     @StateObject private var playbackState = PlaybackState()
     @StateObject private var searchState = SearchState()
+    @StateObject private var subscriptions = Subscriptions()
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -40,6 +41,7 @@ struct ContentView: View {
         .environmentObject(navigationState)
             .environmentObject(playbackState)
             .environmentObject(searchState)
+            .environmentObject(subscriptions)
     }
 }
 

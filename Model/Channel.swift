@@ -1,12 +1,22 @@
 import AVFoundation
 import Defaults
 import Foundation
+import SwiftyJSON
 
 struct Channel: Codable, Defaults.Serializable {
     var id: String
     var name: String
+    var subscriptionsCount: String
 
-    static func from(video: Video) -> Channel {
-        Channel(id: video.channelID, name: video.author)
+    init(json: JSON) {
+        id = json["authorId"].stringValue
+        name = json["author"].stringValue
+        subscriptionsCount = json["subCountText"].stringValue
+    }
+
+    init(id: String, name: String, subscriptionsCount: String) {
+        self.id = id
+        self.name = name
+        self.subscriptionsCount = subscriptionsCount
     }
 }

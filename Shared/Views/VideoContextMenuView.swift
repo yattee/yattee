@@ -3,33 +3,49 @@ import SwiftUI
 
 struct VideoContextMenuView: View {
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<Subscriptions> private var subscriptions
 
     let video: Video
 
     @Default(.showingAddToPlaylist) var showingAddToPlaylist
     @Default(.videoIDToAddToPlaylist) var videoIDToAddToPlaylist
 
+    @State private var subscribed = false
+
     var body: some View {
-        openChannelButton(from: video)
+        Section {
+            openChannelButton
 
-        openVideoDetailsButton
+            subscriptionButton
+                .opacity(subscribed ? 1 : 1)
 
-        if navigationState.tabSelection == .playlists {
-            removeFromPlaylistButton
-        } else {
-            addToPlaylistButton
+            openVideoDetailsButton
+
+            if navigationState.tabSelection == .playlists {
+                removeFromPlaylistButton
+            } else {
+                addToPlaylistButton
+            }
         }
     }
 
-    func openChannelButton(from video: Video) -> some View {
+    var openChannelButton: some View {
         Button("\(video.author) Channel") {
-            navigationState.openChannel(Channel.from(video: video))
+            navigationState.openChannel(video.channel)
         }
     }
 
-    func closeChannelButton(from video: Video) -> some View {
-        Button("Close \(Channel.from(video: video).name) Channel") {
-            navigationState.closeChannel()
+    var subscriptionButton: some View {
+        Group {
+            if subscriptions.subscribed(video.channel.id) {
+                Button("Unsubscribe", role: .destructive) {
+                    subscriptions.unsubscribe(video.channel.id)
+                }
+            } else {
+                Button("Subscribe") {
+                    subscriptions.subscribe(video.channel.id)
+                }
+            }
         }
     }
 

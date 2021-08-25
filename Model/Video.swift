@@ -11,7 +11,6 @@ struct Video: Identifiable, Equatable {
     var length: TimeInterval
     var published: String
     var views: Int
-    var channelID: String
     var description: String
     var genre: String
 
@@ -29,6 +28,8 @@ struct Video: Identifiable, Equatable {
     var dislikes: Int?
     var keywords = [String]()
 
+    var channel: Channel
+
     init(
         id: String,
         title: String,
@@ -36,9 +37,9 @@ struct Video: Identifiable, Equatable {
         length: TimeInterval,
         published: String,
         views: Int,
-        channelID: String,
         description: String,
         genre: String,
+        channel: Channel,
         thumbnails: [Thumbnail] = [],
         indexID: String? = nil,
         live: Bool = false,
@@ -54,9 +55,9 @@ struct Video: Identifiable, Equatable {
         self.length = length
         self.published = published
         self.views = views
-        self.channelID = channelID
         self.description = description
         self.genre = genre
+        self.channel = channel
         self.thumbnails = thumbnails
         self.indexID = indexID
         self.live = live
@@ -83,7 +84,6 @@ struct Video: Identifiable, Equatable {
         length = json["lengthSeconds"].doubleValue
         published = json["publishedText"].stringValue
         views = json["viewCount"].intValue
-        channelID = json["authorId"].stringValue
         description = json["description"].stringValue
         genre = json["genre"].stringValue
 
@@ -105,6 +105,7 @@ struct Video: Identifiable, Equatable {
         streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
 
         hlsUrl = json["hlsUrl"].url
+        channel = Channel(json: json)
     }
 
     var playTime: String? {
