@@ -2,6 +2,10 @@ import Foundation
 import SwiftUI
 
 final class NavigationState: ObservableObject {
+    enum TabSelection: Hashable {
+        case subscriptions, popular, trending, playlists, channel(String), playlist(String), search
+    }
+
     @Published var tabSelection: TabSelection = .subscriptions
 
     @Published var showingChannel = false
@@ -12,6 +16,12 @@ final class NavigationState: ObservableObject {
     @Published var video: Video?
 
     @Published var returnToDetails = false
+
+    @Published var presentingPlaylistForm = false
+    @Published var editedPlaylist: Playlist!
+
+    @Published var presentingUnsubscribeAlert = false
+    @Published var channelToUnsubscribe: Channel!
 
     func openChannel(_ channel: Channel) {
         returnToDetails = false
@@ -54,4 +64,21 @@ final class NavigationState: ObservableObject {
             }
         )
     }
+
+    func presentEditPlaylistForm(_ playlist: Playlist?) {
+        editedPlaylist = playlist
+        presentingPlaylistForm = editedPlaylist != nil
+    }
+
+    func presentNewPlaylistForm() {
+        editedPlaylist = nil
+        presentingPlaylistForm = true
+    }
+
+    func presentUnsubscribeAlert(_ channel: Channel?) {
+        channelToUnsubscribe = channel
+        presentingUnsubscribeAlert = channelToUnsubscribe != nil
+    }
 }
+
+typealias TabSelection = NavigationState.TabSelection

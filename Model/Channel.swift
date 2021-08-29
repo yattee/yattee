@@ -3,7 +3,7 @@ import Defaults
 import Foundation
 import SwiftyJSON
 
-struct Channel: Codable, Defaults.Serializable {
+struct Channel: Codable, Identifiable, Defaults.Serializable {
     var id: String
     var name: String
     var subscriptionsCount: String

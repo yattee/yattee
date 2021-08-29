@@ -5,6 +5,7 @@ struct ContentView: View {
     @StateObject private var playbackState = PlaybackState()
     @StateObject private var searchState = SearchState()
     @StateObject private var subscriptions = Subscriptions()
+    @StateObject private var playlists = Playlists()
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -37,11 +38,15 @@ struct ContentView: View {
                     #endif
                 }
             }
+            .sheet(isPresented: $navigationState.presentingPlaylistForm) {
+                PlaylistFormView(playlist: $navigationState.editedPlaylist)
+            }
         #endif
         .environmentObject(navigationState)
             .environmentObject(playbackState)
             .environmentObject(searchState)
             .environmentObject(subscriptions)
+            .environmentObject(playlists)
     }
 }
 

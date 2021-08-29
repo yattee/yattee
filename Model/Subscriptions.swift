@@ -13,6 +13,10 @@ final class Subscriptions: ObservableObject {
         load()
     }
 
+    var all: [Channel] {
+        channels.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
     func subscribe(_ channelID: String) {
         performChannelSubscriptionRequest(channelID, method: .post)
     }

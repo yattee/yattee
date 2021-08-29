@@ -54,6 +54,10 @@ final class InvidiousAPI: Service {
             content.json.arrayValue.map(Playlist.init)
         }
 
+        configureTransformer("/auth/playlists/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Playlist in
+            Playlist(content.json)
+        }
+
         configureTransformer("/auth/playlists", requestMethods: [.post, .patch]) { (content: Entity<Data>) -> Playlist in
             // hacky, to verify if possible to get it in easier way
             Playlist(JSON(parseJSON: String(data: content.content, encoding: .utf8)!))

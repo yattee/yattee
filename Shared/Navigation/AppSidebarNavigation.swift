@@ -3,16 +3,16 @@ import SwiftUI
     import Introspect
 #endif
 
-typealias TabSelection = AppSidebarNavigation.TabSelection
-
 struct AppSidebarNavigation: View {
-    enum TabSelection: String {
-        case subscriptions, popular, trending, playlists, channel, search
-    }
-
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<Subscriptions> private var subscriptions
 
     @State private var didApplyPrimaryViewWorkAround = false
+
+    var selection: Binding<TabSelection?> {
+        navigationState.tabSelectionOptionalBinding
+    }
 
     var body: some View {
         #if os(iOS)
@@ -38,53 +38,18 @@ struct AppSidebarNavigation: View {
         NavigationView {
             sidebar
                 .frame(minWidth: 180)
-
             Text("Select section")
         }
     }
 
     var sidebar: some View {
         List {
-            NavigationLink(tag: TabSelection.subscriptions, selection: navigationState.tabSelectionOptionalBinding) {
-                SubscriptionsView()
-            }
-            label: {
-                Label("Subscriptions", systemImage: "star.circle.fill")
-                    .accessibility(label: Text("Subscriptions"))
-            }
+            mainNavigationLinks
 
-            NavigationLink(tag: TabSelection.popular, selection: navigationState.tabSelectionOptionalBinding) {
-                PopularView()
-            }
-            label: {
-                Label("Popular", systemImage: "chart.bar")
-                    .accessibility(label: Text("Popular"))
-            }
-
-            NavigationLink(tag: TabSelection.trending, selection: navigationState.tabSelectionOptionalBinding) {
-                TrendingView()
-            }
-            label: {
-                Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
-                    .accessibility(label: Text("Trending"))
-            }
-
-            NavigationLink(tag: TabSelection.playlists, selection: navigationState.tabSelectionOptionalBinding) {
-                PlaylistsView()
-            }
-            label: {
-                Label("Playlists", systemImage: "list.and.film")
-                    .accessibility(label: Text("Playlists"))
-            }
-
-            NavigationLink(tag: TabSelection.search, selection: navigationState.tabSelectionOptionalBinding) {
-                SearchView()
-            }
-            label: {
-                Label("Search", systemImage: "magnifyingglass")
-                    .accessibility(label: Text("Search"))
-            }
+            AppSidebarSubscriptions(selection: selection)
+            AppSidebarPlaylists(selection: selection)
         }
+
         #if os(macOS)
             .toolbar {
                 Button(action: toggleSidebar) {
@@ -92,6 +57,59 @@ struct AppSidebarNavigation: View {
                 }
             }
         #endif
+    }
+
+    var mainNavigationLinks: some View {
+        Group {
+            NavigationLink(tag: TabSelection.subscriptions, selection: selection) {
+                SubscriptionsView()
+            }
+            label: {
+                Label("Subscriptions", systemImage: "star.circle.fill")
+                    .accessibility(label: Text("Subscriptions"))
+            }
+
+            NavigationLink(tag: TabSelection.popular, selection: selection) {
+                PopularView()
+            }
+            label: {
+                Label("Popular", systemImage: "chart.bar")
+                    .accessibility(label: Text("Popular"))
+            }
+
+            NavigationLink(tag: TabSelection.trending, selection: selection) {
+                TrendingView()
+            }
+            label: {
+                Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+                    .accessibility(label: Text("Trending"))
+            }
+
+            NavigationLink(tag: TabSelection.playlists, selection: selection) {
+                PlaylistsView()
+            }
+            label: {
+                Label("Playlists", systemImage: "list.and.film")
+                    .accessibility(label: Text("Playlists"))
+            }
+
+            NavigationLink(tag: TabSelection.search, selection: selection) {
+                SearchView()
+            }
+            label: {
+                Label("Search", systemImage: "magnifyingglass")
+                    .accessibility(label: Text("Search"))
+            }
+        }
+    }
+
+    static func symbolSystemImage(_ name: String) -> String {
+        let firstLetter = name.first?.lowercased()
+        let regex = #"^[a-z0-9]$"#
+
+        let symbolName = firstLetter?.range(of: regex, options: .regularExpression) != nil ? firstLetter! : "questionmark"
+
+        return "\(symbolName).square"
     }
 
     #if os(macOS)

@@ -14,6 +14,8 @@ struct PlaylistFormView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @EnvironmentObject<Playlists> private var playlists
+
     var editing: Bool {
         playlist != nil
     }
@@ -138,6 +140,8 @@ struct PlaylistFormView: View {
             if let modifiedPlaylist: Playlist = response.typedContent() {
                 playlist = modifiedPlaylist
             }
+
+            playlists.reload()
 
             dismiss()
         }
