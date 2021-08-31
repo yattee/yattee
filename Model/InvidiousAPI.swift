@@ -75,12 +75,8 @@ final class InvidiousAPI: Service {
             content.json.arrayValue.map(Channel.init)
         }
 
-        configureTransformer("/channels/*", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            if let channelVideos = content.json.dictionaryValue["latestVideos"] {
-                return channelVideos.arrayValue.map(Video.init)
-            }
-
-            return []
+        configureTransformer("/channels/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Channel in
+            Channel(json: content.json)
         }
 
         configureTransformer("/videos/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
@@ -112,7 +108,7 @@ final class InvidiousAPI: Service {
         resource("/auth/subscriptions").child(id)
     }
 
-    func channelVideos(_ id: String) -> Resource {
+    func channel(_ id: String) -> Resource {
         resource("/channels/\(id)")
     }
 

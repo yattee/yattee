@@ -8,34 +8,48 @@ struct VideoView: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @Environment(\.inNavigationView) private var inNavigationView
+
     var video: Video
     var layout: ListingLayout
 
     var body: some View {
-        Button(action: { navigationState.playVideo(video) }) {
-            VStack {
-                if layout == .cells {
-                    #if os(iOS)
-                        if verticalSizeClass == .compact {
-                            horizontalRow
-                                .padding(.vertical, 4)
-                        } else {
-                            verticalRow
-                        }
-                    #else
-                        verticalRow
-                    #endif
-                } else {
-                    horizontalRow
+        Group {
+            if inNavigationView {
+                NavigationLink(destination: VideoPlayerView(video)) {
+                    content
+                }
+            } else {
+                Button(action: { navigationState.playVideo(video) }) {
+                    content
                 }
             }
-            #if os(macOS)
-                .background()
-            #endif
         }
         .modifier(ButtonStyleModifier(layout: layout))
         .contentShape(RoundedRectangle(cornerRadius: 12))
         .contextMenu { VideoContextMenuView(video: video) }
+    }
+
+    var content: some View {
+        VStack {
+            if layout == .cells {
+                #if os(iOS)
+                    if verticalSizeClass == .compact {
+                        horizontalRow
+                            .padding(.vertical, 4)
+                    } else {
+                        verticalRow
+                    }
+                #else
+                    verticalRow
+                #endif
+            } else {
+                horizontalRow
+            }
+        }
+        #if os(macOS)
+            .background()
+        #endif
     }
 
     var horizontalRow: some View {
@@ -228,7 +242,7 @@ struct VideoListRowPreview: PreviewProvider {
                     VideoView(video: video, layout: .list)
                 }
             }
-            .listStyle(GroupedListStyle())
+            .listStyle(.grouped)
 
             HStack {
                 ForEach(Video.allFixtures) { video in

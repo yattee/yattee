@@ -38,6 +38,16 @@
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "37BA796226DC40CB002A0235"
+               BuildableName = "Shared Tests.xctest"
+               BlueprintName = "Shared Tests"
+               ReferencedContainer = "container:Pearvidious.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

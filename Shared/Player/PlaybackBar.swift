@@ -59,7 +59,7 @@ struct PlaybackBar: View {
             Image(systemName: "chevron.down.circle.fill")
         }
         .accessibilityLabel(Text("Close"))
-        .buttonStyle(BorderlessButtonStyle())
+        .buttonStyle(.borderless)
         .foregroundColor(.gray)
         .keyboardShortcut(.cancelAction)
     }

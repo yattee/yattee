@@ -127,40 +127,15 @@ struct Video: Identifiable, Equatable {
     }
 
     var viewsCount: String? {
-        views != 0 ? formattedCount(views) : nil
+        views != 0 ? views.formattedAsAbbreviation() : nil
     }
 
     var likesCount: String? {
-        formattedCount(likes)
+        likes?.formattedAsAbbreviation()
     }
 
     var dislikesCount: String? {
-        formattedCount(dislikes)
-    }
-
-    func formattedCount(_ count: Int!) -> String? {
-        guard count != nil else {
-            return nil
-        }
-
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-
-        var number: NSNumber
-        var unit: String
-
-        if count < 1000 {
-            return "\(count!)"
-        } else if count < 1_000_000 {
-            number = NSNumber(value: Double(count) / 1000.0)
-            unit = "K"
-        } else {
-            number = NSNumber(value: Double(count) / 1_000_000.0)
-            unit = "M"
-        }
-
-        return "\(formatter.string(from: number)!)\(unit)"
+        dislikes?.formattedAsAbbreviation()
     }
 
     var selectableStreams: [Stream] {

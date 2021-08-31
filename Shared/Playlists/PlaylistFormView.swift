@@ -44,7 +44,7 @@ struct PlaylistFormView: View {
                             Text(visibility.name)
                         }
                     }
-                    .pickerStyle(SegmentedPickerStyle())
+                    .pickerStyle(.segmented)
                 }
                 Divider()
                     .padding(.vertical, 4)

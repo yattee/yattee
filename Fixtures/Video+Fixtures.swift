@@ -13,7 +13,7 @@ extension Video {
             views: 21534,
             description: "Some relaxing live piano music",
             genre: "Music",
-            channel: Channel(id: "AbCdEFgHI", name: "The Channel", subscriptionsCount: "2.3K"),
+            channel: Channel(id: "AbCdEFgHI", name: "The Channel", subscriptionsCount: 2300, videos: []),
             thumbnails: Thumbnail.fixturesForAllQualities(videoId: id),
             live: false,
             upcoming: false,

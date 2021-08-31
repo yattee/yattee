@@ -8,9 +8,6 @@ final class NavigationState: ObservableObject {
 
     @Published var tabSelection: TabSelection = .subscriptions
 
-    @Published var showingChannel = false
-    @Published var channel: Channel?
-
     @Published var showingVideoDetails = false
     @Published var showingVideo = false
     @Published var video: Video?
@@ -23,15 +20,40 @@ final class NavigationState: ObservableObject {
     @Published var presentingUnsubscribeAlert = false
     @Published var channelToUnsubscribe: Channel!
 
+    @Published var openChannels = Set<Channel>()
+    @Published var isChannelOpen = false
+    @Published var sidebarSectionChanged = false
+
     func openChannel(_ channel: Channel) {
-        returnToDetails = false
-        self.channel = channel
-        showingChannel = true
+        openChannels.insert(channel)
+
+        isChannelOpen = true
+        tabSelection = .channel(channel.id)
     }
 
-    func closeChannel() {
-        showingChannel = false
-        channel = nil
+    func closeChannel(_ channel: Channel) {
+        guard openChannels.remove(channel) != nil else {
+            return
+        }
+
+        isChannelOpen = !openChannels.isEmpty
+
+        if tabSelection == .channel(channel.id) {
+            tabSelection = .subscriptions
+        }
+    }
+
+    func closeAllChannels() {
+        isChannelOpen = false
+        openChannels.removeAll()
+    }
+
+    func showOpenChannel(_ id: Channel.ID) -> Bool {
+        if case .channel = tabSelection {
+            return false
+        } else {
+            return !openChannels.contains { $0.id == id }
+        }
     }
 
     func openVideoDetails(_ video: Video) {
@@ -59,8 +81,10 @@ final class NavigationState: ObservableObject {
             get: {
                 self.tabSelection
             },
-            set: {
-                self.tabSelection = $0 ?? .subscriptions
+            set: { newValue in
+                if newValue != nil {
+                    self.tabSelection = newValue!
+                }
             }
         )
     }

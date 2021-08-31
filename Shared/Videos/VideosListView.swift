@@ -24,7 +24,7 @@ struct VideosListView: View {
                     }
                 }
             }
-            .listStyle(GroupedListStyle())
+            .listStyle(.grouped)
         }
     }
 }

@@ -15,6 +15,7 @@ struct AppSidebarPlaylists: View {
                     Label(playlist.title, systemImage: AppSidebarNavigation.symbolSystemImage(playlist.title))
                         .badge(Text("\(playlist.videos.count)"))
                 }
+                .id(playlist.id)
                 .contextMenu {
                     Button("Edit") {
                         navigationState.presentEditPlaylistForm(playlists.find(id: playlist.id))

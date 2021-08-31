@@ -4,8 +4,6 @@ import SwiftUI
 struct VideosView: View {
     @EnvironmentObject<NavigationState> private var navigationState
 
-    @State private var profile = Profile()
-
     #if os(tvOS)
         @Default(.layout) private var layout
     #endif

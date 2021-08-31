@@ -26,8 +26,8 @@ struct VideoDetails: View {
                         Text(video.channel.name)
                             .font(.system(size: 13))
                             .bold()
-                        if !video.channel.subscriptionsCount.isEmpty {
-                            Text("\(video.channel.subscriptionsCount) subscribers")
+                        if let subscribers = video.channel.subscriptionsString {
+                            Text("\(subscribers) subscribers")
                                 .font(.caption2)
                         }
                     }
@@ -154,7 +154,7 @@ struct VideoDetails: View {
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .bottom])
         .onAppear {
-            subscribed = subscriptions.subscribed(video.channel.id)
+            subscribed = subscriptions.isSubscribing(video.channel.id)
         }
     }
 

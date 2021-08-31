@@ -38,20 +38,25 @@ struct TVNavigationView: View {
                 VideoDetailsView(video)
             }
         }
-        .fullScreenCover(isPresented: $navigationState.showingChannel, onDismiss: {
-            navigationState.showVideoDetailsIfNeeded()
-        }) {
-            if let channel = navigationState.channel {
-                ChannelView(id: channel.id)
-            }
-        }
         .fullScreenCover(isPresented: $navigationState.showingVideo) {
             if let video = navigationState.video {
                 VideoPlayerView(video)
                     .environmentObject(playbackState)
             }
         }
+        .fullScreenCover(isPresented: $navigationState.isChannelOpen, onDismiss: {
+            navigationState.closeChannel(presentedChannel)
+        }) {
+            if presentedChannel != nil {
+                ChannelVideosView(presentedChannel)
+                    .background(.thickMaterial)
+            }
+        }
         .onPlayPauseCommand { showingOptions.toggle() }
+    }
+
+    fileprivate var presentedChannel: Channel! {
+        navigationState.openChannels.first
     }
 }
 

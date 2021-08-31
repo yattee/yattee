@@ -38,16 +38,27 @@ struct AppSidebarNavigation: View {
         NavigationView {
             sidebar
                 .frame(minWidth: 180)
+
             Text("Select section")
         }
     }
 
     var sidebar: some View {
-        List {
-            mainNavigationLinks
+        ScrollViewReader { scrollView in
+            List {
+                mainNavigationLinks
 
-            AppSidebarSubscriptions(selection: selection)
-            AppSidebarPlaylists(selection: selection)
+                Group {
+                    AppSidebarRecentlyOpened(selection: selection)
+                        .id("recentlyOpened")
+                    AppSidebarSubscriptions(selection: selection)
+                    AppSidebarPlaylists(selection: selection)
+                }
+                .onChange(of: navigationState.sidebarSectionChanged) { _ in
+                    scrollScrollViewToItem(scrollView: scrollView, for: navigationState.tabSelection)
+                }
+            }
+            .listStyle(.sidebar)
         }
 
         #if os(macOS)
@@ -61,47 +72,50 @@ struct AppSidebarNavigation: View {
 
     var mainNavigationLinks: some View {
         Group {
-            NavigationLink(tag: TabSelection.subscriptions, selection: selection) {
-                SubscriptionsView()
-            }
-            label: {
+            NavigationLink(destination: SubscriptionsView(), tag: TabSelection.subscriptions, selection: selection) {
                 Label("Subscriptions", systemImage: "star.circle.fill")
                     .accessibility(label: Text("Subscriptions"))
             }
 
-            NavigationLink(tag: TabSelection.popular, selection: selection) {
-                PopularView()
-            }
-            label: {
+            NavigationLink(destination: PopularView(), tag: TabSelection.popular, selection: selection) {
                 Label("Popular", systemImage: "chart.bar")
                     .accessibility(label: Text("Popular"))
             }
 
-            NavigationLink(tag: TabSelection.trending, selection: selection) {
-                TrendingView()
-            }
-            label: {
+            NavigationLink(destination: TrendingView(), tag: TabSelection.trending, selection: selection) {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
                     .accessibility(label: Text("Trending"))
             }
 
-            NavigationLink(tag: TabSelection.playlists, selection: selection) {
-                PlaylistsView()
-            }
-            label: {
+            NavigationLink(destination: PlaylistsView(), tag: TabSelection.playlists, selection: selection) {
                 Label("Playlists", systemImage: "list.and.film")
                     .accessibility(label: Text("Playlists"))
             }
 
-            NavigationLink(tag: TabSelection.search, selection: selection) {
-                SearchView()
-            }
-            label: {
+            NavigationLink(destination: SearchView(), tag: TabSelection.search, selection: selection) {
                 Label("Search", systemImage: "magnifyingglass")
                     .accessibility(label: Text("Search"))
             }
         }
     }
+
+    func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
+        if case let .channel(id) = selection {
+            if subscriptions.isSubscribing(id) {
+                scrollView.scrollTo(id)
+            } else {
+                scrollView.scrollTo("recentlyOpened")
+            }
+        } else if case let .playlist(id) = selection {
+            scrollView.scrollTo(id)
+        }
+    }
+
+    #if os(macOS)
+        private func toggleSidebar() {
+            NSApp.keyWindow?.contentViewController?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+        }
+    #endif
 
     static func symbolSystemImage(_ name: String) -> String {
         let firstLetter = name.first?.lowercased()
@@ -111,10 +125,4 @@ struct AppSidebarNavigation: View {
 
         return "\(symbolName).square"
     }
-
-    #if os(macOS)
-        private func toggleSidebar() {
-            NSApp.keyWindow?.contentViewController?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
-        }
-    #endif
 }

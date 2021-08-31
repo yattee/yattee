@@ -14,7 +14,9 @@ struct VideoContextMenuView: View {
 
     var body: some View {
         Section {
-            openChannelButton
+            if navigationState.showOpenChannel(video.channel.id) {
+                openChannelButton
+            }
 
             subscriptionButton
                 .opacity(subscribed ? 1 : 1)
@@ -32,18 +34,25 @@ struct VideoContextMenuView: View {
     var openChannelButton: some View {
         Button("\(video.author) Channel") {
             navigationState.openChannel(video.channel)
+            navigationState.sidebarSectionChanged.toggle()
         }
     }
 
     var subscriptionButton: some View {
         Group {
-            if subscriptions.subscribed(video.channel.id) {
+            if subscriptions.isSubscribing(video.channel.id) {
                 Button("Unsubscribe", role: .destructive) {
-                    subscriptions.unsubscribe(video.channel.id)
+                    #if os(tvOS)
+                        subscriptions.unsubscribe(video.channel.id)
+                    #else
+                        navigationState.presentUnsubscribeAlert(video.channel)
+                    #endif
                 }
             } else {
                 Button("Subscribe") {
-                    subscriptions.subscribe(video.channel.id)
+                    subscriptions.subscribe(video.channel.id) {
+                        navigationState.sidebarSectionChanged.toggle()
+                    }
                 }
             }
         }

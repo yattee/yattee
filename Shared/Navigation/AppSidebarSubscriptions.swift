@@ -19,13 +19,7 @@ struct AppSidebarSubscriptions: View {
                         navigationState.presentUnsubscribeAlert(channel)
                     }
                 }
-                .alert(unsubscribeAlertTitle, isPresented: $navigationState.presentingUnsubscribeAlert) {
-                    if let channel = navigationState.channelToUnsubscribe {
-                        Button("Unsubscribe", role: .destructive) {
-                            subscriptions.unsubscribe(channel.id)
-                        }
-                    }
-                }
+                .modifier(UnsubscribeAlertModifier())
             }
         }
     }

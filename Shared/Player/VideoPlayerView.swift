@@ -89,10 +89,9 @@ struct VideoPlayerView: View {
             navigationState.showingVideoDetails = navigationState.returnToDetails
         }
         #if os(macOS)
-            .navigationTitle(video.title)
             .frame(maxWidth: 1000, minHeight: 700)
         #elseif os(iOS)
-            .navigationBarTitle(video.title, displayMode: .inline)
+            .navigationBarHidden(true)
         #endif
     }
 

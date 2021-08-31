@@ -2,10 +2,10 @@ import Defaults
 import SwiftUI
 
 struct AppTabNavigation: View {
-    @State private var tabSelection: TabSelection = .subscriptions
+    @EnvironmentObject<NavigationState> private var navigationState
 
     var body: some View {
-        TabView(selection: $tabSelection) {
+        TabView(selection: $navigationState.tabSelection) {
             NavigationView {
                 SubscriptionsView()
             }
@@ -51,5 +51,19 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.search)
         }
+        .sheet(isPresented: $navigationState.isChannelOpen, onDismiss: {
+            navigationState.closeChannel(presentedChannel)
+        }) {
+            if presentedChannel != nil {
+                NavigationView {
+                    ChannelVideosView(presentedChannel)
+                        .environment(\.inNavigationView, true)
+                }
+            }
+        }
+    }
+
+    fileprivate var presentedChannel: Channel! {
+        navigationState.openChannels.first
     }
 }
