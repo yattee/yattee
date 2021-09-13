@@ -90,7 +90,7 @@ struct ChannelVideosView: View {
         var subscriptionToolbarItemPlacement: ToolbarItemPlacement {
             #if os(iOS)
                 if horizontalSizeClass == .regular {
-                    return .primaryAction
+                    return .primaryAction // swiftlint:disable:this implicit_return
                 }
             #endif
 

@@ -62,7 +62,9 @@ final class PlayerState: ObservableObject {
     }
 
     fileprivate func playVideo(_ video: Video) {
-        if video.hlsUrl != nil {
+        playbackState.live = video.live
+
+        if video.live {
             playHlsUrl()
             return
         }

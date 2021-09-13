@@ -10,7 +10,7 @@ struct AppSidebarSubscriptions: View {
         Section(header: Text("Subscriptions")) {
             ForEach(subscriptions.all) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $selection) {
-                    ChannelVideosView(channel)
+                    LazyView(ChannelVideosView(channel))
                 } label: {
                     Label(channel.name, systemImage: AppSidebarNavigation.symbolSystemImage(channel.name))
                 }

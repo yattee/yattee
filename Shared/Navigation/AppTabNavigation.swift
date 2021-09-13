@@ -3,6 +3,9 @@ import SwiftUI
 
 struct AppTabNavigation: View {
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<SearchState> private var searchState
+
+    @State private var searchQuery = ""
 
     var body: some View {
         TabView(selection: $navigationState.tabSelection) {
@@ -44,6 +47,22 @@ struct AppTabNavigation: View {
 
             NavigationView {
                 SearchView()
+                    .searchable(text: $searchQuery, placement: .navigationBarDrawer(displayMode: .always)) {
+                        ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
+                            Text(suggestion)
+                                .searchCompletion(suggestion)
+                        }
+                    }
+                    .onChange(of: searchQuery) { query in
+                        searchState.loadQuerySuggestions(query)
+                    }
+                    .onSubmit(of: .search) {
+                        searchState.changeQuery { query in
+                            query.query = self.searchQuery
+                        }
+
+                        navigationState.tabSelection = .search
+                    }
             }
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")

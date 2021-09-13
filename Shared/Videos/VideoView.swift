@@ -119,12 +119,15 @@ struct VideoView: View {
                 #endif
                 .padding(.bottom)
 
-                if additionalDetailsAvailable {
-                    additionalDetails
-                        .padding(.bottom, 10)
-                } else {
-                    Spacer()
+                Group {
+                    if additionalDetailsAvailable {
+                        additionalDetails
+                    } else {
+                        Spacer()
+                    }
                 }
+                .frame(minHeight: 30, alignment: .top)
+                .padding(.bottom, 10)
             }
             #if os(tvOS)
                 .padding(.horizontal, 8)

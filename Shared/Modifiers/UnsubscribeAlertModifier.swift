@@ -12,6 +12,7 @@ struct UnsubscribeAlertModifier: ViewModifier {
                     Button("Unsubscribe", role: .destructive) {
                         subscriptions.unsubscribe(channel.id) {
                             navigationState.openChannel(channel)
+                            navigationState.tabSelection = .channel(channel.id)
                             navigationState.sidebarSectionChanged.toggle()
                         }
                     }

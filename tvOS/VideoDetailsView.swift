@@ -105,6 +105,7 @@ struct VideoDetailsView: View {
 
         return Button("Open \(channel.name) channel") {
             navigationState.openChannel(channel)
+            navigationState.tabSelection = .channel(channel.id)
             navigationState.returnToDetails = true
             dismiss()
         }

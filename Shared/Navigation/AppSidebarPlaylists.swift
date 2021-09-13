@@ -10,7 +10,7 @@ struct AppSidebarPlaylists: View {
         Section(header: Text("Playlists")) {
             ForEach(playlists.all) { playlist in
                 NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $selection) {
-                    PlaylistVideosView(playlist)
+                    LazyView(PlaylistVideosView(playlist))
                 } label: {
                     Label(playlist.title, systemImage: AppSidebarNavigation.symbolSystemImage(playlist.title))
                         .badge(Text("\(playlist.videos.count)"))

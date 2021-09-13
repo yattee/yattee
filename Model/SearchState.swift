@@ -3,13 +3,15 @@ import Siesta
 import SwiftUI
 
 final class SearchState: ObservableObject {
+    @Published var store = Store<[Video]>()
     @Published var query = SearchQuery()
+
+    @Published var querySuggestions = Store<[String]>()
+
     @Default(.searchQuery) private var queryText
 
     private var previousResource: Resource?
     private var resource: Resource!
-
-    @Published var store = Store<[Video]>()
 
     init() {
         let newQuery = query
@@ -21,6 +23,23 @@ final class SearchState: ObservableObject {
 
     var isLoading: Bool {
         resource.isLoading
+    }
+
+    func loadQuerySuggestions(_ query: String) {
+        let resource = InvidiousAPI.shared.searchSuggestions(query: query)
+
+        resource.addObserver(querySuggestions)
+        resource.loadIfNeeded()
+
+        if let request = resource.loadIfNeeded() {
+            request.onSuccess { response in
+                if let suggestions: [String] = response.typedContent() {
+                    self.querySuggestions = Store<[String]>(suggestions)
+                }
+            }
+        } else {
+            querySuggestions = Store<[String]>(querySuggestions.collection)
+        }
     }
 
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {

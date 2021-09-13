@@ -12,7 +12,7 @@ struct PlaybackBar: View {
             closeButton
                 .frame(width: 60, alignment: .leading)
 
-            Text(playbackFinishAtString)
+            Text(playbackStatus)
                 .foregroundColor(.gray)
                 .font(.caption2)
                 .frame(minWidth: 60, maxWidth: .infinity)
@@ -21,7 +21,11 @@ struct PlaybackBar: View {
                 if playbackState.stream != nil {
                     Text(currentStreamString)
                 } else {
-                    Image(systemName: "bolt.horizontal.fill")
+                    if video.live {
+                        Image(systemName: "dot.radiowaves.left.and.right")
+                    } else {
+                        Image(systemName: "bolt.horizontal.fill")
+                    }
                 }
             }
             .foregroundColor(.gray)
@@ -37,9 +41,13 @@ struct PlaybackBar: View {
         playbackState.stream != nil ? "\(playbackState.stream!.resolution.height)p" : ""
     }
 
-    var playbackFinishAtString: String {
+    var playbackStatus: String {
         guard playbackState.time != nil else {
-            return "loading..."
+            if playbackState.live {
+                return "LIVE"
+            } else {
+                return "loading..."
+            }
         }
 
         let remainingSeconds = video.length - playbackState.time!.seconds

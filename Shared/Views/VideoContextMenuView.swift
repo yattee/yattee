@@ -34,6 +34,7 @@ struct VideoContextMenuView: View {
     var openChannelButton: some View {
         Button("\(video.author) Channel") {
             navigationState.openChannel(video.channel)
+            navigationState.tabSelection = .channel(video.channel.id)
             navigationState.sidebarSectionChanged.toggle()
         }
     }

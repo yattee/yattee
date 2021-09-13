@@ -14,7 +14,7 @@ struct AppSidebarRecentlyOpened: View {
                 Section(header: Text("Recently Opened")) {
                     ForEach(recentlyOpened) { channel in
                         NavigationLink(tag: TabSelection.channel(channel.id), selection: $selection) {
-                            ChannelVideosView(channel)
+                            LazyView(ChannelVideosView(channel))
                         } label: {
                             HStack {
                                 Label(channel.name, systemImage: AppSidebarNavigation.symbolSystemImage(channel.name))

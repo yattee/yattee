@@ -4,11 +4,22 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
+    enum SidebarGroup: String, Identifiable {
+        case main
+
+        var id: RawValue {
+            rawValue
+        }
+    }
+
     @EnvironmentObject<NavigationState> private var navigationState
     @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<SearchState> private var searchState
     @EnvironmentObject<Subscriptions> private var subscriptions
 
     @State private var didApplyPrimaryViewWorkAround = false
+
+    @State private var searchQuery = ""
 
     var selection: Binding<TabSelection?> {
         navigationState.tabSelectionOptionalBinding
@@ -41,60 +52,93 @@ struct AppSidebarNavigation: View {
 
             Text("Select section")
         }
+        .searchable(text: $searchQuery, placement: .sidebar) {
+            ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
+                Text(suggestion)
+                    .searchCompletion(suggestion)
+            }
+        }
+        .onChange(of: searchQuery) { query in
+            searchState.loadQuerySuggestions(query)
+        }
+        .onSubmit(of: .search) {
+            searchState.changeQuery { query in
+                query.query = self.searchQuery
+            }
+
+            navigationState.tabSelection = .search
+        }
     }
 
     var sidebar: some View {
         ScrollViewReader { scrollView in
             List {
-                mainNavigationLinks
-
-                Group {
-                    AppSidebarRecentlyOpened(selection: selection)
-                        .id("recentlyOpened")
-                    AppSidebarSubscriptions(selection: selection)
-                    AppSidebarPlaylists(selection: selection)
+                ForEach(sidebarGroups) { group in
+                    sidebarGroupContent(group)
+                        .id(group)
                 }
+
                 .onChange(of: navigationState.sidebarSectionChanged) { _ in
                     scrollScrollViewToItem(scrollView: scrollView, for: navigationState.tabSelection)
                 }
             }
+            .background {
+                NavigationLink(destination: SearchView(), tag: TabSelection.search, selection: selection) {
+                    Color.clear
+                }
+                .hidden()
+            }
             .listStyle(.sidebar)
         }
-
-        #if os(macOS)
-            .toolbar {
-                Button(action: toggleSidebar) {
-                    Image(systemName: "sidebar.left").help("Toggle Sidebar")
+        .toolbar {
+            #if os(macOS)
+                ToolbarItemGroup {
+                    Button(action: toggleSidebar) {
+                        Image(systemName: "sidebar.left").help("Toggle Sidebar")
+                    }
                 }
+            #endif
+        }
+    }
+
+    var sidebarGroups: [SidebarGroup] {
+        [.main]
+    }
+
+    func sidebarGroupContent(_ group: SidebarGroup) -> some View {
+        switch group {
+        case .main:
+            return Group {
+                mainNavigationLinks
+
+                AppSidebarRecentlyOpened(selection: selection)
+                    .id("recentlyOpened")
+                AppSidebarSubscriptions(selection: selection)
+                AppSidebarPlaylists(selection: selection)
             }
-        #endif
+        }
     }
 
     var mainNavigationLinks: some View {
-        Group {
-            NavigationLink(destination: SubscriptionsView(), tag: TabSelection.subscriptions, selection: selection) {
+        Section("Videos") {
+            NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: selection) {
                 Label("Subscriptions", systemImage: "star.circle.fill")
                     .accessibility(label: Text("Subscriptions"))
             }
 
-            NavigationLink(destination: PopularView(), tag: TabSelection.popular, selection: selection) {
+            NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: selection) {
                 Label("Popular", systemImage: "chart.bar")
                     .accessibility(label: Text("Popular"))
             }
 
-            NavigationLink(destination: TrendingView(), tag: TabSelection.trending, selection: selection) {
+            NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: selection) {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
                     .accessibility(label: Text("Trending"))
             }
 
-            NavigationLink(destination: PlaylistsView(), tag: TabSelection.playlists, selection: selection) {
+            NavigationLink(destination: LazyView(PlaylistsView()), tag: TabSelection.playlists, selection: selection) {
                 Label("Playlists", systemImage: "list.and.film")
                     .accessibility(label: Text("Playlists"))
-            }
-
-            NavigationLink(destination: SearchView(), tag: TabSelection.search, selection: selection) {
-                Label("Search", systemImage: "magnifyingglass")
-                    .accessibility(label: Text("Search"))
             }
         }
     }

@@ -2,6 +2,7 @@ import CoreMedia
 import Foundation
 
 final class PlaybackState: ObservableObject {
+    @Published var live = false
     @Published var stream: Stream?
     @Published var time: CMTime?
 

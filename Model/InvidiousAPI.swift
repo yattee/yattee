@@ -50,6 +50,14 @@ final class InvidiousAPI: Service {
             content.json.arrayValue.map(Video.init)
         }
 
+        configureTransformer("/search/suggestions", requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
+            if let suggestions = content.json.dictionaryValue["suggestions"] {
+                return suggestions.arrayValue.map(String.init)
+            }
+
+            return []
+        }
+
         configureTransformer("/auth/playlists", requestMethods: [.get]) { (content: Entity<JSON>) -> [Playlist] in
             content.json.arrayValue.map(Playlist.init)
         }
@@ -146,6 +154,11 @@ final class InvidiousAPI: Service {
         }
 
         return resource
+    }
+
+    func searchSuggestions(query: String) -> Resource {
+        resource("/search/suggestions")
+            .withParam("q", query.lowercased())
     }
 
     private func searchQuery(_ query: String) -> String {

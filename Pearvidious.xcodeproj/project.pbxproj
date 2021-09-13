@@ -20,6 +20,9 @@
 		37141673267A8E10006CA35D /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37141672267A8E10006CA35D /* Country.swift */; };
 		37141674267A8E10006CA35D /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37141672267A8E10006CA35D /* Country.swift */; };
 		37141675267A8E10006CA35D /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37141672267A8E10006CA35D /* Country.swift */; };
+		37152EEA26EFEB95004FB96D /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37152EE926EFEB95004FB96D /* LazyView.swift */; };
+		37152EEB26EFEB95004FB96D /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37152EE926EFEB95004FB96D /* LazyView.swift */; };
+		37152EEC26EFEB95004FB96D /* LazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37152EE926EFEB95004FB96D /* LazyView.swift */; };
 		371F2F1A269B43D300E4A7AB /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationState.swift */; };
 		371F2F1B269B43D300E4A7AB /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationState.swift */; };
 		371F2F1C269B43D300E4A7AB /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationState.swift */; };
@@ -191,7 +194,6 @@
 		37D4B15F267164AF00C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B15E267164AF00C925CA /* Assets.xcassets */; };
 		37D4B176267164B000C925CA /* PearvidiousUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B175267164B000C925CA /* PearvidiousUITests.swift */; };
 		37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* PearvidiousApp.swift */; };
-		37D4B1812671653A00C925CA /* AppTabNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C32671614700C925CA /* AppTabNavigation.swift */; };
 		37D4B1862671691600C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B0C42671614800C925CA /* Assets.xcassets */; };
 		37D4B18E26717B3800C925CA /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B18B26717B3800C925CA /* VideoView.swift */; };
 		37D4B19726717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
@@ -253,6 +255,7 @@
 		3711403E26B206A6005B3555 /* SearchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchState.swift; sourceTree = "<group>"; };
 		3714166E267A8ACC006CA35D /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
 		37141672267A8E10006CA35D /* Country.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
+		37152EE926EFEB95004FB96D /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
 		371F2F19269B43D300E4A7AB /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
 		372915E52687E3B900F5A35B /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
 		373CFABD26966115003CB2C6 /* CoverSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverSectionView.swift; sourceTree = "<group>"; };
@@ -467,6 +470,7 @@
 			isa = PBXGroup;
 			children = (
 				37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */,
+				37152EE926EFEB95004FB96D /* LazyView.swift */,
 				37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
@@ -964,6 +968,7 @@
 				3763495126DFF59D00B9A393 /* AppSidebarRecentlyOpened.swift in Sources */,
 				37BA793B26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */,
+				37152EEA26EFEB95004FB96D /* LazyView.swift in Sources */,
 				37C7A1DA267CACF50010EAD6 /* TrendingCountry.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				37BE0BD626A1D4A90092E2DB /* PlayerViewController.swift in Sources */,
@@ -1043,6 +1048,7 @@
 				37EAD870267B9ED100D9E01B /* Segment.swift in Sources */,
 				37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				37141670267A8ACC006CA35D /* TrendingView.swift in Sources */,
+				37152EEB26EFEB95004FB96D /* LazyView.swift in Sources */,
 				377FC7E2267A084A00A6BBAF /* VideoView.swift in Sources */,
 				37B81B0626D2CEDA00675966 /* PlaybackState.swift in Sources */,
 				3765788A2685471400D4EA09 /* Playlist.swift in Sources */,
@@ -1161,6 +1167,7 @@
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
 				373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				37141675267A8E10006CA35D /* Country.swift in Sources */,
+				37152EEC26EFEB95004FB96D /* LazyView.swift in Sources */,
 				37F49BA826CB0FCE00304AC0 /* PlaylistFormView.swift in Sources */,
 				373CFAC42696616C003CB2C6 /* CoverSectionRowView.swift in Sources */,
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
@@ -1168,7 +1175,6 @@
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,
 				37BAB54C269B39FD00E75ED1 /* TVNavigationView.swift in Sources */,
-				37D4B1812671653A00C925CA /* AppTabNavigation.swift in Sources */,
 				3797758D2689345500DD52A8 /* Store.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

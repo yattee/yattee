@@ -28,7 +28,6 @@ final class NavigationState: ObservableObject {
         openChannels.insert(channel)
 
         isChannelOpen = true
-        tabSelection = .channel(channel.id)
     }
 
     func closeChannel(_ channel: Channel) {
@@ -41,11 +40,6 @@ final class NavigationState: ObservableObject {
         if tabSelection == .channel(channel.id) {
             tabSelection = .subscriptions
         }
-    }
-
-    func closeAllChannels() {
-        isChannelOpen = false
-        openChannels.removeAll()
     }
 
     func showOpenChannel(_ id: Channel.ID) -> Bool {

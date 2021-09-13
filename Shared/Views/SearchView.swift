@@ -26,7 +26,6 @@ struct SearchView: View {
                 Spacer()
             }
         }
-        .searchable(text: $queryText)
         .onAppear {
             state.changeQuery { query in
                 query.query = queryText
@@ -35,7 +34,7 @@ struct SearchView: View {
                 query.duration = searchDuration
             }
         }
-        .onChange(of: queryText) { queryText in
+        .onChange(of: state.query.query) { queryText in
             state.changeQuery { query in query.query = queryText }
         }
         .onChange(of: searchSortOrder) { order in
@@ -48,8 +47,12 @@ struct SearchView: View {
             state.changeQuery { query in query.duration = duration }
         }
         #if !os(tvOS)
-            .navigationTitle("Search")
+            .navigationTitle(navigationTitle)
         #endif
+    }
+
+    var navigationTitle: String {
+        state.query.query.isEmpty ? "Search" : "Search: \"\(state.query.query)\""
     }
 
     var searchFiltersActive: Bool {
