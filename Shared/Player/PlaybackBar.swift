@@ -64,7 +64,7 @@ struct PlaybackBar: View {
 
     var closeButton: some View {
         Button(action: { dismiss() }) {
-            Image(systemName: "chevron.down.circle.fill")
+            Image(systemName: "xmark.circle.fill")
         }
         .accessibilityLabel(Text("Close"))
         .buttonStyle(.borderless)

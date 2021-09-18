@@ -6,7 +6,7 @@ final class PlaybackState: ObservableObject {
     @Published var stream: Stream?
     @Published var time: CMTime?
 
-    var aspectRatio: CGFloat? {
+    var aspectRatio: Double? {
         let tracks = stream?.videoAsset.tracks(withMediaType: .video)
 
         guard tracks != nil else {

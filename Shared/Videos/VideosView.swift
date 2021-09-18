@@ -14,12 +14,12 @@ struct VideosView: View {
         VStack {
             #if os(tvOS)
                 if layout == .cells {
-                    VideosCellsView(videos: videos)
+                    VideosCellsVertical(videos: videos)
                 } else {
                     VideosListView(videos: videos)
                 }
             #else
-                VideosCellsView(videos: videos)
+                VideosCellsVertical(videos: videos)
             #endif
         }
         #if os(macOS)

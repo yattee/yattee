@@ -3,10 +3,10 @@ import SwiftUI
 
 final class NavigationState: ObservableObject {
     enum TabSelection: Hashable {
-        case subscriptions, popular, trending, playlists, channel(String), playlist(String), search
+        case watchNow, subscriptions, popular, trending, playlists, channel(String), playlist(String), search
     }
 
-    @Published var tabSelection: TabSelection = .subscriptions
+    @Published var tabSelection: TabSelection = .watchNow
 
     @Published var showingVideoDetails = false
     @Published var showingVideo = false

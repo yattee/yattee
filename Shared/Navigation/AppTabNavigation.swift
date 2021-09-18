@@ -10,6 +10,15 @@ struct AppTabNavigation: View {
     var body: some View {
         TabView(selection: $navigationState.tabSelection) {
             NavigationView {
+                WatchNowView()
+            }
+            .tabItem {
+                Label("Watch Now", systemImage: "play.circle")
+                    .accessibility(label: Text("Subscriptions"))
+            }
+            .tag(TabSelection.watchNow)
+
+            NavigationView {
                 SubscriptionsView()
             }
             .tabItem {
@@ -18,14 +27,16 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.subscriptions)
 
-            NavigationView {
-                PopularView()
-            }
-            .tabItem {
-                Label("Popular", systemImage: "chart.bar")
-                    .accessibility(label: Text("Popular"))
-            }
-            .tag(TabSelection.popular)
+//            TODO: reenable with settings
+//            ============================
+//            NavigationView {
+//                PopularView()
+//            }
+//            .tabItem {
+//                Label("Popular", systemImage: "chart.bar")
+//                    .accessibility(label: Text("Popular"))
+//            }
+//            .tag(TabSelection.popular)
 
             NavigationView {
                 TrendingView()

@@ -3,8 +3,8 @@ import Siesta
 import SwiftUI
 
 struct VideoPlayerView: View {
-    static let defaultAspectRatio: CGFloat = 1.77777778
-    static var defaultMinimumHeightLeft: CGFloat {
+    static let defaultAspectRatio: Double = 1.77777778
+    static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
             300
         #else

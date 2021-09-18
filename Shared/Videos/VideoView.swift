@@ -9,6 +9,7 @@ struct VideoView: View {
     #endif
 
     @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.horizontalCells) private var horizontalCells
 
     var video: Video
     var layout: ListingLayout
@@ -34,7 +35,7 @@ struct VideoView: View {
         VStack {
             if layout == .cells {
                 #if os(iOS)
-                    if verticalSizeClass == .compact {
+                    if verticalSizeClass == .compact, !horizontalCells {
                         horizontalRow
                             .padding(.vertical, 4)
                     } else {
@@ -64,14 +65,31 @@ struct VideoView: View {
             .frame(maxWidth: 320)
 
             VStack(alignment: .leading, spacing: 0) {
-                videoDetail(video.title)
+                videoDetail(video.title, lineLimit: 5)
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
                 videoDetail(video.author)
 
-                Spacer()
+                if additionalDetailsAvailable {
+                    Spacer()
 
-                additionalDetails
+                    HStack {
+                        if let date = video.publishedDate {
+                            VStack {
+                                Image(systemName: "calendar")
+                                Text(date)
+                            }
+                        }
+
+                        if video.views != 0 {
+                            VStack {
+                                Image(systemName: "eye")
+                                Text(video.viewsCount!)
+                            }
+                        }
+                    }
+                    .foregroundColor(.secondary)
+                }
             }
             .padding()
             .frame(minHeight: 180)
@@ -101,11 +119,10 @@ struct VideoView: View {
                 }
             #endif
         }
-        .padding(.trailing)
     }
 
     var verticalRow: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             thumbnail
 
             VStack(alignment: .leading) {
@@ -121,7 +138,18 @@ struct VideoView: View {
 
                 Group {
                     if additionalDetailsAvailable {
-                        additionalDetails
+                        HStack(spacing: 8) {
+                            if let date = video.publishedDate {
+                                Image(systemName: "calendar")
+                                Text(date)
+                            }
+
+                            if video.views != 0 {
+                                Image(systemName: "eye")
+                                Text(video.viewsCount!)
+                            }
+                        }
+                        .foregroundColor(.secondary)
                     } else {
                         Spacer()
                     }
@@ -129,6 +157,8 @@ struct VideoView: View {
                 .frame(minHeight: 30, alignment: .top)
                 .padding(.bottom, 10)
             }
+            .padding(.top, 4)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .topLeading)
             #if os(tvOS)
                 .padding(.horizontal, 8)
             #endif
@@ -137,21 +167,6 @@ struct VideoView: View {
 
     var additionalDetailsAvailable: Bool {
         video.publishedDate != nil || video.views != 0
-    }
-
-    var additionalDetails: some View {
-        HStack(spacing: 8) {
-            if let date = video.publishedDate {
-                Image(systemName: "calendar")
-                Text(date)
-            }
-
-            if video.views != 0 {
-                Image(systemName: "eye")
-                Text(video.viewsCount!)
-            }
-        }
-        .foregroundColor(.secondary)
     }
 
     var thumbnail: some View {
@@ -184,8 +199,6 @@ struct VideoView: View {
                 .padding(10)
             }
         }
-        .padding([.leading, .top, .trailing], 4)
-        .frame(maxWidth: 600)
     }
 
     func thumbnailImage(quality: Thumbnail.Quality) -> some View {
@@ -196,19 +209,17 @@ struct VideoView: View {
                         .resizable()
                 } placeholder: {
                     ProgressView()
-                        .aspectRatio(contentMode: .fill)
                 }
             } else {
                 Image(systemName: "exclamationmark.square")
             }
         }
-        .frame(minWidth: 300, maxWidth: .infinity, minHeight: 180, maxHeight: .infinity)
         .background(.gray)
         .mask(RoundedRectangle(cornerRadius: 12))
         #if os(tvOS)
             .frame(minHeight: layout == .cells ? 320 : 200)
         #endif
-        .aspectRatio(1.777, contentMode: .fit)
+        .modifier(AspectRatioModifier())
     }
 
     func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
@@ -216,6 +227,21 @@ struct VideoView: View {
             .fontWeight(.bold)
             .lineLimit(lineLimit)
             .truncationMode(.middle)
+    }
+
+    struct AspectRatioModifier: ViewModifier {
+        @Environment(\.horizontalCells) private var horizontalCells
+
+        func body(content: Content) -> some View {
+            Group {
+                if horizontalCells {
+                    content
+                } else {
+                    content
+                        .aspectRatio(1.777, contentMode: .fill)
+                }
+            }
+        }
     }
 
     struct ButtonStyleModifier: ViewModifier {
@@ -234,43 +260,5 @@ struct VideoView: View {
                 #endif
             }
         }
-    }
-}
-
-struct VideoListRowPreview: PreviewProvider {
-    static var previews: some View {
-        #if os(tvOS)
-            List {
-                ForEach(Video.allFixtures) { video in
-                    VideoView(video: video, layout: .list)
-                }
-            }
-            .listStyle(.grouped)
-
-            HStack {
-                ForEach(Video.allFixtures) { video in
-                    VideoView(video: video, layout: .cells)
-                }
-            }
-            .frame(maxHeight: 600)
-        #else
-            List {
-                ForEach(Video.allFixtures) { video in
-                    VideoView(video: video, layout: .list)
-                }
-            }
-            #if os(macOS)
-                .frame(minHeight: 800)
-            #endif
-
-            #if os(iOS)
-                List {
-                    ForEach(Video.allFixtures) { video in
-                        VideoView(video: video, layout: .list)
-                    }
-                }
-                .previewInterfaceOrientation(.landscapeRight)
-            #endif
-        #endif
     }
 }

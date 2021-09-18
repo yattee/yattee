@@ -3,15 +3,15 @@ import SwiftUI
 
 struct VideoDetailsPaddingModifier: ViewModifier {
     let geometry: GeometryProxy
-    let aspectRatio: CGFloat?
-    let minimumHeightLeft: CGFloat
-    let additionalPadding: CGFloat
+    let aspectRatio: Double?
+    let minimumHeightLeft: Double
+    let additionalPadding: Double
 
     init(
         geometry: GeometryProxy,
-        aspectRatio: CGFloat? = nil,
-        minimumHeightLeft: CGFloat? = nil,
-        additionalPadding: CGFloat = 35.00
+        aspectRatio: Double? = nil,
+        minimumHeightLeft: Double? = nil,
+        additionalPadding: Double = 35.00
     ) {
         self.geometry = geometry
         self.aspectRatio = aspectRatio ?? VideoPlayerView.defaultAspectRatio
@@ -19,7 +19,7 @@ struct VideoDetailsPaddingModifier: ViewModifier {
         self.additionalPadding = additionalPadding
     }
 
-    var usedAspectRatio: CGFloat {
+    var usedAspectRatio: Double {
         guard aspectRatio != nil else {
             return VideoPlayerView.defaultAspectRatio
         }
@@ -27,11 +27,11 @@ struct VideoDetailsPaddingModifier: ViewModifier {
         return [aspectRatio!, VideoPlayerView.defaultAspectRatio].min()!
     }
 
-    var playerHeight: CGFloat {
+    var playerHeight: Double {
         [geometry.size.width / usedAspectRatio, geometry.size.height - minimumHeightLeft].min()!
     }
 
-    var topPadding: CGFloat {
+    var topPadding: Double {
         playerHeight + additionalPadding
     }
 

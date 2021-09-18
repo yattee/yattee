@@ -121,6 +121,14 @@ struct AppSidebarNavigation: View {
 
     var mainNavigationLinks: some View {
         Section("Videos") {
+            NavigationLink(tag: TabSelection.watchNow, selection: selection) {
+                WatchNowView()
+            }
+            label: {
+                Label("Watch Now", systemImage: "play.circle")
+                    .accessibility(label: Text("Watch Now"))
+            }
+
             NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: selection) {
                 Label("Subscriptions", systemImage: "star.circle.fill")
                     .accessibility(label: Text("Subscriptions"))

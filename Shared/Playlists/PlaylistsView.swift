@@ -25,7 +25,7 @@ struct PlaylistsView: View {
         currentPlaylist?.videos ?? []
     }
 
-    var videosViewMaxHeight: CGFloat {
+    var videosViewMaxHeight: Double {
         #if os(tvOS)
             videos.isEmpty ? 150 : .infinity
         #else

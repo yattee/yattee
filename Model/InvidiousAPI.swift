@@ -87,6 +87,10 @@ final class InvidiousAPI: Service {
             Channel(json: content.json)
         }
 
+        configureTransformer("/channels/*/latest", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+            content.json.arrayValue.map(Video.init)
+        }
+
         configureTransformer("/videos/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
             Video(content.json)
         }
@@ -118,6 +122,10 @@ final class InvidiousAPI: Service {
 
     func channel(_ id: String) -> Resource {
         resource("/channels/\(id)")
+    }
+
+    func channelVideos(_ id: String) -> Resource {
+        resource("/channels/\(id)/latest")
     }
 
     func video(_ id: String) -> Resource {

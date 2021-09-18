@@ -12,6 +12,10 @@ struct TVNavigationView: View {
 
     var body: some View {
         TabView(selection: $navigationState.tabSelection) {
+            WatchNowView()
+                .tabItem { Text("Watch Now") }
+                .tag(TabSelection.watchNow)
+
             SubscriptionsView()
                 .tabItem { Text("Subscriptions") }
                 .tag(TabSelection.subscriptions)

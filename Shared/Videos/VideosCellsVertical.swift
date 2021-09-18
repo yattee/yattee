@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct VideosCellsView: View {
+struct VideosCellsVertical: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
@@ -49,7 +49,7 @@ struct VideosCellsView: View {
         [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize))]
     }
 
-    var adaptiveGridItemMinimumSize: CGFloat {
+    var adaptiveGridItemMinimumSize: Double {
         #if os(iOS)
             return verticalSizeClass == .regular ? 320 : 800
         #elseif os(tvOS)
