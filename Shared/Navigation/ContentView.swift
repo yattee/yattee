@@ -3,9 +3,10 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var navigationState = NavigationState()
     @StateObject private var playbackState = PlaybackState()
+    @StateObject private var playlists = Playlists()
+    @StateObject private var recents = Recents()
     @StateObject private var searchState = SearchState()
     @StateObject private var subscriptions = Subscriptions()
-    @StateObject private var playlists = Playlists()
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -44,9 +45,10 @@ struct ContentView: View {
         #endif
         .environmentObject(navigationState)
             .environmentObject(playbackState)
+            .environmentObject(playlists)
+            .environmentObject(recents)
             .environmentObject(searchState)
             .environmentObject(subscriptions)
-            .environmentObject(playlists)
     }
 }
 

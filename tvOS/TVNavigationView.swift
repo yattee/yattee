@@ -4,6 +4,7 @@ import SwiftUI
 struct TVNavigationView: View {
     @EnvironmentObject<NavigationState> private var navigationState
     @EnvironmentObject<PlaybackState> private var playbackState
+    @EnvironmentObject<Recents> private var recents
     @EnvironmentObject<SearchState> private var searchState
 
     @State private var showingOptions = false
@@ -47,30 +48,19 @@ struct TVNavigationView: View {
         }
         .fullScreenCover(isPresented: $showingOptions) { OptionsView() }
         .fullScreenCover(isPresented: $showingAddToPlaylist) { AddToPlaylistView() }
-        .fullScreenCover(isPresented: $navigationState.showingVideoDetails) {
-            if let video = navigationState.video {
-                VideoDetailsView(video)
-            }
-        }
         .fullScreenCover(isPresented: $navigationState.showingVideo) {
             if let video = navigationState.video {
                 VideoPlayerView(video)
                     .environmentObject(playbackState)
             }
         }
-        .fullScreenCover(isPresented: $navigationState.isChannelOpen, onDismiss: {
-            navigationState.closeChannel(presentedChannel)
-        }) {
-            if presentedChannel != nil {
-                ChannelVideosView(presentedChannel)
+        .fullScreenCover(isPresented: $navigationState.isChannelOpen) {
+            if let channel = recents.presentedChannel {
+                ChannelVideosView(channel)
                     .background(.thickMaterial)
             }
         }
         .onPlayPauseCommand { showingOptions.toggle() }
-    }
-
-    fileprivate var presentedChannel: Channel! {
-        navigationState.openChannels.first
     }
 }
 

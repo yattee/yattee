@@ -8,14 +8,11 @@ final class SearchState: ObservableObject {
 
     @Published var querySuggestions = Store<[String]>()
 
-    @Default(.searchQuery) private var queryText
-
     private var previousResource: Resource?
     private var resource: Resource!
 
     init() {
         let newQuery = query
-        newQuery.query = queryText
         query = newQuery
 
         resource = InvidiousAPI.shared.search(newQuery)
@@ -53,7 +50,23 @@ final class SearchState: ObservableObject {
         previousResource?.removeObservers(ownedBy: store)
         previousResource = newResource
 
-        queryText = query.query
+        resource = newResource
+        resource.addObserver(store)
+        loadResourceIfNeededAndReplaceStore()
+    }
+
+    func resetQuery(_ query: SearchQuery) {
+        self.query = query
+
+        let newResource = InvidiousAPI.shared.search(query)
+        guard newResource != previousResource else {
+            return
+        }
+
+        store.replace([])
+
+        previousResource?.removeObservers(ownedBy: store)
+        previousResource = newResource
 
         resource = newResource
         resource.addObserver(store)

@@ -3,12 +3,17 @@ import Siesta
 import SwiftUI
 
 struct SearchView: View {
-    @Default(.searchQuery) private var queryText
     @Default(.searchSortOrder) private var searchSortOrder
     @Default(.searchDate) private var searchDate
     @Default(.searchDuration) private var searchDuration
 
     @EnvironmentObject<SearchState> private var state
+
+    private var query: SearchQuery?
+
+    init(_ query: SearchQuery? = nil) {
+        self.query = query
+    }
 
     var body: some View {
         VStack {
@@ -27,11 +32,8 @@ struct SearchView: View {
             }
         }
         .onAppear {
-            state.changeQuery { query in
-                query.query = queryText
-                query.sortBy = searchSortOrder
-                query.date = searchDate
-                query.duration = searchDuration
+            if query != nil {
+                state.resetQuery(query!)
             }
         }
         .onChange(of: state.query.query) { queryText in

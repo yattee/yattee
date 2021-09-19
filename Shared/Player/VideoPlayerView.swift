@@ -85,8 +85,6 @@ struct VideoPlayerView: View {
         .onDisappear {
             resource.removeObservers(ownedBy: store)
             resource.invalidate()
-
-            navigationState.showingVideoDetails = navigationState.returnToDetails
         }
         #if os(macOS)
             .frame(maxWidth: 1000, minHeight: 700)

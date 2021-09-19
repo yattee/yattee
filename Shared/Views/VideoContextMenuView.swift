@@ -3,6 +3,7 @@ import SwiftUI
 
 struct VideoContextMenuView: View {
     @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<Recents> private var recents
     @EnvironmentObject<Subscriptions> private var subscriptions
 
     let video: Video
@@ -14,14 +15,10 @@ struct VideoContextMenuView: View {
 
     var body: some View {
         Section {
-            if navigationState.showOpenChannel(video.channel.id) {
-                openChannelButton
-            }
+            openChannelButton
 
             subscriptionButton
                 .opacity(subscribed ? 1 : 1)
-
-            openVideoDetailsButton
 
             if navigationState.tabSelection == .playlists {
                 removeFromPlaylistButton
@@ -33,8 +30,10 @@ struct VideoContextMenuView: View {
 
     var openChannelButton: some View {
         Button("\(video.author) Channel") {
-            navigationState.openChannel(video.channel)
-            navigationState.tabSelection = .channel(video.channel.id)
+            let recent = RecentItem(from: video.channel)
+            recents.open(recent)
+            navigationState.tabSelection = .recentlyOpened(recent.tag)
+            navigationState.isChannelOpen = true
             navigationState.sidebarSectionChanged.toggle()
         }
     }
@@ -56,12 +55,6 @@ struct VideoContextMenuView: View {
                     }
                 }
             }
-        }
-    }
-
-    var openVideoDetailsButton: some View {
-        Button("Open video details") {
-            navigationState.openVideoDetails(video)
         }
     }
 

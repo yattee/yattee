@@ -14,6 +14,7 @@ struct AppSidebarNavigation: View {
 
     @EnvironmentObject<NavigationState> private var navigationState
     @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<Recents> private var recents
     @EnvironmentObject<SearchState> private var searchState
     @EnvironmentObject<Subscriptions> private var subscriptions
 
@@ -66,6 +67,8 @@ struct AppSidebarNavigation: View {
                 query.query = self.searchQuery
             }
 
+            recents.open(RecentItem(type: .query, identifier: self.searchQuery, title: self.searchQuery))
+
             navigationState.tabSelection = .search
         }
     }
@@ -111,7 +114,7 @@ struct AppSidebarNavigation: View {
             return Group {
                 mainNavigationLinks
 
-                AppSidebarRecentlyOpened(selection: selection)
+                AppSidebarRecents(selection: selection)
                     .id("recentlyOpened")
                 AppSidebarSubscriptions(selection: selection)
                 AppSidebarPlaylists(selection: selection)
@@ -130,7 +133,7 @@ struct AppSidebarNavigation: View {
             }
 
             NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: selection) {
-                Label("Subscriptions", systemImage: "star.circle.fill")
+                Label("Subscriptions", systemImage: "star.circle")
                     .accessibility(label: Text("Subscriptions"))
             }
 

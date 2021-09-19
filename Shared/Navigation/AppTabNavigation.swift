@@ -5,6 +5,8 @@ struct AppTabNavigation: View {
     @EnvironmentObject<NavigationState> private var navigationState
     @EnvironmentObject<SearchState> private var searchState
 
+    @EnvironmentObject<Recents> private var recents
+
     @State private var searchQuery = ""
 
     var body: some View {
@@ -82,18 +84,17 @@ struct AppTabNavigation: View {
             .tag(TabSelection.search)
         }
         .sheet(isPresented: $navigationState.isChannelOpen, onDismiss: {
-            navigationState.closeChannel(presentedChannel)
+            if let channel = recents.presentedChannel {
+                let recent = RecentItem(from: channel)
+                recents.close(recent)
+            }
         }) {
-            if presentedChannel != nil {
+            if recents.presentedChannel != nil {
                 NavigationView {
-                    ChannelVideosView(presentedChannel)
+                    ChannelVideosView(recents.presentedChannel!)
                         .environment(\.inNavigationView, true)
                 }
             }
         }
-    }
-
-    fileprivate var presentedChannel: Channel! {
-        navigationState.openChannels.first
     }
 }
