@@ -6,7 +6,6 @@ struct Profile {
 
     var skippedSegmentsCategories = [String]() // SponsorBlockSegmentsProvider.categories
 
-    // var sid = "B3_WzklziGu8JKefihLrCsTNavdj73KMiPUBfN5HW2M="
     var sid = "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="
 
     var cellsColumns = 3

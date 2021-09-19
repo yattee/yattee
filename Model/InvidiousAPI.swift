@@ -30,11 +30,12 @@ final class InvidiousAPI: Service {
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
 
-        configure("/auth/**") {
+        configure(requestMethods: [.get]) {
             $0.headers["Cookie"] = self.authHeader
         }
 
         configure("**", requestMethods: [.post]) {
+            $0.headers["Cookie"] = self.authHeader
             $0.pipeline[.parsing].removeTransformers()
         }
 
@@ -106,6 +107,10 @@ final class InvidiousAPI: Service {
         resource("/trending")
             .withParam("type", category.name)
             .withParam("region", country.rawValue)
+    }
+
+    var home: Resource {
+        resource(baseURL: InvidiousAPI.instance, path: "/feed/subscriptions")
     }
 
     var feed: Resource {

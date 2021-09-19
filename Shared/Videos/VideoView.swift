@@ -208,7 +208,10 @@ struct VideoView: View {
                     image
                         .resizable()
                 } placeholder: {
-                    ProgressView()
+                    HStack {
+                        ProgressView()
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    }
                 }
             } else {
                 Image(systemName: "exclamationmark.square")

@@ -2,6 +2,10 @@ import Siesta
 import SwiftUI
 
 struct WatchNowView: View {
+    init() {
+        InvidiousAPI.shared.home.loadIfNeeded()
+    }
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {

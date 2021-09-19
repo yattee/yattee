@@ -12,7 +12,13 @@ struct SubscriptionsView: View {
     var body: some View {
         VideosView(videos: store.collection)
             .onAppear {
-                resource.loadIfNeeded()
+                if let home = InvidiousAPI.shared.home.loadIfNeeded() {
+                    home.onSuccess { _ in
+                        resource.loadIfNeeded()
+                    }
+                } else {
+                    resource.loadIfNeeded()
+                }
             }
             .refreshable {
                 resource.load()
