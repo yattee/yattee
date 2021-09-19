@@ -6,6 +6,8 @@ final class SearchState: ObservableObject {
     @Published var store = Store<[Video]>()
     @Published var query = SearchQuery()
 
+    @Published var queryText = ""
+
     @Published var querySuggestions = Store<[String]>()
 
     private var previousResource: Resource?

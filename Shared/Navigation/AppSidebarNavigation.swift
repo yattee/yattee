@@ -20,8 +20,6 @@ struct AppSidebarNavigation: View {
 
     @State private var didApplyPrimaryViewWorkAround = false
 
-    @State private var searchQuery = ""
-
     var selection: Binding<TabSelection?> {
         navigationState.tabSelectionOptionalBinding
     }
@@ -53,21 +51,22 @@ struct AppSidebarNavigation: View {
 
             Text("Select section")
         }
-        .searchable(text: $searchQuery, placement: .sidebar) {
+        .environment(\.navigationStyle, .sidebar)
+        .searchable(text: $searchState.queryText, placement: .sidebar) {
             ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
                 Text(suggestion)
                     .searchCompletion(suggestion)
             }
         }
-        .onChange(of: searchQuery) { query in
+        .onChange(of: searchState.queryText) { query in
             searchState.loadQuerySuggestions(query)
         }
         .onSubmit(of: .search) {
             searchState.changeQuery { query in
-                query.query = self.searchQuery
+                query.query = searchState.queryText
             }
 
-            recents.open(RecentItem(type: .query, identifier: self.searchQuery, title: self.searchQuery))
+            recents.open(RecentItem(from: searchState.queryText))
 
             navigationState.tabSelection = .search
         }

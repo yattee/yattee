@@ -79,6 +79,12 @@ struct RecentItem: Defaults.Serializable, Identifiable {
         id = channel.id
         title = channel.name
     }
+
+    init(from query: String) {
+        type = .query
+        id = query
+        title = query
+    }
 }
 
 struct RecentItemBridge: Defaults.Bridge {

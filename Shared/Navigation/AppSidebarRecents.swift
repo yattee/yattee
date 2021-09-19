@@ -13,7 +13,7 @@ struct AppSidebarRecents: View {
         Group {
             if !recentItems.isEmpty {
                 Section(header: Text("Recents")) {
-                    ForEach(recentItems) { recent in
+                    ForEach(recentItems.reversed()) { recent in
                         Group {
                             switch recent.type {
                             case .channel:

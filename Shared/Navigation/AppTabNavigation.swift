@@ -4,10 +4,7 @@ import SwiftUI
 struct AppTabNavigation: View {
     @EnvironmentObject<NavigationState> private var navigationState
     @EnvironmentObject<SearchState> private var searchState
-
     @EnvironmentObject<Recents> private var recents
-
-    @State private var searchQuery = ""
 
     var body: some View {
         TabView(selection: $navigationState.tabSelection) {
@@ -60,19 +57,21 @@ struct AppTabNavigation: View {
 
             NavigationView {
                 SearchView()
-                    .searchable(text: $searchQuery, placement: .navigationBarDrawer(displayMode: .always)) {
+                    .searchable(text: $searchState.queryText, placement: .navigationBarDrawer(displayMode: .always)) {
                         ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
                             Text(suggestion)
                                 .searchCompletion(suggestion)
                         }
                     }
-                    .onChange(of: searchQuery) { query in
+                    .onChange(of: searchState.queryText) { query in
                         searchState.loadQuerySuggestions(query)
                     }
                     .onSubmit(of: .search) {
                         searchState.changeQuery { query in
-                            query.query = self.searchQuery
+                            query.query = searchState.queryText
                         }
+
+                        recents.open(RecentItem(from: searchState.queryText))
 
                         navigationState.tabSelection = .search
                     }
@@ -83,6 +82,7 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.search)
         }
+        .environment(\.navigationStyle, .tab)
         .sheet(isPresented: $navigationState.isChannelOpen, onDismiss: {
             if let channel = recents.presentedChannel {
                 let recent = RecentItem(from: channel)

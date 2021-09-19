@@ -9,6 +9,14 @@ private struct HorizontalCellsKey: EnvironmentKey {
     static let defaultValue = false
 }
 
+enum NavigationStyle {
+    case tab, sidebar
+}
+
+private struct NavigationStyleKey: EnvironmentKey {
+    static let defaultValue = NavigationStyle.tab
+}
+
 extension EnvironmentValues {
     var inNavigationView: Bool {
         get { self[InNavigationViewKey.self] }
@@ -18,5 +26,10 @@ extension EnvironmentValues {
     var horizontalCells: Bool {
         get { self[HorizontalCellsKey.self] }
         set { self[HorizontalCellsKey.self] = newValue }
+    }
+
+    var navigationStyle: NavigationStyle {
+        get { self[NavigationStyleKey.self] }
+        set { self[NavigationStyleKey.self] = newValue }
     }
 }

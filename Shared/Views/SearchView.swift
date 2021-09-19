@@ -7,7 +7,13 @@ struct SearchView: View {
     @Default(.searchDate) private var searchDate
     @Default(.searchDuration) private var searchDuration
 
+    @EnvironmentObject<Recents> private var recents
     @EnvironmentObject<SearchState> private var state
+
+    @Environment(\.navigationStyle) private var navigationStyle
+
+    @State private var presentingClearConfirmation = false
+    @State private var recentsChanged = false
 
     private var query: SearchQuery?
 
@@ -16,23 +22,34 @@ struct SearchView: View {
     }
 
     var body: some View {
-        VStack {
-            VideosView(videos: state.store.collection)
-
-            if state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty {
-                Text("No results")
-
-                if searchFiltersActive {
-                    Button("Reset search filters") {
-                        Defaults.reset(.searchDate, .searchDuration)
+        Group {
+            if navigationStyle == .tab && state.queryText.isEmpty {
+                VStack {
+                    if !recentItems.isEmpty {
+                        recentQueries
                     }
                 }
+            } else {
+                VideosView(videos: state.store.collection)
 
-                Spacer()
+                if state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty {
+                    Text("No results")
+
+                    if searchFiltersActive {
+                        Button("Reset search filters") {
+                            Defaults.reset(.searchDate, .searchDuration)
+                        }
+                    }
+
+                    Spacer()
+                }
             }
         }
         .onAppear {
             if query != nil {
+                if navigationStyle == .tab {
+                    state.queryText = query!.query
+                }
                 state.resetQuery(query!)
             }
         }
@@ -53,11 +70,63 @@ struct SearchView: View {
         #endif
     }
 
+    var recentQueries: some View {
+        List {
+            Section(header: Text("Recents")) {
+                ForEach(recentItems) { item in
+                    Button(item.title) {
+                        state.queryText = item.title
+                        state.changeQuery { query in query.query = item.title }
+                    }
+                    #if os(iOS)
+                        .swipeActions(edge: .trailing) {
+                            clearButton(item)
+                        }
+                    #endif
+                }
+            }
+            .opacity(recentsChanged ? 1 : 1)
+
+            clearAllButton
+        }
+        #if os(iOS)
+            .listStyle(.insetGrouped)
+        #endif
+    }
+
+    func clearButton(_ item: RecentItem) -> some View {
+        Button(role: .destructive) {
+            recents.close(item)
+            recentsChanged.toggle()
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+
+    var clearAllButton: some View {
+        Button("Clear All", role: .destructive) {
+            presentingClearConfirmation = true
+        }
+        .confirmationDialog("Clear All", isPresented: $presentingClearConfirmation) {
+            Button("Clear All", role: .destructive) {
+                recents.clearQueries()
+            }
+        }
+    }
+
     var navigationTitle: String {
-        state.query.query.isEmpty ? "Search" : "Search: \"\(state.query.query)\""
+        if state.query.query.isEmpty || (navigationStyle == .tab && state.queryText.isEmpty) {
+            return "Search"
+        }
+
+        return "Search: \"\(state.query.query)\""
     }
 
     var searchFiltersActive: Bool {
         searchDate != nil || searchDuration != nil
+    }
+
+    var recentItems: [RecentItem] {
+        Defaults[.recentlyOpened].filter { $0.type == .query }.reversed()
     }
 }

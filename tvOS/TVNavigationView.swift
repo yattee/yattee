@@ -34,14 +34,15 @@ struct TVNavigationView: View {
                 .tag(TabSelection.playlists)
 
             SearchView()
-                .searchable(text: $searchState.query.query) {
+                .searchable(text: $searchState.queryText) {
                     ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
                         Text(suggestion)
                             .searchCompletion(suggestion)
                     }
                 }
-                .onChange(of: searchState.query.query) { query in
-                    searchState.loadQuerySuggestions(query)
+                .onChange(of: searchState.queryText) { newQuery in
+                    searchState.loadQuerySuggestions(newQuery)
+                    searchState.changeQuery { query in query.query = newQuery }
                 }
                 .tabItem { Image(systemName: "magnifyingglass") }
                 .tag(TabSelection.search)
