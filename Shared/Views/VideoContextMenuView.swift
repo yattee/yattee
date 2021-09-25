@@ -4,7 +4,7 @@ import SwiftUI
 struct VideoContextMenuView: View {
     @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<Recents> private var recents
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     let video: Video

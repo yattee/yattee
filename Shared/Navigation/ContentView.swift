@@ -4,7 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var navigation = NavigationModel()
     @StateObject private var playback = PlaybackModel()
-    @StateObject private var recents = Recents()
+    @StateObject private var recents = RecentsModel()
 
     @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<InstancesModel> private var instances
@@ -34,6 +34,7 @@ struct ContentView: View {
             .sheet(isPresented: $navigation.showingVideo) {
                 if let video = navigation.video {
                     VideoPlayerView(video)
+                        .environmentObject(playback)
 
                     #if !os(iOS)
                         .frame(minWidth: 550, minHeight: 720)

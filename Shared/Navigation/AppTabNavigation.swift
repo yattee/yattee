@@ -4,7 +4,7 @@ import SwiftUI
 struct AppTabNavigation: View {
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<SearchModel> private var search
-    @EnvironmentObject<Recents> private var recents
+    @EnvironmentObject<RecentsModel> private var recents
 
     var body: some View {
         TabView(selection: $navigation.tabSelection) {
@@ -78,9 +78,7 @@ struct AppTabNavigation: View {
                                 query.query = search.queryText
                             }
 
-                            recents.open(RecentItem(from: search.queryText))
-
-                            navigation.tabSelection = .search
+                            recents.addQuery(search.queryText)
                         }
                 )
             }

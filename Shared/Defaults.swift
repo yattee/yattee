@@ -7,10 +7,6 @@ extension Defaults.Keys {
 
     static let instances = Key<[Instance]>("instances", default: [])
 
-    static let searchSortOrder = Key<SearchQuery.SortOrder>("searchSortOrder", default: .relevance)
-    static let searchDate = Key<SearchQuery.Date?>("searchDate")
-    static let searchDuration = Key<SearchQuery.Duration?>("searchDuration")
-
     static let selectedPlaylistID = Key<String?>("selectedPlaylistID")
     static let showingAddToPlaylist = Key<Bool>("showingAddToPlaylist", default: false)
     static let videoIDToAddToPlaylist = Key<String?>("videoIDToAddToPlaylist")

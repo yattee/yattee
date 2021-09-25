@@ -1,7 +1,7 @@
 import Defaults
 import Foundation
 
-final class Recents: ObservableObject {
+final class RecentsModel: ObservableObject {
     @Default(.recentlyOpened) var items
 
     var isEmpty: Bool {
@@ -26,6 +26,10 @@ final class Recents: ObservableObject {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
             items.remove(at: index)
         }
+    }
+
+    func addQuery(_ query: String) {
+        open(.init(from: query))
     }
 
     var presentedChannel: Channel? {

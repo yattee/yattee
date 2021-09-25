@@ -36,9 +36,9 @@ final class SearchQuery: ObservableObject {
         var name: String {
             switch self {
             case .uploadDate:
-                return "Upload Date"
+                return "Date"
             case .viewCount:
-                return "View Count"
+                return "Views"
             default:
                 return rawValue.capitalized
             }

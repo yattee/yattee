@@ -31,15 +31,14 @@ struct PearvidiousApp: App {
                     .onAppear(perform: configureAPI)
                     .environmentObject(api)
                     .environmentObject(instances)
-                    .environmentObject(playlists)
-                    .environmentObject(subscriptions)
             }
         #endif
     }
 
     fileprivate func configureAPI() {
-        subscriptions.api = api
         playlists.api = api
+        search.api = api
+        subscriptions.api = api
 
         guard api.account == nil, instances.defaultAccount != nil else {
             return

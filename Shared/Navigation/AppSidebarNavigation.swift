@@ -16,8 +16,7 @@ struct AppSidebarNavigation: View {
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<Recents> private var recents
-    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @State private var didApplyPrimaryViewWorkAround = false
@@ -56,23 +55,6 @@ struct AppSidebarNavigation: View {
             Text("Select section")
         }
         .environment(\.navigationStyle, .sidebar)
-        .searchable(text: $search.queryText, placement: .sidebar) {
-            ForEach(search.querySuggestions.collection, id: \.self) { suggestion in
-                Text(suggestion)
-                    .searchCompletion(suggestion)
-            }
-        }
-        .onChange(of: search.queryText) { query in
-            search.loadSuggestions(query)
-        }
-        .onSubmit(of: .search) {
-            search.changeQuery { query in
-                query.query = search.queryText
-            }
-            recents.open(RecentItem(from: search.queryText))
-
-            navigation.tabSelection = .search
-        }
     }
 
     var sidebar: some View {
@@ -86,12 +68,6 @@ struct AppSidebarNavigation: View {
                 .onChange(of: navigation.sidebarSectionChanged) { _ in
                     scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)
                 }
-            }
-            .background {
-                NavigationLink(destination: SearchView(), tag: TabSelection.search, selection: selection) {
-                    Color.clear
-                }
-                .hidden()
             }
             .listStyle(.sidebar)
         }
@@ -144,6 +120,12 @@ struct AppSidebarNavigation: View {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
                     .accessibility(label: Text("Trending"))
             }
+
+            NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: selection) {
+                Label("Search", systemImage: "magnifyingglass")
+                    .accessibility(label: Text("Search"))
+            }
+            .keyboardShortcut("f")
         }
     }
 

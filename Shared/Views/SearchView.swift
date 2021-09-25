@@ -3,19 +3,19 @@ import Siesta
 import SwiftUI
 
 struct SearchView: View {
-    @Default(.searchSortOrder) private var searchSortOrder
-    @Default(.searchDate) private var searchDate
-    @Default(.searchDuration) private var searchDuration
+    private var query: SearchQuery?
 
-    @EnvironmentObject<Recents> private var recents
-    @EnvironmentObject<SearchModel> private var state
-
-    @Environment(\.navigationStyle) private var navigationStyle
+    @State private var searchSortOrder: SearchQuery.SortOrder = .relevance
+    @State private var searchDate: SearchQuery.Date?
+    @State private var searchDuration: SearchQuery.Duration?
 
     @State private var presentingClearConfirmation = false
     @State private var recentsChanged = false
 
-    private var query: SearchQuery?
+    @Environment(\.navigationStyle) private var navigationStyle
+
+    @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var state
 
     init(_ query: SearchQuery? = nil) {
         self.query = query
@@ -37,7 +37,9 @@ struct SearchView: View {
 
                     if searchFiltersActive {
                         Button("Reset search filters") {
-                            Defaults.reset(.searchDate, .searchDuration)
+                            self.searchSortOrder = .relevance
+                            self.searchDate = nil
+                            self.searchDuration = nil
                         }
                     }
 
@@ -45,16 +47,74 @@ struct SearchView: View {
                 }
             }
         }
+        .toolbar {
+            #if os(iOS)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Section {
+                        if !state.queryText.isEmpty {
+                            Text("Sort:")
+                                .foregroundColor(.secondary)
+
+                            Menu(searchSortOrder.name) {
+                                ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
+                                    Button(sortOrder.name) {
+                                        searchSortOrder = sortOrder
+                                    }
+                                }
+                            }
+
+                            Spacer()
+
+                            Text("Filter:")
+                                .foregroundColor(.secondary)
+
+                            Menu(searchDuration?.name ?? "Duration") {
+                                Button("All") {
+                                    searchDuration = nil
+                                }
+                                ForEach(SearchQuery.Duration.allCases) { duration in
+                                    Button(duration.name) {
+                                        searchDuration = duration
+                                    }
+                                }
+                            }
+                            .foregroundColor(searchDuration.isNil ? .secondary : .accentColor)
+
+                            Menu(searchDate?.name ?? "Date") {
+                                Button("All") {
+                                    searchDate = nil
+                                }
+                                ForEach(SearchQuery.Date.allCases) { date in
+                                    Button(date.name) {
+                                        searchDate = date
+                                    }
+                                }
+                            }
+                            .foregroundColor(searchDate.isNil ? .secondary : .accentColor)
+                        }
+                    }
+                    .transaction { t in t.animation = .none }
+                }
+            #endif
+        }
         .onAppear {
             if query != nil {
-                if navigationStyle == .tab {
-                    state.queryText = query!.query
-                }
+                state.queryText = query!.query
                 state.resetQuery(query!)
             }
         }
-        .onChange(of: state.query.query) { queryText in
-            state.changeQuery { query in query.query = queryText }
+        .searchable(text: $state.queryText, placement: searchFieldPlacement) {
+            ForEach(state.querySuggestions.collection, id: \.self) { suggestion in
+                Text(suggestion)
+                    .searchCompletion(suggestion)
+            }
+        }
+        .onChange(of: state.queryText) { query in
+            state.loadSuggestions(query)
+        }
+        .onSubmit(of: .search) {
+            state.changeQuery { query in query.query = state.queryText }
+            recents.addQuery(state.queryText)
         }
         .onChange(of: searchSortOrder) { order in
             state.changeQuery { query in query.sortBy = order }
@@ -66,7 +126,15 @@ struct SearchView: View {
             state.changeQuery { query in query.duration = duration }
         }
         #if !os(tvOS)
-            .navigationTitle(navigationTitle)
+            .navigationTitle("Search")
+        #endif
+    }
+
+    var searchFieldPlacement: SearchFieldPlacement {
+        #if os(iOS)
+            .navigationBarDrawer(displayMode: .always)
+        #else
+            .automatic
         #endif
     }
 
@@ -112,14 +180,6 @@ struct SearchView: View {
                 recents.clearQueries()
             }
         }
-    }
-
-    var navigationTitle: String {
-        if state.query.query.isEmpty || (navigationStyle == .tab && state.queryText.isEmpty) {
-            return "Search"
-        }
-
-        return "Search: \"\(state.query.query)\""
     }
 
     var searchFiltersActive: Bool {

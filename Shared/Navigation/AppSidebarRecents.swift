@@ -5,7 +5,7 @@ struct AppSidebarRecents: View {
     @Binding var selection: TabSelection?
 
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<Recents> private var recents
+    @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.recentlyOpened) private var recentItems
 
@@ -44,7 +44,7 @@ struct AppSidebarRecents: View {
 }
 
 struct RecentNavigationLink<DestinationContent: View>: View {
-    @EnvironmentObject<Recents> private var recents
+    @EnvironmentObject<RecentsModel> private var recents
 
     var recent: RecentItem
     @Binding var selection: TabSelection?

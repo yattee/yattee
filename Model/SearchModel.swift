@@ -14,24 +14,7 @@ final class SearchModel: ObservableObject {
     private var resource: Resource!
 
     var isLoading: Bool {
-        resource.isLoading
-    }
-
-    func loadSuggestions(_ query: String) {
-        let resource = api.searchSuggestions(query: query)
-
-        resource.addObserver(querySuggestions)
-        resource.loadIfNeeded()
-
-        if let request = resource.loadIfNeeded() {
-            request.onSuccess { response in
-                if let suggestions: [String] = response.typedContent() {
-                    self.querySuggestions = Store<[String]>(suggestions)
-                }
-            }
-        } else {
-            querySuggestions = Store<[String]>(querySuggestions.collection)
-        }
+        resource?.isLoading ?? false
     }
 
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
@@ -85,6 +68,29 @@ final class SearchModel: ObservableObject {
     func replace(_ videos: [Video], for resource: Resource) {
         if self.resource == resource {
             store = Store<[Video]>(videos)
+        }
+    }
+
+    private var suggestionsDebounceTimer: Timer?
+
+    func loadSuggestions(_ query: String) {
+        suggestionsDebounceTimer?.invalidate()
+
+        suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
+            let resource = self.api.searchSuggestions(query: query)
+
+            resource.addObserver(self.querySuggestions)
+            resource.loadIfNeeded()
+
+            if let request = resource.loadIfNeeded() {
+                request.onSuccess { response in
+                    if let suggestions: [String] = response.typedContent() {
+                        self.querySuggestions = Store<[String]>(suggestions)
+                    }
+                }
+            } else {
+                self.querySuggestions = Store<[String]>(self.querySuggestions.collection)
+            }
         }
     }
 }
