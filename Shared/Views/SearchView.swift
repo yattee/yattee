@@ -8,7 +8,7 @@ struct SearchView: View {
     @Default(.searchDuration) private var searchDuration
 
     @EnvironmentObject<Recents> private var recents
-    @EnvironmentObject<SearchState> private var state
+    @EnvironmentObject<SearchModel> private var state
 
     @Environment(\.navigationStyle) private var navigationStyle
 
@@ -85,7 +85,7 @@ struct SearchView: View {
                     #endif
                 }
             }
-            .opacity(recentsChanged ? 1 : 1)
+            .redrawOn(change: recentsChanged)
 
             clearAllButton
         }

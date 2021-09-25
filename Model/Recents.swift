@@ -103,7 +103,7 @@ struct RecentItemBridge: Defaults.Bridge {
         ]
     }
 
-    func deserialize(_ object: Serializable?) -> RecentItem? {
+    func deserialize(_ object: Serializable?) -> Value? {
         guard
             let object = object,
             let type = object["type"],

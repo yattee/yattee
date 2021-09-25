@@ -1,12 +1,13 @@
+import Defaults
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var navigationState = NavigationState()
-    @StateObject private var playbackState = PlaybackState()
-    @StateObject private var playlists = Playlists()
+    @StateObject private var navigation = NavigationModel()
+    @StateObject private var playback = PlaybackModel()
     @StateObject private var recents = Recents()
-    @StateObject private var searchState = SearchState()
-    @StateObject private var subscriptions = Subscriptions()
+
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<InstancesModel> private var instances
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -26,29 +27,29 @@ struct ContentView: View {
                 TVNavigationView()
             #endif
         }
+        .environmentObject(navigation)
+        .environmentObject(playback)
+        .environmentObject(recents)
         #if !os(tvOS)
-            .sheet(isPresented: $navigationState.showingVideo) {
-                if let video = navigationState.video {
+            .sheet(isPresented: $navigation.showingVideo) {
+                if let video = navigation.video {
                     VideoPlayerView(video)
 
                     #if !os(iOS)
                         .frame(minWidth: 550, minHeight: 720)
                         .onExitCommand {
-                            navigationState.showingVideo = false
+                            navigation.showingVideo = false
                         }
                     #endif
                 }
             }
-            .sheet(isPresented: $navigationState.presentingPlaylistForm) {
-                PlaylistFormView(playlist: $navigationState.editedPlaylist)
+            .sheet(isPresented: $navigation.presentingPlaylistForm) {
+                PlaylistFormView(playlist: $navigation.editedPlaylist)
+            }
+            .sheet(isPresented: $navigation.presentingSettings) {
+                SettingsView()
             }
         #endif
-        .environmentObject(navigationState)
-            .environmentObject(playbackState)
-            .environmentObject(playlists)
-            .environmentObject(recents)
-            .environmentObject(searchState)
-            .environmentObject(subscriptions)
     }
 }
 

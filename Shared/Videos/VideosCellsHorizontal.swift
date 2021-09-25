@@ -20,7 +20,7 @@ struct VideosCellsHorizontal: View {
                             .padding(.trailing, 20)
                             .padding(.bottom, 40)
                         #else
-                            .frame(maxWidth: 300)
+                            .frame(width: 300)
                         #endif
                     }
                 }
@@ -31,6 +31,11 @@ struct VideosCellsHorizontal: View {
                     .padding(.horizontal, 15)
                     .padding(.vertical, 20)
                 #endif
+            }
+            .onAppear {
+                if let video = videos.first {
+                    scrollView.scrollTo(video.id, anchor: .leading)
+                }
             }
             .onChange(of: videos) { [videos] newVideos in
                 #if !os(tvOS)
@@ -45,7 +50,7 @@ struct VideosCellsHorizontal: View {
         #if os(tvOS)
             .frame(height: 560)
         #else
-            .frame(height: 320)
+            .frame(height: 280)
         #endif
 
         .edgesIgnoringSafeArea(.horizontal)
@@ -55,7 +60,7 @@ struct VideosCellsHorizontal: View {
 struct VideoCellsHorizontal_Previews: PreviewProvider {
     static var previews: some View {
         VideosCellsHorizontal(videos: Video.allFixtures)
-            .environmentObject(NavigationState())
-            .environmentObject(Subscriptions())
+            .environmentObject(NavigationModel())
+            .environmentObject(SubscriptionsModel())
     }
 }

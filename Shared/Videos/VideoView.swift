@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct VideoView: View {
-    @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<NavigationModel> private var navigation
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -21,7 +21,7 @@ struct VideoView: View {
                     content
                 }
             } else {
-                Button(action: { navigationState.playVideo(video) }) {
+                Button(action: { navigation.playVideo(video) }) {
                     content
                 }
             }
@@ -125,7 +125,7 @@ struct VideoView: View {
         VStack(alignment: .leading, spacing: 0) {
             thumbnail
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 videoDetail(video.title, lineLimit: additionalDetailsAvailable ? 2 : 3)
                 #if os(tvOS)
                     .frame(minHeight: additionalDetailsAvailable ? 80 : 120, alignment: .top)
@@ -155,7 +155,9 @@ struct VideoView: View {
                     }
                 }
                 .frame(minHeight: 30, alignment: .top)
-                .padding(.bottom, 10)
+                #if os(tvOS)
+                    .padding(.bottom, 10)
+                #endif
             }
             .padding(.top, 4)
             .frame(minWidth: 0, maxWidth: .infinity, alignment: .topLeading)

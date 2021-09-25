@@ -5,11 +5,13 @@ import SwiftUI
 final class PlayerViewController: UIViewController {
     var video: Video!
 
+    var api: InvidiousAPI!
     var playerLoaded = false
     var player = AVPlayer()
-    var playerState: PlayerState!
-    var playbackState: PlaybackState!
+    var playerModel: PlayerModel!
+    var playback: PlaybackModel!
     var playerViewController = AVPlayerViewController()
+    var resolution: Stream.ResolutionSetting!
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -22,7 +24,7 @@ final class PlayerViewController: UIViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         #if os(iOS)
-            if !playerState.playingOutsideViewController {
+            if !playerModel.playingOutsideViewController {
                 playerViewController.player?.replaceCurrentItem(with: nil)
                 playerViewController.player = nil
 
@@ -34,15 +36,15 @@ final class PlayerViewController: UIViewController {
     }
 
     func loadPlayer() {
-        playerState = PlayerState(playbackState: playbackState)
+        playerModel = PlayerModel(playback: playback, api: api, resolution: resolution)
 
         guard !playerLoaded else {
             return
         }
 
-        playerState.player = player
-        playerViewController.player = playerState.player
-        playerState.loadVideo(video)
+        playerModel.player = player
+        playerViewController.player = playerModel.player
+        playerModel.loadVideo(video)
 
         #if os(tvOS)
             present(playerViewController, animated: false)
@@ -95,7 +97,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
-        playerState.playingOutsideViewController = false
+        playerModel.playingOutsideViewController = false
         dismiss(animated: false)
     }
 
@@ -103,7 +105,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         _: AVPlayerViewController,
         willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
     ) {
-        playerState.playingOutsideViewController = true
+        playerModel.playingOutsideViewController = true
     }
 
     func playerViewController(
@@ -112,7 +114,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     ) {
         coordinator.animate(alongsideTransition: nil) { context in
             if !context.isCancelled {
-                self.playerState.playingOutsideViewController = false
+                self.playerModel.playingOutsideViewController = false
 
                 #if os(iOS)
                     if self.traitCollection.verticalSizeClass == .compact {
@@ -124,10 +126,10 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {
-        playerState.playingOutsideViewController = true
+        playerModel.playingOutsideViewController = true
     }
 
     func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {
-        playerState.playingOutsideViewController = false
+        playerModel.playingOutsideViewController = false
     }
 }

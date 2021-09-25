@@ -2,14 +2,15 @@ import Defaults
 import SwiftUI
 
 struct AppTabNavigation: View {
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<SearchState> private var searchState
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SearchModel> private var search
     @EnvironmentObject<Recents> private var recents
 
     var body: some View {
-        TabView(selection: $navigationState.tabSelection) {
+        TabView(selection: $navigation.tabSelection) {
             NavigationView {
-                WatchNowView()
+                LazyView(WatchNowView())
+                    .toolbar { toolbarContent }
             }
             .tabItem {
                 Label("Watch Now", systemImage: "play.circle")
@@ -18,7 +19,8 @@ struct AppTabNavigation: View {
             .tag(TabSelection.watchNow)
 
             NavigationView {
-                SubscriptionsView()
+                LazyView(SubscriptionsView())
+                    .toolbar { toolbarContent }
             }
             .tabItem {
                 Label("Subscriptions", systemImage: "star.circle.fill")
@@ -29,7 +31,8 @@ struct AppTabNavigation: View {
 //            TODO: reenable with settings
 //            ============================
 //            NavigationView {
-//                PopularView()
+//                LazyView(PopularView())
+//                    .toolbar { toolbarContent }
 //            }
 //            .tabItem {
 //                Label("Popular", systemImage: "chart.bar")
@@ -38,7 +41,8 @@ struct AppTabNavigation: View {
 //            .tag(TabSelection.popular)
 
             NavigationView {
-                TrendingView()
+                LazyView(TrendingView())
+                    .toolbar { toolbarContent }
             }
             .tabItem {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
@@ -47,7 +51,8 @@ struct AppTabNavigation: View {
             .tag(TabSelection.trending)
 
             NavigationView {
-                PlaylistsView()
+                LazyView(PlaylistsView())
+                    .toolbar { toolbarContent }
             }
             .tabItem {
                 Label("Playlists", systemImage: "list.and.film")
@@ -56,25 +61,28 @@ struct AppTabNavigation: View {
             .tag(TabSelection.playlists)
 
             NavigationView {
-                SearchView()
-                    .searchable(text: $searchState.queryText, placement: .navigationBarDrawer(displayMode: .always)) {
-                        ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
-                            Text(suggestion)
-                                .searchCompletion(suggestion)
+                LazyView(
+                    SearchView()
+                        .toolbar { toolbarContent }
+                        .searchable(text: $search.queryText, placement: .navigationBarDrawer(displayMode: .always)) {
+                            ForEach(search.querySuggestions.collection, id: \.self) { suggestion in
+                                Text(suggestion)
+                                    .searchCompletion(suggestion)
+                            }
                         }
-                    }
-                    .onChange(of: searchState.queryText) { query in
-                        searchState.loadQuerySuggestions(query)
-                    }
-                    .onSubmit(of: .search) {
-                        searchState.changeQuery { query in
-                            query.query = searchState.queryText
+                        .onChange(of: search.queryText) { query in
+                            search.loadSuggestions(query)
                         }
+                        .onSubmit(of: .search) {
+                            search.changeQuery { query in
+                                query.query = search.queryText
+                            }
 
-                        recents.open(RecentItem(from: searchState.queryText))
+                            recents.open(RecentItem(from: search.queryText))
 
-                        navigationState.tabSelection = .search
-                    }
+                            navigation.tabSelection = .search
+                        }
+                )
             }
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
@@ -83,7 +91,7 @@ struct AppTabNavigation: View {
             .tag(TabSelection.search)
         }
         .environment(\.navigationStyle, .tab)
-        .sheet(isPresented: $navigationState.isChannelOpen, onDismiss: {
+        .sheet(isPresented: $navigation.isChannelOpen, onDismiss: {
             if let channel = recents.presentedChannel {
                 let recent = RecentItem(from: channel)
                 recents.close(recent)
@@ -91,10 +99,26 @@ struct AppTabNavigation: View {
         }) {
             if recents.presentedChannel != nil {
                 NavigationView {
-                    ChannelVideosView(recents.presentedChannel!)
+                    ChannelVideosView(channel: recents.presentedChannel!)
                         .environment(\.inNavigationView, true)
                 }
             }
         }
+    }
+
+    var toolbarContent: some ToolbarContent {
+        #if os(iOS)
+            Group {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button(action: { navigation.presentingSettings = true }) {
+                        Image(systemName: "gearshape.2")
+                    }
+                }
+
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    AccountsMenuView()
+                }
+            }
+        #endif
     }
 }

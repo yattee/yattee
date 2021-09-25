@@ -160,11 +160,7 @@ struct Video: Identifiable, Equatable {
     }
 
     func streamWithResolution(_ resolution: Stream.Resolution) -> Stream? {
-        selectableStreams.first { $0.resolution == resolution }
-    }
-
-    func defaultStreamForProfile(_ profile: Profile) -> Stream? {
-        streamWithResolution(profile.defaultStreamResolution.value) ?? streams.first
+        selectableStreams.first { $0.resolution == resolution } ?? defaultStream
     }
 
     func thumbnailURL(quality: Thumbnail.Quality) -> URL? {

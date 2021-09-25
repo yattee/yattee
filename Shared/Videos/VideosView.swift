@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct VideosView: View {
-    @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<NavigationModel> private var navigation
 
     #if os(tvOS)
         @Default(.layout) private var layout

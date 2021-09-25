@@ -3,9 +3,9 @@ import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
-    @ObservedObject private var store = Store<[Playlist]>()
+    @StateObject private var store = Store<[Playlist]>()
 
-    @Default(.selectedPlaylistID) private var selectedPlaylistID
+    @EnvironmentObject<InvidiousAPI> private var api
 
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
@@ -13,49 +13,32 @@ struct PlaylistsView: View {
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
 
-    var resource: Resource {
-        InvidiousAPI.shared.playlists
-    }
+    @Default(.selectedPlaylistID) private var selectedPlaylistID
 
-    init() {
-        resource.addObserver(store)
+    var resource: Resource {
+        api.playlists
     }
 
     var videos: [Video] {
         currentPlaylist?.videos ?? []
     }
 
-    var videosViewMaxHeight: Double {
-        #if os(tvOS)
-            videos.isEmpty ? 150 : .infinity
-        #else
-            videos.isEmpty ? 0 : .infinity
-        #endif
-    }
-
     var body: some View {
-        VStack {
-            #if os(tvOS)
-                toolbar
-                    .font(.system(size: 28))
+        SignInRequiredView(title: "Playlists") {
+            VStack {
+                #if os(tvOS)
+                    toolbar
+                        .font(.system(size: 28))
 
-            #endif
-            if currentPlaylist != nil, videos.isEmpty {
-                hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
-            } else if store.collection.isEmpty {
-                hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
-            } else {
-                VideosView(videos: videos)
+                #endif
+                if currentPlaylist != nil, videos.isEmpty {
+                    hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
+                } else if store.collection.isEmpty {
+                    hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
+                } else {
+                    VideosView(videos: videos)
+                }
             }
-
-            #if os(iOS)
-                toolbar
-                    .font(.system(size: 14))
-                    .padding(.horizontal)
-                    .padding(.vertical, 10)
-                    .overlay(Divider().offset(x: 0, y: -2), alignment: .topTrailing)
-                    .transaction { t in t.animation = .none }
-            #endif
         }
         #if os(tvOS)
             .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
@@ -85,21 +68,37 @@ struct PlaylistsView: View {
                 #endif
                 newPlaylistButton
             }
+
+            #if os(iOS)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Group {
+                        if store.collection.isEmpty {
+                            Text("No Playlists")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Current Playlist")
+                                .foregroundColor(.secondary)
+
+                            selectPlaylistButton
+                        }
+
+                        Spacer()
+
+                        if currentPlaylist != nil {
+                            editPlaylistButton
+                        }
+                    }
+                    .transaction { t in t.animation = .none }
+                }
+            #endif
         }
         .onAppear {
+            resource.addObserver(store)
+
             resource.loadIfNeeded()?.onSuccess { _ in
                 selectPlaylist(selectedPlaylistID)
             }
         }
-        #if !os(tvOS)
-            .navigationTitle("Playlists")
-        #elseif os(iOS)
-            .navigationBarItems(trailing: newPlaylistButton)
-        #endif
-    }
-
-    var scaledToolbar: some View {
-        toolbar.scaleEffect(0.85)
     }
 
     var toolbar: some View {
@@ -233,6 +232,6 @@ struct PlaylistsView: View {
 struct PlaylistsView_Provider: PreviewProvider {
     static var previews: some View {
         PlaylistsView()
-            .environmentObject(NavigationState())
+            .environmentObject(NavigationModel())
     }
 }

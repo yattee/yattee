@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct VideoDetails: View {
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @State private var subscribed = false
     @State private var confirmationShown = false
@@ -186,6 +186,6 @@ struct VideoDetails: View {
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
         VideoDetails(video: Video.fixture)
-            .environmentObject(Subscriptions())
+            .environmentObject(SubscriptionsModel())
     }
 }

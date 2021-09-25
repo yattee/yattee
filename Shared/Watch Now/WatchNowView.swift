@@ -1,24 +1,28 @@
+import Defaults
 import Siesta
 import SwiftUI
 
 struct WatchNowView: View {
-    init() {
-        InvidiousAPI.shared.home.loadIfNeeded()
-    }
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<NavigationModel> private var navigation
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 0) {
-                WatchNowSection(resource: InvidiousAPI.shared.feed, label: "Subscriptions")
-                WatchNowSection(resource: InvidiousAPI.shared.popular, label: "Popular")
-                WatchNowSection(resource: InvidiousAPI.shared.trending(category: .default, country: .pl), label: "Trending")
-                WatchNowSection(resource: InvidiousAPI.shared.trending(category: .movies, country: .pl), label: "Movies")
-                WatchNowSection(resource: InvidiousAPI.shared.trending(category: .music, country: .pl), label: "Music")
+            if api.validInstance {
+                VStack(alignment: .leading, spacing: 0) {
+                    if api.signedIn {
+                        WatchNowSection(resource: api.feed, label: "Subscriptions")
+                    }
+                    WatchNowSection(resource: api.popular, label: "Popular")
+                    WatchNowSection(resource: api.trending(category: .default, country: .pl), label: "Trending")
+                    WatchNowSection(resource: api.trending(category: .movies, country: .pl), label: "Movies")
+                    WatchNowSection(resource: api.trending(category: .music, country: .pl), label: "Music")
 
-//              TODO: adding sections to view
-//              ===================
-//              WatchNowPlaylistSection(id: "IVPLmRFYLGYZpq61SpujNw3EKbzzGNvoDmH")
-//              WatchNowSection(resource: InvidiousAPI.shared.channelVideos("UCBJycsmduvYEL83R_U4JriQ"), label: "MKBHD")
+//                  TODO: adding sections to view
+//                  ===================
+//                  WatchNowPlaylistSection(id: "IVPLmRFYLGYZpq61SpujNw3EKbzzGNvoDmH")
+//                  WatchNowSection(resource: InvidiousAPI.shared.channelVideos("UCBJycsmduvYEL83R_U4JriQ"), label: "MKBHD")
+                }
             }
         }
         #if os(tvOS)
@@ -36,7 +40,7 @@ struct WatchNowView: View {
 struct WatchNowView_Previews: PreviewProvider {
     static var previews: some View {
         WatchNowView()
-            .environmentObject(Subscriptions())
-            .environmentObject(NavigationState())
+            .environmentObject(SubscriptionsModel())
+            .environmentObject(NavigationModel())
     }
 }

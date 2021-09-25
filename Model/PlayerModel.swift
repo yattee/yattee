@@ -5,7 +5,7 @@ import Logging
     import UIKit
 #endif
 
-final class PlayerState: ObservableObject {
+final class PlayerModel: ObservableObject {
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
 
     var video: Video!
@@ -19,17 +19,19 @@ final class PlayerState: ObservableObject {
     private(set) var currentRate: Float = 0.0
     static let availableRates: [Double] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
-    var playbackState: PlaybackState
+    var api: InvidiousAPI
+    var playback: PlaybackModel
     var timeObserver: Any?
 
-    let maxResolution: Stream.Resolution?
+    let resolution: Stream.ResolutionSetting?
 
     var playingOutsideViewController = false
 
-    init(_ video: Video? = nil, playbackState: PlaybackState, maxResolution: Stream.Resolution? = nil) {
+    init(_ video: Video? = nil, playback: PlaybackModel, api: InvidiousAPI, resolution: Stream.ResolutionSetting? = nil) {
         self.video = video
-        self.playbackState = playbackState
-        self.maxResolution = maxResolution
+        self.playback = playback
+        self.api = api
+        self.resolution = resolution
     }
 
     deinit {
@@ -41,7 +43,7 @@ final class PlayerState: ObservableObject {
             return
         }
 
-        playbackState.reset()
+        playback.reset()
 
         loadExtendedVideoDetails(video) { video in
             self.video = video
@@ -54,22 +56,26 @@ final class PlayerState: ObservableObject {
             return
         }
 
-        InvidiousAPI.shared.video(video!.id).load().onSuccess { response in
+        api.video(video!.id).load().onSuccess { response in
             if let video: Video = response.typedContent() {
                 onSuccess(video)
             }
         }
     }
 
+    var requestedResolution: Bool {
+        resolution != nil && resolution != .hd720pFirstThenBest
+    }
+
     fileprivate func playVideo(_ video: Video) {
-        playbackState.live = video.live
+        playback.live = video.live
 
         if video.live {
             playHlsUrl()
             return
         }
 
-        let stream = maxResolution != nil ? video.streamWithResolution(maxResolution!) : video.defaultStream
+        let stream = requestedResolution ? video.streamWithResolution(resolution!.value) : video.defaultStream
 
         guard stream != nil else {
             return
@@ -78,7 +84,7 @@ final class PlayerState: ObservableObject {
         Task {
             await self.loadStream(stream!)
 
-            if stream != video.bestStream {
+            if resolution == .hd720pFirstThenBest {
                 await self.loadBestStream()
             }
         }
@@ -91,9 +97,7 @@ final class PlayerState: ObservableObject {
 
     fileprivate func loadStream(_ stream: Stream) async {
         if stream.oneMeaningfullAsset {
-            DispatchQueue.main.async {
-                self.playStream(stream)
-            }
+            playStream(stream)
 
             return
         } else {
@@ -111,11 +115,11 @@ final class PlayerState: ObservableObject {
         DispatchQueue.main.async {
             self.saveTime()
             self.player?.replaceCurrentItem(with: self.playerItemWithMetadata(for: stream))
-            self.playbackState.stream = stream
+            self.playback.stream = stream
             if self.timeObserver == nil {
                 self.addTimeObserver()
             }
-            self.player?.playImmediately(atRate: 1.0)
+            self.player?.play()
             self.seekToSavedTime()
         }
     }
@@ -267,7 +271,7 @@ final class PlayerState: ObservableObject {
                 self.player.rate = self.currentRate
             }
 
-            self.playbackState.time = self.player.currentTime()
+            self.playback.time = self.player.currentTime()
         }
     }
 

@@ -4,7 +4,7 @@ import SwiftUI
 struct AppSidebarRecents: View {
     @Binding var selection: TabSelection?
 
-    @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<Recents> private var recents
 
     @Default(.recentlyOpened) private var recentItems
@@ -18,7 +18,7 @@ struct AppSidebarRecents: View {
                             switch recent.type {
                             case .channel:
                                 RecentNavigationLink(recent: recent, selection: $selection) {
-                                    LazyView(ChannelVideosView(Channel(id: recent.id, name: recent.title)))
+                                    LazyView(ChannelVideosView(channel: Channel(id: recent.id, name: recent.title)))
                                 }
                             case .query:
                                 RecentNavigationLink(recent: recent, selection: $selection, systemImage: "magnifyingglass") {

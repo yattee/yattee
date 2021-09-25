@@ -1,23 +1,28 @@
+import Defaults
 import Siesta
 import SwiftUI
 
 struct WatchNowSection: View {
-    @ObservedObject private var store = Store<[Video]>()
-
     let resource: Resource
     let label: String
+
+    @StateObject private var store = Store<[Video]>()
+
+    @EnvironmentObject<InvidiousAPI> private var api
 
     init(resource: Resource, label: String) {
         self.resource = resource
         self.label = label
-
-        self.resource.addObserver(store)
     }
 
     var body: some View {
         WatchNowSectionBody(label: label, videos: store.collection)
             .onAppear {
-                resource.loadIfNeeded()
+                resource.addObserver(store)
+                resource.load()
+            }
+            .onChange(of: api.account) { _ in
+                resource.load()
             }
     }
 }

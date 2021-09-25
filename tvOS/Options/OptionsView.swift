@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct OptionsView: View {
-    @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<NavigationModel> private var navigation
 
     @Default(.layout) private var layout
 
@@ -28,6 +28,8 @@ struct OptionsView: View {
                         }
 
                         Spacer()
+
+                        SettingsView()
                     }
                     .frame(maxWidth: 800)
 
@@ -42,7 +44,7 @@ struct OptionsView: View {
 
     var tabSelectionOptions: some View {
         VStack {
-            switch navigationState.tabSelection {
+            switch navigation.tabSelection {
             case .search:
                 SearchOptionsView()
 

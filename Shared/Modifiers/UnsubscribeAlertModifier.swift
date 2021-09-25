@@ -2,13 +2,13 @@ import Foundation
 import SwiftUI
 
 struct UnsubscribeAlertModifier: ViewModifier {
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     func body(content: Content) -> some View {
         content
-            .alert(unsubscribeAlertTitle, isPresented: $navigationState.presentingUnsubscribeAlert) {
-                if let channel = navigationState.channelToUnsubscribe {
+            .alert(unsubscribeAlertTitle, isPresented: $navigation.presentingUnsubscribeAlert) {
+                if let channel = navigation.channelToUnsubscribe {
                     Button("Unsubscribe", role: .destructive) {
                         subscriptions.unsubscribe(channel.id)
                     }
@@ -17,7 +17,7 @@ struct UnsubscribeAlertModifier: ViewModifier {
     }
 
     var unsubscribeAlertTitle: String {
-        if let channel = navigationState.channelToUnsubscribe {
+        if let channel = navigation.channelToUnsubscribe {
             return "Unsubscribe from \(channel.name)"
         }
 

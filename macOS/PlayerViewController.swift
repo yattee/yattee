@@ -4,36 +4,40 @@ import SwiftUI
 final class PlayerViewController: NSViewController {
     var video: Video!
 
+    var api: InvidiousAPI!
     var player = AVPlayer()
-    var playerState: PlayerState!
-    var playbackState: PlaybackState!
+    var playerModel: PlayerModel!
+    var playback: PlaybackModel!
     var playerView = AVPlayerView()
+    var resolution: Stream.ResolutionSetting!
 
     override func viewDidDisappear() {
         playerView.player?.replaceCurrentItem(with: nil)
         playerView.player = nil
 
-        playerState.player = nil
-        playerState = nil
+        playerModel.player = nil
+        playerModel = nil
 
         super.viewDidDisappear()
     }
 
     override func loadView() {
-        playerState = PlayerState(playbackState: playbackState)
+        playerModel = PlayerModel(playback: playback, api: api, resolution: resolution)
 
-        guard playerState.player == nil else {
+        guard playerModel.player == nil else {
             return
         }
 
-        playerState.player = player
-        playerView.player = playerState.player
+        playerModel.player = player
+        playerView.player = playerModel.player
 
         playerView.allowsPictureInPicturePlayback = true
         playerView.showsFullScreenToggleButton = true
 
         view = playerView
 
-        playerState.loadVideo(video)
+        DispatchQueue.main.async {
+            self.playerModel.loadVideo(self.video)
+        }
     }
 }

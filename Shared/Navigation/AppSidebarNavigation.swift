@@ -12,16 +12,18 @@ struct AppSidebarNavigation: View {
         }
     }
 
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<InstancesModel> private var instances
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<Recents> private var recents
-    @EnvironmentObject<SearchState> private var searchState
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @State private var didApplyPrimaryViewWorkAround = false
 
     var selection: Binding<TabSelection?> {
-        navigationState.tabSelectionOptionalBinding
+        navigation.tabSelectionOptionalBinding
     }
 
     var body: some View {
@@ -30,11 +32,10 @@ struct AppSidebarNavigation: View {
                 // workaround for an empty supplementary view on launch
                 // the supplementary view is determined by the default selection inside the
                 // primary view, but the primary view is not loaded so its selection is not read
-                // We work around that by briefly showing the primary view.
+                // We work around that by showing the primary view
                 if !didApplyPrimaryViewWorkAround, let splitVC = viewController.children.first as? UISplitViewController {
                     UIView.performWithoutAnimation {
                         splitVC.show(.primary)
-                        splitVC.hide(.primary)
                     }
                     didApplyPrimaryViewWorkAround = true
                 }
@@ -44,31 +45,33 @@ struct AppSidebarNavigation: View {
         #endif
     }
 
+    let sidebarMinWidth: Double = 280
+
     var content: some View {
         NavigationView {
             sidebar
-                .frame(minWidth: 180)
+                .toolbar { toolbarContent }
+                .frame(minWidth: sidebarMinWidth)
 
             Text("Select section")
         }
         .environment(\.navigationStyle, .sidebar)
-        .searchable(text: $searchState.queryText, placement: .sidebar) {
-            ForEach(searchState.querySuggestions.collection, id: \.self) { suggestion in
+        .searchable(text: $search.queryText, placement: .sidebar) {
+            ForEach(search.querySuggestions.collection, id: \.self) { suggestion in
                 Text(suggestion)
                     .searchCompletion(suggestion)
             }
         }
-        .onChange(of: searchState.queryText) { query in
-            searchState.loadQuerySuggestions(query)
+        .onChange(of: search.queryText) { query in
+            search.loadSuggestions(query)
         }
         .onSubmit(of: .search) {
-            searchState.changeQuery { query in
-                query.query = searchState.queryText
+            search.changeQuery { query in
+                query.query = search.queryText
             }
+            recents.open(RecentItem(from: search.queryText))
 
-            recents.open(RecentItem(from: searchState.queryText))
-
-            navigationState.tabSelection = .search
+            navigation.tabSelection = .search
         }
     }
 
@@ -80,8 +83,8 @@ struct AppSidebarNavigation: View {
                         .id(group)
                 }
 
-                .onChange(of: navigationState.sidebarSectionChanged) { _ in
-                    scrollScrollViewToItem(scrollView: scrollView, for: navigationState.tabSelection)
+                .onChange(of: navigation.sidebarSectionChanged) { _ in
+                    scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)
                 }
             }
             .background {
@@ -93,13 +96,7 @@ struct AppSidebarNavigation: View {
             .listStyle(.sidebar)
         }
         .toolbar {
-            #if os(macOS)
-                ToolbarItemGroup {
-                    Button(action: toggleSidebar) {
-                        Image(systemName: "sidebar.left").help("Toggle Sidebar")
-                    }
-                }
-            #endif
+            toolbarContent
         }
     }
 
@@ -115,25 +112,27 @@ struct AppSidebarNavigation: View {
 
                 AppSidebarRecents(selection: selection)
                     .id("recentlyOpened")
-                AppSidebarSubscriptions(selection: selection)
-                AppSidebarPlaylists(selection: selection)
+
+                if api.signedIn {
+                    AppSidebarSubscriptions(selection: selection)
+                    AppSidebarPlaylists(selection: selection)
+                }
             }
         }
     }
 
     var mainNavigationLinks: some View {
         Section("Videos") {
-            NavigationLink(tag: TabSelection.watchNow, selection: selection) {
-                WatchNowView()
-            }
-            label: {
+            NavigationLink(destination: LazyView(WatchNowView()), tag: TabSelection.watchNow, selection: selection) {
                 Label("Watch Now", systemImage: "play.circle")
                     .accessibility(label: Text("Watch Now"))
             }
 
-            NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: selection) {
-                Label("Subscriptions", systemImage: "star.circle")
-                    .accessibility(label: Text("Subscriptions"))
+            if api.signedIn {
+                NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: selection) {
+                    Label("Subscriptions", systemImage: "star.circle")
+                        .accessibility(label: Text("Subscriptions"))
+                }
             }
 
             NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: selection) {
@@ -144,11 +143,6 @@ struct AppSidebarNavigation: View {
             NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: selection) {
                 Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
                     .accessibility(label: Text("Trending"))
-            }
-
-            NavigationLink(destination: LazyView(PlaylistsView()), tag: TabSelection.playlists, selection: selection) {
-                Label("Playlists", systemImage: "list.and.film")
-                    .accessibility(label: Text("Playlists"))
             }
         }
     }
@@ -165,6 +159,36 @@ struct AppSidebarNavigation: View {
         }
     }
 
+    var toolbarContent: some ToolbarContent {
+        Group {
+            #if os(iOS)
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button(action: { navigation.presentingSettings = true }) {
+                        Image(systemName: "gearshape.2")
+                    }
+                }
+            #endif
+
+            ToolbarItem(placement: accountsMenuToolbarItemPlacement) {
+                AccountsMenuView()
+                    .help(
+                        "Switch Instances and Accounts\n" +
+                            "Current Instance: \n" +
+                            "\(api.account?.url ?? "Not Set")\n" +
+                            "Current User: \(api.account?.description ?? "Not set")"
+                    )
+            }
+        }
+    }
+
+    var accountsMenuToolbarItemPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            return .bottomBar
+        #else
+            return .automatic
+        #endif
+    }
+
     #if os(macOS)
         private func toggleSidebar() {
             NSApp.keyWindow?.contentViewController?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
@@ -177,6 +201,6 @@ struct AppSidebarNavigation: View {
 
         let symbolName = firstLetter?.range(of: regex, options: .regularExpression) != nil ? firstLetter! : "questionmark"
 
-        return "\(symbolName).square"
+        return "\(symbolName).circle"
     }
 }

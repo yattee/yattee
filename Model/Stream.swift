@@ -1,9 +1,32 @@
 import AVFoundation
+import Defaults
 import Foundation
 
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable {
-    enum Resolution: String, CaseIterable, Comparable {
+    enum ResolutionSetting: String, Defaults.Serializable, CaseIterable {
+        case hd720pFirstThenBest, hd1080p, hd720p, sd480p, sd360p, sd240p, sd144p
+
+        var value: Stream.Resolution {
+            switch self {
+            case .hd720pFirstThenBest:
+                return .hd720p
+            default:
+                return Stream.Resolution(rawValue: rawValue)!
+            }
+        }
+
+        var description: String {
+            switch self {
+            case .hd720pFirstThenBest:
+                return "Default: adaptive"
+            default:
+                return "\(value.height)p".replacingOccurrences(of: " ", with: "")
+            }
+        }
+    }
+
+    enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
         case hd1080p, hd720p, sd480p, sd360p, sd240p, sd144p
 
         var height: Int {

@@ -5,7 +5,7 @@ struct PlaybackBar: View {
     let video: Video
 
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var playbackState: PlaybackState
+    @EnvironmentObject private var playback: PlaybackModel
 
     var body: some View {
         HStack {
@@ -18,7 +18,7 @@ struct PlaybackBar: View {
                 .frame(minWidth: 60, maxWidth: .infinity)
 
             VStack {
-                if playbackState.stream != nil {
+                if playback.stream != nil {
                     Text(currentStreamString)
                 } else {
                     if video.live {
@@ -38,19 +38,19 @@ struct PlaybackBar: View {
     }
 
     var currentStreamString: String {
-        playbackState.stream != nil ? "\(playbackState.stream!.resolution.height)p" : ""
+        playback.stream != nil ? "\(playback.stream!.resolution.height)p" : ""
     }
 
     var playbackStatus: String {
-        guard playbackState.time != nil else {
-            if playbackState.live {
+        guard playback.time != nil else {
+            if playback.live {
                 return "LIVE"
             } else {
                 return "loading..."
             }
         }
 
-        let remainingSeconds = video.length - playbackState.time!.seconds
+        let remainingSeconds = video.length - playback.time!.seconds
 
         if remainingSeconds < 60 {
             return "less than a minute"

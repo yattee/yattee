@@ -3,55 +3,108 @@ import Foundation
 import Siesta
 import SwiftyJSON
 
-final class InvidiousAPI: Service {
-    static let shared = InvidiousAPI()
+final class InvidiousAPI: Service, ObservableObject {
+    static let basePath = "/api/v1"
 
-    static let instance = "https://invidious.home.arekf.net"
+    @Published var account: Instance.Account!
 
-    static func proxyURLForAsset(_ url: String) -> URL? {
-        guard let instanceURLComponents = URLComponents(string: InvidiousAPI.instance),
-              var urlComponents = URLComponents(string: url) else { return nil }
-
-        urlComponents.scheme = instanceURLComponents.scheme
-        urlComponents.host = instanceURLComponents.host
-
-        return urlComponents.url
-    }
+    @Published var validInstance = true
+    @Published var signedIn = true
 
     init() {
+        super.init()
+
+        #if os(tvOS)
+            // TODO: remove
+            setAccount(.init(id: UUID(), name: "", url: "https://invidious.home.arekf.net", sid: "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="))
+        #endif
+    }
+
+    func setAccount(_ account: Instance.Account) {
+        self.account = account
+
+        validInstance = false
+        signedIn = false
+
+        configure()
+        validate()
+    }
+
+    func validate() {
+        validateInstance()
+        validateSID()
+    }
+
+    func validateInstance() {
+        guard !validInstance else {
+            return
+        }
+
+        home
+            .load()
+            .onSuccess { _ in
+                self.validInstance = true
+            }
+            .onFailure { _ in
+                self.validInstance = false
+            }
+    }
+
+    func validateSID() {
+        guard !signedIn else {
+            return
+        }
+
+        feed
+            .load()
+            .onSuccess { _ in
+                self.signedIn = true
+            }
+            .onFailure { _ in
+                self.signedIn = false
+            }
+    }
+
+    static func proxyURLForAsset(_ url: String) -> URL? {
+        URL(string: url)
+        // TODO: Switching instances, move up to player
+        //        guard let instanceURLComponents = URLComponents(string: InvidiousAPI.instance),
+        //              var urlComponents = URLComponents(string: url) else { return nil }
+        //
+        //        urlComponents.scheme = instanceURLComponents.scheme
+        //        urlComponents.host = instanceURLComponents.host
+        //
+        //        return urlComponents.url
+    }
+
+    func configure() {
         SiestaLog.Category.enabled = .common
 
         let SwiftyJSONTransformer =
             ResponseContentTransformer(transformErrors: true) { JSON($0.content as AnyObject) }
 
-        super.init(baseURL: "\(InvidiousAPI.instance)/api/v1")
-
         configure {
+            $0.headers["Cookie"] = self.cookieHeader
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
 
-        configure(requestMethods: [.get]) {
-            $0.headers["Cookie"] = self.authHeader
-        }
-
         configure("**", requestMethods: [.post]) {
-            $0.headers["Cookie"] = self.authHeader
             $0.pipeline[.parsing].removeTransformers()
         }
 
-        configureTransformer("/popular", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+        configureTransformer(pathPattern("popular"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.arrayValue.map(Video.init)
         }
 
-        configureTransformer("/trending", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+        configureTransformer(pathPattern("trending"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.arrayValue.map(Video.init)
         }
 
-        configureTransformer("/search", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.arrayValue.map(Video.init)
         }
 
-        configureTransformer("/search/suggestions", requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
+        configureTransformer(pathPattern("search/suggestions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
             if let suggestions = content.json.dictionaryValue["suggestions"] {
                 return suggestions.arrayValue.map(String.init)
             }
@@ -59,20 +112,20 @@ final class InvidiousAPI: Service {
             return []
         }
 
-        configureTransformer("/auth/playlists", requestMethods: [.get]) { (content: Entity<JSON>) -> [Playlist] in
+        configureTransformer(pathPattern("auth/playlists"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Playlist] in
             content.json.arrayValue.map(Playlist.init)
         }
 
-        configureTransformer("/auth/playlists/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Playlist in
+        configureTransformer(pathPattern("auth/playlists/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Playlist in
             Playlist(content.json)
         }
 
-        configureTransformer("/auth/playlists", requestMethods: [.post, .patch]) { (content: Entity<Data>) -> Playlist in
+        configureTransformer(pathPattern("auth/playlists"), requestMethods: [.post, .patch]) { (content: Entity<Data>) -> Playlist in
             // hacky, to verify if possible to get it in easier way
             Playlist(JSON(parseJSON: String(data: content.content, encoding: .utf8)!))
         }
 
-        configureTransformer("/auth/feed", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+        configureTransformer(pathPattern("auth/feed"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let feedVideos = content.json.dictionaryValue["videos"] {
                 return feedVideos.arrayValue.map(Video.init)
             }
@@ -80,69 +133,83 @@ final class InvidiousAPI: Service {
             return []
         }
 
-        configureTransformer("/auth/subscriptions", requestMethods: [.get]) { (content: Entity<JSON>) -> [Channel] in
+        configureTransformer(pathPattern("auth/subscriptions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Channel] in
             content.json.arrayValue.map(Channel.init)
         }
 
-        configureTransformer("/channels/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Channel in
+        configureTransformer(pathPattern("channels/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Channel in
             Channel(json: content.json)
         }
 
-        configureTransformer("/channels/*/latest", requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+        configureTransformer(pathPattern("channels/*/latest"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.arrayValue.map(Video.init)
         }
 
-        configureTransformer("/videos/*", requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
+        configureTransformer(pathPattern("videos/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
             Video(content.json)
         }
     }
 
-    var authHeader: String? = "SID=\(Profile().sid)"
+    fileprivate func pathPattern(_ path: String) -> String {
+        "**\(InvidiousAPI.basePath)/\(path)"
+    }
+
+    fileprivate func basePathAppending(_ path: String) -> String {
+        "\(InvidiousAPI.basePath)/\(path)"
+    }
+
+    private var cookieHeader: String {
+        "SID=\(account.sid)"
+    }
 
     var popular: Resource {
-        resource("/popular")
+        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/popular")
     }
 
     func trending(category: TrendingCategory, country: Country) -> Resource {
-        resource("/trending")
+        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/trending")
             .withParam("type", category.name)
             .withParam("region", country.rawValue)
     }
 
     var home: Resource {
-        resource(baseURL: InvidiousAPI.instance, path: "/feed/subscriptions")
+        resource(baseURL: account.url, path: "/feed/subscriptions")
     }
 
     var feed: Resource {
-        resource("/auth/feed")
+        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/auth/feed")
+    }
+
+    var stats: Resource {
+        resource(baseURL: account.url, path: basePathAppending("stats"))
     }
 
     var subscriptions: Resource {
-        resource("/auth/subscriptions")
+        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
     }
 
     func channelSubscription(_ id: String) -> Resource {
-        resource("/auth/subscriptions").child(id)
+        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions")).child(id)
     }
 
     func channel(_ id: String) -> Resource {
-        resource("/channels/\(id)")
+        resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
     }
 
     func channelVideos(_ id: String) -> Resource {
-        resource("/channels/\(id)/latest")
+        resource(baseURL: account.url, path: basePathAppending("channels/\(id)/latest"))
     }
 
     func video(_ id: String) -> Resource {
-        resource("/videos/\(id)")
+        resource(baseURL: account.url, path: basePathAppending("videos/\(id)"))
     }
 
     var playlists: Resource {
-        resource("/auth/playlists")
+        resource(baseURL: account.url, path: basePathAppending("auth/playlists"))
     }
 
     func playlist(_ id: String) -> Resource {
-        resource("/auth/playlists/\(id)")
+        resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
     }
 
     func playlistVideos(_ id: String) -> Resource {
@@ -154,7 +221,7 @@ final class InvidiousAPI: Service {
     }
 
     func search(_ query: SearchQuery) -> Resource {
-        var resource = resource("/search")
+        var resource = resource(baseURL: account.url, path: basePathAppending("search"))
             .withParam("q", searchQuery(query.query))
             .withParam("sort_by", query.sortBy.parameter)
 
@@ -170,7 +237,7 @@ final class InvidiousAPI: Service {
     }
 
     func searchSuggestions(query: String) -> Resource {
-        resource("/search/suggestions")
+        resource(baseURL: account.url, path: basePathAppending("search/suggestions"))
             .withParam("q", query.lowercased())
     }
 

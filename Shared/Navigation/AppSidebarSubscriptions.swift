@@ -1,8 +1,9 @@
+import Defaults
 import SwiftUI
 
 struct AppSidebarSubscriptions: View {
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Binding var selection: TabSelection?
 
@@ -10,22 +11,25 @@ struct AppSidebarSubscriptions: View {
         Section(header: Text("Subscriptions")) {
             ForEach(subscriptions.all) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $selection) {
-                    LazyView(ChannelVideosView(channel))
+                    LazyView(ChannelVideosView(channel: channel))
                 } label: {
                     Label(channel.name, systemImage: AppSidebarNavigation.symbolSystemImage(channel.name))
                 }
                 .contextMenu {
                     Button("Unsubscribe") {
-                        navigationState.presentUnsubscribeAlert(channel)
+                        navigation.presentUnsubscribeAlert(channel)
                     }
                 }
                 .modifier(UnsubscribeAlertModifier())
             }
         }
+        .onAppear {
+            subscriptions.load()
+        }
     }
 
     var unsubscribeAlertTitle: String {
-        if let channel = navigationState.channelToUnsubscribe {
+        if let channel = navigation.channelToUnsubscribe {
             return "Unsubscribe from \(channel.name)"
         }
 

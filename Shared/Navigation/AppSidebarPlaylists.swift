@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct AppSidebarPlaylists: View {
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
 
     @Binding var selection: TabSelection?
 
     var body: some View {
         Section(header: Text("Playlists")) {
-            ForEach(playlists.all) { playlist in
+            ForEach(playlists.playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }) { playlist in
                 NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $selection) {
                     LazyView(PlaylistVideosView(playlist))
                 } label: {
@@ -18,7 +18,7 @@ struct AppSidebarPlaylists: View {
                 .id(playlist.id)
                 .contextMenu {
                     Button("Edit") {
-                        navigationState.presentEditPlaylistForm(playlists.find(id: playlist.id))
+                        navigation.presentEditPlaylistForm(playlists.find(id: playlist.id))
                     }
                 }
             }
@@ -26,11 +26,14 @@ struct AppSidebarPlaylists: View {
             newPlaylistButton
                 .padding(.top, 8)
         }
+        .onAppear {
+            playlists.load()
+        }
     }
 
     var newPlaylistButton: some View {
-        Button(action: { navigationState.presentNewPlaylistForm() }) {
-            Label("New Playlist", systemImage: "plus.square")
+        Button(action: { navigation.presentNewPlaylistForm() }) {
+            Label("New Playlist", systemImage: "plus.circle")
         }
         .foregroundColor(.secondary)
         .buttonStyle(.plain)

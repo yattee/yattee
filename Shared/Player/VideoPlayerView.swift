@@ -12,31 +12,31 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<PlaybackState> private var playbackState
-
-    @ObservedObject private var store = Store<Video>()
+    @StateObject private var store = Store<Video>()
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaybackModel> private var playback
+
     var resource: Resource {
-        InvidiousAPI.shared.video(video.id)
+        api.video(video.id)
     }
 
     var video: Video
 
     init(_ video: Video) {
         self.video = video
-        resource.addObserver(store)
     }
 
     var body: some View {
         VStack(spacing: 0) {
             #if os(tvOS)
                 Player(video: video)
-                    .environmentObject(playbackState)
+                    .environmentObject(playback)
             #else
                 GeometryReader { geometry in
                     VStack(spacing: 0) {
@@ -49,8 +49,8 @@ struct VideoPlayerView: View {
                         #endif
 
                         Player(video: video)
-                            .environmentObject(playbackState)
-                            .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: playbackState.aspectRatio))
+                            .environmentObject(playback)
+                            .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: playback.aspectRatio))
                     }
                     .background(.black)
 
@@ -73,13 +73,13 @@ struct VideoPlayerView: View {
                             }
                         #endif
                     }
-                    .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: playbackState.aspectRatio))
+                    .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: playback.aspectRatio))
                 }
-                .animation(.linear(duration: 0.2), value: playbackState.aspectRatio)
+                .animation(.linear(duration: 0.2), value: playback.aspectRatio)
             #endif
         }
-
         .onAppear {
+            resource.addObserver(store)
             resource.loadIfNeeded()
         }
         .onDisappear {
@@ -109,7 +109,7 @@ struct VideoPlayerView_Previews: PreviewProvider {
         }
         .sheet(isPresented: .constant(true)) {
             VideoPlayerView(Video.fixture)
-                .environmentObject(NavigationState())
+                .environmentObject(NavigationModel())
         }
     }
 }

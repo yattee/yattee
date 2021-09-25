@@ -1,7 +1,9 @@
+import Defaults
 import SwiftUI
 
 struct Player: UIViewControllerRepresentable {
-    @EnvironmentObject<PlaybackState> private var playbackState
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<PlaybackModel> private var playback
 
     var video: Video?
 
@@ -9,7 +11,10 @@ struct Player: UIViewControllerRepresentable {
         let controller = PlayerViewController()
 
         controller.video = video
-        controller.playbackState = playbackState
+        controller.playback = playback
+        controller.api = api
+
+        controller.resolution = Defaults[.quality]
 
         return controller
     }

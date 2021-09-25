@@ -3,7 +3,7 @@ import Siesta
 import SwiftUI
 
 struct AddToPlaylistView: View {
-    @ObservedObject private var store = Store<[Playlist]>()
+    @StateObject private var store = Store<[Playlist]>()
 
     @State private var selectedPlaylist: Playlist?
 
@@ -11,8 +11,10 @@ struct AddToPlaylistView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @EnvironmentObject<InvidiousAPI> private var api
+
     var resource: Resource {
-        InvidiousAPI.shared.playlists
+        api.playlists
     }
 
     init() {
@@ -85,12 +87,12 @@ struct AddToPlaylistView: View {
             return
         }
 
-        let resource = InvidiousAPI.shared.playlistVideos(currentPlaylist!.id)
+        let resource = api.playlistVideos(currentPlaylist!.id)
         let body = ["videoId": videoID]
 
         resource.request(.post, json: body).onSuccess { _ in
             Defaults.reset(.videoIDToAddToPlaylist)
-            InvidiousAPI.shared.playlists.load()
+            api.playlists.load()
             dismiss()
         }
     }

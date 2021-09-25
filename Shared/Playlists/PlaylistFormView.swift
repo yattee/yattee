@@ -2,6 +2,8 @@ import Siesta
 import SwiftUI
 
 struct PlaylistFormView: View {
+    @Binding var playlist: Playlist!
+
     @State private var name = ""
     @State private var visibility = Playlist.Visibility.public
 
@@ -10,11 +12,10 @@ struct PlaylistFormView: View {
 
     @FocusState private var focused: Bool
 
-    @Binding var playlist: Playlist!
-
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject<Playlists> private var playlists
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<PlaylistsModel> private var playlists
 
     var editing: Bool {
         playlist != nil
@@ -33,6 +34,8 @@ struct PlaylistFormView: View {
                         dismiss()
                     }.keyboardShortcut(.cancelAction)
                 }
+                .padding(.horizontal)
+
                 Form {
                     TextField("Name", text: $name, onCommit: validate)
                         .frame(maxWidth: 450)
@@ -46,8 +49,7 @@ struct PlaylistFormView: View {
                     }
                     .pickerStyle(.segmented)
                 }
-                Divider()
-                    .padding(.vertical, 4)
+
                 HStack {
                     if editing {
                         deletePlaylistButton
@@ -59,11 +61,14 @@ struct PlaylistFormView: View {
                         .disabled(!valid)
                         .keyboardShortcut(.defaultAction)
                 }
+                .frame(minHeight: 35)
+                .padding(.horizontal)
             }
             .onChange(of: name) { _ in validate() }
             .onAppear(perform: initializeForm)
-            .padding(.horizontal)
-            #if !os(iOS)
+            #if os(iOS)
+                .padding(.vertical)
+            #else
                 .frame(width: 400, height: 150)
             #endif
 
@@ -141,14 +146,14 @@ struct PlaylistFormView: View {
                 playlist = modifiedPlaylist
             }
 
-            playlists.reload()
+            playlists.load(force: true)
 
             dismiss()
         }
     }
 
     var resource: Resource {
-        editing ? InvidiousAPI.shared.playlist(playlist.id) : InvidiousAPI.shared.playlists
+        editing ? api.playlist(playlist.id) : api.playlists
     }
 
     var visibilityButton: some View {
@@ -189,9 +194,9 @@ struct PlaylistFormView: View {
     }
 
     func deletePlaylistAndDismiss() {
-        let resource = InvidiousAPI.shared.playlist(playlist.id)
-        resource.request(.delete).onSuccess { _ in
+        api.playlist(playlist.id).request(.delete).onSuccess { _ in
             playlist = nil
+            playlists.load(force: true)
             dismiss()
         }
     }

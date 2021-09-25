@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-final class NavigationState: ObservableObject {
+final class NavigationModel: ObservableObject {
     enum TabSelection: Hashable {
         case watchNow, subscriptions, popular, trending, playlists, channel(String), playlist(String), recentlyOpened(String), search
     }
@@ -21,6 +21,8 @@ final class NavigationState: ObservableObject {
 
     @Published var isChannelOpen = false
     @Published var sidebarSectionChanged = false
+
+    @Published var presentingSettings = false
 
     func playVideo(_ video: Video) {
         self.video = video
@@ -56,4 +58,4 @@ final class NavigationState: ObservableObject {
     }
 }
 
-typealias TabSelection = NavigationState.TabSelection
+typealias TabSelection = NavigationModel.TabSelection

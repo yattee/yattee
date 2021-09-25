@@ -4,7 +4,7 @@ struct TrendingCountry: View {
     static let prompt = "Country Name or Code"
     @Binding var selectedCountry: Country?
 
-    @ObservedObject private var store = Store(Country.allCases)
+    @StateObject private var store = Store(Country.allCases)
 
     @State private var query: String = ""
     @State private var selection: Country?

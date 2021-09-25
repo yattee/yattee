@@ -2,25 +2,23 @@ import Defaults
 import SwiftUI
 
 struct VideoContextMenuView: View {
-    @EnvironmentObject<NavigationState> private var navigationState
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<Recents> private var recents
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     let video: Video
 
     @Default(.showingAddToPlaylist) var showingAddToPlaylist
     @Default(.videoIDToAddToPlaylist) var videoIDToAddToPlaylist
 
-    @State private var subscribed = false
-
     var body: some View {
         Section {
             openChannelButton
 
             subscriptionButton
-                .opacity(subscribed ? 1 : 1)
 
-            if navigationState.tabSelection == .playlists {
+            if navigation.tabSelection == .playlists {
                 removeFromPlaylistButton
             } else {
                 addToPlaylistButton
@@ -32,9 +30,9 @@ struct VideoContextMenuView: View {
         Button("\(video.author) Channel") {
             let recent = RecentItem(from: video.channel)
             recents.open(recent)
-            navigationState.tabSelection = .recentlyOpened(recent.tag)
-            navigationState.isChannelOpen = true
-            navigationState.sidebarSectionChanged.toggle()
+            navigation.tabSelection = .recentlyOpened(recent.tag)
+            navigation.isChannelOpen = true
+            navigation.sidebarSectionChanged.toggle()
         }
     }
 
@@ -45,13 +43,13 @@ struct VideoContextMenuView: View {
                     #if os(tvOS)
                         subscriptions.unsubscribe(video.channel.id)
                     #else
-                        navigationState.presentUnsubscribeAlert(video.channel)
+                        navigation.presentUnsubscribeAlert(video.channel)
                     #endif
                 }
             } else {
                 Button("Subscribe") {
                     subscriptions.subscribe(video.channel.id) {
-                        navigationState.sidebarSectionChanged.toggle()
+                        navigation.sidebarSectionChanged.toggle()
                     }
                 }
             }
@@ -67,9 +65,9 @@ struct VideoContextMenuView: View {
 
     var removeFromPlaylistButton: some View {
         Button("Remove from playlist", role: .destructive) {
-            let resource = InvidiousAPI.shared.playlistVideo(Defaults[.selectedPlaylistID]!, video.indexID!)
+            let resource = api.playlistVideo(Defaults[.selectedPlaylistID]!, video.indexID!)
             resource.request(.delete).onSuccess { _ in
-                InvidiousAPI.shared.playlists.load()
+                api.playlists.load()
             }
         }
     }

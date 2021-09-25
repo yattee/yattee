@@ -4,8 +4,11 @@ import SwiftUI
 struct ChannelVideosView: View {
     let channel: Channel
 
-    @EnvironmentObject<NavigationState> private var navigationState
-    @EnvironmentObject<Subscriptions> private var subscriptions
+    @StateObject private var store = Store<Channel>()
+
+    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Environment(\.inNavigationView) private var inNavigationView
 
@@ -14,15 +17,7 @@ struct ChannelVideosView: View {
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
-    @ObservedObject private var store = Store<Channel>()
-
     @Namespace private var focusNamespace
-
-    init(_ channel: Channel) {
-        self.channel = channel
-
-        resource.addObserver(store)
-    }
 
     var body: some View {
         VStack {
@@ -55,12 +50,11 @@ struct ChannelVideosView: View {
         #endif
         #if !os(tvOS)
             .toolbar {
-                ToolbarItem(placement: subscriptionToolbarItemPlacement) {
+                ToolbarItem {
                     HStack {
-                        if let channel = store.item, let subscribers = channel.subscriptionsString {
-                            Text("**\(subscribers)** subscribers")
-                                .foregroundColor(.secondary)
-                        }
+                        Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
+                            .foregroundColor(.secondary)
+                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
 
                         subscriptionToggleButton
                     }
@@ -77,13 +71,19 @@ struct ChannelVideosView: View {
         #endif
         .modifier(UnsubscribeAlertModifier())
             .onAppear {
-                resource.loadIfNeeded()
+                if store.item.isNil {
+                    resource.addObserver(store)
+                    resource.load()
+                }
             }
             .navigationTitle(navigationTitle)
     }
 
     var resource: Resource {
-        InvidiousAPI.shared.channel(channel.id)
+        let resource = api.channel(channel.id)
+        resource.addObserver(store)
+
+        return resource
     }
 
     #if !os(tvOS)
@@ -94,7 +94,7 @@ struct ChannelVideosView: View {
                 }
             #endif
 
-            return .status
+            return .automatic
         }
     #endif
 
@@ -102,12 +102,12 @@ struct ChannelVideosView: View {
         Group {
             if subscriptions.isSubscribing(channel.id) {
                 Button("Unsubscribe") {
-                    navigationState.presentUnsubscribeAlert(channel)
+                    navigation.presentUnsubscribeAlert(channel)
                 }
             } else {
                 Button("Subscribe") {
                     subscriptions.subscribe(channel.id) {
-                        navigationState.sidebarSectionChanged.toggle()
+                        navigation.sidebarSectionChanged.toggle()
                     }
                 }
             }

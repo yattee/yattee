@@ -72,6 +72,6 @@ struct VideoCellsView_Previews: PreviewProvider {
     static var previews: some View {
         VideosView(videos: Video.allFixtures)
             .frame(minWidth: 1000)
-            .environmentObject(NavigationState())
+            .environmentObject(NavigationModel())
     }
 }

@@ -2,21 +2,22 @@ import Siesta
 import SwiftUI
 
 struct PopularView: View {
-    @ObservedObject private var store = Store<[Video]>()
+    @StateObject private var store = Store<[Video]>()
 
-    var resource = InvidiousAPI.shared.popular
+    @EnvironmentObject<InvidiousAPI> private var api
 
-    init() {
-        resource.addObserver(store)
+    var resource: Resource {
+        api.popular
     }
 
     var body: some View {
         VideosView(videos: store.collection)
+            .onAppear {
+                resource.addObserver(store)
+                resource.loadIfNeeded()
+            }
         #if !os(tvOS)
             .navigationTitle("Popular")
         #endif
-        .onAppear {
-            resource.loadIfNeeded()
-        }
     }
 }

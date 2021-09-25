@@ -2,30 +2,23 @@ import Defaults
 import Siesta
 import SwiftUI
 
-final class SearchState: ObservableObject {
+final class SearchModel: ObservableObject {
     @Published var store = Store<[Video]>()
+
+    @Published var api: InvidiousAPI!
     @Published var query = SearchQuery()
-
     @Published var queryText = ""
-
     @Published var querySuggestions = Store<[String]>()
 
     private var previousResource: Resource?
     private var resource: Resource!
 
-    init() {
-        let newQuery = query
-        query = newQuery
-
-        resource = InvidiousAPI.shared.search(newQuery)
-    }
-
     var isLoading: Bool {
         resource.isLoading
     }
 
-    func loadQuerySuggestions(_ query: String) {
-        let resource = InvidiousAPI.shared.searchSuggestions(query: query)
+    func loadSuggestions(_ query: String) {
+        let resource = api.searchSuggestions(query: query)
 
         resource.addObserver(querySuggestions)
         resource.loadIfNeeded()
@@ -44,7 +37,7 @@ final class SearchState: ObservableObject {
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
         changeHandler(query)
 
-        let newResource = InvidiousAPI.shared.search(query)
+        let newResource = api.search(query)
         guard newResource != previousResource else {
             return
         }
@@ -60,7 +53,7 @@ final class SearchState: ObservableObject {
     func resetQuery(_ query: SearchQuery) {
         self.query = query
 
-        let newResource = InvidiousAPI.shared.search(query)
+        let newResource = api.search(query)
         guard newResource != previousResource else {
             return
         }
