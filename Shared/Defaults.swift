@@ -6,6 +6,7 @@ extension Defaults.Keys {
     #endif
 
     static let instances = Key<[Instance]>("instances", default: [])
+    static let accounts = Key<[Instance.Account]>("accounts", default: [])
 
     static let selectedPlaylistID = Key<String?>("selectedPlaylistID")
     static let showingAddToPlaylist = Key<Bool>("showingAddToPlaylist", default: false)

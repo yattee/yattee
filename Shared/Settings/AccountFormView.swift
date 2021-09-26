@@ -111,7 +111,7 @@ struct AccountFormView: View {
             return
         }
 
-        let account = instances.addAccount(instance: instance, name: name.serializationSafe, sid: sid)
+        let account = instances.addAccount(instance: instance, name: name, sid: sid)
         selectedAccount?.wrappedValue = account
 
         dismiss()
@@ -120,7 +120,7 @@ struct AccountFormView: View {
     private var validator: AccountValidator {
         AccountValidator(
             url: instance.url,
-            account: Instance.Account(url: instance.url, sid: sid),
+            account: Instance.Account(instanceID: instance.id, url: instance.url, sid: sid),
             id: $sid,
             valid: $valid,
             validated: $validated

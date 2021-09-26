@@ -12,6 +12,7 @@ struct AccountSettingsView: View {
     var body: some View {
         HStack {
             Text(account.description)
+
             Spacer()
 
             HStack {
@@ -23,7 +24,7 @@ struct AccountSettingsView: View {
                     isPresented: $presentingRemovalConfirmationDialog
                 ) {
                     Button("Remove", role: .destructive) {
-                        instances.removeAccount(instance: instance, account: account)
+                        instances.removeAccount(account)
                     }
                 }
                 #if os(macOS)

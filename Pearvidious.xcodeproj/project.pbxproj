@@ -80,9 +80,6 @@
 		375168D62700FAFF008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
 		375168D72700FDB8008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
 		375168D82700FDB9008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
-		375168DB27010806008F96A6 /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D92701070E008F96A6 /* String+Format.swift */; };
-		375168DC27010807008F96A6 /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D92701070E008F96A6 /* String+Format.swift */; };
-		375168DD27010808008F96A6 /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D92701070E008F96A6 /* String+Format.swift */; };
 		375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
 		375DFB5926F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
 		375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
@@ -332,7 +329,6 @@
 		37484C2C26FC844700287258 /* InstanceDetailsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceDetailsSettingsView.swift; sourceTree = "<group>"; };
 		37484C3026FCB8F900287258 /* AccountValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidator.swift; sourceTree = "<group>"; };
 		375168D52700FAFF008F96A6 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
-		375168D92701070E008F96A6 /* String+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Format.swift"; sourceTree = "<group>"; };
 		375DFB5726F9DA010013F468 /* InstancesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesModel.swift; sourceTree = "<group>"; };
 		3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnvironmentValues.swift; sourceTree = "<group>"; };
 		3761AC0E26F0F9A600AA496F /* UnsubscribeAlertModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnsubscribeAlertModifier.swift; sourceTree = "<group>"; };
@@ -648,7 +644,6 @@
 				379775922689365600DD52A8 /* Array+Next.swift */,
 				376578842685429C00D4EA09 /* CaseIterable+Next.swift */,
 				37BA794E26DC3E0E002A0235 /* Int+Format.swift */,
-				375168D92701070E008F96A6 /* String+Format.swift */,
 				377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */,
 			);
 			path = Extensions;
@@ -1079,7 +1074,6 @@
 				37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37754C9D26B7500000DBD602 /* VideosView.swift in Sources */,
 				37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
-				375168DD27010808008F96A6 /* String+Format.swift in Sources */,
 				37484C1926FC837400287258 /* PlaybackSettingsView.swift in Sources */,
 				3711403F26B206A6005B3555 /* SearchModel.swift in Sources */,
 				37F64FE426FE70A60081B69E /* RedrawOnViewModifier.swift in Sources */,
@@ -1214,7 +1208,6 @@
 				37754C9E26B7500000DBD602 /* VideosView.swift in Sources */,
 				3797758C2689345500DD52A8 /* Store.swift in Sources */,
 				37141674267A8E10006CA35D /* Country.swift in Sources */,
-				375168DC27010807008F96A6 /* String+Format.swift in Sources */,
 				37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37BA794C26DC30EC002A0235 /* AppSidebarPlaylists.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
@@ -1295,7 +1288,6 @@
 				37AAF27E26737323007FC770 /* PopularView.swift in Sources */,
 				37A9966026D6F9B9006E3224 /* WatchNowView.swift in Sources */,
 				37484C1F26FC83A400287258 /* InstancesSettingsView.swift in Sources */,
-				375168DB27010806008F96A6 /* String+Format.swift in Sources */,
 				37AAF29A26740A01007FC770 /* VideosListView.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,

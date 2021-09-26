@@ -23,6 +23,14 @@ struct InstancesSettingsView: View {
         instancesModel.find(selectedInstanceID)
     }
 
+    var accounts: [Instance.Account] {
+        guard selectedInstance != nil else {
+            return []
+        }
+
+        return instancesModel.accounts(selectedInstanceID)
+    }
+
     var body: some View {
         Group {
             #if os(iOS)
@@ -74,16 +82,17 @@ struct InstancesSettingsView: View {
                     }
 
                     if let instance = selectedInstance {
-                        if instance.accounts.isEmpty {
+                        if accounts.isEmpty {
                             Text("You have no accounts for this instance")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         } else {
                             Text("Accounts")
                             List(selection: $selectedAccount) {
-                                ForEach(instance.accounts) { account in
+                                ForEach(accounts) { account in
                                     AccountSettingsView(instance: instance, account: account,
                                                         selectedAccount: $selectedAccount)
+                                        .tag(account)
                                 }
                             }
                             #if os(macOS)

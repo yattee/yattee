@@ -3,7 +3,7 @@ import Foundation
 
 final class InstancesModel: ObservableObject {
     var defaultAccount: Instance.Account! {
-        Defaults[.instances].first?.accounts.first
+        Defaults[.accounts].first
     }
 
     func find(_ id: Instance.ID?) -> Instance? {
@@ -15,7 +15,7 @@ final class InstancesModel: ObservableObject {
     }
 
     func accounts(_ id: Instance.ID?) -> [Instance.Account] {
-        find(id)?.accounts ?? []
+        Defaults[.accounts].filter { $0.instanceID == id }
     }
 
     func add(name: String, url: String) -> Instance {
@@ -32,20 +32,15 @@ final class InstancesModel: ObservableObject {
     }
 
     func addAccount(instance: Instance, name: String, sid: String) -> Instance.Account {
-        let account = Instance.Account(name: name, url: instance.url, sid: sid)
-
-        if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
-            Defaults[.instances][index].accounts.append(account)
-        }
+        let account = Instance.Account(instanceID: instance.id, name: name, url: instance.url, sid: sid)
+        Defaults[.accounts].append(account)
 
         return account
     }
 
-    func removeAccount(instance: Instance, account: Instance.Account) {
-        if let instanceIndex = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
-            if let accountIndex = Defaults[.instances][instanceIndex].accounts.firstIndex(where: { $0.id == account.id }) {
-                Defaults[.instances][instanceIndex].accounts.remove(at: accountIndex)
-            }
+    func removeAccount(_ account: Instance.Account) {
+        if let accountIndex = Defaults[.accounts].firstIndex(where: { $0.id == account.id }) {
+            Defaults[.accounts].remove(at: accountIndex)
         }
     }
 }

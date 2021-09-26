@@ -15,12 +15,12 @@ struct InstanceDetailsSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("Accounts")) {
-                ForEach(instance.accounts) { account in
+                ForEach(instances.accounts(instanceID)) { account in
                     Text(account.description)
                     #if !os(tvOS)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button("Remove", role: .destructive) {
-                                instances.removeAccount(instance: instance, account: account)
+                                instances.removeAccount(account)
                                 accountsChanged.toggle()
                             }
                         }

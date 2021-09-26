@@ -2,6 +2,7 @@ import Defaults
 import SwiftUI
 
 struct AccountsMenuView: View {
+    @EnvironmentObject<InstancesModel> private var instancesModel
     @EnvironmentObject<InvidiousAPI> private var api
 
     @Default(.instances) private var instances
@@ -13,7 +14,7 @@ struct AccountsMenuView: View {
                     api.setAccount(instance.anonymousAccount)
                 }
 
-                ForEach(instance.accounts) { account in
+                ForEach(instancesModel.accounts(instance.id)) { account in
                     Button(accountButtonTitle(instance: instance, account: account)) {
                         api.setAccount(account)
                     }
