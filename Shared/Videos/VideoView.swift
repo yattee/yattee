@@ -12,7 +12,6 @@ struct VideoView: View {
     @Environment(\.horizontalCells) private var horizontalCells
 
     var video: Video
-    var layout: ListingLayout
 
     var body: some View {
         Group {
@@ -26,27 +25,23 @@ struct VideoView: View {
                 }
             }
         }
-        .modifier(ButtonStyleModifier(layout: layout))
+        .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: 12))
         .contextMenu { VideoContextMenuView(video: video) }
     }
 
     var content: some View {
         VStack {
-            if layout == .cells {
-                #if os(iOS)
-                    if verticalSizeClass == .compact, !horizontalCells {
-                        horizontalRow
-                            .padding(.vertical, 4)
-                    } else {
-                        verticalRow
-                    }
-                #else
+            #if os(iOS)
+                if verticalSizeClass == .compact, !horizontalCells {
+                    horizontalRow
+                        .padding(.vertical, 4)
+                } else {
                     verticalRow
-                #endif
-            } else {
-                horizontalRow
-            }
+                }
+            #else
+                verticalRow
+            #endif
         }
         #if os(macOS)
             .background()
@@ -222,7 +217,7 @@ struct VideoView: View {
         .background(.gray)
         .mask(RoundedRectangle(cornerRadius: 12))
         #if os(tvOS)
-            .frame(minHeight: layout == .cells ? 320 : 200)
+            .frame(minHeight: 320)
         #endif
         .modifier(AspectRatioModifier())
     }
@@ -245,24 +240,6 @@ struct VideoView: View {
                     content
                         .aspectRatio(1.777, contentMode: .fill)
                 }
-            }
-        }
-    }
-
-    struct ButtonStyleModifier: ViewModifier {
-        var layout: ListingLayout
-
-        func body(content: Content) -> some View {
-            Section {
-                #if os(tvOS)
-                    if layout == .cells {
-                        content.buttonStyle(.plain)
-                    } else {
-                        content
-                    }
-                #else
-                    content.buttonStyle(.plain)
-                #endif
             }
         }
     }

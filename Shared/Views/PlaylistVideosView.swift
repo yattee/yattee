@@ -9,7 +9,7 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        VideosView(videos: playlist.videos)
+        VideosCellsVertical(videos: playlist.videos)
         #if !os(tvOS)
             .navigationTitle("\(playlist.title) Playlist")
         #endif

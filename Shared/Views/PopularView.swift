@@ -11,7 +11,7 @@ struct PopularView: View {
     }
 
     var body: some View {
-        VideosView(videos: store.collection)
+        VideosCellsVertical(videos: store.collection)
             .onAppear {
                 resource.addObserver(store)
                 resource.loadIfNeeded()

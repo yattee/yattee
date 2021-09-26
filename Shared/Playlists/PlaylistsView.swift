@@ -36,7 +36,7 @@ struct PlaylistsView: View {
                 } else if store.collection.isEmpty {
                     hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
                 } else {
-                    VideosView(videos: videos)
+                    VideosCellsVertical(videos: videos)
                 }
             }
         }

@@ -12,7 +12,7 @@ struct SubscriptionsView: View {
 
     var body: some View {
         SignInRequiredView(title: "Subscriptions") {
-            VideosView(videos: store.collection)
+            VideosCellsVertical(videos: store.collection)
                 .onAppear {
                     loadResources()
                 }

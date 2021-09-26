@@ -13,7 +13,7 @@ struct VideosCellsVertical: View {
             ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
                 LazyVGrid(columns: items, alignment: .center) {
                     ForEach(videos) { video in
-                        VideoView(video: video, layout: .cells)
+                        VideoView(video: video)
                         #if os(tvOS)
                             .padding(.horizontal)
                         #endif
@@ -35,6 +35,10 @@ struct VideosCellsVertical: View {
             #endif
         }
         .edgesIgnoringSafeArea(.horizontal)
+        #if os(macOS)
+            .background()
+            .frame(minWidth: 360)
+        #endif
     }
 
     var items: [GridItem] {
@@ -68,9 +72,9 @@ struct VideosCellsVertical: View {
     }
 }
 
-struct VideoCellsView_Previews: PreviewProvider {
+struct VideoCellsVertical_Previews: PreviewProvider {
     static var previews: some View {
-        VideosView(videos: Video.allFixtures)
+        VideosCellsVertical(videos: Video.allFixtures)
             .frame(minWidth: 1000)
             .environmentObject(NavigationModel())
     }

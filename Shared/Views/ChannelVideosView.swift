@@ -39,7 +39,7 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            VideosView(videos: store.item?.videos ?? [])
+            VideosCellsVertical(videos: store.item?.videos ?? [])
 
             #if !os(iOS)
                 .prefersDefaultFocus(in: focusNamespace)

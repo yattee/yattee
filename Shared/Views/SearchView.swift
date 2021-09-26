@@ -37,7 +37,7 @@ struct SearchView: View {
                     }
                     .edgesIgnoringSafeArea(.horizontal)
                 #else
-                    VideosView(videos: state.store.collection)
+                VideosCellsVertical(videos: state.store.collection)
                 #endif
 
                 if noResults {

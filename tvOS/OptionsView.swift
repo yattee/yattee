@@ -4,8 +4,6 @@ import SwiftUI
 struct OptionsView: View {
     @EnvironmentObject<NavigationModel> private var navigation
 
-    @Default(.layout) private var layout
-
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -18,7 +16,7 @@ struct OptionsView: View {
                         Spacer()
 
                         CoverSectionView("View Options") {
-                            CoverSectionRowView("Show videos as") { nextLayoutButton }
+//                            CoverSectionRowView("Show videos as") { nextLayoutButton }
                         }
 
                         CoverSectionView(divider: false) {
@@ -38,19 +36,6 @@ struct OptionsView: View {
             }
         }
         .background(.thinMaterial)
-    }
-
-    var nextLayoutButton: some View {
-        Button(layout.name) {
-            self.layout = layout.next()
-        }
-        .contextMenu {
-            ForEach(ListingLayout.allCases) { layout in
-                Button(layout.name) {
-                    Defaults[.layout] = layout
-                }
-            }
-        }
     }
 }
 

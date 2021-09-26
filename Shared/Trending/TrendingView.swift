@@ -31,7 +31,7 @@ struct TrendingView: View {
                     Text("Loading")
                 }
 
-                VideosView(videos: store.collection)
+                VideosCellsVertical(videos: store.collection)
             }
         }
         #if os(tvOS)

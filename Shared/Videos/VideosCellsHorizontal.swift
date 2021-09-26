@@ -13,7 +13,7 @@ struct VideosCellsHorizontal: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 20) {
                     ForEach(videos) { video in
-                        VideoView(video: video, layout: .cells)
+                        VideoView(video: video)
                             .environment(\.horizontalCells, true)
                         #if os(tvOS)
                             .frame(width: 580)
