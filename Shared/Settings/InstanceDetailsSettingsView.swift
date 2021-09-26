@@ -15,7 +15,7 @@ struct InstanceDetailsSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("Accounts")) {
-                ForEach(instance.accounts, id: \.self) { account in
+                ForEach(instance.accounts) { account in
                     Text(account.description)
                     #if !os(tvOS)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {

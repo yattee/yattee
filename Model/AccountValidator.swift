@@ -2,7 +2,7 @@ import Foundation
 import Siesta
 import SwiftUI
 
-final class InstanceAccountValidator: Service {
+final class AccountValidator: Service {
     let url: String
     let account: Instance.Account?
 
@@ -14,14 +14,14 @@ final class InstanceAccountValidator: Service {
     init(
         url: String,
         account: Instance.Account? = nil,
-        formObjectID: Binding<String>,
+        id: Binding<String>,
         valid: Binding<Bool>,
         validated: Binding<Bool>,
         error: Binding<String?>? = nil
     ) {
         self.url = url
         self.account = account
-        self.formObjectID = formObjectID
+        formObjectID = id
         self.valid = valid
         self.validated = validated
         self.error = error

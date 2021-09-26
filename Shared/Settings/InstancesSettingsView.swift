@@ -27,7 +27,7 @@ struct InstancesSettingsView: View {
         Group {
             #if os(iOS)
                 Section(header: instancesHeader) {
-                    ForEach(instances, id: \.self) { instance in
+                    ForEach(instances) { instance in
                         Button(action: {
                             self.selectedInstanceID = instance.id
                             self.presentingInstanceDetails = true
@@ -62,7 +62,7 @@ struct InstancesSettingsView: View {
 
                     if !instances.isEmpty {
                         Picker("Instance", selection: $selectedInstanceID) {
-                            ForEach(instances, id: \.url) { instance in
+                            ForEach(instances) { instance in
                                 Text(instance.description).tag(Optional(instance.id))
                             }
                         }
@@ -81,7 +81,7 @@ struct InstancesSettingsView: View {
                         } else {
                             Text("Accounts")
                             List(selection: $selectedAccount) {
-                                ForEach(instance.accounts, id: \.self) { account in
+                                ForEach(instance.accounts) { account in
                                     AccountSettingsView(instance: instance, account: account,
                                                         selectedAccount: $selectedAccount)
                                 }

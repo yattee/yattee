@@ -12,13 +12,13 @@ struct SearchView: View {
     @State private var presentingClearConfirmation = false
     @State private var recentsChanged = false
 
+    @State private var searchDebounce = Debounce()
+    @State private var recentsDebounce = Debounce()
+
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
-
-    @State private var searchDebounceTimer: Timer?
-    @State private var recentSearchDebounceTimer: Timer?
 
     init(_ query: SearchQuery? = nil) {
         self.query = query
@@ -26,7 +26,7 @@ struct SearchView: View {
 
     var body: some View {
         VStack {
-            if navigationStyle == .tab && state.queryText.isEmpty {
+            if showRecentQueries {
                 recentQueries
             } else {
                 #if os(tvOS)
@@ -40,15 +40,11 @@ struct SearchView: View {
                     VideosView(videos: state.store.collection)
                 #endif
 
-                if state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty {
+                if noResults {
                     Text("No results")
 
                     if searchFiltersActive {
-                        Button("Reset search filters") {
-                            self.searchSortOrder = .relevance
-                            self.searchDate = .any
-                            self.searchDuration = .any
-                        }
+                        Button("Reset search filters", action: resetFilters)
                     }
 
                     Spacer()
@@ -101,14 +97,14 @@ struct SearchView: View {
             state.loadSuggestions(newQuery)
 
             #if os(tvOS)
-                searchDebounceTimer?.invalidate()
-                recentSearchDebounceTimer?.invalidate()
+                searchDebounce.invalidate()
+                recentsDebounce.invalidate()
 
-                searchDebounceTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+                searchDebounce.debouncing(2) {
                     state.changeQuery { query in query.query = newQuery }
                 }
 
-                recentSearchDebounceTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { _ in
+                recentsDebounce.debouncing(10) {
                     recents.addQuery(newQuery)
                 }
             #endif
@@ -147,8 +143,22 @@ struct SearchView: View {
         #endif
     }
 
-    var filtersActive: Bool {
+    fileprivate var showRecentQueries: Bool {
+        navigationStyle == .tab && state.queryText.isEmpty
+    }
+
+    fileprivate var filtersActive: Bool {
         searchDuration != .any || searchDate != .any
+    }
+
+    fileprivate func resetFilters() {
+        searchSortOrder = .relevance
+        searchDate = .any
+        searchDuration = .any
+    }
+
+    fileprivate var noResults: Bool {
+        state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty
     }
 
     var recentQueries: some View {
@@ -282,6 +292,7 @@ struct SearchView: View {
                     searchSortOrderButton
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
+
                 HStack(spacing: 30) {
                     Text("Duration")
                         .foregroundColor(.secondary)

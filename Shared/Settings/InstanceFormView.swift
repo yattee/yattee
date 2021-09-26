@@ -9,6 +9,7 @@ struct InstanceFormView: View {
     @State private var valid = false
     @State private var validated = false
     @State private var validationError: String?
+    @State private var validationDebounce = Debounce()
 
     @FocusState private var nameFieldFocused: Bool
 
@@ -78,14 +79,13 @@ struct InstanceFormView: View {
             .padding(.vertical)
         #else
             .frame(width: 400, height: 150)
-
         #endif
     }
 
-    var validator: InstanceAccountValidator {
-        InstanceAccountValidator(
+    var validator: AccountValidator {
+        AccountValidator(
             url: url,
-            formObjectID: $url,
+            id: $url,
             valid: $valid,
             validated: $validated,
             error: $validationError
@@ -93,15 +93,16 @@ struct InstanceFormView: View {
     }
 
     func validate() {
-        valid = false
-        validated = false
-        validationError = nil
+        validationDebounce.invalidate()
 
         guard !url.isEmpty else {
+            validator.reset()
             return
         }
 
-        validator.validateInstance()
+        validationDebounce.debouncing(2) {
+            validator.validateInstance()
+        }
     }
 
     func initializeForm() {

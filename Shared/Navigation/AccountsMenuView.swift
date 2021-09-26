@@ -8,12 +8,12 @@ struct AccountsMenuView: View {
 
     var body: some View {
         Menu {
-            ForEach(instances, id: \.self) { instance in
+            ForEach(instances) { instance in
                 Button(accountButtonTitle(instance: instance, account: instance.anonymousAccount)) {
                     api.setAccount(instance.anonymousAccount)
                 }
 
-                ForEach(instance.accounts, id: \.self) { account in
+                ForEach(instance.accounts) { account in
                     Button(accountButtonTitle(instance: instance, account: account)) {
                         api.setAccount(account)
                     }
