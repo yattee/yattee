@@ -19,6 +19,10 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
             self.sid = sid
         }
 
+        var instance: Instance {
+            Defaults[.instances].first { $0.id == instanceID }!
+        }
+
         var anonymizedSID: String {
             guard sid.count > 3 else {
                 return ""
@@ -35,42 +39,42 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         func hash(into hasher: inout Hasher) {
             hasher.combine(sid)
         }
-    }
 
-    struct AccountsBridge: Defaults.Bridge {
-        typealias Value = Account
-        typealias Serializable = [String: String]
+        struct AccountsBridge: Defaults.Bridge {
+            typealias Value = Account
+            typealias Serializable = [String: String]
 
-        func serialize(_ value: Value?) -> Serializable? {
-            guard let value = value else {
-                return nil
+            func serialize(_ value: Value?) -> Serializable? {
+                guard let value = value else {
+                    return nil
+                }
+
+                return [
+                    "id": value.id.uuidString,
+                    "instanceID": value.instanceID.uuidString,
+                    "name": value.name ?? "",
+                    "url": value.url,
+                    "sid": value.sid
+                ]
             }
 
-            return [
-                "id": value.id.uuidString,
-                "instanceID": value.instanceID.uuidString,
-                "name": value.name ?? "",
-                "url": value.url,
-                "sid": value.sid
-            ]
-        }
+            func deserialize(_ object: Serializable?) -> Value? {
+                guard
+                    let object = object,
+                    let id = object["id"],
+                    let instanceID = object["instanceID"],
+                    let url = object["url"],
+                    let sid = object["sid"]
+                else {
+                    return nil
+                }
 
-        func deserialize(_ object: Serializable?) -> Value? {
-            guard
-                let object = object,
-                let id = object["id"],
-                let instanceID = object["instanceID"],
-                let url = object["url"],
-                let sid = object["sid"]
-            else {
-                return nil
+                let uuid = UUID(uuidString: id)
+                let instanceUUID = UUID(uuidString: instanceID)!
+                let name = object["name"] ?? ""
+
+                return Account(id: uuid, instanceID: instanceUUID, name: name, url: url, sid: sid)
             }
-
-            let uuid = UUID(uuidString: id)
-            let instanceUUID = UUID(uuidString: instanceID)!
-            let name = object["name"] ?? ""
-
-            return Account(id: uuid, instanceID: instanceUUID, name: name, url: url, sid: sid)
         }
     }
 

@@ -1,7 +1,7 @@
+import Defaults
 import SwiftUI
 
 struct AccountSettingsView: View {
-    let instance: Instance
     let account: Instance.Account
     @Binding var selectedAccount: Instance.Account?
 
@@ -11,11 +11,22 @@ struct AccountSettingsView: View {
 
     var body: some View {
         HStack {
-            Text(account.description)
+            HStack(spacing: 2) {
+                Text(account.description)
+                if instances.defaultAccount == account {
+                    Text("— default")
+                        .foregroundColor(.secondary)
+                }
+            }
 
             Spacer()
 
             HStack {
+                if instances.defaultAccount != account {
+                    Button("Make default", action: makeDefault)
+                } else {
+                    Button("Reset default", action: resetDefault)
+                }
                 Button("Remove", role: .destructive) {
                     presentingRemovalConfirmationDialog = true
                 }
@@ -33,5 +44,13 @@ struct AccountSettingsView: View {
             }
             .opacity(account == selectedAccount ? 1 : 0)
         }
+    }
+
+    private func makeDefault() {
+        instances.setDefaultAccount(account)
+    }
+
+    private func resetDefault() {
+        instances.resetDefaultAccount()
     }
 }

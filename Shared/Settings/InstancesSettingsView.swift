@@ -34,7 +34,7 @@ struct InstancesSettingsView: View {
     var body: some View {
         Group {
             #if os(iOS)
-                Section(header: instancesHeader) {
+                Section(header: instancesHeader, footer: instancesFooter) {
                     ForEach(instances) { instance in
                         Button(action: {
                             self.selectedInstanceID = instance.id
@@ -81,7 +81,7 @@ struct InstancesSettingsView: View {
                             .foregroundColor(.secondary)
                     }
 
-                    if let instance = selectedInstance {
+                    if !selectedInstance.isNil {
                         if accounts.isEmpty {
                             Text("You have no accounts for this instance")
                                 .font(.caption)
@@ -90,7 +90,7 @@ struct InstancesSettingsView: View {
                             Text("Accounts")
                             List(selection: $selectedAccount) {
                                 ForEach(accounts) { account in
-                                    AccountSettingsView(instance: instance, account: account,
+                                    AccountSettingsView(account: account,
                                                         selectedAccount: $selectedAccount)
                                         .tag(account)
                                 }
@@ -131,6 +131,9 @@ struct InstancesSettingsView: View {
                     Button("Add Instance...") {
                         presentingInstanceForm = true
                     }
+
+                    defaultAccountSection
+                        .padding(.top, 10)
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
@@ -154,6 +157,24 @@ struct InstancesSettingsView: View {
         Text("Instances").background(instanceDetailsNavigationLink)
     }
 
+    var instancesFooter: some View {
+        Group {
+            if let account = instancesModel.defaultAccount {
+                HStack(spacing: 2) {
+                    Text("**\(account.description)** account on instance **\(account.instance.shortDescription)** is your default.")
+                        .truncationMode(.middle)
+                        .lineLimit(1)
+
+                    Button("Reset", action: resetDefaultAccount)
+                        .buttonStyle(.plain)
+                        .foregroundColor(.red)
+                }
+            } else {
+                Text("You have no default account set")
+            }
+        }
+    }
+
     var instanceDetailsNavigationLink: some View {
         NavigationLink(
             isActive: $presentingInstanceDetails,
@@ -162,7 +183,30 @@ struct InstancesSettingsView: View {
         )
     }
 
-    func setSelectedInstanceToFormInstance() {
+    private var defaultAccountSection: some View {
+        Group {
+            if let account = instancesModel.defaultAccount {
+                HStack(spacing: 2) {
+                    Text("**\(account.description)** account on instance **\(account.instance.shortDescription)** is your default.")
+                        .truncationMode(.middle)
+                        .lineLimit(1)
+                    Button("Reset", action: resetDefaultAccount)
+                        .buttonStyle(.plain)
+                        .foregroundColor(.red)
+                }
+            } else {
+                Text("You have no default account set")
+            }
+        }
+        .font(.caption2)
+        .foregroundColor(.secondary)
+    }
+
+    private func resetDefaultAccount() {
+        instancesModel.resetDefaultAccount()
+    }
+
+    private func setSelectedInstanceToFormInstance() {
         if let id = savedFormInstanceID {
             selectedInstanceID = id
             savedFormInstanceID = nil
@@ -172,6 +216,10 @@ struct InstancesSettingsView: View {
 
 struct InstancesSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        InstancesSettingsView()
+        VStack {
+            InstancesSettingsView()
+        }
+        .frame(width: 400, height: 270)
+        .environmentObject(InstancesModel())
     }
 }

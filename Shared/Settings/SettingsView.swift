@@ -29,28 +29,27 @@ struct SettingsView: View {
                 .tag(Tabs.playback)
             }
             .padding(20)
-            .frame(width: 400, height: 270)
+            .frame(width: 400, height: 310)
         #else
             NavigationView {
                 List {
                     InstancesSettingsView()
                     PlaybackSettingsView()
                 }
+                .navigationTitle("Settings")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") {
+                            dismiss()
+                        }
+                        #if !os(tvOS)
+                            .keyboardShortcut(.cancelAction)
+                        #endif
+                    }
+                }
                 #if os(iOS)
                     .listStyle(.insetGrouped)
                 #endif
-
-                .navigationTitle("Settings")
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Done") {
-                                dismiss()
-                            }
-                            #if !os(tvOS)
-                                .keyboardShortcut(.cancelAction)
-                            #endif
-                        }
-                    }
             }
         #endif
     }
