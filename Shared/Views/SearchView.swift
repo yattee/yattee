@@ -5,9 +5,9 @@ import SwiftUI
 struct SearchView: View {
     private var query: SearchQuery?
 
-    @State private var searchSortOrder: SearchQuery.SortOrder = .relevance
-    @State private var searchDate: SearchQuery.Date?
-    @State private var searchDuration: SearchQuery.Duration?
+    @State private var searchSortOrder = SearchQuery.SortOrder.relevance
+    @State private var searchDate = SearchQuery.Date.any
+    @State private var searchDuration = SearchQuery.Duration.any
 
     @State private var presentingClearConfirmation = false
     @State private var recentsChanged = false
@@ -17,20 +17,28 @@ struct SearchView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
+    @State private var searchDebounceTimer: Timer?
+    @State private var recentSearchDebounceTimer: Timer?
+
     init(_ query: SearchQuery? = nil) {
         self.query = query
     }
 
     var body: some View {
-        Group {
+        VStack {
             if navigationStyle == .tab && state.queryText.isEmpty {
-                VStack {
-                    if !recentItems.isEmpty {
-                        recentQueries
-                    }
-                }
+                recentQueries
             } else {
-                VideosView(videos: state.store.collection)
+                #if os(tvOS)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        filtersHorizontalStack
+
+                        VideosCellsHorizontal(videos: state.store.collection)
+                    }
+                    .edgesIgnoringSafeArea(.horizontal)
+                #else
+                    VideosView(videos: state.store.collection)
+                #endif
 
                 if state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty {
                     Text("No results")
@@ -38,8 +46,8 @@ struct SearchView: View {
                     if searchFiltersActive {
                         Button("Reset search filters") {
                             self.searchSortOrder = .relevance
-                            self.searchDate = nil
-                            self.searchDuration = nil
+                            self.searchDate = .any
+                            self.searchDuration = .any
                         }
                     }
 
@@ -48,53 +56,29 @@ struct SearchView: View {
             }
         }
         .toolbar {
-            #if os(iOS)
-                ToolbarItemGroup(placement: .bottomBar) {
+            #if !os(tvOS)
+                ToolbarItemGroup(placement: toolbarPlacement) {
                     Section {
-                        if !state.queryText.isEmpty {
-                            Text("Sort:")
-                                .foregroundColor(.secondary)
+                        #if os(macOS)
+                            HStack {
+                                Text("Sort:")
+                                    .foregroundColor(.secondary)
 
-                            Menu(searchSortOrder.name) {
-                                ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
-                                    Button(sortOrder.name) {
-                                        searchSortOrder = sortOrder
-                                    }
-                                }
+                                searchSortOrderPicker
                             }
-
-                            Spacer()
-
-                            Text("Filter:")
-                                .foregroundColor(.secondary)
-
-                            Menu(searchDuration?.name ?? "Duration") {
-                                Button("All") {
-                                    searchDuration = nil
-                                }
-                                ForEach(SearchQuery.Duration.allCases) { duration in
-                                    Button(duration.name) {
-                                        searchDuration = duration
-                                    }
-                                }
+                        #else
+                            Menu("Sort: \(searchSortOrder.name)") {
+                                searchSortOrderPicker
                             }
-                            .foregroundColor(searchDuration.isNil ? .secondary : .accentColor)
-
-                            Menu(searchDate?.name ?? "Date") {
-                                Button("All") {
-                                    searchDate = nil
-                                }
-                                ForEach(SearchQuery.Date.allCases) { date in
-                                    Button(date.name) {
-                                        searchDate = date
-                                    }
-                                }
-                            }
-                            .foregroundColor(searchDate.isNil ? .secondary : .accentColor)
-                        }
+                        #endif
                     }
                     .transaction { t in t.animation = .none }
+
+                    Spacer()
+
+                    filtersMenu
                 }
+
             #endif
         }
         .onAppear {
@@ -109,8 +93,25 @@ struct SearchView: View {
                     .searchCompletion(suggestion)
             }
         }
-        .onChange(of: state.queryText) { query in
-            state.loadSuggestions(query)
+        .onChange(of: state.queryText) { newQuery in
+            if newQuery.isEmpty {
+                state.resetQuery()
+            }
+
+            state.loadSuggestions(newQuery)
+
+            #if os(tvOS)
+                searchDebounceTimer?.invalidate()
+                recentSearchDebounceTimer?.invalidate()
+
+                searchDebounceTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+                    state.changeQuery { query in query.query = newQuery }
+                }
+
+                recentSearchDebounceTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { _ in
+                    recents.addQuery(newQuery)
+                }
+            #endif
         }
         .onSubmit(of: .search) {
             state.changeQuery { query in query.query = state.queryText }
@@ -138,24 +139,48 @@ struct SearchView: View {
         #endif
     }
 
+    var toolbarPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            .bottomBar
+        #else
+            .automatic
+        #endif
+    }
+
+    var filtersActive: Bool {
+        searchDuration != .any || searchDate != .any
+    }
+
     var recentQueries: some View {
-        List {
-            Section(header: Text("Recents")) {
-                ForEach(recentItems) { item in
-                    Button(item.title) {
-                        state.queryText = item.title
-                        state.changeQuery { query in query.query = item.title }
+        VStack {
+            List {
+                Section(header: Text("Recents")) {
+                    if recentItems.isEmpty {
+                        Text("Search history is empty")
+                            .foregroundColor(.secondary)
                     }
-                    #if os(iOS)
-                        .swipeActions(edge: .trailing) {
-                            clearButton(item)
+                    ForEach(recentItems) { item in
+                        Button(item.title) {
+                            state.queryText = item.title
+                            state.changeQuery { query in query.query = item.title }
                         }
-                    #endif
+                        #if os(iOS)
+                            .swipeActions(edge: .trailing) {
+                                clearButton(item)
+                            }
+                        #elseif os(tvOS)
+                            .contextMenu {
+                                clearButton(item)
+                            }
+                        #endif
+                    }
+                }
+                .redrawOn(change: recentsChanged)
+
+                if !recentItems.isEmpty {
+                    clearAllButton
                 }
             }
-            .redrawOn(change: recentsChanged)
-
-            clearAllButton
         }
         #if os(iOS)
             .listStyle(.insetGrouped)
@@ -183,10 +208,125 @@ struct SearchView: View {
     }
 
     var searchFiltersActive: Bool {
-        searchDate != nil || searchDuration != nil
+        searchDate != .any || searchDuration != .any
     }
 
     var recentItems: [RecentItem] {
         Defaults[.recentlyOpened].filter { $0.type == .query }.reversed()
+    }
+
+    var searchSortOrderPicker: some View {
+        Picker("Sort", selection: $searchSortOrder) {
+            ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
+                Text(sortOrder.name).tag(sortOrder)
+            }
+        }
+    }
+
+    #if os(tvOS)
+        var searchSortOrderButton: some View {
+            Button(action: { self.searchSortOrder = self.searchSortOrder.next() }) { Text(self.searchSortOrder.name)
+                .font(.system(size: 30))
+                .padding(.horizontal)
+                .padding(.vertical, 2)
+            }
+            .buttonStyle(.card)
+            .contextMenu {
+                ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
+                    Button(sortOrder.name) {
+                        self.searchSortOrder = sortOrder
+                    }
+                }
+            }
+        }
+
+        var searchDateButton: some View {
+            Button(action: { self.searchDate = self.searchDate.next() }) {
+                Text(self.searchDate.name)
+                    .font(.system(size: 30))
+                    .padding(.horizontal)
+                    .padding(.vertical, 2)
+            }
+            .buttonStyle(.card)
+            .contextMenu {
+                ForEach(SearchQuery.Date.allCases) { searchDate in
+                    Button(searchDate.name) {
+                        self.searchDate = searchDate
+                    }
+                }
+            }
+        }
+
+        var searchDurationButton: some View {
+            Button(action: { self.searchDuration = self.searchDuration.next() }) {
+                Text(self.searchDate.name)
+                    .font(.system(size: 30))
+                    .padding(.horizontal)
+                    .padding(.vertical, 2)
+            }
+            .buttonStyle(.card)
+            .contextMenu {
+                ForEach(SearchQuery.Duration.allCases) { searchDuration in
+                    Button(searchDuration.name) {
+                        self.searchDuration = searchDuration
+                    }
+                }
+            }
+        }
+
+        var filtersHorizontalStack: some View {
+            HStack {
+                HStack(spacing: 30) {
+                    Text("Sort")
+                        .foregroundColor(.secondary)
+                    searchSortOrderButton
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                HStack(spacing: 30) {
+                    Text("Duration")
+                        .foregroundColor(.secondary)
+                    searchDurationButton
+                }
+                .frame(maxWidth: .infinity)
+
+                HStack(spacing: 30) {
+                    Text("Date")
+                        .foregroundColor(.secondary)
+                    searchDateButton
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.system(size: 20))
+        }
+    #else
+        var filtersMenu: some View {
+            Menu(filtersActive ? "Filter: active" : "Filter") {
+                Picker(selection: $searchDuration, label: Text("Duration")) {
+                    ForEach(SearchQuery.Duration.allCases) { duration in
+                        Text(duration.name).tag(duration)
+                    }
+                }
+
+                Picker("Upload date", selection: $searchDate) {
+                    ForEach(SearchQuery.Date.allCases) { date in
+                        Text(date.name).tag(date)
+                    }
+                }
+            }
+            .foregroundColor(filtersActive ? .accentColor : .secondary)
+            .transaction { t in t.animation = .none }
+        }
+
+    #endif
+}
+
+struct SearchView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            SearchView(SearchQuery(query: "Is Google Evil"))
+                .environmentObject(NavigationModel())
+                .environmentObject(SearchModel())
+                .environmentObject(SubscriptionsModel())
+        }
     }
 }

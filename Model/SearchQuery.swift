@@ -3,7 +3,7 @@ import Foundation
 
 final class SearchQuery: ObservableObject {
     enum Date: String, CaseIterable, Identifiable, DefaultsSerializable {
-        case hour, today, week, month, year
+        case any, hour, today, week, month, year
 
         var id: SearchQuery.Date.RawValue {
             rawValue
@@ -15,7 +15,7 @@ final class SearchQuery: ObservableObject {
     }
 
     enum Duration: String, CaseIterable, Identifiable, DefaultsSerializable {
-        case short, long
+        case any, short, long
 
         var id: SearchQuery.Duration.RawValue {
             rawValue

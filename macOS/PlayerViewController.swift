@@ -24,7 +24,7 @@ final class PlayerViewController: NSViewController {
     override func loadView() {
         playerModel = PlayerModel(playback: playback, api: api, resolution: resolution)
 
-        guard playerModel.player == nil else {
+        guard playerModel.player.isNil else {
             return
         }
 

@@ -4,7 +4,7 @@ import SwiftUI
 struct TVNavigationView: View {
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaybackModel> private var playback
-    @EnvironmentObject<Recents> private var recents
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
     @State private var showingOptions = false
@@ -34,16 +34,6 @@ struct TVNavigationView: View {
                 .tag(TabSelection.playlists)
 
             SearchView()
-                .searchable(text: $search.queryText) {
-                    ForEach(search.querySuggestions.collection, id: \.self) { suggestion in
-                        Text(suggestion)
-                            .searchCompletion(suggestion)
-                    }
-                }
-                .onChange(of: search.queryText) { newQuery in
-                    search.loadSuggestions(newQuery)
-                    search.changeQuery { query in query.query = newQuery }
-                }
                 .tabItem { Image(systemName: "magnifyingglass") }
                 .tag(TabSelection.search)
         }

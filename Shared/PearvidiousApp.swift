@@ -40,7 +40,7 @@ struct PearvidiousApp: App {
         search.api = api
         subscriptions.api = api
 
-        guard api.account == nil, instances.defaultAccount != nil else {
+        guard api.account.isNil, instances.defaultAccount != nil else {
             return
         }
 

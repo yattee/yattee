@@ -5,7 +5,7 @@ import SwiftUI
 final class SearchModel: ObservableObject {
     @Published var store = Store<[Video]>()
 
-    @Published var api: InvidiousAPI!
+    @Published var api = InvidiousAPI()
     @Published var query = SearchQuery()
     @Published var queryText = ""
     @Published var querySuggestions = Store<[String]>()
@@ -30,10 +30,13 @@ final class SearchModel: ObservableObject {
 
         resource = newResource
         resource.addObserver(store)
-        loadResourceIfNeededAndReplaceStore()
+
+        if !query.isEmpty {
+            loadResourceIfNeededAndReplaceStore()
+        }
     }
 
-    func resetQuery(_ query: SearchQuery) {
+    func resetQuery(_ query: SearchQuery = SearchQuery()) {
         self.query = query
 
         let newResource = api.search(query)
@@ -48,7 +51,10 @@ final class SearchModel: ObservableObject {
 
         resource = newResource
         resource.addObserver(store)
-        loadResourceIfNeededAndReplaceStore()
+
+        if !query.isEmpty {
+            loadResourceIfNeededAndReplaceStore()
+        }
     }
 
     func loadResourceIfNeededAndReplaceStore() {

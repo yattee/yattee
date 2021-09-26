@@ -159,7 +159,7 @@ struct PlaylistsView: View {
     }
 
     func selectEditedPlaylist() {
-        if editedPlaylist == nil {
+        if editedPlaylist.isNil {
             selectPlaylist(nil)
         }
 

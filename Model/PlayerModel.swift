@@ -116,7 +116,7 @@ final class PlayerModel: ObservableObject {
             self.saveTime()
             self.player?.replaceCurrentItem(with: self.playerItemWithMetadata(for: stream))
             self.playback.stream = stream
-            if self.timeObserver == nil {
+            if self.timeObserver.isNil {
                 self.addTimeObserver()
             }
             self.player?.play()
@@ -201,7 +201,7 @@ final class PlayerModel: ObservableObject {
     }
 
     fileprivate func composition(for stream: Stream) -> AVMutableComposition {
-        if compositions[stream] == nil {
+        if compositions[stream].isNil {
             compositions[stream] = AVMutableComposition()
         }
 

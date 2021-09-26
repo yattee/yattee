@@ -36,7 +36,6 @@
 		373CFAC226966159003CB2C6 /* CoverSectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */; };
 		373CFAC32696616C003CB2C6 /* CoverSectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */; };
 		373CFAC42696616C003CB2C6 /* CoverSectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */; };
-		373CFAC926966188003CB2C6 /* SearchOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAC52696617C003CB2C6 /* SearchOptionsView.swift */; };
 		373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFACA26966264003CB2C6 /* SearchQuery.swift */; };
 		373CFACC26966264003CB2C6 /* SearchQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFACA26966264003CB2C6 /* SearchQuery.swift */; };
 		373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFACA26966264003CB2C6 /* SearchQuery.swift */; };
@@ -312,7 +311,6 @@
 		372915E52687E3B900F5A35B /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
 		373CFABD26966115003CB2C6 /* CoverSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverSectionView.swift; sourceTree = "<group>"; };
 		373CFAC126966159003CB2C6 /* CoverSectionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverSectionRowView.swift; sourceTree = "<group>"; };
-		373CFAC52696617C003CB2C6 /* SearchOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchOptionsView.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
 		373CFADA269663F1003CB2C6 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
 		373CFAEA26975CBF003CB2C6 /* PlaylistFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistFormView.swift; sourceTree = "<group>"; };
@@ -552,15 +550,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		371AAE2926CF143200901972 /* Options */ = {
-			isa = PBXGroup;
-			children = (
-				37B76E95268747C900CE5671 /* OptionsView.swift */,
-				373CFAC52696617C003CB2C6 /* SearchOptionsView.swift */,
-			);
-			path = Options;
-			sourceTree = "<group>";
-		};
 		3748186426A762300084E870 /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
@@ -729,8 +718,8 @@
 		37D4B159267164AE00C925CA /* tvOS */ = {
 			isa = PBXGroup;
 			children = (
-				371AAE2926CF143200901972 /* Options */,
 				373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */,
+				37B76E95268747C900CE5671 /* OptionsView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
 				37D4B15E267164AF00C925CA /* Assets.xcassets */,
 				37D4B1AE26729DEB00C925CA /* Info.plist */,
@@ -1269,7 +1258,6 @@
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */,
 				3748187026A769D60084E870 /* DetailBadge.swift in Sources */,
-				373CFAC926966188003CB2C6 /* SearchOptionsView.swift in Sources */,
 				37A9965C26D6F8CA006E3224 /* VideosCellsHorizontal.swift in Sources */,
 				37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */,
 				376B2E0926F920D600B1D64D /* SignInRequiredView.swift in Sources */,

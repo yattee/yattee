@@ -29,7 +29,9 @@ final class RecentsModel: ObservableObject {
     }
 
     func addQuery(_ query: String) {
-        open(.init(from: query))
+        if !query.isEmpty {
+            open(.init(from: query))
+        }
     }
 
     var presentedChannel: Channel? {

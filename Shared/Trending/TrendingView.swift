@@ -61,6 +61,9 @@ struct TrendingView: View {
                                 .foregroundColor(.secondary)
 
                             categoryButton
+                                // only way to disable Menu animation is to
+                                // force redraw of the view when it changes
+                                .id(UUID())
                         }
 
                         HStack {
@@ -70,7 +73,6 @@ struct TrendingView: View {
                             countryButton
                         }
                     }
-                    .transaction { t in t.animation = .none }
                 }
             }
         #endif
@@ -117,15 +119,9 @@ struct TrendingView: View {
             }
 
         #else
-            Menu(category.name) {
+            Picker("Category", selection: $category) {
                 ForEach(TrendingCategory.allCases) { category in
-                    Button(action: { self.category = category }) {
-                        if category == self.category {
-                            Label(category.name, systemImage: "checkmark")
-                        } else {
-                            Text(category.name)
-                        }
-                    }
+                    Text(category.name).tag(category)
                 }
             }
         #endif

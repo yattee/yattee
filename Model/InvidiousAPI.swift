@@ -225,12 +225,12 @@ final class InvidiousAPI: Service, ObservableObject {
             .withParam("q", searchQuery(query.query))
             .withParam("sort_by", query.sortBy.parameter)
 
-        if let date = query.date?.rawValue {
-            resource = resource.withParam("date", date)
+        if let date = query.date, date != .any {
+            resource = resource.withParam("date", date.rawValue)
         }
 
-        if let duration = query.duration?.rawValue {
-            resource = resource.withParam("duration", duration)
+        if let duration = query.duration, duration != .any {
+            resource = resource.withParam("duration", duration.rawValue)
         }
 
         return resource

@@ -43,7 +43,7 @@ struct AddToPlaylistView: View {
 
                     CoverSectionRowView {
                         Button("Add", action: addToPlaylist)
-                            .disabled(currentPlaylist == nil)
+                            .disabled(currentPlaylist.isNil)
                     }
                 }
 

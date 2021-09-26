@@ -17,8 +17,6 @@ struct OptionsView: View {
                     VStack(alignment: .leading) {
                         Spacer()
 
-                        tabSelectionOptions
-
                         CoverSectionView("View Options") {
                             CoverSectionRowView("Show videos as") { nextLayoutButton }
                         }
@@ -40,18 +38,6 @@ struct OptionsView: View {
             }
         }
         .background(.thinMaterial)
-    }
-
-    var tabSelectionOptions: some View {
-        VStack {
-            switch navigation.tabSelection {
-            case .search:
-                SearchOptionsView()
-
-            default:
-                EmptyView()
-            }
-        }
     }
 
     var nextLayoutButton: some View {
