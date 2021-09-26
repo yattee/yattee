@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TrendingCountry: View {
     static let prompt = "Country Name or Code"
-    @Binding var selectedCountry: Country?
+    @Binding var selectedCountry: Country
 
     @StateObject private var store = Store(Country.allCases)
 
@@ -87,9 +87,7 @@ struct TrendingCountry: View {
     }
 
     func selectCountryAndDismiss(_ country: Country? = nil) {
-        let selected = country ?? selection
-
-        if selected != nil {
+        if let selected = country ?? selection {
             selectedCountry = selected
         }
 

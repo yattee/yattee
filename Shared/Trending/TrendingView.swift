@@ -1,11 +1,13 @@
+import Defaults
 import Siesta
 import SwiftUI
 
 struct TrendingView: View {
     @StateObject private var store = Store<[Video]>()
 
-    @State private var category: TrendingCategory = .default
-    @State private var country: Country! = .pl
+    @Default(.trendingCategory) private var category
+    @Default(.trendingCountry) private var country
+
     @State private var presentingCountrySelection = false
 
     @EnvironmentObject<InvidiousAPI> private var api

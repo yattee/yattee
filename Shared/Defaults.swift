@@ -9,6 +9,9 @@ extension Defaults.Keys {
     static let accounts = Key<[Instance.Account]>("accounts", default: [])
     static let defaultAccountID = Key<String?>("defaultAccountID")
 
+    static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
+    static let trendingCountry = Key<Country>("trendingCountry", default: .us)
+
     static let selectedPlaylistID = Key<String?>("selectedPlaylistID")
     static let showingAddToPlaylist = Key<Bool>("showingAddToPlaylist", default: false)
     static let videoIDToAddToPlaylist = Key<String?>("videoIDToAddToPlaylist")

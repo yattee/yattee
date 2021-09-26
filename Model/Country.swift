@@ -1,6 +1,7 @@
 // swiftlint:disable switch_case_on_newline
+import Defaults
 
-enum Country: String, CaseIterable, Identifiable, Hashable {
+enum Country: String, CaseIterable, Identifiable, Hashable, Defaults.Serializable {
     var id: String {
         rawValue
     }
