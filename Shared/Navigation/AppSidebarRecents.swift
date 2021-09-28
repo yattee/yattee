@@ -2,8 +2,6 @@ import Defaults
 import SwiftUI
 
 struct AppSidebarRecents: View {
-    @Binding var selection: TabSelection?
-
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
 
@@ -17,11 +15,11 @@ struct AppSidebarRecents: View {
                         Group {
                             switch recent.type {
                             case .channel:
-                                RecentNavigationLink(recent: recent, selection: $selection) {
-                                    LazyView(ChannelVideosView(channel: Channel(id: recent.id, name: recent.title)))
+                                RecentNavigationLink(recent: recent) {
+                                    LazyView(ChannelVideosView(channel: recent.channel!))
                                 }
                             case .query:
-                                RecentNavigationLink(recent: recent, selection: $selection, systemImage: "magnifyingglass") {
+                                RecentNavigationLink(recent: recent, systemImage: "magnifyingglass") {
                                     LazyView(SearchView(recent.query!))
                                 }
                             }
@@ -44,28 +42,25 @@ struct AppSidebarRecents: View {
 }
 
 struct RecentNavigationLink<DestinationContent: View>: View {
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
 
     var recent: RecentItem
-    @Binding var selection: TabSelection?
-
     var systemImage: String?
     let destination: DestinationContent
 
     init(
         recent: RecentItem,
-        selection: Binding<TabSelection?>,
         systemImage: String? = nil,
         @ViewBuilder destination: () -> DestinationContent
     ) {
         self.recent = recent
-        _selection = selection
         self.systemImage = systemImage
         self.destination = destination()
     }
 
     var body: some View {
-        NavigationLink(tag: TabSelection.recentlyOpened(recent.tag), selection: $selection) {
+        NavigationLink(tag: TabSelection.recentlyOpened(recent.tag), selection: $navigation.tabSelection) {
             destination
         } label: {
             HStack {

@@ -7,7 +7,7 @@ struct AppTabNavigation: View {
     @EnvironmentObject<RecentsModel> private var recents
 
     var body: some View {
-        TabView(selection: $navigation.tabSelection) {
+        TabView(selection: navigation.tabSelectionBinding) {
             NavigationView {
                 LazyView(WatchNowView())
                     .toolbar { toolbarContent }

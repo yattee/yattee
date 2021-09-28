@@ -6,7 +6,7 @@ final class NavigationModel: ObservableObject {
         case watchNow, subscriptions, popular, trending, playlists, channel(String), playlist(String), recentlyOpened(String), search
     }
 
-    @Published var tabSelection: TabSelection = .watchNow
+    @Published var tabSelection: TabSelection! = .watchNow
 
     @Published var showingVideo = false
     @Published var video: Video?
@@ -32,15 +32,13 @@ final class NavigationModel: ObservableObject {
         showingVideo = true
     }
 
-    var tabSelectionOptionalBinding: Binding<TabSelection?> {
-        Binding<TabSelection?>(
+    var tabSelectionBinding: Binding<TabSelection> {
+        Binding<TabSelection>(
             get: {
-                self.tabSelection
+                self.tabSelection ?? .watchNow
             },
             set: { newValue in
-                if newValue != nil {
-                    self.tabSelection = newValue!
-                }
+                self.tabSelection = newValue
             }
         )
     }

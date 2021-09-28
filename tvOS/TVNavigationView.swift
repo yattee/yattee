@@ -8,7 +8,7 @@ struct TVNavigationView: View {
     @EnvironmentObject<SearchModel> private var search
 
     var body: some View {
-        TabView(selection: $navigation.tabSelection) {
+        TabView(selection: navigation.tabSelectionBinding) {
             WatchNowView()
                 .tabItem { Text("Watch Now") }
                 .tag(TabSelection.watchNow)

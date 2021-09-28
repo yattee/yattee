@@ -4,12 +4,10 @@ struct AppSidebarPlaylists: View {
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaylistsModel> private var playlists
 
-    @Binding var selection: TabSelection?
-
     var body: some View {
         Section(header: Text("Playlists")) {
             ForEach(playlists.playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }) { playlist in
-                NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $selection) {
+                NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $navigation.tabSelection) {
                     LazyView(PlaylistVideosView(playlist))
                 } label: {
                     Label(playlist.title, systemImage: AppSidebarNavigation.symbolSystemImage(playlist.title))
