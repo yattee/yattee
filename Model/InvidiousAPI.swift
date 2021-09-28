@@ -11,15 +11,6 @@ final class InvidiousAPI: Service, ObservableObject {
     @Published var validInstance = true
     @Published var signedIn = true
 
-    init() {
-        super.init()
-
-        #if os(tvOS)
-            // TODO: remove
-            setAccount(.init(id: UUID(), name: "", url: "https://invidious.home.arekf.net", sid: "RpoS7YPPK2-QS81jJF9z4KSQAjmzsOnMpn84c73-GQ8="))
-        #endif
-    }
-
     func setAccount(_ account: Instance.Account) {
         self.account = account
 

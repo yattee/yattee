@@ -7,23 +7,26 @@ final class AccountValidator: Service {
     let account: Instance.Account?
 
     var formObjectID: Binding<String>
-    var valid: Binding<Bool>
-    var validated: Binding<Bool>
+    var isValid: Binding<Bool>
+    var isValidated: Binding<Bool>
+    var isValidating: Binding<Bool>
     var error: Binding<String?>?
 
     init(
         url: String,
         account: Instance.Account? = nil,
         id: Binding<String>,
-        valid: Binding<Bool>,
-        validated: Binding<Bool>,
+        isValid: Binding<Bool>,
+        isValidated: Binding<Bool>,
+        isValidating: Binding<Bool>,
         error: Binding<String?>? = nil
     ) {
         self.url = url
         self.account = account
         formObjectID = id
-        self.valid = valid
-        self.validated = validated
+        self.isValid = isValid
+        self.isValidated = isValidated
+        self.isValidating = isValidating
         self.error = error
 
         super.init(baseURL: url)
@@ -50,18 +53,20 @@ final class AccountValidator: Service {
                     return
                 }
 
-                self.valid.wrappedValue = true
+                self.isValid.wrappedValue = true
                 self.error?.wrappedValue = nil
-                self.validated.wrappedValue = true
             }
             .onFailure { error in
                 guard self.url == self.formObjectID.wrappedValue else {
                     return
                 }
 
-                self.valid.wrappedValue = false
+                self.isValid.wrappedValue = false
                 self.error?.wrappedValue = error.userMessage
-                self.validated.wrappedValue = true
+            }
+            .onCompletion { _ in
+                self.isValidated.wrappedValue = true
+                self.isValidating.wrappedValue = false
             }
     }
 
@@ -75,22 +80,25 @@ final class AccountValidator: Service {
                     return
                 }
 
-                self.valid.wrappedValue = true
-                self.validated.wrappedValue = true
+                self.isValid.wrappedValue = true
             }
             .onFailure { _ in
                 guard self.account!.sid == self.formObjectID.wrappedValue else {
                     return
                 }
 
-                self.valid.wrappedValue = false
-                self.validated.wrappedValue = true
+                self.isValid.wrappedValue = false
+            }
+            .onCompletion { _ in
+                self.isValidated.wrappedValue = true
+                self.isValidating.wrappedValue = false
             }
     }
 
     func reset() {
-        valid.wrappedValue = false
-        validated.wrappedValue = false
+        isValid.wrappedValue = false
+        isValidated.wrappedValue = false
+        isValidating.wrappedValue = false
         error?.wrappedValue = nil
     }
 

@@ -16,7 +16,6 @@ struct InstanceDetailsSettingsView: View {
         List {
             Section(header: Text("Accounts")) {
                 ForEach(instances.accounts(instanceID), id: \.self) { account in
-
                     #if !os(tvOS)
                         HStack(spacing: 2) {
                             Text(account.description)
@@ -27,13 +26,13 @@ struct InstanceDetailsSettingsView: View {
                         }
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             if instances.defaultAccount != account {
-                                Button("Make Default", action: { makeDefault(account) })
+                                Button("Make Default") { makeDefault(account) }
                             } else {
                                 Button("Reset Default", action: resetDefaultAccount)
                             }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button("Remove", role: .destructive, action: { removeAccount(account) })
+                            Button("Remove", role: .destructive) { removeAccount(account) }
                         }
 
                     #else
@@ -47,8 +46,8 @@ struct InstanceDetailsSettingsView: View {
                             }
                         }
                         .contextMenu {
-                            Button("Toggle Default", action: { toggleDefault(account) })
-                            Button("Remove", role: .destructive, action: { removeAccount(account) })
+                            Button("Toggle Default") { toggleDefault(account) }
+                            Button("Remove", role: .destructive) { removeAccount(account) }
                         }
                     #endif
                 }

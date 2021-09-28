@@ -5,7 +5,7 @@ import SwiftUI
 struct AddToPlaylistView: View {
     @EnvironmentObject<PlaylistsModel> private var model
 
-    @State var video: Video
+    let video: Video
 
     @Environment(\.dismiss) private var dismiss
 

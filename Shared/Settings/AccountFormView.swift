@@ -8,8 +8,9 @@ struct AccountFormView: View {
     @State private var name = ""
     @State private var sid = ""
 
-    @State private var valid = false
-    @State private var validated = false
+    @State private var isValid = false
+    @State private var isValidated = false
+    @State private var isValidating = false
     @State private var validationDebounce = Debounce()
 
     @FocusState private var focused: Bool
@@ -82,12 +83,12 @@ struct AccountFormView: View {
 
     var footer: some View {
         HStack {
-            validationStatus
+            ValidationStatusView(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: .constant(nil))
 
             Spacer()
 
             Button("Save", action: submitForm)
-                .disabled(!valid)
+                .disabled(!isValid)
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
@@ -97,17 +98,6 @@ struct AccountFormView: View {
             .padding(.top, 30)
         #endif
         .padding(.horizontal)
-    }
-
-    var validationStatus: some View {
-        HStack(spacing: 4) {
-            Image(systemName: valid ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundColor(valid ? .green : .red)
-            VStack(alignment: .leading) {
-                Text(valid ? "Account found" : "Invalid account details")
-            }
-        }
-        .opacity(validated ? 1 : 0)
     }
 
     private func initializeForm() {
@@ -122,13 +112,15 @@ struct AccountFormView: View {
             return
         }
 
-        validationDebounce.debouncing(2) {
+        isValidating = true
+
+        validationDebounce.debouncing(1) {
             validator.validateAccount()
         }
     }
 
     private func submitForm() {
-        guard valid else {
+        guard isValid else {
             return
         }
 
@@ -143,8 +135,9 @@ struct AccountFormView: View {
             url: instance.url,
             account: Instance.Account(instanceID: instance.id, url: instance.url, sid: sid),
             id: $sid,
-            valid: $valid,
-            validated: $validated
+            isValid: $isValid,
+            isValidated: $isValidated,
+            isValidating: $isValidating
         )
     }
 }

@@ -6,8 +6,9 @@ struct InstanceFormView: View {
     @State private var name = ""
     @State private var url = ""
 
-    @State private var valid = false
-    @State private var validated = false
+    @State private var isValid = false
+    @State private var isValidated = false
+    @State private var isValidating = false
     @State private var validationError: String?
     @State private var validationDebounce = Debounce()
 
@@ -73,21 +74,24 @@ struct InstanceFormView: View {
     private var formFields: some View {
         Group {
             TextField("Name", text: $name, prompt: Text("Instance Name (optional)"))
-
                 .focused($nameFieldFocused)
 
             TextField("URL", text: $url, prompt: Text("https://invidious.home.net"))
+            #if !os(macOS)
+                .autocapitalization(.none)
+                .keyboardType(.URL)
+            #endif
         }
     }
 
     private var footer: some View {
         HStack(alignment: .center) {
-            validationStatus
+            ValidationStatusView(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: $validationError)
 
             Spacer()
 
             Button("Save", action: submitForm)
-                .disabled(!valid)
+                .disabled(!isValid)
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
@@ -98,31 +102,13 @@ struct InstanceFormView: View {
         .padding(.horizontal)
     }
 
-    private var validationStatus: some View {
-        HStack(spacing: 4) {
-            Image(systemName: valid ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundColor(valid ? .green : .red)
-            VStack(alignment: .leading) {
-                Text(valid ? "Connected successfully" : "Connection failed")
-                if !valid {
-                    Text(validationError ?? "Unknown Error")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .truncationMode(.tail)
-                        .lineLimit(1)
-                }
-            }
-            .frame(minHeight: 35)
-        }
-        .opacity(validated ? 1 : 0)
-    }
-
     var validator: AccountValidator {
         AccountValidator(
             url: url,
             id: $url,
-            valid: $valid,
-            validated: $validated,
+            isValid: $isValid,
+            isValidated: $isValidated,
+            isValidating: $isValidating,
             error: $validationError
         )
     }
@@ -135,6 +121,8 @@ struct InstanceFormView: View {
             return
         }
 
+        isValidating = true
+
         validationDebounce.debouncing(2) {
             validator.validateInstance()
         }
@@ -145,7 +133,7 @@ struct InstanceFormView: View {
     }
 
     func submitForm() {
-        guard valid else {
+        guard isValid else {
             return
         }
 
