@@ -47,6 +47,10 @@ struct SignInRequiredView<Content: View>: View {
             if instances.isEmpty {
                 openSettingsButton
             }
+
+            #if os(tvOS)
+                openSettingsButton
+            #endif
         }
     }
 

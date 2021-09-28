@@ -34,7 +34,7 @@ struct InstancesSettingsView: View {
     var body: some View {
         Group {
             #if os(iOS)
-                Section(header: instancesHeader, footer: instancesFooter) {
+                Section(header: instancesHeader, footer: defaultAccountSection) {
                     ForEach(instances) { instance in
                         Button(action: {
                             self.selectedInstanceID = instance.id
@@ -59,11 +59,33 @@ struct InstancesSettingsView: View {
                         .buttonStyle(.plain)
                     }
 
-                    Button("Add Instance...") {
-                        presentingInstanceForm = true
-                    }
+                    addInstanceButton
                 }
                 .listStyle(.insetGrouped)
+            #elseif os(tvOS)
+                Section(header: instancesHeader) {
+                    ForEach(instances) { instance in
+                        Button(action: {
+                            self.selectedInstanceID = instance.id
+                            self.presentingInstanceDetails = true
+                        }) {
+                            Text(instance.description)
+                        }
+                        .contextMenu {
+                            Button("Remove", role: .destructive) {
+                                instancesModel.remove(instance)
+                            }
+                        }
+                    }
+
+                    addInstanceButton
+
+                    defaultAccountSection
+                }
+                .frame(maxWidth: 1000, alignment: .leading)
+                .sheet(isPresented: $presentingAccountForm) {
+                    AccountFormView(instance: selectedInstance, selectedAccount: $selectedAccount)
+                }
             #else
                 Section {
                     Text("Instance")
@@ -157,22 +179,33 @@ struct InstancesSettingsView: View {
         Text("Instances").background(instanceDetailsNavigationLink)
     }
 
-    var instancesFooter: some View {
+    var defaultAccountSection: some View {
         Group {
             if let account = instancesModel.defaultAccount {
-                HStack(spacing: 2) {
-                    Text("**\(account.description)** account on instance **\(account.instance.shortDescription)** is your default.")
-                        .truncationMode(.middle)
-                        .lineLimit(1)
+                VStack {
+                    HStack(spacing: 2) {
+                        Text("**\(account.description)** account on instance **\(account.instance.shortDescription)** is your default.")
+                            .truncationMode(.middle)
+                            .lineLimit(1)
 
-                    Button("Reset", action: resetDefaultAccount)
-                        .buttonStyle(.plain)
-                        .foregroundColor(.red)
+                        #if !os(tvOS)
+
+                            Button("Reset", action: resetDefaultAccount)
+                                .buttonStyle(.plain)
+                                .foregroundColor(.red)
+                        #endif
+                    }
                 }
             } else {
                 Text("You have no default account set")
             }
         }
+        #if os(tvOS)
+            .foregroundColor(.gray)
+        #elseif os(macOS)
+            .font(.caption2)
+            .foregroundColor(.secondary)
+        #endif
     }
 
     var instanceDetailsNavigationLink: some View {
@@ -181,25 +214,13 @@ struct InstancesSettingsView: View {
             destination: { InstanceDetailsSettingsView(instanceID: selectedInstanceID) },
             label: { EmptyView() }
         )
+        .opacity(0)
     }
 
-    private var defaultAccountSection: some View {
-        Group {
-            if let account = instancesModel.defaultAccount {
-                HStack(spacing: 2) {
-                    Text("**\(account.description)** account on instance **\(account.instance.shortDescription)** is your default.")
-                        .truncationMode(.middle)
-                        .lineLimit(1)
-                    Button("Reset", action: resetDefaultAccount)
-                        .buttonStyle(.plain)
-                        .foregroundColor(.red)
-                }
-            } else {
-                Text("You have no default account set")
-            }
+    private var addInstanceButton: some View {
+        Button("Add Instance...") {
+            presentingInstanceForm = true
         }
-        .font(.caption2)
-        .foregroundColor(.secondary)
     }
 
     private func resetDefaultAccount() {

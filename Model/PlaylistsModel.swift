@@ -4,11 +4,12 @@ import SwiftUI
 
 final class PlaylistsModel: ObservableObject {
     @Published var playlists = [Playlist]()
+    @Published var api = InvidiousAPI()
 
-    @Published var api: InvidiousAPI!
+    @Published var selectedPlaylistID: Playlist.ID = ""
 
-    var resource: Resource {
-        api.playlists
+    init(_ playlists: [Playlist] = [Playlist]()) {
+        self.playlists = playlists
     }
 
     var all: [Playlist] {
@@ -16,20 +17,67 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func find(id: Playlist.ID) -> Playlist? {
-        all.first { $0.id == id }
+        playlists.first { $0.id == id }
     }
 
-    func load(force: Bool = false) {
+    var isEmpty: Bool {
+        playlists.isEmpty
+    }
+
+    func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
         let request = force ? resource.load() : resource.loadIfNeeded()
 
         request?
             .onSuccess { resource in
                 if let playlists: [Playlist] = resource.typedContent() {
                     self.playlists = playlists
+                    if self.selectedPlaylistID.isEmpty {
+                        self.selectPlaylist(self.all.first?.id)
+                    }
+                    onSuccess()
                 }
             }
             .onFailure { _ in
                 self.playlists = []
             }
+    }
+
+    func addVideoToCurrentPlaylist(videoID: Video.ID, onSuccess: @escaping () -> Void = {}) {
+        let resource = api.playlistVideos(currentPlaylist!.id)
+        let body = ["videoId": videoID]
+
+        resource.request(.post, json: body).onSuccess { _ in
+            self.load(force: true)
+            onSuccess()
+        }
+    }
+
+    func removeVideoFromPlaylist(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
+        let resource = api.playlistVideo(playlistID, videoIndexID)
+
+        resource.request(.delete).onSuccess { _ in
+            self.load(force: true)
+            onSuccess()
+        }
+    }
+
+    func selectPlaylist(_ id: String?) {
+        selectedPlaylistID = id ?? ""
+    }
+
+    private var resource: Resource {
+        api.playlists
+    }
+
+    private var selectedPlaylist: Playlist? {
+        guard !selectedPlaylistID.isEmpty else {
+            return nil
+        }
+
+        return find(id: selectedPlaylistID)
+    }
+
+    var currentPlaylist: Playlist? {
+        selectedPlaylist ?? all.first
     }
 }

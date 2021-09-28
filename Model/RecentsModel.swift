@@ -16,7 +16,7 @@ final class RecentsModel: ObservableObject {
         items.removeAll { $0.type == .query }
     }
 
-    func open(_ item: RecentItem) {
+    func add(_ item: RecentItem) {
         if !items.contains(where: { $0.id == item.id }) {
             items.append(item)
         }
@@ -30,7 +30,7 @@ final class RecentsModel: ObservableObject {
 
     func addQuery(_ query: String) {
         if !query.isEmpty {
-            open(.init(from: query))
+            add(.init(from: query))
         }
     }
 

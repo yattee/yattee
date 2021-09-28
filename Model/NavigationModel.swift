@@ -13,6 +13,9 @@ final class NavigationModel: ObservableObject {
 
     @Published var returnToDetails = false
 
+    @Published var presentingAddToPlaylist = false
+    @Published var videoToAddToPlaylist: Video!
+
     @Published var presentingPlaylistForm = false
     @Published var editedPlaylist: Playlist!
 
@@ -40,6 +43,11 @@ final class NavigationModel: ObservableObject {
                 }
             }
         )
+    }
+
+    func presentAddToPlaylist(_ video: Video) {
+        videoToAddToPlaylist = video
+        presentingAddToPlaylist = true
     }
 
     func presentEditPlaylistForm(_ playlist: Playlist?) {

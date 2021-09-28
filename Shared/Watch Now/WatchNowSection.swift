@@ -19,7 +19,7 @@ struct WatchNowSection: View {
         WatchNowSectionBody(label: label, videos: store.collection)
             .onAppear {
                 resource.addObserver(store)
-                resource.load()
+                resource.loadIfNeeded()
             }
             .onChange(of: api.account) { _ in
                 resource.load()

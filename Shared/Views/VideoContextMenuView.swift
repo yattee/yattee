@@ -4,13 +4,11 @@ import SwiftUI
 struct VideoContextMenuView: View {
     @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     let video: Video
-
-    @Default(.showingAddToPlaylist) var showingAddToPlaylist
-    @Default(.videoIDToAddToPlaylist) var videoIDToAddToPlaylist
 
     var body: some View {
         Section {
@@ -18,8 +16,12 @@ struct VideoContextMenuView: View {
 
             subscriptionButton
 
+            if case let .playlist(id) = navigation.tabSelection {
+                removeFromPlaylistButton(playlistID: id)
+            }
+
             if navigation.tabSelection == .playlists {
-                removeFromPlaylistButton
+                removeFromPlaylistButton(playlistID: playlists.currentPlaylist!.id)
             } else {
                 addToPlaylistButton
             }
@@ -29,7 +31,7 @@ struct VideoContextMenuView: View {
     var openChannelButton: some View {
         Button("\(video.author) Channel") {
             let recent = RecentItem(from: video.channel)
-            recents.open(recent)
+            recents.add(recent)
             navigation.tabSelection = .recentlyOpened(recent.tag)
             navigation.isChannelOpen = true
             navigation.sidebarSectionChanged.toggle()
@@ -58,17 +60,13 @@ struct VideoContextMenuView: View {
 
     var addToPlaylistButton: some View {
         Button("Add to playlist...") {
-            videoIDToAddToPlaylist = video.id
-            showingAddToPlaylist = true
+            navigation.presentAddToPlaylist(video)
         }
     }
 
-    var removeFromPlaylistButton: some View {
+    func removeFromPlaylistButton(playlistID: String) -> some View {
         Button("Remove from playlist", role: .destructive) {
-            let resource = api.playlistVideo(Defaults[.selectedPlaylistID]!, video.indexID!)
-            resource.request(.delete).onSuccess { _ in
-                api.playlists.load()
-            }
+            playlists.removeVideoFromPlaylist(videoIndexID: video.indexID!, playlistID: playlistID)
         }
     }
 }

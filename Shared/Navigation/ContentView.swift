@@ -8,6 +8,7 @@ struct ContentView: View {
 
     @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<InstancesModel> private var instances
+    @EnvironmentObject<PlaylistsModel> private var playlists
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -43,6 +44,9 @@ struct ContentView: View {
                         }
                     #endif
                 }
+            }
+            .sheet(isPresented: $navigation.presentingAddToPlaylist) {
+                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
             }
             .sheet(isPresented: $navigation.presentingPlaylistForm) {
                 PlaylistFormView(playlist: $navigation.editedPlaylist)

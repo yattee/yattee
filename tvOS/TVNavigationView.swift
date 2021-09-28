@@ -7,10 +7,6 @@ struct TVNavigationView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
-    @State private var showingOptions = false
-
-    @Default(.showingAddToPlaylist) var showingAddToPlaylist
-
     var body: some View {
         TabView(selection: $navigation.tabSelection) {
             WatchNowView()
@@ -37,8 +33,12 @@ struct TVNavigationView: View {
                 .tabItem { Image(systemName: "magnifyingglass") }
                 .tag(TabSelection.search)
         }
-        .fullScreenCover(isPresented: $showingOptions) { OptionsView() }
-        .fullScreenCover(isPresented: $showingAddToPlaylist) { AddToPlaylistView() }
+        .fullScreenCover(isPresented: $navigation.presentingSettings) { SettingsView() }
+        .fullScreenCover(isPresented: $navigation.presentingAddToPlaylist) {
+            if let video = navigation.videoToAddToPlaylist {
+                AddToPlaylistView(video: video)
+            }
+        }
         .fullScreenCover(isPresented: $navigation.showingVideo) {
             if let video = navigation.video {
                 VideoPlayerView(video)
@@ -48,15 +48,19 @@ struct TVNavigationView: View {
         .fullScreenCover(isPresented: $navigation.isChannelOpen) {
             if let channel = recents.presentedChannel {
                 ChannelVideosView(channel: channel)
-                    .background(.thickMaterial)
             }
         }
-        .onPlayPauseCommand { showingOptions.toggle() }
+        .onPlayPauseCommand { navigation.presentingSettings.toggle() }
     }
 }
 
 struct TVNavigationView_Previews: PreviewProvider {
     static var previews: some View {
         TVNavigationView()
+            .environmentObject(InvidiousAPI())
+            .environmentObject(NavigationModel())
+            .environmentObject(SearchModel())
+            .environmentObject(InstancesModel())
+            .environmentObject(SubscriptionsModel())
     }
 }

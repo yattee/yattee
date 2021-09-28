@@ -15,15 +15,16 @@ struct InstanceDetailsSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("Accounts")) {
-                ForEach(instances.accounts(instanceID)) { account in
-                    HStack(spacing: 2) {
-                        Text(account.description)
-                        if instances.defaultAccount == account {
-                            Text("— default")
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                ForEach(instances.accounts(instanceID), id: \.self) { account in
+
                     #if !os(tvOS)
+                        HStack(spacing: 2) {
+                            Text(account.description)
+                            if instances.defaultAccount == account {
+                                Text("— default")
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             if instances.defaultAccount != account {
                                 Button("Make Default", action: { makeDefault(account) })
@@ -32,6 +33,21 @@ struct InstanceDetailsSettingsView: View {
                             }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button("Remove", role: .destructive, action: { removeAccount(account) })
+                        }
+
+                    #else
+                        Button(action: { toggleDefault(account) }) {
+                            HStack(spacing: 2) {
+                                Text(account.description)
+                                if instances.defaultAccount == account {
+                                    Text("— default")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .contextMenu {
+                            Button("Toggle Default", action: { toggleDefault(account) })
                             Button("Remove", role: .destructive, action: { removeAccount(account) })
                         }
                     #endif
@@ -45,6 +61,8 @@ struct InstanceDetailsSettingsView: View {
         }
         #if os(iOS)
             .listStyle(.insetGrouped)
+        #elseif os(tvOS)
+            .frame(maxWidth: 1000)
         #endif
 
         .navigationTitle(instance.shortDescription)
@@ -56,6 +74,14 @@ struct InstanceDetailsSettingsView: View {
     private func makeDefault(_ account: Instance.Account) {
         instances.setDefaultAccount(account)
         accountsChanged.toggle()
+    }
+
+    private func toggleDefault(_ account: Instance.Account) {
+        if account == instances.defaultAccount {
+            resetDefaultAccount()
+        } else {
+            makeDefault(account)
+        }
     }
 
     private func resetDefaultAccount() {

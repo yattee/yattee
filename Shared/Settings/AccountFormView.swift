@@ -20,12 +20,18 @@ struct AccountFormView: View {
 
     var body: some View {
         VStack {
-            header
-            form
-            footer
+            Group {
+                header
+                form
+                footer
+            }
+            .frame(maxWidth: 1000)
         }
         #if os(iOS)
             .padding(.vertical)
+        #elseif os(tvOS)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .background(.thickMaterial)
         #else
             .frame(width: 400, height: 145)
         #endif
@@ -48,18 +54,30 @@ struct AccountFormView: View {
         .padding(.horizontal)
     }
 
-    var form: some View {
-        Form {
+    private var form: some View {
+        Group {
+            #if !os(tvOS)
+                Form {
+                    formFields
+                    #if os(macOS)
+                        .padding(.horizontal)
+                    #endif
+                }
+            #else
+                formFields
+            #endif
+        }
+        .onAppear(perform: initializeForm)
+        .onChange(of: sid) { _ in validate() }
+    }
+
+    var formFields: some View {
+        Group {
             TextField("Name", text: $name, prompt: Text("Account Name (optional)"))
                 .focused($focused)
 
             TextField("SID", text: $sid, prompt: Text("Invidious SID Cookie"))
         }
-        .onAppear(perform: initializeForm)
-        .onChange(of: sid) { _ in validate() }
-        #if os(macOS)
-            .padding(.horizontal)
-        #endif
     }
 
     var footer: some View {
@@ -75,6 +93,9 @@ struct AccountFormView: View {
             #endif
         }
         .frame(minHeight: 35)
+        #if os(tvOS)
+            .padding(.top, 30)
+        #endif
         .padding(.horizontal)
     }
 

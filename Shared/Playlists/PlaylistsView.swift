@@ -3,9 +3,10 @@ import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
-    @StateObject private var store = Store<[Playlist]>()
+    @EnvironmentObject<PlaylistsModel> private var model
 
     @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<NavigationModel> private var navigation
 
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
@@ -13,14 +14,11 @@ struct PlaylistsView: View {
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
 
-    @Default(.selectedPlaylistID) private var selectedPlaylistID
-
-    var resource: Resource {
-        api.playlists
-    }
+    @State private var showingAddToPlaylist = false
+    @State private var videoIDToAddToPlaylist = ""
 
     var videos: [Video] {
-        currentPlaylist?.videos ?? []
+        model.currentPlaylist?.videos ?? []
     }
 
     var body: some View {
@@ -31,9 +29,9 @@ struct PlaylistsView: View {
                         .font(.system(size: 28))
 
                 #endif
-                if currentPlaylist != nil, videos.isEmpty {
+                if model.currentPlaylist != nil, videos.isEmpty {
                     hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
-                } else if store.collection.isEmpty {
+                } else if model.all.isEmpty {
                     hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
                 } else {
                     VideosCellsVertical(videos: videos)
@@ -58,11 +56,11 @@ struct PlaylistsView: View {
         .toolbar {
             ToolbarItemGroup {
                 #if !os(iOS)
-                    if !store.collection.isEmpty {
+                    if !model.isEmpty {
                         selectPlaylistButton
                     }
 
-                    if currentPlaylist != nil {
+                    if model.currentPlaylist != nil {
                         editPlaylistButton
                     }
                 #endif
@@ -72,7 +70,7 @@ struct PlaylistsView: View {
             #if os(iOS)
                 ToolbarItemGroup(placement: .bottomBar) {
                     Group {
-                        if store.collection.isEmpty {
+                        if model.isEmpty {
                             Text("No Playlists")
                                 .foregroundColor(.secondary)
                         } else {
@@ -84,7 +82,7 @@ struct PlaylistsView: View {
 
                         Spacer()
 
-                        if currentPlaylist != nil {
+                        if model.currentPlaylist != nil {
                             editPlaylistButton
                         }
                     }
@@ -93,17 +91,13 @@ struct PlaylistsView: View {
             #endif
         }
         .onAppear {
-            resource.addObserver(store)
-
-            resource.loadIfNeeded()?.onSuccess { _ in
-                selectPlaylist(selectedPlaylistID)
-            }
+            model.load()
         }
     }
 
     var toolbar: some View {
         HStack {
-            if store.collection.isEmpty {
+            if model.isEmpty {
                 Text("No Playlists")
                     .foregroundColor(.secondary)
             } else {
@@ -117,7 +111,7 @@ struct PlaylistsView: View {
                 Spacer()
             #endif
 
-            if currentPlaylist != nil {
+            if model.currentPlaylist != nil {
                 editPlaylistButton
             }
 
@@ -142,17 +136,15 @@ struct PlaylistsView: View {
         #endif
     }
 
-    func selectPlaylist(_ id: String?) {
-        selectedPlaylistID = id
-    }
-
     func selectCreatedPlaylist() {
         guard createdPlaylist != nil else {
             return
         }
 
-        resource.load().onSuccess { _ in
-            self.selectPlaylist(createdPlaylist?.id)
+        model.load(force: true) {
+            if let id = createdPlaylist?.id {
+                self.model.selectPlaylist(id)
+            }
 
             self.createdPlaylist = nil
         }
@@ -160,41 +152,37 @@ struct PlaylistsView: View {
 
     func selectEditedPlaylist() {
         if editedPlaylist.isNil {
-            selectPlaylist(nil)
+            model.selectPlaylist(nil)
         }
 
-        resource.load().onSuccess { _ in
-            selectPlaylist(editedPlaylist?.id)
+        model.load(force: true) {
+            model.selectPlaylist(editedPlaylist?.id)
 
             self.editedPlaylist = nil
         }
     }
 
-    var currentPlaylist: Playlist? {
-        store.collection.first { $0.id == selectedPlaylistID } ?? store.collection.first
-    }
-
     var selectPlaylistButton: some View {
         #if os(tvOS)
-            Button(currentPlaylist?.title ?? "Select playlist") {
-                guard currentPlaylist != nil else {
+            Button(model.currentPlaylist?.title ?? "Select playlist") {
+                guard model.currentPlaylist != nil else {
                     return
                 }
 
-                selectPlaylist(store.collection.next(after: currentPlaylist!)?.id)
+                model.selectPlaylist(model.all.next(after: model.currentPlaylist!)?.id)
             }
             .contextMenu {
-                ForEach(store.collection) { playlist in
+                ForEach(model.all) { playlist in
                     Button(playlist.title) {
-                        selectPlaylist(playlist.id)
+                        model.selectPlaylist(playlist.id)
                     }
                 }
             }
         #else
-            Menu(currentPlaylist?.title ?? "Select playlist") {
-                ForEach(store.collection) { playlist in
-                    Button(action: { selectPlaylist(playlist.id) }) {
-                        if playlist == self.currentPlaylist {
+            Menu(model.currentPlaylist?.title ?? "Select playlist") {
+                ForEach(model.all) { playlist in
+                    Button(action: { model.selectPlaylist(playlist.id) }) {
+                        if playlist == model.currentPlaylist {
                             Label(playlist.title, systemImage: "checkmark")
                         } else {
                             Text(playlist.title)
@@ -207,7 +195,7 @@ struct PlaylistsView: View {
 
     var editPlaylistButton: some View {
         Button(action: {
-            self.editedPlaylist = self.currentPlaylist
+            self.editedPlaylist = self.model.currentPlaylist
             self.showingEditPlaylist = true
         }) {
             HStack(spacing: 8) {

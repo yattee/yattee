@@ -15,6 +15,8 @@ struct PlaybackSettingsView: View {
 
             #if os(iOS)
                 .pickerStyle(.automatic)
+            #elseif os(tvOS)
+                .pickerStyle(.inline)
             #endif
 
             #if os(macOS)

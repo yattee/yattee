@@ -73,37 +73,13 @@ struct PlaylistFormView: View {
             #endif
 
         #else
-            HStack {
-                Spacer()
-
-                VStack {
-                    Spacer()
-
-                    CoverSectionView(editing ? "Edit Playlist" : "Create Playlist") {
-                        CoverSectionRowView("Name") {
-                            TextField("Playlist Name", text: $name, onCommit: validate)
-                                .frame(maxWidth: 450)
-                        }
-
-                        CoverSectionRowView("Visibility") { visibilityButton }
-                    }
-
-                    CoverSectionRowView {
-                        Button("Save", action: submitForm).disabled(!valid)
-                    }
-
-                    if editing {
-                        CoverSectionView("Delete Playlist", divider: false, inline: true) { deletePlaylistButton }
-                            .padding(.top, 50)
-                    }
-
-                    Spacer()
+            VStack {
+                Group {
+                    header
+                    form
                 }
-                .frame(maxWidth: 800)
-
-                Spacer()
+                .frame(maxWidth: 1000)
             }
-            .background(.thinMaterial)
             .onAppear {
                 guard editing else {
                     return
@@ -114,7 +90,64 @@ struct PlaylistFormView: View {
 
                 validate()
             }
+
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .background(.thickMaterial)
         #endif
+    }
+
+    var header: some View {
+        HStack(alignment: .center) {
+            Text(editing ? "Edit Playlist" : "Create Playlist")
+                .font(.title2.bold())
+
+            Spacer()
+
+            Button("Cancel") {
+                dismiss()
+            }
+            #if !os(tvOS)
+                .keyboardShortcut(.cancelAction)
+            #endif
+        }
+        .padding(.horizontal)
+    }
+
+    var form: some View {
+        VStack(alignment: .trailing) {
+            VStack {
+                Text("Name")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                TextField("Playlist Name", text: $name, onCommit: validate)
+            }
+
+            HStack {
+                Text("Visibility")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                visibilityButton
+            }
+            .padding(.top, 10)
+
+            HStack {
+                Spacer()
+
+                Button("Save", action: submitForm).disabled(!valid)
+            }
+            .padding(.top, 40)
+
+            if editing {
+                Divider()
+                HStack {
+                    Text("Delete playlist")
+                        .font(.title2.bold())
+                    Spacer()
+                    deletePlaylistButton
+                }
+            }
+        }
+        .padding(.horizontal)
     }
 
     func initializeForm() {

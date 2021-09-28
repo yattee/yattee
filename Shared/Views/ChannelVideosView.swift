@@ -69,6 +69,9 @@ struct ChannelVideosView: View {
                 }
             }
         #endif
+        #if os(tvOS)
+            .background(.thickMaterial)
+        #endif
         .modifier(UnsubscribeAlertModifier())
             .onAppear {
                 if store.item.isNil {

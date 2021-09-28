@@ -2,6 +2,6 @@ import Foundation
 
 extension Playlist {
     static var fixture: Playlist {
-        Playlist(id: "ABC", title: "The Playlist", visibility: .public, updated: 1)
+        Playlist(id: UUID().uuidString, title: "Relaxing music", visibility: .public, updated: 1)
     }
 }
