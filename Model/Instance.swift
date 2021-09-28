@@ -4,6 +4,7 @@ import Foundation
 struct Instance: Defaults.Serializable, Hashable, Identifiable {
     struct Account: Defaults.Serializable, Hashable, Identifiable {
         static var bridge = AccountsBridge()
+        static var empty = Account(instanceID: UUID(), name: "Signed Out", url: "", sid: "")
 
         let id: UUID
         let instanceID: UUID
@@ -34,6 +35,10 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
 
         var description: String {
             (name != nil && name!.isEmpty) ? "Unnamed (\(anonymizedSID))" : name!
+        }
+
+        var isEmpty: Bool {
+            self == Account.empty
         }
 
         func hash(into hasher: inout Hasher) {

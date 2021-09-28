@@ -40,7 +40,7 @@ struct PearvidiousApp: App {
         search.api = api
         subscriptions.api = api
 
-        if let account = instances.defaultAccount, api.account.isNil {
+        if let account = instances.defaultAccount, api.account.isEmpty {
             api.setAccount(account)
         }
     }

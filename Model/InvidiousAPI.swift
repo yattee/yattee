@@ -6,7 +6,7 @@ import SwiftyJSON
 final class InvidiousAPI: Service, ObservableObject {
     static let basePath = "/api/v1"
 
-    @Published var account: Instance.Account!
+    @Published var account: Instance.Account! = .empty
 
     @Published var validInstance = true
     @Published var signedIn = true
