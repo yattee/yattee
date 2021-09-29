@@ -122,6 +122,6 @@ struct InstancesSettingsView_Previews: PreviewProvider {
             InstancesSettingsView()
         }
         .frame(width: 400, height: 270)
-        .environmentObject(InstancesModel())
+        .injectFixtureEnvironmentObjects()
     }
 }

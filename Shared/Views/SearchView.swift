@@ -20,8 +20,11 @@ struct SearchView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
-    init(_ query: SearchQuery? = nil) {
+    private var videos = [Video]()
+
+    init(_ query: SearchQuery? = nil, videos: [Video] = [Video]()) {
         self.query = query
+        self.videos = videos
     }
 
     var body: some View {
@@ -81,6 +84,10 @@ struct SearchView: View {
             if query != nil {
                 state.queryText = query!.query
                 state.resetQuery(query!)
+            }
+
+            if !videos.isEmpty {
+                state.store.replace(videos)
             }
         }
         .searchable(text: $state.queryText, placement: searchFieldPlacement) {
@@ -269,7 +276,7 @@ struct SearchView: View {
 
         var searchDurationButton: some View {
             Button(action: { self.searchDuration = self.searchDuration.next() }) {
-                Text(self.searchDate.name)
+                Text(self.searchDuration.name)
                     .font(.system(size: 30))
                     .padding(.horizontal)
                     .padding(.vertical, 2)
@@ -334,10 +341,8 @@ struct SearchView: View {
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            SearchView(SearchQuery(query: "Is Google Evil"))
-                .environmentObject(NavigationModel())
-                .environmentObject(SearchModel())
-                .environmentObject(SubscriptionsModel())
+            SearchView(SearchQuery(query: "Is Google Evil"), videos: Video.fixtures(30))
+                .injectFixtureEnvironmentObjects()
         }
     }
 }

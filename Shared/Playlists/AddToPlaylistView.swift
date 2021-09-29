@@ -171,8 +171,6 @@ struct AddToPlaylistView: View {
 struct AddToPlaylistView_Previews: PreviewProvider {
     static var previews: some View {
         AddToPlaylistView(video: Video.fixture)
-            .environmentObject(PlaylistsModel([Playlist.fixture]))
-            .environmentObject(SubscriptionsModel())
-            .environmentObject(NavigationModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

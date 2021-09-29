@@ -40,7 +40,6 @@ struct WatchNowView: View {
 struct WatchNowView_Previews: PreviewProvider {
     static var previews: some View {
         WatchNowView()
-            .environmentObject(SubscriptionsModel())
-            .environmentObject(NavigationModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

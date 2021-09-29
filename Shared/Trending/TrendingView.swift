@@ -4,7 +4,7 @@ import SwiftUI
 
 struct TrendingView: View {
     @StateObject private var store = Store<[Video]>()
-    private var videos: [Video]
+    private var videos = [Video]()
 
     @Default(.trendingCategory) private var category
     @Default(.trendingCountry) private var country
@@ -149,9 +149,7 @@ struct TrendingView: View {
 
 struct TrendingView_Previews: PreviewProvider {
     static var previews: some View {
-        TrendingView(Video.allFixtures + Video.allFixtures + Video.allFixtures)
-            .environmentObject(InvidiousAPI())
-            .environmentObject(NavigationModel())
-            .environmentObject(SubscriptionsModel())
+        TrendingView(Video.allFixtures)
+            .injectFixtureEnvironmentObjects()
     }
 }

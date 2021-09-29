@@ -8,8 +8,8 @@ final class InvidiousAPI: Service, ObservableObject {
 
     @Published var account: Instance.Account! = .empty
 
-    @Published var validInstance = true
-    @Published var signedIn = true
+    @Published var validInstance = false
+    @Published var signedIn = false
 
     func setAccount(_ account: Instance.Account) {
         self.account = account

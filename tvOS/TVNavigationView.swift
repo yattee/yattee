@@ -57,10 +57,6 @@ struct TVNavigationView: View {
 struct TVNavigationView_Previews: PreviewProvider {
     static var previews: some View {
         TVNavigationView()
-            .environmentObject(InvidiousAPI())
-            .environmentObject(NavigationModel())
-            .environmentObject(SearchModel())
-            .environmentObject(InstancesModel())
-            .environmentObject(SubscriptionsModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

@@ -265,6 +265,9 @@
 		37FD43DE2704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
 		37FD43DF2704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
 		37FD43E02704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
+		37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
+		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
+		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -402,6 +405,7 @@
 		37F64FE326FE70A60081B69E /* RedrawOnViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedrawOnViewModifier.swift; sourceTree = "<group>"; };
 		37FD43DB270470B70073EE42 /* InstancesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettingsView.swift; sourceTree = "<group>"; };
 		37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAccountHint.swift; sourceTree = "<group>"; };
+		37FD43E22704847C0073EE42 /* View+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Fixtures.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -554,6 +558,7 @@
 				37F49BA226CAA59B00304AC0 /* Playlist+Fixtures.swift */,
 				3748186926A764FB0084E870 /* Thumbnail+Fixtures.swift */,
 				3748186526A7627F0084E870 /* Video+Fixtures.swift */,
+				37FD43E22704847C0073EE42 /* View+Fixtures.swift */,
 			);
 			path = Fixtures;
 			sourceTree = "<group>";
@@ -1073,6 +1078,7 @@
 				378E50FF26FE8EEE00F49626 /* AccountsMenuView.swift in Sources */,
 				37C7A1DA267CACF50010EAD6 /* TrendingCountry.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37BE0BD626A1D4A90092E2DB /* PlayerViewController.swift in Sources */,
 				37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
@@ -1208,6 +1214,7 @@
 				37B767DC2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
 				3797758C2689345500DD52A8 /* Store.swift in Sources */,
 				37141674267A8E10006CA35D /* Country.swift in Sources */,
+				37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37732FF12703A26300F04329 /* ValidationStatusView.swift in Sources */,
 				37BA794C26DC30EC002A0235 /* AppSidebarPlaylists.swift in Sources */,
@@ -1310,6 +1317,7 @@
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
 				373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */,
+				37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37141675267A8E10006CA35D /* Country.swift in Sources */,
 				37152EEC26EFEB95004FB96D /* LazyView.swift in Sources */,
 				37484C2726FC83E000287258 /* InstanceFormView.swift in Sources */,

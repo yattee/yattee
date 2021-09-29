@@ -186,6 +186,6 @@ struct VideoDetails: View {
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
         VideoDetails(video: Video.fixture)
-            .environmentObject(SubscriptionsModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

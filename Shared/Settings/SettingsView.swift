@@ -65,11 +65,7 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
-            .environmentObject(InstancesModel())
-            .environmentObject(InvidiousAPI())
-            .environmentObject(NavigationModel())
-            .environmentObject(SearchModel())
-            .environmentObject(SubscriptionsModel())
+            .injectFixtureEnvironmentObjects()
         #if os(macOS)
             .frame(width: 600, height: 300)
         #endif

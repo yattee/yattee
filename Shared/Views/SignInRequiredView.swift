@@ -44,9 +44,11 @@ struct SignInRequiredView<Content: View>: View {
             .font(.title3)
             .padding(.vertical)
 
-            if instances.isEmpty {
-                openSettingsButton
-            }
+            #if !os(tvOS)
+                if instances.isEmpty {
+                    openSettingsButton
+                }
+            #endif
 
             #if os(tvOS)
                 openSettingsButton
@@ -73,5 +75,6 @@ struct SignInRequiredView_Previews: PreviewProvider {
         SignInRequiredView(title: "Subscriptions") {
             Text("Only when signed in")
         }
+        .environmentObject(InvidiousAPI())
     }
 }

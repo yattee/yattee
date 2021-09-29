@@ -47,4 +47,13 @@ extension Video {
     static var allFixtures: [Video] {
         [fixture, fixtureLiveWithoutPublishedOrViews, fixtureUpcomingWithoutPublishedOrViews]
     }
+
+    static func fixtures(_ count: Int) -> [Video] {
+        var result = [Video]()
+        while result.count < count {
+            result.append(allFixtures.shuffled().first!)
+        }
+
+        return result
+    }
 }

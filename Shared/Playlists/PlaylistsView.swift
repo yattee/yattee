@@ -220,6 +220,6 @@ struct PlaylistsView: View {
 struct PlaylistsView_Provider: PreviewProvider {
     static var previews: some View {
         PlaylistsView()
-            .environmentObject(NavigationModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

@@ -109,7 +109,7 @@ struct VideoPlayerView_Previews: PreviewProvider {
         }
         .sheet(isPresented: .constant(true)) {
             VideoPlayerView(Video.fixture)
-                .environmentObject(NavigationModel())
+                .injectFixtureEnvironmentObjects()
         }
     }
 }

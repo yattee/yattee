@@ -75,7 +75,6 @@ struct VideosCellsVertical: View {
 struct VideoCellsVertical_Previews: PreviewProvider {
     static var previews: some View {
         VideosCellsVertical(videos: Video.allFixtures)
-            .frame(minWidth: 1000)
-            .environmentObject(NavigationModel())
+            .injectFixtureEnvironmentObjects()
     }
 }

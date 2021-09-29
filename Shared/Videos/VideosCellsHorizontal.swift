@@ -60,7 +60,6 @@ struct VideosCellsHorizontal: View {
 struct VideoCellsHorizontal_Previews: PreviewProvider {
     static var previews: some View {
         VideosCellsHorizontal(videos: Video.allFixtures)
-            .environmentObject(NavigationModel())
-            .environmentObject(SubscriptionsModel())
+            .injectFixtureEnvironmentObjects()
     }
 }
