@@ -4,6 +4,7 @@ import SwiftUI
 
 struct TrendingView: View {
     @StateObject private var store = Store<[Video]>()
+    private var videos: [Video]
 
     @Default(.trendingCategory) private var category
     @Default(.trendingCountry) private var country
@@ -11,6 +12,10 @@ struct TrendingView: View {
     @State private var presentingCountrySelection = false
 
     @EnvironmentObject<InvidiousAPI> private var api
+
+    init(_ videos: [Video] = [Video]()) {
+        self.videos = videos
+    }
 
     var resource: Resource {
         let resource = api.trending(category: category, country: country)
@@ -21,17 +26,18 @@ struct TrendingView: View {
 
     var body: some View {
         Section {
-            VStack(alignment: .center, spacing: 2) {
+            VStack(alignment: .center, spacing: 0) {
                 #if os(tvOS)
                     toolbar
-                        .scaleEffect(0.85)
+                    VideosCellsHorizontal(videos: store.collection)
+                        .padding(.top, 40)
+                #else
+                    VideosCellsVertical(videos: store.collection)
                 #endif
 
-                if store.collection.isEmpty {
-                    Text("Loading")
-                }
-
-                VideosCellsVertical(videos: store.collection)
+                #if os(tvOS)
+                    Spacer()
+                #endif
             }
         }
         #if os(tvOS)
@@ -47,15 +53,13 @@ struct TrendingView: View {
             }
             .navigationTitle("Trending")
         #endif
-        #if os(macOS)
-            .toolbar {
+        .toolbar {
+            #if os(macOS)
                 ToolbarItemGroup {
                     categoryButton
                     countryButton
                 }
-            }
-        #elseif os(iOS)
-            .toolbar {
+            #elseif os(iOS)
                 ToolbarItemGroup(placement: .bottomBar) {
                     Group {
                         HStack {
@@ -76,14 +80,18 @@ struct TrendingView: View {
                         }
                     }
                 }
-            }
-        #endif
-        .onChange(of: resource) { resource in
+            #endif
+        }
+        .onChange(of: resource) { _ in
             resource.load()
         }
         .onAppear {
-            resource.addObserver(store)
-            resource.loadIfNeeded()
+            if videos.isEmpty {
+                resource.addObserver(store)
+                resource.loadIfNeeded()
+            } else {
+                store.replace(videos)
+            }
         }
     }
 
@@ -141,7 +149,9 @@ struct TrendingView: View {
 
 struct TrendingView_Previews: PreviewProvider {
     static var previews: some View {
-        TrendingView()
+        TrendingView(Video.allFixtures + Video.allFixtures + Video.allFixtures)
+            .environmentObject(InvidiousAPI())
             .environmentObject(NavigationModel())
+            .environmentObject(SubscriptionsModel())
     }
 }
