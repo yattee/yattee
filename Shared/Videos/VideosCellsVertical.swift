@@ -9,6 +9,8 @@ struct VideosCellsVertical: View {
     var videos = [Video]()
 
     var body: some View {
+        EmptyView().id("cellsTop")
+
         ScrollViewReader { scrollView in
             ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
                 LazyVGrid(columns: items, alignment: .center) {
@@ -22,13 +24,11 @@ struct VideosCellsVertical: View {
                 .padding()
             }
             .onChange(of: videos) { [videos] newVideos in
-                #if !os(tvOS)
-                    guard !videos.isEmpty, let video = newVideos.first else {
-                        return
-                    }
+                guard !videos.isEmpty else {
+                    return
+                }
 
-                    scrollView.scrollTo(video.id, anchor: .top)
-                #endif
+                scrollView.scrollTo("cellsTop", anchor: .top)
             }
             #if os(tvOS)
                 .padding(.horizontal, 10)

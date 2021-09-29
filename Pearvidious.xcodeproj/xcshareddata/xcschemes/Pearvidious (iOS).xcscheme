@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "37D4B0D32671614900C925CA"
-               BuildableName = "Tests iOS.xctest"
+               BuildableName = "Tests (iOS).xctest"
                BlueprintName = "Tests (iOS)"
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>

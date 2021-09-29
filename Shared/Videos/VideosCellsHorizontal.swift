@@ -9,6 +9,8 @@ struct VideosCellsHorizontal: View {
     var videos = [Video]()
 
     var body: some View {
+        EmptyView().id("cellsTop")
+
         ScrollViewReader { scrollView in
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 20) {
@@ -32,19 +34,12 @@ struct VideosCellsHorizontal: View {
                     .padding(.vertical, 20)
                 #endif
             }
-            .onAppear {
-                if let video = videos.first {
-                    scrollView.scrollTo(video.id, anchor: .leading)
-                }
-            }
             .onChange(of: videos) { [videos] newVideos in
-                #if !os(tvOS)
-                    guard !videos.isEmpty, let video = newVideos.first else {
-                        return
-                    }
+                guard !videos.isEmpty else {
+                    return
+                }
 
-                    scrollView.scrollTo(video.id, anchor: .leading)
-                #endif
+                scrollView.scrollTo("cellsTop", anchor: .leading)
             }
         }
         #if os(tvOS)
