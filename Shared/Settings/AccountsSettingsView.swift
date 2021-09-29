@@ -48,6 +48,7 @@ struct AccountsSettingsView: View {
                         .contextMenu {
                             Button("Toggle Default") { toggleDefault(account) }
                             Button("Remove", role: .destructive) { removeAccount(account) }
+                            Button("Cancel", role: .cancel) {}
                         }
                     #endif
                 }

@@ -154,6 +154,8 @@ struct AddToPlaylistView: View {
                     model.selectedPlaylistID = playlist.id
                 }
             }
+
+            Button("Cancel", role: .cancel) {}
         }
     }
 

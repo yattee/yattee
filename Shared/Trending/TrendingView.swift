@@ -124,6 +124,8 @@ struct TrendingView: View {
                 ForEach(TrendingCategory.allCases) { category in
                     Button(category.name) { self.category = category }
                 }
+
+                Button("Cancel", role: .cancel) {}
             }
 
         #else

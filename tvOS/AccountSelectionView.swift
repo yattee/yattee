@@ -29,6 +29,8 @@ struct AccountSelectionView: View {
                         }
                     }
                 }
+
+                Button("Cancel", role: .cancel) {}
             }
         }
     }

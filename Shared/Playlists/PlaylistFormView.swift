@@ -103,10 +103,10 @@ struct PlaylistFormView: View {
 
             Spacer()
 
-            Button("Cancel") {
-                dismiss()
-            }
             #if !os(tvOS)
+                Button("Cancel") {
+                    dismiss()
+                }
                 .keyboardShortcut(.cancelAction)
             #endif
         }
@@ -206,6 +206,10 @@ struct PlaylistFormView: View {
                         self.visibility = visibility
                     }
                 }
+
+                #if os(tvOS)
+                    Button("Cancel", role: .cancel) {}
+                #endif
             }
         #endif
     }

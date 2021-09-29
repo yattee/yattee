@@ -17,6 +17,8 @@ struct PlaylistsView: View {
     @State private var showingAddToPlaylist = false
     @State private var videoIDToAddToPlaylist = ""
 
+    @Namespace private var focusNamespace
+
     var videos: [Video] {
         model.currentPlaylist?.videos ?? []
     }
@@ -63,6 +65,7 @@ struct PlaylistsView: View {
                 #if !os(iOS)
                     if !model.isEmpty {
                         selectPlaylistButton
+                            .prefersDefaultFocus(in: focusNamespace)
                     }
 
                     if model.currentPlaylist != nil {
@@ -95,6 +98,7 @@ struct PlaylistsView: View {
                 }
             #endif
         }
+        .focusScope(focusNamespace)
         .onAppear {
             model.load()
         }
@@ -112,18 +116,14 @@ struct PlaylistsView: View {
                 selectPlaylistButton
             }
 
-            #if os(iOS)
-                Spacer()
-            #endif
-
             if model.currentPlaylist != nil {
                 editPlaylistButton
             }
 
-            #if !os(iOS)
-                newPlaylistButton
-                    .padding(.leading, 40)
-            #endif
+            Spacer()
+
+            newPlaylistButton
+                .padding(.leading, 40)
         }
     }
 
@@ -182,6 +182,8 @@ struct PlaylistsView: View {
                         model.selectPlaylist(playlist.id)
                     }
                 }
+
+                Button("Cancel", role: .cancel) {}
             }
         #else
             Menu(model.currentPlaylist?.title ?? "Select playlist") {
