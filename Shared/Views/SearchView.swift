@@ -314,7 +314,7 @@ struct SearchView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .font(.system(size: 20))
+            .font(.system(size: 30))
         }
     #else
         var filtersMenu: some View {
