@@ -6,6 +6,31 @@
 	objectVersion = 55;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		37FD43E62704A2240073EE42 /* Periphery (macOS) */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 37FD43E72704A2240073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (macOS)" */;
+			buildPhases = (
+				37FD43EA2704A2350073EE42 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Periphery (macOS)";
+			productName = "Periphery (Unused code)";
+		};
+		37FD43EB2704A7710073EE42 /* Periphery (tvOS) */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 37FD43EC2704A7710073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (tvOS)" */;
+			buildPhases = (
+				37FD43EF2704A7780073EE42 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Periphery (tvOS)";
+			productName = "Periphery (iOS)";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B17F267B4DFB00704544 /* TrendingCountry.swift */; };
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
@@ -216,7 +241,6 @@
 		37BE0BDC26A2367F0092E2DB /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* Player.swift */; };
 		37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
-		37C194C926F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
 		37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
 		37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
@@ -268,6 +292,7 @@
 		37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
+		37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -386,13 +411,13 @@
 		37D4B0C42671614800C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		37D4B0C92671614900C925CA /* Pearvidious.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pearvidious.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0CF2671614900C925CA /* Pearvidious.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pearvidious.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		37D4B0D42671614900C925CA /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B0D42671614900C925CA /* Tests (iOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (iOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0D82671614900C925CA /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
-		37D4B0DE2671614900C925CA /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B0DE2671614900C925CA /* Tests (macOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (macOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0E22671614900C925CA /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
-		37D4B158267164AE00C925CA /* Pearvidious (Apple TV).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pearvidious (Apple TV).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pearvidious (tvOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B15E267164AF00C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		37D4B171267164B000C925CA /* Tests Apple TV.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests Apple TV.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B171267164B000C925CA /* Tests (tvOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (tvOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B175267164B000C925CA /* PearvidiousUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearvidiousUITests.swift; sourceTree = "<group>"; };
 		37D4B18B26717B3800C925CA /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		37D4B19626717E1500C925CA /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
@@ -695,10 +720,10 @@
 			children = (
 				37D4B0C92671614900C925CA /* Pearvidious.app */,
 				37D4B0CF2671614900C925CA /* Pearvidious.app */,
-				37D4B0D42671614900C925CA /* Tests iOS.xctest */,
-				37D4B0DE2671614900C925CA /* Tests macOS.xctest */,
-				37D4B158267164AE00C925CA /* Pearvidious (Apple TV).app */,
-				37D4B171267164B000C925CA /* Tests Apple TV.xctest */,
+				37D4B0D42671614900C925CA /* Tests (iOS).xctest */,
+				37D4B0DE2671614900C925CA /* Tests (macOS).xctest */,
+				37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */,
+				37D4B171267164B000C925CA /* Tests (tvOS).xctest */,
 				37BA796326DC40CB002A0235 /* Shared Tests.xctest */,
 			);
 			name = Products;
@@ -849,9 +874,9 @@
 			productReference = 37D4B0CF2671614900C925CA /* Pearvidious.app */;
 			productType = "com.apple.product-type.application";
 		};
-		37D4B0D32671614900C925CA /* Tests iOS */ = {
+		37D4B0D32671614900C925CA /* Tests (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B0F22671614900C925CA /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildConfigurationList = 37D4B0F22671614900C925CA /* Build configuration list for PBXNativeTarget "Tests (iOS)" */;
 			buildPhases = (
 				37D4B0D02671614900C925CA /* Sources */,
 				37D4B0D12671614900C925CA /* Frameworks */,
@@ -862,14 +887,14 @@
 			dependencies = (
 				37D4B0D62671614900C925CA /* PBXTargetDependency */,
 			);
-			name = "Tests iOS";
+			name = "Tests (iOS)";
 			productName = "Tests iOS";
-			productReference = 37D4B0D42671614900C925CA /* Tests iOS.xctest */;
+			productReference = 37D4B0D42671614900C925CA /* Tests (iOS).xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		37D4B0DD2671614900C925CA /* Tests macOS */ = {
+		37D4B0DD2671614900C925CA /* Tests (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B0F52671614900C925CA /* Build configuration list for PBXNativeTarget "Tests macOS" */;
+			buildConfigurationList = 37D4B0F52671614900C925CA /* Build configuration list for PBXNativeTarget "Tests (macOS)" */;
 			buildPhases = (
 				37D4B0DA2671614900C925CA /* Sources */,
 				37D4B0DB2671614900C925CA /* Frameworks */,
@@ -880,14 +905,14 @@
 			dependencies = (
 				37D4B0E02671614900C925CA /* PBXTargetDependency */,
 			);
-			name = "Tests macOS";
+			name = "Tests (macOS)";
 			productName = "Tests macOS";
-			productReference = 37D4B0DE2671614900C925CA /* Tests macOS.xctest */;
+			productReference = 37D4B0DE2671614900C925CA /* Tests (macOS).xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		37D4B157267164AE00C925CA /* Pearvidious (Apple TV) */ = {
+		37D4B157267164AE00C925CA /* Pearvidious (tvOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (Apple TV)" */;
+			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (tvOS)" */;
 			buildPhases = (
 				37D4B154267164AE00C925CA /* Sources */,
 				37D4B155267164AE00C925CA /* Frameworks */,
@@ -897,7 +922,7 @@
 			);
 			dependencies = (
 			);
-			name = "Pearvidious (Apple TV)";
+			name = "Pearvidious (tvOS)";
 			packageProductDependencies = (
 				37D4B19C2671817900C925CA /* SwiftyJSON */,
 				37B767DF2678C5BF0098BAA8 /* Logging */,
@@ -906,12 +931,12 @@
 				37BADCA8269A570B009BE4FB /* Alamofire */,
 			);
 			productName = Pearvidious;
-			productReference = 37D4B158267164AE00C925CA /* Pearvidious (Apple TV).app */;
+			productReference = 37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */;
 			productType = "com.apple.product-type.application";
 		};
-		37D4B170267164B000C925CA /* Tests Apple TV */ = {
+		37D4B170267164B000C925CA /* Tests (tvOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B17D267164B000C925CA /* Build configuration list for PBXNativeTarget "Tests Apple TV" */;
+			buildConfigurationList = 37D4B17D267164B000C925CA /* Build configuration list for PBXNativeTarget "Tests (tvOS)" */;
 			buildPhases = (
 				37D4B16D267164B000C925CA /* Sources */,
 				37D4B16E267164B000C925CA /* Frameworks */,
@@ -922,9 +947,9 @@
 			dependencies = (
 				37D4B173267164B000C925CA /* PBXTargetDependency */,
 			);
-			name = "Tests Apple TV";
+			name = "Tests (tvOS)";
 			productName = PearvidiousUITests;
-			productReference = 37D4B171267164B000C925CA /* Tests Apple TV.xctest */;
+			productReference = 37D4B171267164B000C925CA /* Tests (tvOS).xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -962,6 +987,12 @@
 						CreatedOnToolsVersion = 13.0;
 						TestTargetID = 37D4B157267164AE00C925CA;
 					};
+					37FD43E62704A2240073EE42 = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					37FD43EB2704A7710073EE42 = {
+						CreatedOnToolsVersion = 13.0;
+					};
 				};
 			};
 			buildConfigurationList = 37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Pearvidious" */;
@@ -987,11 +1018,13 @@
 			targets = (
 				37D4B0C82671614900C925CA /* Pearvidious (iOS) */,
 				37D4B0CE2671614900C925CA /* Pearvidious (macOS) */,
-				37D4B157267164AE00C925CA /* Pearvidious (Apple TV) */,
-				37D4B0D32671614900C925CA /* Tests iOS */,
-				37D4B0DD2671614900C925CA /* Tests macOS */,
-				37D4B170267164B000C925CA /* Tests Apple TV */,
+				37D4B157267164AE00C925CA /* Pearvidious (tvOS) */,
+				37D4B0D32671614900C925CA /* Tests (iOS) */,
+				37D4B0DD2671614900C925CA /* Tests (macOS) */,
+				37D4B170267164B000C925CA /* Tests (tvOS) */,
 				37BA796226DC40CB002A0235 /* Shared Tests */,
+				37FD43E62704A2240073EE42 /* Periphery (macOS) */,
+				37FD43EB2704A7710073EE42 /* Periphery (tvOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -1051,6 +1084,43 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		37FD43EA2704A2350073EE42 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (macOS)\" \\\n  --targets \"Pearvidious (macOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+		};
+		37FD43EF2704A7780073EE42 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (Apple TV)\" \\\n  --targets \"Pearvidious (Apple TV)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		37BA795F26DC40CB002A0235 /* Sources */ = {
@@ -1309,11 +1379,11 @@
 				37BE0BD726A1D4A90092E2DB /* PlayerViewController.swift in Sources */,
 				37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
-				37C194C926F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
 				37F64FE626FE70A60081B69E /* RedrawOnViewModifier.swift in Sources */,
 				37484C2B26FC83FF00287258 /* AccountFormView.swift in Sources */,
 				37BA793D26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				3711404126B206A6005B3555 /* SearchModel.swift in Sources */,
+				37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
 				373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */,
@@ -1363,7 +1433,7 @@
 		};
 		37D4B173267164B000C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 37D4B157267164AE00C925CA /* Pearvidious (Apple TV) */;
+			target = 37D4B157267164AE00C925CA /* Pearvidious (tvOS) */;
 			targetProxy = 37D4B172267164B000C925CA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1876,6 +1946,42 @@
 			};
 			name = Release;
 		};
+		37FD43E82704A2240073EE42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		37FD43E92704A2240073EE42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		37FD43ED2704A7710073EE42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		37FD43EE2704A7710073EE42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1915,7 +2021,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B0F22671614900C925CA /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+		37D4B0F22671614900C925CA /* Build configuration list for PBXNativeTarget "Tests (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B0F32671614900C925CA /* Debug */,
@@ -1924,7 +2030,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B0F52671614900C925CA /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
+		37D4B0F52671614900C925CA /* Build configuration list for PBXNativeTarget "Tests (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B0F62671614900C925CA /* Debug */,
@@ -1933,7 +2039,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (Apple TV)" */ = {
+		37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (tvOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B178267164B000C925CA /* Debug */,
@@ -1942,11 +2048,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B17D267164B000C925CA /* Build configuration list for PBXNativeTarget "Tests Apple TV" */ = {
+		37D4B17D267164B000C925CA /* Build configuration list for PBXNativeTarget "Tests (tvOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B17E267164B000C925CA /* Debug */,
 				37D4B17F267164B000C925CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37FD43E72704A2240073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37FD43E82704A2240073EE42 /* Debug */,
+				37FD43E92704A2240073EE42 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37FD43EC2704A7710073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (tvOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37FD43ED2704A7710073EE42 /* Debug */,
+				37FD43EE2704A7710073EE42 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

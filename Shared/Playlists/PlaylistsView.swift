@@ -5,17 +5,11 @@ import SwiftUI
 struct PlaylistsView: View {
     @EnvironmentObject<PlaylistsModel> private var model
 
-    @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<NavigationModel> private var navigation
-
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
 
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
-
-    @State private var showingAddToPlaylist = false
-    @State private var videoIDToAddToPlaylist = ""
 
     @Namespace private var focusNamespace
 
@@ -98,34 +92,38 @@ struct PlaylistsView: View {
                 }
             #endif
         }
-        .focusScope(focusNamespace)
+        #if os(tvOS)
+            .focusScope(focusNamespace)
+        #endif
         .onAppear {
             model.load()
         }
     }
 
-    var toolbar: some View {
-        HStack {
-            if model.isEmpty {
-                Text("No Playlists")
-                    .foregroundColor(.secondary)
-            } else {
-                Text("Current Playlist")
-                    .foregroundColor(.secondary)
+    #if os(tvOS)
+        var toolbar: some View {
+            HStack {
+                if model.isEmpty {
+                    Text("No Playlists")
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("Current Playlist")
+                        .foregroundColor(.secondary)
 
-                selectPlaylistButton
+                    selectPlaylistButton
+                }
+
+                if model.currentPlaylist != nil {
+                    editPlaylistButton
+                }
+
+                Spacer()
+
+                newPlaylistButton
+                    .padding(.leading, 40)
             }
-
-            if model.currentPlaylist != nil {
-                editPlaylistButton
-            }
-
-            Spacer()
-
-            newPlaylistButton
-                .padding(.leading, 40)
         }
-    }
+    #endif
 
     func hintText(_ text: String) -> some View {
         VStack {

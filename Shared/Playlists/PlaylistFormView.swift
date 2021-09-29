@@ -42,12 +42,8 @@ struct PlaylistFormView: View {
                         .padding(.leading, 10)
                         .focused($focused)
 
-                    Picker("Visibility", selection: $visibility) {
-                        ForEach(Playlist.Visibility.allCases, id: \.self) { visibility in
-                            Text(visibility.name)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    visibilityFormItem
+                        .pickerStyle(.segmented)
                 }
 
                 HStack {
@@ -126,7 +122,7 @@ struct PlaylistFormView: View {
                 Text("Visibility")
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                visibilityButton
+                visibilityFormItem
             }
             .padding(.top, 10)
 
@@ -189,7 +185,7 @@ struct PlaylistFormView: View {
         editing ? api.playlist(playlist.id) : api.playlists
     }
 
-    var visibilityButton: some View {
+    var visibilityFormItem: some View {
         #if os(macOS)
             Picker("Visibility", selection: $visibility) {
                 ForEach(Playlist.Visibility.allCases) { visibility in

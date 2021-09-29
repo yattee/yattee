@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D4B0CE2671614900C925CA"
-               BuildableName = "Pearvidious.app"
-               BlueprintName = "Pearvidious (macOS)"
+               BlueprintIdentifier = "37D4B157267164AE00C925CA"
+               BuildableName = "Pearvidious (tvOS).app"
+               BlueprintName = "Pearvidious (tvOS)"
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D4B0DD2671614900C925CA"
-               BuildableName = "Tests (macOS).xctest"
-               BlueprintName = "Tests (macOS)"
+               BlueprintIdentifier = "37D4B170267164B000C925CA"
+               BuildableName = "Tests (tvOS).xctest"
+               BlueprintName = "Tests (tvOS)"
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -42,9 +42,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37BA796226DC40CB002A0235"
-               BuildableName = "Shared Tests.xctest"
-               BlueprintName = "Shared Tests"
+               BlueprintIdentifier = "37D4B166267164B000C925CA"
+               BuildableName = "PearvidiousTests.xctest"
+               BlueprintName = "PearvidiousTests"
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -64,9 +64,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D4B0CE2671614900C925CA"
-            BuildableName = "Pearvidious.app"
-            BlueprintName = "Pearvidious (macOS)"
+            BlueprintIdentifier = "37D4B157267164AE00C925CA"
+            BuildableName = "Pearvidious (tvOS).app"
+            BlueprintName = "Pearvidious (tvOS)"
             ReferencedContainer = "container:Pearvidious.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -81,9 +81,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D4B0CE2671614900C925CA"
-            BuildableName = "Pearvidious.app"
-            BlueprintName = "Pearvidious (macOS)"
+            BlueprintIdentifier = "37D4B157267164AE00C925CA"
+            BuildableName = "Pearvidious (tvOS).app"
+            BlueprintName = "Pearvidious (tvOS)"
             ReferencedContainer = "container:Pearvidious.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

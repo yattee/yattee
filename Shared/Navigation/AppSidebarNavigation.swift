@@ -5,9 +5,11 @@ import SwiftUI
 
 struct AppSidebarNavigation: View {
     @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<NavigationModel> private var navigation
 
-    @State private var didApplyPrimaryViewWorkAround = false
+    #if os(iOS)
+        @EnvironmentObject<NavigationModel> private var navigation
+        @State private var didApplyPrimaryViewWorkAround = false
+    #endif
 
     var body: some View {
         #if os(iOS)

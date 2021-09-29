@@ -26,12 +26,4 @@ struct AppSidebarSubscriptions: View {
             subscriptions.load()
         }
     }
-
-    var unsubscribeAlertTitle: String {
-        if let channel = navigation.channelToUnsubscribe {
-            return "Unsubscribe from \(channel.name)"
-        }
-
-        return "Unknown channel"
-    }
 }

@@ -4,7 +4,6 @@ import SwiftUI
 
 struct WatchNowView: View {
     @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<NavigationModel> private var navigation
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -21,7 +20,7 @@ struct WatchNowView: View {
 //                  TODO: adding sections to view
 //                  ===================
 //                  WatchNowPlaylistSection(id: "IVPLmRFYLGYZpq61SpujNw3EKbzzGNvoDmH")
-//                  WatchNowSection(resource: InvidiousAPI.shared.channelVideos("UCBJycsmduvYEL83R_U4JriQ"), label: "MKBHD")
+//                  WatchNowSection(resource: api.channelVideos("UCBJycsmduvYEL83R_U4JriQ"), label: "MKBHD")
                 }
             }
         }

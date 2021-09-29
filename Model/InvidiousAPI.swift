@@ -171,10 +171,6 @@ final class InvidiousAPI: Service, ObservableObject {
         resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/auth/feed")
     }
 
-    var stats: Resource {
-        resource(baseURL: account.url, path: basePathAppending("stats"))
-    }
-
     var subscriptions: Resource {
         resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
     }

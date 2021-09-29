@@ -78,13 +78,15 @@ struct TrendingCountry: View {
         #endif
     }
 
-    var searchPlacement: SearchFieldPlacement {
-        #if os(iOS)
-            .navigationBarDrawer(displayMode: .always)
-        #else
-            .automatic
-        #endif
-    }
+    #if !os(macOS)
+        var searchPlacement: SearchFieldPlacement {
+            #if os(iOS)
+                .navigationBarDrawer(displayMode: .always)
+            #else
+                .automatic
+            #endif
+        }
+    #endif
 
     func selectCountryAndDismiss(_ country: Country? = nil) {
         if let selected = country ?? selection {

@@ -12,8 +12,10 @@ struct SearchView: View {
     @State private var presentingClearConfirmation = false
     @State private var recentsChanged = false
 
-    @State private var searchDebounce = Debounce()
-    @State private var recentsDebounce = Debounce()
+    #if os(tvOS)
+        @State private var searchDebounce = Debounce()
+        @State private var recentsDebounce = Debounce()
+    #endif
 
     @Environment(\.navigationStyle) private var navigationStyle
 
@@ -183,11 +185,11 @@ struct SearchView: View {
                         }
                         #if os(iOS)
                             .swipeActions(edge: .trailing) {
-                                clearButton(item)
+                                deleteButton(item)
                             }
                         #elseif os(tvOS)
                             .contextMenu {
-                                clearButton(item)
+                                deleteButton(item)
                             }
                         #endif
                     }
@@ -204,14 +206,16 @@ struct SearchView: View {
         #endif
     }
 
-    func clearButton(_ item: RecentItem) -> some View {
-        Button(role: .destructive) {
-            recents.close(item)
-            recentsChanged.toggle()
-        } label: {
-            Label("Delete", systemImage: "trash")
+    #if !os(macOS)
+        func deleteButton(_ item: RecentItem) -> some View {
+            Button(role: .destructive) {
+                recents.close(item)
+                recentsChanged.toggle()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
-    }
+    #endif
 
     var clearAllButton: some View {
         Button("Clear All", role: .destructive) {

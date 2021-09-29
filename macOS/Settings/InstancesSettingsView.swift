@@ -5,10 +5,6 @@ struct InstancesSettingsView: View {
     @Default(.instances) private var instances
     @EnvironmentObject<InstancesModel> private var model
 
-    @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<PlaylistsModel> private var playlists
-
     @State private var selectedInstanceID: Instance.ID?
     @State private var selectedAccount: Instance.Account?
 

@@ -16,7 +16,7 @@ struct AccountSelectionView: View {
                     api.setAccount(account)
                 }
             }
-            .disabled(nextAccount == nil)
+            .disabled(instances.isEmpty)
             .contextMenu {
                 ForEach(instances) { instance in
                     Button(accountButtonTitle(instance: instance, account: instance.anonymousAccount)) {

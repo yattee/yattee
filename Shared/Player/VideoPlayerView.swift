@@ -19,7 +19,6 @@ struct VideoPlayerView: View {
     #endif
 
     @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaybackModel> private var playback
 
     var resource: Resource {

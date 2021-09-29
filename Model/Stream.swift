@@ -87,18 +87,6 @@ class Stream: Equatable, Hashable {
         assets.dropFirst().allSatisfy { $0 == assets.first }
     }
 
-    var assetsLoaded: Bool {
-        assets.allSatisfy { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
-    }
-
-    var loadedAssets: [AVURLAsset] {
-        assets.filter { $0.statusOfValue(forKey: "playable", error: nil) == .loaded }
-    }
-
-    func cancelLoadingAssets() {
-        assets.forEach { $0.cancelLoading() }
-    }
-
     static func == (lhs: Stream, rhs: Stream) -> Bool {
         lhs.resolution == rhs.resolution && lhs.kind == rhs.kind
     }

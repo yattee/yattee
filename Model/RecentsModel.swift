@@ -4,10 +4,6 @@ import Foundation
 final class RecentsModel: ObservableObject {
     @Default(.recentlyOpened) var items
 
-    var isEmpty: Bool {
-        items.isEmpty
-    }
-
     func clear() {
         items = []
     }

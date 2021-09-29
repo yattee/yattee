@@ -6,10 +6,6 @@ struct ContentView: View {
     @StateObject private var playback = PlaybackModel()
     @StateObject private var recents = RecentsModel()
 
-    @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<InstancesModel> private var instances
-    @EnvironmentObject<PlaylistsModel> private var playlists
-
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif

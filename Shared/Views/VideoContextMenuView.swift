@@ -2,7 +2,6 @@ import Defaults
 import SwiftUI
 
 struct VideoContextMenuView: View {
-    @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents

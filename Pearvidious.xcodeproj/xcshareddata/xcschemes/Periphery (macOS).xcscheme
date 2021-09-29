@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D4B157267164AE00C925CA"
-               BuildableName = "Pearvidious (Apple TV).app"
-               BlueprintName = "Pearvidious (Apple TV)"
+               BlueprintIdentifier = "37FD43E62704A2240073EE42"
+               BuildableName = "Periphery (macOS)"
+               BlueprintName = "Periphery (macOS)"
                ReferencedContainer = "container:Pearvidious.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,26 +28,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D4B170267164B000C925CA"
-               BuildableName = "Tests Apple TV.xctest"
-               BlueprintName = "Tests Apple TV"
-               ReferencedContainer = "container:Pearvidious.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D4B166267164B000C925CA"
-               BuildableName = "PearvidiousTests.xctest"
-               BlueprintName = "PearvidiousTests"
-               ReferencedContainer = "container:Pearvidious.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -60,16 +40,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D4B157267164AE00C925CA"
-            BuildableName = "Pearvidious (Apple TV).app"
-            BlueprintName = "Pearvidious (Apple TV)"
-            ReferencedContainer = "container:Pearvidious.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -77,16 +47,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37D4B157267164AE00C925CA"
-            BuildableName = "Pearvidious (Apple TV).app"
-            BlueprintName = "Pearvidious (Apple TV)"
+            BlueprintIdentifier = "37FD43E62704A2240073EE42"
+            BuildableName = "Periphery (macOS)"
+            BlueprintName = "Periphery (macOS)"
             ReferencedContainer = "container:Pearvidious.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

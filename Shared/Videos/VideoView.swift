@@ -6,10 +6,10 @@ struct VideoView: View {
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+        @Environment(\.horizontalCells) private var horizontalCells
     #endif
 
     @Environment(\.inNavigationView) private var inNavigationView
-    @Environment(\.horizontalCells) private var horizontalCells
 
     var video: Video
 
@@ -48,73 +48,75 @@ struct VideoView: View {
         #endif
     }
 
-    var horizontalRow: some View {
-        HStack(alignment: .top, spacing: 2) {
-            Section {
+    #if os(iOS)
+        var horizontalRow: some View {
+            HStack(alignment: .top, spacing: 2) {
+                Section {
+                    #if os(tvOS)
+                        thumbnailImage(quality: .medium)
+                    #else
+                        thumbnail
+                    #endif
+                }
+                .frame(maxWidth: 320)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    videoDetail(video.title, lineLimit: 5)
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+
+                    videoDetail(video.author)
+
+                    if additionalDetailsAvailable {
+                        Spacer()
+
+                        HStack {
+                            if let date = video.publishedDate {
+                                VStack {
+                                    Image(systemName: "calendar")
+                                    Text(date)
+                                }
+                            }
+
+                            if video.views != 0 {
+                                VStack {
+                                    Image(systemName: "eye")
+                                    Text(video.viewsCount!)
+                                }
+                            }
+                        }
+                        .foregroundColor(.secondary)
+                    }
+                }
+                .padding()
+                .frame(minHeight: 180)
+
                 #if os(tvOS)
-                    thumbnailImage(quality: .medium)
-                #else
-                    thumbnail
+                    if video.playTime != nil || video.live || video.upcoming {
+                        Spacer()
+
+                        VStack(alignment: .center) {
+                            Spacer()
+
+                            if let time = video.playTime {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "clock")
+                                    Text(time)
+                                        .fontWeight(.bold)
+                                }
+                                .foregroundColor(.secondary)
+                            } else if video.live {
+                                DetailBadge(text: "Live", style: .outstanding)
+                            } else if video.upcoming {
+                                DetailBadge(text: "Upcoming", style: .informational)
+                            }
+
+                            Spacer()
+                        }
+                    }
                 #endif
             }
-            .frame(maxWidth: 320)
-
-            VStack(alignment: .leading, spacing: 0) {
-                videoDetail(video.title, lineLimit: 5)
-                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-
-                videoDetail(video.author)
-
-                if additionalDetailsAvailable {
-                    Spacer()
-
-                    HStack {
-                        if let date = video.publishedDate {
-                            VStack {
-                                Image(systemName: "calendar")
-                                Text(date)
-                            }
-                        }
-
-                        if video.views != 0 {
-                            VStack {
-                                Image(systemName: "eye")
-                                Text(video.viewsCount!)
-                            }
-                        }
-                    }
-                    .foregroundColor(.secondary)
-                }
-            }
-            .padding()
-            .frame(minHeight: 180)
-
-            #if os(tvOS)
-                if video.playTime != nil || video.live || video.upcoming {
-                    Spacer()
-
-                    VStack(alignment: .center) {
-                        Spacer()
-
-                        if let time = video.playTime {
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock")
-                                Text(time)
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.secondary)
-                        } else if video.live {
-                            DetailBadge(text: "Live", style: .outstanding)
-                        } else if video.upcoming {
-                            DetailBadge(text: "Upcoming", style: .informational)
-                        }
-
-                        Spacer()
-                    }
-                }
-            #endif
         }
-    }
+    #endif
 
     var verticalRow: some View {
         VStack(alignment: .leading, spacing: 0) {

@@ -90,7 +90,6 @@ struct AddToPlaylistView: View {
 
             VStack(alignment: formAlignment) {
                 #if os(tvOS)
-
                     selectPlaylistButton
                 #else
                     Picker("Playlist", selection: $model.selectedPlaylistID) {
@@ -130,14 +129,6 @@ struct AddToPlaylistView: View {
                 .padding(.top, 30)
         }
         .padding(.horizontal)
-    }
-
-    private var footerAlignment: HorizontalAlignment {
-        #if os(tvOS)
-            .trailing
-        #else
-            .leading
-        #endif
     }
 
     private var selectPlaylistButton: some View {

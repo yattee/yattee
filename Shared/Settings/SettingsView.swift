@@ -3,11 +3,15 @@ import Foundation
 import SwiftUI
 
 struct SettingsView: View {
-    private enum Tabs: Hashable {
-        case playback, instances
-    }
+    #if os(macOS)
+        private enum Tabs: Hashable {
+            case playback, instances
+        }
+    #endif
 
-    @Environment(\.dismiss) private var dismiss
+    #if os(iOS)
+        @Environment(\.dismiss) private var dismiss
+    #endif
 
     var body: some View {
         #if os(macOS)

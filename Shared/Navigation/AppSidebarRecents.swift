@@ -2,7 +2,6 @@ import Defaults
 import SwiftUI
 
 struct AppSidebarRecents: View {
-    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.recentlyOpened) private var recentItems

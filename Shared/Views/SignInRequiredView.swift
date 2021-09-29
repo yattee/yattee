@@ -7,7 +7,9 @@ struct SignInRequiredView<Content: View>: View {
 
     @EnvironmentObject<InvidiousAPI> private var api
     @Default(.instances) private var instances
-    @EnvironmentObject<NavigationModel> private var navigation
+    #if !os(macOS)
+        @EnvironmentObject<NavigationModel> private var navigation
+    #endif
 
     init(title: String, @ViewBuilder content: @escaping () -> Content) {
         self.title = title

@@ -11,8 +11,6 @@ final class NavigationModel: ObservableObject {
     @Published var showingVideo = false
     @Published var video: Video?
 
-    @Published var returnToDetails = false
-
     @Published var presentingAddToPlaylist = false
     @Published var videoToAddToPlaylist: Video!
 

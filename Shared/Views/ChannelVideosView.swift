@@ -89,18 +89,6 @@ struct ChannelVideosView: View {
         return resource
     }
 
-    #if !os(tvOS)
-        var subscriptionToolbarItemPlacement: ToolbarItemPlacement {
-            #if os(iOS)
-                if horizontalSizeClass == .regular {
-                    return .primaryAction // swiftlint:disable:this implicit_return
-                }
-            #endif
-
-            return .automatic
-        }
-    #endif
-
     var subscriptionToggleButton: some View {
         Group {
             if subscriptions.isSubscribing(channel.id) {
