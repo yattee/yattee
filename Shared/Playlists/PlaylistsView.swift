@@ -26,15 +26,20 @@ struct PlaylistsView: View {
             VStack {
                 #if os(tvOS)
                     toolbar
-                        .font(.system(size: 28))
-
                 #endif
+
                 if model.currentPlaylist != nil, videos.isEmpty {
                     hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
                 } else if model.all.isEmpty {
                     hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
                 } else {
-                    VideosCellsVertical(videos: videos)
+                    #if os(tvOS)
+                        VideosCellsHorizontal(videos: videos)
+                            .padding(.top, 40)
+                        Spacer()
+                    #else
+                        VideosCellsVertical(videos: videos)
+                    #endif
                 }
             }
         }

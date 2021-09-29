@@ -31,12 +31,10 @@ struct TrendingView: View {
                     toolbar
                     VideosCellsHorizontal(videos: store.collection)
                         .padding(.top, 40)
+
+                    Spacer()
                 #else
                     VideosCellsVertical(videos: store.collection)
-                #endif
-
-                #if os(tvOS)
-                    Spacer()
                 #endif
             }
         }
