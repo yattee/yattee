@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct InstanceDetailsSettingsView: View {
+struct AccountsSettingsView: View {
     let instanceID: Instance.ID?
 
     @State private var accountsChanged = false
@@ -14,9 +14,9 @@ struct InstanceDetailsSettingsView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Accounts")) {
+            Section(header: Text("Accounts"), footer: sectionFooter) {
                 ForEach(instances.accounts(instanceID), id: \.self) { account in
-                    #if !os(tvOS)
+                    #if os(iOS)
                         HStack(spacing: 2) {
                             Text(account.description)
                             if instances.defaultAccount == account {
@@ -58,16 +58,24 @@ struct InstanceDetailsSettingsView: View {
                 }
             }
         }
+        .navigationTitle(instance.shortDescription)
+        .sheet(isPresented: $presentingAccountForm, onDismiss: { accountsChanged.toggle() }) {
+            AccountFormView(instance: instance)
+        }
         #if os(iOS)
             .listStyle(.insetGrouped)
         #elseif os(tvOS)
             .frame(maxWidth: 1000)
         #endif
+    }
 
-        .navigationTitle(instance.shortDescription)
-            .sheet(isPresented: $presentingAccountForm, onDismiss: { accountsChanged.toggle() }) {
-                AccountFormView(instance: instance)
-            }
+    private var sectionFooter: some View {
+        #if os(iOS)
+            Text("Swipe right to toggle default account, swipe left to remove")
+        #else
+            Text("Tap to toggle default account, tap and hold to remove")
+                .foregroundColor(.secondary)
+        #endif
     }
 
     private func makeDefault(_ account: Instance.Account) {

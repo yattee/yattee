@@ -5,10 +5,13 @@ final class InstancesModel: ObservableObject {
     @Published var defaultAccount: Instance.Account?
 
     init() {
-        if let id = Defaults[.defaultAccountID] {
-            let uuid = UUID(uuidString: id)
-            defaultAccount = Defaults[.accounts].first { $0.id == uuid }
+        guard let id = Defaults[.defaultAccountID],
+              let uuid = UUID(uuidString: id)
+        else {
+            return
         }
+
+        defaultAccount = findAccount(uuid)
     }
 
     func find(_ id: Instance.ID?) -> Instance? {
@@ -38,6 +41,10 @@ final class InstancesModel: ObservableObject {
         }
     }
 
+    func findAccount(_ id: Instance.Account.ID) -> Instance.Account? {
+        Defaults[.accounts].first { $0.id == id }
+    }
+
     func addAccount(instance: Instance, name: String, sid: String) -> Instance.Account {
         let account = Instance.Account(instanceID: instance.id, name: name, url: instance.url, sid: sid)
         Defaults[.accounts].append(account)
@@ -51,12 +58,12 @@ final class InstancesModel: ObservableObject {
         }
     }
 
-    func resetDefaultAccount() {
-        setDefaultAccount(nil)
-    }
-
     func setDefaultAccount(_ account: Instance.Account?) {
         Defaults[.defaultAccountID] = account?.id.uuidString
         defaultAccount = account
+    }
+
+    func resetDefaultAccount() {
+        setDefaultAccount(nil)
     }
 }

@@ -38,9 +38,7 @@ struct AccountSettingsView: View {
                         instances.removeAccount(account)
                     }
                 }
-                #if os(macOS)
-                    .foregroundColor(.red)
-                #endif
+                .foregroundColor(.red)
             }
             .opacity(account == selectedAccount ? 1 : 0)
         }
