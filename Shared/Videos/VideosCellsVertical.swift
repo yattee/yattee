@@ -9,31 +9,21 @@ struct VideosCellsVertical: View {
     var videos = [Video]()
 
     var body: some View {
-        EmptyView().id("cellsTop")
-
-        ScrollViewReader { scrollView in
-            ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
-                LazyVGrid(columns: items, alignment: .center) {
-                    ForEach(videos) { video in
-                        VideoView(video: video)
-                        #if os(tvOS)
-                            .padding(.horizontal)
-                        #endif
-                    }
+        ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
+            LazyVGrid(columns: items, alignment: .center) {
+                ForEach(videos) { video in
+                    VideoView(video: video)
+                    #if os(tvOS)
+                        .padding(.horizontal)
+                    #endif
                 }
-                .padding()
             }
-            .onChange(of: videos) { [videos] newVideos in
-                guard !videos.isEmpty else {
-                    return
-                }
-
-                scrollView.scrollTo("cellsTop", anchor: .top)
-            }
-            #if os(tvOS)
-                .padding(.horizontal, 10)
-            #endif
+            .padding()
         }
+        .id(UUID())
+        #if os(tvOS)
+            .padding(.horizontal, 10)
+        #endif
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
             .background()
