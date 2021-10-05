@@ -3,15 +3,23 @@ import SwiftUI
 
 struct Player: UIViewControllerRepresentable {
     @EnvironmentObject<InvidiousAPI> private var api
-    @EnvironmentObject<PlaybackModel> private var playback
+    @EnvironmentObject<PlayerModel> private var player
 
-    var video: Video?
+    var controller: PlayerViewController?
+
+    init(controller: PlayerViewController? = nil) {
+        self.controller = controller
+    }
 
     func makeUIViewController(context _: Context) -> PlayerViewController {
+        if self.controller != nil {
+            return self.controller!
+        }
+
         let controller = PlayerViewController()
 
-        controller.video = video
-        controller.playback = playback
+        player.controller = controller
+        controller.playerModel = player
         controller.api = api
 
         controller.resolution = Defaults[.quality]

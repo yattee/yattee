@@ -2,55 +2,59 @@ import Foundation
 import SwiftUI
 
 struct PlaybackBar: View {
-    let video: Video
-
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var playback: PlaybackModel
+    @Environment(\.inNavigationView) private var inNavigationView
+
+    @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
         HStack {
             closeButton
-                .frame(width: 60, alignment: .leading)
+                .frame(width: 80, alignment: .leading)
 
-            Text(playbackStatus)
-                .foregroundColor(.gray)
-                .font(.caption2)
-                .frame(minWidth: 60, maxWidth: .infinity)
+            if player.currentItem != nil {
+                Text(playbackStatus)
+                    .foregroundColor(.gray)
+                    .font(.caption2)
+                    .frame(minWidth: 130, maxWidth: .infinity)
 
-            VStack {
-                if playback.stream != nil {
-                    Text(currentStreamString)
-                } else {
-                    if video.live {
-                        Image(systemName: "dot.radiowaves.left.and.right")
+                VStack {
+                    if player.stream != nil {
+                        Text(currentStreamString)
                     } else {
-                        Image(systemName: "bolt.horizontal.fill")
+                        if player.currentVideo!.live {
+                            Image(systemName: "dot.radiowaves.left.and.right")
+                        } else {
+                            Image(systemName: "bolt.horizontal.fill")
+                        }
                     }
                 }
+                .foregroundColor(.gray)
+                .font(.caption2)
+                .frame(width: 80, alignment: .trailing)
+                .fixedSize(horizontal: true, vertical: true)
+            } else {
+                Spacer()
             }
-            .foregroundColor(.gray)
-            .font(.caption2)
-            .frame(width: 60, alignment: .trailing)
-            .fixedSize(horizontal: true, vertical: true)
         }
         .padding(4)
         .background(.black)
     }
 
     var currentStreamString: String {
-        playback.stream != nil ? "\(playback.stream!.resolution.height)p" : ""
+        "\(player.stream!.resolution.height)p"
     }
 
     var playbackStatus: String {
-        guard playback.time != nil else {
-            if playback.live {
-                return "LIVE"
-            } else {
-                return "loading..."
-            }
+        if player.live {
+            return "LIVE"
         }
 
-        let remainingSeconds = video.length - playback.time!.seconds
+        guard player.time != nil, player.time!.isValid else {
+            return "loading..."
+        }
+
+        let remainingSeconds = player.currentVideo!.length - player.time!.seconds
 
         if remainingSeconds < 60 {
             return "less than a minute"
@@ -59,12 +63,15 @@ struct PlaybackBar: View {
         let timeFinishAt = Date.now.addingTimeInterval(remainingSeconds)
         let timeFinishAtString = timeFinishAt.formatted(date: .omitted, time: .shortened)
 
-        return "finishes at \(timeFinishAtString)"
+        return "ends at \(timeFinishAtString)"
     }
 
     var closeButton: some View {
-        Button(action: { dismiss() }) {
-            Image(systemName: "xmark.circle.fill")
+        Button {
+            dismiss()
+        } label: {
+            Label("Close", systemImage: inNavigationView ? "chevron.backward.circle.fill" : "chevron.down.circle.fill")
+                .labelStyle(.iconOnly)
         }
         .accessibilityLabel(Text("Close"))
         .buttonStyle(.borderless)

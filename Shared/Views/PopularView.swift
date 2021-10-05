@@ -11,13 +11,15 @@ struct PopularView: View {
     }
 
     var body: some View {
-        VideosCellsVertical(videos: store.collection)
-            .onAppear {
-                resource.addObserver(store)
-                resource.loadIfNeeded()
-            }
-        #if !os(tvOS)
-            .navigationTitle("Popular")
-        #endif
+        PlayerControlsView {
+            VideosCellsVertical(videos: store.collection)
+                .onAppear {
+                    resource.addObserver(store)
+                    resource.loadIfNeeded()
+                }
+            #if !os(tvOS)
+                .navigationTitle("Popular")
+            #endif
+        }
     }
 }

@@ -84,7 +84,7 @@ class Stream: Equatable, Hashable {
     }
 
     var oneMeaningfullAsset: Bool {
-        assets.dropFirst().allSatisfy { $0 == assets.first }
+        assets.dropFirst().allSatisfy { $0.url == assets.first!.url }
     }
 
     static func == (lhs: Stream, rhs: Stream) -> Bool {

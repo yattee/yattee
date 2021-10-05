@@ -11,17 +11,19 @@ struct SubscriptionsView: View {
     }
 
     var body: some View {
-        SignInRequiredView(title: "Subscriptions") {
-            VideosCellsVertical(videos: store.collection)
-                .onAppear {
-                    loadResources()
-                }
-                .onChange(of: api.account) { _ in
-                    loadResources(force: true)
-                }
-                .onChange(of: feed) { _ in
-                    loadResources(force: true)
-                }
+        PlayerControlsView {
+            SignInRequiredView(title: "Subscriptions") {
+                VideosCellsVertical(videos: store.collection)
+                    .onAppear {
+                        loadResources()
+                    }
+                    .onChange(of: api.account) { _ in
+                        loadResources(force: true)
+                    }
+                    .onChange(of: feed) { _ in
+                        loadResources(force: true)
+                    }
+            }
         }
         .refreshable {
             loadResources(force: true)

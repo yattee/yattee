@@ -2,32 +2,43 @@ import Defaults
 import SwiftUI
 
 struct VideoView: View {
-    @EnvironmentObject<NavigationModel> private var navigation
+    var video: Video
+
+    @State private var playerNavigationLinkActive = false
+
+    @Environment(\.inNavigationView) private var inNavigationView
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
         @Environment(\.horizontalCells) private var horizontalCells
     #endif
 
-    @Environment(\.inNavigationView) private var inNavigationView
-
-    var video: Video
+    @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
         Group {
-            if inNavigationView {
-                NavigationLink(destination: VideoPlayerView(video)) {
-                    content
+            Button(action: {
+                player.playNow(video)
+
+                if inNavigationView {
+                    playerNavigationLinkActive = true
+                } else {
+                    player.presentPlayer()
                 }
-            } else {
-                Button(action: { navigation.playVideo(video) }) {
-                    content
-                }
+            }) {
+                content
+            }
+
+            NavigationLink(isActive: $playerNavigationLinkActive, destination: {
+                VideoPlayerView()
+                    .environment(\.inNavigationView, true)
+            }) {
+                EmptyView()
             }
         }
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: 12))
-        .contextMenu { VideoContextMenuView(video: video) }
+        .contextMenu { VideoContextMenuView(video: video, playerNavigationLinkActive: $playerNavigationLinkActive) }
     }
 
     var content: some View {
@@ -131,7 +142,7 @@ struct VideoView: View {
                 #else
                     .frame(minHeight: 50, alignment: .top)
                 #endif
-                .padding(.bottom)
+                .padding(.bottom, 4)
 
                 Group {
                     if additionalDetailsAvailable {

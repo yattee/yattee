@@ -30,29 +30,31 @@ struct SearchView: View {
     }
 
     var body: some View {
-        VStack {
-            if showRecentQueries {
-                recentQueries
-            } else {
-                #if os(tvOS)
-                    ScrollView(.vertical, showsIndicators: false) {
-                        filtersHorizontalStack
+        PlayerControlsView {
+            VStack {
+                if showRecentQueries {
+                    recentQueries
+                } else {
+                    #if os(tvOS)
+                        ScrollView(.vertical, showsIndicators: false) {
+                            filtersHorizontalStack
 
-                        VideosCellsHorizontal(videos: state.store.collection)
+                            VideosCellsHorizontal(videos: state.store.collection)
+                        }
+                        .edgesIgnoringSafeArea(.horizontal)
+                    #else
+                        VideosCellsVertical(videos: state.store.collection)
+                    #endif
+
+                    if noResults {
+                        Text("No results")
+
+                        if searchFiltersActive {
+                            Button("Reset search filters", action: resetFilters)
+                        }
+
+                        Spacer()
                     }
-                    .edgesIgnoringSafeArea(.horizontal)
-                #else
-                    VideosCellsVertical(videos: state.store.collection)
-                #endif
-
-                if noResults {
-                    Text("No results")
-
-                    if searchFiltersActive {
-                        Button("Reset search filters", action: resetFilters)
-                    }
-
-                    Spacer()
                 }
             }
         }

@@ -20,6 +20,22 @@ struct ChannelVideosView: View {
     @Namespace private var focusNamespace
 
     var body: some View {
+        #if os(iOS)
+            if inNavigationView {
+                content
+            } else {
+                PlayerControlsView {
+                    content
+                }
+            }
+        #else
+            PlayerControlsView {
+                content
+            }
+        #endif
+    }
+
+    var content: some View {
         VStack {
             #if os(tvOS)
                 HStack {

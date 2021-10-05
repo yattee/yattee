@@ -3,13 +3,19 @@ import SwiftUI
 
 final class NavigationModel: ObservableObject {
     enum TabSelection: Hashable {
-        case watchNow, subscriptions, popular, trending, playlists, channel(String), playlist(String), recentlyOpened(String), search
+        case watchNow
+        case subscriptions
+        case popular
+        case trending
+        case playlists
+        case channel(String)
+        case playlist(String)
+        case recentlyOpened(String)
+        case nowPlaying
+        case search
     }
 
     @Published var tabSelection: TabSelection! = .watchNow
-
-    @Published var showingVideo = false
-    @Published var video: Video?
 
     @Published var presentingAddToPlaylist = false
     @Published var videoToAddToPlaylist: Video!
@@ -24,11 +30,6 @@ final class NavigationModel: ObservableObject {
     @Published var sidebarSectionChanged = false
 
     @Published var presentingSettings = false
-
-    func playVideo(_ video: Video) {
-        self.video = video
-        showingVideo = true
-    }
 
     var tabSelectionBinding: Binding<TabSelection> {
         Binding<TabSelection>(

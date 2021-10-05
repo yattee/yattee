@@ -6,33 +6,35 @@ struct WatchNowView: View {
     @EnvironmentObject<InvidiousAPI> private var api
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            if api.validInstance {
-                VStack(alignment: .leading, spacing: 0) {
-                    if api.signedIn {
-                        WatchNowSection(resource: api.feed, label: "Subscriptions")
-                    }
-                    WatchNowSection(resource: api.popular, label: "Popular")
-                    WatchNowSection(resource: api.trending(category: .default, country: .pl), label: "Trending")
-                    WatchNowSection(resource: api.trending(category: .movies, country: .pl), label: "Movies")
-                    WatchNowSection(resource: api.trending(category: .music, country: .pl), label: "Music")
+        PlayerControlsView {
+            ScrollView(.vertical, showsIndicators: false) {
+                if api.validInstance {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if api.signedIn {
+                            WatchNowSection(resource: api.feed, label: "Subscriptions")
+                        }
+                        WatchNowSection(resource: api.popular, label: "Popular")
+                        WatchNowSection(resource: api.trending(category: .default, country: .pl), label: "Trending")
+                        WatchNowSection(resource: api.trending(category: .movies, country: .pl), label: "Movies")
+                        WatchNowSection(resource: api.trending(category: .music, country: .pl), label: "Music")
 
 //                  TODO: adding sections to view
 //                  ===================
 //                  WatchNowPlaylistSection(id: "IVPLmRFYLGYZpq61SpujNw3EKbzzGNvoDmH")
 //                  WatchNowSection(resource: api.channelVideos("UCBJycsmduvYEL83R_U4JriQ"), label: "MKBHD")
+                    }
                 }
             }
+            #if os(tvOS)
+                .edgesIgnoringSafeArea(.horizontal)
+            #else
+                .navigationTitle("Watch Now")
+            #endif
+            #if os(macOS)
+                .background()
+                .frame(minWidth: 360)
+            #endif
         }
-        #if os(tvOS)
-            .edgesIgnoringSafeArea(.horizontal)
-        #else
-            .navigationTitle("Watch Now")
-        #endif
-        #if os(macOS)
-            .background()
-            .frame(minWidth: 360)
-        #endif
     }
 }
 

@@ -3,8 +3,9 @@ import AVKit
 import Foundation
 import SwiftyJSON
 
-struct Video: Identifiable, Equatable {
+struct Video: Identifiable, Equatable, Hashable {
     let id: String
+    let videoID: String
     var title: String
     var thumbnails: [Thumbnail]
     var author: String
@@ -31,7 +32,8 @@ struct Video: Identifiable, Equatable {
     var channel: Channel
 
     init(
-        id: String,
+        id: String? = nil,
+        videoID: String,
         title: String,
         author: String,
         length: TimeInterval,
@@ -49,7 +51,8 @@ struct Video: Identifiable, Equatable {
         dislikes: Int? = nil,
         keywords: [String] = []
     ) {
-        self.id = id
+        self.id = id ?? UUID().uuidString
+        self.videoID = videoID
         self.title = title
         self.author = author
         self.length = length
@@ -69,7 +72,7 @@ struct Video: Identifiable, Equatable {
     }
 
     init(_ json: JSON) {
-        let videoID = json["videoId"].stringValue
+        videoID = json["videoId"].stringValue
 
         if let id = json["indexId"].string {
             indexID = id
@@ -205,5 +208,9 @@ struct Video: Identifiable, Equatable {
 
     static func == (lhs: Video, rhs: Video) -> Bool {
         lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

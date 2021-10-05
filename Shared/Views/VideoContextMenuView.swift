@@ -2,26 +2,72 @@ import Defaults
 import SwiftUI
 
 struct VideoContextMenuView: View {
+    let video: Video
+
+    @Binding var playerNavigationLinkActive: Bool
+
+    @Environment(\.inNavigationView) private var inNavigationView
+
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
-    let video: Video
-
     var body: some View {
-        openChannelButton
-
-        subscriptionButton
-
-        if navigation.tabSelection != .playlists {
-            addToPlaylistButton
-        } else if let playlist = playlists.currentPlaylist {
-            removeFromPlaylistButton(playlistID: playlist.id)
+        Section {
+            playNowButton
+        }
+        Section {
+            playNextButton
+            addToQueueButton
         }
 
-        if case let .playlist(id) = navigation.tabSelection {
-            removeFromPlaylistButton(playlistID: id)
+        Section {
+            openChannelButton
+            subscriptionButton
+        }
+
+        Section {
+            if navigation.tabSelection != .playlists {
+                addToPlaylistButton
+            } else if let playlist = playlists.currentPlaylist {
+                removeFromPlaylistButton(playlistID: playlist.id)
+            }
+
+            if case let .playlist(id) = navigation.tabSelection {
+                removeFromPlaylistButton(playlistID: id)
+            }
+        }
+    }
+
+    var playNowButton: some View {
+        Button {
+            player.playNow(video)
+
+            if inNavigationView {
+                playerNavigationLinkActive = true
+            } else {
+                player.presentPlayer()
+            }
+        } label: {
+            Label("Play Now", systemImage: "play")
+        }
+    }
+
+    var playNextButton: some View {
+        Button {
+            player.playNext(video)
+        } label: {
+            Label("Play Next", systemImage: "text.insert")
+        }
+    }
+
+    var addToQueueButton: some View {
+        Button {
+            player.enqueueVideo(video)
+        } label: {
+            Label("Play Last", systemImage: "text.append")
         }
     }
 

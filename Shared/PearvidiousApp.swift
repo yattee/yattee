@@ -3,21 +3,9 @@ import SwiftUI
 
 @main
 struct PearvidiousApp: App {
-    @StateObject private var api = InvidiousAPI()
-    @StateObject private var instances = InstancesModel()
-    @StateObject private var playlists = PlaylistsModel()
-    @StateObject private var search = SearchModel()
-    @StateObject private var subscriptions = SubscriptionsModel()
-
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear(perform: configureAPI)
-                .environmentObject(api)
-                .environmentObject(instances)
-                .environmentObject(playlists)
-                .environmentObject(search)
-                .environmentObject(subscriptions)
         }
         #if !os(tvOS)
             .commands {
@@ -28,20 +16,9 @@ struct PearvidiousApp: App {
         #if os(macOS)
             Settings {
                 SettingsView()
-                    .onAppear(perform: configureAPI)
-                    .environmentObject(api)
-                    .environmentObject(instances)
+                    .environmentObject(InvidiousAPI())
+                    .environmentObject(InstancesModel())
             }
         #endif
-    }
-
-    fileprivate func configureAPI() {
-        playlists.api = api
-        search.api = api
-        subscriptions.api = api
-
-        if let account = instances.defaultAccount, api.account.isEmpty {
-            api.setAccount(account)
-        }
     }
 }

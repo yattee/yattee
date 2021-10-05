@@ -3,6 +3,7 @@ import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var model
 
     @State private var showingNewPlaylist = false
@@ -18,24 +19,26 @@ struct PlaylistsView: View {
     }
 
     var body: some View {
-        SignInRequiredView(title: "Playlists") {
-            VStack {
-                #if os(tvOS)
-                    toolbar
-                #endif
-
-                if model.currentPlaylist != nil, videos.isEmpty {
-                    hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
-                } else if model.all.isEmpty {
-                    hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
-                } else {
+        PlayerControlsView {
+            SignInRequiredView(title: "Playlists") {
+                VStack {
                     #if os(tvOS)
-                        VideosCellsHorizontal(videos: videos)
-                            .padding(.top, 40)
-                        Spacer()
-                    #else
-                        VideosCellsVertical(videos: videos)
+                        toolbar
                     #endif
+
+                    if model.currentPlaylist != nil, videos.isEmpty {
+                        hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
+                    } else if model.all.isEmpty {
+                        hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
+                    } else {
+                        #if os(tvOS)
+                            VideosCellsHorizontal(videos: videos)
+                                .padding(.top, 40)
+                            Spacer()
+                        #else
+                            VideosCellsVertical(videos: videos)
+                        #endif
+                    }
                 }
             }
         }
@@ -111,6 +114,16 @@ struct PlaylistsView: View {
                         .foregroundColor(.secondary)
 
                     selectPlaylistButton
+                }
+
+                Button {
+                    player.playAll(videos)
+                    player.presentPlayer()
+                } label: {
+                    HStack(spacing: 15) {
+                        Image(systemName: "play.fill")
+                        Text("Play All")
+                    }
                 }
 
                 if model.currentPlaylist != nil {

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppSidebarPlaylists: View {
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var playlists
 
     var body: some View {
@@ -15,6 +16,11 @@ struct AppSidebarPlaylists: View {
                 }
                 .id(playlist.id)
                 .contextMenu {
+                    Button("Add to queue...") {
+                        playlists.find(id: playlist.id)?.videos.forEach { video in
+                            player.enqueueVideo(video)
+                        }
+                    }
                     Button("Edit") {
                         navigation.presentEditPlaylistForm(playlists.find(id: playlist.id))
                     }

@@ -2,8 +2,8 @@ import Defaults
 import SwiftUI
 
 struct TVNavigationView: View {
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlaybackModel> private var playback
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
@@ -29,6 +29,10 @@ struct TVNavigationView: View {
                 .tabItem { Text("Playlists") }
                 .tag(TabSelection.playlists)
 
+            NowPlayingView()
+                .tabItem { Text("Now Playing") }
+                .tag(TabSelection.nowPlaying)
+
             SearchView()
                 .tabItem { Image(systemName: "magnifyingglass") }
                 .tag(TabSelection.search)
@@ -39,11 +43,8 @@ struct TVNavigationView: View {
                 AddToPlaylistView(video: video)
             }
         }
-        .fullScreenCover(isPresented: $navigation.showingVideo) {
-            if let video = navigation.video {
-                VideoPlayerView(video)
-                    .environmentObject(playback)
-            }
+        .fullScreenCover(isPresented: $player.presentingPlayer) {
+            VideoPlayerView()
         }
         .fullScreenCover(isPresented: $navigation.isChannelOpen) {
             if let channel = recents.presentedChannel {

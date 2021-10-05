@@ -25,17 +25,19 @@ struct TrendingView: View {
     }
 
     var body: some View {
-        Section {
-            VStack(alignment: .center, spacing: 0) {
-                #if os(tvOS)
-                    toolbar
-                    VideosCellsHorizontal(videos: store.collection)
-                        .padding(.top, 40)
+        PlayerControlsView {
+            Section {
+                VStack(alignment: .center, spacing: 0) {
+                    #if os(tvOS)
+                        toolbar
+                        VideosCellsHorizontal(videos: store.collection)
+                            .padding(.top, 40)
 
-                    Spacer()
-                #else
-                    VideosCellsVertical(videos: store.collection)
-                #endif
+                        Spacer()
+                    #else
+                        VideosCellsVertical(videos: store.collection)
+                    #endif
+                }
             }
         }
         #if os(tvOS)

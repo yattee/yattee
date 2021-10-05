@@ -3,15 +3,12 @@ import Logging
 import SwiftUI
 
 final class PlayerViewController: UIViewController {
-    var video: Video!
-
     var api: InvidiousAPI!
     var playerLoaded = false
-    var player = AVPlayer()
     var playerModel: PlayerModel!
-    var playback: PlaybackModel!
     var playerViewController = AVPlayerViewController()
     var resolution: Stream.ResolutionSetting!
+    var shouldResume = false
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -22,61 +19,42 @@ final class PlayerViewController: UIViewController {
         try? AVAudioSession.sharedInstance().setActive(true)
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
-        #if os(iOS)
-            if !playerModel.playingOutsideViewController {
-                playerViewController.player?.replaceCurrentItem(with: nil)
-                playerViewController.player = nil
-
-                try? AVAudioSession.sharedInstance().setActive(false)
-            }
-        #endif
-
-        super.viewDidDisappear(animated)
-    }
-
     func loadPlayer() {
-        playerModel = PlayerModel(playback: playback, api: api, resolution: resolution)
-
         guard !playerLoaded else {
             return
         }
 
-        playerModel.player = player
+        playerModel.controller = self
         playerViewController.player = playerModel.player
-        playerModel.loadVideo(video)
+        playerViewController.allowsPictureInPicturePlayback = true
+        playerViewController.delegate = self
 
         #if os(tvOS)
+            playerModel.avPlayerViewController = playerViewController
+            playerViewController.customInfoViewControllers = [playerQueueInfoViewController]
             present(playerViewController, animated: false)
-
-            addItemDidPlayToEndTimeObserver()
         #else
             embedViewController()
         #endif
 
-        playerViewController.allowsPictureInPicturePlayback = true
-        playerViewController.delegate = self
         playerLoaded = true
     }
 
     #if os(tvOS)
-        func addItemDidPlayToEndTimeObserver() {
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(itemDidPlayToEndTime),
-                name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-                object: nil
+        var playerQueueInfoViewController: UIHostingController<AnyView> {
+            let controller = UIHostingController(rootView:
+                AnyView(
+                    NowPlayingView(infoViewController: true)
+                        .environmentObject(playerModel)
+                )
             )
-        }
 
-        @objc func itemDidPlayToEndTime() {
-            playerViewController.dismiss(animated: true) {
-                self.dismiss(animated: false)
-            }
+            controller.title = "Playing Next"
+
+            return controller
         }
     #else
         func embedViewController() {
-            playerViewController.exitsFullScreenWhenPlaybackEnds = true
             playerViewController.view.frame = view.bounds
 
             addChild(playerViewController)
@@ -96,17 +74,22 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         false
     }
 
+    func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
+        shouldResume = playerModel.isPlaying
+    }
+
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
-        playerModel.playingOutsideViewController = false
+        if shouldResume {
+            playerModel.player.play()
+        }
+
         dismiss(animated: false)
     }
 
     func playerViewController(
         _: AVPlayerViewController,
         willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
-    ) {
-        playerModel.playingOutsideViewController = true
-    }
+    ) {}
 
     func playerViewController(
         _: AVPlayerViewController,
@@ -114,8 +97,6 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     ) {
         coordinator.animate(alongsideTransition: nil) { context in
             if !context.isCancelled {
-                self.playerModel.playingOutsideViewController = false
-
                 #if os(iOS)
                     if self.traitCollection.verticalSizeClass == .compact {
                         self.dismiss(animated: true)
@@ -125,11 +106,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         }
     }
 
-    func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {
-        playerModel.playingOutsideViewController = true
-    }
+    func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {}
 
-    func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {
-        playerModel.playingOutsideViewController = false
-    }
+    func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {}
 }

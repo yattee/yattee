@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct VideoPlayerSizeModifier: ViewModifier {
-    let geometry: GeometryProxy
+    let geometry: GeometryProxy!
     let aspectRatio: Double?
     let minimumHeightLeft: Double
 
@@ -11,7 +11,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
     #endif
 
     init(
-        geometry: GeometryProxy,
+        geometry: GeometryProxy? = nil,
         aspectRatio: Double? = nil,
         minimumHeightLeft: Double? = nil
     ) {
@@ -21,10 +21,15 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content
-            .frame(maxHeight: maxHeight)
-            .aspectRatio(usedAspectRatio, contentMode: usedAspectRatioContentMode)
-            .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+        // TODO: verify if optional GeometryProxy is still used
+        if geometry != nil {
+            content
+                .frame(maxHeight: maxHeight)
+                .aspectRatio(usedAspectRatio, contentMode: usedAspectRatioContentMode)
+                .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+        } else {
+            content.edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+        }
     }
 
     var usedAspectRatio: Double {

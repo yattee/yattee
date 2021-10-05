@@ -5,7 +5,7 @@ extension Video {
         let id = "D2sxamzaHkM"
 
         return Video(
-            id: UUID().uuidString,
+            videoID: UUID().uuidString,
             title: "Relaxing Piano Music that will make you feel amazingly good",
             author: "Fancy Videotuber",
             length: 582,

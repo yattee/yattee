@@ -7,11 +7,11 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(InstancesModel())
             .environmentObject(api)
             .environmentObject(NavigationModel())
-            .environmentObject(PlaybackModel())
+            .environmentObject(player)
             .environmentObject(PlaylistsModel())
             .environmentObject(RecentsModel())
             .environmentObject(SearchModel())
-            .environmentObject(SubscriptionsModel(api: api))
+            .environmentObject(subscriptions)
     }
 
     private var api: InvidiousAPI {
@@ -21,6 +21,24 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
         api.signedIn = true
 
         return api
+    }
+
+    private var player: PlayerModel {
+        let player = PlayerModel()
+
+        player.currentItem = PlayerQueueItem(Video.fixture)
+        player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
+        player.history = player.queue
+
+        return player
+    }
+
+    private var subscriptions: SubscriptionsModel {
+        let subscriptions = SubscriptionsModel()
+
+        subscriptions.channels = Video.allFixtures.map { $0.channel }
+
+        return subscriptions
     }
 }
 

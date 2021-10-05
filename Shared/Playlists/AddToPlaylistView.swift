@@ -79,14 +79,8 @@ struct AddToPlaylistView: View {
 
     private var form: some View {
         VStack(alignment: formAlignment) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(video.title)
-                    .font(.headline)
-                Text(video.author)
-                    .foregroundColor(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 40)
+            VideoBanner(video: video)
+                .padding(.vertical, 40)
 
             VStack(alignment: formAlignment) {
                 #if os(tvOS)

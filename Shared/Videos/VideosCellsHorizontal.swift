@@ -28,14 +28,14 @@ struct VideosCellsHorizontal: View {
                 .padding(.vertical, 30)
             #else
                 .padding(.horizontal, 15)
-                .padding(.vertical, 20)
+                .padding(.vertical, 10)
             #endif
         }
         .id(UUID())
         #if os(tvOS)
             .frame(height: 560)
         #else
-            .frame(height: 280)
+            .frame(height: 250)
         #endif
 
         .edgesIgnoringSafeArea(.horizontal)

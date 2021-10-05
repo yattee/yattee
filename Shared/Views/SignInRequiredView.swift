@@ -56,6 +56,7 @@ struct SignInRequiredView<Content: View>: View {
                 openSettingsButton
             #endif
         }
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
     }
 
     var openSettingsButton: some View {
@@ -74,9 +75,12 @@ struct SignInRequiredView<Content: View>: View {
 
 struct SignInRequiredView_Previews: PreviewProvider {
     static var previews: some View {
-        SignInRequiredView(title: "Subscriptions") {
-            Text("Only when signed in")
+        PlayerControlsView {
+            SignInRequiredView(title: "Subscriptions") {
+                Text("Only when signed in")
+            }
         }
+        .environmentObject(PlayerModel())
         .environmentObject(InvidiousAPI())
     }
 }
