@@ -14,11 +14,7 @@ struct PlayerQueueRow: View {
                 player.addCurrentItemToHistory()
 
                 if history {
-                    let newItem = player.enqueueVideo(item.video, prepending: true)
-                    player.advanceToItem(newItem!)
-                    if let historyItemIndex = player.history.firstIndex(of: item) {
-                        player.history.remove(at: historyItemIndex)
-                    }
+                    player.playHistory(item)
                 } else {
                     player.advanceToItem(item)
                 }

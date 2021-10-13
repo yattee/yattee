@@ -45,6 +45,7 @@ final class PlayerViewController: UIViewController {
             let controller = UIHostingController(rootView:
                 AnyView(
                     NowPlayingView(infoViewController: true)
+                        .frame(maxHeight: 600)
                         .environmentObject(playerModel)
                 )
             )

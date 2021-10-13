@@ -127,6 +127,16 @@ extension PlayerModel {
         }
     }
 
+    func playHistory(_ item: PlayerQueueItem) {
+        let newItem = enqueueVideo(item.video, prepending: true)
+
+        advanceToItem(newItem!)
+
+        if let historyItemIndex = history.firstIndex(of: item) {
+            history.remove(at: historyItemIndex)
+        }
+    }
+
     @discardableResult func removeHistory(_ item: PlayerQueueItem) -> PlayerQueueItem? {
         if let index = history.firstIndex(where: { $0 == item }) {
             return history.remove(at: index)

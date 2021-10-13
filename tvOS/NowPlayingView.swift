@@ -33,15 +33,13 @@ struct NowPlayingView: View {
                     .padding(.bottom, 20)
                 }
 
-                if !infoViewController {
-                    header("Playing Next")
-                }
+                header("Playing Next")
 
                 if player.queue.isEmpty {
                     Spacer()
 
                     Text("Playback queue is empty")
-                        .padding(.leading, 40)
+                        .padding([.vertical, .leading], 40)
                         .foregroundColor(.secondary)
                 }
 
@@ -55,6 +53,34 @@ struct NowPlayingView: View {
                     .contextMenu {
                         Button("Delete", role: .destructive) {
                             player.remove(item)
+                        }
+                    }
+                }
+
+                header("Played Previously")
+
+                if player.history.isEmpty {
+                    Spacer()
+
+                    Text("History is empty")
+                        .padding([.vertical, .leading], 40)
+                        .foregroundColor(.secondary)
+                }
+
+                ForEach(player.history) { item in
+                    Button {
+                        player.playHistory(item)
+                        player.presentPlayer()
+                    } label: {
+                        VideoBanner(video: item.video)
+                    }
+                    .contextMenu {
+                        Button("Delete", role: .destructive) {
+                            player.removeHistory(item)
+                        }
+
+                        Button("Delete History", role: .destructive) {
+                            player.removeHistoryItems()
                         }
                     }
                 }
