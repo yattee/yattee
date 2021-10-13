@@ -67,6 +67,8 @@ final class PlayerModel: ObservableObject {
 
     func playVideo(_ video: Video) {
         if video.live {
+            self.stream = nil
+
             playHlsUrl(video)
             return
         }

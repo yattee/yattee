@@ -159,7 +159,6 @@ struct VideoPlayerView: View {
 struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
-//            .frame(minWidth: 1200, minHeight: 1400)
             .injectFixtureEnvironmentObjects()
 
         VideoPlayerView()

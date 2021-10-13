@@ -79,3 +79,10 @@ struct PlaybackBar: View {
         .keyboardShortcut(.cancelAction)
     }
 }
+
+struct PlaybackBar_Previews: PreviewProvider {
+    static var previews: some View {
+        PlaybackBar()
+            .injectFixtureEnvironmentObjects()
+    }
+}

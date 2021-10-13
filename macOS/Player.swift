@@ -18,6 +18,7 @@ struct Player: NSViewControllerRepresentable {
         let controller = PlayerViewController()
 
         controller.playerModel = player
+        player.controller = controller
 
         return controller
     }

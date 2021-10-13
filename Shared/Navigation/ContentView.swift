@@ -42,6 +42,7 @@ struct ContentView: View {
             .fullScreenCover(isPresented: $player.presentingPlayer) {
                 VideoPlayerView()
                     .environmentObject(api)
+                    .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
                     .environmentObject(subscriptions)
@@ -51,6 +52,7 @@ struct ContentView: View {
                 VideoPlayerView()
                     .frame(minWidth: 900, minHeight: 800)
                     .environmentObject(api)
+                    .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
                     .environmentObject(subscriptions)
