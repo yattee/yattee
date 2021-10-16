@@ -8,7 +8,7 @@ struct WatchNowSection: View {
 
     @StateObject private var store = Store<[Video]>()
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
 
     init(resource: Resource, label: String) {
         self.resource = resource
@@ -21,7 +21,7 @@ struct WatchNowSection: View {
                 resource.addObserver(store)
                 resource.loadIfNeeded()
             }
-            .onChange(of: api.account) { _ in
+            .onChange(of: accounts.account) { _ in
                 resource.load()
             }
     }

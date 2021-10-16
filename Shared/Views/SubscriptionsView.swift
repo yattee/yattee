@@ -4,7 +4,11 @@ import SwiftUI
 struct SubscriptionsView: View {
     @StateObject private var store = Store<[Video]>()
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
+
+    var api: InvidiousAPI {
+        accounts.invidious
+    }
 
     var feed: Resource {
         api.feed
@@ -17,10 +21,7 @@ struct SubscriptionsView: View {
                     .onAppear {
                         loadResources()
                     }
-                    .onChange(of: api.account) { _ in
-                        loadResources(force: true)
-                    }
-                    .onChange(of: feed) { _ in
+                    .onChange(of: accounts.account) { _ in
                         loadResources(force: true)
                     }
             }

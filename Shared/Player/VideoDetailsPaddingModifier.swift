@@ -4,9 +4,9 @@ import SwiftUI
 struct VideoDetailsPaddingModifier: ViewModifier {
     static var defaultAdditionalDetailsPadding: Double {
         #if os(macOS)
-            20
+            30
         #else
-            35
+            40
         #endif
     }
 

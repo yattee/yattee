@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import Siesta
 
 extension PlayerModel {
     var currentVideo: Video? {
@@ -20,7 +21,7 @@ extension PlayerModel {
 
     func playNext(_ video: Video) {
         enqueueVideo(video, prepending: true) { _, item in
-            if self.currentItem == nil {
+            if self.currentItem.isNil {
                 self.advanceToItem(item)
             }
         }
@@ -103,6 +104,10 @@ extension PlayerModel {
         return item
     }
 
+    func videoResource(_ id: Video.ID) -> Resource {
+        accounts.invidious.video(id)
+    }
+
     private func loadDetails(_ video: Video?, onSuccess: @escaping (Video) -> Void) {
         guard video != nil else {
             return
@@ -114,7 +119,7 @@ extension PlayerModel {
             return
         }
 
-        api.video(video!.videoID).load().onSuccess { response in
+        videoResource(video!.videoID).load().onSuccess { response in
             if let video: Video = response.typedContent() {
                 onSuccess(video)
             }

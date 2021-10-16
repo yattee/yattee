@@ -2,7 +2,6 @@ import Defaults
 import SwiftUI
 
 struct Player: UIViewControllerRepresentable {
-    @EnvironmentObject<InvidiousAPI> private var api
     @EnvironmentObject<PlayerModel> private var player
 
     var controller: PlayerViewController?
@@ -18,11 +17,8 @@ struct Player: UIViewControllerRepresentable {
 
         let controller = PlayerViewController()
 
-        player.controller = controller
         controller.playerModel = player
-        controller.api = api
-
-        controller.resolution = Defaults[.quality]
+        player.controller = controller
 
         return controller
     }

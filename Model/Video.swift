@@ -22,7 +22,6 @@ struct Video: Identifiable, Equatable, Hashable {
     var upcoming: Bool
 
     var streams = [Stream]()
-    var hlsUrl: URL?
 
     var publishedAt: Date?
     var likes: Int?
@@ -104,10 +103,13 @@ struct Video: Identifiable, Equatable, Hashable {
             publishedAt = Date(timeIntervalSince1970: publishedInterval)
         }
 
+        if let hlsURL = json["hlsUrl"].url {
+            streams.append(.init(hlsURL: hlsURL))
+        }
+
         streams = Video.extractFormatStreams(from: json["formatStreams"].arrayValue)
         streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
 
-        hlsUrl = json["hlsUrl"].url
         channel = Channel(json: json)
     }
 
@@ -179,8 +181,8 @@ struct Video: Identifiable, Equatable, Hashable {
     private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
             SingleAssetStream(
-                avAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
+                avAsset: AVURLAsset(url: $0["url"].url!),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
                 kind: .stream,
                 encoding: $0["encoding"].stringValue
             )
@@ -197,9 +199,9 @@ struct Video: Identifiable, Equatable, Hashable {
 
         return videoAssetsURLs.map {
             Stream(
-                audioAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset(audioAssetURL!["url"].stringValue)!),
-                videoAsset: AVURLAsset(url: InvidiousAPI.proxyURLForAsset($0["url"].stringValue)!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue)!,
+                audioAsset: AVURLAsset(url: audioAssetURL!["url"].url!),
+                videoAsset: AVURLAsset(url: $0["url"].url!),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
                 kind: .adaptive,
                 encoding: $0["encoding"].stringValue
             )

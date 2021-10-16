@@ -19,8 +19,10 @@ struct InstancesSettingsView: View {
         Group {
             Section(header: Text("Instances"), footer: DefaultAccountHint()) {
                 ForEach(instances) { instance in
-                    NavigationLink(instance.description) {
-                        AccountsSettingsView(instanceID: instance.id)
+                    Group {
+                        NavigationLink(instance.longDescription) {
+                            AccountsSettingsView(instanceID: instance.id)
+                        }
                     }
                     #if os(iOS)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {

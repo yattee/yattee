@@ -4,14 +4,18 @@ import SwiftUI
 
 final class SubscriptionsModel: ObservableObject {
     @Published var channels = [Channel]()
-    @Published var api: InvidiousAPI! = InvidiousAPI()
+    var accounts: AccountsModel
+
+    var api: InvidiousAPI {
+        accounts.invidious
+    }
 
     var resource: Resource {
         api.subscriptions
     }
 
-    init(api: InvidiousAPI? = nil) {
-        self.api = api
+    init(accounts: AccountsModel? = nil) {
+        self.accounts = accounts ?? AccountsModel()
     }
 
     var all: [Channel] {

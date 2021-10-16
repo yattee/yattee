@@ -13,6 +13,18 @@ struct AccountsSettingsView: View {
     }
 
     var body: some View {
+        Group {
+            if instance.supportsAccounts {
+                accounts
+            } else {
+                Text("Accounts are not supported for the application of this instance")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .navigationTitle(instance.shortDescription)
+    }
+
+    var accounts: some View {
         List {
             Section(header: Text("Accounts"), footer: sectionFooter) {
                 ForEach(instances.accounts(instanceID), id: \.self) { account in
@@ -59,7 +71,6 @@ struct AccountsSettingsView: View {
                 }
             }
         }
-        .navigationTitle(instance.shortDescription)
         .sheet(isPresented: $presentingAccountForm, onDismiss: { accountsChanged.toggle() }) {
             AccountFormView(instance: instance)
         }

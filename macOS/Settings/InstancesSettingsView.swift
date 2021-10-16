@@ -21,7 +21,7 @@ struct InstancesSettingsView: View {
             if !instances.isEmpty {
                 Picker("Instance", selection: $selectedInstanceID) {
                     ForEach(instances) { instance in
-                        Text(instance.description).tag(Optional(instance.id))
+                        Text(instance.longDescription).tag(Optional(instance.id))
                     }
                 }
                 .labelsHidden()
@@ -31,7 +31,7 @@ struct InstancesSettingsView: View {
                     .foregroundColor(.secondary)
             }
 
-            if !selectedInstance.isNil {
+            if !selectedInstance.isNil, selectedInstance.supportsAccounts {
                 Text("Accounts")
                 List(selection: $selectedAccount) {
                     if accounts.isEmpty {
@@ -46,11 +46,21 @@ struct InstancesSettingsView: View {
                 .listStyle(.inset(alternatesRowBackgrounds: true))
             }
 
+            if selectedInstance != nil, !selectedInstance.supportsAccounts {
+                Text("Accounts are not supported for the application of this instance")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+            }
+
             if selectedInstance != nil {
                 HStack {
-                    Button("Add Account...") {
-                        selectedAccount = nil
-                        presentingAccountForm = true
+                    if selectedInstance.supportsAccounts {
+                        Button("Add Account...") {
+                            selectedAccount = nil
+                            presentingAccountForm = true
+                        }
                     }
 
                     Spacer()
@@ -59,7 +69,7 @@ struct InstancesSettingsView: View {
                         presentingConfirmationDialog = true
                     }
                     .confirmationDialog(
-                        "Are you sure you want to remove \(selectedInstance!.description) instance?",
+                        "Are you sure you want to remove \(selectedInstance!.longDescription) instance?",
                         isPresented: $presentingConfirmationDialog
                     ) {
                         Button("Remove Instance", role: .destructive) {

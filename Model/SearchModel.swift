@@ -5,7 +5,7 @@ import SwiftUI
 final class SearchModel: ObservableObject {
     @Published var store = Store<[Video]>()
 
-    @Published var api = InvidiousAPI()
+    var accounts = AccountsModel()
     @Published var query = SearchQuery()
     @Published var queryText = ""
     @Published var querySuggestions = Store<[String]>()
@@ -15,6 +15,10 @@ final class SearchModel: ObservableObject {
 
     var isLoading: Bool {
         resource?.isLoading ?? false
+    }
+
+    var api: InvidiousAPI {
+        accounts.invidious
     }
 
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {

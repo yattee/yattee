@@ -52,6 +52,10 @@ struct PlayerControlsView<Content: View>: View {
                 .padding(.vertical, 20)
                 .contentShape(Rectangle())
             }
+            #if !os(tvOS)
+                .keyboardShortcut("o")
+            #endif
+
             Group {
                 if model.isPlaying {
                     Button(action: {
@@ -65,7 +69,7 @@ struct PlayerControlsView<Content: View>: View {
                     }) {
                         Label("Play", systemImage: "play.fill")
                     }
-                    .disabled(model.player.currentItem == nil)
+                    .disabled(model.player.currentItem.isNil)
                 }
             }
             .frame(minWidth: 30)

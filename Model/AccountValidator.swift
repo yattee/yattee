@@ -3,6 +3,7 @@ import Siesta
 import SwiftUI
 
 final class AccountValidator: Service {
+    let app: Binding<Instance.App>
     let url: String
     let account: Instance.Account?
 
@@ -13,6 +14,7 @@ final class AccountValidator: Service {
     var error: Binding<String?>?
 
     init(
+        app: Binding<Instance.App>,
         url: String,
         account: Instance.Account? = nil,
         id: Binding<String>,
@@ -21,6 +23,7 @@ final class AccountValidator: Service {
         isValidating: Binding<Bool>,
         error: Binding<String?>? = nil
     ) {
+        self.app = app
         self.url = url
         self.account = account
         formObjectID = id
@@ -34,6 +37,10 @@ final class AccountValidator: Service {
     }
 
     func configure() {
+        configure {
+            $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
+        }
+
         configure("/api/v1/auth/feed", requestMethods: [.get]) {
             guard self.account != nil else {
                 return
@@ -46,15 +53,35 @@ final class AccountValidator: Service {
     func validateInstance() {
         reset()
 
+        // TODO: validation for Piped instances
+        guard app.wrappedValue == .invidious else {
+            isValid.wrappedValue = true
+            error?.wrappedValue = nil
+            isValidated.wrappedValue = true
+            isValidating.wrappedValue = false
+
+            return
+        }
+
         stats
             .load()
-            .onSuccess { _ in
+            .onSuccess { response in
                 guard self.url == self.formObjectID.wrappedValue else {
                     return
                 }
 
-                self.isValid.wrappedValue = true
-                self.error?.wrappedValue = nil
+                if response
+                    .json
+                    .dictionaryValue["software"]?
+                    .dictionaryValue["name"]?
+                    .stringValue == "invidious"
+                {
+                    self.isValid.wrappedValue = true
+                    self.error?.wrappedValue = nil
+                } else {
+                    self.isValid.wrappedValue = false
+                    self.error?.wrappedValue = "Not an Invidious Instance"
+                }
             }
             .onFailure { error in
                 guard self.url == self.formObjectID.wrappedValue else {
@@ -70,7 +97,7 @@ final class AccountValidator: Service {
             }
     }
 
-    func validateAccount() {
+    func validateInvidiousAccount() {
         reset()
 
         feed

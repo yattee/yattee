@@ -3,11 +3,9 @@ import Logging
 import SwiftUI
 
 final class PlayerViewController: UIViewController {
-    var api: InvidiousAPI!
     var playerLoaded = false
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
-    var resolution: Stream.ResolutionSetting!
     var shouldResume = false
 
     override func viewWillAppear(_ animated: Bool) {
@@ -81,7 +79,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
         if shouldResume {
-            playerModel.player.play()
+            playerModel.play()
         }
 
         dismiss(animated: false)

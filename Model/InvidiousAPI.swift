@@ -6,10 +6,20 @@ import SwiftyJSON
 final class InvidiousAPI: Service, ObservableObject {
     static let basePath = "/api/v1"
 
-    @Published var account: Instance.Account! = .empty
+    @Published var account: Instance.Account!
 
-    @Published var validInstance = false
+    @Published var validInstance = true
     @Published var signedIn = false
+
+    init(account: Instance.Account? = nil) {
+        super.init()
+
+        guard !account.isNil else {
+            return
+        }
+
+        setAccount(account!)
+    }
 
     func setAccount(_ account: Instance.Account) {
         self.account = account
@@ -56,26 +66,11 @@ final class InvidiousAPI: Service, ObservableObject {
             }
     }
 
-    static func proxyURLForAsset(_ url: String) -> URL? {
-        URL(string: url)
-        // TODO: Switching instances, move up to player
-        //        guard let instanceURLComponents = URLComponents(string: InvidiousAPI.instance),
-        //              var urlComponents = URLComponents(string: url) else { return nil }
-        //
-        //        urlComponents.scheme = instanceURLComponents.scheme
-        //        urlComponents.host = instanceURLComponents.host
-        //
-        //        return urlComponents.url
-    }
-
     func configure() {
-        SiestaLog.Category.enabled = .common
-
-        let SwiftyJSONTransformer =
-            ResponseContentTransformer(transformErrors: true) { JSON($0.content as AnyObject) }
-
         configure {
-            $0.headers["Cookie"] = self.cookieHeader
+            if !self.account.sid.isEmpty {
+                $0.headers["Cookie"] = self.cookieHeader
+            }
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
 

@@ -5,6 +5,7 @@ struct InstanceFormView: View {
 
     @State private var name = ""
     @State private var url = ""
+    @State private var app = Instance.App.invidious
 
     @State private var isValid = false
     @State private var isValidated = false
@@ -37,7 +38,7 @@ struct InstanceFormView: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .background(.thickMaterial)
         #else
-            .frame(width: 400, height: 150)
+            .frame(width: 400, height: 190)
         #endif
     }
 
@@ -73,6 +74,13 @@ struct InstanceFormView: View {
 
     private var formFields: some View {
         Group {
+            Picker("Application", selection: $app) {
+                ForEach(Instance.App.allCases, id: \.self) { app in
+                    Text(app.rawValue.capitalized).tag(app)
+                }
+            }
+            .pickerStyle(.segmented)
+
             TextField("Name", text: $name, prompt: Text("Instance Name (optional)"))
                 .focused($nameFieldFocused)
 
@@ -104,6 +112,7 @@ struct InstanceFormView: View {
 
     var validator: AccountValidator {
         AccountValidator(
+            app: $app,
             url: url,
             id: $url,
             isValid: $isValid,
@@ -137,7 +146,7 @@ struct InstanceFormView: View {
             return
         }
 
-        savedInstanceID = instancesModel.add(name: name, url: url).id
+        savedInstanceID = instancesModel.add(app: app, name: name, url: url).id
 
         dismiss()
     }

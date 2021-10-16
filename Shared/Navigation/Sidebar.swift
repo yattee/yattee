@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct Sidebar: View {
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
 
     var body: some View {
@@ -12,7 +12,7 @@ struct Sidebar: View {
                 AppSidebarRecents()
                     .id("recentlyOpened")
 
-                if api.signedIn {
+                if accounts.signedIn {
                     AppSidebarSubscriptions()
                     AppSidebarPlaylists()
                 }
@@ -31,7 +31,7 @@ struct Sidebar: View {
                     .accessibility(label: Text("Watch Now"))
             }
 
-            if api.signedIn {
+            if accounts.signedIn {
                 NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
                     Label("Subscriptions", systemImage: "star.circle")
                         .accessibility(label: Text("Subscriptions"))

@@ -1,8 +1,9 @@
 import Defaults
+import Siesta
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var api = InvidiousAPI()
+    @StateObject private var accounts = AccountsModel()
     @StateObject private var instances = InstancesModel()
     @StateObject private var navigation = NavigationModel()
     @StateObject private var player = PlayerModel()
@@ -29,8 +30,8 @@ struct ContentView: View {
                 TVNavigationView()
             #endif
         }
-        .onAppear(perform: configureAPI)
-        .environmentObject(api)
+        .onAppear(perform: configure)
+        .environmentObject(accounts)
         .environmentObject(instances)
         .environmentObject(navigation)
         .environmentObject(player)
@@ -41,7 +42,7 @@ struct ContentView: View {
         #if os(iOS)
             .fullScreenCover(isPresented: $player.presentingPlayer) {
                 VideoPlayerView()
-                    .environmentObject(api)
+                    .environmentObject(accounts)
                     .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
@@ -51,7 +52,7 @@ struct ContentView: View {
             .sheet(isPresented: $player.presentingPlayer) {
                 VideoPlayerView()
                     .frame(minWidth: 900, minHeight: 800)
-                    .environmentObject(api)
+                    .environmentObject(accounts)
                     .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
@@ -61,31 +62,30 @@ struct ContentView: View {
         #if !os(tvOS)
             .sheet(isPresented: $navigation.presentingAddToPlaylist) {
                 AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-                    .environmentObject(api)
                     .environmentObject(playlists)
             }
             .sheet(isPresented: $navigation.presentingPlaylistForm) {
                 PlaylistFormView(playlist: $navigation.editedPlaylist)
-                    .environmentObject(api)
                     .environmentObject(playlists)
             }
             .sheet(isPresented: $navigation.presentingSettings) {
                 SettingsView()
-                    .environmentObject(api)
                     .environmentObject(instances)
             }
         #endif
     }
 
-    func configureAPI() {
-        if let account = instances.defaultAccount, api.account.isEmpty {
-            api.setAccount(account)
+    func configure() {
+        SiestaLog.Category.enabled = .common
+
+        if let account = instances.defaultAccount {
+            accounts.setAccount(account)
         }
 
-        player.api = api
-        playlists.api = api
-        search.api = api
-        subscriptions.api = api
+        player.accounts = accounts
+        playlists.accounts = accounts
+        search.accounts = accounts
+        subscriptions.accounts = accounts
     }
 }
 

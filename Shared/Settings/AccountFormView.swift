@@ -115,7 +115,7 @@ struct AccountFormView: View {
         isValidating = true
 
         validationDebounce.debouncing(1) {
-            validator.validateAccount()
+            validator.validateInvidiousAccount()
         }
     }
 
@@ -132,6 +132,7 @@ struct AccountFormView: View {
 
     private var validator: AccountValidator {
         AccountValidator(
+            app: .constant(instance.app),
             url: instance.url,
             account: Instance.Account(instanceID: instance.id, url: instance.url, sid: sid),
             id: $sid,

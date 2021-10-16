@@ -1,7 +1,10 @@
 import Defaults
 
 extension Defaults.Keys {
-    static let instances = Key<[Instance]>("instances", default: [])
+    static let instances = Key<[Instance]>("instances", default: [
+        .init(app: .piped, name: "Public", url: "https://pipedapi.kavin.rocks"),
+        .init(app: .invidious, name: "Private", url: "https://invidious.home.arekf.net")
+    ])
     static let accounts = Key<[Instance.Account]>("accounts", default: [])
     static let defaultAccountID = Key<String?>("defaultAccountID")
 

@@ -5,11 +5,13 @@ struct SignInRequiredView<Content: View>: View {
     let title: String
     let content: Content
 
-    @EnvironmentObject<InvidiousAPI> private var api
-    @Default(.instances) private var instances
+    @EnvironmentObject<AccountsModel> private var accounts
+
     #if !os(macOS)
         @EnvironmentObject<NavigationModel> private var navigation
     #endif
+
+    @Default(.instances) private var instances
 
     init(title: String, @ViewBuilder content: @escaping () -> Content) {
         self.title = title
@@ -18,7 +20,7 @@ struct SignInRequiredView<Content: View>: View {
 
     var body: some View {
         Group {
-            if api.signedIn {
+            if accounts.signedIn {
                 content
             } else {
                 prompt

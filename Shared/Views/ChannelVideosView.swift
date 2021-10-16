@@ -6,7 +6,7 @@ struct ChannelVideosView: View {
 
     @StateObject private var store = Store<Channel>()
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
@@ -99,7 +99,7 @@ struct ChannelVideosView: View {
     }
 
     var resource: Resource {
-        let resource = api.channel(channel.id)
+        let resource = accounts.invidious.channel(channel.id)
         resource.addObserver(store)
 
         return resource

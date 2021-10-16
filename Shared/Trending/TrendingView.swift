@@ -11,14 +11,14 @@ struct TrendingView: View {
 
     @State private var presentingCountrySelection = false
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
 
     init(_ videos: [Video] = [Video]()) {
         self.videos = videos
     }
 
     var resource: Resource {
-        let resource = api.trending(category: category, country: country)
+        let resource = accounts.invidious.trending(category: category, country: country)
         resource.addObserver(store)
 
         return resource

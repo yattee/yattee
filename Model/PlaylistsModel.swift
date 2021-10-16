@@ -4,9 +4,14 @@ import SwiftUI
 
 final class PlaylistsModel: ObservableObject {
     @Published var playlists = [Playlist]()
-    @Published var api = InvidiousAPI()
 
     @Published var selectedPlaylistID: Playlist.ID = ""
+
+    var accounts = AccountsModel()
+
+    var api: InvidiousAPI {
+        accounts.invidious
+    }
 
     init(_ playlists: [Playlist] = [Playlist]()) {
         self.playlists = playlists

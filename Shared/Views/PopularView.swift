@@ -4,10 +4,10 @@ import SwiftUI
 struct PopularView: View {
     @StateObject private var store = Store<[Video]>()
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
 
     var resource: Resource {
-        api.popular
+        accounts.invidious.popular
     }
 
     var body: some View {

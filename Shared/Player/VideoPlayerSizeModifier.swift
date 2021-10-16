@@ -57,10 +57,12 @@ struct VideoPlayerSizeModifier: ViewModifier {
 
     var maxHeight: Double {
         #if os(iOS)
-            verticalSizeClass == .regular ? geometry.size.height - minimumHeightLeft : .infinity
+            let height = verticalSizeClass == .regular ? geometry.size.height - minimumHeightLeft : .infinity
         #else
-            geometry.size.height - minimumHeightLeft
+            let height = geometry.size.height - minimumHeightLeft
         #endif
+
+        return [height, 0].max()!
     }
 
     var edgesIgnoringSafeArea: Edge.Set {

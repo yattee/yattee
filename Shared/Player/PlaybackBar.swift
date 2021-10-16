@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -5,47 +6,71 @@ struct PlaybackBar: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.inNavigationView) private var inNavigationView
 
+    @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
         HStack {
             closeButton
-                .frame(width: 80, alignment: .leading)
 
             if player.currentItem != nil {
                 Text(playbackStatus)
                     .foregroundColor(.gray)
                     .font(.caption2)
-                    .frame(minWidth: 130, maxWidth: .infinity)
 
-                VStack {
-                    if player.stream != nil {
-                        Text(currentStreamString)
-                    } else {
-                        if player.currentVideo!.live {
-                            Image(systemName: "dot.radiowaves.left.and.right")
-                        } else {
-                            Image(systemName: "bolt.horizontal.fill")
-                        }
+                Spacer()
+
+                HStack(spacing: 4) {
+                    if player.currentVideo!.live {
+                        Image(systemName: "dot.radiowaves.left.and.right")
+                    } else if player.isLoadingAvailableStreams || player.isLoadingStream {
+                        Image(systemName: "bolt.horizontal.fill")
                     }
+
+                    streamControl
+                        .disabled(player.isLoadingAvailableStreams)
+                        .frame(alignment: .trailing)
+                        .environment(\.colorScheme, .dark)
+                        .onChange(of: player.streamSelection) { selection in
+                            guard !selection.isNil else {
+                                return
+                            }
+
+                            player.upgradeToStream(selection!)
+                        }
+                    #if os(macOS)
+                        .frame(maxWidth: 180)
+                    #endif
                 }
+                .transaction { t in t.animation = .none }
                 .foregroundColor(.gray)
                 .font(.caption2)
-                .frame(width: 80, alignment: .trailing)
-                .fixedSize(horizontal: true, vertical: true)
             } else {
                 Spacer()
             }
         }
+        .frame(minWidth: 0, maxWidth: .infinity)
         .padding(4)
         .background(.black)
     }
 
-    var currentStreamString: String {
-        "\(player.stream!.resolution.height)p"
+    private var closeButton: some View {
+        Button {
+            dismiss()
+        } label: {
+            Label(
+                "Close",
+                systemImage: inNavigationView ? "chevron.backward.circle.fill" : "chevron.down.circle.fill"
+            )
+            .labelStyle(.iconOnly)
+        }
+        .accessibilityLabel(Text("Close"))
+        .buttonStyle(.borderless)
+        .foregroundColor(.gray)
+        .keyboardShortcut(.cancelAction)
     }
 
-    var playbackStatus: String {
+    private var playbackStatus: String {
         if player.live {
             return "LIVE"
         }
@@ -66,17 +91,61 @@ struct PlaybackBar: View {
         return "ends at \(timeFinishAtString)"
     }
 
-    var closeButton: some View {
-        Button {
-            dismiss()
-        } label: {
-            Label("Close", systemImage: inNavigationView ? "chevron.backward.circle.fill" : "chevron.down.circle.fill")
-                .labelStyle(.iconOnly)
-        }
-        .accessibilityLabel(Text("Close"))
-        .buttonStyle(.borderless)
-        .foregroundColor(.gray)
-        .keyboardShortcut(.cancelAction)
+    private var streamControl: some View {
+        #if os(macOS)
+            Picker("", selection: $player.streamSelection) {
+                ForEach(instances.all) { instance in
+                    let instanceStreams = availableStreamsForInstance(instance)
+                    if !instanceStreams.values.isEmpty {
+                        let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
+
+                        Section(header: Text(instance.longDescription)) {
+                            ForEach(kinds, id: \.self) { key in
+                                ForEach(instanceStreams[key] ?? []) { stream in
+                                    Text(stream.quality).tag(Stream?.some(stream))
+                                }
+
+                                if kinds.count > 1 {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        #else
+            Menu {
+                ForEach(instances.all) { instance in
+                    let instanceStreams = availableStreamsForInstance(instance)
+                    if !instanceStreams.values.isEmpty {
+                        let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
+                        Picker("", selection: $player.streamSelection) {
+                            ForEach(kinds, id: \.self) { key in
+                                ForEach(instanceStreams[key] ?? []) { stream in
+                                    Text(stream.description).tag(Stream?.some(stream))
+                                }
+
+                                if kinds.count > 1 {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+                }
+            } label: {
+                Text(player.streamSelection?.quality ?? "")
+            }
+        #endif
+    }
+
+    private func availableStreamsForInstance(_ instance: Instance) -> [Stream.Kind: [Stream]] {
+        let streams = player.availableStreams.filter { $0.instance == instance }.sorted(by: streamsSorter)
+
+        return Dictionary(grouping: streams, by: \.kind!)
+    }
+
+    private func streamsSorter(_ lhs: Stream, _ rhs: Stream) -> Bool {
+        lhs.kind == rhs.kind ? (lhs.resolution.height > rhs.resolution.height) : (lhs.kind < rhs.kind)
     }
 }
 

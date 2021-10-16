@@ -5,6 +5,8 @@ import Logging
 #if !os(macOS)
     import UIKit
 #endif
+import Siesta
+import SwiftyJSON
 
 final class PlayerModel: ObservableObject {
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
@@ -20,6 +22,9 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float?
 
+    @Published var availableStreams = [Stream]()
+    @Published var streamSelection: Stream?
+
     @Published var queue = [PlayerQueueItem]()
     @Published var currentItem: PlayerQueueItem!
     @Published var live = false
@@ -27,22 +32,30 @@ final class PlayerModel: ObservableObject {
 
     @Published var history = [PlayerQueueItem]()
 
-    var api: InvidiousAPI
-    var timeObserver: Any?
+    @Published var savedTime: CMTime?
 
+    @Published var composition = AVMutableComposition()
+
+    var accounts: AccountsModel
+    var instances: InstancesModel
+
+    var timeObserver: Any?
+    private var shouldResumePlaying = true
     private var statusObservation: NSKeyValueObservation?
 
-    var isPlaying: Bool {
-        stream != nil && currentRate != 0.0
-    }
-
-    init(api: InvidiousAPI? = nil) {
-        self.api = api ?? InvidiousAPI()
+    init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
+        self.accounts = accounts ?? AccountsModel()
+        self.instances = instances ?? InstancesModel()
         addItemDidPlayToEndTimeObserver()
+        addTimeObserver()
     }
 
     func presentPlayer() {
         presentingPlayer = true
+    }
+
+    var isPlaying: Bool {
+        player.timeControlStatus == .playing
     }
 
     func togglePlay() {
@@ -66,118 +79,156 @@ final class PlayerModel: ObservableObject {
     }
 
     func playVideo(_ video: Video) {
-        if video.live {
-            self.stream = nil
+        savedTime = nil
+        shouldResumePlaying = true
 
-            playHlsUrl(video)
-            return
+        loadAvailableStreams(video) { streams in
+            guard let stream = streams.first else {
+                return
+            }
+
+            self.streamSelection = stream
+            self.playStream(stream, of: video, forcePlay: true)
         }
+    }
 
-        guard let stream = video.streamWithResolution(Defaults[.quality].value) ?? video.defaultStream else {
-            return
+    func upgradeToStream(_ stream: Stream) {
+        if !self.stream.isNil, self.stream != stream {
+            playStream(stream, of: currentItem.video, preservingTime: true)
         }
+    }
 
-        if stream.oneMeaningfullAsset {
-            playStream(stream, for: video)
+    func piped(_ instance: Instance) -> PipedAPI {
+        PipedAPI(account: instance.anonymousAccount)
+    }
+
+    func invidious(_ instance: Instance) -> InvidiousAPI {
+        InvidiousAPI(account: instance.anonymousAccount)
+    }
+
+    private func playStream(
+        _ stream: Stream,
+        of video: Video,
+        forcePlay: Bool = false,
+        preservingTime: Bool = false
+    ) {
+        if let url = stream.singleAssetURL {
+            logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
+
+            insertPlayerItem(stream, for: video, forcePlay: forcePlay, preservingTime: preservingTime)
         } else {
+            logger.info("playing stream with many assets:")
+            logger.info("composition audio asset: \(stream.audioAsset.url)")
+            logger.info("composition video asset: \(stream.videoAsset.url)")
+
             Task {
-                await playComposition(video, for: stream)
+                await self.loadComposition(stream, of: video, forcePlay: forcePlay, preservingTime: preservingTime)
             }
         }
     }
 
-    private func playHlsUrl(_ video: Video) {
-        player.replaceCurrentItem(with: playerItemWithMetadata(video))
-        player.playImmediately(atRate: 1.0)
-    }
+    private func insertPlayerItem(
+        _ stream: Stream,
+        for video: Video,
+        forcePlay: Bool = false,
+        preservingTime: Bool = false
+    ) {
+        let playerItem = playerItem(stream)
 
-    private func playStream(_ stream: Stream, for video: Video) {
-        logger.warning("loading \(stream.description) to player")
-
-        let playerItem: AVPlayerItem! = playerItemWithMetadata(video, for: stream)
         guard playerItem != nil else {
             return
         }
 
-        if let index = queue.firstIndex(where: { $0.video.id == video.id }) {
-            queue[index].playerItems.append(playerItem)
-        }
-
+        attachMetadata(to: playerItem!, video: video, for: stream)
         DispatchQueue.main.async {
             self.stream = stream
-            self.player.replaceCurrentItem(with: playerItem)
+            self.composition = AVMutableComposition()
         }
 
-        if timeObserver.isNil {
-            addTimeObserver()
-        }
-    }
+        shouldResumePlaying = forcePlay || isPlaying
 
-    private func playComposition(_ video: Video, for stream: Stream) async {
-        async let assetAudioTrack = stream.audioAsset.loadTracks(withMediaType: .audio)
-        async let assetVideoTrack = stream.videoAsset.loadTracks(withMediaType: .video)
+        if preservingTime {
+            saveTime {
+                self.player.replaceCurrentItem(with: playerItem)
 
-        logger.info("loading audio track")
-        if let audioTrack = composition(video, for: stream)?.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid),
-           let assetTrack = try? await assetAudioTrack.first
-        {
-            try! audioTrack.insertTimeRange(
-                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
-                of: assetTrack,
-                at: .zero
-            )
-            logger.critical("audio loaded")
-        } else {
-            logger.critical("NO audio track")
-        }
-
-        logger.info("loading video track")
-        if let videoTrack = composition(video, for: stream)?.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
-           let assetTrack = try? await assetVideoTrack.first
-        {
-            try! videoTrack.insertTimeRange(
-                CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
-                of: assetTrack,
-                at: .zero
-            )
-            logger.critical("video loaded")
-            playStream(stream, for: video)
-        } else {
-            logger.critical("NO video track")
-        }
-    }
-
-    private func playerItem(_ video: Video, for stream: Stream? = nil) -> AVPlayerItem? {
-        if stream != nil {
-            if stream!.oneMeaningfullAsset {
-                logger.info("stream has one meaningfull asset")
-                return AVPlayerItem(asset: AVURLAsset(url: stream!.videoAsset.url))
+                self.seekToSavedTime { finished in
+                    guard finished else {
+                        return
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        forcePlay || self.shouldResumePlaying ? self.play() : self.pause()
+                        self.shouldResumePlaying = false
+                    }
+                }
             }
-            if let composition = composition(video, for: stream!) {
-                logger.info("stream has MANY assets, using composition")
-                return AVPlayerItem(asset: composition)
-            } else {
-                return nil
+        } else {
+            player.replaceCurrentItem(with: playerItem)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                forcePlay || self.shouldResumePlaying ? self.play() : self.pause()
+                self.shouldResumePlaying = false
             }
         }
-
-        return AVPlayerItem(url: video.hlsUrl!)
     }
 
-    private func playerItemWithMetadata(_ video: Video, for stream: Stream? = nil) -> AVPlayerItem? {
-        logger.info("building player item metadata")
-        let playerItemWithMetadata: AVPlayerItem! = playerItem(video, for: stream)
-        guard playerItemWithMetadata != nil else {
-            return nil
+    private func loadComposition(
+        _ stream: Stream,
+        of video: Video,
+        forcePlay: Bool = false,
+        preservingTime: Bool = false
+    ) async {
+        await loadCompositionAsset(stream.audioAsset, type: .audio, of: video)
+        await loadCompositionAsset(stream.videoAsset, type: .video, of: video)
+
+        guard streamSelection == stream else {
+            logger.critical("IGNORING LOADED")
+            return
         }
 
-        var externalMetadata = [
-            makeMetadataItem(.commonIdentifierTitle, value: video.title),
-            makeMetadataItem(.quickTimeMetadataGenre, value: video.genre),
-            makeMetadataItem(.commonIdentifierDescription, value: video.description)
-        ]
+        insertPlayerItem(stream, for: video, forcePlay: forcePlay, preservingTime: preservingTime)
+    }
 
+    private func loadCompositionAsset(_ asset: AVURLAsset, type: AVMediaType, of video: Video) async {
+        async let assetTracks = asset.loadTracks(withMediaType: type)
+
+        logger.info("loading \(type.rawValue) track")
+        guard let compositionTrack = composition.addMutableTrack(
+            withMediaType: type,
+            preferredTrackID: kCMPersistentTrackID_Invalid
+        ) else {
+            logger.critical("composition \(type.rawValue) addMutableTrack FAILED")
+            return
+        }
+
+        guard let assetTrack = try? await assetTracks.first else {
+            logger.critical("asset \(type.rawValue) track FAILED")
+            return
+        }
+
+        try! compositionTrack.insertTimeRange(
+            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
+            of: assetTrack,
+            at: .zero
+        )
+
+        logger.critical("\(type.rawValue) LOADED")
+    }
+
+    private func playerItem(_ stream: Stream) -> AVPlayerItem? {
+        if let url = stream.singleAssetURL {
+            return AVPlayerItem(asset: AVURLAsset(url: url))
+        } else {
+            return AVPlayerItem(asset: composition)
+        }
+    }
+
+    private func attachMetadata(to item: AVPlayerItem, video: Video, for _: Stream? = nil) {
         #if !os(macOS)
+            var externalMetadata = [
+                makeMetadataItem(.commonIdentifierTitle, value: video.title),
+                makeMetadataItem(.quickTimeMetadataGenre, value: video.genre),
+                makeMetadataItem(.commonIdentifierDescription, value: video.description)
+            ]
             if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .medium)!),
                let image = UIImage(data: thumbnailData),
                let pngData = image.pngData()
@@ -186,28 +237,41 @@ final class PlayerModel: ObservableObject {
                 externalMetadata.append(artworkItem)
             }
 
-            playerItemWithMetadata.externalMetadata = externalMetadata
+            item.externalMetadata = externalMetadata
         #endif
 
-        playerItemWithMetadata.preferredForwardBufferDuration = 15
+        item.preferredForwardBufferDuration = 5
 
         statusObservation?.invalidate()
-        statusObservation = playerItemWithMetadata.observe(\.status, options: [.old, .new]) { playerItem, _ in
+        statusObservation = item.observe(\.status, options: [.old, .new]) { playerItem, _ in
             switch playerItem.status {
             case .readyToPlay:
-                if self.isAutoplaying(playerItem) {
-                    self.player.play()
+                if self.isAutoplaying(playerItem), self.shouldResumePlaying {
+                    self.play()
                 }
+            case .failed:
+                print("item error: \(String(describing: item.error))")
+                print((item.asset as! AVURLAsset).url)
+
             default:
                 return
             }
         }
-
-        logger.info("item metadata retrieved")
-        return playerItemWithMetadata
     }
 
-    func addItemDidPlayToEndTimeObserver() {
+    #if !os(macOS)
+        private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
+            let item = AVMutableMetadataItem()
+
+            item.identifier = identifier
+            item.value = value as? NSCopying & NSObjectProtocol
+            item.extendedLanguageTag = "und"
+
+            return item.copy() as! AVMetadataItem
+        }
+    #endif
+
+    private func addItemDidPlayToEndTimeObserver() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(itemDidPlayToEndTime),
@@ -230,15 +294,30 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    private func composition(_ video: Video, for stream: Stream) -> AVMutableComposition? {
-        if let index = queue.firstIndex(where: { $0.video == video }) {
-            if queue[index].compositions[stream].isNil {
-                queue[index].compositions[stream] = AVMutableComposition()
-            }
-            return queue[index].compositions[stream]!
+    private func saveTime(completionHandler: @escaping () -> Void = {}) {
+        let currentTime = player.currentTime()
+
+        guard currentTime.seconds > 0 else {
+            return
         }
 
-        return nil
+        DispatchQueue.main.async {
+            self.savedTime = currentTime
+            completionHandler()
+        }
+    }
+
+    private func seekToSavedTime(completionHandler: @escaping (Bool) -> Void = { _ in }) {
+        guard let time = savedTime else {
+            return
+        }
+
+        player.seek(
+            to: time,
+            toleranceBefore: .init(seconds: 1, preferredTimescale: 1000),
+            toleranceAfter: .zero,
+            completionHandler: completionHandler
+        )
     }
 
     private func addTimeObserver() {
@@ -249,15 +328,5 @@ final class PlayerModel: ObservableObject {
             self.live = self.currentVideo?.live ?? false
             self.time = self.player.currentTime()
         }
-    }
-
-    private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
-        let item = AVMutableMetadataItem()
-
-        item.identifier = identifier
-        item.value = value as? NSCopying & NSObjectProtocol
-        item.extendedLanguageTag = "und"
-
-        return item.copy() as! AVMetadataItem
     }
 }

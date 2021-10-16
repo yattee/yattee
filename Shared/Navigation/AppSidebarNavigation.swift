@@ -4,8 +4,7 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
-    @EnvironmentObject<InvidiousAPI> private var api
-
+    @EnvironmentObject<AccountsModel> private var accounts
     #if os(iOS)
         @EnvironmentObject<NavigationModel> private var navigation
         @State private var didApplyPrimaryViewWorkAround = false
@@ -58,8 +57,8 @@ struct AppSidebarNavigation: View {
                     .help(
                         "Switch Instances and Accounts\n" +
                             "Current Instance: \n" +
-                            "\(api.account?.url ?? "Not Set")\n" +
-                            "Current User: \(api.account?.description ?? "Not set")"
+                            "\(accounts.account?.url ?? "Not Set")\n" +
+                            "Current User: \(accounts.account?.description ?? "Not set")"
                     )
             }
         }

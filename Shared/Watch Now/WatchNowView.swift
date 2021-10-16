@@ -3,12 +3,16 @@ import Siesta
 import SwiftUI
 
 struct WatchNowView: View {
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
+
+    var api: InvidiousAPI! {
+        accounts.invidious
+    }
 
     var body: some View {
         PlayerControlsView {
             ScrollView(.vertical, showsIndicators: false) {
-                if api.validInstance {
+                if !accounts.account.isNil {
                     VStack(alignment: .leading, spacing: 0) {
                         if api.signedIn {
                             WatchNowSection(resource: api.feed, label: "Subscriptions")

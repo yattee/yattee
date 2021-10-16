@@ -10,5 +10,4 @@ struct PlayerQueueItem: Hashable, Identifiable {
     }
 
     var playerItems = [AVPlayerItem]()
-    var compositions = [Stream: AVMutableComposition]()
 }

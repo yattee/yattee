@@ -32,6 +32,15 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		3700155B271B0D4D0049C794 /* PipedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155A271B0D4D0049C794 /* PipedAPI.swift */; };
+		3700155C271B0D4D0049C794 /* PipedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155A271B0D4D0049C794 /* PipedAPI.swift */; };
+		3700155D271B0D4D0049C794 /* PipedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155A271B0D4D0049C794 /* PipedAPI.swift */; };
+		3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155E271B12DD0049C794 /* SiestaConfiguration.swift */; };
+		37001560271B12DD0049C794 /* SiestaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155E271B12DD0049C794 /* SiestaConfiguration.swift */; };
+		37001561271B12DD0049C794 /* SiestaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155E271B12DD0049C794 /* SiestaConfiguration.swift */; };
+		37001563271B1F250049C794 /* AccountsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37001562271B1F250049C794 /* AccountsModel.swift */; };
+		37001564271B1F250049C794 /* AccountsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37001562271B1F250049C794 /* AccountsModel.swift */; };
+		37001565271B1F250049C794 /* AccountsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37001562271B1F250049C794 /* AccountsModel.swift */; };
 		3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B17F267B4DFB00704544 /* TrendingCountry.swift */; };
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
@@ -284,6 +293,9 @@
 		37D4B19826717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19926717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4B19C2671817900C925CA /* SwiftyJSON */; };
+		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
+		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
+		37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37E2EEAB270656EC00170416 /* PlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2EEAA270656EC00170416 /* PlayerControlsView.swift */; };
 		37E2EEAC270656EC00170416 /* PlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2EEAA270656EC00170416 /* PlayerControlsView.swift */; };
 		37E2EEAD270656EC00170416 /* PlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E2EEAA270656EC00170416 /* PlayerControlsView.swift */; };
@@ -348,6 +360,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3700155A271B0D4D0049C794 /* PipedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipedAPI.swift; sourceTree = "<group>"; };
+		3700155E271B12DD0049C794 /* SiestaConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiestaConfiguration.swift; sourceTree = "<group>"; };
+		37001562271B1F250049C794 /* AccountsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsModel.swift; sourceTree = "<group>"; };
 		3705B17F267B4DFB00704544 /* TrendingCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountry.swift; sourceTree = "<group>"; };
 		3705B181267B4E4900704544 /* TrendingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCategory.swift; sourceTree = "<group>"; };
 		3711403E26B206A6005B3555 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
@@ -449,6 +464,7 @@
 		37D4B18B26717B3800C925CA /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		37D4B19626717E1500C925CA /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStreams.swift; sourceTree = "<group>"; };
 		37E2EEAA270656EC00170416 /* PlayerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsView.swift; sourceTree = "<group>"; };
 		37E64DD026D597EB00C71877 /* SubscriptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsModel.swift; sourceTree = "<group>"; };
 		37EAD86A267B9C5600D9E01B /* SponsorBlockAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockAPI.swift; sourceTree = "<group>"; };
@@ -744,6 +760,7 @@
 				372915E52687E3B900F5A35B /* Defaults.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				37D4B0C22671614700C925CA /* PearvidiousApp.swift */,
+				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37BD07C42698ADEE003EBB87 /* Pearvidious.entitlements */,
 			);
@@ -803,6 +820,7 @@
 		37D4B1B72672CFE300C925CA /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				37001562271B1F250049C794 /* AccountsModel.swift */,
 				37484C3026FCB8F900287258 /* AccountValidator.swift */,
 				37AAF28F26740715007FC770 /* Channel.swift */,
 				37141672267A8E10006CA35D /* Country.swift */,
@@ -810,9 +828,11 @@
 				375DFB5726F9DA010013F468 /* InstancesModel.swift */,
 				37977582268922F600DD52A8 /* InvidiousAPI.swift */,
 				371F2F19269B43D300E4A7AB /* NavigationModel.swift */,
+				3700155A271B0D4D0049C794 /* PipedAPI.swift */,
 				37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */,
 				37319F0427103F94004ECCD0 /* PlayerQueue.swift */,
 				37CC3F44270CE30600608308 /* PlayerQueueItem.swift */,
+				37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */,
 				376578882685471400D4EA09 /* Playlist.swift */,
 				37BA794226DBA973002A0235 /* PlaylistsModel.swift */,
 				37C194C626F6A9C8005D3B96 /* RecentsModel.swift */,
@@ -1252,6 +1272,7 @@
 				3711403F26B206A6005B3555 /* SearchModel.swift in Sources */,
 				37F64FE426FE70A60081B69E /* RedrawOnViewModifier.swift in Sources */,
 				37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */,
+				37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				37BE0BD326A1D4780092E2DB /* Player.swift in Sources */,
 				37A9965E26D6F9B9006E3224 /* WatchNowView.swift in Sources */,
 				37CEE4C12677B697005A1EFE /* Stream.swift in Sources */,
@@ -1263,6 +1284,7 @@
 				37FD43DE2704717F0073EE42 /* DefaultAccountHint.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
+				3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
 				375168D62700FAFF008F96A6 /* Debounce.swift in Sources */,
 				37E64DD126D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
@@ -1271,6 +1293,7 @@
 				3788AC2B26F6842D00F6BAA9 /* WatchNowSectionBody.swift in Sources */,
 				3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
+				3700155B271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoView.swift in Sources */,
 				37E2EEAB270656EC00170416 /* PlayerControlsView.swift in Sources */,
@@ -1311,6 +1334,7 @@
 				37484C2926FC83FF00287258 /* AccountFormView.swift in Sources */,
 				371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				37BE0BCF26A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
+				37001563271B1F250049C794 /* AccountsModel.swift in Sources */,
 				37CC3F50270D010D00608308 /* VideoBanner.swift in Sources */,
 				378E50FB26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37484C1D26FC83A400287258 /* InstancesSettingsView.swift in Sources */,
@@ -1334,6 +1358,7 @@
 				37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
 				371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */,
+				37001564271B1F250049C794 /* AccountsModel.swift in Sources */,
 				37FD43DF2704717F0073EE42 /* DefaultAccountHint.swift in Sources */,
 				3761ABFE26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37BA795026DC3E0E002A0235 /* Int+Format.swift in Sources */,
@@ -1367,6 +1392,7 @@
 				37BD07BC2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */,
 				3748186F26A769D60084E870 /* DetailBadge.swift in Sources */,
 				372915E72687E3B900F5A35B /* Defaults.swift in Sources */,
+				37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				376578922685490700D4EA09 /* PlaylistsView.swift in Sources */,
 				37484C2626FC83E000287258 /* InstanceFormView.swift in Sources */,
 				377FC7E4267A084E00A6BBAF /* SearchView.swift in Sources */,
@@ -1376,6 +1402,7 @@
 				376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37A9965F26D6F9B9006E3224 /* WatchNowView.swift in Sources */,
 				37F4AE7326828F0900BD60EA /* VideosCellsVertical.swift in Sources */,
+				37001560271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37B81AFD26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */,
 				37A9965B26D6F8CA006E3224 /* VideosCellsHorizontal.swift in Sources */,
 				3761AC1026F0F9A600AA496F /* UnsubscribeAlertModifier.swift in Sources */,
@@ -1394,6 +1421,7 @@
 				37732FF12703A26300F04329 /* ValidationStatusView.swift in Sources */,
 				37BA794C26DC30EC002A0235 /* AppSidebarPlaylists.swift in Sources */,
 				37CC3F46270CE30600608308 /* PlayerQueueItem.swift in Sources */,
+				3700155C271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				375168D72700FDB8008F96A6 /* Debounce.swift in Sources */,
 				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
@@ -1445,6 +1473,7 @@
 				37CEE4BF2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				37BE0BD426A1D47D0092E2DB /* Player.swift in Sources */,
 				37977585268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				3700155D271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */,
 				37F4AE7426828F0900BD60EA /* VideosCellsVertical.swift in Sources */,
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
@@ -1456,6 +1485,7 @@
 				37141671267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				3788AC2926F6840700F6BAA9 /* WatchNowSection.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
+				37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				375168D82700FDB9008F96A6 /* Debounce.swift in Sources */,
 				37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37AAF29226740715007FC770 /* Channel.swift in Sources */,
@@ -1475,10 +1505,12 @@
 				37AAF27E26737323007FC770 /* PopularView.swift in Sources */,
 				3743CA50270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				37A9966026D6F9B9006E3224 /* WatchNowView.swift in Sources */,
+				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,
 				37484C1F26FC83A400287258 /* InstancesSettingsView.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,
 				37CC3F47270CE30600608308 /* PlayerQueueItem.swift in Sources */,
+				37001561271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37BA795126DC3E0E002A0235 /* Int+Format.swift in Sources */,
 				3748186C26A764FB0084E870 /* Thumbnail+Fixtures.swift in Sources */,
 				377A20AB2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */,

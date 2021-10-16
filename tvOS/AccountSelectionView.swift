@@ -4,46 +4,40 @@ import SwiftUI
 
 struct AccountSelectionView: View {
     @EnvironmentObject<InstancesModel> private var instancesModel
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
 
-    @Default(.accounts) private var accounts
     @Default(.instances) private var instances
 
     var body: some View {
         Section(header: Text("Current Account")) {
-            Button(api.account?.name ?? "Not selected") {
+            Button(accountButtonTitle(account: accounts.account)) {
                 if let account = nextAccount {
-                    api.setAccount(account)
+                    accounts.setAccount(account)
                 }
             }
             .disabled(instances.isEmpty)
             .contextMenu {
-                ForEach(instances) { instance in
-                    Button(accountButtonTitle(instance: instance, account: instance.anonymousAccount)) {
-                        api.setAccount(instance.anonymousAccount)
-                    }
-
-                    ForEach(instancesModel.accounts(instance.id)) { account in
-                        Button(accountButtonTitle(instance: instance, account: account)) {
-                            api.setAccount(account)
-                        }
+                ForEach(accounts.all) { account in
+                    Button(accountButtonTitle(account: account)) {
+                        accounts.setAccount(account)
                     }
                 }
 
                 Button("Cancel", role: .cancel) {}
             }
         }
+        .id(UUID())
     }
 
     private var nextAccount: Instance.Account? {
-        guard api.account != nil else {
-            return accounts.first
-        }
-
-        return accounts.next(after: api.account!)
+        accounts.all.next(after: accounts.account)
     }
 
-    func accountButtonTitle(instance: Instance, account: Instance.Account) -> String {
-        instances.count > 1 ? "\(account.description) — \(instance.shortDescription)" : account.description
+    func accountButtonTitle(account: Instance.Account! = nil) -> String {
+        guard account != nil else {
+            return "Not selected"
+        }
+
+        return instances.count > 1 ? "\(account.description) — \(account.instance.shortDescription)" : account.description
     }
 }

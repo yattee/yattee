@@ -4,14 +4,16 @@ import Foundation
 final class InstancesModel: ObservableObject {
     @Published var defaultAccount: Instance.Account?
 
+    var all: [Instance] {
+        Defaults[.instances]
+    }
+
     init() {
-        guard let id = Defaults[.defaultAccountID],
-              let uuid = UUID(uuidString: id)
-        else {
+        guard let id = Defaults[.defaultAccountID] else {
             return
         }
 
-        defaultAccount = findAccount(uuid)
+        defaultAccount = findAccount(id)
     }
 
     func find(_ id: Instance.ID?) -> Instance? {
@@ -26,8 +28,8 @@ final class InstancesModel: ObservableObject {
         Defaults[.accounts].filter { $0.instanceID == id }
     }
 
-    func add(name: String, url: String) -> Instance {
-        let instance = Instance(name: name, url: url)
+    func add(app: Instance.App, name: String, url: String) -> Instance {
+        let instance = Instance(app: app, name: name, url: url)
         Defaults[.instances].append(instance)
 
         return instance
@@ -59,7 +61,7 @@ final class InstancesModel: ObservableObject {
     }
 
     func setDefaultAccount(_ account: Instance.Account?) {
-        Defaults[.defaultAccountID] = account?.id.uuidString
+        Defaults[.defaultAccountID] = account?.id
         defaultAccount = account
     }
 
