@@ -14,8 +14,12 @@ final class AccountsModel: ObservableObject {
         Defaults[.instances].map(\.anonymousAccount) + Defaults[.accounts]
     }
 
+    var isEmpty: Bool {
+        account.isNil
+    }
+
     var signedIn: Bool {
-        !account.isNil && !account.anonymous
+        !isEmpty && !account.anonymous
     }
 
     init() {
@@ -28,12 +32,16 @@ final class AccountsModel: ObservableObject {
         )
     }
 
-    func setAccount(_ account: Instance.Account) {
+    func setAccount(_ account: Instance.Account! = nil) {
         guard account != self.account else {
             return
         }
 
         self.account = account
+
+        guard !account.isNil else {
+            return
+        }
 
         switch account.instance.app {
         case .invidious:

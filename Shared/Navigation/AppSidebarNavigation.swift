@@ -37,7 +37,12 @@ struct AppSidebarNavigation: View {
                 .toolbar { toolbarContent }
                 .frame(minWidth: sidebarMinWidth)
 
-            Text("Select section")
+            VStack {
+                Image(systemName: "play.tv")
+                    .renderingMode(.original)
+                    .font(.system(size: 60))
+                    .foregroundColor(.accentColor)
+            }
         }
         .environment(\.navigationStyle, .sidebar)
     }

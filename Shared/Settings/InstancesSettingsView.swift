@@ -4,7 +4,7 @@ import SwiftUI
 struct InstancesSettingsView: View {
     @Default(.instances) private var instances
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<InstancesModel> private var instancesModel
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
     @EnvironmentObject<PlaylistsModel> private var playlists
@@ -55,6 +55,9 @@ struct InstancesSettingsView: View {
 
     private func removeInstanceButton(_ instance: Instance) -> some View {
         Button("Remove", role: .destructive) {
+            if accounts.account?.instance == instance {
+                accounts.setAccount(nil)
+            }
             instancesModel.remove(instance)
         }
     }

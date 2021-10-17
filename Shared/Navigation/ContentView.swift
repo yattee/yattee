@@ -39,6 +39,11 @@ struct ContentView: View {
         .environmentObject(recents)
         .environmentObject(search)
         .environmentObject(subscriptions)
+        .sheet(isPresented: $navigation.presentingWelcomeScreen) {
+            WelcomeScreen()
+                .environmentObject(accounts)
+                .environmentObject(navigation)
+        }
         #if os(iOS)
             .fullScreenCover(isPresented: $player.presentingPlayer) {
                 VideoPlayerView()
@@ -68,8 +73,9 @@ struct ContentView: View {
                 PlaylistFormView(playlist: $navigation.editedPlaylist)
                     .environmentObject(playlists)
             }
-            .sheet(isPresented: $navigation.presentingSettings) {
+            .sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
                 SettingsView()
+                    .environmentObject(accounts)
                     .environmentObject(instances)
             }
         #endif
@@ -78,16 +84,28 @@ struct ContentView: View {
     func configure() {
         SiestaLog.Category.enabled = .common
 
+        // TODO: Remove when piped supports videos information
         if let account = instances.defaultAccount ??
-            // TODO: Remove when piped supports videos information
             accounts.all.first(where: { $0.instance.app == .invidious })
         {
             accounts.setAccount(account)
+        }
+
+        if accounts.account.isNil {
+            navigation.presentingWelcomeScreen = true
         }
         player.accounts = accounts
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
+    }
+
+    func openWelcomeScreenIfAccountEmpty() {
+        guard accounts.isEmpty else {
+            return
+        }
+
+        navigation.presentingWelcomeScreen = true
     }
 }
 

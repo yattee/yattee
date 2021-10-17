@@ -7,14 +7,16 @@ struct Sidebar: View {
     var body: some View {
         ScrollViewReader { scrollView in
             List {
-                mainNavigationLinks
+                if !accounts.isEmpty {
+                    mainNavigationLinks
 
-                AppSidebarRecents()
-                    .id("recentlyOpened")
+                    AppSidebarRecents()
+                        .id("recentlyOpened")
 
-                if accounts.signedIn {
-                    AppSidebarSubscriptions()
-                    AppSidebarPlaylists()
+                    if accounts.signedIn {
+                        AppSidebarSubscriptions()
+                        AppSidebarPlaylists()
+                    }
                 }
             }
             .onChange(of: navigation.sidebarSectionChanged) { _ in

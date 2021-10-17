@@ -3,13 +3,15 @@ import Foundation
 import SwiftUI
 
 struct AccountSelectionView: View {
+    var showHeader = true
+
     @EnvironmentObject<InstancesModel> private var instancesModel
     @EnvironmentObject<AccountsModel> private var accounts
 
     @Default(.instances) private var instances
 
     var body: some View {
-        Section(header: Text("Current Account")) {
+        Section(header: Text(showHeader ? "Current Account" : "")) {
             Button(accountButtonTitle(account: accounts.account)) {
                 if let account = nextAccount {
                     accounts.setAccount(account)

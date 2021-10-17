@@ -139,7 +139,7 @@ struct PlaybackBar: View {
     }
 
     private func availableStreamsForInstance(_ instance: Instance) -> [Stream.Kind: [Stream]] {
-        let streams = player.availableStreams.filter { $0.instance == instance }.sorted(by: player.streamsSorter)
+        let streams = player.availableStreamsSorted.filter { $0.instance == instance }
 
         return Dictionary(grouping: streams, by: \.kind!)
     }

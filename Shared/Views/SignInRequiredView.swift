@@ -50,28 +50,15 @@ struct SignInRequiredView<Content: View>: View {
 
             #if !os(tvOS)
                 if instances.isEmpty {
-                    openSettingsButton
+                    OpenSettingsButton()
                 }
             #endif
 
             #if os(tvOS)
-                openSettingsButton
+                OpenSettingsButton()
             #endif
         }
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
-    }
-
-    var openSettingsButton: some View {
-        Button(action: {
-            #if os(macOS)
-                NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-            #else
-                navigation.presentingSettings = true
-            #endif
-        }) {
-            Text("Open Settings")
-        }
-        .buttonStyle(.borderedProminent)
     }
 }
 

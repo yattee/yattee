@@ -30,6 +30,7 @@ final class NavigationModel: ObservableObject {
     @Published var sidebarSectionChanged = false
 
     @Published var presentingSettings = false
+    @Published var presentingWelcomeScreen = false
 
     var tabSelectionBinding: Binding<TabSelection> {
         Binding<TabSelection>(

@@ -2,9 +2,6 @@ import Defaults
 import SwiftUI
 
 struct InstancesSettingsView: View {
-    @Default(.instances) private var instances
-    @EnvironmentObject<InstancesModel> private var model
-
     @State private var selectedInstanceID: Instance.ID?
     @State private var selectedAccount: Instance.Account?
 
@@ -13,6 +10,11 @@ struct InstancesSettingsView: View {
     @State private var savedFormInstanceID: Instance.ID?
 
     @State private var presentingConfirmationDialog = false
+
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<InstancesModel> private var model
+
+    @Default(.instances) private var instances
 
     var body: some View {
         Section {
@@ -34,11 +36,11 @@ struct InstancesSettingsView: View {
             if !selectedInstance.isNil, selectedInstance.supportsAccounts {
                 Text("Accounts")
                 List(selection: $selectedAccount) {
-                    if accounts.isEmpty {
+                    if selectedInstanceAccounts.isEmpty {
                         Text("You have no accounts for this instance")
                             .foregroundColor(.secondary)
                     }
-                    ForEach(accounts) { account in
+                    ForEach(selectedInstanceAccounts) { account in
                         AccountSettingsView(account: account, selectedAccount: $selectedAccount)
                             .tag(account)
                     }
@@ -73,6 +75,10 @@ struct InstancesSettingsView: View {
                         isPresented: $presentingConfirmationDialog
                     ) {
                         Button("Remove Instance", role: .destructive) {
+                            if accounts.account?.instance == selectedInstance {
+                                accounts.setAccount(nil)
+                            }
+
                             model.remove(selectedInstance!)
                             selectedInstanceID = instances.last?.id
                         }
@@ -113,7 +119,7 @@ struct InstancesSettingsView: View {
         model.find(selectedInstanceID)
     }
 
-    private var accounts: [Instance.Account] {
+    private var selectedInstanceAccounts: [Instance.Account] {
         guard selectedInstance != nil else {
             return []
         }

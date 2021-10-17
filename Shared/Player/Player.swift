@@ -36,17 +36,23 @@ struct Player: UIViewControllerRepresentable {
     #if os(tvOS)
         var streamingQualityMenu: UIMenu {
             UIMenu(
-                title: "Streaming quality",
+                title: "Streams",
                 image: UIImage(systemName: "antenna.radiowaves.left.and.right"),
                 children: streamingQualityMenuActions
             )
         }
 
         var streamingQualityMenuActions: [UIAction] {
-            player.availableStreamsSorted.map { stream in
-                let image = player.streamSelection == stream ? UIImage(systemName: "checkmark") : nil
+            guard !player.availableStreams.isEmpty else {
+                return [ // swiftlint:disable:this implicit_return
+                    UIAction(title: "Empty", attributes: .disabled) { _ in }
+                ]
+            }
 
-                return UIAction(title: stream.description, image: image) { _ in
+            return player.availableStreamsSorted.map { stream in
+                let state = player.streamSelection == stream ? UIAction.State.on : .off
+
+                return UIAction(title: stream.description, state: state) { _ in
                     self.player.streamSelection = stream
                     self.player.upgradeToStream(stream)
                 }

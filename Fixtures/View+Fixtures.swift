@@ -4,9 +4,11 @@ import SwiftUI
 struct FixtureEnvironmentObjectsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .environmentObject(AccountsModel())
             .environmentObject(InstancesModel())
-            .environmentObject(api)
+            .environmentObject(invidious)
             .environmentObject(NavigationModel())
+            .environmentObject(PipedAPI())
             .environmentObject(player)
             .environmentObject(PlaylistsModel())
             .environmentObject(RecentsModel())
@@ -14,7 +16,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(subscriptions)
     }
 
-    private var api: InvidiousAPI {
+    private var invidious: InvidiousAPI {
         let api = InvidiousAPI()
 
         api.validInstance = true

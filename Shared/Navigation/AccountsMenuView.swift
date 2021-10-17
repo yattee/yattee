@@ -3,7 +3,6 @@ import SwiftUI
 
 struct AccountsMenuView: View {
     @EnvironmentObject<AccountsModel> private var model
-    @EnvironmentObject<InstancesModel> private var instancesModel
 
     @Default(.instances) private var instances
 
