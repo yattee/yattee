@@ -10,6 +10,10 @@ extension PlayerModel {
         !stream.isNil && stream != streamSelection
     }
 
+    var availableStreamsSorted: [Stream] {
+        availableStreams.sorted(by: streamsSorter)
+    }
+
     func loadAvailableStreams(
         _ video: Video,
         completionHandler: @escaping ([Stream]) -> Void = { _ in }
@@ -96,5 +100,9 @@ extension PlayerModel {
 
     func streamsWithAssetsFromInstance(instance: Instance, streams: [Stream]) -> [Stream] {
         streams.map { stream in stream.withAssetsFrom(instance) }
+    }
+
+    func streamsSorter(_ lhs: Stream, _ rhs: Stream) -> Bool {
+        lhs.kind == rhs.kind ? (lhs.resolution.height > rhs.resolution.height) : (lhs.kind < rhs.kind)
     }
 }

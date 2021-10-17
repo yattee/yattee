@@ -20,13 +20,13 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         let sid: String
         let anonymous: Bool
 
-        init(id: String? = nil, instanceID: UUID, name: String? = nil, url: String, sid: String? = nil, anonymous: Bool = false) {
+        init(id: String? = nil, instanceID: UUID? = nil, name: String? = nil, url: String? = nil, sid: String? = nil, anonymous: Bool = false) {
             self.anonymous = anonymous
 
-            self.id = id ?? (anonymous ? "anonymous-\(instanceID)" : UUID().uuidString)
-            self.instanceID = instanceID
+            self.id = id ?? (anonymous ? "anonymous-\(instanceID!)" : UUID().uuidString)
+            self.instanceID = instanceID ?? UUID()
             self.name = name
-            self.url = url
+            self.url = url ?? ""
             self.sid = sid ?? ""
         }
 

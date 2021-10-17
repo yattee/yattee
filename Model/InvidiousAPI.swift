@@ -15,6 +15,7 @@ final class InvidiousAPI: Service, ObservableObject {
         super.init()
 
         guard !account.isNil else {
+            self.account = .init(name: "Empty")
             return
         }
 

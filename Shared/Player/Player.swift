@@ -20,8 +20,37 @@ struct Player: UIViewControllerRepresentable {
         controller.playerModel = player
         player.controller = controller
 
+        #if os(tvOS)
+            player.controller?.playerViewController.transportBarCustomMenuItems = [streamingQualityMenu]
+        #endif
+
         return controller
     }
 
-    func updateUIViewController(_: PlayerViewController, context _: Context) {}
+    func updateUIViewController(_: PlayerViewController, context _: Context) {
+        #if os(tvOS)
+            player.controller?.playerViewController.transportBarCustomMenuItems = [streamingQualityMenu]
+        #endif
+    }
+
+    #if os(tvOS)
+        var streamingQualityMenu: UIMenu {
+            UIMenu(
+                title: "Streaming quality",
+                image: UIImage(systemName: "antenna.radiowaves.left.and.right"),
+                children: streamingQualityMenuActions
+            )
+        }
+
+        var streamingQualityMenuActions: [UIAction] {
+            player.availableStreamsSorted.map { stream in
+                let image = player.streamSelection == stream ? UIImage(systemName: "checkmark") : nil
+
+                return UIAction(title: stream.description, image: image) { _ in
+                    self.player.streamSelection = stream
+                    self.player.upgradeToStream(stream)
+                }
+            }
+        }
+    #endif
 }

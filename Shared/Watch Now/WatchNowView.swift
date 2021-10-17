@@ -29,6 +29,7 @@ struct WatchNowView: View {
                     }
                 }
             }
+            .id(UUID())
             #if os(tvOS)
                 .edgesIgnoringSafeArea(.horizontal)
             #else

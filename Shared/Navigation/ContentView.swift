@@ -78,10 +78,12 @@ struct ContentView: View {
     func configure() {
         SiestaLog.Category.enabled = .common
 
-        if let account = instances.defaultAccount {
+        if let account = instances.defaultAccount ??
+            // TODO: Remove when piped supports videos information
+            accounts.all.first(where: { $0.instance.app == .invidious })
+        {
             accounts.setAccount(account)
         }
-
         player.accounts = accounts
         playlists.accounts = accounts
         search.accounts = accounts
