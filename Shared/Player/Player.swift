@@ -20,43 +20,8 @@ struct Player: UIViewControllerRepresentable {
         controller.playerModel = player
         player.controller = controller
 
-        #if os(tvOS)
-            player.controller?.playerViewController.transportBarCustomMenuItems = [streamingQualityMenu]
-        #endif
-
         return controller
     }
 
-    func updateUIViewController(_: PlayerViewController, context _: Context) {
-        #if os(tvOS)
-            player.controller?.playerViewController.transportBarCustomMenuItems = [streamingQualityMenu]
-        #endif
-    }
-
-    #if os(tvOS)
-        var streamingQualityMenu: UIMenu {
-            UIMenu(
-                title: "Streams",
-                image: UIImage(systemName: "antenna.radiowaves.left.and.right"),
-                children: streamingQualityMenuActions
-            )
-        }
-
-        var streamingQualityMenuActions: [UIAction] {
-            guard !player.availableStreams.isEmpty else {
-                return [ // swiftlint:disable:this implicit_return
-                    UIAction(title: "Empty", attributes: .disabled) { _ in }
-                ]
-            }
-
-            return player.availableStreamsSorted.map { stream in
-                let state = player.streamSelection == stream ? UIAction.State.on : .off
-
-                return UIAction(title: stream.description, state: state) { _ in
-                    self.player.streamSelection = stream
-                    self.player.upgradeToStream(stream)
-                }
-            }
-        }
-    #endif
+    func updateUIViewController(_: PlayerViewController, context _: Context) {}
 }

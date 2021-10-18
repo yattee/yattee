@@ -22,8 +22,8 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float?
 
-    @Published var availableStreams = [Stream]()
-    @Published var streamSelection: Stream?
+    @Published var availableStreams = [Stream]() { didSet { rebuildStreamsMenu() } }
+    @Published var streamSelection: Stream? { didSet { rebuildStreamsMenu() } }
 
     @Published var queue = [PlayerQueueItem]()
     @Published var currentItem: PlayerQueueItem!
