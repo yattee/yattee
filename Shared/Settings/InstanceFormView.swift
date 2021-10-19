@@ -146,7 +146,7 @@ struct InstanceFormView: View {
             return
         }
 
-        savedInstanceID = instancesModel.add(app: app, name: name, url: url).id
+        savedInstanceID = InstancesModel.add(app: app, name: name, url: url).id
 
         dismiss()
     }

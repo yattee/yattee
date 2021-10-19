@@ -101,7 +101,6 @@
 		37484C1B26FC837400287258 /* PlaybackSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C1826FC837400287258 /* PlaybackSettingsView.swift */; };
 		37484C1D26FC83A400287258 /* InstancesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C1C26FC83A400287258 /* InstancesSettingsView.swift */; };
 		37484C1F26FC83A400287258 /* InstancesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C1C26FC83A400287258 /* InstancesSettingsView.swift */; };
-		37484C2226FC83C400287258 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C2026FC83C400287258 /* AccountSettingsView.swift */; };
 		37484C2526FC83E000287258 /* InstanceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C2426FC83E000287258 /* InstanceFormView.swift */; };
 		37484C2626FC83E000287258 /* InstanceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C2426FC83E000287258 /* InstanceFormView.swift */; };
 		37484C2726FC83E000287258 /* InstanceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C2426FC83E000287258 /* InstanceFormView.swift */; };
@@ -325,9 +324,6 @@
 		37F64FE526FE70A60081B69E /* RedrawOnViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnViewModifier.swift */; };
 		37F64FE626FE70A60081B69E /* RedrawOnViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnViewModifier.swift */; };
 		37FD43DC270470B70073EE42 /* InstancesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DB270470B70073EE42 /* InstancesSettingsView.swift */; };
-		37FD43DE2704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
-		37FD43DF2704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
-		37FD43E02704717F0073EE42 /* DefaultAccountHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */; };
 		37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
@@ -390,7 +386,6 @@
 		3748186D26A769D60084E870 /* DetailBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBadge.swift; sourceTree = "<group>"; };
 		37484C1826FC837400287258 /* PlaybackSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSettingsView.swift; sourceTree = "<group>"; };
 		37484C1C26FC83A400287258 /* InstancesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettingsView.swift; sourceTree = "<group>"; };
-		37484C2026FC83C400287258 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		37484C2426FC83E000287258 /* InstanceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceFormView.swift; sourceTree = "<group>"; };
 		37484C2826FC83FF00287258 /* AccountFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFormView.swift; sourceTree = "<group>"; };
 		37484C2C26FC844700287258 /* AccountsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsSettingsView.swift; sourceTree = "<group>"; };
@@ -481,7 +476,6 @@
 		37F4AE7126828F0900BD60EA /* VideosCellsVertical.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosCellsVertical.swift; sourceTree = "<group>"; };
 		37F64FE326FE70A60081B69E /* RedrawOnViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedrawOnViewModifier.swift; sourceTree = "<group>"; };
 		37FD43DB270470B70073EE42 /* InstancesSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettingsView.swift; sourceTree = "<group>"; };
-		37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAccountHint.swift; sourceTree = "<group>"; };
 		37FD43E22704847C0073EE42 /* View+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Fixtures.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -653,7 +647,6 @@
 			children = (
 				37484C2826FC83FF00287258 /* AccountFormView.swift */,
 				37484C2C26FC844700287258 /* AccountsSettingsView.swift */,
-				37FD43DD2704717F0073EE42 /* DefaultAccountHint.swift */,
 				37484C2426FC83E000287258 /* InstanceFormView.swift */,
 				37484C1C26FC83A400287258 /* InstancesSettingsView.swift */,
 				37484C1826FC837400287258 /* PlaybackSettingsView.swift */,
@@ -865,7 +858,6 @@
 		37FD43E1270472060073EE42 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				37484C2026FC83C400287258 /* AccountSettingsView.swift */,
 				37FD43DB270470B70073EE42 /* InstancesSettingsView.swift */,
 			);
 			path = Settings;
@@ -1291,7 +1283,6 @@
 				3748186626A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				37BA794726DC2E56002A0235 /* AppSidebarSubscriptions.swift in Sources */,
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
-				37FD43DE2704717F0073EE42 /* DefaultAccountHint.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
@@ -1372,7 +1363,6 @@
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
 				371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				37001564271B1F250049C794 /* AccountsModel.swift in Sources */,
-				37FD43DF2704717F0073EE42 /* DefaultAccountHint.swift in Sources */,
 				3761ABFE26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37BA795026DC3E0E002A0235 /* Int+Format.swift in Sources */,
 				3743CA4F270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
@@ -1443,7 +1433,6 @@
 				37BA794026DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				3711404026B206A6005B3555 /* SearchModel.swift in Sources */,
 				37484C2A26FC83FF00287258 /* AccountFormView.swift in Sources */,
-				37484C2226FC83C400287258 /* AccountSettingsView.swift in Sources */,
 				37BE0BD026A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
 				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
@@ -1477,7 +1466,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37FD43E02704717F0073EE42 /* DefaultAccountHint.swift in Sources */,
 				37AAF28026737550007FC770 /* SearchView.swift in Sources */,
 				3788AC2D26F6842D00F6BAA9 /* WatchNowSectionBody.swift in Sources */,
 				37EAD871267B9ED100D9E01B /* Segment.swift in Sources */,

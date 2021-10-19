@@ -17,7 +17,7 @@ struct InstancesSettingsView: View {
 
     var body: some View {
         Group {
-            Section(header: Text("Instances"), footer: DefaultAccountHint()) {
+            Section(header: Text("Instances")) {
                 ForEach(instances) { instance in
                     Group {
                         NavigationLink(instance.longDescription) {
@@ -55,15 +55,11 @@ struct InstancesSettingsView: View {
 
     private func removeInstanceButton(_ instance: Instance) -> some View {
         Button("Remove", role: .destructive) {
-            if accounts.account?.instance == instance {
-                accounts.setAccount(nil)
+            if accounts.current?.instance == instance {
+                accounts.setCurrent(nil)
             }
-            instancesModel.remove(instance)
+            InstancesModel.remove(instance)
         }
-    }
-
-    private func resetDefaultAccount() {
-        instancesModel.resetDefaultAccount()
     }
 }
 

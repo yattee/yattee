@@ -6,22 +6,23 @@ struct AccountSelectionView: View {
     var showHeader = true
 
     @EnvironmentObject<InstancesModel> private var instancesModel
-    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<AccountsModel> private var accountsModel
 
+    @Default(.accounts) private var accounts
     @Default(.instances) private var instances
 
     var body: some View {
         Section(header: Text(showHeader ? "Current Account" : "")) {
-            Button(accountButtonTitle(account: accounts.account)) {
+            Button(accountButtonTitle(account: accountsModel.current)) {
                 if let account = nextAccount {
-                    accounts.setAccount(account)
+                    accountsModel.setCurrent(account)
                 }
             }
             .disabled(instances.isEmpty)
             .contextMenu {
-                ForEach(accounts.all) { account in
+                ForEach(allAccounts) { account in
                     Button(accountButtonTitle(account: account)) {
-                        accounts.setAccount(account)
+                        accountsModel.setCurrent(account)
                     }
                 }
 
@@ -31,8 +32,12 @@ struct AccountSelectionView: View {
         .id(UUID())
     }
 
+    var allAccounts: [Instance.Account] {
+        accounts + instances.map(\.anonymousAccount)
+    }
+
     private var nextAccount: Instance.Account? {
-        accounts.all.next(after: accounts.account)
+        allAccounts.next(after: accountsModel.current)
     }
 
     func accountButtonTitle(account: Instance.Account! = nil) -> String {

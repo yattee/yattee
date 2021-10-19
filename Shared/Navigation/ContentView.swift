@@ -85,15 +85,17 @@ struct ContentView: View {
         SiestaLog.Category.enabled = .common
 
         // TODO: Remove when piped supports videos information
-        if let account = instances.defaultAccount ??
-            accounts.all.first(where: { $0.instance.app == .invidious })
+        if let account = accounts.lastUsed ??
+            instances.lastUsed?.anonymousAccount ??
+            instances.all.first?.anonymousAccount
         {
-            accounts.setAccount(account)
+            accounts.setCurrent(account)
         }
 
-        if accounts.account.isNil {
+        if accounts.current.isNil {
             navigation.presentingWelcomeScreen = true
         }
+
         player.accounts = accounts
         playlists.accounts = accounts
         search.accounts = accounts
@@ -101,7 +103,7 @@ struct ContentView: View {
     }
 
     func openWelcomeScreenIfAccountEmpty() {
-        guard accounts.isEmpty else {
+        guard Defaults[.instances].isEmpty else {
             return
         }
 

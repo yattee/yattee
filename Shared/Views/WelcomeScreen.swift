@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct WelcomeScreen: View {
@@ -5,6 +6,8 @@ struct WelcomeScreen: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
+
+    @Default(.accounts) private var allAccounts
 
     var body: some View {
         VStack {
@@ -14,7 +17,7 @@ struct WelcomeScreen: View {
                 .font(.largeTitle)
                 .padding(.bottom, 10)
 
-            if accounts.all.isEmpty {
+            if allAccounts.isEmpty {
                 Text("To start, configure your Instances in Settings")
                     .foregroundColor(.secondary)
             } else {
@@ -28,12 +31,12 @@ struct WelcomeScreen: View {
                     } label: {
                         Text("Start")
                     }
-                    .opacity(accounts.account.isNil ? 0 : 1)
-                    .disabled(accounts.account.isNil)
+                    .opacity(accounts.current.isNil ? 0 : 1)
+                    .disabled(accounts.current.isNil)
 
                 #else
                     AccountsMenuView()
-                        .onChange(of: accounts.account) { _ in
+                        .onChange(of: accounts.current) { _ in
                             dismiss()
                         }
                     #if os(macOS)

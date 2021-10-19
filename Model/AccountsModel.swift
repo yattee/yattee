@@ -3,7 +3,7 @@ import Defaults
 import Foundation
 
 final class AccountsModel: ObservableObject {
-    @Published private(set) var account: Instance.Account!
+    @Published private(set) var current: Instance.Account!
 
     @Published private(set) var invidious = InvidiousAPI()
     @Published private(set) var piped = PipedAPI()
@@ -11,15 +11,23 @@ final class AccountsModel: ObservableObject {
     private var cancellables = [AnyCancellable]()
 
     var all: [Instance.Account] {
-        Defaults[.instances].map(\.anonymousAccount) + Defaults[.accounts]
+        Defaults[.accounts]
+    }
+
+    var lastUsed: Instance.Account? {
+        guard let id = Defaults[.lastAccountID] else {
+            return nil
+        }
+
+        return AccountsModel.find(id)
     }
 
     var isEmpty: Bool {
-        account.isNil
+        current.isNil
     }
 
     var signedIn: Bool {
-        !isEmpty && !account.anonymous
+        !isEmpty && !current.anonymous
     }
 
     init() {
@@ -32,12 +40,12 @@ final class AccountsModel: ObservableObject {
         )
     }
 
-    func setAccount(_ account: Instance.Account! = nil) {
-        guard account != self.account else {
+    func setCurrent(_ account: Instance.Account! = nil) {
+        guard account != current else {
             return
         }
 
-        self.account = account
+        current = account
 
         guard !account.isNil else {
             return
@@ -48,6 +56,26 @@ final class AccountsModel: ObservableObject {
             invidious.setAccount(account)
         case .piped:
             piped.setAccount(account)
+        }
+
+        Defaults[.lastAccountID] = account.anonymous ? nil : account.id
+        Defaults[.lastInstanceID] = account.instanceID
+    }
+
+    static func find(_ id: Instance.Account.ID) -> Instance.Account? {
+        Defaults[.accounts].first { $0.id == id }
+    }
+
+    static func add(instance: Instance, name: String, sid: String) -> Instance.Account {
+        let account = Instance.Account(instanceID: instance.id, name: name, url: instance.url, sid: sid)
+        Defaults[.accounts].append(account)
+
+        return account
+    }
+
+    static func remove(_ account: Instance.Account) {
+        if let accountIndex = Defaults[.accounts].firstIndex(where: { $0.id == account.id }) {
+            Defaults[.accounts].remove(at: accountIndex)
         }
     }
 }

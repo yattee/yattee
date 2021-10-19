@@ -124,7 +124,7 @@ struct AccountFormView: View {
             return
         }
 
-        let account = instances.addAccount(instance: instance, name: name, sid: sid)
+        let account = AccountsModel.add(instance: instance, name: name, sid: sid)
         selectedAccount?.wrappedValue = account
 
         dismiss()

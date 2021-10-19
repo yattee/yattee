@@ -14,17 +14,17 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         static var bridge = AccountsBridge()
 
         let id: String
-        let instanceID: UUID
+        let instanceID: String
         var name: String?
         let url: String
         let sid: String
         let anonymous: Bool
 
-        init(id: String? = nil, instanceID: UUID? = nil, name: String? = nil, url: String? = nil, sid: String? = nil, anonymous: Bool = false) {
+        init(id: String? = nil, instanceID: String? = nil, name: String? = nil, url: String? = nil, sid: String? = nil, anonymous: Bool = false) {
             self.anonymous = anonymous
 
             self.id = id ?? (anonymous ? "anonymous-\(instanceID!)" : UUID().uuidString)
-            self.instanceID = instanceID ?? UUID()
+            self.instanceID = instanceID ?? UUID().uuidString
             self.name = name
             self.url = url ?? ""
             self.sid = sid ?? ""
@@ -62,7 +62,7 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
 
                 return [
                     "id": value.id,
-                    "instanceID": value.instanceID.uuidString,
+                    "instanceID": value.instanceID,
                     "name": value.name ?? "",
                     "url": value.url,
                     "sid": value.sid
@@ -80,10 +80,9 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
                     return nil
                 }
 
-                let instanceUUID = UUID(uuidString: instanceID)!
                 let name = object["name"] ?? ""
 
-                return Account(id: id, instanceID: instanceUUID, name: name, url: url, sid: sid)
+                return Account(id: id, instanceID: instanceID, name: name, url: url, sid: sid)
             }
         }
     }
@@ -91,13 +90,13 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     static var bridge = InstancesBridge()
 
     let app: App
-    let id: UUID
+    let id: String
     let name: String
     let url: String
 
-    init(app: App, id: UUID? = nil, name: String, url: String) {
+    init(app: App, id: String? = nil, name: String, url: String) {
         self.app = app
-        self.id = id ?? UUID()
+        self.id = id ?? UUID().uuidString
         self.name = name
         self.url = url
     }
@@ -133,7 +132,7 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
 
             return [
                 "app": value.app.rawValue,
-                "id": value.id.uuidString,
+                "id": value.id,
                 "name": value.name,
                 "url": value.url
             ]
@@ -149,10 +148,9 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
                 return nil
             }
 
-            let uuid = UUID(uuidString: id)
             let name = object["name"] ?? ""
 
-            return Instance(app: app, id: uuid, name: name, url: url)
+            return Instance(app: app, id: id, name: name, url: url)
         }
     }
 

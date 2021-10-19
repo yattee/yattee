@@ -21,7 +21,7 @@ struct WatchNowSection: View {
                 resource.addObserver(store)
                 resource.loadIfNeeded()
             }
-            .onChange(of: accounts.account) { _ in
+            .onChange(of: accounts.current) { _ in
                 resource.load()
             }
     }

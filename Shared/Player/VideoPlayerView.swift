@@ -122,8 +122,7 @@ struct VideoPlayerView: View {
                 VStack(spacing: 10) {
                     #if !os(tvOS)
                         Image(systemName: "ticket")
-                            .font(.system(size: 80))
-                        Text("What are we watching next?")
+                            .font(.system(size: 120))
                     #endif
                 }
                 Spacer()

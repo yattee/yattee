@@ -16,7 +16,6 @@ struct PearvidiousApp: App {
         #if os(macOS)
             Settings {
                 SettingsView()
-                    .environmentObject(InvidiousAPI())
                     .environmentObject(InstancesModel())
             }
         #endif

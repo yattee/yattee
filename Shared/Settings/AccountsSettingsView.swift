@@ -6,10 +6,11 @@ struct AccountsSettingsView: View {
     @State private var accountsChanged = false
     @State private var presentingAccountForm = false
 
+    @EnvironmentObject<AccountsModel> private var model
     @EnvironmentObject<InstancesModel> private var instances
 
     var instance: Instance! {
-        instances.find(instanceID)
+        InstancesModel.find(instanceID)
     }
 
     var body: some View {
@@ -27,41 +28,18 @@ struct AccountsSettingsView: View {
     var accounts: some View {
         List {
             Section(header: Text("Accounts"), footer: sectionFooter) {
-                ForEach(instances.accounts(instanceID), id: \.self) { account in
-                    #if os(iOS)
-                        HStack(spacing: 2) {
-                            Text(account.description)
-                            if instances.defaultAccount == account {
-                                Text("— default")
-                                    .foregroundColor(.secondary)
+                ForEach(InstancesModel.accounts(instanceID), id: \.self) { account in
+                    #if os(tvOS)
+                        Button(account.description) {}
+                            .contextMenu {
+                                Button("Remove", role: .destructive) { removeAccount(account) }
+                                Button("Cancel", role: .cancel) {}
                             }
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            if instances.defaultAccount != account {
-                                Button("Make Default") { makeDefault(account) }
-                            } else {
-                                Button("Reset Default", action: resetDefaultAccount)
-                            }
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button("Remove", role: .destructive) { removeAccount(account) }
-                        }
-
                     #else
-                        Button(action: { toggleDefault(account) }) {
-                            HStack(spacing: 2) {
-                                Text(account.description)
-                                if instances.defaultAccount == account {
-                                    Text("— default")
-                                        .foregroundColor(.secondary)
-                                }
+                        Text(account.description)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button("Remove", role: .destructive) { removeAccount(account) }
                             }
-                        }
-                        .contextMenu {
-                            Button("Toggle Default") { toggleDefault(account) }
-                            Button("Remove", role: .destructive) { removeAccount(account) }
-                            Button("Cancel", role: .cancel) {}
-                        }
                     #endif
                 }
                 .redrawOn(change: accountsChanged)
@@ -83,33 +61,15 @@ struct AccountsSettingsView: View {
 
     private var sectionFooter: some View {
         #if os(iOS)
-            Text("Swipe right to toggle default account, swipe left to remove")
+            Text("Swipe to remove account")
         #else
-            Text("Tap to toggle default account, tap and hold to remove")
+            Text("Tap and hold to remove account")
                 .foregroundColor(.secondary)
         #endif
     }
 
-    private func makeDefault(_ account: Instance.Account) {
-        instances.setDefaultAccount(account)
-        accountsChanged.toggle()
-    }
-
-    private func toggleDefault(_ account: Instance.Account) {
-        if account == instances.defaultAccount {
-            resetDefaultAccount()
-        } else {
-            makeDefault(account)
-        }
-    }
-
-    private func resetDefaultAccount() {
-        instances.resetDefaultAccount()
-        accountsChanged.toggle()
-    }
-
     private func removeAccount(_ account: Instance.Account) {
-        instances.removeAccount(account)
+        AccountsModel.remove(account)
         accountsChanged.toggle()
     }
 }

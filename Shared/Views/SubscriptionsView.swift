@@ -21,7 +21,7 @@ struct SubscriptionsView: View {
                     .onAppear {
                         loadResources()
                     }
-                    .onChange(of: accounts.account) { _ in
+                    .onChange(of: accounts.current) { _ in
                         loadResources(force: true)
                     }
             }

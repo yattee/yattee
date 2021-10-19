@@ -12,7 +12,7 @@ struct WatchNowView: View {
     var body: some View {
         PlayerControlsView {
             ScrollView(.vertical, showsIndicators: false) {
-                if !accounts.account.isNil {
+                if !accounts.current.isNil {
                     VStack(alignment: .leading, spacing: 0) {
                         if api.signedIn {
                             WatchNowSection(resource: api.feed, label: "Subscriptions")

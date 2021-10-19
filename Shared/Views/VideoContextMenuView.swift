@@ -39,6 +39,10 @@ struct VideoContextMenuView: View {
                 removeFromPlaylistButton(playlistID: id)
             }
         }
+
+        #if os(tvOS)
+            Button("Cancel", role: .cancel) {}
+        #endif
     }
 
     var playNowButton: some View {

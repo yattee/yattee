@@ -9,7 +9,8 @@ struct InstancesSettingsView: View {
     @State private var presentingInstanceForm = false
     @State private var savedFormInstanceID: Instance.ID?
 
-    @State private var presentingConfirmationDialog = false
+    @State private var presentingAccountRemovalConfirmation = false
+    @State private var presentingInstanceRemovalConfirmation = false
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<InstancesModel> private var model
@@ -41,8 +42,26 @@ struct InstancesSettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     ForEach(selectedInstanceAccounts) { account in
-                        AccountSettingsView(account: account, selectedAccount: $selectedAccount)
-                            .tag(account)
+                        HStack {
+                            Text(account.description)
+
+                            Spacer()
+
+                            Button("Remove", role: .destructive) {
+                                presentingAccountRemovalConfirmation = true
+                            }
+                            .foregroundColor(.red)
+                            .opacity(account == selectedAccount ? 1 : 0)
+                        }
+                        .tag(account)
+                    }
+                }
+                .confirmationDialog(
+                    "Are you sure you want to remove \(selectedAccount?.description ?? "") account?",
+                    isPresented: $presentingAccountRemovalConfirmation
+                ) {
+                    Button("Remove", role: .destructive) {
+                        AccountsModel.remove(selectedAccount!)
                     }
                 }
                 .listStyle(.inset(alternatesRowBackgrounds: true))
@@ -58,28 +77,27 @@ struct InstancesSettingsView: View {
 
             if selectedInstance != nil {
                 HStack {
-                    if selectedInstance.supportsAccounts {
-                        Button("Add Account...") {
-                            selectedAccount = nil
-                            presentingAccountForm = true
-                        }
+                    Button("Add Account...") {
+                        selectedAccount = nil
+                        presentingAccountForm = true
                     }
+                    .disabled(!selectedInstance.supportsAccounts)
 
                     Spacer()
 
                     Button("Remove Instance", role: .destructive) {
-                        presentingConfirmationDialog = true
+                        presentingInstanceRemovalConfirmation = true
                     }
                     .confirmationDialog(
                         "Are you sure you want to remove \(selectedInstance!.longDescription) instance?",
-                        isPresented: $presentingConfirmationDialog
+                        isPresented: $presentingInstanceRemovalConfirmation
                     ) {
                         Button("Remove Instance", role: .destructive) {
-                            if accounts.account?.instance == selectedInstance {
-                                accounts.setAccount(nil)
+                            if accounts.current?.instance == selectedInstance {
+                                accounts.setCurrent(nil)
                             }
 
-                            model.remove(selectedInstance!)
+                            InstancesModel.remove(selectedInstance!)
                             selectedInstanceID = instances.last?.id
                         }
                     }
@@ -91,9 +109,6 @@ struct InstancesSettingsView: View {
             Button("Add Instance...") {
                 presentingInstanceForm = true
             }
-
-            DefaultAccountHint()
-                .padding(.top, 10)
         }
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
@@ -116,7 +131,7 @@ struct InstancesSettingsView: View {
     }
 
     var selectedInstance: Instance! {
-        model.find(selectedInstanceID)
+        InstancesModel.find(selectedInstanceID)
     }
 
     private var selectedInstanceAccounts: [Instance.Account] {
@@ -124,7 +139,7 @@ struct InstancesSettingsView: View {
             return []
         }
 
-        return model.accounts(selectedInstanceID)
+        return InstancesModel.accounts(selectedInstanceID)
     }
 }
 
