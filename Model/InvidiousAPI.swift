@@ -3,15 +3,15 @@ import Foundation
 import Siesta
 import SwiftyJSON
 
-final class InvidiousAPI: Service, ObservableObject {
+final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     static let basePath = "/api/v1"
 
-    @Published var account: Instance.Account!
+    @Published var account: Account!
 
     @Published var validInstance = true
     @Published var signedIn = false
 
-    init(account: Instance.Account? = nil) {
+    init(account: Account? = nil) {
         super.init()
 
         guard !account.isNil else {
@@ -22,7 +22,7 @@ final class InvidiousAPI: Service, ObservableObject {
         setAccount(account!)
     }
 
-    func setAccount(_ account: Instance.Account) {
+    func setAccount(_ account: Account) {
         self.account = account
 
         validInstance = false
@@ -42,7 +42,7 @@ final class InvidiousAPI: Service, ObservableObject {
             return
         }
 
-        home
+        home?
             .load()
             .onSuccess { _ in
                 self.validInstance = true
@@ -57,7 +57,7 @@ final class InvidiousAPI: Service, ObservableObject {
             return
         }
 
-        feed
+        feed?
             .load()
             .onSuccess { _ in
                 self.signedIn = true
@@ -149,29 +149,29 @@ final class InvidiousAPI: Service, ObservableObject {
         "SID=\(account.sid)"
     }
 
-    var popular: Resource {
+    var popular: Resource? {
         resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/popular")
     }
 
-    func trending(category: TrendingCategory, country: Country) -> Resource {
+    func trending(country: Country, category: TrendingCategory?) -> Resource {
         resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/trending")
-            .withParam("type", category.name)
+            .withParam("type", category!.name)
             .withParam("region", country.rawValue)
     }
 
-    var home: Resource {
+    var home: Resource? {
         resource(baseURL: account.url, path: "/feed/subscriptions")
     }
 
-    var feed: Resource {
+    var feed: Resource? {
         resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/auth/feed")
     }
 
-    var subscriptions: Resource {
+    var subscriptions: Resource? {
         resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
     }
 
-    func channelSubscription(_ id: String) -> Resource {
+    func channelSubscription(_ id: String) -> Resource? {
         resource(baseURL: account.url, path: basePathAppending("auth/subscriptions")).child(id)
     }
 
@@ -187,20 +187,20 @@ final class InvidiousAPI: Service, ObservableObject {
         resource(baseURL: account.url, path: basePathAppending("videos/\(id)"))
     }
 
-    var playlists: Resource {
+    var playlists: Resource? {
         resource(baseURL: account.url, path: basePathAppending("auth/playlists"))
     }
 
-    func playlist(_ id: String) -> Resource {
+    func playlist(_ id: String) -> Resource? {
         resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
     }
 
-    func playlistVideos(_ id: String) -> Resource {
-        playlist(id).child("videos")
+    func playlistVideos(_ id: String) -> Resource? {
+        playlist(id)?.child("videos")
     }
 
-    func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource {
-        playlist(playlistID).child("videos").child(videoID)
+    func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource? {
+        playlist(playlistID)?.child("videos").child(videoID)
     }
 
     func search(_ query: SearchQuery) -> Resource {

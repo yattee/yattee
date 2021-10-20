@@ -13,7 +13,7 @@ struct PlayerQueueView: View {
         }
 
         #if os(macOS)
-            .listStyle(.groupedWithInsets)
+            .listStyle(.inset)
         #elseif os(iOS)
             .listStyle(.insetGrouped)
         #else

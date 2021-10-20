@@ -5,7 +5,7 @@ struct InstanceFormView: View {
 
     @State private var name = ""
     @State private var url = ""
-    @State private var app = Instance.App.invidious
+    @State private var app = VideosApp.invidious
 
     @State private var isValid = false
     @State private var isValidated = false
@@ -75,7 +75,7 @@ struct InstanceFormView: View {
     private var formFields: some View {
         Group {
             Picker("Application", selection: $app) {
-                ForEach(Instance.App.allCases, id: \.self) { app in
+                ForEach(VideosApp.allCases, id: \.self) { app in
                     Text(app.rawValue.capitalized).tag(app)
                 }
             }

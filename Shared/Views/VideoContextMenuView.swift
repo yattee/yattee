@@ -8,6 +8,7 @@ struct VideoContextMenuView: View {
 
     @Environment(\.inNavigationView) private var inNavigationView
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var playlists
@@ -25,18 +26,22 @@ struct VideoContextMenuView: View {
 
         Section {
             openChannelButton
-            subscriptionButton
+            if accounts.app.supportsSubscriptions {
+                subscriptionButton
+            }
         }
 
-        Section {
-            if navigation.tabSelection != .playlists {
-                addToPlaylistButton
-            } else if let playlist = playlists.currentPlaylist {
-                removeFromPlaylistButton(playlistID: playlist.id)
-            }
+        if accounts.app.supportsUserPlaylists {
+            Section {
+                if navigation.tabSelection != .playlists {
+                    addToPlaylistButton
+                } else if let playlist = playlists.currentPlaylist {
+                    removeFromPlaylistButton(playlistID: playlist.id)
+                }
 
-            if case let .playlist(id) = navigation.tabSelection {
-                removeFromPlaylistButton(playlistID: id)
+                if case let .playlist(id) = navigation.tabSelection {
+                    removeFromPlaylistButton(playlistID: id)
+                }
             }
         }
 

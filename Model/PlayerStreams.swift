@@ -23,57 +23,28 @@ extension PlayerModel {
         var instancesWithLoadedStreams = [Instance]()
 
         instances.all.forEach { instance in
-            switch instance.app {
-            case .piped:
-                fetchPipedStreams(instance, video: video) { _ in
-                    self.completeIfAllInstancesLoaded(
-                        instance: instance,
-                        streams: self.availableStreams,
-                        instancesWithLoadedStreams: &instancesWithLoadedStreams,
-                        completionHandler: completionHandler
-                    )
-                }
-
-            case .invidious:
-                fetchInvidiousStreams(instance, video: video) { _ in
-                    self.completeIfAllInstancesLoaded(
-                        instance: instance,
-                        streams: self.availableStreams,
-                        instancesWithLoadedStreams: &instancesWithLoadedStreams,
-                        completionHandler: completionHandler
-                    )
-                }
+            fetchStreams(instance.anonymous.video(video.videoID), instance: instance, video: video) { _ in
+                self.completeIfAllInstancesLoaded(
+                    instance: instance,
+                    streams: self.availableStreams,
+                    instancesWithLoadedStreams: &instancesWithLoadedStreams,
+                    completionHandler: completionHandler
+                )
             }
         }
     }
 
-    private func fetchInvidiousStreams(
-        _ instance: Instance,
+    private func fetchStreams(
+        _ resource: Resource,
+        instance: Instance,
         video: Video,
         onCompletion: @escaping (ResponseInfo) -> Void = { _ in }
     ) {
-        invidious(instance)
-            .video(video.videoID)
+        resource
             .load()
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
-                    self.availableStreams += self.streamsWithAssetsFromInstance(instance: instance, streams: video.streams)
-                }
-            }
-            .onCompletion(onCompletion)
-    }
-
-    private func fetchPipedStreams(
-        _ instance: Instance,
-        video: Video,
-        onCompletion: @escaping (ResponseInfo) -> Void = { _ in }
-    ) {
-        piped(instance)
-            .streams(id: video.videoID)
-            .load()
-            .onSuccess { response in
-                if let pipedStreams: [Stream] = response.typedContent() {
-                    self.availableStreams += self.streamsWithInstance(instance: instance, streams: pipedStreams)
+                    self.availableStreams += self.streamsWithInstance(instance: instance, streams: video.streams)
                 }
             }
             .onCompletion(onCompletion)

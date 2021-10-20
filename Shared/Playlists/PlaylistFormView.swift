@@ -170,7 +170,7 @@ struct PlaylistFormView: View {
 
         let body = ["title": name, "privacy": visibility.rawValue]
 
-        resource.request(editing ? .patch : .post, json: body).onSuccess { response in
+        resource?.request(editing ? .patch : .post, json: body).onSuccess { response in
             if let modifiedPlaylist: Playlist = response.typedContent() {
                 playlist = modifiedPlaylist
             }
@@ -181,7 +181,7 @@ struct PlaylistFormView: View {
         }
     }
 
-    var resource: Resource {
+    var resource: Resource? {
         editing ? api.playlist(playlist.id) : api.playlists
     }
 
@@ -227,7 +227,7 @@ struct PlaylistFormView: View {
     }
 
     func deletePlaylistAndDismiss() {
-        api.playlist(playlist.id).request(.delete).onSuccess { _ in
+        api.playlist(playlist.id)?.request(.delete).onSuccess { _ in
             playlist = nil
             playlists.load(force: true)
             dismiss()

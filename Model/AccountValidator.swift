@@ -3,9 +3,9 @@ import Siesta
 import SwiftUI
 
 final class AccountValidator: Service {
-    let app: Binding<Instance.App>
+    let app: Binding<VideosApp>
     let url: String
-    let account: Instance.Account?
+    let account: Account?
 
     var formObjectID: Binding<String>
     var isValid: Binding<Bool>
@@ -14,9 +14,9 @@ final class AccountValidator: Service {
     var error: Binding<String?>?
 
     init(
-        app: Binding<Instance.App>,
+        app: Binding<VideosApp>,
         url: String,
-        account: Instance.Account? = nil,
+        account: Account? = nil,
         id: Binding<String>,
         isValid: Binding<Bool>,
         isValidated: Binding<Bool>,

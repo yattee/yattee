@@ -104,22 +104,12 @@ extension PlayerModel {
         return item
     }
 
-    func videoResource(_ id: Video.ID) -> Resource {
-        accounts.invidious.video(id)
-    }
-
     private func loadDetails(_ video: Video?, onSuccess: @escaping (Video) -> Void) {
         guard video != nil else {
             return
         }
 
-        if !video!.streams.isEmpty {
-            logger.critical("not loading video details again")
-            onSuccess(video!)
-            return
-        }
-
-        videoResource(video!.videoID).load().onSuccess { response in
+        accounts.api.video(video!.videoID).load().onSuccess { response in
             if let video: Video = response.typedContent() {
                 onSuccess(video)
             }

@@ -99,7 +99,7 @@ struct ChannelVideosView: View {
     }
 
     var resource: Resource {
-        let resource = accounts.invidious.channel(channel.id)
+        let resource = accounts.api.channel(channel.id)
         resource.addObserver(store)
 
         return resource
@@ -107,14 +107,16 @@ struct ChannelVideosView: View {
 
     var subscriptionToggleButton: some View {
         Group {
-            if subscriptions.isSubscribing(channel.id) {
-                Button("Unsubscribe") {
-                    navigation.presentUnsubscribeAlert(channel)
-                }
-            } else {
-                Button("Subscribe") {
-                    subscriptions.subscribe(channel.id) {
-                        navigation.sidebarSectionChanged.toggle()
+            if accounts.app.supportsSubscriptions && accounts.signedIn {
+                if subscriptions.isSubscribing(channel.id) {
+                    Button("Unsubscribe") {
+                        navigation.presentUnsubscribeAlert(channel)
+                    }
+                } else {
+                    Button("Subscribe") {
+                        subscriptions.subscribe(channel.id) {
+                            navigation.sidebarSectionChanged.toggle()
+                        }
                     }
                 }
             }

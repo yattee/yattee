@@ -3,7 +3,7 @@ import SwiftUI
 
 struct InstancesSettingsView: View {
     @State private var selectedInstanceID: Instance.ID?
-    @State private var selectedAccount: Instance.Account?
+    @State private var selectedAccount: Account?
 
     @State private var presentingAccountForm = false
     @State private var presentingInstanceForm = false
@@ -34,7 +34,7 @@ struct InstancesSettingsView: View {
                     .foregroundColor(.secondary)
             }
 
-            if !selectedInstance.isNil, selectedInstance.supportsAccounts {
+            if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
                 Text("Accounts")
                 List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
@@ -67,7 +67,7 @@ struct InstancesSettingsView: View {
                 .listStyle(.inset(alternatesRowBackgrounds: true))
             }
 
-            if selectedInstance != nil, !selectedInstance.supportsAccounts {
+            if selectedInstance != nil, !selectedInstance.app.supportsAccounts {
                 Text("Accounts are not supported for the application of this instance")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -81,7 +81,7 @@ struct InstancesSettingsView: View {
                         selectedAccount = nil
                         presentingAccountForm = true
                     }
-                    .disabled(!selectedInstance.supportsAccounts)
+                    .disabled(!selectedInstance.app.supportsAccounts)
 
                     Spacer()
 
@@ -134,7 +134,7 @@ struct InstancesSettingsView: View {
         InstancesModel.find(selectedInstanceID)
     }
 
-    private var selectedInstanceAccounts: [Instance.Account] {
+    private var selectedInstanceAccounts: [Account] {
         guard selectedInstance != nil else {
             return []
         }

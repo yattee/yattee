@@ -47,15 +47,6 @@
         }
       },
       {
-        "package": "SwiftUIKit",
-        "repositoryURL": "https://github.com/danielsaidi/SwiftUIKit.git",
-        "state": {
-          "branch": null,
-          "revision": "ad509355ba9bc87f8375a297c3df93acd42e6c01",
-          "version": "2.0.0"
-        }
-      },
-      {
         "package": "SwiftyJSON",
         "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON.git",
         "state": {

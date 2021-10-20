@@ -22,11 +22,11 @@ final class InstancesModel: ObservableObject {
         return Defaults[.instances].first { $0.id == id }
     }
 
-    static func accounts(_ id: Instance.ID?) -> [Instance.Account] {
+    static func accounts(_ id: Instance.ID?) -> [Account] {
         Defaults[.accounts].filter { $0.instanceID == id }
     }
 
-    static func add(app: Instance.App, name: String, url: String) -> Instance {
+    static func add(app: VideosApp, name: String, url: String) -> Instance {
         let instance = Instance(app: app, id: UUID().uuidString, name: name, url: url)
         Defaults[.instances].append(instance)
 
@@ -41,7 +41,7 @@ final class InstancesModel: ObservableObject {
         }
     }
 
-    static func setLastAccount(_ account: Instance.Account?) {
+    static func setLastAccount(_ account: Account?) {
         Defaults[.lastAccountID] = account?.id
     }
 }

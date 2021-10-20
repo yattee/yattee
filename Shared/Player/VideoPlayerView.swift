@@ -2,9 +2,6 @@ import AVKit
 import Defaults
 import Siesta
 import SwiftUI
-#if !os(tvOS)
-    import SwiftUIKit
-#endif
 
 struct VideoPlayerView: View {
     static let defaultAspectRatio: Double = 1.77777778

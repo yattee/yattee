@@ -2,6 +2,7 @@ import Defaults
 import SwiftUI
 
 struct TVNavigationView: View {
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
@@ -13,21 +14,27 @@ struct TVNavigationView: View {
                 .tabItem { Text("Watch Now") }
                 .tag(TabSelection.watchNow)
 
-            SubscriptionsView()
-                .tabItem { Text("Subscriptions") }
-                .tag(TabSelection.subscriptions)
+            if accounts.app.supportsSubscriptions {
+                SubscriptionsView()
+                    .tabItem { Text("Subscriptions") }
+                    .tag(TabSelection.subscriptions)
+            }
 
-            PopularView()
-                .tabItem { Text("Popular") }
-                .tag(TabSelection.popular)
+            if accounts.app.supportsPopular {
+                PopularView()
+                    .tabItem { Text("Popular") }
+                    .tag(TabSelection.popular)
+            }
 
             TrendingView()
                 .tabItem { Text("Trending") }
                 .tag(TabSelection.trending)
 
-            PlaylistsView()
-                .tabItem { Text("Playlists") }
-                .tag(TabSelection.playlists)
+            if accounts.app.supportsUserPlaylists {
+                PlaylistsView()
+                    .tabItem { Text("Playlists") }
+                    .tag(TabSelection.playlists)
+            }
 
             NowPlayingView()
                 .tabItem { Text("Now Playing") }

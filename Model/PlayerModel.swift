@@ -226,8 +226,8 @@ final class PlayerModel: ObservableObject {
         #if !os(macOS)
             var externalMetadata = [
                 makeMetadataItem(.commonIdentifierTitle, value: video.title),
-                makeMetadataItem(.quickTimeMetadataGenre, value: video.genre),
-                makeMetadataItem(.commonIdentifierDescription, value: video.description)
+                makeMetadataItem(.quickTimeMetadataGenre, value: video.genre ?? ""),
+                makeMetadataItem(.commonIdentifierDescription, value: video.description ?? "")
             ]
             if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .medium)!),
                let image = UIImage(data: thumbnailData),

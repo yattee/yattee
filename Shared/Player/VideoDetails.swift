@@ -16,6 +16,7 @@ struct VideoDetails: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
@@ -86,7 +87,8 @@ struct VideoDetails: View {
             }
         }
         .onAppear {
-            guard video != nil else {
+            guard video != nil, accounts.app.supportsSubscriptions else {
+                subscribed = false
                 return
             }
 
@@ -155,41 +157,42 @@ struct VideoDetails: View {
                     }
                     .foregroundColor(.secondary)
 
-                    Spacer()
+                    if accounts.app.supportsSubscriptions {
+                        Spacer()
 
-                    Section {
-                        if subscribed {
-                            Button("Unsubscribe") {
-                                confirmationShown = true
-                            }
-                            #if os(iOS)
-                                .tint(.gray)
-                            #endif
-                            .confirmationDialog("Are you you want to unsubscribe from \(video!.channel.name)?", isPresented: $confirmationShown) {
+                        Section {
+                            if subscribed {
                                 Button("Unsubscribe") {
-                                    subscriptions.unsubscribe(video!.channel.id)
+                                    confirmationShown = true
+                                }
+                                #if os(iOS)
+                                    .tint(.gray)
+                                #endif
+                                .confirmationDialog("Are you you want to unsubscribe from \(video!.channel.name)?", isPresented: $confirmationShown) {
+                                    Button("Unsubscribe") {
+                                        subscriptions.unsubscribe(video!.channel.id)
+
+                                        withAnimation {
+                                            subscribed.toggle()
+                                        }
+                                    }
+                                }
+                            } else {
+                                Button("Subscribe") {
+                                    subscriptions.subscribe(video!.channel.id)
 
                                     withAnimation {
                                         subscribed.toggle()
                                     }
                                 }
+                                .tint(.blue)
                             }
-                        } else {
-                            Button("Subscribe") {
-                                subscriptions.subscribe(video!.channel.id)
-
-                                withAnimation {
-                                    subscribed.toggle()
-                                }
-                            }
-                            .tint(.blue)
                         }
+                        .font(.system(size: 13))
+                        .buttonStyle(.borderless)
+                        .buttonBorderShape(.roundedRectangle)
                     }
-                    .font(.system(size: 13))
-                    .buttonStyle(.borderless)
-                    .buttonBorderShape(.roundedRectangle)
                 }
-                Divider()
             }
         }
     }
@@ -264,7 +267,10 @@ struct VideoDetails: View {
         Group {
             if let video = player.currentItem?.video {
                 Group {
-                    publishedDateSection
+                    HStack {
+                        publishedDateSection
+                        Spacer()
+                    }
 
                     Divider()
 
@@ -274,8 +280,13 @@ struct VideoDetails: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(video.description)
-                        .font(.caption)
+                    if let description = video.description {
+                        Text(description)
+                            .font(.caption)
+                    } else {
+                        Text("No description")
+                            .foregroundColor(.secondary)
+                    }
 
                     ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
                         HStack {

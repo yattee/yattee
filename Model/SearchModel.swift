@@ -17,14 +17,10 @@ final class SearchModel: ObservableObject {
         resource?.isLoading ?? false
     }
 
-    var api: InvidiousAPI {
-        accounts.invidious
-    }
-
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
         changeHandler(query)
 
-        let newResource = api.search(query)
+        let newResource = accounts.api.search(query)
         guard newResource != previousResource else {
             return
         }
@@ -43,7 +39,7 @@ final class SearchModel: ObservableObject {
     func resetQuery(_ query: SearchQuery = SearchQuery()) {
         self.query = query
 
-        let newResource = api.search(query)
+        let newResource = accounts.api.search(query)
         guard newResource != previousResource else {
             return
         }
@@ -87,7 +83,7 @@ final class SearchModel: ObservableObject {
         suggestionsDebounceTimer?.invalidate()
 
         suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
-            let resource = self.api.searchSuggestions(query: query)
+            let resource = self.accounts.api.searchSuggestions(query: query)
 
             resource.addObserver(self.querySuggestions)
             resource.loadIfNeeded()

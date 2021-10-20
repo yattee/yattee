@@ -32,15 +32,15 @@ struct AccountSelectionView: View {
         .id(UUID())
     }
 
-    var allAccounts: [Instance.Account] {
+    var allAccounts: [Account] {
         accounts + instances.map(\.anonymousAccount)
     }
 
-    private var nextAccount: Instance.Account? {
+    private var nextAccount: Account? {
         allAccounts.next(after: accountsModel.current)
     }
 
-    func accountButtonTitle(account: Instance.Account! = nil) -> String {
+    func accountButtonTitle(account: Account! = nil) -> String {
         guard account != nil else {
             return "Not selected"
         }

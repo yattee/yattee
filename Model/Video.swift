@@ -12,8 +12,8 @@ struct Video: Identifiable, Equatable, Hashable {
     var length: TimeInterval
     var published: String
     var views: Int
-    var description: String
-    var genre: String
+    var description: String?
+    var genre: String?
 
     // index used when in the Playlist
     let indexID: String?
@@ -38,8 +38,8 @@ struct Video: Identifiable, Equatable, Hashable {
         length: TimeInterval,
         published: String,
         views: Int,
-        description: String,
-        genre: String,
+        description: String? = nil,
+        genre: String? = nil,
         channel: Channel,
         thumbnails: [Thumbnail] = [],
         indexID: String? = nil,
@@ -48,7 +48,8 @@ struct Video: Identifiable, Equatable, Hashable {
         publishedAt: Date? = nil,
         likes: Int? = nil,
         dislikes: Int? = nil,
-        keywords: [String] = []
+        keywords: [String] = [],
+        streams: [Stream] = []
     ) {
         self.id = id ?? UUID().uuidString
         self.videoID = videoID
@@ -68,6 +69,7 @@ struct Video: Identifiable, Equatable, Hashable {
         self.likes = likes
         self.dislikes = dislikes
         self.keywords = keywords
+        self.streams = streams
     }
 
     init(_ json: JSON) {
@@ -169,7 +171,11 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     func thumbnailURL(quality: Thumbnail.Quality) -> URL? {
-        thumbnails.first { $0.quality == quality }?.url
+        if let url = thumbnails.first(where: { $0.quality == quality })?.url.absoluteString {
+            return URL(string: url.replacingOccurrences(of: "hqdefault", with: quality.filename))
+        }
+
+        return nil
     }
 
     private static func extractThumbnails(from details: JSON) -> [Thumbnail] {

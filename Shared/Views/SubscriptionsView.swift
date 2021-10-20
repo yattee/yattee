@@ -6,12 +6,8 @@ struct SubscriptionsView: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
 
-    var api: InvidiousAPI {
-        accounts.invidious
-    }
-
-    var feed: Resource {
-        api.feed
+    var feed: Resource? {
+        accounts.api.feed
     }
 
     var body: some View {
@@ -32,9 +28,9 @@ struct SubscriptionsView: View {
     }
 
     fileprivate func loadResources(force: Bool = false) {
-        feed.addObserver(store)
+        feed?.addObserver(store)
 
-        if let request = force ? api.home.load() : api.home.loadIfNeeded() {
+        if let request = force ? accounts.api.home?.load() : accounts.api.home?.loadIfNeeded() {
             request.onSuccess { _ in
                 loadFeed(force: force)
             }
@@ -44,6 +40,6 @@ struct SubscriptionsView: View {
     }
 
     fileprivate func loadFeed(force: Bool = false) {
-        _ = force ? feed.load() : feed.loadIfNeeded()
+        _ = force ? feed?.load() : feed?.loadIfNeeded()
     }
 }

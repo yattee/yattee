@@ -5,22 +5,22 @@ import SwiftUI
 struct WatchNowView: View {
     @EnvironmentObject<AccountsModel> private var accounts
 
-    var api: InvidiousAPI! {
-        accounts.invidious
-    }
-
     var body: some View {
         PlayerControlsView {
             ScrollView(.vertical, showsIndicators: false) {
                 if !accounts.current.isNil {
                     VStack(alignment: .leading, spacing: 0) {
-                        if api.signedIn {
-                            WatchNowSection(resource: api.feed, label: "Subscriptions")
+                        if accounts.api.signedIn {
+                            WatchNowSection(resource: accounts.api.feed, label: "Subscriptions")
                         }
-                        WatchNowSection(resource: api.popular, label: "Popular")
-                        WatchNowSection(resource: api.trending(category: .default, country: .pl), label: "Trending")
-                        WatchNowSection(resource: api.trending(category: .movies, country: .pl), label: "Movies")
-                        WatchNowSection(resource: api.trending(category: .music, country: .pl), label: "Music")
+                        if accounts.app.supportsPopular {
+                            WatchNowSection(resource: accounts.api.popular, label: "Popular")
+                        }
+                        WatchNowSection(resource: accounts.api.trending(country: .pl, category: .default), label: "Trending")
+                        if accounts.app.supportsTrendingCategories {
+                            WatchNowSection(resource: accounts.api.trending(country: .pl, category: .movies), label: "Movies")
+                            WatchNowSection(resource: accounts.api.trending(country: .pl, category: .music), label: "Music")
+                        }
 
 //                  TODO: adding sections to view
 //                  ===================

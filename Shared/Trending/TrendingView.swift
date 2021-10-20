@@ -18,10 +18,12 @@ struct TrendingView: View {
     }
 
     var resource: Resource {
-        let resource = accounts.invidious.trending(category: category, country: country)
-        resource.addObserver(store)
+        let newResource: Resource
 
-        return resource
+        newResource = accounts.api.trending(country: country, category: category)
+        newResource.addObserver(store)
+
+        return newResource
     }
 
     var body: some View {
@@ -56,20 +58,26 @@ struct TrendingView: View {
         .toolbar {
             #if os(macOS)
                 ToolbarItemGroup {
-                    categoryButton
+                    if accounts.app.supportsTrendingCategories {
+                        categoryButton
+                    }
                     countryButton
                 }
             #elseif os(iOS)
                 ToolbarItemGroup(placement: .bottomBar) {
                     Group {
-                        HStack {
-                            Text("Category")
-                                .foregroundColor(.secondary)
+                        if accounts.app.supportsTrendingCategories {
+                            HStack {
+                                Text("Category")
+                                    .foregroundColor(.secondary)
 
-                            categoryButton
-                                // only way to disable Menu animation is to
-                                // force redraw of the view when it changes
-                                .id(UUID())
+                                categoryButton
+                                    // only way to disable Menu animation is to
+                                    // force redraw of the view when it changes
+                                    .id(UUID())
+                            }
+                        } else {
+                            Spacer()
                         }
 
                         HStack {
@@ -97,11 +105,13 @@ struct TrendingView: View {
 
     var toolbar: some View {
         HStack {
-            HStack {
-                Text("Category")
-                    .foregroundColor(.secondary)
+            if accounts.app.supportsTrendingCategories {
+                HStack {
+                    Text("Category")
+                        .foregroundColor(.secondary)
 
-                categoryButton
+                    categoryButton
+                }
             }
 
             #if os(iOS)

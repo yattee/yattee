@@ -6,16 +6,16 @@ struct PopularView: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
 
-    var resource: Resource {
-        accounts.invidious.popular
+    var resource: Resource? {
+        accounts.api.popular
     }
 
     var body: some View {
         PlayerControlsView {
             VideosCellsVertical(videos: store.collection)
                 .onAppear {
-                    resource.addObserver(store)
-                    resource.loadIfNeeded()
+                    resource?.addObserver(store)
+                    resource?.loadIfNeeded()
                 }
             #if !os(tvOS)
                 .navigationTitle("Popular")

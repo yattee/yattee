@@ -14,23 +14,6 @@ extension Thumbnail {
     }
 
     private static func fixtureUrl(videoId: String, quality: Thumbnail.Quality) -> URL {
-        URL(string: "\(fixturesHost)/vi/\(videoId)/\(filenameForQuality(quality)).jpg")!
-    }
-
-    private static func filenameForQuality(_ quality: Thumbnail.Quality) -> String {
-        switch quality {
-        case .high:
-            return "hqdefault"
-        case .medium:
-            return "mqdefault"
-        case .start:
-            return "1"
-        case .middle:
-            return "2"
-        case .end:
-            return "3"
-        default:
-            return quality.rawValue
-        }
+        URL(string: "\(fixturesHost)/vi/\(videoId)/\(quality.filename).jpg")!
     }
 }

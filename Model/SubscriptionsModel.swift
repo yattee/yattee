@@ -6,12 +6,8 @@ final class SubscriptionsModel: ObservableObject {
     @Published var channels = [Channel]()
     var accounts: AccountsModel
 
-    var api: InvidiousAPI {
-        accounts.invidious
-    }
-
-    var resource: Resource {
-        api.subscriptions
+    var resource: Resource? {
+        accounts.api.subscriptions
     }
 
     init(accounts: AccountsModel? = nil) {
@@ -35,7 +31,7 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        let request = force ? resource.load() : resource.loadIfNeeded()
+        let request = force ? resource?.load() : resource?.loadIfNeeded()
 
         request?
             .onSuccess { resource in
@@ -50,7 +46,7 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     fileprivate func performRequest(_ channelID: String, method: RequestMethod, onSuccess: @escaping () -> Void = {}) {
-        api.channelSubscription(channelID).request(method).onCompletion { _ in
+        accounts.api.channelSubscription(channelID)?.request(method).onCompletion { _ in
             self.load(force: true, onSuccess: onSuccess)
         }
     }

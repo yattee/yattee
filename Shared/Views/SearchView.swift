@@ -19,6 +19,7 @@ struct SearchView: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
@@ -37,7 +38,9 @@ struct SearchView: View {
                 } else {
                     #if os(tvOS)
                         ScrollView(.vertical, showsIndicators: false) {
-                            filtersHorizontalStack
+                            if accounts.app.supportsSearchFilters {
+                                filtersHorizontalStack
+                            }
 
                             VideosCellsHorizontal(videos: state.store.collection)
                         }
@@ -61,27 +64,28 @@ struct SearchView: View {
         .toolbar {
             #if !os(tvOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
-                    Section {
-                        #if os(macOS)
-                            HStack {
-                                Text("Sort:")
-                                    .foregroundColor(.secondary)
+                    if accounts.app.supportsSearchFilters {
+                        Section {
+                            #if os(macOS)
+                                HStack {
+                                    Text("Sort:")
+                                        .foregroundColor(.secondary)
 
-                                searchSortOrderPicker
-                            }
-                        #else
-                            Menu("Sort: \(searchSortOrder.name)") {
-                                searchSortOrderPicker
-                            }
-                        #endif
+                                    searchSortOrderPicker
+                                }
+                            #else
+                                Menu("Sort: \(searchSortOrder.name)") {
+                                    searchSortOrderPicker
+                                }
+                            #endif
+                        }
+                        .transaction { t in t.animation = .none }
+
+                        Spacer()
+
+                        filtersMenu
                     }
-                    .transaction { t in t.animation = .none }
-
-                    Spacer()
-
-                    filtersMenu
                 }
-
             #endif
         }
         .onAppear {

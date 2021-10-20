@@ -14,8 +14,8 @@ struct AccountsSettingsView: View {
     }
 
     var body: some View {
-        Group {
-            if instance.supportsAccounts {
+        VStack {
+            if instance.app.supportsAccounts {
                 accounts
             } else {
                 Text("Accounts are not supported for the application of this instance")
@@ -68,7 +68,7 @@ struct AccountsSettingsView: View {
         #endif
     }
 
-    private func removeAccount(_ account: Instance.Account) {
+    private func removeAccount(_ account: Account) {
         AccountsModel.remove(account)
         accountsChanged.toggle()
     }

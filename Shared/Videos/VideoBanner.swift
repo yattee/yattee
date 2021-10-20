@@ -7,6 +7,7 @@ struct VideoBanner: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             smallThumbnail
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(video.title)
                     .truncationMode(.middle)

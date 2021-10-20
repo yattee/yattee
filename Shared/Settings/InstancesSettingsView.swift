@@ -10,7 +10,7 @@ struct InstancesSettingsView: View {
     @EnvironmentObject<PlaylistsModel> private var playlists
 
     @State private var selectedInstanceID: Instance.ID?
-    @State private var selectedAccount: Instance.Account?
+    @State private var selectedAccount: Account?
 
     @State private var presentingInstanceForm = false
     @State private var savedFormInstanceID: Instance.ID?

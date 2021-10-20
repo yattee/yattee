@@ -32,17 +32,18 @@ struct Sidebar: View {
                 Label("Watch Now", systemImage: "play.circle")
                     .accessibility(label: Text("Watch Now"))
             }
-
-            if accounts.signedIn {
+            if accounts.app.supportsSubscriptions && accounts.signedIn {
                 NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
                     Label("Subscriptions", systemImage: "star.circle")
                         .accessibility(label: Text("Subscriptions"))
                 }
             }
 
-            NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
-                Label("Popular", systemImage: "chart.bar")
-                    .accessibility(label: Text("Popular"))
+            if accounts.app.supportsPopular {
+                NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
+                    Label("Popular", systemImage: "chart.bar")
+                        .accessibility(label: Text("Popular"))
+                }
             }
 
             NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {

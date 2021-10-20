@@ -9,10 +9,6 @@ final class PlaylistsModel: ObservableObject {
 
     var accounts = AccountsModel()
 
-    var api: InvidiousAPI {
-        accounts.invidious
-    }
-
     init(_ playlists: [Playlist] = [Playlist]()) {
         self.playlists = playlists
     }
@@ -48,19 +44,19 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func addVideoToCurrentPlaylist(videoID: Video.ID, onSuccess: @escaping () -> Void = {}) {
-        let resource = api.playlistVideos(currentPlaylist!.id)
+        let resource = accounts.api.playlistVideos(currentPlaylist!.id)
         let body = ["videoId": videoID]
 
-        resource.request(.post, json: body).onSuccess { _ in
+        resource?.request(.post, json: body).onSuccess { _ in
             self.load(force: true)
             onSuccess()
         }
     }
 
     func removeVideoFromPlaylist(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
-        let resource = api.playlistVideo(playlistID, videoIndexID)
+        let resource = accounts.api.playlistVideo(playlistID, videoIndexID)
 
-        resource.request(.delete).onSuccess { _ in
+        resource?.request(.delete).onSuccess { _ in
             self.load(force: true)
             onSuccess()
         }
@@ -71,7 +67,7 @@ final class PlaylistsModel: ObservableObject {
     }
 
     private var resource: Resource {
-        api.playlists
+        accounts.api.playlists!
     }
 
     private var selectedPlaylist: Playlist? {

@@ -3,7 +3,7 @@ import SwiftUI
 
 struct AccountFormView: View {
     let instance: Instance
-    var selectedAccount: Binding<Instance.Account?>?
+    var selectedAccount: Binding<Account?>?
 
     @State private var name = ""
     @State private var sid = ""
@@ -134,7 +134,7 @@ struct AccountFormView: View {
         AccountValidator(
             app: .constant(instance.app),
             url: instance.url,
-            account: Instance.Account(instanceID: instance.id, url: instance.url, sid: sid),
+            account: Account(instanceID: instance.id, url: instance.url, sid: sid),
             id: $sid,
             isValid: $isValid,
             isValidated: $isValidated,
