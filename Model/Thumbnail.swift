@@ -32,11 +32,6 @@ struct Thumbnail {
     var url: URL
     var quality: Quality
 
-    init(_ json: JSON) {
-        url = json["url"].url!
-        quality = Quality(rawValue: json["quality"].string!)!
-    }
-
     init(url: URL, quality: Quality) {
         self.url = url
         self.quality = quality

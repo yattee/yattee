@@ -1,6 +1,7 @@
 import Foundation
 import Siesta
 import SwiftUI
+import AVFoundation
 
 extension PlayerModel {
     var isLoadingAvailableStreams: Bool {
@@ -101,12 +102,14 @@ extension PlayerModel {
     func streamsWithInstance(instance: Instance, streams: [Stream]) -> [Stream] {
         streams.map { stream in
             stream.instance = instance
+
+            if instance.app == .invidious {
+                stream.audioAsset = AVURLAsset(url: InvidiousAPI.assetURLFrom(instance: instance, url: stream.audioAsset.url)!)
+                stream.videoAsset = AVURLAsset(url: InvidiousAPI.assetURLFrom(instance: instance, url: stream.videoAsset.url)!)
+            }
+            
             return stream
         }
-    }
-
-    func streamsWithAssetsFromInstance(instance: Instance, streams: [Stream]) -> [Stream] {
-        streams.map { stream in stream.withAssetsFrom(instance) }
     }
 
     func streamsSorter(_ lhs: Stream, _ rhs: Stream) -> Bool {

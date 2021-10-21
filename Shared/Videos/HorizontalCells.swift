@@ -1,18 +1,18 @@
 import Defaults
 import SwiftUI
 
-struct VideosCellsHorizontal: View {
+struct HorizontalCells: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    var videos = [Video]()
+    var items = [ContentItem]()
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 20) {
-                ForEach(videos) { video in
-                    VideoView(video: video)
+                ForEach(items) { item in
+                    ContentItemView(item: item)
                         .environment(\.horizontalCells, true)
                     #if os(tvOS)
                         .frame(width: 580)
@@ -42,9 +42,9 @@ struct VideosCellsHorizontal: View {
     }
 }
 
-struct VideoCellsHorizontal_Previews: PreviewProvider {
+struct HorizontalCells_Previews: PreviewProvider {
     static var previews: some View {
-        VideosCellsHorizontal(videos: Video.allFixtures)
+        HorizontalCells(items: ContentItem.array(of: Video.allFixtures))
             .injectFixtureEnvironmentObjects()
     }
 }

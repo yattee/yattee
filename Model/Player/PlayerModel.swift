@@ -98,14 +98,6 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func piped(_ instance: Instance) -> PipedAPI {
-        PipedAPI(account: instance.anonymousAccount)
-    }
-
-    func invidious(_ instance: Instance) -> InvidiousAPI {
-        InvidiousAPI(account: instance.anonymousAccount)
-    }
-
     private func playStream(
         _ stream: Stream,
         of video: Video,

@@ -13,6 +13,10 @@ struct TrendingView: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
 
+    var popular: [ContentItem] {
+        ContentItem.array(of: store.collection)
+    }
+
     init(_ videos: [Video] = [Video]()) {
         self.videos = videos
     }
@@ -32,12 +36,12 @@ struct TrendingView: View {
                 VStack(alignment: .center, spacing: 0) {
                     #if os(tvOS)
                         toolbar
-                        VideosCellsHorizontal(videos: store.collection)
+                        HorizontalCells(items: popular)
                             .padding(.top, 40)
 
                         Spacer()
                     #else
-                        VideosCellsVertical(videos: store.collection)
+                        VerticalCells(items: popular)
                     #endif
                 }
             }

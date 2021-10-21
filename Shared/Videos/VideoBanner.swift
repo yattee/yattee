@@ -1,4 +1,5 @@
 import Foundation
+import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoBanner: View {
@@ -35,22 +36,12 @@ struct VideoBanner: View {
     }
 
     var smallThumbnail: some View {
-        Group {
-            if let url = video.thumbnailURL(quality: .medium) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    HStack {
-                        ProgressView()
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    }
-                }
-            } else {
-                Image(systemName: "exclamationmark.square")
+        WebImage(url: video.thumbnailURL(quality: .medium))
+            .resizable()
+            .placeholder {
+                ProgressView()
             }
-        }
-        .background(.gray)
+            .indicator(.activity)
         #if os(tvOS)
             .frame(width: 177, height: 100)
             .mask(RoundedRectangle(cornerRadius: 12))

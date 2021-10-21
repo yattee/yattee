@@ -72,49 +72,6 @@ struct Video: Identifiable, Equatable, Hashable {
         self.streams = streams
     }
 
-    init(_ json: JSON) {
-        videoID = json["videoId"].stringValue
-
-        if let id = json["indexId"].string {
-            indexID = id
-            self.id = videoID + id
-        } else {
-            indexID = nil
-            id = videoID
-        }
-
-        title = json["title"].stringValue
-        author = json["author"].stringValue
-        length = json["lengthSeconds"].doubleValue
-        published = json["publishedText"].stringValue
-        views = json["viewCount"].intValue
-        description = json["description"].stringValue
-        genre = json["genre"].stringValue
-
-        thumbnails = Video.extractThumbnails(from: json)
-
-        live = json["liveNow"].boolValue
-        upcoming = json["isUpcoming"].boolValue
-
-        likes = json["likeCount"].int
-        dislikes = json["dislikeCount"].int
-
-        keywords = json["keywords"].arrayValue.map { $0.stringValue }
-
-        if let publishedInterval = json["published"].double {
-            publishedAt = Date(timeIntervalSince1970: publishedInterval)
-        }
-
-        if let hlsURL = json["hlsUrl"].url {
-            streams.append(.init(hlsURL: hlsURL))
-        }
-
-        streams = Video.extractFormatStreams(from: json["formatStreams"].arrayValue)
-        streams.append(contentsOf: Video.extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue))
-
-        channel = Channel(json: json)
-    }
-
     var playTime: String? {
         guard !length.isZero else {
             return nil
@@ -145,73 +102,12 @@ struct Video: Identifiable, Equatable, Hashable {
         dislikes?.formattedAsAbbreviation()
     }
 
-    var selectableStreams: [Stream] {
-        let streams = streams.sorted { $0.resolution > $1.resolution }
-        var selectable = [Stream]()
-
-        Stream.Resolution.allCases.forEach { resolution in
-            if let stream = streams.filter({ $0.resolution == resolution }).min(by: { $0.kind < $1.kind }) {
-                selectable.append(stream)
-            }
-        }
-
-        return selectable
-    }
-
-    var defaultStream: Stream? {
-        selectableStreams.first { $0.kind == .stream }
-    }
-
-    var bestStream: Stream? {
-        selectableStreams.min { $0.resolution > $1.resolution }
-    }
-
-    func streamWithResolution(_ resolution: Stream.Resolution) -> Stream? {
-        selectableStreams.first { $0.resolution == resolution } ?? defaultStream
-    }
-
     func thumbnailURL(quality: Thumbnail.Quality) -> URL? {
         if let url = thumbnails.first(where: { $0.quality == quality })?.url.absoluteString {
             return URL(string: url.replacingOccurrences(of: "hqdefault", with: quality.filename))
         }
 
         return nil
-    }
-
-    private static func extractThumbnails(from details: JSON) -> [Thumbnail] {
-        details["videoThumbnails"].arrayValue.map { json in
-            Thumbnail(json)
-        }
-    }
-
-    private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
-        streams.map {
-            SingleAssetStream(
-                avAsset: AVURLAsset(url: $0["url"].url!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
-                kind: .stream,
-                encoding: $0["encoding"].stringValue
-            )
-        }
-    }
-
-    private static func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
-        let audioAssetURL = streams.first { $0["type"].stringValue.starts(with: "audio/mp4") }
-        guard audioAssetURL != nil else {
-            return []
-        }
-
-        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/mp4") && $0["encoding"].stringValue == "h264" }
-
-        return videoAssetsURLs.map {
-            Stream(
-                audioAsset: AVURLAsset(url: audioAssetURL!["url"].url!),
-                videoAsset: AVURLAsset(url: $0["url"].url!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
-                kind: .adaptive,
-                encoding: $0["encoding"].stringValue
-            )
-        }
     }
 
     static func == (lhs: Video, rhs: Video) -> Bool {

@@ -13,9 +13,11 @@ final class RecentsModel: ObservableObject {
     }
 
     func add(_ item: RecentItem) {
-        if !items.contains(where: { $0.id == item.id }) {
-            items.append(item)
+        if let index = items.firstIndex(where: { $0.id == item.id }) {
+            items.remove(at: index)
         }
+
+        items.append(item)
     }
 
     func close(_ item: RecentItem) {

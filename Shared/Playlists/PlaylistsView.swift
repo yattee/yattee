@@ -14,8 +14,8 @@ struct PlaylistsView: View {
 
     @Namespace private var focusNamespace
 
-    var videos: [Video] {
-        model.currentPlaylist?.videos ?? []
+    var items: [ContentItem] {
+        ContentItem.array(of: model.currentPlaylist?.videos ?? [])
     }
 
     var body: some View {
@@ -26,17 +26,17 @@ struct PlaylistsView: View {
                         toolbar
                     #endif
 
-                    if model.currentPlaylist != nil, videos.isEmpty {
+                    if model.currentPlaylist != nil, items.isEmpty {
                         hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
                     } else if model.all.isEmpty {
                         hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
                     } else {
                         #if os(tvOS)
-                            VideosCellsHorizontal(videos: videos)
+                            HorizontalCells(items: items)
                                 .padding(.top, 40)
                             Spacer()
                         #else
-                            VideosCellsVertical(videos: videos)
+                            VerticalCells(items: items)
                         #endif
                     }
                 }
@@ -117,7 +117,7 @@ struct PlaylistsView: View {
                 }
 
                 Button {
-                    player.playAll(videos)
+                    player.playAll(items.compactMap(\.video))
                     player.presentPlayer()
                 } label: {
                     HStack(spacing: 15) {

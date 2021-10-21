@@ -1,4 +1,7 @@
 import Defaults
+import SDWebImage
+import SDWebImagePINPlugin
+import SDWebImageWebPCoder
 import Siesta
 import SwiftUI
 
@@ -83,6 +86,8 @@ struct ContentView: View {
 
     func configure() {
         SiestaLog.Category.enabled = .common
+        SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
+        SDWebImageManager.defaultImageCache = PINCache(name: "net.yattee.app")
 
         // TODO: Remove when piped supports videos information
         if let account = accounts.lastUsed ??

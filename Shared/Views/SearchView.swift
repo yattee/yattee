@@ -42,11 +42,11 @@ struct SearchView: View {
                                 filtersHorizontalStack
                             }
 
-                            VideosCellsHorizontal(videos: state.store.collection)
+                            HorizontalCells(items: state.store.collection)
                         }
                         .edgesIgnoringSafeArea(.horizontal)
                     #else
-                        VideosCellsVertical(videos: state.store.collection)
+                        VerticalCells(items: state.store.collection)
                     #endif
 
                     if noResults {
@@ -95,7 +95,7 @@ struct SearchView: View {
             }
 
             if !videos.isEmpty {
-                state.store.replace(videos)
+                state.store.replace(ContentItem.array(of: videos))
             }
         }
         .searchable(text: $state.queryText, placement: searchFieldPlacement) {

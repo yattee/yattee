@@ -10,10 +10,14 @@ struct SubscriptionsView: View {
         accounts.api.feed
     }
 
+    var videos: [ContentItem] {
+        ContentItem.array(of: store.collection)
+    }
+
     var body: some View {
         PlayerControlsView {
             SignInRequiredView(title: "Subscriptions") {
-                VideosCellsVertical(videos: store.collection)
+                VerticalCells(items: videos)
                     .onAppear {
                         loadResources()
                     }

@@ -19,6 +19,10 @@ struct ChannelVideosView: View {
 
     @Namespace private var focusNamespace
 
+    var videos: [ContentItem] {
+        ContentItem.array(of: store.item?.videos ?? [])
+    }
+
     var body: some View {
         #if os(iOS)
             if inNavigationView {
@@ -55,7 +59,7 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            VideosCellsVertical(videos: store.item?.videos ?? [])
+            VerticalCells(items: videos)
 
             #if !os(iOS)
                 .prefersDefaultFocus(in: focusNamespace)

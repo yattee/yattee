@@ -20,6 +20,69 @@
         }
       },
       {
+        "package": "libwebp",
+        "repositoryURL": "https://github.com/SDWebImage/libwebp-Xcode.git",
+        "state": {
+          "branch": null,
+          "revision": "2b3b43faaef54d1b897482428428357b7f7cd08b",
+          "version": "1.2.1"
+        }
+      },
+      {
+        "package": "PINCache",
+        "repositoryURL": "https://github.com/pinterest/PINCache.git",
+        "state": {
+          "branch": null,
+          "revision": "875c654984fb52b47ca65ae70d24852b0003ccd9",
+          "version": "3.0.3"
+        }
+      },
+      {
+        "package": "PINOperation",
+        "repositoryURL": "https://github.com/pinterest/PINOperation.git",
+        "state": {
+          "branch": null,
+          "revision": "44d8ca154a4e75a028a5548c31ff3a53b90cef15",
+          "version": "1.2.1"
+        }
+      },
+      {
+        "package": "SDWebImage",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImage.git",
+        "state": {
+          "branch": null,
+          "revision": "a72df4849408da7e5d3c1b586797b7c601c41d1b",
+          "version": "5.12.1"
+        }
+      },
+      {
+        "package": "SDWebImagePINPlugin",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImagePINPlugin.git",
+        "state": {
+          "branch": null,
+          "revision": "bd73a4fb30352ec311303d811559c9c46df4caa4",
+          "version": "0.3.0"
+        }
+      },
+      {
+        "package": "SDWebImageSwiftUI",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
+        "state": {
+          "branch": null,
+          "revision": "cd8625b7cf11a97698e180d28bb7d5d357196678",
+          "version": "2.0.2"
+        }
+      },
+      {
+        "package": "SDWebImageWebPCoder",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
+        "state": {
+          "branch": null,
+          "revision": "95a6838df13bc08d8064cf7e048b787b6e52348d",
+          "version": "0.8.4"
+        }
+      },
+      {
         "package": "Siesta",
         "repositoryURL": "https://github.com/bustoutsolutions/siesta",
         "state": {

@@ -1,3 +1,4 @@
+import AVKit
 import Defaults
 import Foundation
 import Siesta
@@ -80,15 +81,25 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("popular"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(Video.init)
+            content.json.arrayValue.map(InvidiousAPI.extractVideo)
         }
 
         configureTransformer(pathPattern("trending"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(Video.init)
+            content.json.arrayValue.map(InvidiousAPI.extractVideo)
         }
 
-        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(Video.init)
+        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> [ContentItem] in
+            content.json.arrayValue.map {
+                let type = $0.dictionaryValue["type"]?.stringValue
+
+                if type == "channel" {
+                    return ContentItem(channel: InvidiousAPI.extractChannel(from: $0))
+                } else if type == "playlist" {
+                    // TODO: fix playlists
+                    return ContentItem(playlist: Playlist(JSON(parseJSON: "{}")))
+                }
+                return ContentItem(video: InvidiousAPI.extractVideo($0))
+            }
         }
 
         configureTransformer(pathPattern("search/suggestions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
@@ -114,34 +125,34 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         configureTransformer(pathPattern("auth/feed"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let feedVideos = content.json.dictionaryValue["videos"] {
-                return feedVideos.arrayValue.map(Video.init)
+                return feedVideos.arrayValue.map(InvidiousAPI.extractVideo)
             }
 
             return []
         }
 
         configureTransformer(pathPattern("auth/subscriptions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Channel] in
-            content.json.arrayValue.map(Channel.init)
+            content.json.arrayValue.map(InvidiousAPI.extractChannel)
         }
 
         configureTransformer(pathPattern("channels/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Channel in
-            Channel(json: content.json)
+            InvidiousAPI.extractChannel(from: content.json)
         }
 
         configureTransformer(pathPattern("channels/*/latest"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(Video.init)
+            content.json.arrayValue.map(InvidiousAPI.extractVideo)
         }
 
         configureTransformer(pathPattern("videos/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
-            Video(content.json)
+            InvidiousAPI.extractVideo(content.json)
         }
     }
 
-    fileprivate func pathPattern(_ path: String) -> String {
+    private func pathPattern(_ path: String) -> String {
         "**\(InvidiousAPI.basePath)/\(path)"
     }
 
-    fileprivate func basePathAppending(_ path: String) -> String {
+    private func basePathAppending(_ path: String) -> String {
         "\(InvidiousAPI.basePath)/\(path)"
     }
 
@@ -207,6 +218,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         var resource = resource(baseURL: account.url, path: basePathAppending("search"))
             .withParam("q", searchQuery(query.query))
             .withParam("sort_by", query.sortBy.parameter)
+            .withParam("type", "all")
 
         if let date = query.date, date != .any {
             resource = resource.withParam("date", date.rawValue)
@@ -241,5 +253,107 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         return searchQuery
+    }
+
+    static func assetURLFrom(instance: Instance, url: URL) -> URL? {
+        guard let instanceURLComponents = URLComponents(string: instance.url),
+              var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+
+        urlComponents.scheme = instanceURLComponents.scheme
+        urlComponents.host = instanceURLComponents.host
+
+        return urlComponents.url
+    }
+
+    static func extractVideo(_ json: JSON) -> Video {
+        let indexID: String?
+        var id: Video.ID
+        var publishedAt: Date?
+
+        if let publishedInterval = json["published"].double {
+            publishedAt = Date(timeIntervalSince1970: publishedInterval)
+        }
+
+        let videoID = json["videoId"].stringValue
+
+        if let index = json["indexId"].string {
+            indexID = index
+            id = videoID + index
+        } else {
+            indexID = nil
+            id = videoID
+        }
+
+        return Video(
+            id: id,
+            videoID: videoID,
+            title: json["title"].stringValue,
+            author: json["author"].stringValue,
+            length: json["lengthSeconds"].doubleValue,
+            published: json["publishedText"].stringValue,
+            views: json["viewCount"].intValue,
+            description: json["description"].stringValue,
+            genre: json["genre"].stringValue,
+            channel: extractChannel(from: json),
+            thumbnails: extractThumbnails(from: json),
+            indexID: indexID,
+            live: json["liveNow"].boolValue,
+            upcoming: json["isUpcoming"].boolValue,
+            publishedAt: publishedAt,
+            likes: json["likeCount"].int,
+            dislikes: json["dislikeCount"].int,
+            keywords: json["keywords"].arrayValue.map { $0.stringValue },
+            streams: extractFormatStreams(from: json["formatStreams"].arrayValue) +
+                extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue)
+        )
+    }
+
+    static func extractChannel(from json: JSON) -> Channel {
+        let thumbnailURL = "https:\(json["authorThumbnails"].arrayValue.first?.dictionaryValue["url"]?.stringValue ?? "")"
+
+        return Channel(
+            id: json["authorId"].stringValue,
+            name: json["author"].stringValue,
+            thumbnailURL: URL(string: thumbnailURL),
+            subscriptionsCount: json["subCount"].int,
+            subscriptionsText: json["subCountText"].string,
+            videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(InvidiousAPI.extractVideo) ?? []
+        )
+    }
+
+    private static func extractThumbnails(from details: JSON) -> [Thumbnail] {
+        details["videoThumbnails"].arrayValue.map { json in
+            Thumbnail(url: json["url"].url!, quality: .init(rawValue: json["quality"].string!)!)
+        }
+    }
+
+    private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
+        streams.map {
+            SingleAssetStream(
+                avAsset: AVURLAsset(url: $0["url"].url!),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
+                kind: .stream,
+                encoding: $0["encoding"].stringValue
+            )
+        }
+    }
+
+    private static func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
+        let audioAssetURL = streams.first { $0["type"].stringValue.starts(with: "audio/mp4") }
+        guard audioAssetURL != nil else {
+            return []
+        }
+
+        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/mp4") && $0["encoding"].stringValue == "h264" }
+
+        return videoAssetsURLs.map {
+            Stream(
+                audioAsset: AVURLAsset(url: audioAssetURL!["url"].url!),
+                videoAsset: AVURLAsset(url: $0["url"].url!),
+                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
+                kind: .adaptive,
+                encoding: $0["encoding"].stringValue
+            )
+        }
     }
 }

@@ -3,7 +3,7 @@ import Siesta
 import SwiftUI
 
 final class SearchModel: ObservableObject {
-    @Published var store = Store<[Video]>()
+    @Published var store = Store<[ContentItem]>()
 
     var accounts = AccountsModel()
     @Published var query = SearchQuery()
@@ -62,8 +62,8 @@ final class SearchModel: ObservableObject {
 
         if let request = resource.loadIfNeeded() {
             request.onSuccess { response in
-                if let videos: [Video] = response.typedContent() {
-                    self.replace(videos, for: currentResource)
+                if let results: [ContentItem] = response.typedContent() {
+                    self.replace(results, for: currentResource)
                 }
             }
         } else {
@@ -71,9 +71,9 @@ final class SearchModel: ObservableObject {
         }
     }
 
-    func replace(_ videos: [Video], for resource: Resource) {
+    func replace(_ videos: [ContentItem], for resource: Resource) {
         if self.resource == resource {
-            store = Store<[Video]>(videos)
+            store = Store<[ContentItem]>(videos)
         }
     }
 

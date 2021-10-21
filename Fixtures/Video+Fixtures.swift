@@ -3,6 +3,7 @@ import Foundation
 extension Video {
     static var fixture: Video {
         let id = "D2sxamzaHkM"
+        let thumbnailURL = "https://yt3.ggpht.com/ytc/AKedOLR-pT_JEsz_hcaA4Gjx8DHcqJ8mS42aTRqcVy6P7w=s88-c-k-c0x00ffffff-no-rj-mo"
 
         return Video(
             videoID: UUID().uuidString,
@@ -13,7 +14,13 @@ extension Video {
             views: 21534,
             description: "Some relaxing live piano music",
             genre: "Music",
-            channel: Channel(id: "AbCdEFgHI", name: "The Channel", subscriptionsCount: 2300, videos: []),
+            channel: Channel(
+                id: "AbCdEFgHI",
+                name: "The Channel",
+                thumbnailURL: URL(string: thumbnailURL)!,
+                subscriptionsCount: 2300,
+                videos: []
+            ),
             thumbnails: Thumbnail.fixturesForAllQualities(videoId: id),
             live: false,
             upcoming: false,

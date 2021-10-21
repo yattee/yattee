@@ -7,6 +7,7 @@ struct VideoContextMenuView: View {
     @Binding var playerNavigationLinkActive: Bool
 
     @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
@@ -85,8 +86,11 @@ struct VideoContextMenuView: View {
             let recent = RecentItem(from: video.channel)
             recents.add(recent)
             navigation.isChannelOpen = true
-            navigation.sidebarSectionChanged.toggle()
-            navigation.tabSelection = .recentlyOpened(recent.tag)
+
+            if navigationStyle == .sidebar {
+                navigation.sidebarSectionChanged.toggle()
+                navigation.tabSelection = .recentlyOpened(recent.tag)
+            }
         } label: {
             Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
         }

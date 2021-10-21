@@ -32,172 +32,24 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("channel/*")) { (content: Entity<JSON>) -> Channel? in
-            self.extractChannel(content.json)
+            PipedAPI.extractChannel(content.json)
         }
 
         configureTransformer(pathPattern("streams/*")) { (content: Entity<JSON>) -> Video? in
-            self.extractVideo(content.json)
+            PipedAPI.extractVideo(content.json)
         }
 
         configureTransformer(pathPattern("trending")) { (content: Entity<JSON>) -> [Video] in
-            self.extractVideos(content.json)
+            PipedAPI.extractVideos(content.json)
         }
 
-        configureTransformer(pathPattern("search")) { (content: Entity<JSON>) -> [Video] in
-            self.extractVideos(content.json.dictionaryValue["items"]!)
+        configureTransformer(pathPattern("search")) { (content: Entity<JSON>) -> [ContentItem] in
+            PipedAPI.extractContentItems(content.json.dictionaryValue["items"]!)
         }
 
         configureTransformer(pathPattern("suggestions")) { (content: Entity<JSON>) -> [String] in
             content.json.arrayValue.map(String.init)
         }
-    }
-
-    private func extractChannel(_ content: JSON) -> Channel? {
-        Channel(
-            id: content.dictionaryValue["id"]!.stringValue,
-            name: content.dictionaryValue["name"]!.stringValue,
-            subscriptionsCount: content.dictionaryValue["subscriberCount"]!.intValue,
-            videos: extractVideos(content.dictionaryValue["relatedStreams"]!)
-        )
-    }
-
-    private func extractVideo(_ content: JSON) -> Video? {
-        let details = content.dictionaryValue
-        let url = details["url"]?.string
-
-        if !url.isNil {
-            guard url!.contains("/watch") else {
-                return nil
-            }
-        }
-
-        let channelId = details["uploaderUrl"]!.stringValue.components(separatedBy: "/").last!
-
-        let thumbnails: [Thumbnail] = Thumbnail.Quality.allCases.compactMap {
-            if let url = buildThumbnailURL(content, quality: $0) {
-                return Thumbnail(url: url, quality: $0)
-            }
-
-            return nil
-        }
-
-        let author = details["uploaderName"]?.stringValue ?? details["uploader"]!.stringValue
-
-        return Video(
-            videoID: extractID(content),
-            title: details["title"]!.stringValue,
-            author: author,
-            length: details["duration"]!.doubleValue,
-            published: details["uploadedDate"]?.stringValue ?? details["uploadDate"]!.stringValue,
-            views: details["views"]!.intValue,
-            description: extractDescription(content),
-            channel: Channel(id: channelId, name: author),
-            thumbnails: thumbnails,
-            likes: details["likes"]?.int,
-            dislikes: details["dislikes"]?.int,
-            streams: extractStreams(content)
-        )
-    }
-
-    private func extractID(_ content: JSON) -> Video.ID {
-        content.dictionaryValue["url"]?.stringValue.components(separatedBy: "?v=").last ??
-            extractThumbnailURL(content)!.relativeString.components(separatedBy: "/")[4]
-    }
-
-    private func extractThumbnailURL(_ content: JSON) -> URL? {
-        content.dictionaryValue["thumbnail"]?.url! ?? content.dictionaryValue["thumbnailUrl"]!.url!
-    }
-
-    private func buildThumbnailURL(_ content: JSON, quality: Thumbnail.Quality) -> URL? {
-        let thumbnailURL = extractThumbnailURL(content)
-        guard !thumbnailURL.isNil else {
-            return nil
-        }
-
-        return URL(string: thumbnailURL!
-            .absoluteString
-            .replacingOccurrences(of: "_webp", with: "")
-            .replacingOccurrences(of: ".webp", with: ".jpg")
-            .replacingOccurrences(of: "hqdefault", with: quality.filename)
-            .replacingOccurrences(of: "maxresdefault", with: quality.filename)
-        )!
-    }
-
-    private func extractDescription(_ content: JSON) -> String? {
-        guard var description = content.dictionaryValue["description"]?.string else {
-            return nil
-        }
-
-        description = description.replacingOccurrences(
-            of: "<br/>|<br />|<br>",
-            with: "\n",
-            options: .regularExpression,
-            range: nil
-        )
-
-        description = description.replacingOccurrences(
-            of: "<[^>]+>",
-            with: "",
-            options: .regularExpression,
-            range: nil
-        )
-
-        return description
-    }
-
-    private func extractVideos(_ content: JSON) -> [Video] {
-        content.arrayValue.compactMap(extractVideo(_:))
-    }
-
-    private func extractStreams(_ content: JSON) -> [Stream] {
-        var streams = [Stream]()
-
-        if let hlsURL = content.dictionaryValue["hls"]?.url {
-            streams.append(Stream(hlsURL: hlsURL))
-        }
-
-        guard let audioStream = compatibleAudioStreams(content).first else {
-            return streams
-        }
-
-        let videoStreams = compatibleVideoStream(content)
-
-        videoStreams.forEach { videoStream in
-            let audioAsset = AVURLAsset(url: audioStream.dictionaryValue["url"]!.url!)
-            let videoAsset = AVURLAsset(url: videoStream.dictionaryValue["url"]!.url!)
-
-            let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
-            let resolution = Stream.Resolution.from(resolution: videoStream.dictionaryValue["quality"]!.stringValue)
-
-            if videoOnly {
-                streams.append(
-                    Stream(audioAsset: audioAsset, videoAsset: videoAsset, resolution: resolution, kind: .adaptive)
-                )
-            } else {
-                streams.append(
-                    SingleAssetStream(avAsset: videoAsset, resolution: resolution, kind: .stream)
-                )
-            }
-        }
-
-        return streams
-    }
-
-    private func compatibleAudioStreams(_ content: JSON) -> [JSON] {
-        content
-            .dictionaryValue["audioStreams"]?
-            .arrayValue
-            .filter { $0.dictionaryValue["format"]?.stringValue == "M4A" }
-            .sorted {
-                $0.dictionaryValue["bitrate"]?.intValue ?? 0 > $1.dictionaryValue["bitrate"]?.intValue ?? 0
-            } ?? []
-    }
-
-    private func compatibleVideoStream(_ content: JSON) -> [JSON] {
-        content
-            .dictionaryValue["videoStreams"]?
-            .arrayValue
-            .filter { $0.dictionaryValue["format"] == "MPEG_4" } ?? []
     }
 
     func channel(_ id: String) -> Resource {
@@ -239,5 +91,206 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     private func pathPattern(_ path: String) -> String {
         "**\(path)"
+    }
+
+    private static func extractContentItem(_ content: JSON) -> ContentItem? {
+        let details = content.dictionaryValue
+        let url: String! = details["url"]?.string
+
+        let contentType: ContentItem.ContentType
+
+        if !url.isNil {
+            if url.contains("/playlist") {
+                contentType = .playlist
+            } else if url.contains("/channel") {
+                contentType = .channel
+            } else {
+                contentType = .video
+            }
+        } else {
+            contentType = .video
+        }
+
+        switch contentType {
+        case .video:
+            if let video = PipedAPI.extractVideo(content) {
+                return ContentItem(video: video)
+            }
+
+        case .playlist:
+            return nil
+
+        case .channel:
+            if let channel = PipedAPI.extractChannel(content) {
+                return ContentItem(channel: channel)
+            }
+        }
+
+        return nil
+    }
+
+    private static func extractContentItems(_ content: JSON) -> [ContentItem] {
+        content.arrayValue.compactMap { PipedAPI.extractContentItem($0) }
+    }
+
+    private static func extractChannel(_ content: JSON) -> Channel? {
+        let attributes = content.dictionaryValue
+        guard let id = attributes["id"]?.stringValue ??
+            attributes["url"]?.stringValue.components(separatedBy: "/").last
+        else {
+            return nil
+        }
+
+        let subscriptionsCount = attributes["subscriberCount"]?.intValue ?? attributes["subscribers"]?.intValue
+
+        var videos = [Video]()
+        if let relatedStreams = attributes["relatedStreams"] {
+            videos = PipedAPI.extractVideos(relatedStreams)
+        }
+
+        return Channel(
+            id: id,
+            name: attributes["name"]!.stringValue,
+            thumbnailURL: attributes["thumbnail"]?.url,
+            subscriptionsCount: subscriptionsCount,
+            videos: videos
+        )
+    }
+
+    private static func extractVideo(_ content: JSON) -> Video? {
+        let details = content.dictionaryValue
+        let url = details["url"]?.string
+
+        if !url.isNil {
+            guard url!.contains("/watch") else {
+                return nil
+            }
+        }
+
+        let channelId = details["uploaderUrl"]!.stringValue.components(separatedBy: "/").last!
+
+        let thumbnails: [Thumbnail] = Thumbnail.Quality.allCases.compactMap {
+            if let url = PipedAPI.buildThumbnailURL(content, quality: $0) {
+                return Thumbnail(url: url, quality: $0)
+            }
+
+            return nil
+        }
+
+        let author = details["uploaderName"]?.stringValue ?? details["uploader"]!.stringValue
+
+        return Video(
+            videoID: PipedAPI.extractID(content),
+            title: details["title"]!.stringValue,
+            author: author,
+            length: details["duration"]!.doubleValue,
+            published: details["uploadedDate"]?.stringValue ?? details["uploadDate"]!.stringValue,
+            views: details["views"]!.intValue,
+            description: PipedAPI.extractDescription(content),
+            channel: Channel(id: channelId, name: author),
+            thumbnails: thumbnails,
+            likes: details["likes"]?.int,
+            dislikes: details["dislikes"]?.int,
+            streams: extractStreams(content)
+        )
+    }
+
+    private static func extractID(_ content: JSON) -> Video.ID {
+        content.dictionaryValue["url"]?.stringValue.components(separatedBy: "?v=").last ??
+            extractThumbnailURL(content)!.relativeString.components(separatedBy: "/")[4]
+    }
+
+    private static func extractThumbnailURL(_ content: JSON) -> URL? {
+        content.dictionaryValue["thumbnail"]?.url! ?? content.dictionaryValue["thumbnailUrl"]!.url!
+    }
+
+    private static func buildThumbnailURL(_ content: JSON, quality: Thumbnail.Quality) -> URL? {
+        let thumbnailURL = extractThumbnailURL(content)
+        guard !thumbnailURL.isNil else {
+            return nil
+        }
+
+        return URL(string: thumbnailURL!
+            .absoluteString
+            .replacingOccurrences(of: "hqdefault", with: quality.filename)
+            .replacingOccurrences(of: "maxresdefault", with: quality.filename)
+        )!
+    }
+
+    private static func extractDescription(_ content: JSON) -> String? {
+        guard var description = content.dictionaryValue["description"]?.string else {
+            return nil
+        }
+
+        description = description.replacingOccurrences(
+            of: "<br/>|<br />|<br>",
+            with: "\n",
+            options: .regularExpression,
+            range: nil
+        )
+
+        description = description.replacingOccurrences(
+            of: "<[^>]+>",
+            with: "",
+            options: .regularExpression,
+            range: nil
+        )
+
+        return description
+    }
+
+    private static func extractVideos(_ content: JSON) -> [Video] {
+        content.arrayValue.compactMap(extractVideo(_:))
+    }
+
+    private static func extractStreams(_ content: JSON) -> [Stream] {
+        var streams = [Stream]()
+
+        if let hlsURL = content.dictionaryValue["hls"]?.url {
+            streams.append(Stream(hlsURL: hlsURL))
+        }
+
+        guard let audioStream = PipedAPI.compatibleAudioStreams(content).first else {
+            return streams
+        }
+
+        let videoStreams = PipedAPI.compatibleVideoStream(content)
+
+        videoStreams.forEach { videoStream in
+            let audioAsset = AVURLAsset(url: audioStream.dictionaryValue["url"]!.url!)
+            let videoAsset = AVURLAsset(url: videoStream.dictionaryValue["url"]!.url!)
+
+            let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
+            let resolution = Stream.Resolution.from(resolution: videoStream.dictionaryValue["quality"]!.stringValue)
+
+            if videoOnly {
+                streams.append(
+                    Stream(audioAsset: audioAsset, videoAsset: videoAsset, resolution: resolution, kind: .adaptive)
+                )
+            } else {
+                streams.append(
+                    SingleAssetStream(avAsset: videoAsset, resolution: resolution, kind: .stream)
+                )
+            }
+        }
+
+        return streams
+    }
+
+    private static func compatibleAudioStreams(_ content: JSON) -> [JSON] {
+        content
+            .dictionaryValue["audioStreams"]?
+            .arrayValue
+            .filter { $0.dictionaryValue["format"]?.stringValue == "M4A" }
+            .sorted {
+                $0.dictionaryValue["bitrate"]?.intValue ?? 0 > $1.dictionaryValue["bitrate"]?.intValue ?? 0
+            } ?? []
+    }
+
+    private static func compatibleVideoStream(_ content: JSON) -> [JSON] {
+        content
+            .dictionaryValue["videoStreams"]?
+            .arrayValue
+            .filter { $0.dictionaryValue["format"] == "MPEG_4" } ?? []
     }
 }

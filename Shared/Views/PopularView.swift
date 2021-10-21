@@ -10,9 +10,13 @@ struct PopularView: View {
         accounts.api.popular
     }
 
+    var videos: [ContentItem] {
+        ContentItem.array(of: store.collection)
+    }
+
     var body: some View {
         PlayerControlsView {
-            VideosCellsVertical(videos: store.collection)
+            VerticalCells(items: videos)
                 .onAppear {
                     resource?.addObserver(store)
                     resource?.loadIfNeeded()

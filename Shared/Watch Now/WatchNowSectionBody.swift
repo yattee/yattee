@@ -15,7 +15,7 @@ struct WatchNowSectionBody: View {
                 .padding(.leading, 15)
             #endif
 
-            VideosCellsHorizontal(videos: videos)
+            HorizontalCells(items: ContentItem.array(of: videos))
         }
     }
 }

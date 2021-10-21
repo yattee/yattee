@@ -148,29 +148,4 @@ class Stream: Equatable, Hashable, Identifiable {
         hasher.combine(audioAsset?.url)
         hasher.combine(hlsURL)
     }
-
-    func withAssetsFrom(_ instance: Instance) -> Stream {
-        if kind == .hls {
-            return Stream(instance: instance, hlsURL: hlsURL)
-        } else {
-            return Stream(
-                instance: instance,
-                audioAsset: AVURLAsset(url: assetURLFrom(instance: instance, url: (audioAsset ?? videoAsset).url)!),
-                videoAsset: AVURLAsset(url: assetURLFrom(instance: instance, url: videoAsset.url)!),
-                resolution: resolution,
-                kind: kind,
-                encoding: encoding
-            )
-        }
-    }
-
-    private func assetURLFrom(instance: Instance, url: URL) -> URL? {
-        guard let instanceURLComponents = URLComponents(string: instance.url),
-              var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
-
-        urlComponents.scheme = instanceURLComponents.scheme
-        urlComponents.host = instanceURLComponents.host
-
-        return urlComponents.url
-    }
 }

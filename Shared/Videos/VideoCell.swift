@@ -1,10 +1,12 @@
 import Defaults
+import SDWebImageSwiftUI
 import SwiftUI
 
-struct VideoView: View {
+struct VideoCell: View {
     var video: Video
 
     @State private var playerNavigationLinkActive = false
+    @State private var lowQualityThumbnail = false
 
     @Environment(\.inNavigationView) private var inNavigationView
 
@@ -181,7 +183,7 @@ struct VideoView: View {
 
     var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnailImage(quality: .maxresdefault)
+            thumbnailImage(quality: lowQualityThumbnail ? .medium : .maxresdefault)
 
             VStack {
                 HStack(alignment: .top) {
@@ -212,27 +214,20 @@ struct VideoView: View {
     }
 
     func thumbnailImage(quality: Thumbnail.Quality) -> some View {
-        Group {
-            if let url = video.thumbnailURL(quality: quality) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    HStack {
-                        ProgressView()
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    }
-                }
-            } else {
-                Image(systemName: "exclamationmark.square")
+        WebImage(url: video.thumbnailURL(quality: quality))
+            .resizable()
+            .placeholder {
+                Rectangle().fill(Color("PlaceholderColor"))
             }
-        }
-        .background(.gray)
-        .mask(RoundedRectangle(cornerRadius: 12))
+            .onFailure { _ in
+                lowQualityThumbnail = true
+            }
+            .indicator(.progress)
+            .mask(RoundedRectangle(cornerRadius: 12))
+            .modifier(AspectRatioModifier())
         #if os(tvOS)
             .frame(minHeight: 320)
         #endif
-        .modifier(AspectRatioModifier())
     }
 
     func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
@@ -255,5 +250,15 @@ struct VideoView: View {
                 }
             }
         }
+    }
+}
+
+struct VideoView_Preview: PreviewProvider {
+    static var previews: some View {
+        Group {
+            VideoCell(video: Video.fixture)
+        }
+        .frame(maxWidth: 300, maxHeight: 200)
+        .injectFixtureEnvironmentObjects()
     }
 }

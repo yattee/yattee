@@ -73,6 +73,7 @@ struct RecentNavigationLink<DestinationContent: View>: View {
                     Image(systemName: "xmark.circle.fill")
                 }
                 .foregroundColor(.secondary)
+                .opacity(0.5)
                 .buttonStyle(.plain)
             }
         }

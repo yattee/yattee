@@ -1,29 +1,23 @@
 import Defaults
 import SwiftUI
 
-struct VideosCellsVertical: View {
+struct VerticalCells: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    var videos = [Video]()
+    var items = [ContentItem]()
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
-            LazyVGrid(columns: items, alignment: .center) {
-                ForEach(videos) { video in
-                    VideoView(video: video)
-                    #if os(tvOS)
-                        .padding(.horizontal)
-                    #endif
+            LazyVGrid(columns: columns, alignment: .center) {
+                ForEach(items.sorted { $0 < $1 }) { item in
+                    ContentItemView(item: item)
                 }
             }
             .padding()
         }
         .id(UUID())
-        #if os(tvOS)
-            .padding(.horizontal, 10)
-        #endif
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
             .background()
@@ -31,9 +25,9 @@ struct VideosCellsVertical: View {
         #endif
     }
 
-    var items: [GridItem] {
+    var columns: [GridItem] {
         #if os(tvOS)
-            videos.count < 3 ? Array(repeating: GridItem(.fixed(540)), count: [videos.count, 1].max()!) : adaptiveItem
+            items.count < 3 ? Array(repeating: GridItem(.fixed(540)), count: [items.count, 1].max()!) : adaptiveItem
         #else
             adaptiveItem
         #endif
@@ -64,7 +58,7 @@ struct VideosCellsVertical: View {
 
 struct VideoCellsVertical_Previews: PreviewProvider {
     static var previews: some View {
-        VideosCellsVertical(videos: Video.allFixtures)
+        VerticalCells(items: ContentItem.array(of: Video.allFixtures))
             .injectFixtureEnvironmentObjects()
     }
 }
