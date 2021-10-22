@@ -30,11 +30,11 @@
       },
       {
         "package": "PINCache",
-        "repositoryURL": "https://github.com/pinterest/PINCache.git",
+        "repositoryURL": "https://github.com/pinterest/PINCache",
         "state": {
-          "branch": null,
-          "revision": "875c654984fb52b47ca65ae70d24852b0003ccd9",
-          "version": "3.0.3"
+          "branch": "master",
+          "revision": "a16dae6cec4897a7a9710239e0cb50b6de935e7b",
+          "version": null
         }
       },
       {

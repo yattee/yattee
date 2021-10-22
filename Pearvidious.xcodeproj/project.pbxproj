@@ -136,6 +136,9 @@
 		376578912685490700D4EA09 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578902685490700D4EA09 /* PlaylistsView.swift */; };
 		376578922685490700D4EA09 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578902685490700D4EA09 /* PlaylistsView.swift */; };
 		376578932685490700D4EA09 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578902685490700D4EA09 /* PlaylistsView.swift */; };
+		3765917A27237D07009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917927237D07009F956E /* PINCache */; };
+		3765917C27237D21009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917B27237D21009F956E /* PINCache */; };
+		3765917E27237D2A009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917D27237D2A009F956E /* PINCache */; };
 		37666BAA27023AF000F869E5 /* AccountSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37666BA927023AF000F869E5 /* AccountSelectionView.swift */; };
 		376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		376A33E12720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
@@ -546,6 +549,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37FB284B2722099E00A57617 /* SDWebImageSwiftUI in Frameworks */,
+				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
 				37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */,
@@ -564,6 +568,7 @@
 				37FB2851272209AB00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37FB285827220D9600A57617 /* SDWebImagePINPlugin in Frameworks */,
 				37FB284F272209AB00A57617 /* SDWebImageSwiftUI in Frameworks */,
+				3765917A27237D07009F956E /* PINCache in Frameworks */,
 				37BD07BE2698AC96003EBB87 /* Defaults in Frameworks */,
 				37BADCA7269A552E009BE4FB /* Alamofire in Frameworks */,
 				377FC7ED267A0A0800A6BBAF /* SwiftyJSON in Frameworks */,
@@ -593,6 +598,7 @@
 				37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				37FB28462722054C00A57617 /* SDWebImageSwiftUI in Frameworks */,
+				3765917E27237D2A009F956E /* PINCache in Frameworks */,
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
@@ -1021,6 +1027,7 @@
 				37FB284A2722099E00A57617 /* SDWebImageSwiftUI */,
 				37FB284C2722099E00A57617 /* SDWebImageWebPCoder */,
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
+				3765917B27237D21009F956E /* PINCache */,
 			);
 			productName = "Pearvidious (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Pearvidious.app */;
@@ -1049,6 +1056,7 @@
 				37FB284E272209AB00A57617 /* SDWebImageSwiftUI */,
 				37FB2850272209AB00A57617 /* SDWebImageWebPCoder */,
 				37FB285727220D9600A57617 /* SDWebImagePINPlugin */,
+				3765917927237D07009F956E /* PINCache */,
 			);
 			productName = "Pearvidious (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Pearvidious.app */;
@@ -1113,6 +1121,7 @@
 				37FB28452722054C00A57617 /* SDWebImageSwiftUI */,
 				37FB2848272207F000A57617 /* SDWebImageWebPCoder */,
 				37FB285327220D8400A57617 /* SDWebImagePINPlugin */,
+				3765917D27237D2A009F956E /* PINCache */,
 			);
 			productName = Pearvidious;
 			productReference = 37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */;
@@ -1198,6 +1207,7 @@
 				37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
 				37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */,
+				3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -2394,6 +2404,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pinterest/PINCache";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bustoutsolutions/siesta";
@@ -2465,6 +2483,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 372915E22687E33E00F5A35B /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		3765917927237D07009F956E /* PINCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
+			productName = PINCache;
+		};
+		3765917B27237D21009F956E /* PINCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
+			productName = PINCache;
+		};
+		3765917D27237D2A009F956E /* PINCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
+			productName = PINCache;
 		};
 		377FC7D4267A080300A6BBAF /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
