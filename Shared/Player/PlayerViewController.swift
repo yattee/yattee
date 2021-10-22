@@ -42,7 +42,7 @@ final class PlayerViewController: UIViewController {
         var playerQueueInfoViewController: UIHostingController<AnyView> {
             let controller = UIHostingController(rootView:
                 AnyView(
-                    NowPlayingView(infoViewController: true)
+                    NowPlayingView(inInfoViewController: true)
                         .frame(maxHeight: 600)
                         .environmentObject(playerModel)
                 )

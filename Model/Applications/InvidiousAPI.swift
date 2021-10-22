@@ -255,14 +255,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         return searchQuery
     }
 
-    static func assetURLFrom(instance: Instance, url: URL) -> URL? {
+    static func proxiedAsset(instance: Instance, asset: AVURLAsset) -> AVURLAsset? {
         guard let instanceURLComponents = URLComponents(string: instance.url),
-              var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+              var urlComponents = URLComponents(url: asset.url, resolvingAgainstBaseURL: false) else { return nil }
 
         urlComponents.scheme = instanceURLComponents.scheme
         urlComponents.host = instanceURLComponents.host
 
-        return urlComponents.url
+        guard let url = urlComponents.url else {
+            return nil
+        }
+
+        return AVURLAsset(url: url)
     }
 
     static func extractVideo(_ json: JSON) -> Video {

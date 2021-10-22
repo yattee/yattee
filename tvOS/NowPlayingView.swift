@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct NowPlayingView: View {
-    var infoViewController = false
+    var inInfoViewController = false
 
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
-        if infoViewController {
+        if inInfoViewController {
             content
                 .background(.thinMaterial)
                 .mask(RoundedRectangle(cornerRadius: 24))
@@ -18,7 +18,7 @@ struct NowPlayingView: View {
     var content: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading) {
-                if !infoViewController, let item = player.currentItem {
+                if !inInfoViewController, let item = player.currentItem {
                     Group {
                         header("Now Playing")
 
@@ -93,7 +93,7 @@ struct NowPlayingView: View {
 
     func header(_ text: String) -> some View {
         Text(text)
-            .font(.title3.bold())
+            .font((inInfoViewController ? Font.system(size: 40) : .title3).bold())
             .foregroundColor(.secondary)
             .padding(.leading, 40)
     }
@@ -102,6 +102,9 @@ struct NowPlayingView: View {
 struct NowPlayingView_Previews: PreviewProvider {
     static var previews: some View {
         NowPlayingView()
+            .injectFixtureEnvironmentObjects()
+
+        NowPlayingView(inInfoViewController: true)
             .injectFixtureEnvironmentObjects()
     }
 }

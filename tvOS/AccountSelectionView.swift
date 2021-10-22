@@ -13,7 +13,7 @@ struct AccountSelectionView: View {
 
     var body: some View {
         Section(header: Text(showHeader ? "Current Account" : "")) {
-            Button(accountButtonTitle(account: accountsModel.current)) {
+            Button(accountButtonTitle(account: accountsModel.current, long: true)) {
                 if let account = nextAccount {
                     accountsModel.setCurrent(account)
                 }
@@ -40,11 +40,13 @@ struct AccountSelectionView: View {
         allAccounts.next(after: accountsModel.current)
     }
 
-    func accountButtonTitle(account: Account! = nil) -> String {
+    func accountButtonTitle(account: Account! = nil, long: Bool = false) -> String {
         guard account != nil else {
             return "Not selected"
         }
 
-        return instances.count > 1 ? "\(account.description) — \(account.instance.shortDescription)" : account.description
+        let instanceDescription = long ? account.instance.longDescription : account.instance.description
+
+        return instances.count > 1 ? "\(account.description) — \(instanceDescription)" : account.description
     }
 }

@@ -1,7 +1,6 @@
 import Foundation
 import Siesta
 import SwiftUI
-import AVFoundation
 
 extension PlayerModel {
     var isLoadingAvailableStreams: Bool {
@@ -104,10 +103,10 @@ extension PlayerModel {
             stream.instance = instance
 
             if instance.app == .invidious {
-                stream.audioAsset = AVURLAsset(url: InvidiousAPI.assetURLFrom(instance: instance, url: stream.audioAsset.url)!)
-                stream.videoAsset = AVURLAsset(url: InvidiousAPI.assetURLFrom(instance: instance, url: stream.videoAsset.url)!)
+                stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: stream.audioAsset)
+                stream.videoAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: stream.videoAsset)
             }
-            
+
             return stream
         }
     }
