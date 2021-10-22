@@ -1,9 +1,8 @@
-import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
 
-struct ChannelCell: View {
-    let channel: Channel
+struct ChannelPlaylistCell: View {
+    let playlist: ChannelPlaylist
 
     @Environment(\.navigationStyle) private var navigationStyle
 
@@ -12,9 +11,9 @@ struct ChannelCell: View {
 
     var body: some View {
         Button {
-            let recent = RecentItem(from: channel)
+            let recent = RecentItem(from: playlist)
             recents.add(recent)
-            navigation.presentingChannel = true
+            navigation.presentingPlaylist = true
 
             if navigationStyle == .sidebar {
                 navigation.sidebarSectionChanged.toggle()
@@ -31,43 +30,39 @@ struct ChannelCell: View {
     var content: some View {
         VStack {
             HStack(alignment: .top, spacing: 3) {
-                Image(systemName: "person.crop.rectangle")
-                Text("Channel".uppercased())
+                Image(systemName: "list.and.film")
+                Text("Playlist".uppercased())
                     .fontWeight(.light)
                     .opacity(0.6)
             }
             .foregroundColor(.secondary)
 
-            WebImage(url: channel.thumbnailURL)
+            WebImage(url: playlist.thumbnailURL)
                 .resizable()
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))
                 }
                 .indicator(.progress)
-                .frame(width: 88, height: 88)
-                .clipShape(Circle())
-
-            DetailBadge(text: channel.name, style: .prominent)
+                .frame(width: 165, height: 88)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
 
             Group {
-                if let subscriptions = channel.subscriptionsString {
-                    Text("\(subscriptions) subscribers")
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("")
-                }
+                DetailBadge(text: playlist.title, style: .prominent)
+                    .lineLimit(2)
+
+                Text("\(playlist.videosCount ?? playlist.videos.count) videos")
+                    .foregroundColor(.secondary)
+
+                    .frame(height: 20)
             }
-            .frame(height: 20)
         }
     }
 }
 
-struct ChannelSearchItem_Preview: PreviewProvider {
+struct ChannelPlaylistCell_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ChannelCell(channel: Video.fixture.channel)
-        }
-        .frame(maxWidth: 300, maxHeight: 200)
-        .injectFixtureEnvironmentObjects()
+        ChannelPlaylistCell(playlist: ChannelPlaylist.fixture)
+            .frame(maxWidth: 320)
+            .injectFixtureEnvironmentObjects()
     }
 }

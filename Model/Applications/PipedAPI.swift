@@ -35,6 +35,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             PipedAPI.extractChannel(content.json)
         }
 
+        configureTransformer(pathPattern("playlists/*")) { (content: Entity<JSON>) -> ChannelPlaylist? in
+            PipedAPI.extractChannelPlaylist(from: content.json)
+        }
+
         configureTransformer(pathPattern("streams/*")) { (content: Entity<JSON>) -> Video? in
             PipedAPI.extractVideo(content.json)
         }
@@ -54,6 +58,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func channel(_ id: String) -> Resource {
         resource(baseURL: account.url, path: "channel/\(id)")
+    }
+
+    func channelPlaylist(_ id: String) -> Resource? {
+        resource(baseURL: account.url, path: "playlists/\(id)")
     }
 
     func trending(country: Country, category _: TrendingCategory? = nil) -> Resource {
@@ -118,7 +126,9 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             }
 
         case .playlist:
-            return nil
+            if let playlist = PipedAPI.extractChannelPlaylist(from: content) {
+                return ContentItem(playlist: playlist)
+            }
 
         case .channel:
             if let channel = PipedAPI.extractChannel(content) {
@@ -136,7 +146,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     private static func extractChannel(_ content: JSON) -> Channel? {
         let attributes = content.dictionaryValue
         guard let id = attributes["id"]?.stringValue ??
-            attributes["url"]?.stringValue.components(separatedBy: "/").last
+            (attributes["url"] ?? attributes["uploaderUrl"])?.stringValue.components(separatedBy: "/").last
         else {
             return nil
         }
@@ -155,6 +165,28 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             subscriptionsCount: subscriptionsCount,
             videos: videos
         )
+    }
+
+    static func extractChannelPlaylist(from json: JSON) -> ChannelPlaylist? {
+        let details = json.dictionaryValue
+        let id = details["url"]?.stringValue.components(separatedBy: "?list=").last ?? UUID().uuidString
+        let thumbnailURL = details["thumbnail"]?.url ?? details["thumbnailUrl"]?.url
+        var videos = [Video]()
+        if let relatedStreams = details["relatedStreams"] {
+            videos = PipedAPI.extractVideos(relatedStreams)
+        }
+        return ChannelPlaylist(
+            id: id,
+            title: details["name"]!.stringValue,
+            thumbnailURL: thumbnailURL,
+            channel: extractChannel(json)!,
+            videos: videos,
+            videosCount: details["videos"]?.int
+        )
+    }
+
+    static func extractChannelPlaylists(from json: JSON) -> [ChannelPlaylist] {
+        json.arrayValue.compactMap(PipedAPI.extractChannelPlaylist)
     }
 
     private static func extractVideo(_ content: JSON) -> Video? {

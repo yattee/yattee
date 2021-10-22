@@ -2,9 +2,11 @@ import Defaults
 import SwiftUI
 
 struct AppTabNavigation: View {
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var search
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
@@ -18,27 +20,30 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.watchNow)
 
-            NavigationView {
-                LazyView(SubscriptionsView())
-                    .toolbar { toolbarContent }
+            if accounts.app.supportsSubscriptions {
+                NavigationView {
+                    LazyView(SubscriptionsView())
+                        .toolbar { toolbarContent }
+                }
+                .tabItem {
+                    Label("Subscriptions", systemImage: "star.circle.fill")
+                        .accessibility(label: Text("Subscriptions"))
+                }
+                .tag(TabSelection.subscriptions)
             }
-            .tabItem {
-                Label("Subscriptions", systemImage: "star.circle.fill")
-                    .accessibility(label: Text("Subscriptions"))
-            }
-            .tag(TabSelection.subscriptions)
 
-//            TODO: reenable with settings
-//            ============================
-//            NavigationView {
-//                LazyView(PopularView())
-//                    .toolbar { toolbarContent }
-//            }
-//            .tabItem {
-//                Label("Popular", systemImage: "chart.bar")
-//                    .accessibility(label: Text("Popular"))
-//            }
-//            .tag(TabSelection.popular)
+            // TODO: reenable with settings
+            if accounts.app.supportsPopular && false {
+                NavigationView {
+                    LazyView(PopularView())
+                        .toolbar { toolbarContent }
+                }
+                .tabItem {
+                    Label("Popular", systemImage: "chart.bar")
+                        .accessibility(label: Text("Popular"))
+                }
+                .tag(TabSelection.popular)
+            }
 
             NavigationView {
                 LazyView(TrendingView())
@@ -50,15 +55,17 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.trending)
 
-            NavigationView {
-                LazyView(PlaylistsView())
-                    .toolbar { toolbarContent }
+            if accounts.app.supportsUserPlaylists {
+                NavigationView {
+                    LazyView(PlaylistsView())
+                        .toolbar { toolbarContent }
+                }
+                .tabItem {
+                    Label("Playlists", systemImage: "list.and.film")
+                        .accessibility(label: Text("Playlists"))
+                }
+                .tag(TabSelection.playlists)
             }
-            .tabItem {
-                Label("Playlists", systemImage: "list.and.film")
-                    .accessibility(label: Text("Playlists"))
-            }
-            .tag(TabSelection.playlists)
 
             NavigationView {
                 LazyView(
@@ -89,18 +96,40 @@ struct AppTabNavigation: View {
             .tag(TabSelection.search)
         }
         .environment(\.navigationStyle, .tab)
-        .sheet(isPresented: $navigation.isChannelOpen, onDismiss: {
+        .sheet(isPresented: $navigation.presentingChannel, onDismiss: {
             if let channel = recents.presentedChannel {
-                let recent = RecentItem(from: channel)
-                recents.close(recent)
+                recents.close(RecentItem(from: channel))
             }
         }) {
-            if recents.presentedChannel != nil {
+            if let channel = recents.presentedChannel {
                 NavigationView {
-                    ChannelVideosView(channel: recents.presentedChannel!)
+                    ChannelVideosView(channel: channel)
                         .environment(\.inNavigationView, true)
+                        .background(playerNavigationLink)
                 }
             }
+        }
+        .sheet(isPresented: $navigation.presentingPlaylist, onDismiss: {
+            if let playlist = recents.presentedPlaylist {
+                recents.close(RecentItem(from: playlist))
+            }
+        }) {
+            if let playlist = recents.presentedPlaylist {
+                NavigationView {
+                    ChannelPlaylistView(playlist: playlist)
+                        .environment(\.inNavigationView, true)
+                        .background(playerNavigationLink)
+                }
+            }
+        }
+    }
+
+    private var playerNavigationLink: some View {
+        NavigationLink(isActive: $player.playerNavigationLinkActive, destination: {
+            VideoPlayerView()
+                .environment(\.inNavigationView, true)
+        }) {
+            EmptyView()
         }
     }
 

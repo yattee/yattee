@@ -26,7 +26,8 @@ final class NavigationModel: ObservableObject {
     @Published var presentingUnsubscribeAlert = false
     @Published var channelToUnsubscribe: Channel!
 
-    @Published var isChannelOpen = false
+    @Published var presentingChannel = false
+    @Published var presentingPlaylist = false
     @Published var sidebarSectionChanged = false
 
     @Published var presentingSettings = false

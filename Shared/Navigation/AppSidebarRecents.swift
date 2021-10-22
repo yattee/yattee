@@ -17,6 +17,12 @@ struct AppSidebarRecents: View {
                                 RecentNavigationLink(recent: recent) {
                                     LazyView(ChannelVideosView(channel: recent.channel!))
                                 }
+
+                            case .playlist:
+                                RecentNavigationLink(recent: recent, systemImage: "list.and.film") {
+                                    LazyView(ChannelPlaylistView(playlist: recent.playlist!))
+                                }
+
                             case .query:
                                 RecentNavigationLink(recent: recent, systemImage: "magnifyingglass") {
                                     LazyView(SearchView(recent.query!))
@@ -64,6 +70,7 @@ struct RecentNavigationLink<DestinationContent: View>: View {
         } label: {
             HStack {
                 Label(recent.title, systemImage: labelSystemImage)
+                    .lineLimit(1)
 
                 Spacer()
 

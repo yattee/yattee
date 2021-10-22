@@ -21,4 +21,6 @@ protocol VideosAPI {
 
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource?
     func playlistVideos(_ id: String) -> Resource?
+
+    func channelPlaylist(_ id: String) -> Resource?
 }

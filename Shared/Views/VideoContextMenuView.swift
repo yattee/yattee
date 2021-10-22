@@ -85,7 +85,7 @@ struct VideoContextMenuView: View {
         Button {
             let recent = RecentItem(from: video.channel)
             recents.add(recent)
-            navigation.isChannelOpen = true
+            navigation.presentingChannel = true
 
             if navigationStyle == .sidebar {
                 navigation.sidebarSectionChanged.toggle()

@@ -39,13 +39,21 @@ final class RecentsModel: ObservableObject {
 
         return nil
     }
+
+    var presentedPlaylist: ChannelPlaylist? {
+        if let recent = items.last(where: { $0.type == .playlist }) {
+            return recent.playlist
+        }
+
+        return nil
+    }
 }
 
 struct RecentItem: Defaults.Serializable, Identifiable {
     static var bridge = RecentItemBridge()
 
     enum ItemType: String {
-        case channel, query
+        case channel, playlist, query
     }
 
     var type: ItemType
@@ -72,6 +80,14 @@ struct RecentItem: Defaults.Serializable, Identifiable {
         return Channel(id: id, name: title)
     }
 
+    var playlist: ChannelPlaylist? {
+        guard type == .playlist else {
+            return nil
+        }
+
+        return ChannelPlaylist(id: id, title: title)
+    }
+
     init(type: ItemType, identifier: String, title: String) {
         self.type = type
         id = identifier
@@ -88,6 +104,12 @@ struct RecentItem: Defaults.Serializable, Identifiable {
         type = .query
         id = query
         title = query
+    }
+
+    init(from playlist: ChannelPlaylist) {
+        type = .playlist
+        id = playlist.id
+        title = playlist.title
     }
 }
 

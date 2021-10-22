@@ -27,17 +27,16 @@ final class PlayerModel: ObservableObject {
 
     @Published var queue = [PlayerQueueItem]()
     @Published var currentItem: PlayerQueueItem!
-    @Published var live = false
 
     @Published var history = [PlayerQueueItem]()
-
     @Published var savedTime: CMTime?
 
-    @Published var composition = AVMutableComposition()
+    @Published var playerNavigationLinkActive = false
 
     var accounts: AccountsModel
     var instances: InstancesModel
 
+    var composition = AVMutableComposition()
     var timeObserver: Any?
     private var shouldResumePlaying = true
     private var statusObservation: NSKeyValueObservation?
@@ -59,6 +58,10 @@ final class PlayerModel: ObservableObject {
 
     var time: CMTime? {
         currentItem?.playbackTime
+    }
+
+    var live: Bool {
+        currentItem?.video.live ?? false
     }
 
     var playerItemDuration: CMTime? {
@@ -335,7 +338,6 @@ final class PlayerModel: ObservableObject {
 
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
             self.currentRate = self.player.rate
-            self.live = self.currentVideo?.live ?? false
             self.currentItem?.playbackTime = self.player.currentTime()
             self.currentItem?.videoDuration = self.player.currentItem?.asset.duration.seconds
         }

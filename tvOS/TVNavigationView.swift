@@ -53,9 +53,14 @@ struct TVNavigationView: View {
         .fullScreenCover(isPresented: $player.presentingPlayer) {
             VideoPlayerView()
         }
-        .fullScreenCover(isPresented: $navigation.isChannelOpen) {
+        .fullScreenCover(isPresented: $navigation.presentingChannel) {
             if let channel = recents.presentedChannel {
                 ChannelVideosView(channel: channel)
+            }
+        }
+        .fullScreenCover(isPresented: $navigation.presentingPlaylist) {
+            if let playlist = recents.presentedPlaylist {
+                ChannelPlaylistView(playlist: playlist)
             }
         }
         .onPlayPauseCommand { navigation.presentingSettings.toggle() }

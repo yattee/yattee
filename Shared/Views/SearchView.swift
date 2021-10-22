@@ -25,6 +25,10 @@ struct SearchView: View {
 
     private var videos = [Video]()
 
+    var items: [ContentItem] {
+        state.store.collection.sorted { $0 < $1 }
+    }
+
     init(_ query: SearchQuery? = nil, videos: [Video] = [Video]()) {
         self.query = query
         self.videos = videos
@@ -42,11 +46,11 @@ struct SearchView: View {
                                 filtersHorizontalStack
                             }
 
-                            HorizontalCells(items: state.store.collection)
+                            HorizontalCells(items: items)
                         }
                         .edgesIgnoringSafeArea(.horizontal)
                     #else
-                        VerticalCells(items: state.store.collection)
+                        VerticalCells(items: items)
                     #endif
 
                     if noResults {
@@ -173,7 +177,7 @@ struct SearchView: View {
     }
 
     fileprivate var noResults: Bool {
-        state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty
+        items.isEmpty && !state.isLoading && !state.query.isEmpty
     }
 
     var recentQueries: some View {

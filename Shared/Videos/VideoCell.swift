@@ -4,8 +4,6 @@ import SwiftUI
 
 struct VideoCell: View {
     var video: Video
-
-    @State private var playerNavigationLinkActive = false
     @State private var lowQualityThumbnail = false
 
     @Environment(\.inNavigationView) private var inNavigationView
@@ -23,24 +21,17 @@ struct VideoCell: View {
                 player.playNow(video)
 
                 if inNavigationView {
-                    playerNavigationLinkActive = true
+                    player.playerNavigationLinkActive = true
                 } else {
                     player.presentPlayer()
                 }
             }) {
                 content
             }
-
-            NavigationLink(isActive: $playerNavigationLinkActive, destination: {
-                VideoPlayerView()
-                    .environment(\.inNavigationView, true)
-            }) {
-                EmptyView()
-            }
         }
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: 12))
-        .contextMenu { VideoContextMenuView(video: video, playerNavigationLinkActive: $playerNavigationLinkActive) }
+        .contextMenu { VideoContextMenuView(video: video, playerNavigationLinkActive: $player.playerNavigationLinkActive) }
     }
 
     var content: some View {
@@ -90,7 +81,7 @@ struct VideoCell: View {
                                 }
                             }
 
-                            if video.views != 0 {
+                            if video.views > 0 {
                                 VStack {
                                     Image(systemName: "eye")
                                     Text(video.viewsCount!)
@@ -125,6 +116,7 @@ struct VideoCell: View {
 
                             Spacer()
                         }
+                        .lineLimit(1)
                     }
                 #endif
             }
@@ -154,7 +146,7 @@ struct VideoCell: View {
                                 Text(date)
                             }
 
-                            if video.views != 0 {
+                            if video.views > 0 {
                                 Image(systemName: "eye")
                                 Text(video.viewsCount!)
                             }
@@ -210,6 +202,7 @@ struct VideoCell: View {
                 }
                 .padding(10)
             }
+            .lineLimit(1)
         }
     }
 
@@ -253,7 +246,7 @@ struct VideoCell: View {
     }
 }
 
-struct VideoView_Preview: PreviewProvider {
+struct VideoCell_Preview: PreviewProvider {
     static var previews: some View {
         Group {
             VideoCell(video: Video.fixture)

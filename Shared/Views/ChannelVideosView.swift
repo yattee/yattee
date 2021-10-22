@@ -6,16 +6,16 @@ struct ChannelVideosView: View {
 
     @StateObject private var store = Store<Channel>()
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.inNavigationView) private var inNavigationView
 
-    @Environment(\.dismiss) private var dismiss
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
+
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Namespace private var focusNamespace
 
@@ -88,8 +88,7 @@ struct ChannelVideosView: View {
                     }
                 }
             }
-        #endif
-        #if os(tvOS)
+        #else
             .background(.thickMaterial)
         #endif
         .modifier(UnsubscribeAlertModifier())

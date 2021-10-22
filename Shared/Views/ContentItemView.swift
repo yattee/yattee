@@ -8,7 +8,7 @@ struct ContentItemView: View {
         Group {
             switch item.contentType {
             case .playlist:
-                VideoCell(video: item.video)
+                ChannelPlaylistCell(playlist: item.playlist)
             case .channel:
                 ChannelCell(channel: item.channel)
             default:

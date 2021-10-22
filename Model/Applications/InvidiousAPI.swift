@@ -95,8 +95,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 if type == "channel" {
                     return ContentItem(channel: InvidiousAPI.extractChannel(from: $0))
                 } else if type == "playlist" {
-                    // TODO: fix playlists
-                    return ContentItem(playlist: Playlist(JSON(parseJSON: "{}")))
+                    return ContentItem(playlist: InvidiousAPI.extractChannelPlaylist(from: $0))
                 }
                 return ContentItem(video: InvidiousAPI.extractVideo($0))
             }
@@ -141,6 +140,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         configureTransformer(pathPattern("channels/*/latest"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.arrayValue.map(InvidiousAPI.extractVideo)
+        }
+
+        configureTransformer(pathPattern("playlists/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPlaylist in
+            InvidiousAPI.extractChannelPlaylist(from: content.json)
         }
 
         configureTransformer(pathPattern("videos/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
@@ -212,6 +215,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource? {
         playlist(playlistID)?.child("videos").child(videoID)
+    }
+
+    func channelPlaylist(_ id: String) -> Resource? {
+        resource(baseURL: account.url, path: basePathAppending("playlists/\(id)"))
     }
 
     func search(_ query: SearchQuery) -> Resource {
@@ -323,6 +330,21 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             subscriptionsText: json["subCountText"].string,
             videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(InvidiousAPI.extractVideo) ?? []
         )
+    }
+
+    static func extractChannelPlaylist(from json: JSON) -> ChannelPlaylist {
+        let details = json.dictionaryValue
+        return ChannelPlaylist(
+            id: details["playlistId"]!.stringValue,
+            title: details["title"]!.stringValue,
+            thumbnailURL: details["playlistThumbnail"]?.url,
+            channel: extractChannel(from: json),
+            videos: details["videos"]?.arrayValue.compactMap(InvidiousAPI.extractVideo) ?? []
+        )
+    }
+
+    static func extractChannelPlaylists(from json: JSON) -> [ChannelPlaylist] {
+        json.arrayValue.map(InvidiousAPI.extractChannelPlaylist)
     }
 
     private static func extractThumbnails(from details: JSON) -> [Thumbnail] {

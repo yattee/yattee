@@ -8,7 +8,7 @@ struct ContentItem: Identifiable {
             switch self {
             case .channel:
                 return 1
-            case .video:
+            case .playlist:
                 return 2
             default:
                 return 3
@@ -21,7 +21,7 @@ struct ContentItem: Identifiable {
     }
 
     var video: Video!
-    var playlist: Playlist!
+    var playlist: ChannelPlaylist!
     var channel: Channel!
 
     static func array(of videos: [Video]) -> [ContentItem] {

@@ -73,7 +73,6 @@ struct DetailBadge: View {
 
     var body: some View {
         Text(text)
-            .lineLimit(1)
             .truncationMode(.middle)
             .padding(10)
             .modifier(StyleModifier(style: style))
