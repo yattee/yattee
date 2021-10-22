@@ -56,32 +56,46 @@ struct PlayerControlsView<Content: View>: View {
                 .keyboardShortcut("o")
             #endif
 
-            Group {
-                if model.isPlaying {
-                    Button(action: {
-                        model.pause()
-                    }) {
-                        Label("Pause", systemImage: "pause.fill")
+            ZStack(alignment: .bottom) {
+                HStack {
+                    Group {
+                        if model.isPlaying {
+                            Button(action: {
+                                model.pause()
+                            }) {
+                                Label("Pause", systemImage: "pause.fill")
+                            }
+                        } else {
+                            Button(action: {
+                                model.play()
+                            }) {
+                                Label("Play", systemImage: "play.fill")
+                            }
+                            .disabled(model.player.currentItem.isNil)
+                        }
                     }
-                } else {
-                    Button(action: {
-                        model.play()
-                    }) {
-                        Label("Play", systemImage: "play.fill")
-                    }
-                    .disabled(model.player.currentItem.isNil)
-                }
-            }
-            .frame(minWidth: 30)
-            .scaleEffect(1.7)
-            #if !os(tvOS)
-                .keyboardShortcut("p")
-            #endif
+                    .frame(minWidth: 30)
+                    .scaleEffect(1.7)
+                    #if !os(tvOS)
+                        .keyboardShortcut("p")
+                    #endif
 
-            Button(action: { model.advanceToNextItem() }) {
-                Label("Next", systemImage: "forward.fill")
+                    Button(action: { model.advanceToNextItem() }) {
+                        Label("Next", systemImage: "forward.fill")
+                    }
+                    .disabled(model.queue.isEmpty)
+                }
+
+                ProgressView(value: progressViewValue, total: progressViewTotal)
+                    .progressViewStyle(.linear)
+                #if os(iOS)
+                    .offset(x: 0, y: 15)
+                    .frame(maxWidth: 60)
+                #else
+                    .offset(x: 0, y: 20)
+                    .frame(maxWidth: 70)
+                #endif
             }
-            .disabled(model.queue.isEmpty)
         }
         .buttonStyle(.plain)
         .labelStyle(.iconOnly)
@@ -96,6 +110,14 @@ struct PlayerControlsView<Content: View>: View {
                 model.presentingPlayer = true
             })
         #endif
+    }
+
+    private var progressViewValue: Double {
+        [model.time?.seconds, model.videoDuration].compactMap { $0 }.min() ?? 0
+    }
+
+    private var progressViewTotal: Double {
+        model.playerItemDuration?.seconds ?? model.currentVideo?.length ?? progressViewValue
     }
 }
 

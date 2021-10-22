@@ -29,7 +29,6 @@ struct NowPlayingView: View {
                         }
                     }
                     .onPlayPauseCommand(perform: player.togglePlay)
-
                     .padding(.bottom, 20)
                 }
 
@@ -72,7 +71,7 @@ struct NowPlayingView: View {
                         player.playHistory(item)
                         player.presentPlayer()
                     } label: {
-                        VideoBanner(video: item.video)
+                        VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
                     }
                     .contextMenu {
                         Button("Delete", role: .destructive) {

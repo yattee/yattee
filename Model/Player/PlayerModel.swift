@@ -28,7 +28,6 @@ final class PlayerModel: ObservableObject {
     @Published var queue = [PlayerQueueItem]()
     @Published var currentItem: PlayerQueueItem!
     @Published var live = false
-    @Published var time: CMTime?
 
     @Published var history = [PlayerQueueItem]()
 
@@ -58,6 +57,18 @@ final class PlayerModel: ObservableObject {
         player.timeControlStatus == .playing
     }
 
+    var time: CMTime? {
+        currentItem?.playbackTime
+    }
+
+    var playerItemDuration: CMTime? {
+        player.currentItem?.asset.duration
+    }
+
+    var videoDuration: TimeInterval? {
+        currentItem?.duration ?? currentVideo?.length
+    }
+
     func togglePlay() {
         isPlaying ? pause() : play()
     }
@@ -78,8 +89,8 @@ final class PlayerModel: ObservableObject {
         player.pause()
     }
 
-    func playVideo(_ video: Video) {
-        savedTime = nil
+    func playVideo(_ video: Video, time: CMTime? = nil) {
+        savedTime = time
         shouldResumePlaying = true
 
         loadAvailableStreams(video) { streams in
@@ -88,33 +99,32 @@ final class PlayerModel: ObservableObject {
             }
 
             self.streamSelection = stream
-            self.playStream(stream, of: video, forcePlay: true)
+            self.playStream(stream, of: video, preservingTime: !time.isNil)
         }
     }
 
     func upgradeToStream(_ stream: Stream) {
         if !self.stream.isNil, self.stream != stream {
-            playStream(stream, of: currentItem.video, preservingTime: true)
+            playStream(stream, of: currentVideo!, preservingTime: true)
         }
     }
 
     private func playStream(
         _ stream: Stream,
         of video: Video,
-        forcePlay: Bool = false,
         preservingTime: Bool = false
     ) {
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
 
-            insertPlayerItem(stream, for: video, forcePlay: forcePlay, preservingTime: preservingTime)
+            insertPlayerItem(stream, for: video, preservingTime: preservingTime)
         } else {
             logger.info("playing stream with many assets:")
             logger.info("composition audio asset: \(stream.audioAsset.url)")
             logger.info("composition video asset: \(stream.videoAsset.url)")
 
             Task {
-                await self.loadComposition(stream, of: video, forcePlay: forcePlay, preservingTime: preservingTime)
+                await self.loadComposition(stream, of: video, preservingTime: preservingTime)
             }
         }
     }
@@ -122,51 +132,58 @@ final class PlayerModel: ObservableObject {
     private func insertPlayerItem(
         _ stream: Stream,
         for video: Video,
-        forcePlay: Bool = false,
         preservingTime: Bool = false
     ) {
         let playerItem = playerItem(stream)
-
         guard playerItem != nil else {
             return
         }
 
         attachMetadata(to: playerItem!, video: video, for: stream)
+
         DispatchQueue.main.async {
             self.stream = stream
             self.composition = AVMutableComposition()
         }
 
-        shouldResumePlaying = forcePlay || isPlaying
+        let replaceItemAndSeek = {
+            self.player.replaceCurrentItem(with: playerItem)
+            self.seekToSavedTime { finished in
+                guard finished else {
+                    return
+                }
+                self.savedTime = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.play()
+                }
+            }
+        }
+
+        let startPlaying = {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.play()
+            }
+        }
 
         if preservingTime {
-            saveTime {
-                self.player.replaceCurrentItem(with: playerItem)
-
-                self.seekToSavedTime { finished in
-                    guard finished else {
-                        return
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        forcePlay || self.shouldResumePlaying ? self.play() : self.pause()
-                        self.shouldResumePlaying = false
-                    }
+            if savedTime.isNil {
+                saveTime {
+                    replaceItemAndSeek()
+                    startPlaying()
                 }
+            } else {
+                replaceItemAndSeek()
+                startPlaying()
             }
         } else {
             player.replaceCurrentItem(with: playerItem)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                forcePlay || self.shouldResumePlaying ? self.play() : self.pause()
-                self.shouldResumePlaying = false
-            }
+            startPlaying()
         }
     }
 
     private func loadComposition(
         _ stream: Stream,
         of video: Video,
-        forcePlay: Bool = false,
         preservingTime: Bool = false
     ) async {
         await loadCompositionAsset(stream.audioAsset, type: .audio, of: video)
@@ -177,7 +194,7 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        insertPlayerItem(stream, for: video, forcePlay: forcePlay, preservingTime: preservingTime)
+        insertPlayerItem(stream, for: video, preservingTime: preservingTime)
     }
 
     private func loadCompositionAsset(_ asset: AVURLAsset, type: AVMediaType, of video: Video) async {
@@ -274,6 +291,7 @@ final class PlayerModel: ObservableObject {
 
     @objc func itemDidPlayToEndTime() {
         if queue.isEmpty {
+            addCurrentItemToHistory()
             resetQueue()
             #if os(tvOS)
                 avPlayerViewController!.dismiss(animated: true) {
@@ -318,7 +336,8 @@ final class PlayerModel: ObservableObject {
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
             self.currentRate = self.player.rate
             self.live = self.currentVideo?.live ?? false
-            self.time = self.player.currentTime()
+            self.currentItem?.playbackTime = self.player.currentTime()
+            self.currentItem?.videoDuration = self.player.currentItem?.asset.duration.seconds
         }
     }
 }

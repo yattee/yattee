@@ -211,7 +211,7 @@ struct VideoDetails: View {
 
     var publishedDateSection: some View {
         Group {
-            if let video = player.currentItem.video {
+            if let video = player.currentVideo {
                 HStack(spacing: 4) {
                     if let published = video.publishedDate {
                         Text(published)
@@ -235,7 +235,7 @@ struct VideoDetails: View {
 
     var countsSection: some View {
         Group {
-            if let video = player.currentItem.video {
+            if let video = player.currentVideo {
                 HStack {
                     Spacer()
 

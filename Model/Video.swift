@@ -72,20 +72,6 @@ struct Video: Identifiable, Equatable, Hashable {
         self.streams = streams
     }
 
-    var playTime: String? {
-        guard !length.isZero else {
-            return nil
-        }
-
-        let formatter = DateComponentsFormatter()
-
-        formatter.unitsStyle = .positional
-        formatter.allowedUnits = length >= (60 * 60) ? [.hour, .minute, .second] : [.minute, .second]
-        formatter.zeroFormattingBehavior = [.pad]
-
-        return formatter.string(from: length)
-    }
-
     var publishedDate: String? {
         (published.isEmpty || published == "0 seconds ago") ? nil : published
     }

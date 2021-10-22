@@ -25,7 +25,7 @@ struct PlayerQueueRow: View {
                     }
                 }
             } label: {
-                VideoBanner(video: item.video)
+                VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
             }
             .buttonStyle(.plain)
         }

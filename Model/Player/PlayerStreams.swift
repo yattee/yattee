@@ -112,6 +112,10 @@ extension PlayerModel {
     }
 
     func streamsSorter(_ lhs: Stream, _ rhs: Stream) -> Bool {
-        lhs.kind == rhs.kind ? (lhs.resolution.height > rhs.resolution.height) : (lhs.kind < rhs.kind)
+        if lhs.resolution.isNil || rhs.resolution.isNil {
+            return lhs.kind < rhs.kind
+        }
+
+        return lhs.kind == rhs.kind ? (lhs.resolution.height > rhs.resolution.height) : (lhs.kind < rhs.kind)
     }
 }

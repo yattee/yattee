@@ -37,12 +37,15 @@ extension PlayerModel {
 
     func playItem(_ item: PlayerQueueItem, video: Video? = nil) {
         currentItem = item
+        if currentItem.playbackTime.isNil {
+            currentItem.playbackTime = .zero
+        }
 
         if video != nil {
             currentItem.video = video!
         }
 
-        playVideo(currentItem.video)
+        playVideo(currentVideo!, time: item.playbackTime)
     }
 
     func advanceToNextItem() {
@@ -54,6 +57,8 @@ extension PlayerModel {
     }
 
     func advanceToItem(_ newItem: PlayerQueueItem) {
+        addCurrentItemToHistory()
+
         let item = remove(newItem)!
         loadDetails(newItem.video) { video in
             self.playItem(item, video: video)
@@ -86,10 +91,11 @@ extension PlayerModel {
     @discardableResult func enqueueVideo(
         _ video: Video,
         play: Bool = false,
+        atTime: CMTime? = nil,
         prepending: Bool = false,
         videoDetailsLoadHandler: @escaping (Video, PlayerQueueItem) -> Void = { _, _ in }
     ) -> PlayerQueueItem? {
-        let item = PlayerQueueItem(video)
+        let item = PlayerQueueItem(video, playbackTime: atTime)
 
         queue.insert(item, at: prepending ? 0 : queue.endIndex)
 
@@ -117,13 +123,23 @@ extension PlayerModel {
     }
 
     func addCurrentItemToHistory() {
-        if let item = currentItem, !history.contains(where: { $0.video.videoID == item.video.videoID }) {
+        if let item = currentItem {
+            if let index = history.firstIndex(where: { $0.video.videoID == item.video.videoID }) {
+                history.remove(at: index)
+            }
+
             history.insert(item, at: 0)
         }
     }
 
     func playHistory(_ item: PlayerQueueItem) {
-        let newItem = enqueueVideo(item.video, prepending: true)
+        var time = item.playbackTime
+
+        if item.shouldRestartPlaying {
+            time = .zero
+        }
+
+        let newItem = enqueueVideo(item.video, atTime: time, prepending: true)
 
         advanceToItem(newItem!)
 

@@ -104,13 +104,13 @@ struct VideoCell: View {
                 .frame(minHeight: 180)
 
                 #if os(tvOS)
-                    if video.playTime != nil || video.live || video.upcoming {
+                    if let time = video.length.formattedAsPlaybackTime() || video.live || video.upcoming {
                         Spacer()
 
                         VStack(alignment: .center) {
                             Spacer()
 
-                            if let time = video.playTime {
+                            if let time = video.length.formattedAsPlaybackTime() {
                                 HStack(spacing: 4) {
                                     Image(systemName: "clock")
                                     Text(time)
@@ -204,7 +204,7 @@ struct VideoCell: View {
                 HStack(alignment: .top) {
                     Spacer()
 
-                    if let time = video.playTime {
+                    if let time = video.length.formattedAsPlaybackTime() {
                         DetailBadge(text: time, style: .prominent)
                     }
                 }
