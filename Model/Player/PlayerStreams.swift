@@ -57,45 +57,11 @@ extension PlayerModel {
         completionHandler: @escaping ([Stream]) -> Void
     ) {
         instancesWithLoadedStreams.append(instance)
-        rebuildStreamsMenu()
+        rebuildTVMenu()
 
         if instances.all.count == instancesWithLoadedStreams.count {
             completionHandler(streams.sorted { $0.kind < $1.kind })
         }
-    }
-
-    #if os(tvOS)
-        var streamsMenu: UIMenu {
-            UIMenu(
-                title: "Streams",
-                image: UIImage(systemName: "antenna.radiowaves.left.and.right"),
-                children: streamsMenuActions
-            )
-        }
-
-        var streamsMenuActions: [UIAction] {
-            guard !availableStreams.isEmpty else {
-                return [ // swiftlint:disable:this implicit_return
-                    UIAction(title: "Empty", attributes: .disabled) { _ in }
-                ]
-            }
-
-            return availableStreamsSorted.map { stream in
-                let state = stream == streamSelection ? UIAction.State.on : .off
-
-                return UIAction(title: stream.description, state: state) { _ in
-                    self.streamSelection = stream
-                    self.upgradeToStream(stream)
-                }
-            }
-        }
-
-    #endif
-
-    func rebuildStreamsMenu() {
-        #if os(tvOS)
-            avPlayerViewController?.transportBarCustomMenuItems = [streamsMenu]
-        #endif
     }
 
     func streamsWithInstance(instance: Instance, streams: [Stream]) -> [Stream] {

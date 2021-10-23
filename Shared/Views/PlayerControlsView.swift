@@ -5,7 +5,6 @@ struct PlayerControlsView<Content: View>: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
     @EnvironmentObject<PlayerModel> private var model
-    @EnvironmentObject<NavigationModel> private var navigation
 
     init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content()

@@ -185,10 +185,6 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         )
     }
 
-    static func extractChannelPlaylists(from json: JSON) -> [ChannelPlaylist] {
-        json.arrayValue.compactMap(PipedAPI.extractChannelPlaylist)
-    }
-
     private static func extractVideo(from content: JSON) -> Video? {
         let details = content.dictionaryValue
         let url = details["url"]?.string

@@ -13,8 +13,16 @@ class Segment: ObservableObject, Hashable {
         segment.first!
     }
 
+    var startTime: CMTime {
+        CMTime(seconds: start, preferredTimescale: 1000)
+    }
+
     var end: Double {
         segment.last!
+    }
+
+    var endTime: CMTime {
+        CMTime(seconds: end, preferredTimescale: 1000)
     }
 
     var duration: Double {
@@ -32,10 +40,6 @@ class Segment: ObservableObject, Hashable {
         (start ... end).contains(time.seconds)
     }
 
-    var skipTo: CMTime {
-        CMTime(seconds: segment.last!, preferredTimescale: 1000)
-    }
-
     func hash(into hasher: inout Hasher) {
         hasher.combine(uuid)
     }
@@ -46,9 +50,5 @@ class Segment: ObservableObject, Hashable {
 
     func title() -> String {
         category
-    }
-
-    func shouldSkip(_ atTime: CMTime) -> Bool {
-        atTime.seconds - start < 2 && end - atTime.seconds > 2
     }
 }

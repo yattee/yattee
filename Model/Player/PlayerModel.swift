@@ -6,6 +6,7 @@ import Logging
     import UIKit
 #endif
 import Siesta
+import SwiftUI
 import SwiftyJSON
 
 final class PlayerModel: ObservableObject {
@@ -22,8 +23,8 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float?
 
-    @Published var availableStreams = [Stream]() { didSet { rebuildStreamsMenu() } }
-    @Published var streamSelection: Stream? { didSet { rebuildStreamsMenu() } }
+    @Published var availableStreams = [Stream]() { didSet { rebuildTVMenu() } }
+    @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]()
     @Published var currentItem: PlayerQueueItem!
@@ -32,6 +33,11 @@ final class PlayerModel: ObservableObject {
     @Published var savedTime: CMTime?
 
     @Published var playerNavigationLinkActive = false
+
+    @Published var sponsorBlock = SponsorBlockAPI()
+    @Published var segmentRestorationTime: CMTime?
+    @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
+    @Published var restoredSegments = [Segment]()
 
     var accounts: AccountsModel
     var instances: InstancesModel
@@ -117,6 +123,9 @@ final class PlayerModel: ObservableObject {
         of video: Video,
         preservingTime: Bool = false
     ) {
+        resetSegments()
+        sponsorBlock.loadSegments(videoID: video.videoID)
+
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
 
@@ -218,7 +227,7 @@ final class PlayerModel: ObservableObject {
         }
 
         try! compositionTrack.insertTimeRange(
-            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1000)),
+            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1_000_000)),
             of: assetTrack,
             at: .zero
         )
@@ -327,19 +336,28 @@ final class PlayerModel: ObservableObject {
 
         player.seek(
             to: time,
-            toleranceBefore: .init(seconds: 1, preferredTimescale: 1000),
+            toleranceBefore: .init(seconds: 1, preferredTimescale: 1_000_000),
             toleranceAfter: .zero,
             completionHandler: completionHandler
         )
     }
 
     private func addTimeObserver() {
-        let interval = CMTime(seconds: 0.5, preferredTimescale: 1000)
+        let interval = CMTime(seconds: 0.5, preferredTimescale: 1_000_000)
 
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
             self.currentRate = self.player.rate
-            self.currentItem?.playbackTime = self.player.currentTime()
-            self.currentItem?.videoDuration = self.player.currentItem?.asset.duration.seconds
+
+            guard !self.currentItem.isNil else {
+                return
+            }
+
+            let time = self.player.currentTime()
+
+            self.currentItem!.playbackTime = time
+            self.currentItem!.videoDuration = self.player.currentItem?.asset.duration.seconds
+
+            self.handleSegments(at: time)
         }
     }
 }

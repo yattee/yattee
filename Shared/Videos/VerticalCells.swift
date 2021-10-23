@@ -17,7 +17,7 @@ struct VerticalCells: View {
             }
             .padding()
         }
-        .id(UUID())
+        .id(items.map(\.id).joined())
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
             .background()
@@ -56,7 +56,7 @@ struct VerticalCells: View {
     }
 }
 
-struct VideoCellsVertical_Previews: PreviewProvider {
+struct VeticalCells_Previews: PreviewProvider {
     static var previews: some View {
         VerticalCells(items: ContentItem.array(of: Video.allFixtures))
             .injectFixtureEnvironmentObjects()

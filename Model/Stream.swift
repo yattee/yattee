@@ -109,10 +109,6 @@ class Stream: Equatable, Hashable, Identifiable {
         self.encoding = encoding
     }
 
-    var shortQuality: String {
-        kind == .hls ? "adaptive" : resolution.name
-    }
-
     var quality: String {
         kind == .hls ? "adaptive (HLS)" : "\(resolution.name) \(kind == .stream ? "(\(kind.rawValue))" : "")"
     }

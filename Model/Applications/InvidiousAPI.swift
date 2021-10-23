@@ -343,10 +343,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         )
     }
 
-    static func extractChannelPlaylists(from json: JSON) -> [ChannelPlaylist] {
-        json.arrayValue.map(InvidiousAPI.extractChannelPlaylist)
-    }
-
     private static func extractThumbnails(from details: JSON) -> [Thumbnail] {
         details["videoThumbnails"].arrayValue.map { json in
             Thumbnail(url: json["url"].url!, quality: .init(rawValue: json["quality"].string!)!)

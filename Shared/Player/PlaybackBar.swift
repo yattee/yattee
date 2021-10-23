@@ -21,6 +21,9 @@ struct PlaybackBar: View {
                 Spacer()
 
                 HStack(spacing: 4) {
+                    if !player.lastSkipped.isNil {
+                        restoreLastSkippedSegmentButton
+                    }
                     if player.currentVideo!.live {
                         Image(systemName: "dot.radiowaves.left.and.right")
                     } else if player.isLoadingAvailableStreams || player.isLoadingStream {
@@ -30,7 +33,6 @@ struct PlaybackBar: View {
                     streamControl
                         .disabled(player.isLoadingAvailableStreams)
                         .frame(alignment: .trailing)
-                        .environment(\.colorScheme, .dark)
                         .onChange(of: player.streamSelection) { selection in
                             guard !selection.isNil else {
                                 return
@@ -42,6 +44,7 @@ struct PlaybackBar: View {
                         .frame(maxWidth: 180)
                     #endif
                 }
+                .environment(\.colorScheme, .dark)
                 .transaction { t in t.animation = .none }
                 .foregroundColor(.gray)
                 .font(.caption2)
@@ -89,6 +92,19 @@ struct PlaybackBar: View {
         let timeFinishAtString = timeFinishAt.formatted(date: .omitted, time: .shortened)
 
         return "ends at \(timeFinishAtString)"
+    }
+
+    private var restoreLastSkippedSegmentButton: some View {
+        Button {
+            player.restoreLastSkippedSegment()
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.uturn.left.circle")
+                Text(player.lastSkipped!.category)
+                Text("•")
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var streamControl: some View {

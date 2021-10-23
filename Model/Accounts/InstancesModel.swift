@@ -40,8 +40,4 @@ final class InstancesModel: ObservableObject {
             accounts.forEach { AccountsModel.remove($0) }
         }
     }
-
-    static func setLastAccount(_ account: Account?) {
-        Defaults[.lastAccountID] = account?.id
-    }
 }

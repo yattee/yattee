@@ -16,7 +16,7 @@ final class SponsorBlockSegment: Segment {
         case "selfpromo":
             return "self-promotion"
         case "music_offtopic":
-            return "to music"
+            return "offtopic"
         default:
             return category
         }

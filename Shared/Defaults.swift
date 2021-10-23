@@ -19,6 +19,7 @@ extension Defaults.Keys {
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
 
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
+    static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
 
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
 

@@ -17,8 +17,6 @@ struct InstanceForm: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject<InstancesModel> private var instancesModel
-
     var body: some View {
         VStack(alignment: .leading) {
             Group {
