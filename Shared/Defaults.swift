@@ -18,6 +18,8 @@ extension Defaults.Keys {
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
 
+    static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
+
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])

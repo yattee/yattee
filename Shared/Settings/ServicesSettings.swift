@@ -1,15 +1,25 @@
-//
-//  ServicesSettings.swift
-//  Pearvidious
-//
-//  Created by Arkadiusz Fal on 23/10/2021.
-//
-
+import Defaults
 import SwiftUI
 
 struct ServicesSettings: View {
+    @Default(.sponsorBlockInstance) private var sponsorBlock
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Section(header: Text("SponsorBlock API")) {
+            TextField(
+                "SponsorBlock API Instance",
+                text: $sponsorBlock,
+                prompt: Text("SponsorBlock API URL, leave blank to disable")
+            )
+            .labelsHidden()
+            #if !os(macOS)
+                .autocapitalization(.none)
+                .keyboardType(.URL)
+            #endif
+
+            #if os(macOS)
+                Spacer()
+            #endif
+        }
     }
 }
 

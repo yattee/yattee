@@ -5,7 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case playback, instances
+            case playback, services, instances
         }
     #endif
 
@@ -25,6 +25,14 @@ struct SettingsView: View {
                 .tag(Tabs.instances)
 
                 Form {
+                    ServicesSettings()
+                }
+                .tabItem {
+                    Label("Services", systemImage: "puzzlepiece.extension")
+                }
+                .tag(Tabs.services)
+
+                Form {
                     PlaybackSettings()
                 }
                 .tabItem {
@@ -41,6 +49,7 @@ struct SettingsView: View {
                         AccountSelectionView()
                     #endif
                     InstancesSettings()
+                    ServicesSettings()
                     PlaybackSettings()
                 }
                 .navigationTitle("Settings")
