@@ -97,7 +97,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 } else if type == "playlist" {
                     return ContentItem(playlist: InvidiousAPI.extractChannelPlaylist(from: $0))
                 }
-                return ContentItem(video: InvidiousAPI.extractVideo($0))
+                return ContentItem(video: InvidiousAPI.extractVideo(from: $0))
             }
         }
 
@@ -147,7 +147,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("videos/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
-            InvidiousAPI.extractVideo(content.json)
+            InvidiousAPI.extractVideo(from: content.json)
         }
     }
 
@@ -276,7 +276,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         return AVURLAsset(url: url)
     }
 
-    static func extractVideo(_ json: JSON) -> Video {
+    static func extractVideo(from json: JSON) -> Video {
         let indexID: String?
         var id: Video.ID
         var publishedAt: Date?

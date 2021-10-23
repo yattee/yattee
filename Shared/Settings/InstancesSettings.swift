@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct InstancesSettingsView: View {
+struct InstancesSettings: View {
     @Default(.instances) private var instances
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -21,7 +21,7 @@ struct InstancesSettingsView: View {
                 ForEach(instances) { instance in
                     Group {
                         NavigationLink(instance.longDescription) {
-                            AccountsSettingsView(instanceID: instance.id)
+                            AccountsSettings(instanceID: instance.id)
                         }
                     }
                     #if os(iOS)
@@ -43,7 +43,7 @@ struct InstancesSettingsView: View {
             #endif
         }
         .sheet(isPresented: $presentingInstanceForm) {
-            InstanceFormView(savedInstanceID: $savedFormInstanceID)
+            InstanceForm(savedInstanceID: $savedFormInstanceID)
         }
     }
 
@@ -66,7 +66,7 @@ struct InstancesSettingsView: View {
 struct InstancesSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            InstancesSettingsView()
+            InstancesSettings()
         }
         .frame(width: 400, height: 270)
         .environmentObject(InstancesModel())

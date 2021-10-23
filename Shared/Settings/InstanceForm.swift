@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct InstanceFormView: View {
+struct InstanceForm: View {
     @Binding var savedInstanceID: Instance.ID?
 
     @State private var name = ""
@@ -94,7 +94,7 @@ struct InstanceFormView: View {
 
     private var footer: some View {
         HStack(alignment: .center) {
-            ValidationStatusView(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: $validationError)
+            AccountValidationStatus(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: $validationError)
 
             Spacer()
 
@@ -154,6 +154,6 @@ struct InstanceFormView: View {
 
 struct InstanceFormView_Previews: PreviewProvider {
     static var previews: some View {
-        InstanceFormView(savedInstanceID: .constant(nil))
+        InstanceForm(savedInstanceID: .constant(nil))
     }
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RedrawOnViewModifier: ViewModifier {
+struct RedrawOnModifier: ViewModifier {
     @State private var changeFlag: Bool
 
     init(changeFlag: Bool) {
@@ -14,6 +14,6 @@ struct RedrawOnViewModifier: ViewModifier {
 
 extension View {
     func redrawOn(change flag: Bool) -> some View {
-        modifier(RedrawOnViewModifier(changeFlag: flag))
+        modifier(RedrawOnModifier(changeFlag: flag))
     }
 }

@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct InstancesSettingsView: View {
+struct InstancesSettings: View {
     @State private var selectedInstanceID: Instance.ID?
     @State private var selectedAccount: Account?
 
@@ -116,10 +116,10 @@ struct InstancesSettingsView: View {
             selectedInstanceID = instances.first?.id
         }
         .sheet(isPresented: $presentingAccountForm) {
-            AccountFormView(instance: selectedInstance, selectedAccount: $selectedAccount)
+            AccountForm(instance: selectedInstance, selectedAccount: $selectedAccount)
         }
         .sheet(isPresented: $presentingInstanceForm, onDismiss: setSelectedInstanceToFormInstance) {
-            InstanceFormView(savedInstanceID: $savedFormInstanceID)
+            InstanceForm(savedInstanceID: $savedFormInstanceID)
         }
     }
 
@@ -146,7 +146,7 @@ struct InstancesSettingsView: View {
 struct InstancesSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            InstancesSettingsView()
+            InstancesSettings()
         }
         .frame(width: 400, height: 270)
         .injectFixtureEnvironmentObjects()

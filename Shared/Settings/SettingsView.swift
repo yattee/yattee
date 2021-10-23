@@ -17,7 +17,7 @@ struct SettingsView: View {
         #if os(macOS)
             TabView {
                 Form {
-                    InstancesSettingsView()
+                    InstancesSettings()
                 }
                 .tabItem {
                     Label("Instances", systemImage: "server.rack")
@@ -25,7 +25,7 @@ struct SettingsView: View {
                 .tag(Tabs.instances)
 
                 Form {
-                    PlaybackSettingsView()
+                    PlaybackSettings()
                 }
                 .tabItem {
                     Label("Playback", systemImage: "play.rectangle.on.rectangle.fill")
@@ -40,8 +40,8 @@ struct SettingsView: View {
                     #if os(tvOS)
                         AccountSelectionView()
                     #endif
-                    InstancesSettingsView()
-                    PlaybackSettingsView()
+                    InstancesSettings()
+                    PlaybackSettings()
                 }
                 .navigationTitle("Settings")
                 .toolbar {

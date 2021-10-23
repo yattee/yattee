@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct ValidationStatusView: View {
+struct AccountValidationStatus: View {
     @Binding var isValid: Bool
     @Binding var isValidated: Bool
     @Binding var isValidating: Bool

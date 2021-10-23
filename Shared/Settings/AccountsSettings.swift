@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AccountsSettingsView: View {
+struct AccountsSettings: View {
     let instanceID: Instance.ID?
 
     @State private var accountsChanged = false
@@ -50,7 +50,7 @@ struct AccountsSettingsView: View {
             }
         }
         .sheet(isPresented: $presentingAccountForm, onDismiss: { accountsChanged.toggle() }) {
-            AccountFormView(instance: instance)
+            AccountForm(instance: instance)
         }
         #if os(iOS)
             .listStyle(.insetGrouped)

@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct AccountFormView: View {
+struct AccountForm: View {
     let instance: Instance
     var selectedAccount: Binding<Account?>?
 
@@ -83,7 +83,7 @@ struct AccountFormView: View {
 
     var footer: some View {
         HStack {
-            ValidationStatusView(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: .constant(nil))
+            AccountValidationStatus(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: .constant(nil))
 
             Spacer()
 
@@ -145,6 +145,6 @@ struct AccountFormView: View {
 
 struct AccountFormView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountFormView(instance: Instance.fixture)
+        AccountForm(instance: Instance.fixture)
     }
 }

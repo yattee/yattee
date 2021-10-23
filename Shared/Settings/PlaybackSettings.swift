@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct PlaybackSettingsView: View {
+struct PlaybackSettings: View {
     @Default(.quality) private var quality
 
     var body: some View {
