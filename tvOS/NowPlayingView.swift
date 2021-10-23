@@ -16,12 +16,10 @@ struct NowPlayingView: View {
     }
 
     var content: some View {
-        ScrollView(.vertical) {
-            VStack(alignment: .leading) {
+        List {
+            Group {
                 if !inInfoViewController, let item = player.currentItem {
-                    Group {
-                        header("Now Playing")
-
+                    Section(header: Text("Now Playing")) {
                         Button {
                             player.presentPlayer()
                         } label: {
@@ -29,72 +27,66 @@ struct NowPlayingView: View {
                         }
                     }
                     .onPlayPauseCommand(perform: player.togglePlay)
-                    .padding(.bottom, 20)
                 }
 
-                header("Playing Next")
-
-                if player.queue.isEmpty {
-                    Spacer()
-
-                    Text("Playback queue is empty")
-                        .padding([.vertical, .leading], 40)
-                        .foregroundColor(.secondary)
-                }
-
-                ForEach(player.queue) { item in
-                    Button {
-                        player.advanceToItem(item)
-                        player.presentPlayer()
-                    } label: {
-                        VideoBanner(video: item.video)
+                Section(header: Text("Playing Next")) {
+                    if player.queue.isEmpty {
+                        Text("Playback queue is empty")
+                            .padding([.vertical, .leading], 40)
+                            .foregroundColor(.secondary)
                     }
-                    .contextMenu {
-                        Button("Delete", role: .destructive) {
-                            player.remove(item)
+
+                    ForEach(player.queue) { item in
+                        Button {
+                            player.advanceToItem(item)
+                            player.presentPlayer()
+                        } label: {
+                            VideoBanner(video: item.video)
+                        }
+                        .contextMenu {
+                            Button("Delete", role: .destructive) {
+                                player.remove(item)
+                            }
                         }
                     }
                 }
 
-                header("Played Previously")
+                if !player.history.isEmpty {
+                    Section(header: Text("Played Previously")) {
+                        ForEach(player.history) { item in
+                            Button {
+                                player.playHistory(item)
+                                player.presentPlayer()
+                            } label: {
+                                VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
+                            }
+                            .contextMenu {
+                                Button("Delete", role: .destructive) {
+                                    player.removeHistory(item)
+                                }
 
-                if player.history.isEmpty {
-                    Spacer()
-
-                    Text("History is empty")
-                        .padding([.vertical, .leading], 40)
-                        .foregroundColor(.secondary)
-                }
-
-                ForEach(player.history) { item in
-                    Button {
-                        player.playHistory(item)
-                        player.presentPlayer()
-                    } label: {
-                        VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
-                    }
-                    .contextMenu {
-                        Button("Delete", role: .destructive) {
-                            player.removeHistory(item)
-                        }
-
-                        Button("Delete History", role: .destructive) {
-                            player.removeHistoryItems()
+                                Button("Delete History", role: .destructive) {
+                                    player.removeHistoryItems()
+                                }
+                            }
                         }
                     }
                 }
             }
-            .padding(.vertical)
-            .padding(.horizontal, 40)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
+            .padding(.vertical, 20)
+//            .padding(.horizontal, 40)
         }
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 260, maxHeight: .infinity, alignment: .leading)
+        .padding(.horizontal, inInfoViewController ? 40 : 0)
+        .listStyle(.grouped)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 560, maxHeight: .infinity, alignment: .leading)
     }
 
     func header(_ text: String) -> some View {
         Text(text)
             .font((inInfoViewController ? Font.system(size: 40) : .title3).bold())
             .foregroundColor(.secondary)
-            .padding(.leading, 40)
+//            .padding(.leading, 40)
     }
 }
 

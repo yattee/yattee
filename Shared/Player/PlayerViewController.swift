@@ -6,7 +6,6 @@ final class PlayerViewController: UIViewController {
     var playerLoaded = false
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
-    var shouldResume = false
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -73,15 +72,9 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         false
     }
 
-    func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
-        shouldResume = playerModel.isPlaying
-    }
+    func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {}
 
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
-        if shouldResume {
-            playerModel.play()
-        }
-
         dismiss(animated: false)
     }
 

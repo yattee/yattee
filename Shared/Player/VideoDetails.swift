@@ -87,12 +87,25 @@ struct VideoDetails: View {
             }
         }
         .onAppear {
+            if video.isNil {
+                currentPage = .queue
+            }
+
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
                 return
             }
 
             subscribed = subscriptions.isSubscribing(video!.channel.id)
+        }
+        .onChange(of: sidebarQueue) { queue in
+            #if !os(macOS)
+                if queue {
+                    currentPage = .details
+                } else {
+                    currentPage = .queue
+                }
+            #endif
         }
         .edgesIgnoringSafeArea(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -112,11 +125,6 @@ struct VideoDetails: View {
             } else {
                 Text("Not playing")
                     .foregroundColor(.secondary)
-                    .onAppear {
-                        #if !os(macOS)
-                            currentPage = .queue
-                        #endif
-                    }
             }
 
             Spacer()

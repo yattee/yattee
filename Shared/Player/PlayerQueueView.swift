@@ -8,14 +8,21 @@ struct PlayerQueueView: View {
 
     var body: some View {
         List {
-            playingNext
-            playedPreviously
+            Group {
+                playingNext
+                playedPreviously
+            }
+            .padding(.vertical, 5)
+            .listRowInsets(EdgeInsets())
+            #if os(iOS)
+                .padding(.horizontal, 10)
+            #endif
         }
 
         #if os(macOS)
             .listStyle(.inset)
         #elseif os(iOS)
-            .listStyle(.insetGrouped)
+            .listStyle(.grouped)
         #else
             .listStyle(.plain)
         #endif
@@ -44,23 +51,22 @@ struct PlayerQueueView: View {
     }
 
     var playedPreviously: some View {
-        Section(header: Text("Played Previously")) {
-            if player.history.isEmpty {
-                Text("History is empty")
-                    .foregroundColor(.secondary)
-            }
-
-            ForEach(player.history) { item in
-                PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
-                    .contextMenu {
-                        removeButton(item, history: true)
-                        removeAllButton(history: true)
+        Group {
+            if !player.history.isEmpty {
+                Section(header: Text("Played Previously")) {
+                    ForEach(player.history) { item in
+                        PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
+                            .contextMenu {
+                                removeButton(item, history: true)
+                                removeAllButton(history: true)
+                            }
+                        #if os(iOS)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                removeButton(item, history: true)
+                            }
+                        #endif
                     }
-                #if os(iOS)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        removeButton(item, history: true)
-                    }
-                #endif
+                }
             }
         }
     }

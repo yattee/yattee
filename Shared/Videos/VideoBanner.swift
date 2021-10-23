@@ -15,15 +15,13 @@ struct VideoBanner: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: stackAlignment, spacing: 12) {
             VStack(spacing: thumbnailStackSpacing) {
                 smallThumbnail
 
-                if !playbackTime.isNil {
-                    ProgressView(value: progressViewValue, total: progressViewTotal)
-                        .progressViewStyle(.linear)
-                        .frame(maxWidth: thumbnailWidth)
-                }
+                #if !os(tvOS)
+                    progressView
+                #endif
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text(video.title)
@@ -37,6 +35,10 @@ struct VideoBanner: View {
                         .lineLimit(1)
 
                     Spacer()
+
+                    #if os(tvOS)
+                        progressView
+                    #endif
 
                     if let time = (videoDuration ?? video.length).formattedAsPlaybackTime() {
                         Text(time)
@@ -52,11 +54,19 @@ struct VideoBanner: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 100, alignment: .center)
     }
 
+    private var stackAlignment: VerticalAlignment {
+        #if os(macOS)
+            playbackTime.isNil ? .center : .top
+        #else
+            .center
+        #endif
+    }
+
     private var thumbnailStackSpacing: Double {
         #if os(tvOS)
             8
         #else
-            3
+            2
         #endif
     }
 
@@ -68,20 +78,30 @@ struct VideoBanner: View {
             }
             .indicator(.activity)
         #if os(tvOS)
-            .frame(width: thumbnailWidth, height: 100)
+            .frame(width: thumbnailWidth, height: 140)
             .mask(RoundedRectangle(cornerRadius: 12))
         #else
-            .frame(width: thumbnailWidth, height: 50)
+            .frame(width: thumbnailWidth, height: 60)
             .mask(RoundedRectangle(cornerRadius: 6))
         #endif
     }
 
     private var thumbnailWidth: Double {
         #if os(tvOS)
-            177
+            230
         #else
-            88
+            100
         #endif
+    }
+
+    private var progressView: some View {
+        Group {
+            if !playbackTime.isNil {
+                ProgressView(value: progressViewValue, total: progressViewTotal)
+                    .progressViewStyle(.linear)
+                    .frame(maxWidth: thumbnailWidth)
+            }
+        }
     }
 
     private var progressViewValue: Double {

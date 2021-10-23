@@ -26,7 +26,7 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        let request = force ? resource.load() : resource.loadIfNeeded()
+        let request = force ? resource?.load() : resource?.loadIfNeeded()
 
         request?
             .onSuccess { resource in
@@ -66,8 +66,8 @@ final class PlaylistsModel: ObservableObject {
         selectedPlaylistID = id ?? ""
     }
 
-    private var resource: Resource {
-        accounts.api.playlists!
+    private var resource: Resource? {
+        accounts.api.playlists
     }
 
     private var selectedPlaylist: Playlist? {

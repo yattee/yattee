@@ -3,14 +3,15 @@ import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var model
-
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
 
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
+
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var model
 
     @Namespace private var focusNamespace
 
@@ -100,6 +101,9 @@ struct PlaylistsView: View {
         #endif
         .onAppear {
             model.load()
+        }
+        .onChange(of: accounts.current) { _ in
+            model.load(force: true)
         }
     }
 

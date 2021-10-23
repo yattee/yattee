@@ -292,7 +292,6 @@
 		37CC3F47270CE30600608308 /* PlayerQueueItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F44270CE30600608308 /* PlayerQueueItem.swift */; };
 		37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */; };
 		37CC3F4D270CFE1700608308 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */; };
-		37CC3F4E270CFE1700608308 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */; };
 		37CC3F50270D010D00608308 /* VideoBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4F270D010D00608308 /* VideoBanner.swift */; };
 		37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4F270D010D00608308 /* VideoBanner.swift */; };
 		37CC3F52270D010D00608308 /* VideoBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4F270D010D00608308 /* VideoBanner.swift */; };
@@ -1714,7 +1713,6 @@
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37484C1B26FC837400287258 /* PlaybackSettingsView.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,
-				37CC3F4E270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37BAB54C269B39FD00E75ED1 /* TVNavigationView.swift in Sources */,
 				3797758D2689345500DD52A8 /* Store.swift in Sources */,
 				37484C2F26FC844700287258 /* AccountsSettingsView.swift in Sources */,
