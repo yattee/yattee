@@ -89,7 +89,6 @@ struct ContentView: View {
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "net.yattee.app")
 
-        // TODO: Remove when piped supports videos information
         if let account = accounts.lastUsed ??
             instances.lastUsed?.anonymousAccount ??
             instances.all.first?.anonymousAccount

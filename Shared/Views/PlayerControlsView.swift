@@ -31,27 +31,24 @@ struct PlayerControlsView<Content: View>: View {
                 model.presentingPlayer.toggle()
             }) {
                 HStack {
-                    if let item = model.currentItem {
-                        HStack(spacing: 3) {
-                            Text(item.video.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
-                                .lineLimit(1)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(model.currentItem?.video.title ?? "Not playing")
+                            .font(.system(size: 14).bold())
+                            .foregroundColor(model.currentItem.isNil ? .secondary : .accentColor)
+                            .lineLimit(1)
 
-                            Text("— \(item.video.author)")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                    } else {
-                        Text("Not playing")
+                        Text(model.currentItem?.video.author ?? "Yattee v0.1")
+                            .fontWeight(model.currentItem.isNil ? .light : .bold)
+                            .font(.system(size: 10))
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
                     }
+
                     Spacer()
                 }
-                .padding(.vertical, 20)
                 .contentShape(Rectangle())
             }
+            .padding(.vertical, 20)
             #if !os(tvOS)
                 .keyboardShortcut("o")
             #endif
@@ -74,8 +71,9 @@ struct PlayerControlsView<Content: View>: View {
                             .disabled(model.player.currentItem.isNil)
                         }
                     }
+                    .font(.system(size: 30))
                     .frame(minWidth: 30)
-                    .scaleEffect(1.7)
+
                     #if !os(tvOS)
                         .keyboardShortcut("p")
                     #endif
@@ -89,10 +87,10 @@ struct PlayerControlsView<Content: View>: View {
                 ProgressView(value: progressViewValue, total: progressViewTotal)
                     .progressViewStyle(.linear)
                 #if os(iOS)
-                    .offset(x: 0, y: 15)
+                    .offset(x: 0, y: 8)
                     .frame(maxWidth: 60)
                 #else
-                    .offset(x: 0, y: 20)
+                    .offset(x: 0, y: 15)
                     .frame(maxWidth: 70)
                 #endif
             }
@@ -100,7 +98,7 @@ struct PlayerControlsView<Content: View>: View {
         .buttonStyle(.plain)
         .labelStyle(.iconOnly)
         .padding(.horizontal)
-        .frame(minWidth: 0, maxWidth: .infinity)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 55)
         .padding(.vertical, 0)
         .background(.ultraThinMaterial)
         .borderTop(height: 0.4, color: Color("PlayerControlsBorderColor"))
