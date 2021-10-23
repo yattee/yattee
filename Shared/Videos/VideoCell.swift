@@ -215,7 +215,7 @@ struct VideoCell: View {
             .onFailure { _ in
                 lowQualityThumbnail = true
             }
-            .indicator(.progress)
+            .indicator(.activity)
             .mask(RoundedRectangle(cornerRadius: 12))
             .modifier(AspectRatioModifier())
         #if os(tvOS)

@@ -42,7 +42,7 @@ struct ChannelPlaylistCell: View {
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))
                 }
-                .indicator(.progress)
+                .indicator(.activity)
                 .frame(width: 165, height: 88)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 

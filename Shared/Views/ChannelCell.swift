@@ -43,7 +43,7 @@ struct ChannelCell: View {
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))
                 }
-                .indicator(.progress)
+                .indicator(.activity)
                 .frame(width: 88, height: 88)
                 .clipShape(Circle())
 
