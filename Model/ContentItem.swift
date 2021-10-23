@@ -24,16 +24,14 @@ struct ContentItem: Identifiable {
     var playlist: ChannelPlaylist!
     var channel: Channel!
 
+    var id: String = UUID().uuidString
+
     static func array(of videos: [Video]) -> [ContentItem] {
         videos.map { ContentItem(video: $0) }
     }
 
     static func < (lhs: ContentItem, rhs: ContentItem) -> Bool {
         lhs.contentType < rhs.contentType
-    }
-
-    var id: String {
-        "\(contentType.rawValue)-\(video?.id ?? playlist?.id ?? channel?.id ?? "")"
     }
 
     var contentType: ContentType {
