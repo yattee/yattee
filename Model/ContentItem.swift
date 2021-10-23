@@ -35,12 +35,6 @@ struct ContentItem: Identifiable {
     }
 
     var contentType: ContentType {
-        if !playlist.isNil {
-            return .playlist
-        } else if !channel.isNil {
-            return .channel
-        }
-
-        return .video
+        video.isNil ? (channel.isNil ? .playlist : .channel) : .video
     }
 }

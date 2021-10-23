@@ -87,9 +87,11 @@ struct VideoDetails: View {
             }
         }
         .onAppear {
-            if video.isNil {
-                currentPage = .queue
-            }
+            #if !os(macOS)
+                if video.isNil {
+                    currentPage = .queue
+                }
+            #endif
 
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
