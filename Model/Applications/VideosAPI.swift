@@ -23,4 +23,26 @@ protocol VideosAPI {
     func playlistVideos(_ id: String) -> Resource?
 
     func channelPlaylist(_ id: String) -> Resource?
+
+    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
+}
+
+extension VideosAPI {
+    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void = { _ in }) {
+        guard (item.video?.streams ?? []).isEmpty else {
+            completionHandler(item)
+            return
+        }
+
+        video(item.videoID).load().onSuccess { response in
+            guard let video: Video = response.typedContent() else {
+                return
+            }
+
+            var newItem = item
+            newItem.video = video
+
+            completionHandler(newItem)
+        }
+    }
 }

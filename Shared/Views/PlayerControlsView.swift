@@ -31,12 +31,12 @@ struct PlayerControlsView<Content: View>: View {
             }) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(model.currentItem?.video.title ?? "Not playing")
+                        Text(model.currentItem?.video?.title ?? "Not playing")
                             .font(.system(size: 14).bold())
                             .foregroundColor(model.currentItem.isNil ? .secondary : .accentColor)
                             .lineLimit(1)
 
-                        Text(model.currentItem?.video.author ?? "Yattee v0.1")
+                        Text(model.currentItem?.video?.author ?? "Yattee v0.1")
                             .fontWeight(model.currentItem.isNil ? .light : .bold)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)

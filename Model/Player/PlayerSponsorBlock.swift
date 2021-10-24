@@ -5,7 +5,7 @@ import Foundation
 extension PlayerModel {
     func handleSegments(at time: CMTime) {
         if let segment = lastSkipped {
-            if time > CMTime(seconds: segment.end + 10, preferredTimescale: 1_000_000) {
+            if time > .secondsInDefaultTimescale(segment.end + 10) {
                 resetLastSegment()
             }
         }
@@ -18,7 +18,7 @@ extension PlayerModel {
         var nextSegments = [firstSegment]
 
         while let segment = sponsorBlock.segments.first(where: {
-            $0.timeInSegment(CMTime(seconds: nextSegments.last!.end + 2, preferredTimescale: 1_000_000))
+            $0.timeInSegment(.secondsInDefaultTimescale(nextSegments.last!.end + 2))
         }) {
             nextSegments.append(segment)
         }

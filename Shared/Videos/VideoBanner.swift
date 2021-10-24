@@ -4,11 +4,11 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoBanner: View {
-    let video: Video
+    let video: Video?
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
 
-    init(video: Video, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
+    init(video: Video? = nil, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
         self.video = video
         self.playbackTime = playbackTime
         self.videoDuration = videoDuration
@@ -24,14 +24,14 @@ struct VideoBanner: View {
                 #endif
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(video.title)
+                Text(video?.title ?? "Unknown title")
                     .truncationMode(.middle)
                     .lineLimit(2)
                     .font(.headline)
                     .frame(alignment: .leading)
 
                 HStack {
-                    Text(video.author)
+                    Text(video?.author ?? "Unknown author")
                         .lineLimit(1)
 
                     Spacer()
@@ -40,7 +40,7 @@ struct VideoBanner: View {
                         progressView
                     #endif
 
-                    if let time = (videoDuration ?? video.length).formattedAsPlaybackTime() {
+                    if let time = (videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() {
                         Text(time)
                             .fontWeight(.light)
                     }
@@ -71,7 +71,7 @@ struct VideoBanner: View {
     }
 
     private var smallThumbnail: some View {
-        WebImage(url: video.thumbnailURL(quality: .medium))
+        WebImage(url: video?.thumbnailURL(quality: .medium))
             .resizable()
             .placeholder {
                 ProgressView()
@@ -109,7 +109,7 @@ struct VideoBanner: View {
     }
 
     private var progressViewTotal: Double {
-        videoDuration ?? video.length
+        videoDuration ?? video?.length ?? 1
     }
 }
 

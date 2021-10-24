@@ -111,6 +111,10 @@ struct ContentView: View {
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
+
+        if !accounts.current.isNil {
+            player.loadHistoryDetails()
+        }
     }
 
     func openWelcomeScreenIfAccountEmpty() {
@@ -135,6 +139,7 @@ struct ContentView: View {
 
             accounts.api.video(id).load().onSuccess { response in
                 if let video: Video = response.typedContent() {
+                    self.player.autoPlayItems = true
                     self.player.playNow(video, at: parser.time)
                     self.player.presentPlayer()
                 }

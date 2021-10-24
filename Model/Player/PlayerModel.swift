@@ -26,10 +26,10 @@ final class PlayerModel: ObservableObject {
     @Published var availableStreams = [Stream]() { didSet { rebuildTVMenu() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
-    @Published var queue = [PlayerQueueItem]()
-    @Published var currentItem: PlayerQueueItem!
+    @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
+    @Published var currentItem: PlayerQueueItem! { didSet { Defaults[.lastPlayed] = currentItem } }
+    @Published var history = [PlayerQueueItem]() { didSet { Defaults[.history] = history } }
 
-    @Published var history = [PlayerQueueItem]()
     @Published var savedTime: CMTime?
 
     @Published var playerNavigationLinkActive = false
@@ -43,23 +43,54 @@ final class PlayerModel: ObservableObject {
     var instances: InstancesModel
 
     var composition = AVMutableComposition()
-    var timeObserver: Any?
-    private var shouldResumePlaying = true
+
+    private var frequentTimeObserver: Any?
+    private var infrequentTimeObserver: Any?
+    private var playerTimeControlStatusObserver: Any?
+
     private var statusObservation: NSKeyValueObservation?
 
-    #if os(macOS)
-        var playerTimeControlStatusObserver: Any?
-    #endif
+    var autoPlayItems = false
 
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.instances = instances ?? InstancesModel()
         addItemDidPlayToEndTimeObserver()
-        addTimeObserver()
+        addFrequentTimeObserver()
+        addInfrequentTimeObserver()
+        addPlayerTimeControlStatusObserver()
+    }
 
-        #if os(macOS)
-            addPlayerTimeControlStatusObserver()
-        #endif
+    func loadHistoryDetails() {
+        guard !accounts.current.isNil else {
+            return
+        }
+
+        queue = Defaults[.queue]
+        queue.forEach { item in
+            accounts.api.loadDetails(item) { newItem in
+                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
+                    self.queue[index] = newItem
+                }
+            }
+        }
+
+        history = Defaults[.history]
+        history.forEach { item in
+            accounts.api.loadDetails(item) { newItem in
+                if let index = self.history.firstIndex(where: { $0.id == item.id }) {
+                    self.history[index] = newItem
+                }
+            }
+        }
+
+        if let item = Defaults[.lastPlayed] {
+            accounts.api.loadDetails(item) { [weak self] newItem in
+                self?.playNow(newItem.video, at: newItem.playbackTime?.seconds)
+            }
+        } else {
+            autoPlayItems = true
+        }
     }
 
     func presentPlayer() {
@@ -75,7 +106,7 @@ final class PlayerModel: ObservableObject {
     }
 
     var live: Bool {
-        currentItem?.video.live ?? false
+        currentItem?.video?.live ?? false
     }
 
     var playerItemDuration: CMTime? {
@@ -91,7 +122,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func play() {
-        guard !isPlaying else {
+        guard player.timeControlStatus != .playing else {
             return
         }
 
@@ -99,25 +130,11 @@ final class PlayerModel: ObservableObject {
     }
 
     func pause() {
-        guard isPlaying else {
+        guard player.timeControlStatus != .paused else {
             return
         }
 
         player.pause()
-    }
-
-    func playVideo(_ video: Video, time: CMTime? = nil) {
-        savedTime = time
-        shouldResumePlaying = true
-
-        loadAvailableStreams(video) { streams in
-            guard let stream = streams.first else {
-                return
-            }
-
-            self.streamSelection = stream
-            self.playStream(stream, of: video, preservingTime: !time.isNil)
-        }
     }
 
     func upgradeToStream(_ stream: Stream) {
@@ -126,7 +143,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    private func playStream(
+    func playStream(
         _ stream: Stream,
         of video: Video,
         preservingTime: Bool = false
@@ -164,9 +181,31 @@ final class PlayerModel: ObservableObject {
 
         attachMetadata(to: playerItem!, video: video, for: stream)
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+
             self.stream = stream
             self.composition = AVMutableComposition()
+        }
+
+        let startPlaying = {
+            #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setActive(true)
+            #endif
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                guard self.autoPlayItems else {
+                    return
+                }
+
+                self.play()
+            }
         }
 
         let replaceItemAndSeek = {
@@ -176,19 +215,8 @@ final class PlayerModel: ObservableObject {
                     return
                 }
                 self.savedTime = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.play()
-                }
-            }
-        }
 
-        let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.play()
+                startPlaying()
             }
         }
 
@@ -224,7 +252,11 @@ final class PlayerModel: ObservableObject {
         insertPlayerItem(stream, for: video, preservingTime: preservingTime)
     }
 
-    private func loadCompositionAsset(_ asset: AVURLAsset, type: AVMediaType, of video: Video) async {
+    private func loadCompositionAsset(
+        _ asset: AVURLAsset,
+        type: AVMediaType,
+        of video: Video
+    ) async {
         async let assetTracks = asset.loadTracks(withMediaType: type)
 
         logger.info("loading \(type.rawValue) track")
@@ -242,7 +274,7 @@ final class PlayerModel: ObservableObject {
         }
 
         try! compositionTrack.insertTimeRange(
-            CMTimeRange(start: .zero, duration: CMTime(seconds: video.length, preferredTimescale: 1_000_000)),
+            CMTimeRange(start: .zero, duration: CMTime.secondsInDefaultTimescale(video.length)),
             of: assetTrack,
             at: .zero
         )
@@ -279,10 +311,14 @@ final class PlayerModel: ObservableObject {
         item.preferredForwardBufferDuration = 5
 
         statusObservation?.invalidate()
-        statusObservation = item.observe(\.status, options: [.old, .new]) { playerItem, _ in
+        statusObservation = item.observe(\.status, options: [.old, .new]) { [weak self] playerItem, _ in
+            guard let self = self else {
+                return
+            }
+
             switch playerItem.status {
             case .readyToPlay:
-                if self.isAutoplaying(playerItem), self.shouldResumePlaying {
+                if self.isAutoplaying(playerItem) {
                     self.play()
                 }
             case .failed:
@@ -321,12 +357,14 @@ final class PlayerModel: ObservableObject {
             try? AVAudioSession.sharedInstance().setActive(false)
         #endif
 
+        currentItem.playbackTime = playerItemDuration
+
         if queue.isEmpty {
             addCurrentItemToHistory()
             resetQueue()
             #if os(tvOS)
-                avPlayerViewController!.dismiss(animated: true) {
-                    self.controller!.dismiss(animated: true)
+                avPlayerViewController!.dismiss(animated: true) { [weak self] in
+                    self?.controller!.dismiss(animated: true)
                 }
             #endif
             presentingPlayer = false
@@ -342,8 +380,8 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        DispatchQueue.main.async {
-            self.savedTime = currentTime
+        DispatchQueue.main.async { [weak self] in
+            self?.savedTime = currentTime
             completionHandler()
         }
     }
@@ -355,43 +393,74 @@ final class PlayerModel: ObservableObject {
 
         player.seek(
             to: time,
-            toleranceBefore: .init(seconds: 1, preferredTimescale: 1_000_000),
+            toleranceBefore: .secondsInDefaultTimescale(1),
             toleranceAfter: .zero,
             completionHandler: completionHandler
         )
     }
 
-    private func addTimeObserver() {
-        let interval = CMTime(seconds: 0.5, preferredTimescale: 1_000_000)
+    private func addFrequentTimeObserver() {
+        let interval = CMTime.secondsInDefaultTimescale(0.5)
 
-        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { _ in
+        frequentTimeObserver = player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+
             self.currentRate = self.player.rate
 
             guard !self.currentItem.isNil else {
                 return
             }
 
-            let time = self.player.currentTime()
-
-            self.currentItem!.playbackTime = time
-            self.currentItem!.videoDuration = self.player.currentItem?.asset.duration.seconds
-
-            self.handleSegments(at: time)
+            self.handleSegments(at: self.player.currentTime())
         }
     }
 
-    #if os(macOS)
-        private func addPlayerTimeControlStatusObserver() {
-            playerTimeControlStatusObserver = player.observe(\.timeControlStatus) { player, _ in
-                guard self.player == player else {
-                    return
-                }
+    private func addInfrequentTimeObserver() {
+        let interval = CMTime.secondsInDefaultTimescale(5)
+
+        infrequentTimeObserver = player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+
+            guard !self.currentItem.isNil else {
+                return
+            }
+
+            self.updateCurrentItemIntervals()
+        }
+    }
+
+    private func addPlayerTimeControlStatusObserver() {
+        playerTimeControlStatusObserver = player.observe(\.timeControlStatus) { [weak self] player, _ in
+            guard let self = self,
+                  self.player == player
+            else {
+                return
+            }
+
+            #if os(macOS)
                 if player.timeControlStatus == .playing {
                     ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
                 } else {
                     ScreenSaverManager.shared.enable()
                 }
-            }
+            #endif
+
+            self.updateCurrentItemIntervals()
         }
-    #endif
+    }
+
+    private func updateCurrentItemIntervals() {
+        currentItem?.playbackTime = player.currentTime()
+        currentItem?.videoDuration = player.currentItem?.asset.duration.seconds
+    }
 }

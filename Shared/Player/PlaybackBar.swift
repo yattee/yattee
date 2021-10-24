@@ -24,7 +24,7 @@ struct PlaybackBar: View {
                     if !player.lastSkipped.isNil {
                         restoreLastSkippedSegmentButton
                     }
-                    if player.currentVideo!.live {
+                    if player.live {
                         Image(systemName: "dot.radiowaves.left.and.right")
                     } else if player.isLoadingAvailableStreams || player.isLoadingStream {
                         Image(systemName: "bolt.horizontal.fill")
@@ -78,7 +78,7 @@ struct PlaybackBar: View {
             return "LIVE"
         }
 
-        guard player.time != nil, player.time!.isValid else {
+        guard player.time != nil, player.time!.isValid, !player.currentVideo.isNil else {
             return "loading..."
         }
 

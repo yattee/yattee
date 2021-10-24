@@ -1,14 +1,19 @@
 import AVFoundation
+import Defaults
 import Foundation
 
-struct PlayerQueueItem: Hashable, Identifiable {
+struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
+    static let bridge = PlayerQueueItemBridge()
+
     var id = UUID()
-    var video: Video
+    var video: Video!
+    var videoID: Video.ID
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
 
-    init(_ video: Video, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
+    init(_ video: Video? = nil, videoID: Video.ID? = nil, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
         self.video = video
+        self.videoID = videoID ?? video!.videoID
         self.playbackTime = playbackTime
         self.videoDuration = videoDuration
     }

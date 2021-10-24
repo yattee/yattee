@@ -39,7 +39,7 @@ extension PlayerModel {
         currentItem = item
 
         if !time.isNil {
-            currentItem.playbackTime = CMTime(seconds: time!, preferredTimescale: 1_000_000)
+            currentItem.playbackTime = .secondsInDefaultTimescale(time!)
         } else if currentItem.playbackTime.isNil {
             currentItem.playbackTime = .zero
         }
@@ -48,7 +48,20 @@ extension PlayerModel {
             currentItem.video = video!
         }
 
-        playVideo(currentVideo!, time: currentItem.playbackTime)
+        savedTime = currentItem.playbackTime
+
+        loadAvailableStreams(currentVideo!) { streams in
+            guard let stream = streams.first else {
+                return
+            }
+
+            self.streamSelection = stream
+            self.playStream(
+                stream,
+                of: self.currentVideo!,
+                preservingTime: !self.currentItem.playbackTime.isNil
+            )
+        }
     }
 
     func advanceToNextItem() {
@@ -62,9 +75,10 @@ extension PlayerModel {
     func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
         addCurrentItemToHistory()
 
-        let item = remove(newItem)!
-        loadDetails(newItem.video) { video in
-            self.playItem(item, video: video, at: time)
+        remove(newItem)
+
+        accounts.api.loadDetails(newItem) { newItem in
+            self.playItem(newItem, video: newItem.video, at: time)
         }
     }
 
@@ -77,18 +91,30 @@ extension PlayerModel {
     }
 
     func resetQueue() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+
             self.currentItem = nil
             self.stream = nil
             self.removeQueueItems()
-            self.timeObserver = nil
         }
 
         player.replaceCurrentItem(with: nil)
     }
 
     func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        player.currentItem == item
+        guard player.currentItem == item else {
+            return false
+        }
+
+        if !autoPlayItems {
+            autoPlayItems = true
+            return false
+        }
+
+        return true
     }
 
     @discardableResult func enqueueVideo(
@@ -102,36 +128,24 @@ extension PlayerModel {
 
         queue.insert(item, at: prepending ? 0 : queue.endIndex)
 
-        loadDetails(video) { video in
-            videoDetailsLoadHandler(video, item)
+        accounts.api.loadDetails(item) { newItem in
+            videoDetailsLoadHandler(newItem.video, newItem)
 
             if play {
-                self.playItem(item, video: video)
+                self.playItem(newItem, video: video)
             }
         }
 
         return item
     }
 
-    private func loadDetails(_ video: Video?, onSuccess: @escaping (Video) -> Void) {
-        guard video != nil else {
-            return
-        }
-
-        accounts.api.video(video!.videoID).load().onSuccess { response in
-            if let video: Video = response.typedContent() {
-                onSuccess(video)
-            }
-        }
-    }
-
     func addCurrentItemToHistory() {
         if let item = currentItem {
-            if let index = history.firstIndex(where: { $0.video.videoID == item.video.videoID }) {
+            if let index = history.firstIndex(where: { $0.video.videoID == item.video?.videoID }) {
                 history.remove(at: index)
             }
 
-            history.insert(item, at: 0)
+            history.insert(currentItem, at: 0)
         }
     }
 
