@@ -4,7 +4,7 @@ import SwiftUI
 
 struct VideoCell: View {
     var video: Video
-    @State private var lowQualityThumbnail = false
+    @State private var mediumQualityThumbnail = false
 
     @Environment(\.inNavigationView) private var inNavigationView
 
@@ -14,6 +14,7 @@ struct VideoCell: View {
     #endif
 
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
     var body: some View {
         Group {
@@ -175,7 +176,7 @@ struct VideoCell: View {
 
     var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnailImage(quality: lowQualityThumbnail ? .medium : .maxresdefault)
+            thumbnailImage(quality: mediumQualityThumbnail ? .medium : .maxresdefault)
 
             VStack {
                 HStack(alignment: .top) {
@@ -207,20 +208,38 @@ struct VideoCell: View {
     }
 
     func thumbnailImage(quality: Thumbnail.Quality) -> some View {
-        WebImage(url: video.thumbnailURL(quality: quality))
-            .resizable()
-            .placeholder {
-                Rectangle().fill(Color("PlaceholderColor"))
+        Group {
+            if let url = thumbnails.loadableURL(video.thumbnailURL(quality: quality)) {
+                WebImage(url: url)
+                    .resizable()
+                    .placeholder {
+                        Rectangle().fill(Color("PlaceholderColor"))
+                    }
+                    .retryOnAppear(false)
+                    .onFailure { _ in
+                        if let url = video.thumbnailURL(quality: quality) {
+                            thumbnails.insertUnloadable(url)
+                        }
+
+                        if !thumbnails.isUnloadable(video.thumbnailURL(quality: .medium)) {
+                            mediumQualityThumbnail = true
+                        }
+                    }
+                    .indicator(.activity)
+
+                #if os(tvOS)
+                    .frame(minHeight: 320)
+                #endif
+            } else {
+                ZStack {
+                    Color("PlaceholderColor")
+                    Image(systemName: "exclamationmark.triangle")
+                }
+                .font(.system(size: 30))
             }
-            .onFailure { _ in
-                lowQualityThumbnail = true
-            }
-            .indicator(.activity)
-            .mask(RoundedRectangle(cornerRadius: 12))
-            .modifier(AspectRatioModifier())
-        #if os(tvOS)
-            .frame(minHeight: 320)
-        #endif
+        }
+        .mask(RoundedRectangle(cornerRadius: 12))
+        .modifier(AspectRatioModifier())
     }
 
     func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {

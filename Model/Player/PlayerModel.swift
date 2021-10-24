@@ -148,9 +148,6 @@ final class PlayerModel: ObservableObject {
         of video: Video,
         preservingTime: Bool = false
     ) {
-        #if !os(macOS)
-            try? AVAudioSession.sharedInstance().setActive(false)
-        #endif
         resetSegments()
         sponsorBlock.loadSegments(videoID: video.videoID)
 
@@ -353,13 +350,12 @@ final class PlayerModel: ObservableObject {
     }
 
     @objc func itemDidPlayToEndTime() {
-        #if !os(macOS)
-            try? AVAudioSession.sharedInstance().setActive(false)
-        #endif
-
         currentItem.playbackTime = playerItemDuration
 
         if queue.isEmpty {
+            #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setActive(false)
+            #endif
             addCurrentItemToHistory()
             resetQueue()
             #if os(tvOS)

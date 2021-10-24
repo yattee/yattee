@@ -15,6 +15,7 @@ struct ContentView: View {
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
     @StateObject private var subscriptions = SubscriptionsModel()
+    @StateObject private var thumbnailsModel = ThumbnailsModel()
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -44,6 +45,8 @@ struct ContentView: View {
         .environmentObject(recents)
         .environmentObject(search)
         .environmentObject(subscriptions)
+        .environmentObject(thumbnailsModel)
+
         .sheet(isPresented: $navigation.presentingWelcomeScreen) {
             WelcomeScreen()
                 .environmentObject(accounts)
@@ -57,6 +60,7 @@ struct ContentView: View {
                     .environmentObject(navigation)
                     .environmentObject(player)
                     .environmentObject(subscriptions)
+                    .environmentObject(thumbnailsModel)
             }
         #elseif os(macOS)
             .sheet(isPresented: $player.presentingPlayer) {
@@ -67,6 +71,7 @@ struct ContentView: View {
                     .environmentObject(navigation)
                     .environmentObject(player)
                     .environmentObject(subscriptions)
+                    .environmentObject(thumbnailsModel)
             }
         #endif
         #if !os(tvOS)

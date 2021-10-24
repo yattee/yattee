@@ -23,5 +23,7 @@ struct Player: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_: PlayerViewController, context _: Context) {}
+    func updateUIViewController(_: PlayerViewController, context _: Context) {
+        player.rebuildTVMenu()
+    }
 }
