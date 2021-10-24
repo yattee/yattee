@@ -17,6 +17,10 @@ private struct NavigationStyleKey: EnvironmentKey {
     static let defaultValue = NavigationStyle.tab
 }
 
+private struct CurrentPlaylistID: EnvironmentKey {
+    static let defaultValue: String? = nil
+}
+
 extension EnvironmentValues {
     var inNavigationView: Bool {
         get { self[InNavigationViewKey.self] }
@@ -31,5 +35,10 @@ extension EnvironmentValues {
     var navigationStyle: NavigationStyle {
         get { self[NavigationStyleKey.self] }
         set { self[NavigationStyleKey.self] = newValue }
+    }
+
+    var currentPlaylistID: String? {
+        get { self[CurrentPlaylistID.self] }
+        set { self[CurrentPlaylistID.self] = newValue }
     }
 }

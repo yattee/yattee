@@ -5,8 +5,6 @@ import SwiftUI
 final class PlaylistsModel: ObservableObject {
     @Published var playlists = [Playlist]()
 
-    @Published var selectedPlaylistID: Playlist.ID = ""
-
     var accounts = AccountsModel()
 
     init(_ playlists: [Playlist] = [Playlist]()) {
@@ -32,9 +30,6 @@ final class PlaylistsModel: ObservableObject {
             .onSuccess { resource in
                 if let playlists: [Playlist] = resource.typedContent() {
                     self.playlists = playlists
-                    if self.selectedPlaylistID.isEmpty {
-                        self.selectPlaylist(self.all.first?.id)
-                    }
                     onSuccess()
                 }
             }
@@ -43,8 +38,8 @@ final class PlaylistsModel: ObservableObject {
             }
     }
 
-    func addVideoToCurrentPlaylist(videoID: Video.ID, onSuccess: @escaping () -> Void = {}) {
-        let resource = accounts.api.playlistVideos(currentPlaylist!.id)
+    func addVideo(playlistID: Playlist.ID, videoID: Video.ID, onSuccess: @escaping () -> Void = {}) {
+        let resource = accounts.api.playlistVideos(playlistID)
         let body = ["videoId": videoID]
 
         resource?.request(.post, json: body).onSuccess { _ in
@@ -53,7 +48,7 @@ final class PlaylistsModel: ObservableObject {
         }
     }
 
-    func removeVideoFromPlaylist(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
+    func removeVideo(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
         let resource = accounts.api.playlistVideo(playlistID, videoIndexID)
 
         resource?.request(.delete).onSuccess { _ in
@@ -62,23 +57,7 @@ final class PlaylistsModel: ObservableObject {
         }
     }
 
-    func selectPlaylist(_ id: String?) {
-        selectedPlaylistID = id ?? ""
-    }
-
     private var resource: Resource? {
         accounts.api.playlists
-    }
-
-    private var selectedPlaylist: Playlist? {
-        guard !selectedPlaylistID.isEmpty else {
-            return nil
-        }
-
-        return find(id: selectedPlaylistID)
-    }
-
-    var currentPlaylist: Playlist? {
-        selectedPlaylist ?? all.first
     }
 }

@@ -3,11 +3,12 @@ import Siesta
 import SwiftUI
 
 struct AddToPlaylistView: View {
-    @EnvironmentObject<PlaylistsModel> private var model
-
     let video: Video
 
+    @State private var selectedPlaylistID: Playlist.ID = ""
+
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject<PlaylistsModel> private var model
 
     var body: some View {
         Group {
@@ -27,7 +28,7 @@ struct AddToPlaylistView: View {
         .onAppear {
             model.load {
                 if let playlist = model.all.first {
-                    model.selectedPlaylistID = playlist.id
+                    selectedPlaylistID = playlist.id
                 }
             }
         }
@@ -86,7 +87,7 @@ struct AddToPlaylistView: View {
                 #if os(tvOS)
                     selectPlaylistButton
                 #else
-                    Picker("Playlist", selection: $model.selectedPlaylistID) {
+                    Picker("Playlist", selection: $selectedPlaylistID) {
                         ForEach(model.all) { playlist in
                             Text(playlist.title).tag(playlist.id)
                         }
@@ -119,24 +120,24 @@ struct AddToPlaylistView: View {
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
-            .disabled(model.currentPlaylist.isNil)
+            .disabled(currentPlaylist.isNil)
                 .padding(.top, 30)
         }
         .padding(.horizontal)
     }
 
     private var selectPlaylistButton: some View {
-        Button(model.currentPlaylist?.title ?? "Select playlist") {
-            guard model.currentPlaylist != nil else {
+        Button(currentPlaylist?.title ?? "Select playlist") {
+            guard currentPlaylist != nil else {
                 return
             }
 
-            model.selectedPlaylistID = model.all.next(after: model.currentPlaylist!)!.id
+            selectedPlaylistID = model.all.next(after: currentPlaylist!)!.id
         }
         .contextMenu {
             ForEach(model.all) { playlist in
                 Button(playlist.title) {
-                    model.selectedPlaylistID = playlist.id
+                    selectedPlaylistID = playlist.id
                 }
             }
 
@@ -145,13 +146,17 @@ struct AddToPlaylistView: View {
     }
 
     private func addToPlaylist() {
-        guard model.currentPlaylist != nil else {
+        guard currentPlaylist != nil else {
             return
         }
 
-        model.addVideoToCurrentPlaylist(videoID: video.id) {
+        model.addVideo(playlistID: currentPlaylist!.id, videoID: video.videoID) {
             dismiss()
         }
+    }
+
+    private var currentPlaylist: Playlist? {
+        model.find(id: selectedPlaylistID) ?? model.all.first
     }
 }
 

@@ -3,6 +3,8 @@ import Siesta
 import SwiftUI
 
 struct PlaylistsView: View {
+    @State private var selectedPlaylistID: Playlist.ID = ""
+
     @State private var showingNewPlaylist = false
     @State private var createdPlaylist: Playlist?
 
@@ -16,7 +18,7 @@ struct PlaylistsView: View {
     @Namespace private var focusNamespace
 
     var items: [ContentItem] {
-        ContentItem.array(of: model.currentPlaylist?.videos ?? [])
+        ContentItem.array(of: currentPlaylist?.videos ?? [])
     }
 
     var body: some View {
@@ -27,18 +29,21 @@ struct PlaylistsView: View {
                         toolbar
                     #endif
 
-                    if model.currentPlaylist != nil, items.isEmpty {
+                    if currentPlaylist != nil, items.isEmpty {
                         hintText("Playlist is empty\n\nTap and hold on a video and then tap \"Add to Playlist\"")
                     } else if model.all.isEmpty {
                         hintText("You have no playlists\n\nTap on \"New Playlist\" to create one")
                     } else {
-                        #if os(tvOS)
-                            HorizontalCells(items: items)
-                                .padding(.top, 40)
-                            Spacer()
-                        #else
-                            VerticalCells(items: items)
-                        #endif
+                        Group {
+                            #if os(tvOS)
+                                HorizontalCells(items: items)
+                                    .padding(.top, 40)
+                                Spacer()
+                            #else
+                                VerticalCells(items: items)
+                            #endif
+                        }
+                        .environment(\.currentPlaylistID, currentPlaylist?.id)
                     }
                 }
             }
@@ -66,7 +71,7 @@ struct PlaylistsView: View {
                             .prefersDefaultFocus(in: focusNamespace)
                     }
 
-                    if model.currentPlaylist != nil {
+                    if currentPlaylist != nil {
                         editPlaylistButton
                     }
                 #endif
@@ -88,7 +93,7 @@ struct PlaylistsView: View {
 
                         Spacer()
 
-                        if model.currentPlaylist != nil {
+                        if currentPlaylist != nil {
                             editPlaylistButton
                         }
                     }
@@ -130,7 +135,7 @@ struct PlaylistsView: View {
                     }
                 }
 
-                if model.currentPlaylist != nil {
+                if currentPlaylist != nil {
                     editPlaylistButton
                 }
 
@@ -163,7 +168,7 @@ struct PlaylistsView: View {
 
         model.load(force: true) {
             if let id = createdPlaylist?.id {
-                self.model.selectPlaylist(id)
+                selectedPlaylistID = id
             }
 
             self.createdPlaylist = nil
@@ -172,11 +177,11 @@ struct PlaylistsView: View {
 
     func selectEditedPlaylist() {
         if editedPlaylist.isNil {
-            model.selectPlaylist(nil)
+            selectedPlaylistID = ""
         }
 
         model.load(force: true) {
-            model.selectPlaylist(editedPlaylist?.id)
+            self.selectedPlaylistID = editedPlaylist?.id ?? ""
 
             self.editedPlaylist = nil
         }
@@ -184,27 +189,27 @@ struct PlaylistsView: View {
 
     var selectPlaylistButton: some View {
         #if os(tvOS)
-            Button(model.currentPlaylist?.title ?? "Select playlist") {
-                guard model.currentPlaylist != nil else {
+            Button(currentPlaylist?.title ?? "Select playlist") {
+                guard currentPlaylist != nil else {
                     return
                 }
 
-                model.selectPlaylist(model.all.next(after: model.currentPlaylist!)?.id)
+                selectedPlaylistID = model.all.next(after: currentPlaylist!)?.id ?? ""
             }
             .contextMenu {
                 ForEach(model.all) { playlist in
                     Button(playlist.title) {
-                        model.selectPlaylist(playlist.id)
+                        selectedPlaylistID = playlist.id
                     }
                 }
 
                 Button("Cancel", role: .cancel) {}
             }
         #else
-            Menu(model.currentPlaylist?.title ?? "Select playlist") {
+            Menu(currentPlaylist?.title ?? "Select playlist") {
                 ForEach(model.all) { playlist in
-                    Button(action: { model.selectPlaylist(playlist.id) }) {
-                        if playlist == model.currentPlaylist {
+                    Button(action: { selectedPlaylistID = playlist.id }) {
+                        if playlist == currentPlaylist {
                             Label(playlist.title, systemImage: "checkmark")
                         } else {
                             Text(playlist.title)
@@ -217,7 +222,7 @@ struct PlaylistsView: View {
 
     var editPlaylistButton: some View {
         Button(action: {
-            self.editedPlaylist = self.model.currentPlaylist
+            self.editedPlaylist = self.currentPlaylist
             self.showingEditPlaylist = true
         }) {
             HStack(spacing: 8) {
@@ -236,6 +241,10 @@ struct PlaylistsView: View {
                 #endif
             }
         }
+    }
+
+    private var currentPlaylist: Playlist? {
+        model.find(id: selectedPlaylistID) ?? model.all.first
     }
 }
 

@@ -89,11 +89,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     func thumbnailURL(quality: Thumbnail.Quality) -> URL? {
-        if let url = thumbnails.first(where: { $0.quality == quality })?.url.absoluteString {
-            return URL(string: url.replacingOccurrences(of: "hqdefault", with: quality.filename))
-        }
-
-        return nil
+        thumbnails.first { $0.quality == quality }?.url
     }
 
     static func == (lhs: Video, rhs: Video) -> Bool {

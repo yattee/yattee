@@ -8,6 +8,7 @@ struct VideoContextMenuView: View {
 
     @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.navigationStyle) private var navigationStyle
+    @Environment(\.currentPlaylistID) private var playlistID
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
@@ -20,6 +21,7 @@ struct VideoContextMenuView: View {
         Section {
             playNowButton
         }
+
         Section {
             playNextButton
             addToQueueButton
@@ -27,6 +29,7 @@ struct VideoContextMenuView: View {
 
         Section {
             openChannelButton
+
             if accounts.app.supportsSubscriptions {
                 subscriptionButton
             }
@@ -34,13 +37,9 @@ struct VideoContextMenuView: View {
 
         if accounts.app.supportsUserPlaylists {
             Section {
-                if navigation.tabSelection != .playlists {
-                    addToPlaylistButton
-                } else if let playlist = playlists.currentPlaylist {
-                    removeFromPlaylistButton(playlistID: playlist.id)
-                }
+                addToPlaylistButton
 
-                if case let .playlist(id) = navigation.tabSelection {
+                if let id = navigation.tabSelection?.playlistID ?? playlistID {
                     removeFromPlaylistButton(playlistID: id)
                 }
             }
@@ -51,7 +50,7 @@ struct VideoContextMenuView: View {
         #endif
     }
 
-    var playNowButton: some View {
+    private var playNowButton: some View {
         Button {
             player.playNow(video)
 
@@ -65,7 +64,7 @@ struct VideoContextMenuView: View {
         }
     }
 
-    var playNextButton: some View {
+    private var playNextButton: some View {
         Button {
             player.playNext(video)
         } label: {
@@ -73,7 +72,7 @@ struct VideoContextMenuView: View {
         }
     }
 
-    var addToQueueButton: some View {
+    private var addToQueueButton: some View {
         Button {
             player.enqueueVideo(video)
         } label: {
@@ -81,7 +80,7 @@ struct VideoContextMenuView: View {
         }
     }
 
-    var openChannelButton: some View {
+    private var openChannelButton: some View {
         Button {
             let recent = RecentItem(from: video.channel)
             recents.add(recent)
@@ -96,7 +95,7 @@ struct VideoContextMenuView: View {
         }
     }
 
-    var subscriptionButton: some View {
+    private var subscriptionButton: some View {
         Group {
             if subscriptions.isSubscribing(video.channel.id) {
                 Button(role: .destructive) {
@@ -120,7 +119,7 @@ struct VideoContextMenuView: View {
         }
     }
 
-    var addToPlaylistButton: some View {
+    private var addToPlaylistButton: some View {
         Button {
             navigation.presentAddToPlaylist(video)
         } label: {
@@ -130,7 +129,7 @@ struct VideoContextMenuView: View {
 
     func removeFromPlaylistButton(playlistID: String) -> some View {
         Button(role: .destructive) {
-            playlists.removeVideoFromPlaylist(videoIndexID: video.indexID!, playlistID: playlistID)
+            playlists.removeVideo(videoIndexID: video.indexID!, playlistID: playlistID)
         } label: {
             Label("Remove from playlist", systemImage: "text.badge.minus")
         }

@@ -13,6 +13,14 @@ final class NavigationModel: ObservableObject {
         case recentlyOpened(String)
         case nowPlaying
         case search
+
+        var playlistID: Playlist.ID? {
+            if case let .playlist(id) = self {
+                return id
+            }
+
+            return nil
+        }
     }
 
     @Published var tabSelection: TabSelection! = .watchNow
