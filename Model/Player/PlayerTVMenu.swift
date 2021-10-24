@@ -36,7 +36,7 @@ extension PlayerModel {
             }
 
             return UIAction(
-                title: "Restore \(segment.category)",
+                title: "Restore \(segment.title())",
                 image: UIImage(systemName: "arrow.uturn.left.circle")
             ) { _ in
                 self.restoreLastSkippedSegment()

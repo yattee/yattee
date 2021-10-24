@@ -95,16 +95,19 @@ struct PlaybackBar: View {
     }
 
     private var restoreLastSkippedSegmentButton: some View {
-        Button {
-            player.restoreLastSkippedSegment()
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "arrow.uturn.left.circle")
-                Text(player.lastSkipped!.category)
-                Text("•")
+        HStack(spacing: 4) {
+            Button {
+                player.restoreLastSkippedSegment()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.uturn.left.circle")
+                    Text(player.lastSkipped!.title())
+                }
             }
+            .buttonStyle(.plain)
+
+            Text("•")
         }
-        .buttonStyle(.plain)
     }
 
     private var streamControl: some View {

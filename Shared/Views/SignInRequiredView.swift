@@ -7,10 +7,6 @@ struct SignInRequiredView<Content: View>: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
 
-    #if !os(macOS)
-        @EnvironmentObject<NavigationModel> private var navigation
-    #endif
-
     @Default(.instances) private var instances
 
     init(title: String, @ViewBuilder content: @escaping () -> Content) {

@@ -13,20 +13,12 @@ class Segment: ObservableObject, Hashable {
         segment.first!
     }
 
-    var startTime: CMTime {
-        CMTime(seconds: start, preferredTimescale: 1000)
-    }
-
     var end: Double {
         segment.last!
     }
 
     var endTime: CMTime {
         CMTime(seconds: end, preferredTimescale: 1000)
-    }
-
-    var duration: Double {
-        end - start
     }
 
     init(category: String, segment: [Double], uuid: String, videoDuration: Int) {

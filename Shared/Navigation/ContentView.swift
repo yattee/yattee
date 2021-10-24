@@ -35,9 +35,6 @@ struct ContentView: View {
         }
         .onAppear(perform: configure)
 
-        .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
-        .onOpenURL(perform: handleOpenedURL)
-
         .environmentObject(accounts)
         .environmentObject(instances)
         .environmentObject(navigation)
@@ -72,6 +69,8 @@ struct ContentView: View {
             }
         #endif
         #if !os(tvOS)
+            .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
+            .onOpenURL(perform: handleOpenedURL)
             .sheet(isPresented: $navigation.presentingAddToPlaylist) {
                 AddToPlaylistView(video: navigation.videoToAddToPlaylist)
                     .environmentObject(playlists)
@@ -118,24 +117,26 @@ struct ContentView: View {
         navigation.presentingWelcomeScreen = true
     }
 
-    func handleOpenedURL(_ url: URL) {
-        guard !accounts.current.isNil else {
-            return
-        }
+    #if !os(tvOS)
+        func handleOpenedURL(_ url: URL) {
+            guard !accounts.current.isNil else {
+                return
+            }
 
-        let parser = VideoURLParser(url: url)
+            let parser = VideoURLParser(url: url)
 
-        guard let id = parser.id else {
-            return
-        }
+            guard let id = parser.id else {
+                return
+            }
 
-        accounts.api.video(id).load().onSuccess { response in
-            if let video: Video = response.typedContent() {
-                self.player.playNow(video, at: parser.time)
-                self.player.presentPlayer()
+            accounts.api.video(id).load().onSuccess { response in
+                if let video: Video = response.typedContent() {
+                    self.player.playNow(video, at: parser.time)
+                    self.player.presentPlayer()
+                }
             }
         }
-    }
+    #endif
 }
 
 struct ContentView_Previews: PreviewProvider {

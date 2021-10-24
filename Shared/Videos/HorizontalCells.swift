@@ -2,10 +2,6 @@ import Defaults
 import SwiftUI
 
 struct HorizontalCells: View {
-    #if os(iOS)
-        @Environment(\.verticalSizeClass) private var verticalSizeClass
-    #endif
-
     var items = [ContentItem]()
 
     var body: some View {

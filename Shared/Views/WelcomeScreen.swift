@@ -5,7 +5,6 @@ struct WelcomeScreen: View {
     @Environment(\.dismiss) private var dismiss
 
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
 
     @Default(.accounts) private var allAccounts
 

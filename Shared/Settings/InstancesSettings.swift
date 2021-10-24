@@ -5,9 +5,6 @@ struct InstancesSettings: View {
     @Default(.instances) private var instances
 
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<InstancesModel> private var instancesModel
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<PlaylistsModel> private var playlists
 
     @State private var selectedInstanceID: Instance.ID?
     @State private var selectedAccount: Account?
@@ -69,6 +66,5 @@ struct InstancesSettingsView_Previews: PreviewProvider {
             InstancesSettings()
         }
         .frame(width: 400, height: 270)
-        .environmentObject(InstancesModel())
     }
 }

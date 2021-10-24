@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		37A3B19C27258492000FB5EE /* Periphery (iOS) */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 37A3B19D27258492000FB5EE /* Build configuration list for PBXAggregateTarget "Periphery (iOS)" */;
+			buildPhases = (
+				37A3B1A0272584A6000FB5EE /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "Periphery (iOS)";
+			productName = "Periphery (iOS)";
+		};
 		37FD43E62704A2240073EE42 /* Periphery (macOS) */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 37FD43E72704A2240073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (macOS)" */;
@@ -201,6 +212,22 @@
 		379775932689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775942689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775952689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
+		37A3B15A27255E7F000FB5EE /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */; };
+		37A3B15F27255E7F000FB5EE /* images in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B15E27255E7F000FB5EE /* images */; };
+		37A3B16127255E7F000FB5EE /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16027255E7F000FB5EE /* manifest.json */; };
+		37A3B16527255E7F000FB5EE /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16427255E7F000FB5EE /* content.js */; };
+		37A3B16727255E7F000FB5EE /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16627255E7F000FB5EE /* popup.html */; };
+		37A3B16927255E7F000FB5EE /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16827255E7F000FB5EE /* popup.css */; };
+		37A3B16B27255E7F000FB5EE /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16A27255E7F000FB5EE /* popup.js */; };
+		37A3B17027255E7F000FB5EE /* Open in Yattee (macOS).appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37A3B18F2725735F000FB5EE /* Open in Yattee (iOS).appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37A3B194272574FB000FB5EE /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */; };
+		37A3B19627257503000FB5EE /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16427255E7F000FB5EE /* content.js */; };
+		37A3B1972725750B000FB5EE /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16A27255E7F000FB5EE /* popup.js */; };
+		37A3B1982725750B000FB5EE /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16027255E7F000FB5EE /* manifest.json */; };
+		37A3B1992725750B000FB5EE /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16627255E7F000FB5EE /* popup.html */; };
+		37A3B19A2725750B000FB5EE /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16827255E7F000FB5EE /* popup.css */; };
+		37A3B19B2725750F000FB5EE /* images in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B15E27255E7F000FB5EE /* images */; };
 		37A9965A26D6F8CA006E3224 /* HorizontalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A9965926D6F8CA006E3224 /* HorizontalCells.swift */; };
 		37A9965B26D6F8CA006E3224 /* HorizontalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A9965926D6F8CA006E3224 /* HorizontalCells.swift */; };
 		37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A9965926D6F8CA006E3224 /* HorizontalCells.swift */; };
@@ -387,6 +414,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		37A3B16E27255E7F000FB5EE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37A3B15627255E7F000FB5EE;
+			remoteInfo = "Open in Yattee";
+		};
+		37A3B18D2725735F000FB5EE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37A3B1782725735F000FB5EE;
+			remoteInfo = "Open in Yattee";
+		};
 		37D4B0D52671614900C925CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
@@ -409,6 +450,31 @@
 			remoteInfo = Pearvidious;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		37A3B17127255E7F000FB5EE /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				37A3B17027255E7F000FB5EE /* Open in Yattee (macOS).appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37A3B1932725735F000FB5EE /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				37A3B18F2725735F000FB5EE /* Open in Yattee (iOS).appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3700155A271B0D4D0049C794 /* PipedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipedAPI.swift; sourceTree = "<group>"; };
@@ -469,6 +535,17 @@
 		3797758A2689345500DD52A8 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		379775922689365600DD52A8 /* Array+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Next.swift"; sourceTree = "<group>"; };
 		37992DC726CC50BC003D4C27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee (macOS).appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		37A3B15E27255E7F000FB5EE /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
+		37A3B16027255E7F000FB5EE /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		37A3B16427255E7F000FB5EE /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		37A3B16627255E7F000FB5EE /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = popup.html; sourceTree = "<group>"; };
+		37A3B16827255E7F000FB5EE /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = popup.css; sourceTree = "<group>"; };
+		37A3B16A27255E7F000FB5EE /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = popup.js; sourceTree = "<group>"; };
+		37A3B16C27255E7F000FB5EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37A3B16D27255E7F000FB5EE /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
+		37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee (iOS).appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37A9965926D6F8CA006E3224 /* HorizontalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCells.swift; sourceTree = "<group>"; };
 		37A9965D26D6F9B9006E3224 /* WatchNowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNowView.swift; sourceTree = "<group>"; };
 		37AAF27D26737323007FC770 /* PopularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopularView.swift; sourceTree = "<group>"; };
@@ -547,6 +624,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		37A3B15427255E7F000FB5EE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37A3B1762725735F000FB5EE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37D4B0C62671614900C925CA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -811,6 +902,30 @@
 			path = iOS;
 			sourceTree = "<group>";
 		};
+		37A3B15827255E7F000FB5EE /* Open in Yattee */ = {
+			isa = PBXGroup;
+			children = (
+				37A3B15B27255E7F000FB5EE /* Resources */,
+				37A3B16427255E7F000FB5EE /* content.js */,
+				37A3B16C27255E7F000FB5EE /* Info.plist */,
+				37A3B16D27255E7F000FB5EE /* Open in Yattee.entitlements */,
+				37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Open in Yattee";
+			sourceTree = "<group>";
+		};
+		37A3B15B27255E7F000FB5EE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				37A3B15E27255E7F000FB5EE /* images */,
+				37A3B16027255E7F000FB5EE /* manifest.json */,
+				37A3B16627255E7F000FB5EE /* popup.html */,
+				37A3B16827255E7F000FB5EE /* popup.css */,
+				37A3B16A27255E7F000FB5EE /* popup.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		37BA796C26DC4105002A0235 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -854,6 +969,7 @@
 				37D4B1B72672CFE300C925CA /* Model */,
 				37C7A9022679058300E721B4 /* Extensions */,
 				3748186426A762300084E870 /* Fixtures */,
+				37A3B15827255E7F000FB5EE /* Open in Yattee */,
 				377FC7D1267A080300A6BBAF /* Frameworks */,
 				37D4B0CA2671614900C925CA /* Products */,
 				37D4B174267164B000C925CA /* Tests Apple TV */,
@@ -896,6 +1012,8 @@
 				37D4B0DE2671614900C925CA /* Tests (macOS).xctest */,
 				37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */,
 				37D4B171267164B000C925CA /* Tests (tvOS).xctest */,
+				37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */,
+				37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -994,6 +1112,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (macOS)" */;
+			buildPhases = (
+				37A3B15327255E7F000FB5EE /* Sources */,
+				37A3B15427255E7F000FB5EE /* Frameworks */,
+				37A3B15527255E7F000FB5EE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Open in Yattee (macOS)";
+			productName = "Open in Yattee";
+			productReference = 37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (iOS)" */;
+			buildPhases = (
+				37A3B1752725735F000FB5EE /* Sources */,
+				37A3B1762725735F000FB5EE /* Frameworks */,
+				37A3B1772725735F000FB5EE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Open in Yattee (iOS)";
+			productName = "Open in Yattee";
+			productReference = 37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		37D4B0C82671614900C925CA /* Pearvidious (iOS) */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (iOS)" */;
@@ -1002,10 +1154,12 @@
 				37D4B0C62671614900C925CA /* Frameworks */,
 				37D4B0C72671614900C925CA /* Resources */,
 				37CC3F48270CE89B00608308 /* ShellScript */,
+				37A3B1932725735F000FB5EE /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				37A3B18E2725735F000FB5EE /* PBXTargetDependency */,
 			);
 			name = "Pearvidious (iOS)";
 			packageProductDependencies = (
@@ -1032,10 +1186,12 @@
 				37D4B0CC2671614900C925CA /* Frameworks */,
 				37D4B0CD2671614900C925CA /* Resources */,
 				37CC3F4A270CE8D000608308 /* ShellScript */,
+				37A3B17127255E7F000FB5EE /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				37A3B16F27255E7F000FB5EE /* PBXTargetDependency */,
 			);
 			name = "Pearvidious (macOS)";
 			packageProductDependencies = (
@@ -1143,9 +1299,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1300;
+				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 1310;
 				TargetAttributes = {
+					37A3B15627255E7F000FB5EE = {
+						CreatedOnToolsVersion = 13.1;
+					};
+					37A3B1782725735F000FB5EE = {
+						CreatedOnToolsVersion = 13.1;
+					};
+					37A3B19C27258492000FB5EE = {
+						CreatedOnToolsVersion = 13.1;
+					};
 					37D4B0C82671614900C925CA = {
 						CreatedOnToolsVersion = 13.0;
 					};
@@ -1203,16 +1368,45 @@
 				37D4B0C82671614900C925CA /* Pearvidious (iOS) */,
 				37D4B0CE2671614900C925CA /* Pearvidious (macOS) */,
 				37D4B157267164AE00C925CA /* Pearvidious (tvOS) */,
+				37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */,
+				37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */,
+				37A3B19C27258492000FB5EE /* Periphery (iOS) */,
+				37FD43E62704A2240073EE42 /* Periphery (macOS) */,
+				37FD43EB2704A7710073EE42 /* Periphery (tvOS) */,
 				37D4B0D32671614900C925CA /* Tests (iOS) */,
 				37D4B0DD2671614900C925CA /* Tests (macOS) */,
 				37D4B170267164B000C925CA /* Tests (tvOS) */,
-				37FD43E62704A2240073EE42 /* Periphery (macOS) */,
-				37FD43EB2704A7710073EE42 /* Periphery (tvOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		37A3B15527255E7F000FB5EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37A3B16927255E7F000FB5EE /* popup.css in Resources */,
+				37A3B16727255E7F000FB5EE /* popup.html in Resources */,
+				37A3B15F27255E7F000FB5EE /* images in Resources */,
+				37A3B16127255E7F000FB5EE /* manifest.json in Resources */,
+				37A3B16527255E7F000FB5EE /* content.js in Resources */,
+				37A3B16B27255E7F000FB5EE /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37A3B1772725735F000FB5EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37A3B1982725750B000FB5EE /* manifest.json in Resources */,
+				37A3B1992725750B000FB5EE /* popup.html in Resources */,
+				37A3B19A2725750B000FB5EE /* popup.css in Resources */,
+				37A3B19627257503000FB5EE /* content.js in Resources */,
+				37A3B1972725750B000FB5EE /* popup.js in Resources */,
+				37A3B19B2725750F000FB5EE /* images in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37D4B0C72671614900C925CA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1262,6 +1456,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		37A3B1A0272584A6000FB5EE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (iOS)\" \\\n  --targets \"Pearvidious (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
+		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1350,6 +1561,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		37A3B15327255E7F000FB5EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37A3B15A27255E7F000FB5EE /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37A3B1752725735F000FB5EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37A3B194272574FB000FB5EE /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37D4B0C52671614900C925CA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1715,6 +1942,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		37A3B16F27255E7F000FB5EE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */;
+			targetProxy = 37A3B16E27255E7F000FB5EE /* PBXContainerItemProxy */;
+		};
+		37A3B18E2725735F000FB5EE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */;
+			targetProxy = 37A3B18D2725735F000FB5EE /* PBXContainerItemProxy */;
+		};
 		37D4B0D62671614900C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 37D4B0C82671614900C925CA /* Pearvidious (iOS) */;
@@ -1733,6 +1970,157 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		37A3B17227255E7F000FB5EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		37A3B17327255E7F000FB5EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		37A3B1912725735F000FB5EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		37A3B1922725735F000FB5EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		37A3B19E27258492000FB5EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		37A3B19F27258492000FB5EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		37D4B0EA2671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1847,6 +2235,7 @@
 		37D4B0ED2671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -1878,6 +2267,7 @@
 		37D4B0EE2671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -1910,10 +2300,11 @@
 		37D4B0F02671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Shared/Pearvidious.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1943,10 +2334,11 @@
 		37D4B0F12671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Shared/Pearvidious.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2231,6 +2623,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37A3B17227255E7F000FB5EE /* Debug */,
+				37A3B17327255E7F000FB5EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37A3B1912725735F000FB5EE /* Debug */,
+				37A3B1922725735F000FB5EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37A3B19D27258492000FB5EE /* Build configuration list for PBXAggregateTarget "Periphery (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37A3B19E27258492000FB5EE /* Debug */,
+				37A3B19F27258492000FB5EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Pearvidious" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

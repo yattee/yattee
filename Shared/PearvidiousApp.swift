@@ -11,8 +11,8 @@ struct PearvidiousApp: App {
         WindowGroup {
             ContentView()
         }
-        .handlesExternalEvents(matching: Set(["*"]))
         #if !os(tvOS)
+            .handlesExternalEvents(matching: Set(["*"]))
             .commands {
                 SidebarCommands()
             }
