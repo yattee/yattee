@@ -1,3 +1,4 @@
+import AVFAudio
 import Defaults
 import SDWebImage
 import SDWebImagePINPlugin
@@ -91,6 +92,9 @@ struct ContentView: View {
         SiestaLog.Category.enabled = .common
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "net.yattee.app")
+        #if !os(macOS)
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        #endif
 
         if let account = accounts.lastUsed ??
             instances.lastUsed?.anonymousAccount ??

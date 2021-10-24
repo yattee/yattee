@@ -11,9 +11,6 @@ final class PlayerViewController: UIViewController {
         super.viewWillAppear(animated)
 
         loadPlayer()
-
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-        try? AVAudioSession.sharedInstance().setActive(true)
     }
 
     func loadPlayer() {

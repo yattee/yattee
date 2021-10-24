@@ -301,6 +301,7 @@
 		37BE0BD726A1D4A90092E2DB /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* PlayerViewController.swift */; };
 		37BE0BDA26A214630092E2DB /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD926A214630092E2DB /* PlayerViewController.swift */; };
 		37BE0BDC26A2367F0092E2DB /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* Player.swift */; };
+		37C069782725962F00F7F6CB /* ScreenSaverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069772725962F00F7F6CB /* ScreenSaverManager.swift */; };
 		37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C3A241272359900087A57A /* Double+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C3A240272359900087A57A /* Double+Format.swift */; };
@@ -575,6 +576,7 @@
 		37BE0BD526A1D4A90092E2DB /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		37BE0BD926A214630092E2DB /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		37BE0BDB26A2367F0092E2DB /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		37C069772725962F00F7F6CB /* ScreenSaverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSaverManager.swift; sourceTree = "<group>"; };
 		37C194C626F6A9C8005D3B96 /* RecentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentsModel.swift; sourceTree = "<group>"; };
 		37C3A240272359900087A57A /* Double+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Format.swift"; sourceTree = "<group>"; };
 		37C3A24427235DA70087A57A /* ChannelPlaylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelPlaylist.swift; sourceTree = "<group>"; };
@@ -815,6 +817,7 @@
 				374C053E272472C0009BDDBE /* PlayerSegments.swift */,
 				37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */,
 				374C053A2724614F009BDDBE /* PlayerTVMenu.swift */,
+				37C069772725962F00F7F6CB /* ScreenSaverManager.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1777,6 +1780,7 @@
 				3797758C2689345500DD52A8 /* Store.swift in Sources */,
 				37141674267A8E10006CA35D /* Country.swift in Sources */,
 				37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */,
+				37C069782725962F00F7F6CB /* ScreenSaverManager.swift in Sources */,
 				37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37732FF12703A26300F04329 /* AccountValidationStatus.swift in Sources */,
 				37BA794C26DC30EC002A0235 /* AppSidebarPlaylists.swift in Sources */,

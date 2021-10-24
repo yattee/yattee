@@ -47,11 +47,19 @@ final class PlayerModel: ObservableObject {
     private var shouldResumePlaying = true
     private var statusObservation: NSKeyValueObservation?
 
+    #if os(macOS)
+        var playerTimeControlStatusObserver: Any?
+    #endif
+
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.instances = instances ?? InstancesModel()
         addItemDidPlayToEndTimeObserver()
         addTimeObserver()
+
+        #if os(macOS)
+            addPlayerTimeControlStatusObserver()
+        #endif
     }
 
     func presentPlayer() {
@@ -123,6 +131,9 @@ final class PlayerModel: ObservableObject {
         of video: Video,
         preservingTime: Bool = false
     ) {
+        #if !os(macOS)
+            try? AVAudioSession.sharedInstance().setActive(false)
+        #endif
         resetSegments()
         sponsorBlock.loadSegments(videoID: video.videoID)
 
@@ -172,6 +183,10 @@ final class PlayerModel: ObservableObject {
         }
 
         let startPlaying = {
+            #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setActive(true)
+            #endif
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.play()
             }
@@ -302,6 +317,10 @@ final class PlayerModel: ObservableObject {
     }
 
     @objc func itemDidPlayToEndTime() {
+        #if !os(macOS)
+            try? AVAudioSession.sharedInstance().setActive(false)
+        #endif
+
         if queue.isEmpty {
             addCurrentItemToHistory()
             resetQueue()
@@ -360,4 +379,19 @@ final class PlayerModel: ObservableObject {
             self.handleSegments(at: time)
         }
     }
+
+    #if os(macOS)
+        private func addPlayerTimeControlStatusObserver() {
+            playerTimeControlStatusObserver = player.observe(\.timeControlStatus) { player, _ in
+                guard self.player == player else {
+                    return
+                }
+                if player.timeControlStatus == .playing {
+                    ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
+                } else {
+                    ScreenSaverManager.shared.enable()
+                }
+            }
+        }
+    #endif
 }
