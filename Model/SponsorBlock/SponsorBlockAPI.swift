@@ -5,9 +5,9 @@ import Logging
 import SwiftyJSON
 
 final class SponsorBlockAPI: ObservableObject {
-    let logger = Logger(label: "net.yattee.app.sb")
-
     static let categories = ["sponsor", "selfpromo", "intro", "outro", "interaction", "music_offtopic"]
+
+    let logger = Logger(label: "net.yattee.app.sb")
 
     @Published var videoID: String?
     @Published var segments = [Segment]()

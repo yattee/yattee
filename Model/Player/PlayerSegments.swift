@@ -32,14 +32,16 @@ extension PlayerModel {
 
     private func skip(_ segment: Segment, at time: CMTime) {
         guard segment.endTime.seconds <= playerItemDuration?.seconds ?? .infinity else {
-            logger.error("item time is: \(time.seconds) and trying to skip to \(playerItemDuration?.seconds ?? .infinity)")
+            logger.error(
+                "segment end time is: \(segment.end) when player item duration is: \(playerItemDuration?.seconds ?? .infinity)"
+            )
             return
         }
 
         player.seek(to: segment.endTime)
         lastSkipped = segment
         segmentRestorationTime = time
-        logger.info("SponsorBlock skipping to: \(segment.endTime)")
+        logger.info("SponsorBlock skipping to: \(segment.end)")
     }
 
     private func shouldSkip(_ segment: Segment, at time: CMTime) -> Bool {

@@ -17,7 +17,6 @@ struct VerticalCells: View {
             }
             .padding()
         }
-        .id(items.map(\.id).joined())
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
             .background()

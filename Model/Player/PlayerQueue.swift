@@ -27,17 +27,20 @@ extension PlayerModel {
         }
     }
 
-    func playNow(_ video: Video) {
+    func playNow(_ video: Video, at time: TimeInterval? = nil) {
         addCurrentItemToHistory()
 
         enqueueVideo(video, prepending: true) { _, item in
-            self.advanceToItem(item)
+            self.advanceToItem(item, at: time)
         }
     }
 
-    func playItem(_ item: PlayerQueueItem, video: Video? = nil) {
+    func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: TimeInterval? = nil) {
         currentItem = item
-        if currentItem.playbackTime.isNil {
+
+        if !time.isNil {
+            currentItem.playbackTime = CMTime(seconds: time!, preferredTimescale: 1_000_000)
+        } else if currentItem.playbackTime.isNil {
             currentItem.playbackTime = .zero
         }
 
@@ -45,7 +48,7 @@ extension PlayerModel {
             currentItem.video = video!
         }
 
-        playVideo(currentVideo!, time: item.playbackTime)
+        playVideo(currentVideo!, time: currentItem.playbackTime)
     }
 
     func advanceToNextItem() {
@@ -56,12 +59,12 @@ extension PlayerModel {
         }
     }
 
-    func advanceToItem(_ newItem: PlayerQueueItem) {
+    func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
         addCurrentItemToHistory()
 
         let item = remove(newItem)!
         loadDetails(newItem.video) { video in
-            self.playItem(item, video: video)
+            self.playItem(item, video: video, at: time)
         }
     }
 

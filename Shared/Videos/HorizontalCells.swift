@@ -31,7 +31,6 @@ struct HorizontalCells: View {
                 .padding(.vertical, 10)
             #endif
         }
-        .id(items.map(\.id).joined())
         #if os(tvOS)
             .frame(height: 560)
         #else

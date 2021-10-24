@@ -34,6 +34,10 @@ struct ContentView: View {
             #endif
         }
         .onAppear(perform: configure)
+
+        .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
+        .onOpenURL(perform: handleOpenedURL)
+
         .environmentObject(accounts)
         .environmentObject(instances)
         .environmentObject(navigation)
@@ -112,6 +116,25 @@ struct ContentView: View {
         }
 
         navigation.presentingWelcomeScreen = true
+    }
+
+    func handleOpenedURL(_ url: URL) {
+        guard !accounts.current.isNil else {
+            return
+        }
+
+        let parser = VideoURLParser(url: url)
+
+        guard let id = parser.id else {
+            return
+        }
+
+        accounts.api.video(id).load().onSuccess { response in
+            if let video: Video = response.typedContent() {
+                self.player.playNow(video, at: parser.time)
+                self.player.presentPlayer()
+            }
+        }
     }
 }
 
