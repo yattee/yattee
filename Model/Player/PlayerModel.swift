@@ -50,47 +50,14 @@ final class PlayerModel: ObservableObject {
 
     private var statusObservation: NSKeyValueObservation?
 
-    var autoPlayItems = false
-
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.instances = instances ?? InstancesModel()
+
         addItemDidPlayToEndTimeObserver()
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
         addPlayerTimeControlStatusObserver()
-    }
-
-    func loadHistoryDetails() {
-        guard !accounts.current.isNil else {
-            return
-        }
-
-        queue = Defaults[.queue]
-        queue.forEach { item in
-            accounts.api.loadDetails(item) { newItem in
-                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
-                    self.queue[index] = newItem
-                }
-            }
-        }
-
-        history = Defaults[.history]
-        history.forEach { item in
-            accounts.api.loadDetails(item) { newItem in
-                if let index = self.history.firstIndex(where: { $0.id == item.id }) {
-                    self.history[index] = newItem
-                }
-            }
-        }
-
-        if let item = Defaults[.lastPlayed] {
-            accounts.api.loadDetails(item) { [weak self] newItem in
-                self?.playNow(newItem.video, at: newItem.playbackTime?.seconds)
-            }
-        } else {
-            autoPlayItems = true
-        }
     }
 
     func presentPlayer() {
@@ -193,15 +160,7 @@ final class PlayerModel: ObservableObject {
             #endif
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard self.autoPlayItems else {
-                    return
-                }
-
-                self.play()
+                self?.play()
             }
         }
 

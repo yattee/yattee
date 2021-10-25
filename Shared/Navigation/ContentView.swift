@@ -144,7 +144,7 @@ struct ContentView: View {
 
             accounts.api.video(id).load().onSuccess { response in
                 if let video: Video = response.typedContent() {
-                    self.player.autoPlayItems = true
+                    player.addCurrentItemToHistory()
                     self.player.playNow(video, at: parser.time)
                     self.player.presentPlayer()
                 }

@@ -1,4 +1,5 @@
 import AVFoundation
+import Defaults
 import Foundation
 import Siesta
 
@@ -105,16 +106,7 @@ extension PlayerModel {
     }
 
     func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        guard player.currentItem == item else {
-            return false
-        }
-
-        if !autoPlayItems {
-            autoPlayItems = true
-            return false
-        }
-
-        return true
+        player.currentItem == item
     }
 
     @discardableResult func enqueueVideo(
@@ -141,12 +133,16 @@ extension PlayerModel {
 
     func addCurrentItemToHistory() {
         if let item = currentItem {
-            if let index = history.firstIndex(where: { $0.video.videoID == item.video?.videoID }) {
-                history.remove(at: index)
-            }
-
-            history.insert(currentItem, at: 0)
+            addItemToHistory(item)
         }
+    }
+
+    func addItemToHistory(_ item: PlayerQueueItem) {
+        if let index = history.firstIndex(where: { $0.video.videoID == item.video?.videoID }) {
+            history.remove(at: index)
+        }
+
+        history.insert(currentItem, at: 0)
     }
 
     func playHistory(_ item: PlayerQueueItem) {
@@ -179,5 +175,31 @@ extension PlayerModel {
 
     func removeHistoryItems() {
         history.removeAll()
+    }
+
+    func loadHistoryDetails() {
+        guard !accounts.current.isNil else {
+            return
+        }
+
+        queue = Defaults[.queue]
+        queue.forEach { item in
+            accounts.api.loadDetails(item) { newItem in
+                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
+                    self.queue[index] = newItem
+                }
+            }
+        }
+
+        history = [Defaults[.lastPlayed]].compactMap { $0 } + Defaults[.history]
+        history.forEach { item in
+            accounts.api.loadDetails(item) { newItem in
+                if let index = self.history.firstIndex(where: { $0.id == item.id }) {
+                    self.history[index] = newItem
+                }
+            }
+        }
+
+        Defaults[.lastPlayed] = nil
     }
 }
