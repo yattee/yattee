@@ -50,6 +50,8 @@ final class PlayerModel: ObservableObject {
 
     private var statusObservation: NSKeyValueObservation?
 
+    private var timeObserverThrottle = Throttle(interval: 2)
+
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.instances = instances ?? InstancesModel()
@@ -365,8 +367,6 @@ final class PlayerModel: ObservableObject {
                 return
             }
 
-            self.currentRate = self.player.rate
-
             guard !self.currentItem.isNil else {
                 return
             }
@@ -390,7 +390,9 @@ final class PlayerModel: ObservableObject {
                 return
             }
 
-            self.updateCurrentItemIntervals()
+            self.timeObserverThrottle.execute {
+                self.updateCurrentItemIntervals()
+            }
         }
     }
 
@@ -402,15 +404,21 @@ final class PlayerModel: ObservableObject {
                 return
             }
 
-            #if os(macOS)
-                if player.timeControlStatus == .playing {
-                    ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
-                } else {
-                    ScreenSaverManager.shared.enable()
-                }
-            #endif
+            if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
+                self.objectWillChange.send()
+            }
 
-            self.updateCurrentItemIntervals()
+            self.timeObserverThrottle.execute {
+                #if os(macOS)
+                    if player.timeControlStatus == .playing {
+                        ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
+                    } else {
+                        ScreenSaverManager.shared.enable()
+                    }
+                #endif
+
+                self.updateCurrentItemIntervals()
+            }
         }
     }
 

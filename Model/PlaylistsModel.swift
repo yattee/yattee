@@ -15,8 +15,12 @@ final class PlaylistsModel: ObservableObject {
         playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }
     }
 
-    func find(id: Playlist.ID) -> Playlist? {
-        playlists.first { $0.id == id }
+    func find(id: Playlist.ID?) -> Playlist? {
+        if id.isNil {
+            return nil
+        }
+
+        return playlists.first { $0.id == id! }
     }
 
     var isEmpty: Bool {
@@ -25,6 +29,11 @@ final class PlaylistsModel: ObservableObject {
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
         let request = force ? resource?.load() : resource?.loadIfNeeded()
+
+        guard !request.isNil else {
+            onSuccess()
+            return
+        }
 
         request?
             .onSuccess { resource in

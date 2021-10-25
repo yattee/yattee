@@ -6,7 +6,7 @@ final class PlayerViewController: NSViewController {
     var playerView = AVPlayerView()
 
     override func viewDidDisappear() {
-        // TODO: pause on disappear settings
+        playerModel.pause()
         super.viewDidDisappear()
     }
 

@@ -191,7 +191,25 @@ extension PlayerModel {
             }
         }
 
-        history = [Defaults[.lastPlayed]].compactMap { $0 } + Defaults[.history]
+        var savedHistory = Defaults[.history]
+
+        if let lastPlayed = Defaults[.lastPlayed] {
+            if let index = savedHistory.firstIndex(where: { $0.videoID == lastPlayed.videoID }) {
+                var updatedLastPlayed = savedHistory[index]
+
+                updatedLastPlayed.playbackTime = lastPlayed.playbackTime
+                updatedLastPlayed.videoDuration = lastPlayed.videoDuration
+
+                savedHistory.remove(at: index)
+                savedHistory.insert(updatedLastPlayed, at: 0)
+            } else {
+                savedHistory.insert(lastPlayed, at: 0)
+            }
+
+            Defaults[.lastPlayed] = nil
+        }
+
+        history = savedHistory
         history.forEach { item in
             accounts.api.loadDetails(item) { newItem in
                 if let index = self.history.firstIndex(where: { $0.id == item.id }) {
@@ -199,7 +217,5 @@ extension PlayerModel {
                 }
             }
         }
-
-        Defaults[.lastPlayed] = nil
     }
 }

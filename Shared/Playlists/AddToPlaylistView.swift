@@ -27,7 +27,7 @@ struct AddToPlaylistView: View {
         }
         .onAppear {
             model.load {
-                if let playlist = model.all.first {
+                if let playlist = model.find(id: Defaults[.lastUsedPlaylistID]) ?? model.all.first {
                     selectedPlaylistID = playlist.id
                 }
             }
@@ -117,22 +117,22 @@ struct AddToPlaylistView: View {
         HStack {
             Spacer()
             Button("Add to Playlist", action: addToPlaylist)
+                .disabled(selectedPlaylist.isNil)
+                .padding(.top, 30)
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
-            .disabled(currentPlaylist.isNil)
-                .padding(.top, 30)
         }
         .padding(.horizontal)
     }
 
     private var selectPlaylistButton: some View {
-        Button(currentPlaylist?.title ?? "Select playlist") {
-            guard currentPlaylist != nil else {
+        Button(selectedPlaylist?.title ?? "Select playlist") {
+            guard selectedPlaylist != nil else {
                 return
             }
 
-            selectedPlaylistID = model.all.next(after: currentPlaylist!)!.id
+            selectedPlaylistID = model.all.next(after: selectedPlaylist!)!.id
         }
         .contextMenu {
             ForEach(model.all) { playlist in
@@ -146,16 +146,18 @@ struct AddToPlaylistView: View {
     }
 
     private func addToPlaylist() {
-        guard currentPlaylist != nil else {
+        guard let id = selectedPlaylist?.id else {
             return
         }
 
-        model.addVideo(playlistID: currentPlaylist!.id, videoID: video.videoID) {
+        Defaults[.lastUsedPlaylistID] = id
+
+        model.addVideo(playlistID: id, videoID: video.videoID) {
             dismiss()
         }
     }
 
-    private var currentPlaylist: Playlist? {
+    private var selectedPlaylist: Playlist? {
         model.find(id: selectedPlaylistID) ?? model.all.first
     }
 }

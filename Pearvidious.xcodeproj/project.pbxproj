@@ -421,6 +421,9 @@
 		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
+		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -635,6 +638,7 @@
 		37FB285D272225E800A57617 /* ContentItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentItemView.swift; sourceTree = "<group>"; };
 		37FD43DB270470B70073EE42 /* InstancesSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettings.swift; sourceTree = "<group>"; };
 		37FD43E22704847C0073EE42 /* View+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Fixtures.swift"; sourceTree = "<group>"; };
+		37FFC43F272734C3009FFD26 /* Throttle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1013,6 +1017,7 @@
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				37D4B0C22671614700C925CA /* PearvidiousApp.swift */,
 				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
+				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				37CB12782724C76D00213B45 /* VideoURLParser.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37BD07C42698ADEE003EBB87 /* Pearvidious.entitlements */,
@@ -1634,6 +1639,7 @@
 				37BA794726DC2E56002A0235 /* AppSidebarSubscriptions.swift in Sources */,
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
+				37FFC440272734C3009FFD26 /* Throttle.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
@@ -1753,6 +1759,7 @@
 				37EAD870267B9ED100D9E01B /* Segment.swift in Sources */,
 				3788AC2826F6840700F6BAA9 /* WatchNowSection.swift in Sources */,
 				37F64FE526FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
+				37FFC441272734C3009FFD26 /* Throttle.swift in Sources */,
 				37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				378E510026FE8EEE00F49626 /* AccountsMenuView.swift in Sources */,
 				37141670267A8ACC006CA35D /* TrendingView.swift in Sources */,
@@ -1880,6 +1887,7 @@
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
 				37E70925271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
+				37FFC442272734C3009FFD26 /* Throttle.swift in Sources */,
 				375168D82700FDB9008F96A6 /* Debounce.swift in Sources */,
 				37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C0697C2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,

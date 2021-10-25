@@ -11,6 +11,7 @@ struct VideoDetails: View {
 
     @State private var subscribed = false
     @State private var confirmationShown = false
+    @State private var presentingAddToPlaylist = false
 
     @State private var currentPage = Page.details
 
@@ -18,6 +19,7 @@ struct VideoDetails: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     init(
@@ -266,9 +268,23 @@ struct VideoDetails: View {
                     }
 
                     Spacer()
+
+                    Button {
+                        presentingAddToPlaylist = true
+                    } label: {
+                        Label("Add to Playlist", systemImage: "text.badge.plus")
+                            .labelStyle(.iconOnly)
+                            .help("Add to Playlist...")
+                    }
+                    .buttonStyle(.plain)
                 }
                 .frame(maxHeight: 35)
                 .foregroundColor(.secondary)
+            }
+        }
+        .sheet(isPresented: $presentingAddToPlaylist) {
+            if let video = video {
+                AddToPlaylistView(video: video)
             }
         }
     }
@@ -351,7 +367,7 @@ struct VideoDetails: View {
 
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDetails(sidebarQueue: .constant(false))
+        VideoDetails(sidebarQueue: .constant(true))
             .injectFixtureEnvironmentObjects()
     }
 }

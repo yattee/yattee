@@ -59,6 +59,7 @@ struct ContentView: View {
                     .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
+                    .environmentObject(playlists)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnailsModel)
             }
@@ -70,6 +71,7 @@ struct ContentView: View {
                     .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
+                    .environmentObject(playlists)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnailsModel)
             }
