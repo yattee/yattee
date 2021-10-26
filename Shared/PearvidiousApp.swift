@@ -15,6 +15,7 @@ struct PearvidiousApp: App {
             .handlesExternalEvents(matching: Set(["*"]))
             .commands {
                 SidebarCommands()
+                CommandGroup(replacing: .newItem, addition: {})
             }
         #endif
 

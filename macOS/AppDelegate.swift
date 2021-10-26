@@ -6,6 +6,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         true
     }
 
+    func applicationWillFinishLaunching(_: Notification) {
+        NSWindow.allowsAutomaticWindowTabbing = false
+    }
+
     func applicationWillTerminate(_: Notification) {
         ScreenSaverManager.shared.enable()
     }

@@ -74,6 +74,15 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         Account(instanceID: id, name: "Anonymous", url: url, anonymous: true)
     }
 
+    var urlComponents: URLComponents {
+        URLComponents(string: url)!
+    }
+
+    var frontendHost: String {
+        // TODO: piped frontend link
+        urlComponents.host!.replacingOccurrences(of: "api", with: "")
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }

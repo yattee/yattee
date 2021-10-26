@@ -4,6 +4,8 @@ import SwiftUI
 struct ChannelVideosView: View {
     let channel: Channel
 
+    @State private var presentingShareSheet = false
+
     @StateObject private var store = Store<Channel>()
 
     @Environment(\.dismiss) private var dismiss
@@ -70,6 +72,13 @@ struct ChannelVideosView: View {
         #endif
         #if !os(tvOS)
             .toolbar {
+                ToolbarItem(placement: shareButtonPlacement) {
+                    ShareButton(
+                        contentItem: contentItem,
+                        presentingShareSheet: $presentingShareSheet
+                    )
+                }
+
                 ToolbarItem {
                     HStack {
                         Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
@@ -91,6 +100,13 @@ struct ChannelVideosView: View {
         #else
             .background(.thickMaterial)
         #endif
+        #if os(iOS)
+            .sheet(isPresented: $presentingShareSheet) {
+                ShareSheet(activityItems: [
+                    accounts.api.shareURL(contentItem)
+                ])
+            }
+        #endif
         .modifier(UnsubscribeAlertModifier())
             .onAppear {
                 if store.item.isNil {
@@ -101,14 +117,14 @@ struct ChannelVideosView: View {
             .navigationTitle(navigationTitle)
     }
 
-    var resource: Resource {
+    private var resource: Resource {
         let resource = accounts.api.channel(channel.id)
         resource.addObserver(store)
 
         return resource
     }
 
-    var subscriptionToggleButton: some View {
+    private var subscriptionToggleButton: some View {
         Group {
             if accounts.app.supportsSubscriptions && accounts.signedIn {
                 if subscriptions.isSubscribing(channel.id) {
@@ -126,7 +142,19 @@ struct ChannelVideosView: View {
         }
     }
 
-    var navigationTitle: String {
+    private var shareButtonPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            .navigation
+        #else
+            .automatic
+        #endif
+    }
+
+    private var contentItem: ContentItem {
+        ContentItem(channel: channel)
+    }
+
+    private var navigationTitle: String {
         store.item?.name ?? channel.name
     }
 }

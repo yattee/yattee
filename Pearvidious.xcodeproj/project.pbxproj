@@ -191,6 +191,9 @@
 		377FC7E5267A084E00A6BBAF /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27F26737550007FC770 /* SearchView.swift */; };
 		377FC7ED267A0A0800A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7EC267A0A0800A6BBAF /* SwiftyJSON */; };
 		377FC7F3267A0A0800A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7F2267A0A0800A6BBAF /* Logging */; };
+		3784B23B272894DA00B09468 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23A272894DA00B09468 /* ShareSheet.swift */; };
+		3784B23D2728B85300B09468 /* ShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23C2728B85300B09468 /* ShareButton.swift */; };
+		3784B23E2728B85300B09468 /* ShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23C2728B85300B09468 /* ShareButton.swift */; };
 		3788AC2726F6840700F6BAA9 /* WatchNowSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* WatchNowSection.swift */; };
 		3788AC2826F6840700F6BAA9 /* WatchNowSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* WatchNowSection.swift */; };
 		3788AC2926F6840700F6BAA9 /* WatchNowSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* WatchNowSection.swift */; };
@@ -540,6 +543,8 @@
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedContentAccessors.swift; sourceTree = "<group>"; };
+		3784B23A272894DA00B09468 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		3784B23C2728B85300B09468 /* ShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareButton.swift; sourceTree = "<group>"; };
 		3788AC2626F6840700F6BAA9 /* WatchNowSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNowSection.swift; sourceTree = "<group>"; };
 		3788AC2A26F6842D00F6BAA9 /* WatchNowSectionBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNowSectionBody.swift; sourceTree = "<group>"; };
 		378E50FA26FE8B9F00F49626 /* Instance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instance.swift; sourceTree = "<group>"; };
@@ -805,6 +810,7 @@
 				37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
+				3784B23C2728B85300B09468 /* ShareButton.swift */,
 				376B2E0626F920D600B1D64D /* SignInRequiredView.swift */,
 				37AAF29F26741C97007FC770 /* SubscriptionsView.swift */,
 				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
@@ -917,6 +923,7 @@
 		37992DC826CC50CD003D4C27 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				3784B23A272894DA00B09468 /* ShareSheet.swift */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
 			);
 			path = iOS;
@@ -1173,10 +1180,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (iOS)" */;
 			buildPhases = (
+				37CC3F48270CE89B00608308 /* ShellScript */,
 				37D4B0C52671614900C925CA /* Sources */,
 				37D4B0C62671614900C925CA /* Frameworks */,
 				37D4B0C72671614900C925CA /* Resources */,
-				37CC3F48270CE89B00608308 /* ShellScript */,
 				37A3B1932725735F000FB5EE /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -1205,10 +1212,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (macOS)" */;
 			buildPhases = (
+				37CC3F4A270CE8D000608308 /* ShellScript */,
 				37D4B0CB2671614900C925CA /* Sources */,
 				37D4B0CC2671614900C925CA /* Frameworks */,
 				37D4B0CD2671614900C925CA /* Resources */,
-				37CC3F4A270CE8D000608308 /* ShellScript */,
 				37A3B17127255E7F000FB5EE /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -1272,10 +1279,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (tvOS)" */;
 			buildPhases = (
+				37CC3F49270CE8CA00608308 /* ShellScript */,
 				37D4B154267164AE00C925CA /* Sources */,
 				37D4B155267164AE00C925CA /* Frameworks */,
 				37D4B156267164AE00C925CA /* Resources */,
-				37CC3F49270CE8CA00608308 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1498,7 +1505,7 @@
 		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -1511,7 +1518,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		37CC3F49270CE8CA00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1528,7 +1535,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		37CC3F4A270CE8D000608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1545,7 +1552,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		37FD43EA2704A2350073EE42 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1608,6 +1615,7 @@
 				37CC3F45270CE30600608308 /* PlayerQueueItem.swift in Sources */,
 				37BD07C82698B71C003EBB87 /* AppTabNavigation.swift in Sources */,
 				37CB12792724C76D00213B45 /* VideoURLParser.swift in Sources */,
+				3784B23D2728B85300B09468 /* ShareButton.swift in Sources */,
 				37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				3743CA52270F284F00E4D32B /* View+Borders.swift in Sources */,
 				3763495126DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
@@ -1677,6 +1685,7 @@
 				3743CA4E270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				37BD672426F13D65004BE0C1 /* AppSidebarPlaylists.swift in Sources */,
 				37B17DA2268A1F8A006AEE9B /* VideoContextMenuView.swift in Sources */,
+				3784B23B272894DA00B09468 /* ShareSheet.swift in Sources */,
 				379775932689365600DD52A8 /* Array+Next.swift in Sources */,
 				37B81AFC26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */,
 				37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
@@ -1799,6 +1808,7 @@
 				37732FF52703D32400F04329 /* Sidebar.swift in Sources */,
 				379775942689365600DD52A8 /* Array+Next.swift in Sources */,
 				3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */,
+				3784B23E2728B85300B09468 /* ShareButton.swift in Sources */,
 				37BE0BDA26A214630092E2DB /* PlayerViewController.swift in Sources */,
 				37E64DD226D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,

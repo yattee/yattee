@@ -2,6 +2,7 @@ import Foundation
 import Siesta
 
 protocol VideosAPI {
+    var account: Account! { get }
     var signedIn: Bool { get }
 
     func channel(_ id: String) -> Resource
@@ -25,6 +26,7 @@ protocol VideosAPI {
     func channelPlaylist(_ id: String) -> Resource?
 
     func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
+    func shareURL(_ item: ContentItem) -> URL
 }
 
 extension VideosAPI {
@@ -44,5 +46,22 @@ extension VideosAPI {
 
             completionHandler(newItem)
         }
+    }
+
+    func shareURL(_ item: ContentItem) -> URL {
+        var urlComponents = account.instance.urlComponents
+        urlComponents.host = account.instance.frontendHost
+        switch item.contentType {
+        case .video:
+            urlComponents.path = "/watch"
+            urlComponents.query = "v=\(item.video.videoID)"
+        case .channel:
+            urlComponents.path = "/channel/\(item.channel.id)"
+        case .playlist:
+            urlComponents.path = "/playlist"
+            urlComponents.query = "list=\(item.playlist.id)"
+        }
+
+        return urlComponents.url!
     }
 }

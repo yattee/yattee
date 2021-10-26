@@ -12,6 +12,7 @@ struct VideoDetails: View {
     @State private var subscribed = false
     @State private var confirmationShown = false
     @State private var presentingAddToPlaylist = false
+    @State private var presentingShareSheet = false
 
     @State private var currentPage = Page.details
 
@@ -249,6 +250,11 @@ struct VideoDetails: View {
         Group {
             if let video = player.currentVideo {
                 HStack {
+                    ShareButton(
+                        contentItem: ContentItem(video: video),
+                        presentingShareSheet: $presentingShareSheet
+                    )
+
                     Spacer()
 
                     if let views = video.viewsCount {
@@ -269,14 +275,17 @@ struct VideoDetails: View {
 
                     Spacer()
 
-                    Button {
-                        presentingAddToPlaylist = true
-                    } label: {
-                        Label("Add to Playlist", systemImage: "text.badge.plus")
-                            .labelStyle(.iconOnly)
-                            .help("Add to Playlist...")
+                    if accounts.app.supportsUserPlaylists {
+                        Button {
+                            presentingAddToPlaylist = true
+                        } label: {
+                            Label("Add to Playlist", systemImage: "text.badge.plus")
+                                .labelStyle(.iconOnly)
+                                .help("Add to Playlist...")
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.blue)
                     }
-                    .buttonStyle(.plain)
                 }
                 .frame(maxHeight: 35)
                 .foregroundColor(.secondary)
@@ -287,6 +296,17 @@ struct VideoDetails: View {
                 AddToPlaylistView(video: video)
             }
         }
+        #if os(iOS)
+            .sheet(isPresented: $presentingShareSheet) {
+                ShareSheet(activityItems: [
+                    accounts.api.shareURL(contentItem)
+                ])
+            }
+        #endif
+    }
+
+    private var contentItem: ContentItem {
+        ContentItem(video: player.currentVideo!)
     }
 
     var detailsPage: some View {

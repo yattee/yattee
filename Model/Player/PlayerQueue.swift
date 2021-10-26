@@ -84,7 +84,7 @@ extension PlayerModel {
     }
 
     @discardableResult func remove(_ item: PlayerQueueItem) -> PlayerQueueItem? {
-        if let index = queue.firstIndex(where: { $0 == item }) {
+        if let index = queue.firstIndex(where: { $0.videoID == item.videoID }) {
             return queue.remove(at: index)
         }
 
@@ -138,7 +138,7 @@ extension PlayerModel {
     }
 
     func addItemToHistory(_ item: PlayerQueueItem) {
-        if let index = history.firstIndex(where: { $0.video.videoID == item.video?.videoID }) {
+        if let index = history.firstIndex(where: { $0.video?.videoID == item.video?.videoID }) {
             history.remove(at: index)
         }
 
