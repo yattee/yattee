@@ -30,4 +30,8 @@ enum VideosApp: String, CaseIterable {
     var supportsUserPlaylists: Bool {
         self == .invidious
     }
+
+    var hasFrontendURL: Bool {
+        self == .piped
+    }
 }

@@ -133,8 +133,8 @@ struct AccountForm: View {
     private var validator: AccountValidator {
         AccountValidator(
             app: .constant(instance.app),
-            url: instance.url,
-            account: Account(instanceID: instance.id, url: instance.url, sid: sid),
+            url: instance.apiURL,
+            account: Account(instanceID: instance.id, url: instance.apiURL, sid: sid),
             id: $sid,
             isValid: $isValid,
             isValidated: $isValidated,

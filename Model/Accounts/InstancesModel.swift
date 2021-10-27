@@ -27,10 +27,19 @@ final class InstancesModel: ObservableObject {
     }
 
     static func add(app: VideosApp, name: String, url: String) -> Instance {
-        let instance = Instance(app: app, id: UUID().uuidString, name: name, url: url)
+        let instance = Instance(app: app, id: UUID().uuidString, name: name, apiURL: url)
         Defaults[.instances].append(instance)
 
         return instance
+    }
+
+    static func setFrontendURL(_ instance: Instance, _ url: String) {
+        if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
+            var instance = Defaults[.instances][index]
+            instance.frontendURL = url
+
+            Defaults[.instances][index] = instance
+        }
     }
 
     static func remove(_ instance: Instance) {

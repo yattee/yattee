@@ -82,7 +82,8 @@ struct InstanceForm: View {
             TextField("Name", text: $name, prompt: Text("Instance Name (optional)"))
                 .focused($nameFieldFocused)
 
-            TextField("URL", text: $url, prompt: Text("https://invidious.home.net"))
+            TextField("API URL", text: $url, prompt: Text("https://invidious.home.net"))
+
             #if !os(macOS)
                 .autocapitalization(.none)
                 .keyboardType(.URL)

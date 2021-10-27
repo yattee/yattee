@@ -263,7 +263,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     static func proxiedAsset(instance: Instance, asset: AVURLAsset) -> AVURLAsset? {
-        guard let instanceURLComponents = URLComponents(string: instance.url),
+        guard let instanceURLComponents = URLComponents(string: instance.apiURL),
               var urlComponents = URLComponents(url: asset.url, resolvingAgainstBaseURL: false) else { return nil }
 
         urlComponents.scheme = instanceURLComponents.scheme

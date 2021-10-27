@@ -51,6 +51,7 @@ extension VideosAPI {
     func shareURL(_ item: ContentItem) -> URL {
         var urlComponents = account.instance.urlComponents
         urlComponents.host = account.instance.frontendHost
+
         switch item.contentType {
         case .video:
             urlComponents.path = "/watch"

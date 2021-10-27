@@ -75,7 +75,7 @@ final class AccountsModel: ObservableObject {
     }
 
     static func add(instance: Instance, name: String, sid: String) -> Account {
-        let account = Account(instanceID: instance.id, name: name, url: instance.url, sid: sid)
+        let account = Account(instanceID: instance.id, name: name, url: instance.apiURL, sid: sid)
         Defaults[.accounts].append(account)
 
         return account

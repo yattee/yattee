@@ -19,7 +19,7 @@ struct ServicesSettings: View {
             #endif
         }
 
-        Section(header: Text("SponsorBlock Categories to Skip")) {
+        Section(header: Text("Categories to Skip")) {
             #if os(macOS)
                 List(SponsorBlockAPI.categories, id: \.self) { category in
                     SponsorBlockCategorySelectionRow(

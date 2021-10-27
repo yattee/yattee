@@ -2,51 +2,20 @@ import Defaults
 import Foundation
 
 struct Instance: Defaults.Serializable, Hashable, Identifiable {
-    struct InstancesBridge: Defaults.Bridge {
-        typealias Value = Instance
-        typealias Serializable = [String: String]
-
-        func serialize(_ value: Value?) -> Serializable? {
-            guard let value = value else {
-                return nil
-            }
-
-            return [
-                "app": value.app.rawValue,
-                "id": value.id,
-                "name": value.name,
-                "url": value.url
-            ]
-        }
-
-        func deserialize(_ object: Serializable?) -> Value? {
-            guard
-                let object = object,
-                let app = VideosApp(rawValue: object["app"] ?? ""),
-                let id = object["id"],
-                let url = object["url"]
-            else {
-                return nil
-            }
-
-            let name = object["name"] ?? ""
-
-            return Instance(app: app, id: id, name: name, url: url)
-        }
-    }
-
     static var bridge = InstancesBridge()
 
     let app: VideosApp
     let id: String
     let name: String
-    let url: String
+    let apiURL: String
+    var frontendURL: String?
 
-    init(app: VideosApp, id: String? = nil, name: String, url: String) {
+    init(app: VideosApp, id: String? = nil, name: String, apiURL: String, frontendURL: String? = nil) {
         self.app = app
         self.id = id ?? UUID().uuidString
         self.name = name
-        self.url = url
+        self.apiURL = apiURL
+        self.frontendURL = frontendURL
     }
 
     var anonymous: VideosAPI {
@@ -63,27 +32,26 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var longDescription: String {
-        name.isEmpty ? "\(app.name) - \(url)" : "\(app.name) - \(name) (\(url))"
+        name.isEmpty ? "\(app.name) - \(apiURL)" : "\(app.name) - \(name) (\(apiURL))"
     }
 
     var shortDescription: String {
-        name.isEmpty ? url : name
+        name.isEmpty ? apiURL : name
     }
 
     var anonymousAccount: Account {
-        Account(instanceID: id, name: "Anonymous", url: url, anonymous: true)
+        Account(instanceID: id, name: "Anonymous", url: apiURL, anonymous: true)
     }
 
     var urlComponents: URLComponents {
-        URLComponents(string: url)!
+        URLComponents(string: apiURL)!
     }
 
     var frontendHost: String {
-        // TODO: piped frontend link
-        urlComponents.host!.replacingOccurrences(of: "api", with: "")
+        URLComponents(string: frontendURL!)!.host!
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(url)
+        hasher.combine(apiURL)
     }
 }

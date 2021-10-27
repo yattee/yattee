@@ -12,6 +12,8 @@ struct InstancesSettings: View {
     @State private var presentingAccountRemovalConfirmation = false
     @State private var presentingInstanceRemovalConfirmation = false
 
+    @State private var frontendURL = ""
+
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<InstancesModel> private var model
 
@@ -67,12 +69,38 @@ struct InstancesSettings: View {
                 .listStyle(.inset(alternatesRowBackgrounds: true))
             }
 
+            if selectedInstance != nil, selectedInstance.app.hasFrontendURL {
+                Text("Frontend URL")
+
+                TextField("Frontend URL", text: $frontendURL, prompt: Text("Frontend URL"))
+                    .onAppear {
+                        frontendURL = selectedInstance.frontendURL ?? ""
+                    }
+                    .onChange(of: frontendURL) { newValue in
+                        InstancesModel.setFrontendURL(selectedInstance, newValue)
+                    }
+                    .labelsHidden()
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("If provided, you can copy links from videos, channels and playlist using")
+                        .padding(.trailing, 2)
+
+                    HStack(spacing: 0) {
+                        Image(systemName: "command")
+
+                        Text("**+C**")
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+                Spacer()
+            }
+
             if selectedInstance != nil, !selectedInstance.app.supportsAccounts {
+                Spacer()
                 Text("Accounts are not supported for the application of this instance")
                     .font(.caption)
                     .foregroundColor(.secondary)
-
-                Spacer()
             }
 
             if selectedInstance != nil {

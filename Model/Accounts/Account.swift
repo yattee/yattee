@@ -2,41 +2,6 @@ import Defaults
 import Foundation
 
 struct Account: Defaults.Serializable, Hashable, Identifiable {
-    struct AccountsBridge: Defaults.Bridge {
-        typealias Value = Account
-        typealias Serializable = [String: String]
-
-        func serialize(_ value: Value?) -> Serializable? {
-            guard let value = value else {
-                return nil
-            }
-
-            return [
-                "id": value.id,
-                "instanceID": value.instanceID,
-                "name": value.name ?? "",
-                "url": value.url,
-                "sid": value.sid
-            ]
-        }
-
-        func deserialize(_ object: Serializable?) -> Value? {
-            guard
-                let object = object,
-                let id = object["id"],
-                let instanceID = object["instanceID"],
-                let url = object["url"],
-                let sid = object["sid"]
-            else {
-                return nil
-            }
-
-            let name = object["name"] ?? ""
-
-            return Account(id: id, instanceID: instanceID, name: name, url: url, sid: sid)
-        }
-    }
-
     static var bridge = AccountsBridge()
 
     let id: String
@@ -46,7 +11,14 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     let sid: String
     let anonymous: Bool
 
-    init(id: String? = nil, instanceID: String? = nil, name: String? = nil, url: String? = nil, sid: String? = nil, anonymous: Bool = false) {
+    init(
+        id: String? = nil,
+        instanceID: String? = nil,
+        name: String? = nil,
+        url: String? = nil,
+        sid: String? = nil,
+        anonymous: Bool = false
+    ) {
         self.anonymous = anonymous
 
         self.id = id ?? (anonymous ? "anonymous-\(instanceID!)" : UUID().uuidString)

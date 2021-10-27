@@ -7,8 +7,17 @@ extension Defaults.Keys {
     static let privateAccountID = "default-private-invidious-account"
 
     static let instances = Key<[Instance]>("instances", default: [
-        .init(app: .piped, id: pipedInstanceID, name: "Public", url: "https://pipedapi.kavin.rocks"),
-        .init(app: .invidious, id: invidiousInstanceID, name: "Private", url: "https://invidious.home.arekf.net")
+        .init(
+            app: .piped,
+            id: pipedInstanceID,
+            name: "Public",
+            apiURL: "https://pipedapi.kavin.rocks",
+            frontendURL: "https://piped.kavin.rocks"
+        ),
+        .init(app: .invidious,
+              id: invidiousInstanceID,
+              name: "Private",
+              apiURL: "https://invidious.home.arekf.net")
     ])
     static let accounts = Key<[Account]>("accounts", default: [
         .init(

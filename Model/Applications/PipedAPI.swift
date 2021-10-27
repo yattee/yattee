@@ -7,7 +7,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     @Published var account: Account!
 
     var anonymousAccount: Account {
-        .init(instanceID: account.instance.id, name: "Anonymous", url: account.instance.url)
+        .init(instanceID: account.instance.id, name: "Anonymous", url: account.instance.apiURL)
     }
 
     init(account: Account? = nil) {
@@ -65,23 +65,23 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     func trending(country: Country, category _: TrendingCategory? = nil) -> Resource {
-        resource(baseURL: account.instance.url, path: "trending")
+        resource(baseURL: account.instance.apiURL, path: "trending")
             .withParam("region", country.rawValue)
     }
 
     func search(_ query: SearchQuery) -> Resource {
-        resource(baseURL: account.instance.url, path: "search")
+        resource(baseURL: account.instance.apiURL, path: "search")
             .withParam("q", query.query)
             .withParam("filter", "")
     }
 
     func searchSuggestions(query: String) -> Resource {
-        resource(baseURL: account.instance.url, path: "suggestions")
+        resource(baseURL: account.instance.apiURL, path: "suggestions")
             .withParam("query", query.lowercased())
     }
 
     func video(_ id: Video.ID) -> Resource {
-        resource(baseURL: account.instance.url, path: "streams/\(id)")
+        resource(baseURL: account.instance.apiURL, path: "streams/\(id)")
     }
 
     var signedIn: Bool { false }
