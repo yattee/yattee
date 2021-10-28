@@ -111,7 +111,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
             }
 
             #if os(tvOS)
-            if self.playerModel.playingInPictureInPicture {
+                if self.playerModel.playingInPictureInPicture {
                     self.present(playerViewController, animated: false) {
                         completionHandler(true)
                     }

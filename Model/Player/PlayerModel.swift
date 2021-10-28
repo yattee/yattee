@@ -121,7 +121,7 @@ final class PlayerModel: ObservableObject {
         preservingTime: Bool = false
     ) {
         resetSegments()
-        sponsorBlock.loadSegments(videoID: video.videoID)
+        sponsorBlock.loadSegments(videoID: video.videoID, categories: Defaults[.sponsorBlockCategories])
 
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")

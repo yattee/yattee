@@ -27,22 +27,22 @@ final class SponsorBlockAPI: ObservableObject {
         }
     }
 
-    func loadSegments(videoID: String) {
+    func loadSegments(videoID: String, categories: Set<String>) {
         guard !skipSegmentsURL.isNil, self.videoID != videoID else {
             return
         }
 
         self.videoID = videoID
 
-        requestSegments()
+        requestSegments(categories: categories)
     }
 
-    private func requestSegments() {
-        guard let url = skipSegmentsURL else {
+    private func requestSegments(categories: Set<String>) {
+        guard let url = skipSegmentsURL, !categories.isEmpty else {
             return
         }
 
-        AF.request(url, parameters: parameters).responseJSON { response in
+        AF.request(url, parameters: parameters(categories: categories)).responseJSON { response in
             switch response.result {
             case let .success(value):
                 self.segments = JSON(value).arrayValue.map(SponsorBlockSegment.init).sorted { $0.end < $1.end }
@@ -64,10 +64,10 @@ final class SponsorBlockAPI: ObservableObject {
         return url.isEmpty ? nil : "\(url)/api/skipSegments"
     }
 
-    private var parameters: [String: String] {
+    private func parameters(categories: Set<String>) -> [String: String] {
         [
             "videoID": videoID!,
-            "categories": JSON(SponsorBlockAPI.categories).rawString(String.Encoding.utf8)!
+            "categories": JSON(Array(categories)).rawString(String.Encoding.utf8)!
         ]
     }
 }
