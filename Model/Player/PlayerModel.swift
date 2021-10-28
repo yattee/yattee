@@ -2,6 +2,7 @@ import AVKit
 import Defaults
 import Foundation
 import Logging
+import MediaPlayer
 #if !os(macOS)
     import UIKit
 #endif
@@ -45,6 +46,7 @@ final class PlayerModel: ObservableObject {
 
     var composition = AVMutableComposition()
 
+    private var currentArtwork: MPMediaItemArtwork?
     private var frequentTimeObserver: Any?
     private var infrequentTimeObserver: Any?
     private var playerTimeControlStatusObserver: Any?
@@ -136,6 +138,8 @@ final class PlayerModel: ObservableObject {
                 await self.loadComposition(stream, of: video, preservingTime: preservingTime)
             }
         }
+
+        updateCurrentArtwork()
     }
 
     private func insertPlayerItem(
@@ -374,6 +378,7 @@ final class PlayerModel: ObservableObject {
                 return
             }
 
+            self.updateNowPlayingInfo()
             self.handleSegments(at: self.player.currentTime())
         }
     }
@@ -428,5 +433,37 @@ final class PlayerModel: ObservableObject {
     private func updateCurrentItemIntervals() {
         currentItem?.playbackTime = player.currentTime()
         currentItem?.videoDuration = player.currentItem?.asset.duration.seconds
+    }
+
+    fileprivate func updateNowPlayingInfo() {
+        let nowPlayingInfo: [String: AnyObject] = [
+            MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
+            MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
+            MPMediaItemPropertyArtwork: currentArtwork as AnyObject,
+            MPMediaItemPropertyPlaybackDuration: Int(currentItem.videoDuration ?? 0) as AnyObject,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime().seconds as AnyObject,
+            MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
+            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
+        ]
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+
+    private func updateCurrentArtwork() {
+        guard let thumbnailData = try? Data(contentsOf: currentItem.video.thumbnailURL(quality: .medium)!) else {
+            return
+        }
+
+        #if os(macOS)
+            let image = NSImage(data: thumbnailData)
+        #else
+            let image = UIImage(data: thumbnailData)
+        #endif
+
+        if image.isNil {
+            return
+        }
+
+        currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
     }
 }
