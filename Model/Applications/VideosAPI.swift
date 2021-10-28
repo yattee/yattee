@@ -26,7 +26,7 @@ protocol VideosAPI {
     func channelPlaylist(_ id: String) -> Resource?
 
     func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
-    func shareURL(_ item: ContentItem) -> URL
+    func shareURL(_ item: ContentItem) -> URL?
 }
 
 extension VideosAPI {
@@ -48,9 +48,13 @@ extension VideosAPI {
         }
     }
 
-    func shareURL(_ item: ContentItem) -> URL {
+    func shareURL(_ item: ContentItem) -> URL? {
+        guard let frontendHost = account.instance.frontendHost else {
+            return nil
+        }
+
         var urlComponents = account.instance.urlComponents
-        urlComponents.host = account.instance.frontendHost
+        urlComponents.host = frontendHost
 
         switch item.contentType {
         case .video:

@@ -104,6 +104,7 @@ struct AppTabNavigation: View {
             if let channel = recents.presentedChannel {
                 NavigationView {
                     ChannelVideosView(channel: channel)
+                        .environment(\.inChannelView, true)
                         .environment(\.inNavigationView, true)
                         .background(playerNavigationLink)
                 }

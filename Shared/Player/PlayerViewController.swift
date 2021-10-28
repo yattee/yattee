@@ -4,6 +4,7 @@ import SwiftUI
 
 final class PlayerViewController: UIViewController {
     var playerLoaded = false
+    var navigationModel: NavigationModel!
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
 
@@ -11,6 +12,12 @@ final class PlayerViewController: UIViewController {
         super.viewWillAppear(animated)
 
         loadPlayer()
+
+        #if os(tvOS)
+            if !playerViewController.isBeingPresented, !playerViewController.isBeingDismissed {
+                present(playerViewController, animated: false)
+            }
+        #endif
     }
 
     func loadPlayer() {
@@ -26,12 +33,9 @@ final class PlayerViewController: UIViewController {
         #if os(tvOS)
             playerModel.avPlayerViewController = playerViewController
             playerViewController.customInfoViewControllers = [playerQueueInfoViewController]
-            present(playerViewController, animated: false)
         #else
             embedViewController()
         #endif
-
-        playerLoaded = true
     }
 
     #if os(tvOS)
@@ -66,7 +70,7 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
-        false
+        true
     }
 
     func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {}
@@ -95,7 +99,35 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         }
     }
 
-    func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {}
+    func playerViewController(
+        _ playerViewController: AVPlayerViewController,
+        restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
+    ) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if self.navigationModel.presentingChannel {
+                self.playerModel.playerNavigationLinkActive = true
+            } else {
+                self.playerModel.presentPlayer()
+            }
 
-    func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {}
+            #if os(tvOS)
+            if self.playerModel.playingInPictureInPicture {
+                    self.present(playerViewController, animated: false) {
+                        completionHandler(true)
+                    }
+                }
+            #else
+                completionHandler(true)
+            #endif
+        }
+    }
+
+    func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {
+        playerModel.playingInPictureInPicture = true
+        playerModel.playerNavigationLinkActive = false
+    }
+
+    func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {
+        playerModel.playingInPictureInPicture = false
+    }
 }

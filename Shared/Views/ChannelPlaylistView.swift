@@ -48,9 +48,9 @@ struct ChannelPlaylistView: View {
         }
         #if os(iOS)
             .sheet(isPresented: $presentingShareSheet) {
-                ShareSheet(activityItems: [
-                    accounts.api.shareURL(contentItem)
-                ])
+                if let url = accounts.api.shareURL(contentItem) {
+                    ShareSheet(activityItems: [url])
+                }
             }
         #endif
         .onAppear {

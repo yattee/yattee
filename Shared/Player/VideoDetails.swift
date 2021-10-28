@@ -17,6 +17,7 @@ struct VideoDetails: View {
     @State private var currentPage = Page.details
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.inNavigationView) private var inNavigationView
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
@@ -89,6 +90,7 @@ struct VideoDetails: View {
                     .edgesIgnoringSafeArea(.horizontal)
             }
         }
+        .padding(.top, inNavigationView && fullScreen ? 10 : 0)
         .onAppear {
             #if !os(macOS)
                 if video.isNil {
@@ -298,9 +300,9 @@ struct VideoDetails: View {
         }
         #if os(iOS)
             .sheet(isPresented: $presentingShareSheet) {
-                ShareSheet(activityItems: [
-                    accounts.api.shareURL(contentItem)
-                ])
+                if let url = accounts.api.shareURL(contentItem) {
+                    ShareSheet(activityItems: [url])
+                }
             }
         #endif
     }

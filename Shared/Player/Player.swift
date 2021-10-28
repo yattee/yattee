@@ -2,6 +2,7 @@ import Defaults
 import SwiftUI
 
 struct Player: UIViewControllerRepresentable {
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
 
     var controller: PlayerViewController?
@@ -17,6 +18,7 @@ struct Player: UIViewControllerRepresentable {
 
         let controller = PlayerViewController()
 
+        controller.navigationModel = navigation
         controller.playerModel = player
         player.controller = controller
 

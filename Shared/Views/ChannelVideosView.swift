@@ -67,6 +67,7 @@ struct ChannelVideosView: View {
                 .prefersDefaultFocus(in: focusNamespace)
             #endif
         }
+        .environment(\.inChannelView, true)
         #if !os(iOS)
             .focusScope(focusNamespace)
         #endif
@@ -102,9 +103,9 @@ struct ChannelVideosView: View {
         #endif
         #if os(iOS)
             .sheet(isPresented: $presentingShareSheet) {
-                ShareSheet(activityItems: [
-                    accounts.api.shareURL(contentItem)
-                ])
+                if let url = accounts.api.shareURL(contentItem) {
+                    ShareSheet(activityItems: [url])
+                }
             }
         #endif
         .modifier(UnsubscribeAlertModifier())

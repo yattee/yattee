@@ -13,7 +13,8 @@ final class PlayerModel: ObservableObject {
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
 
     private(set) var player = AVPlayer()
-    var controller: PlayerViewController?
+    private(set) var playerView = Player()
+    var controller: PlayerViewController? { didSet { playerView.controller = controller } }
     #if os(tvOS)
         var avPlayerViewController: AVPlayerViewController?
     #endif
@@ -51,6 +52,8 @@ final class PlayerModel: ObservableObject {
     private var statusObservation: NSKeyValueObservation?
 
     private var timeObserverThrottle = Throttle(interval: 2)
+
+    var playingInPictureInPicture = false
 
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()

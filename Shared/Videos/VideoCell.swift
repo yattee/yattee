@@ -21,6 +21,10 @@ struct VideoCell: View {
             Button(action: {
                 player.playNow(video)
 
+                guard !player.playingInPictureInPicture else {
+                    return
+                }
+
                 if inNavigationView {
                     player.playerNavigationLinkActive = true
                 } else {

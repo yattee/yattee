@@ -7,6 +7,7 @@ struct VideoContextMenuView: View {
     @Binding var playerNavigationLinkActive: Bool
 
     @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.inChannelView) private var inChannelView
     @Environment(\.navigationStyle) private var navigationStyle
     @Environment(\.currentPlaylistID) private var playlistID
 
@@ -27,11 +28,13 @@ struct VideoContextMenuView: View {
             addToQueueButton
         }
 
-        Section {
-            openChannelButton
+        if !inChannelView {
+            Section {
+                openChannelButton
 
-            if accounts.app.supportsSubscriptions {
-                subscriptionButton
+                if accounts.app.supportsSubscriptions {
+                    subscriptionButton
+                }
             }
         }
 
@@ -54,6 +57,10 @@ struct VideoContextMenuView: View {
         Button {
             player.playNow(video)
 
+            guard !player.playingInPictureInPicture else {
+                return
+            }
+
             if inNavigationView {
                 playerNavigationLinkActive = true
             } else {
@@ -70,6 +77,14 @@ struct VideoContextMenuView: View {
         } label: {
             Label("Play Next", systemImage: "text.insert")
         }
+    }
+
+    private var isShowingChannelButton: Bool {
+        if case .channel = navigation.tabSelection {
+            return false
+        }
+
+        return !inChannelView
     }
 
     private var addToQueueButton: some View {

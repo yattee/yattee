@@ -7,28 +7,34 @@ struct ShareButton: View {
     @EnvironmentObject<AccountsModel> private var accounts
 
     var body: some View {
-        Button {
-            #if os(iOS)
-                presentingShareSheet = true
-            #else
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(shareURL, forType: .string)
-            #endif
-        } label: {
-            #if os(iOS)
-                Label("Share", systemImage: "square.and.arrow.up")
-            #else
+        Group {
+            if let url = shareURL {
+                Button {
+                    #if os(iOS)
+                        presentingShareSheet = true
+                    #else
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(url, forType: .string)
+                    #endif
+                } label: {
+                    #if os(iOS)
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    #else
+                        EmptyView()
+                    #endif
+                }
+                .keyboardShortcut("c")
+                .foregroundColor(.blue)
+                .buttonStyle(.plain)
+                .labelStyle(.iconOnly)
+            } else {
                 EmptyView()
-            #endif
+            }
         }
-        .keyboardShortcut("c")
-        .foregroundColor(.blue)
-        .buttonStyle(.plain)
-        .labelStyle(.iconOnly)
     }
 
-    private var shareURL: String {
-        accounts.api.shareURL(contentItem).absoluteString
+    private var shareURL: String? {
+        accounts.api.shareURL(contentItem)?.absoluteString
     }
 }
 

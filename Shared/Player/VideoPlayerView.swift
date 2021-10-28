@@ -42,9 +42,9 @@ struct VideoPlayerView: View {
 
     var content: some View {
         Group {
-            VStack(alignment: .leading, spacing: 0) {
+            Group {
                 #if os(tvOS)
-                    player()
+                    player.playerView
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
@@ -59,7 +59,8 @@ struct VideoPlayerView: View {
                             if player.currentItem.isNil {
                                 playerPlaceholder(geometry: geometry)
                             } else {
-                                player(geometry: geometry)
+                                player.playerView
+                                    .modifier(VideoPlayerSizeModifier(geometry: geometry))
                             }
                         }
                         #if os(iOS)
@@ -129,13 +130,6 @@ struct VideoPlayerView: View {
         }
         .contentShape(Rectangle())
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
-    }
-
-    func player(geometry: GeometryProxy? = nil) -> some View {
-        Player()
-        #if !os(tvOS)
-            .modifier(VideoPlayerSizeModifier(geometry: geometry))
-        #endif
     }
 
     #if os(iOS)

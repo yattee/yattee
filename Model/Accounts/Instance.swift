@@ -47,8 +47,12 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         URLComponents(string: apiURL)!
     }
 
-    var frontendHost: String {
-        URLComponents(string: frontendURL!)!.host!
+    var frontendHost: String? {
+        guard let url = app == .invidious ? apiURL : frontendURL else {
+            return nil
+        }
+
+        return URLComponents(string: url)?.host
     }
 
     func hash(into hasher: inout Hasher) {
