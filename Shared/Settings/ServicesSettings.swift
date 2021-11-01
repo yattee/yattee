@@ -95,6 +95,8 @@ struct ServicesSettings: View {
 
 struct ServicesSettings_Previews: PreviewProvider {
     static var previews: some View {
-        ServicesSettings()
+        VStack {
+            ServicesSettings()
+        }
     }
 }

@@ -6,6 +6,7 @@ protocol VideosAPI {
     var signedIn: Bool { get }
 
     func channel(_ id: String) -> Resource
+    func channelVideos(_ id: String) -> Resource
     func trending(country: Country, category: TrendingCategory?) -> Resource
     func search(_ query: SearchQuery) -> Resource
     func searchSuggestions(query: String) -> Resource
@@ -20,6 +21,7 @@ protocol VideosAPI {
 
     func channelSubscription(_ id: String) -> Resource?
 
+    func playlist(_ id: String) -> Resource?
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource?
     func playlistVideos(_ id: String) -> Resource?
 

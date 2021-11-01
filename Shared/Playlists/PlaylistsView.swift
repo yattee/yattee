@@ -75,6 +75,8 @@ struct PlaylistsView: View {
                         editPlaylistButton
                     }
                 #endif
+                FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
+
                 newPlaylistButton
             }
 
@@ -137,6 +139,11 @@ struct PlaylistsView: View {
 
                 if currentPlaylist != nil {
                     editPlaylistButton
+                }
+
+                if let playlist = currentPlaylist {
+                    FavoriteButton(item: FavoriteItem(section: .playlist(playlist.id)))
+                        .labelStyle(.iconOnly)
                 }
 
                 Spacer()

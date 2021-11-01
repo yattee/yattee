@@ -40,9 +40,16 @@ struct ChannelPlaylistView: View {
     var content: some View {
         VStack(alignment: .leading) {
             #if os(tvOS)
-                Text(playlist.title)
-                    .font(.title2)
-                    .frame(alignment: .leading)
+                HStack {
+                    Text(playlist.title)
+                        .font(.title2)
+                        .frame(alignment: .leading)
+
+                    Spacer()
+
+                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                        .labelStyle(.iconOnly)
+                }
             #endif
             VerticalCells(items: items)
         }
@@ -66,12 +73,8 @@ struct ChannelPlaylistView: View {
                     )
                 }
 
-                ToolbarItem(placement: .cancellationAction) {
-                    if inNavigationView {
-                        Button("Done") {
-                            dismiss()
-                        }
-                    }
+                ToolbarItem {
+                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
                 }
             }
             .navigationTitle(playlist.title)

@@ -13,13 +13,16 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @State private var playerSize: CGSize = .zero
     @State private var fullScreen = false
 
     #if os(iOS)
         @Environment(\.dismiss) private var dismiss
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+        private var idiom: UIUserInterfaceIdiom {
+            UIDevice.current.userInterfaceIdiom
+        }
     #endif
 
     @EnvironmentObject<PlayerModel> private var player
@@ -75,12 +78,6 @@ struct VideoPlayerView: View {
                         #endif
 
                         .background(.black)
-                            .onAppear {
-                                self.playerSize = geometry.size
-                            }
-                            .onChange(of: geometry.size) { size in
-                                self.playerSize = size
-                            }
 
                         Group {
                             #if os(iOS)
@@ -134,7 +131,7 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         var sidebarQueue: Bool {
-            horizontalSizeClass == .regular && playerSize.width > 750
+            horizontalSizeClass == .regular && idiom == .pad
         }
 
         var sidebarQueueBinding: Binding<Bool> {

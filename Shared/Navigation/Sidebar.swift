@@ -28,9 +28,9 @@ struct Sidebar: View {
 
     var mainNavigationLinks: some View {
         Section("Videos") {
-            NavigationLink(destination: LazyView(WatchNowView()), tag: TabSelection.watchNow, selection: $navigation.tabSelection) {
-                Label("Watch Now", systemImage: "play.circle")
-                    .accessibility(label: Text("Watch Now"))
+            NavigationLink(destination: LazyView(FavoritesView()), tag: TabSelection.favorites, selection: $navigation.tabSelection) {
+                Label("Favorites", systemImage: "heart")
+                    .accessibility(label: Text("Favorites"))
             }
             if accounts.app.supportsSubscriptions && accounts.signedIn {
                 NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {

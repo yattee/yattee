@@ -106,7 +106,7 @@ extension PlayerModel {
     }
 
     func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        player.currentItem == item
+        player.currentItem == item && presentingPlayer
     }
 
     @discardableResult func enqueueVideo(

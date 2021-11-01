@@ -3,7 +3,7 @@ import SwiftUI
 
 final class NavigationModel: ObservableObject {
     enum TabSelection: Hashable {
-        case watchNow
+        case favorites
         case subscriptions
         case popular
         case trending
@@ -23,7 +23,7 @@ final class NavigationModel: ObservableObject {
         }
     }
 
-    @Published var tabSelection: TabSelection! = .watchNow
+    @Published var tabSelection: TabSelection! = .favorites
 
     @Published var presentingAddToPlaylist = false
     @Published var videoToAddToPlaylist: Video!
@@ -44,7 +44,7 @@ final class NavigationModel: ObservableObject {
     var tabSelectionBinding: Binding<TabSelection> {
         Binding<TabSelection>(
             get: {
-                self.tabSelection ?? .watchNow
+                self.tabSelection ?? .favorites
             },
             set: { newValue in
                 self.tabSelection = newValue

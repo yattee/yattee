@@ -143,24 +143,18 @@ struct VideoCell: View {
                 #endif
                 .padding(.bottom, 4)
 
-                Group {
-                    if additionalDetailsAvailable {
-                        HStack(spacing: 8) {
-                            if let date = video.publishedDate {
-                                Image(systemName: "calendar")
-                                Text(date)
-                            }
+                HStack(spacing: 8) {
+                    if let date = video.publishedDate {
+                        Image(systemName: "calendar")
+                        Text(date)
+                    }
 
-                            if video.views > 0 {
-                                Image(systemName: "eye")
-                                Text(video.viewsCount!)
-                            }
-                        }
-                        .foregroundColor(.secondary)
-                    } else {
-                        Spacer()
+                    if video.views > 0 {
+                        Image(systemName: "eye")
+                        Text(video.viewsCount!)
                     }
                 }
+                .foregroundColor(.secondary)
                 .frame(minHeight: 30, alignment: .top)
                 #if os(tvOS)
                     .padding(.bottom, 10)

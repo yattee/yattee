@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 
 final class SearchQuery: ObservableObject {
-    enum Date: String, CaseIterable, Identifiable, DefaultsSerializable {
+    enum Date: String, CaseIterable, Identifiable {
         case any, hour, today, week, month, year
 
         var id: SearchQuery.Date.RawValue {
@@ -14,7 +14,7 @@ final class SearchQuery: ObservableObject {
         }
     }
 
-    enum Duration: String, CaseIterable, Identifiable, DefaultsSerializable {
+    enum Duration: String, CaseIterable, Identifiable {
         case any, short, long
 
         var id: SearchQuery.Duration.RawValue {
@@ -26,7 +26,7 @@ final class SearchQuery: ObservableObject {
         }
     }
 
-    enum SortOrder: String, CaseIterable, Identifiable, DefaultsSerializable {
+    enum SortOrder: String, CaseIterable, Identifiable {
         case relevance, rating, uploadDate, viewCount
 
         var id: SearchQuery.SortOrder.RawValue {

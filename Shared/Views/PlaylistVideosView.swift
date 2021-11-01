@@ -19,5 +19,10 @@ struct PlaylistVideosView: View {
                 .navigationTitle("\(playlist.title) Playlist")
             #endif
         }
+        .toolbar {
+            ToolbarItem {
+                FavoriteButton(item: FavoriteItem(section: .playlist(playlist.id)))
+            }
+        }
     }
 }

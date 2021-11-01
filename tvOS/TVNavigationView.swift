@@ -10,9 +10,9 @@ struct TVNavigationView: View {
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            WatchNowView()
-                .tabItem { Text("Watch Now") }
-                .tag(TabSelection.watchNow)
+            FavoritesView()
+                .tabItem { Text("Favorites") }
+                .tag(TabSelection.favorites)
 
             if accounts.app.supportsSubscriptions {
                 SubscriptionsView()

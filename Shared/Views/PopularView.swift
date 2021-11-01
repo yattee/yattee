@@ -25,5 +25,10 @@ struct PopularView: View {
                 .navigationTitle("Popular")
             #endif
         }
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                FavoriteButton(item: FavoriteItem(section: .popular))
+            }
+        }
     }
 }

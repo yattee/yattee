@@ -11,8 +11,6 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
             return nil
         }
 
-        let videoID = value.videoID.isEmpty ? value.video!.videoID : value.videoID
-
         var playbackTime = ""
         if let time = value.playbackTime {
             if time.seconds.isFinite {
@@ -28,7 +26,7 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
         }
 
         return [
-            "videoID": videoID,
+            "videoID": value.videoID,
             "playbackTime": playbackTime,
             "videoDuration": videoDuration
         ]

@@ -11,9 +11,11 @@ struct TrendingView: View {
 
     @State private var presentingCountrySelection = false
 
+    @State private var favoriteItem: FavoriteItem?
+
     @EnvironmentObject<AccountsModel> private var accounts
 
-    var popular: [ContentItem] {
+    var trending: [ContentItem] {
         ContentItem.array(of: store.collection)
     }
 
@@ -36,12 +38,12 @@ struct TrendingView: View {
                 VStack(alignment: .center, spacing: 0) {
                     #if os(tvOS)
                         toolbar
-                        HorizontalCells(items: popular)
+                        HorizontalCells(items: trending)
                             .padding(.top, 40)
 
                         Spacer()
                     #else
-                        VerticalCells(items: popular)
+                        VerticalCells(items: trending)
                     #endif
                 }
             }
@@ -62,6 +64,11 @@ struct TrendingView: View {
         .toolbar {
             #if os(macOS)
                 ToolbarItemGroup {
+                    if let favoriteItem = favoriteItem {
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem.id)
+                    }
+
                     if accounts.app.supportsTrendingCategories {
                         categoryButton
                     }
@@ -70,8 +77,8 @@ struct TrendingView: View {
             #elseif os(iOS)
                 ToolbarItemGroup(placement: .bottomBar) {
                     Group {
-                        if accounts.app.supportsTrendingCategories {
-                            HStack {
+                        HStack {
+                            if accounts.app.supportsTrendingCategories {
                                 Text("Category")
                                     .foregroundColor(.secondary)
 
@@ -80,7 +87,14 @@ struct TrendingView: View {
                                     // force redraw of the view when it changes
                                     .id(UUID())
                             }
-                        } else {
+                        }
+
+                        Spacer()
+
+                        if let favoriteItem = favoriteItem {
+                            FavoriteButton(item: favoriteItem)
+                                .id(favoriteItem.id)
+
                             Spacer()
                         }
 
@@ -96,6 +110,7 @@ struct TrendingView: View {
         }
         .onChange(of: resource) { _ in
             resource.load()
+            updateFavoriteItem()
         }
         .onAppear {
             if videos.isEmpty {
@@ -104,10 +119,12 @@ struct TrendingView: View {
             } else {
                 store.replace(videos)
             }
+
+            updateFavoriteItem()
         }
     }
 
-    var toolbar: some View {
+    private var toolbar: some View {
         HStack {
             if accounts.app.supportsTrendingCategories {
                 HStack {
@@ -128,17 +145,25 @@ struct TrendingView: View {
 
                 countryButton
             }
+
+            #if os(tvOS)
+                if let favoriteItem = favoriteItem {
+                    FavoriteButton(item: favoriteItem)
+                        .id(favoriteItem.id)
+                        .labelStyle(.iconOnly)
+                }
+            #endif
         }
     }
 
-    var categoryButton: some View {
+    private var categoryButton: some View {
         #if os(tvOS)
             Button(category.name) {
                 self.category = category.next()
             }
             .contextMenu {
                 ForEach(TrendingCategory.allCases) { category in
-                    Button(category.name) { self.category = category }
+                    Button(category.controlLabel) { self.category = category }
                 }
 
                 Button("Cancel", role: .cancel) {}
@@ -147,19 +172,23 @@ struct TrendingView: View {
         #else
             Picker("Category", selection: $category) {
                 ForEach(TrendingCategory.allCases) { category in
-                    Text(category.name).tag(category)
+                    Text(category.controlLabel).tag(category)
                 }
             }
         #endif
     }
 
-    var countryButton: some View {
+    private var countryButton: some View {
         Button(action: {
             presentingCountrySelection.toggle()
             resource.removeObservers(ownedBy: store)
         }) {
             Text("\(country.flag) \(country.id)")
         }
+    }
+
+    private func updateFavoriteItem() {
+        favoriteItem = FavoriteItem(section: .trending(country.rawValue, category.rawValue))
     }
 }
 

@@ -51,6 +51,9 @@ struct ChannelVideosView: View {
 
                     Spacer()
 
+                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                        .labelStyle(.iconOnly)
+
                     if let subscribers = store.item?.subscriptionsString {
                         Text("**\(subscribers)** subscribers")
                             .foregroundColor(.secondary)
@@ -87,14 +90,8 @@ struct ChannelVideosView: View {
                             .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
 
                         subscriptionToggleButton
-                    }
-                }
 
-                ToolbarItem(placement: .cancellationAction) {
-                    if inNavigationView {
-                        Button("Done") {
-                            dismiss()
-                        }
+                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
                     }
                 }
             }

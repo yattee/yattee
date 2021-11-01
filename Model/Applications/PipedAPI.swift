@@ -60,6 +60,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "channel/\(id)")
     }
 
+    func channelVideos(_ id: String) -> Resource {
+        channel(id)
+    }
+
     func channelPlaylist(_ id: String) -> Resource? {
         resource(baseURL: account.url, path: "playlists/\(id)")
     }
@@ -94,6 +98,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func channelSubscription(_: String) -> Resource? { nil }
 
+    func playlist(_: String) -> Resource? { nil }
     func playlistVideo(_: String, _: String) -> Resource? { nil }
     func playlistVideos(_: String) -> Resource? { nil }
 

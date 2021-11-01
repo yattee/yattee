@@ -26,6 +26,11 @@ struct SubscriptionsView: View {
                     }
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                FavoriteButton(item: FavoriteItem(section: .subscriptions))
+            }
+        }
         .refreshable {
             loadResources(force: true)
         }

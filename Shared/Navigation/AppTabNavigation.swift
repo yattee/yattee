@@ -11,14 +11,14 @@ struct AppTabNavigation: View {
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
             NavigationView {
-                LazyView(WatchNowView())
+                LazyView(FavoritesView())
                     .toolbar { toolbarContent }
             }
             .tabItem {
-                Label("Watch Now", systemImage: "play.circle")
-                    .accessibility(label: Text("Subscriptions"))
+                Label("Favorites", systemImage: "heart")
+                    .accessibility(label: Text("Favorites"))
             }
-            .tag(TabSelection.watchNow)
+            .tag(TabSelection.favorites)
 
             if accounts.app.supportsSubscriptions {
                 NavigationView {

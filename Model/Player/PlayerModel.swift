@@ -168,8 +168,10 @@ final class PlayerModel: ObservableObject {
                 try? AVAudioSession.sharedInstance().setActive(true)
             #endif
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                self?.play()
+            if self.isAutoplaying(playerItem!) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    self?.play()
+                }
             }
         }
 
@@ -440,7 +442,8 @@ final class PlayerModel: ObservableObject {
             MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
             MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
             MPMediaItemPropertyArtwork: currentArtwork as AnyObject,
-            MPMediaItemPropertyPlaybackDuration: Int(currentItem.videoDuration ?? 0) as AnyObject,
+            MPMediaItemPropertyPlaybackDuration: (currentItem.video.live ? nil : Int(currentItem.videoDuration ?? 0)) as AnyObject,
+            MPNowPlayingInfoPropertyIsLiveStream: currentItem.video.live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime().seconds as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject

@@ -14,6 +14,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(RecentsModel())
             .environmentObject(SearchModel())
             .environmentObject(subscriptions)
+            .environmentObject(ThumbnailsModel())
     }
 
     private var invidious: InvidiousAPI {
