@@ -13,6 +13,7 @@ struct VideoDetails: View {
     @State private var confirmationShown = false
     @State private var presentingAddToPlaylist = false
     @State private var presentingShareSheet = false
+    @State private var shareURL = ""
 
     @State private var currentPage = Page.details
 
@@ -254,7 +255,8 @@ struct VideoDetails: View {
                 HStack {
                     ShareButton(
                         contentItem: ContentItem(video: video),
-                        presentingShareSheet: $presentingShareSheet
+                        presentingShareSheet: $presentingShareSheet,
+                        shareURL: $shareURL
                     )
 
                     Spacer()
@@ -286,7 +288,6 @@ struct VideoDetails: View {
                                 .help("Add to Playlist...")
                         }
                         .buttonStyle(.plain)
-                        .foregroundColor(.blue)
                     }
                 }
                 .frame(maxHeight: 35)
@@ -300,9 +301,7 @@ struct VideoDetails: View {
         }
         #if os(iOS)
             .sheet(isPresented: $presentingShareSheet) {
-                if let url = accounts.api.shareURL(contentItem) {
-                    ShareSheet(activityItems: [url])
-                }
+                ShareSheet(activityItems: [shareURL])
             }
         #endif
     }

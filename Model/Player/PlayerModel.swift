@@ -381,7 +381,10 @@ final class PlayerModel: ObservableObject {
                 return
             }
 
-            self.updateNowPlayingInfo()
+            #if !os(tvOS)
+                self.updateNowPlayingInfo()
+            #endif
+
             self.handleSegments(at: self.player.currentTime())
         }
     }

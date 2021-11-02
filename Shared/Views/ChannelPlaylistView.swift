@@ -66,7 +66,7 @@ struct ChannelPlaylistView: View {
         }
         #if !os(tvOS)
             .toolbar {
-                ToolbarItem(placement: shareButtonPlacement) {
+                ToolbarItem(placement: .navigation) {
                     ShareButton(
                         contentItem: contentItem,
                         presentingShareSheet: $presentingShareSheet
@@ -81,14 +81,6 @@ struct ChannelPlaylistView: View {
 
         #else
             .background(.thickMaterial)
-        #endif
-    }
-
-    private var shareButtonPlacement: ToolbarItemPlacement {
-        #if os(iOS)
-            .navigation
-        #else
-            .automatic
         #endif
     }
 

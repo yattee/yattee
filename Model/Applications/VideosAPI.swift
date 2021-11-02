@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Siesta
 
@@ -28,7 +29,7 @@ protocol VideosAPI {
     func channelPlaylist(_ id: String) -> Resource?
 
     func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
-    func shareURL(_ item: ContentItem) -> URL?
+    func shareURL(_ item: ContentItem, frontendHost: String?, time: CMTime?) -> URL?
 }
 
 extension VideosAPI {
@@ -50,23 +51,33 @@ extension VideosAPI {
         }
     }
 
-    func shareURL(_ item: ContentItem) -> URL? {
-        guard let frontendHost = account.instance.frontendHost else {
+    func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {
+        guard let frontendHost = frontendHost ?? account.instance.frontendHost else {
             return nil
         }
 
         var urlComponents = account.instance.urlComponents
         urlComponents.host = frontendHost
 
+        var queryItems = [URLQueryItem]()
+
         switch item.contentType {
         case .video:
             urlComponents.path = "/watch"
-            urlComponents.query = "v=\(item.video.videoID)"
+            queryItems.append(.init(name: "v", value: item.video.videoID))
         case .channel:
             urlComponents.path = "/channel/\(item.channel.id)"
         case .playlist:
             urlComponents.path = "/playlist"
-            urlComponents.query = "list=\(item.playlist.id)"
+            queryItems.append(.init(name: "list", value: item.playlist.id))
+        }
+
+        if !time.isNil, time!.seconds.isFinite {
+            queryItems.append(.init(name: "t", value: "\(Int(time!.seconds))s"))
+        }
+
+        if !queryItems.isEmpty {
+            urlComponents.queryItems = queryItems
         }
 
         return urlComponents.url!

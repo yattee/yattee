@@ -79,7 +79,7 @@ struct EditFavorites: View {
 
     func label(_ item: FavoriteItem) -> String {
         if case let .playlist(id) = item.section {
-            return playlistsModel.find(id: id)?.title ?? "Unknown Playlist"
+            return playlistsModel.find(id: id)?.title ?? "Playlist"
         }
 
         return item.section.label

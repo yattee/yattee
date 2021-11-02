@@ -76,7 +76,7 @@ struct ChannelVideosView: View {
         #endif
         #if !os(tvOS)
             .toolbar {
-                ToolbarItem(placement: shareButtonPlacement) {
+                ToolbarItem(placement: .navigation) {
                     ShareButton(
                         contentItem: contentItem,
                         presentingShareSheet: $presentingShareSheet
@@ -138,14 +138,6 @@ struct ChannelVideosView: View {
                 }
             }
         }
-    }
-
-    private var shareButtonPlacement: ToolbarItemPlacement {
-        #if os(iOS)
-            .navigation
-        #else
-            .automatic
-        #endif
     }
 
     private var contentItem: ContentItem {
