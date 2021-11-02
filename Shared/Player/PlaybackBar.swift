@@ -14,9 +14,15 @@ struct PlaybackBar: View {
             closeButton
 
             if player.currentItem != nil {
-                Text(playbackStatus)
-                    .foregroundColor(.gray)
-                    .font(.caption2)
+                HStack {
+                    Text(playbackStatus)
+
+                    Text("•")
+
+                    rateMenu
+                }
+                .font(.caption2)
+                .foregroundColor(.gray)
 
                 Spacer()
 
@@ -44,7 +50,6 @@ struct PlaybackBar: View {
                         .frame(maxWidth: 180)
                     #endif
                 }
-                .environment(\.colorScheme, .dark)
                 .transaction { t in t.animation = .none }
                 .foregroundColor(.gray)
                 .font(.caption2)
@@ -52,6 +57,7 @@ struct PlaybackBar: View {
                 Spacer()
             }
         }
+        .environment(\.colorScheme, .dark)
         .frame(minWidth: 0, maxWidth: .infinity)
         .padding(4)
         .background(.black)
@@ -82,7 +88,8 @@ struct PlaybackBar: View {
             return "loading..."
         }
 
-        let remainingSeconds = player.currentVideo!.length - player.time!.seconds
+        let videoLengthAtRate = player.currentVideo!.length / Double(player.currentRate)
+        let remainingSeconds = videoLengthAtRate - player.time!.seconds
 
         if remainingSeconds < 60 {
             return "less than a minute"
@@ -92,6 +99,29 @@ struct PlaybackBar: View {
         let timeFinishAtString = timeFinishAt.formatted(date: .omitted, time: .shortened)
 
         return "ends at \(timeFinishAtString)"
+    }
+
+    private var rateMenu: some View {
+        #if os(macOS)
+            ratePicker
+                .labelsHidden()
+                .frame(maxWidth: 70)
+        #else
+            Menu {
+                ratePicker
+            } label: {
+                Text(player.rateLabel(player.currentRate))
+            }
+
+        #endif
+    }
+
+    private var ratePicker: some View {
+        Picker("", selection: $player.currentRate) {
+            ForEach(PlayerModel.availableRates, id: \.self) { rate in
+                Text(player.rateLabel(rate)).tag(rate)
+            }
+        }
     }
 
     private var restoreLastSkippedSegmentButton: some View {

@@ -11,6 +11,7 @@ import SwiftUI
 import SwiftyJSON
 
 final class PlayerModel: ObservableObject {
+    static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
     let logger = Logger(label: "net.arekf.Pearvidious.ps")
 
     private(set) var player = AVPlayer()
@@ -23,7 +24,7 @@ final class PlayerModel: ObservableObject {
     @Published var presentingPlayer = false
 
     @Published var stream: Stream?
-    @Published var currentRate: Float?
+    @Published var currentRate: Float = 1.0 { didSet { player.rate = currentRate } }
 
     @Published var availableStreams = [Stream]() { didSet { rebuildTVMenu() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
@@ -418,6 +419,10 @@ final class PlayerModel: ObservableObject {
                 self.objectWillChange.send()
             }
 
+            if player.timeControlStatus == .playing, player.rate != self.currentRate {
+                player.rate = self.currentRate
+            }
+
             #if os(macOS)
                 if player.timeControlStatus == .playing {
                     ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
@@ -468,5 +473,13 @@ final class PlayerModel: ObservableObject {
         }
 
         currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
+    }
+
+    func rateLabel(_ rate: Float) -> String {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+
+        return "\(formatter.string(from: NSNumber(value: rate))!)×"
     }
 }
