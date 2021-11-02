@@ -418,15 +418,15 @@ final class PlayerModel: ObservableObject {
                 self.objectWillChange.send()
             }
 
-            self.timeObserverThrottle.execute {
-                #if os(macOS)
-                    if player.timeControlStatus == .playing {
-                        ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
-                    } else {
-                        ScreenSaverManager.shared.enable()
-                    }
-                #endif
+            #if os(macOS)
+                if player.timeControlStatus == .playing {
+                    ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
+                } else {
+                    ScreenSaverManager.shared.enable()
+                }
+            #endif
 
+            self.timeObserverThrottle.execute {
                 self.updateCurrentItemIntervals()
             }
         }
