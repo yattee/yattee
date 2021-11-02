@@ -32,23 +32,29 @@ final class PlayerViewController: UIViewController {
 
         #if os(tvOS)
             playerModel.avPlayerViewController = playerViewController
-            playerViewController.customInfoViewControllers = [playerQueueInfoViewController]
+            playerViewController.customInfoViewControllers = [
+                infoViewController([.related], title: "Related"),
+                infoViewController([.playingNext, .playedPreviously], title: "Playing Next")
+            ]
         #else
             embedViewController()
         #endif
     }
 
     #if os(tvOS)
-        var playerQueueInfoViewController: UIHostingController<AnyView> {
+        func infoViewController(
+            _ sections: [NowPlayingView.ViewSection],
+            title: String
+        ) -> UIHostingController<AnyView> {
             let controller = UIHostingController(rootView:
                 AnyView(
-                    NowPlayingView(inInfoViewController: true)
+                    NowPlayingView(sections: sections, inInfoViewController: true)
                         .frame(maxHeight: 600)
                         .environmentObject(playerModel)
                 )
             )
 
-            controller.title = "Playing Next"
+            controller.title = title
 
             return controller
         }

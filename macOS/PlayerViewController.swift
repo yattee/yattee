@@ -7,9 +7,6 @@ final class PlayerViewController: NSViewController {
     var pictureInPictureDelegate = PictureInPictureDelegate()
 
     override func viewDidDisappear() {
-        if !playerModel.playingInPictureInPicture {
-            playerModel.pause()
-        }
         super.viewDidDisappear()
     }
 

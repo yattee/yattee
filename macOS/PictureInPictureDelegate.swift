@@ -9,20 +9,26 @@ final class PictureInPictureDelegate: NSObject, AVPlayerViewPictureInPictureDele
     }
 
     func playerViewWillStartPicture(inPicture _: AVPlayerView) {
-        playerModel.playingInPictureInPicture = true
-        playerModel.presentingPlayer = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.playerModel.playingInPictureInPicture = true
+            self?.playerModel.presentingPlayer = false
+        }
     }
 
     func playerViewWillStopPicture(inPicture _: AVPlayerView) {
-        playerModel.playingInPictureInPicture = false
-        playerModel.presentPlayer()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.playerModel.playingInPictureInPicture = false
+            self?.playerModel.presentPlayer()
+        }
     }
 
     func playerView(
         _: AVPlayerView,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: (Bool) -> Void
     ) {
-        playerModel.presentingPlayer = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.playerModel.presentingPlayer = true
+        }
         completionHandler(true)
     }
 }

@@ -10,12 +10,12 @@ struct PlayerQueueView: View {
         List {
             Group {
                 playingNext
+                related
                 playedPreviously
             }
-            .padding(.vertical, 5)
-            .listRowInsets(EdgeInsets())
-            #if os(iOS)
-                .padding(.horizontal, 10)
+            #if !os(iOS)
+                .padding(.vertical, 5)
+                .listRowInsets(EdgeInsets())
             #endif
         }
 
@@ -71,7 +71,27 @@ struct PlayerQueueView: View {
         }
     }
 
-    func removeButton(_ item: PlayerQueueItem, history: Bool) -> some View {
+    private var related: some View {
+        Group {
+            if !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
+                Section(header: Text("Related")) {
+                    ForEach(player.currentVideo!.related) { video in
+                        PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
+                            .contextMenu {
+                                Button("Play Next") {
+                                    player.playNext(video)
+                                }
+                                Button("Play Last") {
+                                    player.enqueueVideo(video)
+                                }
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    private func removeButton(_ item: PlayerQueueItem, history: Bool) -> some View {
         Button(role: .destructive) {
             if history {
                 player.removeHistory(item)
@@ -83,7 +103,7 @@ struct PlayerQueueView: View {
         }
     }
 
-    func removeAllButton(history: Bool) -> some View {
+    private func removeAllButton(history: Bool) -> some View {
         Button(role: .destructive) {
             if history {
                 player.removeHistoryItems()

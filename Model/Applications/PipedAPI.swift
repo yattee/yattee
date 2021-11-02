@@ -224,7 +224,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             thumbnails: thumbnails,
             likes: details["likes"]?.int,
             dislikes: details["dislikes"]?.int,
-            streams: extractStreams(from: content)
+            streams: extractStreams(from: content),
+            related: extractRelated(from: content)
         )
     }
 
@@ -308,6 +309,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
 
         return streams
+    }
+
+    private static func extractRelated(from content: JSON) -> [Video] {
+        content
+            .dictionaryValue["relatedStreams"]?
+            .arrayValue
+            .compactMap(extractVideo(from:)) ?? []
     }
 
     private static func compatibleAudioStreams(from content: JSON) -> [JSON] {

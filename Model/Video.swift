@@ -30,6 +30,8 @@ struct Video: Identifiable, Equatable, Hashable {
 
     var channel: Channel
 
+    var related = [Video]()
+
     init(
         id: String? = nil,
         videoID: String,
@@ -49,7 +51,8 @@ struct Video: Identifiable, Equatable, Hashable {
         likes: Int? = nil,
         dislikes: Int? = nil,
         keywords: [String] = [],
-        streams: [Stream] = []
+        streams: [Stream] = [],
+        related: [Video] = []
     ) {
         self.id = id ?? UUID().uuidString
         self.videoID = videoID
@@ -70,6 +73,7 @@ struct Video: Identifiable, Equatable, Hashable {
         self.dislikes = dislikes
         self.keywords = keywords
         self.streams = streams
+        self.related = related
     }
 
     var publishedDate: String? {

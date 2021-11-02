@@ -314,8 +314,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             likes: json["likeCount"].int,
             dislikes: json["dislikeCount"].int,
             keywords: json["keywords"].arrayValue.map { $0.stringValue },
-            streams: extractFormatStreams(from: json["formatStreams"].arrayValue) +
-                extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue)
+            streams: extractStreams(from: json),
+            related: extractRelated(from: json)
         )
     }
 
@@ -349,6 +349,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
     }
 
+    private static func extractStreams(from json: JSON) -> [Stream] {
+        extractFormatStreams(from: json["formatStreams"].arrayValue) +
+            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue)
+    }
+
     private static func extractFormatStreams(from streams: [JSON]) -> [Stream] {
         streams.map {
             SingleAssetStream(
@@ -377,5 +382,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 encoding: $0["encoding"].stringValue
             )
         }
+    }
+
+    private static func extractRelated(from content: JSON) -> [Video] {
+        content
+            .dictionaryValue["recommendedVideos"]?
+            .arrayValue
+            .compactMap(extractVideo(from:)) ?? []
     }
 }

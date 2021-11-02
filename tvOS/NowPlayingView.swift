@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct NowPlayingView: View {
+    enum ViewSection: CaseIterable {
+        case nowPlaying, playingNext, playedPreviously, related
+    }
+
+    var sections = ViewSection.allCases
     var inInfoViewController = false
 
     @EnvironmentObject<PlayerModel> private var player
@@ -18,7 +23,7 @@ struct NowPlayingView: View {
     var content: some View {
         List {
             Group {
-                if !inInfoViewController, let item = player.currentItem {
+                if sections.contains(.nowPlaying), let item = player.currentItem {
                     Section(header: Text("Now Playing")) {
                         Button {
                             player.presentPlayer()
@@ -29,29 +34,53 @@ struct NowPlayingView: View {
                     .onPlayPauseCommand(perform: player.togglePlay)
                 }
 
-                Section(header: Text("Playing Next")) {
-                    if player.queue.isEmpty {
-                        Text("Playback queue is empty")
-                            .padding([.vertical, .leading], 40)
-                            .foregroundColor(.secondary)
-                    }
-
-                    ForEach(player.queue) { item in
-                        Button {
-                            player.advanceToItem(item)
-                            player.presentPlayer()
-                        } label: {
-                            VideoBanner(video: item.video)
+                if sections.contains(.playingNext) {
+                    Section(header: Text("Playing Next")) {
+                        if player.queue.isEmpty {
+                            Text("Playback queue is empty")
+                                .padding([.vertical, .leading], 40)
+                                .foregroundColor(.secondary)
                         }
-                        .contextMenu {
-                            Button("Delete", role: .destructive) {
-                                player.remove(item)
+
+                        ForEach(player.queue) { item in
+                            Button {
+                                player.advanceToItem(item)
+                                player.presentPlayer()
+                            } label: {
+                                VideoBanner(video: item.video)
+                            }
+                            .contextMenu {
+                                Button("Delete", role: .destructive) {
+                                    player.remove(item)
+                                }
                             }
                         }
                     }
                 }
 
-                if !player.history.isEmpty {
+                if sections.contains(.related), !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
+                    Section(header: inInfoViewController ? AnyView(EmptyView()) : AnyView(Text("Related"))) {
+                        ForEach(player.currentVideo!.related) { video in
+                            Button {
+                                player.playNow(video)
+                                player.presentPlayer()
+                            } label: {
+                                VideoBanner(video: video)
+                            }
+                            .contextMenu {
+                                Button("Play Next") {
+                                    player.playNext(video)
+                                }
+                                Button("Play Last") {
+                                    player.enqueueVideo(video)
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            }
+                        }
+                    }
+                }
+
+                if sections.contains(.playedPreviously), !player.history.isEmpty {
                     Section(header: Text("Played Previously")) {
                         ForEach(player.history) { item in
                             Button {
@@ -75,7 +104,6 @@ struct NowPlayingView: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
             .padding(.vertical, 20)
-//            .padding(.horizontal, 40)
         }
         .padding(.horizontal, inInfoViewController ? 40 : 0)
         .listStyle(.grouped)
@@ -86,7 +114,6 @@ struct NowPlayingView: View {
         Text(text)
             .font((inInfoViewController ? Font.system(size: 40) : .title3).bold())
             .foregroundColor(.secondary)
-//            .padding(.leading, 40)
     }
 }
 

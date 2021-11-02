@@ -62,8 +62,14 @@ struct VideoPlayerView: View {
                             if player.currentItem.isNil {
                                 playerPlaceholder(geometry: geometry)
                             } else {
-                                player.playerView
-                                    .modifier(VideoPlayerSizeModifier(geometry: geometry))
+                                #if os(macOS)
+                                    Player()
+                                        .modifier(VideoPlayerSizeModifier(geometry: geometry))
+
+                                #else
+                                    player.playerView
+                                        .modifier(VideoPlayerSizeModifier(geometry: geometry))
+                                #endif
                             }
                         }
                         #if os(iOS)
@@ -106,6 +112,11 @@ struct VideoPlayerView: View {
                 PlayerQueueView(fullScreen: $fullScreen)
                     .frame(minWidth: 250)
             #endif
+        }
+        .onDisappear {
+            if !player.playingInPictureInPicture {
+                player.pause()
+            }
         }
     }
 

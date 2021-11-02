@@ -3,7 +3,7 @@ import SwiftUI
 
 struct VideoDetails: View {
     enum Page {
-        case details, queue
+        case details, queue, related
     }
 
     @Binding var sidebarQueue: Bool
@@ -89,6 +89,14 @@ struct VideoDetails: View {
             case .queue:
                 PlayerQueueView(fullScreen: $fullScreen)
                     .edgesIgnoringSafeArea(.horizontal)
+
+            case .related:
+                #if os(macOS)
+                    EmptyView()
+                #else
+                    RelatedView()
+                        .edgesIgnoringSafeArea(.horizontal)
+                #endif
             }
         }
         .padding(.top, inNavigationView && fullScreen ? 10 : 0)
@@ -109,7 +117,9 @@ struct VideoDetails: View {
         .onChange(of: sidebarQueue) { queue in
             #if !os(macOS)
                 if queue {
-                    currentPage = .details
+                    if currentPage == .queue {
+                        currentPage = .details
+                    }
                 } else {
                     currentPage = .queue
                 }
@@ -216,6 +226,7 @@ struct VideoDetails: View {
     var pagePicker: some View {
         Picker("Page", selection: $currentPage) {
             Text("Details").tag(Page.details)
+            Text("Related").tag(Page.related)
             Text("Queue").tag(Page.queue)
         }
 
