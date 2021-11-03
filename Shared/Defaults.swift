@@ -1,7 +1,19 @@
 import Defaults
 import Foundation
 
-extension Defaults.Keys {
+enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
+    case always, whenFits, never
+
+    static var defaultValue: Self {
+        #if os(macOS)
+            .always
+        #else
+            .whenFits
+        #endif
+    }
+}
+
+extension Defaults.Keys {    
     static let invidiousInstanceID = "default-invidious-instance"
     static let pipedInstanceID = "default-piped-instance"
     static let privateAccountID = "default-private-invidious-account"
@@ -40,6 +52,7 @@ extension Defaults.Keys {
     ])
 
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
+    static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 

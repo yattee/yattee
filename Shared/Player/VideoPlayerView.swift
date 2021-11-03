@@ -13,34 +13,37 @@ struct VideoPlayerView: View {
         #endif
     }
 
+    @State private var playerSize: CGSize = .zero
     @State private var fullScreen = false
 
     #if os(iOS)
         @Environment(\.dismiss) private var dismiss
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
-
-        private var idiom: UIUserInterfaceIdiom {
-            UIDevice.current.userInterfaceIdiom
-        }
     #endif
 
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
-        #if os(macOS)
-            HSplitView {
-                content
-            }
-            .frame(idealWidth: 1000, maxWidth: 1100, minHeight: 700)
-        #else
-            HStack(spacing: 0) {
-                content
-            }
-            #if os(iOS)
+        GeometryReader { geometry in
+            #if os(macOS)
+                HSplitView {
+                    content
+                }
+                .frame(idealWidth: 1000, maxWidth: 1100, minHeight: 700)
+            #else
+                HStack(spacing: 0) {
+                    content
+                }
+                .onAppear {
+                    self.playerSize = geometry.size
+                }
+                .onChange(of: geometry.size) { size in
+                    self.playerSize = size
+                }
                 .navigationBarHidden(true)
             #endif
-        #endif
+        }
     }
 
     var content: some View {
@@ -92,7 +95,7 @@ struct VideoPlayerView: View {
                                 }
 
                             #else
-                                VideoDetails(fullScreen: $fullScreen)
+                                VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
                             #endif
                         }
                         .background()
@@ -105,12 +108,14 @@ struct VideoPlayerView: View {
             #endif
             #if os(iOS)
                 if sidebarQueue {
-                    PlayerQueueView(fullScreen: $fullScreen)
+                    PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreen)
                         .frame(maxWidth: 350)
                 }
             #elseif os(macOS)
-                PlayerQueueView(fullScreen: $fullScreen)
-                    .frame(minWidth: 250)
+                if Defaults[.playerSidebar] != .never {
+                    PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
+                        .frame(minWidth: 250)
+                }
             #endif
         }
         .onDisappear {
@@ -140,18 +145,23 @@ struct VideoPlayerView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
     }
 
-    #if os(iOS)
-        var sidebarQueue: Bool {
-            horizontalSizeClass == .regular && idiom == .pad
+    var sidebarQueue: Bool {
+        switch Defaults[.playerSidebar] {
+        case .never:
+            return false
+        case .always:
+            return true
+        case .whenFits:
+            return playerSize.width > 900
         }
+    }
 
-        var sidebarQueueBinding: Binding<Bool> {
-            Binding(
-                get: { self.sidebarQueue },
-                set: { _ in }
-            )
-        }
-    #endif
+    var sidebarQueueBinding: Binding<Bool> {
+        Binding(
+            get: { sidebarQueue },
+            set: { _ in }
+        )
+    }
 }
 
 struct VideoPlayerView_Previews: PreviewProvider {

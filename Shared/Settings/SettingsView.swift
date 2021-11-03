@@ -5,7 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case playback, services, instances
+            case instances, playback, services
         }
     #endif
 
@@ -25,20 +25,20 @@ struct SettingsView: View {
                 .tag(Tabs.instances)
 
                 Form {
-                    ServicesSettings()
-                }
-                .tabItem {
-                    Label("Services", systemImage: "puzzlepiece.extension")
-                }
-                .tag(Tabs.services)
-
-                Form {
                     PlaybackSettings()
                 }
                 .tabItem {
                     Label("Playback", systemImage: "play.rectangle.on.rectangle.fill")
                 }
                 .tag(Tabs.playback)
+
+                Form {
+                    ServicesSettings()
+                }
+                .tabItem {
+                    Label("Services", systemImage: "puzzlepiece.extension")
+                }
+                .tag(Tabs.services)
             }
             .padding(20)
             .frame(width: 400, height: 310)
@@ -49,8 +49,8 @@ struct SettingsView: View {
                         AccountSelectionView()
                     #endif
                     InstancesSettings()
-                    ServicesSettings()
                     PlaybackSettings()
+                    ServicesSettings()
                 }
                 .navigationTitle("Settings")
                 .toolbar {

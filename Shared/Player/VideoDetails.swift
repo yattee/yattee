@@ -58,7 +58,7 @@ struct VideoDetails: View {
                 }
                 .padding(.horizontal)
 
-                if !video.isNil, !sidebarQueue {
+                if !sidebarQueue {
                     pagePicker
                         .padding(.horizontal)
                 }
@@ -87,25 +87,19 @@ struct VideoDetails: View {
                     detailsPage
                 }
             case .queue:
-                PlayerQueueView(fullScreen: $fullScreen)
+                PlayerQueueView(sidebarQueue: $sidebarQueue, fullScreen: $fullScreen)
                     .edgesIgnoringSafeArea(.horizontal)
 
             case .related:
-                #if os(macOS)
-                    EmptyView()
-                #else
-                    RelatedView()
-                        .edgesIgnoringSafeArea(.horizontal)
-                #endif
+                RelatedView()
+                    .edgesIgnoringSafeArea(.horizontal)
             }
         }
         .padding(.top, inNavigationView && fullScreen ? 10 : 0)
         .onAppear {
-            #if !os(macOS)
-                if video.isNil {
-                    currentPage = .queue
-                }
-            #endif
+            if video.isNil {
+                currentPage = .queue
+            }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
@@ -115,15 +109,13 @@ struct VideoDetails: View {
             subscribed = subscriptions.isSubscribing(video!.channel.id)
         }
         .onChange(of: sidebarQueue) { queue in
-            #if !os(macOS)
-                if queue {
-                    if currentPage == .queue {
-                        currentPage = .details
-                    }
-                } else {
-                    currentPage = .queue
+            if queue {
+                if currentPage == .queue {
+                    currentPage = .details
                 }
-            #endif
+            } else if video.isNil {
+                currentPage = .queue
+            }
         }
         .edgesIgnoringSafeArea(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -134,9 +126,7 @@ struct VideoDetails: View {
             if video != nil {
                 Text(video!.title)
                     .onAppear {
-                        #if !os(macOS)
-                            currentPage = .details
-                        #endif
+                        currentPage = .details
                     }
 
                     .font(.title2.bold())
@@ -225,11 +215,13 @@ struct VideoDetails: View {
 
     var pagePicker: some View {
         Picker("Page", selection: $currentPage) {
-            Text("Details").tag(Page.details)
-            Text("Related").tag(Page.related)
+            if !video.isNil {
+                Text("Details").tag(Page.details)
+                Text("Related").tag(Page.related)
+            }
             Text("Queue").tag(Page.queue)
         }
-
+        .labelsHidden()
         .pickerStyle(.segmented)
         .onDisappear {
             currentPage = .details

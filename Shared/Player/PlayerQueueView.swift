@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 struct PlayerQueueView: View {
+    @Binding var sidebarQueue: Bool
     @Binding var fullScreen: Bool
 
     @EnvironmentObject<PlayerModel> private var player
@@ -10,7 +11,9 @@ struct PlayerQueueView: View {
         List {
             Group {
                 playingNext
-                related
+                if sidebarQueue {
+                    related
+                }
                 playedPreviously
             }
             #if !os(iOS)
@@ -119,7 +122,7 @@ struct PlayerQueueView: View {
 struct PlayerQueueView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            PlayerQueueView(fullScreen: .constant(true))
+            PlayerQueueView(sidebarQueue: .constant(true), fullScreen: .constant(true))
         }
         .injectFixtureEnvironmentObjects()
     }

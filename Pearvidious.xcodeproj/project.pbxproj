@@ -82,6 +82,7 @@
 		372915E72687E3B900F5A35B /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
 		372915E82687E3B900F5A35B /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
 		3730D8A02712E2B70020ED53 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3730D89F2712E2B70020ED53 /* NowPlayingView.swift */; };
+		3730F75A2733481E00F385FC /* RelatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373197D82732015300EF734F /* RelatedView.swift */; };
 		373197D92732015300EF734F /* RelatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373197D82732015300EF734F /* RelatedView.swift */; };
 		373197DA2732060100EF734F /* RelatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373197D82732015300EF734F /* RelatedView.swift */; };
 		37319F0527103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
@@ -1876,6 +1877,7 @@
 				3700155C271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				37599F31272B42810087F250 /* FavoriteItem.swift in Sources */,
+				3730F75A2733481E00F385FC /* RelatedView.swift in Sources */,
 				375168D72700FDB8008F96A6 /* Debounce.swift in Sources */,
 				37D526DF2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
