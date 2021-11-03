@@ -13,7 +13,7 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
     }
 }
 
-extension Defaults.Keys {    
+extension Defaults.Keys {
     static let invidiousInstanceID = "default-invidious-instance"
     static let pipedInstanceID = "default-piped-instance"
     static let privateAccountID = "default-private-invidious-account"
@@ -53,6 +53,7 @@ extension Defaults.Keys {
 
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
+    static let showKeywords = Key<Bool>("showKeywords", default: false)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 

@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -24,6 +25,8 @@ struct VideoDetails: View {
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
+
+    @Default(.showKeywords) private var showKeywords
 
     init(
         sidebarQueue: Binding<Bool>? = nil,
@@ -338,25 +341,27 @@ struct VideoDetails: View {
                             .foregroundColor(.secondary)
                     }
 
-                    ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
-                        HStack {
-                            ForEach(video.keywords, id: \.self) { keyword in
-                                HStack(alignment: .center, spacing: 0) {
-                                    Text("#")
-                                        .font(.system(size: 11).bold())
+                    if showKeywords {
+                        ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
+                            HStack {
+                                ForEach(video.keywords, id: \.self) { keyword in
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Text("#")
+                                            .font(.system(size: 11).bold())
 
-                                    Text(keyword)
-                                        .frame(maxWidth: 500)
+                                        Text(keyword)
+                                            .frame(maxWidth: 500)
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 4)
+                                    .padding(.horizontal, 8)
+                                    .background(Color("VideoDetailLikesSymbolColor"))
+                                    .mask(RoundedRectangle(cornerRadius: 3))
                                 }
-                                .font(.caption)
-                                .foregroundColor(.white)
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background(Color("VideoDetailLikesSymbolColor"))
-                                .mask(RoundedRectangle(cornerRadius: 3))
                             }
+                            .padding(.bottom, 10)
                         }
-                        .padding(.bottom, 10)
                     }
                 }
             }
