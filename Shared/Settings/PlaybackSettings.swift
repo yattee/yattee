@@ -2,6 +2,8 @@ import Defaults
 import SwiftUI
 
 struct PlaybackSettings: View {
+    @Default(.instances) private var instances
+    @Default(.playerInstanceID) private var playerInstanceID
     @Default(.quality) private var quality
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showKeywords) private var showKeywords
@@ -13,6 +15,8 @@ struct PlaybackSettings: View {
     #endif
 
     var body: some View {
+        playerInstanceSection
+
         qualitySection
 
         #if !os(tvOS)
@@ -22,6 +26,24 @@ struct PlaybackSettings: View {
         #if os(macOS)
             Spacer()
         #endif
+    }
+
+    private var playerInstanceSection: some View {
+        Section(header: Text("Preferred playback source")) {
+            Picker("Source", selection: $playerInstanceID) {
+                Text("Best available stream").tag(String?.none)
+
+                ForEach(instances) { instance in
+                    Text(instance.longDescription).tag(Optional(instance.id))
+                }
+            }
+            .labelsHidden()
+            #if os(iOS)
+                .pickerStyle(.automatic)
+            #elseif os(tvOS)
+                .pickerStyle(.inline)
+            #endif
+        }
     }
 
     private var qualitySection: some View {

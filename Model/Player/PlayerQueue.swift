@@ -52,7 +52,7 @@ extension PlayerModel {
         savedTime = currentItem.playbackTime
 
         loadAvailableStreams(currentVideo!) { streams in
-            guard let stream = streams.first else {
+            guard let stream = self.preferredStream(streams) else {
                 return
             }
 
@@ -62,6 +62,14 @@ extension PlayerModel {
                 of: self.currentVideo!,
                 preservingTime: !self.currentItem.playbackTime.isNil
             )
+        }
+    }
+
+    private func preferredStream(_ streams: [Stream]) -> Stream? {
+        if let id = Defaults[.playerInstanceID] {
+            return streams.first { $0.instance.id == id }
+        } else {
+            return streams.first
         }
     }
 

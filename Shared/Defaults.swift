@@ -53,6 +53,7 @@ extension Defaults.Keys {
 
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
+    static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
