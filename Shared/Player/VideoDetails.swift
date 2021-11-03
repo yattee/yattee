@@ -335,7 +335,9 @@ struct VideoDetails: View {
                 VStack(alignment: .leading, spacing: 10) {
                     if let description = video.description {
                         Text(description)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .font(.caption)
+                            .padding(.bottom, 4)
                     } else {
                         Text("No description")
                             .foregroundColor(.secondary)
