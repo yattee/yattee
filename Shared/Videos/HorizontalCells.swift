@@ -30,7 +30,7 @@ struct HorizontalCells: View {
         #if os(tvOS)
             .frame(height: 560)
         #else
-            .frame(height: 250)
+            .frame(height: 290)
         #endif
 
         .edgesIgnoringSafeArea(.horizontal)

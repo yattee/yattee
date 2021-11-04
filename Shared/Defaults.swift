@@ -51,6 +51,9 @@ extension Defaults.Keys {
         .init(section: .trending("US", nil))
     ])
 
+    static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
+    static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
+
     static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")

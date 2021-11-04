@@ -88,7 +88,7 @@ struct VideoBanner: View {
 
     private var thumbnailWidth: Double {
         #if os(tvOS)
-            230
+            250
         #else
             100
         #endif

@@ -5,7 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case instances, playback, services
+            case instances, browsing, playback, services
         }
     #endif
 
@@ -23,6 +23,14 @@ struct SettingsView: View {
                     Label("Instances", systemImage: "server.rack")
                 }
                 .tag(Tabs.instances)
+
+                Form {
+                    BrowsingSettings()
+                }
+                .tabItem {
+                    Label("Browsing", systemImage: "list.and.film")
+                }
+                .tag(Tabs.browsing)
 
                 Form {
                     PlaybackSettings()
@@ -49,6 +57,7 @@ struct SettingsView: View {
                         AccountSelectionView()
                     #endif
                     InstancesSettings()
+                    BrowsingSettings()
                     PlaybackSettings()
                     ServicesSettings()
                 }
@@ -69,7 +78,7 @@ struct SettingsView: View {
                 #endif
             }
             #if os(tvOS)
-                .background(.thickMaterial)
+                .background(.black)
             #endif
         #endif
     }

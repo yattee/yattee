@@ -16,6 +16,9 @@ struct VideoCell: View {
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
+    @Default(.channelOnThumbnail) private var channelOnThumbnail
+    @Default(.timeOnThumbnail) private var timeOnThumbnail
+
     var body: some View {
         Group {
             Button(action: {
@@ -73,15 +76,20 @@ struct VideoCell: View {
                     videoDetail(video.title, lineLimit: 5)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    videoDetail(video.author)
+                    if !channelOnThumbnail {
+                        Text(video.channel.name)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                    }
 
                     if additionalDetailsAvailable {
                         Spacer()
 
-                        HStack {
+                        HStack(spacing: 15) {
                             if let date = video.publishedDate {
                                 VStack {
                                     Image(systemName: "calendar")
+                                        .frame(height: 15)
                                     Text(date)
                                 }
                             }
@@ -89,7 +97,16 @@ struct VideoCell: View {
                             if video.views > 0 {
                                 VStack {
                                     Image(systemName: "eye")
+                                        .frame(height: 15)
                                     Text(video.viewsCount!)
+                                }
+                            }
+
+                            if !timeOnThumbnail, let time = video.length.formattedAsPlaybackTime() {
+                                VStack {
+                                    Image(systemName: "clock")
+                                        .frame(height: 15)
+                                    Text(time)
                                 }
                             }
                         }
@@ -133,27 +150,60 @@ struct VideoCell: View {
             thumbnail
 
             VStack(alignment: .leading, spacing: 0) {
-                videoDetail(video.title, lineLimit: additionalDetailsAvailable ? 2 : 3)
+                Group {
+                    VStack(alignment: .leading, spacing: 0) {
+                        videoDetail(video.title, lineLimit: channelOnThumbnail ? 3 : 2)
+                        #if os(tvOS)
+                            .frame(minHeight: 60, alignment: .top)
+                        #elseif os(macOS)
+                            .frame(minHeight: 32, alignment: .top)
+                        #else
+                            .frame(minHeight: 40, alignment: .top)
+                        #endif
+                        if !channelOnThumbnail {
+                            Text(video.channel.name)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
+                                .padding(.bottom, 6)
+                        }
+                    }
+                }
                 #if os(tvOS)
-                    .frame(minHeight: additionalDetailsAvailable ? 80 : 120, alignment: .top)
+                    .frame(minHeight: channelOnThumbnail ? 80 : 120, alignment: .top)
                 #elseif os(macOS)
-                    .frame(minHeight: 30, alignment: .top)
+                    .frame(minHeight: 60, alignment: .top)
                 #else
-                    .frame(minHeight: 50, alignment: .top)
+                    .frame(minHeight: 80, alignment: .top)
                 #endif
                 .padding(.bottom, 4)
 
                 HStack(spacing: 8) {
                     if let date = video.publishedDate {
-                        Image(systemName: "calendar")
-                        Text(date)
+                        HStack(spacing: 2) {
+                            Image(systemName: "calendar")
+                            Text(date)
+                                .allowsTightening(true)
+                        }
                     }
 
                     if video.views > 0 {
-                        Image(systemName: "eye")
-                        Text(video.viewsCount!)
+                        HStack(spacing: 2) {
+                            Image(systemName: "eye")
+                            Text(video.viewsCount!)
+                        }
+                    }
+
+                    if let time = video.length.formattedAsPlaybackTime(), !timeOnThumbnail {
+                        Spacer()
+
+                        HStack(spacing: 2) {
+                            Image(systemName: "clock")
+                            Text(time)
+                        }
                     }
                 }
+                .lineLimit(1)
                 .foregroundColor(.secondary)
                 .frame(minHeight: 30, alignment: .top)
                 #if os(tvOS)
@@ -169,7 +219,7 @@ struct VideoCell: View {
     }
 
     var additionalDetailsAvailable: Bool {
-        video.publishedDate != nil || video.views != 0
+        video.publishedDate != nil || video.views != 0 || (!timeOnThumbnail && !video.length.formattedAsPlaybackTime().isNil)
     }
 
     var thumbnail: some View {
@@ -186,7 +236,9 @@ struct VideoCell: View {
 
                     Spacer()
 
-                    DetailBadge(text: video.author, style: .prominent)
+                    if channelOnThumbnail {
+                        DetailBadge(text: video.author, style: .prominent)
+                    }
                 }
                 .padding(10)
 
@@ -195,7 +247,7 @@ struct VideoCell: View {
                 HStack(alignment: .top) {
                     Spacer()
 
-                    if let time = video.length.formattedAsPlaybackTime() {
+                    if timeOnThumbnail, let time = video.length.formattedAsPlaybackTime() {
                         DetailBadge(text: time, style: .prominent)
                     }
                 }
@@ -268,7 +320,11 @@ struct VideoCell_Preview: PreviewProvider {
         Group {
             VideoCell(video: Video.fixture)
         }
-        .frame(maxWidth: 300, maxHeight: 200)
+        #if os(macOS)
+            .frame(maxWidth: 600, maxHeight: 400)
+        #elseif os(iOS)
+            .frame(maxWidth: 300, maxHeight: 200)
+        #endif
         .injectFixtureEnvironmentObjects()
     }
 }

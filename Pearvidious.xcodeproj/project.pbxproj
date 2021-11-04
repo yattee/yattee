@@ -192,6 +192,9 @@
 		376BE50727347B57009AD608 /* SettingsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50627347B57009AD608 /* SettingsHeader.swift */; };
 		376BE50827347B57009AD608 /* SettingsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50627347B57009AD608 /* SettingsHeader.swift */; };
 		376BE50927347B5F009AD608 /* SettingsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50627347B57009AD608 /* SettingsHeader.swift */; };
+		376BE50B27349108009AD608 /* BrowsingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50A27349108009AD608 /* BrowsingSettings.swift */; };
+		376BE50C27349108009AD608 /* BrowsingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50A27349108009AD608 /* BrowsingSettings.swift */; };
+		376BE50D27349108009AD608 /* BrowsingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376BE50A27349108009AD608 /* BrowsingSettings.swift */; };
 		376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
@@ -571,6 +574,7 @@
 		376A33E32720CB35000C1D6B /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		376B2E0626F920D600B1D64D /* SignInRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRequiredView.swift; sourceTree = "<group>"; };
 		376BE50627347B57009AD608 /* SettingsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHeader.swift; sourceTree = "<group>"; };
+		376BE50A27349108009AD608 /* BrowsingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingSettings.swift; sourceTree = "<group>"; };
 		376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Instance+Fixtures.swift"; sourceTree = "<group>"; };
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
@@ -914,6 +918,7 @@
 				37484C2826FC83FF00287258 /* AccountForm.swift */,
 				37484C2C26FC844700287258 /* AccountsSettings.swift */,
 				37732FEF2703A26300F04329 /* AccountValidationStatus.swift */,
+				376BE50A27349108009AD608 /* BrowsingSettings.swift */,
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
 				37484C1C26FC83A400287258 /* InstancesSettings.swift */,
 				37484C1826FC837400287258 /* PlaybackSettings.swift */,
@@ -1752,6 +1757,7 @@
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				37141673267A8E10006CA35D /* Country.swift in Sources */,
 				3748186E26A769D60084E870 /* DetailBadge.swift in Sources */,
+				376BE50B27349108009AD608 /* BrowsingSettings.swift in Sources */,
 				37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37599F30272B42810087F250 /* FavoriteItem.swift in Sources */,
 				373197D92732015300EF734F /* RelatedView.swift in Sources */,
@@ -1882,6 +1888,7 @@
 				37BA794C26DC30EC002A0235 /* AppSidebarPlaylists.swift in Sources */,
 				37CC3F46270CE30600608308 /* PlayerQueueItem.swift in Sources */,
 				3700155C271B0D4D0049C794 /* PipedAPI.swift in Sources */,
+				376BE50C27349108009AD608 /* BrowsingSettings.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				37599F31272B42810087F250 /* FavoriteItem.swift in Sources */,
 				3730F75A2733481E00F385FC /* RelatedView.swift in Sources */,
@@ -1956,6 +1963,7 @@
 				3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
 				37E70925271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
+				376BE50D27349108009AD608 /* BrowsingSettings.swift in Sources */,
 				37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				37FFC442272734C3009FFD26 /* Throttle.swift in Sources */,
 				375168D82700FDB9008F96A6 /* Debounce.swift in Sources */,
