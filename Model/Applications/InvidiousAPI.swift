@@ -169,7 +169,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func trending(country: Country, category: TrendingCategory?) -> Resource {
         resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/trending")
-            .withParam("type", category!.name)
+            .withParam("type", category?.name)
             .withParam("region", country.rawValue)
     }
 

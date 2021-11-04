@@ -20,8 +20,8 @@ struct InstancesSettings: View {
     @Default(.instances) private var instances
 
     var body: some View {
-        Section {
-            Text("Instance")
+        Group {
+            SettingsHeader(text: "Instance")
 
             if !instances.isEmpty {
                 Picker("Instance", selection: $selectedInstanceID) {
@@ -37,7 +37,8 @@ struct InstancesSettings: View {
             }
 
             if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
-                Text("Accounts")
+                SettingsHeader(text: "Accounts")
+
                 List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
                         Text("You have no accounts for this instance")
@@ -70,7 +71,7 @@ struct InstancesSettings: View {
             }
 
             if selectedInstance != nil, selectedInstance.app.hasFrontendURL {
-                Text("Frontend URL")
+                SettingsHeader(text: "Frontend URL")
 
                 TextField("Frontend URL", text: $frontendURL, prompt: Text("Frontend URL"))
                     .onAppear {

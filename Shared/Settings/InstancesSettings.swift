@@ -14,7 +14,7 @@ struct InstancesSettings: View {
 
     var body: some View {
         Group {
-            Section(header: Text("Instances")) {
+            Section(header: SettingsHeader(text: "Instances")) {
                 ForEach(instances) { instance in
                     Group {
                         NavigationLink(instance.longDescription) {

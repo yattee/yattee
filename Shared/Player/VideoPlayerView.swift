@@ -25,13 +25,13 @@ struct VideoPlayerView: View {
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
-        GeometryReader { geometry in
-            #if os(macOS)
-                HSplitView {
-                    content
-                }
-                .frame(idealWidth: 1000, maxWidth: 1100, minHeight: 700)
-            #else
+        #if os(macOS)
+            HSplitView {
+                content
+            }
+            .frame(idealWidth: 1000, maxWidth: 1100, minHeight: 700)
+        #else
+            GeometryReader { geometry in
                 HStack(spacing: 0) {
                     content
                 }
@@ -42,8 +42,8 @@ struct VideoPlayerView: View {
                     self.playerSize = size
                 }
                 .navigationBarHidden(true)
-            #endif
-        }
+            }
+        #endif
     }
 
     var content: some View {
@@ -168,9 +168,5 @@ struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
             .injectFixtureEnvironmentObjects()
-
-        VideoPlayerView()
-            .injectFixtureEnvironmentObjects()
-            .previewInterfaceOrientation(.landscapeRight)
     }
 }

@@ -6,7 +6,7 @@ struct ServicesSettings: View {
     @Default(.sponsorBlockCategories) private var sponsorBlockCategories
 
     var body: some View {
-        Section(header: Text("SponsorBlock API")) {
+        Section(header: SettingsHeader(text: "SponsorBlock API")) {
             TextField(
                 "SponsorBlock API Instance",
                 text: $sponsorBlockInstance,
@@ -19,7 +19,7 @@ struct ServicesSettings: View {
             #endif
         }
 
-        Section(header: Text("Categories to Skip")) {
+        Section(header: SettingsHeader(text: "Categories to Skip")) {
             #if os(macOS)
                 List(SponsorBlockAPI.categories, id: \.self) { category in
                     SponsorBlockCategorySelectionRow(
