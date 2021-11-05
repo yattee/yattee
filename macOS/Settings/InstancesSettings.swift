@@ -34,6 +34,8 @@ struct InstancesSettings: View {
                 Text("You have no instances configured")
                     .font(.caption)
                     .foregroundColor(.secondary)
+
+                Spacer()
             }
 
             if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
