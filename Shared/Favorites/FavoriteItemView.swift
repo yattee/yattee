@@ -3,42 +3,24 @@ import Siesta
 import SwiftUI
 import UniformTypeIdentifiers
 
-final class FavoriteResourceObserver: ObservableObject, ResourceObserver {
-    @Published var videos = [Video]()
-
-    func resourceChanged(_ resource: Resource, event _: ResourceEvent) {
-        if let videos: [Video] = resource.typedContent() {
-            self.videos = videos
-        } else if let channel: Channel = resource.typedContent() {
-            videos = channel.videos
-        } else if let playlist: ChannelPlaylist = resource.typedContent() {
-            videos = playlist.videos
-        } else if let playlist: Playlist = resource.typedContent() {
-            videos = playlist.videos
-        }
-    }
-}
-
 struct FavoriteItemView: View {
     let item: FavoriteItem
-    let resource: Resource?
 
     @StateObject private var store = FavoriteResourceObserver()
 
-    @Binding private var favorites: [FavoriteItem]
+    @Default(.favorites) private var favorites
     @Binding private var dragging: FavoriteItem?
 
-    @EnvironmentObject<PlaylistsModel> private var playlistsModel
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<PlaylistsModel> private var playlists
+
+    private var favoritesModel = FavoritesModel.shared
 
     init(
         item: FavoriteItem,
-        resource: Resource?,
-        favorites: Binding<[FavoriteItem]>,
         dragging: Binding<FavoriteItem?>
     ) {
         self.item = item
-        self.resource = resource
-        _favorites = favorites
         _dragging = dragging
     }
 
@@ -47,10 +29,9 @@ struct FavoriteItemView: View {
             Text(label)
                 .font(.title3.bold())
                 .foregroundColor(.secondary)
-
                 .contextMenu {
                     Button {
-                        FavoritesModel.shared.remove(item)
+                        favoritesModel.remove(item)
                     } label: {
                         Label("Remove from Favorites", systemImage: "trash")
                     }
@@ -62,7 +43,7 @@ struct FavoriteItemView: View {
                 .padding(.leading, 15)
             #endif
 
-            HorizontalCells(items: store.videos.map { ContentItem(video: $0) })
+            HorizontalCells(items: store.contentItems)
         }
 
         .contentShape(Rectangle())
@@ -83,9 +64,40 @@ struct FavoriteItemView: View {
         #endif
     }
 
-    var label: String {
+    private var resource: Resource? {
+        switch item.section {
+        case .subscriptions:
+            if accounts.app.supportsSubscriptions {
+                return accounts.api.feed
+            }
+
+        case .popular:
+            if accounts.app.supportsPopular {
+                return accounts.api.popular
+            }
+
+        case let .trending(country, category):
+            let trendingCountry = Country(rawValue: country)!
+            let trendingCategory = category.isNil ? nil : TrendingCategory(rawValue: category!)!
+
+            return accounts.api.trending(country: trendingCountry, category: trendingCategory)
+
+        case let .channel(id, _):
+            return accounts.api.channelVideos(id)
+
+        case let .channelPlaylist(id, _):
+            return accounts.api.channelPlaylist(id)
+
+        case let .playlist(id):
+            return accounts.api.playlist(id)
+        }
+
+        return nil
+    }
+
+    private var label: String {
         if case let .playlist(id) = item.section {
-            return playlistsModel.find(id: id)?.title ?? "Playlist"
+            return playlists.find(id: id)?.title ?? "Playlist"
         }
 
         return item.section.label

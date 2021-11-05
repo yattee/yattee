@@ -267,7 +267,7 @@ struct VideoCell: View {
                     }
                     .retryOnAppear(false)
                     .onFailure { _ in
-                            thumbnails.insertUnloadable(url)
+                        thumbnails.insertUnloadable(url)
                     }
                     .indicator(.activity)
 
