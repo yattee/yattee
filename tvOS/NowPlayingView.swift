@@ -90,11 +90,11 @@ struct NowPlayingView: View {
                                 VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
                             }
                             .contextMenu {
-                                Button("Delete", role: .destructive) {
+                                Button("Remove", role: .destructive) {
                                     player.removeHistory(item)
                                 }
 
-                                Button("Delete History", role: .destructive) {
+                                Button("Remove All", role: .destructive) {
                                     player.removeHistoryItems()
                                 }
                             }

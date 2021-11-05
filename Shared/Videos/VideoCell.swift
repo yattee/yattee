@@ -152,7 +152,7 @@ struct VideoCell: View {
             VStack(alignment: .leading, spacing: 0) {
                 Group {
                     VStack(alignment: .leading, spacing: 0) {
-                        videoDetail(video.title, lineLimit: channelOnThumbnail ? 3 : 2)
+                        videoDetail(video.title, lineLimit: 2)
                         #if os(tvOS)
                             .frame(minHeight: 60, alignment: .top)
                         #elseif os(macOS)

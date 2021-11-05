@@ -58,6 +58,11 @@ struct VideoDetails: View {
                     }
 
                     subscriptionsSection
+                        .onChange(of: video) { video in
+                            if let video = video {
+                                subscribed = subscriptions.isSubscribing(video.channel.id)
+                            }
+                        }
                 }
                 .padding(.horizontal)
 
@@ -108,8 +113,6 @@ struct VideoDetails: View {
                 subscribed = false
                 return
             }
-
-            subscribed = subscriptions.isSubscribing(video!.channel.id)
         }
         .onChange(of: sidebarQueue) { queue in
             if queue {
