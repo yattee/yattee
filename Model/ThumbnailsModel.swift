@@ -15,11 +15,16 @@ final class ThumbnailsModel: ObservableObject {
         return unloadable.contains(url)
     }
 
-    func loadableURL(_ url: URL!) -> URL? {
-        guard !url.isNil else {
-            return nil
+    func best(_ video: Video) -> URL? {
+        let qualities = [Thumbnail.Quality.maxresdefault, .medium, .default]
+
+        for quality in qualities {
+            let url = video.thumbnailURL(quality: quality)
+            if !isUnloadable(url) {
+                return url
+            }
         }
 
-        return isUnloadable(url) ? nil : url
+        return nil
     }
 }

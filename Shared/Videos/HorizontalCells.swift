@@ -15,7 +15,7 @@ struct HorizontalCells: View {
                         .padding(.trailing, 20)
                         .padding(.bottom, 40)
                     #else
-                        .frame(width: 285)
+                        .frame(width: 295)
                     #endif
                 }
             }

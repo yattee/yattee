@@ -65,7 +65,7 @@ struct VideoCell: View {
             HStack(alignment: .top, spacing: 2) {
                 Section {
                     #if os(tvOS)
-                        thumbnailImage(quality: .medium)
+                        thumbnailImage
                     #else
                         thumbnail
                     #endif
@@ -224,7 +224,7 @@ struct VideoCell: View {
 
     var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnailImage(quality: mediumQualityThumbnail ? .medium : .maxresdefault)
+            thumbnailImage
 
             VStack {
                 HStack(alignment: .top) {
@@ -257,9 +257,9 @@ struct VideoCell: View {
         }
     }
 
-    func thumbnailImage(quality: Thumbnail.Quality) -> some View {
+    var thumbnailImage: some View {
         Group {
-            if let url = thumbnails.loadableURL(video.thumbnailURL(quality: quality)) {
+            if let url = thumbnails.best(video) {
                 WebImage(url: url)
                     .resizable()
                     .placeholder {
@@ -267,13 +267,7 @@ struct VideoCell: View {
                     }
                     .retryOnAppear(false)
                     .onFailure { _ in
-                        if let url = video.thumbnailURL(quality: quality) {
                             thumbnails.insertUnloadable(url)
-                        }
-
-                        if !thumbnails.isUnloadable(video.thumbnailURL(quality: .medium)) {
-                            mediumQualityThumbnail = true
-                        }
                     }
                     .indicator(.activity)
 
