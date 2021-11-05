@@ -66,10 +66,19 @@ extension PlayerModel {
     }
 
     private func preferredStream(_ streams: [Stream]) -> Stream? {
+        let quality = Defaults[.quality]
+        var streams = streams
+
         if let id = Defaults[.playerInstanceID] {
-            return streams.first { $0.instance.id == id }
-        } else {
-            return streams.first
+            streams = streams.filter { $0.instance.id == id }
+        }
+
+        switch quality {
+        case .best:
+            return streams.first { $0.kind == .hls } ?? streams.first
+        default:
+            let sorted = streams.filter { $0.kind != .hls }.sorted { $0.resolution > $1.resolution }
+            return sorted.first(where: { $0.resolution.height <= quality.value.height })
         }
     }
 

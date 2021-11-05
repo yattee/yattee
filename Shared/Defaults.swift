@@ -1,18 +1,6 @@
 import Defaults
 import Foundation
 
-enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
-    case always, whenFits, never
-
-    static var defaultValue: Self {
-        #if os(macOS)
-            .always
-        #else
-            .whenFits
-        #endif
-    }
-}
-
 extension Defaults.Keys {
     static let invidiousInstanceID = "default-invidious-instance"
     static let pipedInstanceID = "default-piped-instance"
@@ -54,7 +42,7 @@ extension Defaults.Keys {
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
 
-    static let quality = Key<Stream.ResolutionSetting>("quality", default: .hd720pFirstThenBest)
+    static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
@@ -67,4 +55,38 @@ extension Defaults.Keys {
 
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
+}
+
+enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
+    case best, hd720p, sd480p, sd360p, sd240p, sd144p
+
+    var value: Stream.Resolution {
+        switch self {
+        case .best:
+            return .hd720p
+        default:
+            return Stream.Resolution(rawValue: rawValue)!
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .best:
+            return "Best available"
+        default:
+            return value.name
+        }
+    }
+}
+
+enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
+    case always, whenFits, never
+
+    static var defaultValue: Self {
+        #if os(macOS)
+            .always
+        #else
+            .whenFits
+        #endif
+    }
 }

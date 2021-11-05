@@ -67,7 +67,7 @@ struct PlaybackSettings: View {
 
     private var qualityPicker: some View {
         Picker("Quality", selection: $quality) {
-            ForEach(Stream.ResolutionSetting.allCases, id: \.self) { resolution in
+            ForEach(ResolutionSetting.allCases, id: \.self) { resolution in
                 Text(resolution.description).tag(resolution)
             }
         }

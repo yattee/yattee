@@ -4,28 +4,6 @@ import Foundation
 
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
-    enum ResolutionSetting: String, Defaults.Serializable, CaseIterable {
-        case hd720pFirstThenBest, hd1080p, hd720p, sd480p, sd360p, sd240p, sd144p
-
-        var value: Stream.Resolution {
-            switch self {
-            case .hd720pFirstThenBest:
-                return .hd720p
-            default:
-                return Stream.Resolution(rawValue: rawValue)!
-            }
-        }
-
-        var description: String {
-            switch self {
-            case .hd720pFirstThenBest:
-                return "Default: adaptive"
-            default:
-                return value.name
-            }
-        }
-    }
-
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
         case hd1440p60, hd1440p, hd1080p60, hd1080p, hd720p60, hd720p, sd480p, sd360p, sd240p, sd144p, unknown
 
