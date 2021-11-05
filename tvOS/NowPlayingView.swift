@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct NowPlayingView: View {
@@ -9,6 +10,8 @@ struct NowPlayingView: View {
     var inInfoViewController = false
 
     @EnvironmentObject<PlayerModel> private var player
+
+    @Default(.saveHistory) private var saveHistory
 
     var body: some View {
         if inInfoViewController {
@@ -80,7 +83,7 @@ struct NowPlayingView: View {
                     }
                 }
 
-                if sections.contains(.playedPreviously), !player.history.isEmpty {
+                if sections.contains(.playedPreviously), saveHistory, !player.history.isEmpty {
                     Section(header: Text("Played Previously")) {
                         ForEach(player.history) { item in
                             Button {

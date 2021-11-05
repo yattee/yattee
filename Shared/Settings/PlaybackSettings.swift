@@ -7,6 +7,7 @@ struct PlaybackSettings: View {
     @Default(.quality) private var quality
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showKeywords) private var showKeywords
+    @Default(.saveHistory) private var saveHistory
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
@@ -20,10 +21,13 @@ struct PlaybackSettings: View {
                 Section(header: SettingsHeader(text: "Player")) {
                     sourcePicker
                     qualityPicker
+
                     if idiom == .pad {
                         sidebarPicker
                     }
+
                     keywordsToggle
+                    saveHistoryToggle
                 }
             #else
                 Section(header: SettingsHeader(text: "Source")) {
@@ -41,6 +45,7 @@ struct PlaybackSettings: View {
                 #endif
 
                 keywordsToggle
+                saveHistoryToggle
             #endif
         }
 
@@ -103,6 +108,10 @@ struct PlaybackSettings: View {
 
     private var keywordsToggle: some View {
         Toggle("Show video keywords", isOn: $showKeywords)
+    }
+
+    private var saveHistoryToggle: some View {
+        Toggle("Save history of played videos", isOn: $saveHistory)
     }
 }
 

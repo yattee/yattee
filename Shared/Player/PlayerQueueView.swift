@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -7,6 +8,8 @@ struct PlayerQueueView: View {
 
     @EnvironmentObject<PlayerModel> private var player
 
+    @Default(.saveHistory) private var saveHistory
+
     var body: some View {
         List {
             Group {
@@ -14,7 +17,9 @@ struct PlayerQueueView: View {
                 if sidebarQueue {
                     related
                 }
-                playedPreviously
+                if saveHistory {
+                    playedPreviously
+                }
             }
             #if !os(iOS)
                 .padding(.vertical, 5)

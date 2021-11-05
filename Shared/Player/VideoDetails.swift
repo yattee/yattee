@@ -105,7 +105,7 @@ struct VideoDetails: View {
         }
         .padding(.top, inNavigationView && fullScreen ? 10 : 0)
         .onAppear {
-            if video.isNil {
+            if video.isNil && !sidebarQueue {
                 currentPage = .queue
             }
 

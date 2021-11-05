@@ -149,7 +149,7 @@ extension PlayerModel {
     }
 
     func addCurrentItemToHistory() {
-        if let item = currentItem {
+        if let item = currentItem, Defaults[.saveHistory] {
             addItemToHistory(item)
         }
     }
