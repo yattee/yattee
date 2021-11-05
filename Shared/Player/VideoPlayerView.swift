@@ -118,11 +118,6 @@ struct VideoPlayerView: View {
                 }
             #endif
         }
-        .onDisappear {
-            if !player.playingInPictureInPicture {
-                player.pause()
-            }
-        }
     }
 
     func playerPlaceholder(geometry: GeometryProxy) -> some View {

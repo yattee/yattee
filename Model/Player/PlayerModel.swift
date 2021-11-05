@@ -21,7 +21,7 @@ final class PlayerModel: ObservableObject {
         var avPlayerViewController: AVPlayerViewController?
     #endif
 
-    @Published var presentingPlayer = false
+    @Published var presentingPlayer = false { didSet { pauseOnPlayerDismiss() } }
 
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { player.rate = currentRate } }
@@ -141,6 +141,14 @@ final class PlayerModel: ObservableObject {
         }
 
         updateCurrentArtwork()
+    }
+
+    private func pauseOnPlayerDismiss() {
+        if !playingInPictureInPicture, !presentingPlayer {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.pause()
+            }
+        }
     }
 
     private func insertPlayerItem(
