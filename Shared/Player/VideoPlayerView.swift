@@ -67,11 +67,11 @@ struct VideoPlayerView: View {
                             } else {
                                 #if os(macOS)
                                     Player()
-                                        .modifier(VideoPlayerSizeModifier(geometry: geometry))
+                                        .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio))
 
                                 #else
                                     player.playerView
-                                        .modifier(VideoPlayerSizeModifier(geometry: geometry))
+                                        .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio))
                                 #endif
                             }
                         }
@@ -99,7 +99,7 @@ struct VideoPlayerView: View {
                             #endif
                         }
                         .background()
-                        .modifier(VideoDetailsPaddingModifier(geometry: geometry, fullScreen: fullScreen))
+                        .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio, fullScreen: fullScreen))
                     }
                 #endif
             }

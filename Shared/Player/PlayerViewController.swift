@@ -8,6 +8,16 @@ final class PlayerViewController: UIViewController {
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
 
+    var aspectRatio: Double? {
+        let ratio = Double(playerViewController.videoBounds.width) / Double(playerViewController.videoBounds.height)
+
+        if !ratio.isFinite {
+            return VideoPlayerView.defaultAspectRatio
+        }
+
+        return [ratio, 1.0].max()!
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 

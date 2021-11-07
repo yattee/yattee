@@ -6,6 +6,16 @@ final class PlayerViewController: NSViewController {
     var playerView = AVPlayerView()
     var pictureInPictureDelegate = PictureInPictureDelegate()
 
+    var aspectRatio: Double? {
+        let ratio = Double(playerView.videoBounds.width) / Double(playerView.videoBounds.height)
+
+        if !ratio.isFinite {
+            return VideoPlayerView.defaultAspectRatio
+        }
+
+        return [ratio, 1.0].max()!
+    }
+
     override func viewDidDisappear() {
         super.viewDidDisappear()
     }
