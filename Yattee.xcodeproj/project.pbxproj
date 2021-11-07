@@ -384,13 +384,13 @@
 		37CEE4C32677B697005A1EFE /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEE4C02677B697005A1EFE /* Stream.swift */; };
 		37D4B0D92671614900C925CA /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0D82671614900C925CA /* Tests_iOS.swift */; };
 		37D4B0E32671614900C925CA /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0E22671614900C925CA /* Tests_macOS.swift */; };
-		37D4B0E42671614900C925CA /* PearvidiousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* PearvidiousApp.swift */; };
-		37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* PearvidiousApp.swift */; };
+		37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
+		37D4B0E52671614900C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
 		37D4B0E82671614900C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B0C42671614800C925CA /* Assets.xcassets */; };
 		37D4B0E92671614900C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B0C42671614800C925CA /* Assets.xcassets */; };
 		37D4B15F267164AF00C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B15E267164AF00C925CA /* Assets.xcassets */; };
-		37D4B176267164B000C925CA /* PearvidiousUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B175267164B000C925CA /* PearvidiousUITests.swift */; };
-		37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* PearvidiousApp.swift */; };
+		37D4B176267164B000C925CA /* YatteeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B175267164B000C925CA /* YatteeUITests.swift */; };
+		37D4B1802671650A00C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
 		37D4B1862671691600C925CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37D4B0C42671614800C925CA /* Assets.xcassets */; };
 		37D4B18E26717B3800C925CA /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B18B26717B3800C925CA /* VideoCell.swift */; };
 		37D4B19726717E1500C925CA /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
@@ -479,21 +479,21 @@
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 37D4B0C82671614900C925CA;
-			remoteInfo = "Pearvidious (iOS)";
+			remoteInfo = "Yattee (iOS)";
 		};
 		37D4B0DF2671614900C925CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 37D4B0CE2671614900C925CA;
-			remoteInfo = "Pearvidious (macOS)";
+			remoteInfo = "Yattee (macOS)";
 		};
 		37D4B172267164B000C925CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 37D4B157267164AE00C925CA;
-			remoteInfo = Pearvidious;
+			remoteInfo = Yattee;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -626,7 +626,7 @@
 		37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVNavigationView.swift; sourceTree = "<group>"; };
 		37BD07B42698AA4D003EBB87 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		37BD07BA2698AB60003EBB87 /* AppSidebarNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarNavigation.swift; sourceTree = "<group>"; };
-		37BD07C42698ADEE003EBB87 /* Pearvidious.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pearvidious.entitlements; sourceTree = "<group>"; };
+		37BD07C42698ADEE003EBB87 /* Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Yattee.entitlements; sourceTree = "<group>"; };
 		37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD226A1D4780092E2DB /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		37BE0BD526A1D4A90092E2DB /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
@@ -652,19 +652,19 @@
 		37CC3F4F270D010D00608308 /* VideoBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoBanner.swift; sourceTree = "<group>"; };
 		37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleAssetStream.swift; sourceTree = "<group>"; };
 		37CEE4C02677B697005A1EFE /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
-		37D4B0C22671614700C925CA /* PearvidiousApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearvidiousApp.swift; sourceTree = "<group>"; };
+		37D4B0C22671614700C925CA /* YatteeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YatteeApp.swift; sourceTree = "<group>"; };
 		37D4B0C32671614700C925CA /* AppTabNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabNavigation.swift; sourceTree = "<group>"; };
 		37D4B0C42671614800C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		37D4B0C92671614900C925CA /* Pearvidious.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pearvidious.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		37D4B0CF2671614900C925CA /* Pearvidious.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pearvidious.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B0C92671614900C925CA /* Yattee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yattee.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B0CF2671614900C925CA /* Yattee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yattee.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0D42671614900C925CA /* Tests (iOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (iOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0D82671614900C925CA /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
 		37D4B0DE2671614900C925CA /* Tests (macOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (macOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B0E22671614900C925CA /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
-		37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pearvidious (tvOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D4B158267164AE00C925CA /* Yattee (tvOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Yattee (tvOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D4B15E267164AF00C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		37D4B171267164B000C925CA /* Tests (tvOS).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (tvOS).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		37D4B175267164B000C925CA /* PearvidiousUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PearvidiousUITests.swift; sourceTree = "<group>"; };
+		37D4B175267164B000C925CA /* YatteeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YatteeUITests.swift; sourceTree = "<group>"; };
 		37D4B18B26717B3800C925CA /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		37D4B19626717E1500C925CA /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1073,12 +1073,12 @@
 				375168D52700FAFF008F96A6 /* Debounce.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
-				37D4B0C22671614700C925CA /* PearvidiousApp.swift */,
 				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
 				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				37CB12782724C76D00213B45 /* VideoURLParser.swift */,
+				37D4B0C22671614700C925CA /* YatteeApp.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
-				37BD07C42698ADEE003EBB87 /* Pearvidious.entitlements */,
+				37BD07C42698ADEE003EBB87 /* Yattee.entitlements */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1086,11 +1086,11 @@
 		37D4B0CA2671614900C925CA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				37D4B0C92671614900C925CA /* Pearvidious.app */,
-				37D4B0CF2671614900C925CA /* Pearvidious.app */,
+				37D4B0C92671614900C925CA /* Yattee.app */,
+				37D4B0CF2671614900C925CA /* Yattee.app */,
 				37D4B0D42671614900C925CA /* Tests (iOS).xctest */,
 				37D4B0DE2671614900C925CA /* Tests (macOS).xctest */,
-				37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */,
+				37D4B158267164AE00C925CA /* Yattee (tvOS).app */,
 				37D4B171267164B000C925CA /* Tests (tvOS).xctest */,
 				37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */,
 				37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */,
@@ -1132,7 +1132,7 @@
 		37D4B174267164B000C925CA /* Tests Apple TV */ = {
 			isa = PBXGroup;
 			children = (
-				37D4B175267164B000C925CA /* PearvidiousUITests.swift */,
+				37D4B175267164B000C925CA /* YatteeUITests.swift */,
 			);
 			path = "Tests Apple TV";
 			sourceTree = "<group>";
@@ -1230,9 +1230,9 @@
 			productReference = 37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		37D4B0C82671614900C925CA /* Pearvidious (iOS) */ = {
+		37D4B0C82671614900C925CA /* Yattee (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (iOS)" */;
+			buildConfigurationList = 37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Yattee (iOS)" */;
 			buildPhases = (
 				37CC3F48270CE89B00608308 /* ShellScript */,
 				37D4B0C52671614900C925CA /* Sources */,
@@ -1245,7 +1245,7 @@
 			dependencies = (
 				37A3B18E2725735F000FB5EE /* PBXTargetDependency */,
 			);
-			name = "Pearvidious (iOS)";
+			name = "Yattee (iOS)";
 			packageProductDependencies = (
 				377FC7D4267A080300A6BBAF /* SwiftyJSON */,
 				377FC7DA267A080300A6BBAF /* Logging */,
@@ -1258,13 +1258,13 @@
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
 				3765917B27237D21009F956E /* PINCache */,
 			);
-			productName = "Pearvidious (iOS)";
-			productReference = 37D4B0C92671614900C925CA /* Pearvidious.app */;
+			productName = "Yattee (iOS)";
+			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
 			productType = "com.apple.product-type.application";
 		};
-		37D4B0CE2671614900C925CA /* Pearvidious (macOS) */ = {
+		37D4B0CE2671614900C925CA /* Yattee (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (macOS)" */;
+			buildConfigurationList = 37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Yattee (macOS)" */;
 			buildPhases = (
 				37CC3F4A270CE8D000608308 /* ShellScript */,
 				37D4B0CB2671614900C925CA /* Sources */,
@@ -1277,7 +1277,7 @@
 			dependencies = (
 				37A3B16F27255E7F000FB5EE /* PBXTargetDependency */,
 			);
-			name = "Pearvidious (macOS)";
+			name = "Yattee (macOS)";
 			packageProductDependencies = (
 				377FC7EC267A0A0800A6BBAF /* SwiftyJSON */,
 				377FC7F2267A0A0800A6BBAF /* Logging */,
@@ -1289,8 +1289,8 @@
 				37FB285727220D9600A57617 /* SDWebImagePINPlugin */,
 				3765917927237D07009F956E /* PINCache */,
 			);
-			productName = "Pearvidious (macOS)";
-			productReference = 37D4B0CF2671614900C925CA /* Pearvidious.app */;
+			productName = "Yattee (macOS)";
+			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
 			productType = "com.apple.product-type.application";
 		};
 		37D4B0D32671614900C925CA /* Tests (iOS) */ = {
@@ -1329,9 +1329,9 @@
 			productReference = 37D4B0DE2671614900C925CA /* Tests (macOS).xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		37D4B157267164AE00C925CA /* Pearvidious (tvOS) */ = {
+		37D4B157267164AE00C925CA /* Yattee (tvOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (tvOS)" */;
+			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Yattee (tvOS)" */;
 			buildPhases = (
 				37CC3F49270CE8CA00608308 /* ShellScript */,
 				37D4B154267164AE00C925CA /* Sources */,
@@ -1342,7 +1342,7 @@
 			);
 			dependencies = (
 			);
-			name = "Pearvidious (tvOS)";
+			name = "Yattee (tvOS)";
 			packageProductDependencies = (
 				37D4B19C2671817900C925CA /* SwiftyJSON */,
 				37B767DF2678C5BF0098BAA8 /* Logging */,
@@ -1354,8 +1354,8 @@
 				37FB285327220D8400A57617 /* SDWebImagePINPlugin */,
 				3765917D27237D2A009F956E /* PINCache */,
 			);
-			productName = Pearvidious;
-			productReference = 37D4B158267164AE00C925CA /* Pearvidious (tvOS).app */;
+			productName = Yattee;
+			productReference = 37D4B158267164AE00C925CA /* Yattee (tvOS).app */;
 			productType = "com.apple.product-type.application";
 		};
 		37D4B170267164B000C925CA /* Tests (tvOS) */ = {
@@ -1372,7 +1372,7 @@
 				37D4B173267164B000C925CA /* PBXTargetDependency */,
 			);
 			name = "Tests (tvOS)";
-			productName = PearvidiousUITests;
+			productName = YatteeUITests;
 			productReference = 37D4B171267164B000C925CA /* Tests (tvOS).xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -1424,7 +1424,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Pearvidious" */;
+			buildConfigurationList = 37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Yattee" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -1449,9 +1449,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				37D4B0C82671614900C925CA /* Pearvidious (iOS) */,
-				37D4B0CE2671614900C925CA /* Pearvidious (macOS) */,
-				37D4B157267164AE00C925CA /* Pearvidious (tvOS) */,
+				37D4B0C82671614900C925CA /* Yattee (iOS) */,
+				37D4B0CE2671614900C925CA /* Yattee (macOS) */,
+				37D4B157267164AE00C925CA /* Yattee (tvOS) */,
 				37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */,
 				37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */,
 				37A3B19C27258492000FB5EE /* Periphery (iOS) */,
@@ -1555,7 +1555,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (iOS)\" \\\n  --targets \"Pearvidious (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
+			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (iOS)\" \\\n  --targets \"Yattee (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
 		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1623,7 +1623,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (macOS)\" \\\n  --targets \"Pearvidious (macOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (macOS)\" \\\n  --targets \"Yattee (macOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
 		};
 		37FD43EF2704A7780073EE42 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1640,7 +1640,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Pearvidious.xcodeproj\" \\\n  --schemes \"Pearvidious (Apple TV)\" \\\n  --targets \"Pearvidious (Apple TV)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (Apple TV)\" \\\n  --targets \"Yattee (Apple TV)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1785,7 +1785,7 @@
 				37484C1D26FC83A400287258 /* InstancesSettings.swift in Sources */,
 				37BD07BB2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */,
 				37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
-				37D4B0E42671614900C925CA /* PearvidiousApp.swift in Sources */,
+				37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */,
 				37C3A241272359900087A57A /* Double+Format.swift in Sources */,
 				37FB285E272225E800A57617 /* ContentItemView.swift in Sources */,
 				3797758B2689345500DD52A8 /* Store.swift in Sources */,
@@ -1901,7 +1901,7 @@
 				3730F75A2733481E00F385FC /* RelatedView.swift in Sources */,
 				375168D72700FDB8008F96A6 /* Debounce.swift in Sources */,
 				37D526DF2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
-				37D4B0E52671614900C925CA /* PearvidiousApp.swift in Sources */,
+				37D4B0E52671614900C925CA /* YatteeApp.swift in Sources */,
 				37BD07C12698AD3B003EBB87 /* TrendingCountry.swift in Sources */,
 				37BA794026DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				3711404026B206A6005B3555 /* SearchModel.swift in Sources */,
@@ -1960,7 +1960,7 @@
 				375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */,
 				37F4AE7426828F0900BD60EA /* VerticalCells.swift in Sources */,
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
-				37D4B1802671650A00C925CA /* PearvidiousApp.swift in Sources */,
+				37D4B1802671650A00C925CA /* YatteeApp.swift in Sources */,
 				3748187026A769D60084E870 /* DetailBadge.swift in Sources */,
 				37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */,
@@ -2065,7 +2065,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37D4B176267164B000C925CA /* PearvidiousUITests.swift in Sources */,
+				37D4B176267164B000C925CA /* YatteeUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2084,17 +2084,17 @@
 		};
 		37D4B0D62671614900C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 37D4B0C82671614900C925CA /* Pearvidious (iOS) */;
+			target = 37D4B0C82671614900C925CA /* Yattee (iOS) */;
 			targetProxy = 37D4B0D52671614900C925CA /* PBXContainerItemProxy */;
 		};
 		37D4B0E02671614900C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 37D4B0CE2671614900C925CA /* Pearvidious (macOS) */;
+			target = 37D4B0CE2671614900C925CA /* Yattee (macOS) */;
 			targetProxy = 37D4B0DF2671614900C925CA /* PBXContainerItemProxy */;
 		};
 		37D4B173267164B000C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 37D4B157267164AE00C925CA /* Pearvidious (tvOS) */;
+			target = 37D4B157267164AE00C925CA /* Yattee (tvOS) */;
 			targetProxy = 37D4B172267164B000C925CA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -2125,7 +2125,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -2159,7 +2159,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -2190,7 +2190,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2222,7 +2222,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Pearvidious.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.safari-extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2385,8 +2385,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
-				PRODUCT_NAME = Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
+				PRODUCT_NAME = Yattee;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2417,8 +2417,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
-				PRODUCT_NAME = Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
+				PRODUCT_NAME = Yattee;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2433,7 +2433,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Shared/Pearvidious.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2453,8 +2453,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
-				PRODUCT_NAME = Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
+				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2467,7 +2467,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Shared/Pearvidious.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2487,8 +2487,8 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
-				PRODUCT_NAME = Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
+				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2510,13 +2510,13 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Tests-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Pearvidious (iOS)";
+				TEST_TARGET_NAME = "Yattee (iOS)";
 			};
 			name = Debug;
 		};
@@ -2535,13 +2535,13 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Tests-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Pearvidious (iOS)";
+				TEST_TARGET_NAME = "Yattee (iOS)";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -2562,12 +2562,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Tests-macOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Pearvidious (macOS)";
+				TEST_TARGET_NAME = "Yattee (macOS)";
 			};
 			name = Debug;
 		};
@@ -2587,12 +2587,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Tests-macOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Pearvidious (macOS)";
+				TEST_TARGET_NAME = "Yattee (macOS)";
 			};
 			name = Release;
 		};
@@ -2608,9 +2608,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tvOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Pearvidious;
-				INFOPLIST_KEY_CFBundleExecutable = "Pearvidious (Apple TV)";
-				INFOPLIST_KEY_CFBundleName = "Pearvidious (Apple TV)";
+				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
+				INFOPLIST_KEY_CFBundleExecutable = "Yattee (Apple TV)";
+				INFOPLIST_KEY_CFBundleName = "Yattee (Apple TV)";
 				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
@@ -2619,7 +2619,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2641,9 +2641,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tvOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Pearvidious;
-				INFOPLIST_KEY_CFBundleExecutable = "Pearvidious (Apple TV)";
-				INFOPLIST_KEY_CFBundleName = "Pearvidious (Apple TV)";
+				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
+				INFOPLIST_KEY_CFBundleExecutable = "Yattee (Apple TV)";
+				INFOPLIST_KEY_CFBundleName = "Yattee (Apple TV)";
 				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
@@ -2652,7 +2652,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.Pearvidious;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2677,13 +2677,13 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.PearvidiousUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TEST_TARGET_NAME = Pearvidious;
+				TEST_TARGET_NAME = Yattee;
 				TVOS_DEPLOYMENT_TARGET = 15.0;
 			};
 			name = Debug;
@@ -2702,13 +2702,13 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.arekf.PearvidiousUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
-				TEST_TARGET_NAME = Pearvidious;
+				TEST_TARGET_NAME = Yattee;
 				TVOS_DEPLOYMENT_TARGET = 15.0;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2780,7 +2780,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Pearvidious" */ = {
+		37D4B0C02671614700C925CA /* Build configuration list for PBXProject "Yattee" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B0EA2671614900C925CA /* Debug */,
@@ -2789,7 +2789,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (iOS)" */ = {
+		37D4B0EC2671614900C925CA /* Build configuration list for PBXNativeTarget "Yattee (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B0ED2671614900C925CA /* Debug */,
@@ -2798,7 +2798,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (macOS)" */ = {
+		37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Yattee (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B0F02671614900C925CA /* Debug */,
@@ -2825,7 +2825,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Pearvidious (tvOS)" */ = {
+		37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Yattee (tvOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37D4B178267164B000C925CA /* Debug */,

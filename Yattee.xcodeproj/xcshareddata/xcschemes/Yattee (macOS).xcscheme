@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37A3B19C27258492000FB5EE"
-               BuildableName = "Periphery (iOS)"
-               BlueprintName = "Periphery (iOS)"
-               ReferencedContainer = "container:Pearvidious.xcodeproj">
+               BlueprintIdentifier = "37D4B0CE2671614900C925CA"
+               BuildableName = "Yattee.app"
+               BlueprintName = "Yattee (macOS)"
+               ReferencedContainer = "container:Yattee.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "37D4B0DD2671614900C925CA"
+               BuildableName = "Tests (macOS).xctest"
+               BlueprintName = "Tests (macOS)"
+               ReferencedContainer = "container:Yattee.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -40,6 +50,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "37D4B0CE2671614900C925CA"
+            BuildableName = "Yattee.app"
+            BlueprintName = "Yattee (macOS)"
+            ReferencedContainer = "container:Yattee.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -47,15 +67,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "37A3B19C27258492000FB5EE"
-            BuildableName = "Periphery (iOS)"
-            BlueprintName = "Periphery (iOS)"
-            ReferencedContainer = "container:Pearvidious.xcodeproj">
+            BlueprintIdentifier = "37D4B0CE2671614900C925CA"
+            BuildableName = "Yattee.app"
+            BlueprintName = "Yattee (macOS)"
+            ReferencedContainer = "container:Yattee.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

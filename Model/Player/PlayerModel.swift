@@ -12,7 +12,7 @@ import SwiftyJSON
 
 final class PlayerModel: ObservableObject {
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
-    let logger = Logger(label: "net.arekf.Pearvidious.ps")
+    let logger = Logger(label: "stream.yattee.app")
 
     private(set) var player = AVPlayer()
     private(set) var playerView = Player()

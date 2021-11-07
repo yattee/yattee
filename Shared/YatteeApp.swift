@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 @main
-struct PearvidiousApp: App {
+struct YatteeApp: App {
     #if os(macOS)
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #endif

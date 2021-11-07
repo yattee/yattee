@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "37D4B0C82671614900C925CA"
-               BuildableName = "Pearvidious.app"
-               BlueprintName = "Pearvidious (iOS)"
-               ReferencedContainer = "container:Pearvidious.xcodeproj">
+               BuildableName = "Yattee.app"
+               BlueprintName = "Yattee (iOS)"
+               ReferencedContainer = "container:Yattee.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "37D4B0D32671614900C925CA"
                BuildableName = "Tests (iOS).xctest"
                BlueprintName = "Tests (iOS)"
-               ReferencedContainer = "container:Pearvidious.xcodeproj">
+               ReferencedContainer = "container:Yattee.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D4B0C82671614900C925CA"
-            BuildableName = "Pearvidious.app"
-            BlueprintName = "Pearvidious (iOS)"
-            ReferencedContainer = "container:Pearvidious.xcodeproj">
+            BuildableName = "Yattee.app"
+            BlueprintName = "Yattee (iOS)"
+            ReferencedContainer = "container:Yattee.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D4B0C82671614900C925CA"
-            BuildableName = "Pearvidious.app"
-            BlueprintName = "Pearvidious (iOS)"
-            ReferencedContainer = "container:Pearvidious.xcodeproj">
+            BuildableName = "Yattee.app"
+            BlueprintName = "Yattee (iOS)"
+            ReferencedContainer = "container:Yattee.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

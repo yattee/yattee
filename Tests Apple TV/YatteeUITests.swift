@@ -1,13 +1,6 @@
-//
-//  PearvidiousUITests.swift
-//  PearvidiousUITests
-//
-//  Created by Arkadiusz Fal on 09/06/2021.
-//
-
 import XCTest
 
-class PearvidiousUITests: XCTestCase {
+class YatteeUITests: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 

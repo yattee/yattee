@@ -24,6 +24,10 @@ struct Sidebar: View {
             }
             .listStyle(.sidebar)
         }
+        .navigationTitle("Yattee")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 
     var mainNavigationLinks: some View {
