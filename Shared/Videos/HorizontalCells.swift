@@ -4,6 +4,8 @@ import SwiftUI
 struct HorizontalCells: View {
     var items = [ContentItem]()
 
+    @Default(.channelOnThumbnail) private var channelOnThumbnail
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 20) {
@@ -27,13 +29,16 @@ struct HorizontalCells: View {
                 .padding(.vertical, 10)
             #endif
         }
-        #if os(tvOS)
-            .frame(height: 560)
-        #else
-            .frame(height: 290)
-        #endif
-
+        .frame(height: cellHeight)
         .edgesIgnoringSafeArea(.horizontal)
+    }
+
+    var cellHeight: Double {
+        #if os(tvOS)
+            560
+        #else
+            290 - (channelOnThumbnail ? 23 : 0)
+        #endif
     }
 }
 

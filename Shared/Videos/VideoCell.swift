@@ -168,13 +168,14 @@ struct VideoCell: View {
                                 .padding(.bottom, 6)
                         }
                     }
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 }
                 #if os(tvOS)
                     .frame(minHeight: channelOnThumbnail ? 80 : 120, alignment: .top)
                 #elseif os(macOS)
-                    .frame(minHeight: 60, alignment: .top)
+                    .frame(minHeight: 35, alignment: .top)
                 #else
-                    .frame(minHeight: 80, alignment: .top)
+                    .frame(minHeight: 50, alignment: .top)
                 #endif
                 .padding(.bottom, 4)
 
@@ -315,7 +316,7 @@ struct VideoCell_Preview: PreviewProvider {
             VideoCell(video: Video.fixture)
         }
         #if os(macOS)
-            .frame(maxWidth: 600, maxHeight: 400)
+            .frame(maxWidth: 300, maxHeight: 250)
         #elseif os(iOS)
             .frame(maxWidth: 300, maxHeight: 200)
         #endif
