@@ -25,43 +25,58 @@ struct FavoriteItemView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label)
-                .font(.title3.bold())
-                .foregroundColor(.secondary)
-                .contextMenu {
-                    Button {
-                        favoritesModel.remove(item)
-                    } label: {
-                        Label("Remove from Favorites", systemImage: "trash")
-                    }
+        Group {
+            if isVisible {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(label)
+                        .font(.title3.bold())
+                        .foregroundColor(.secondary)
+                        .contextMenu {
+                            Button {
+                                favoritesModel.remove(item)
+                            } label: {
+                                Label("Remove from Favorites", systemImage: "trash")
+                            }
+                        }
+                        .contentShape(Rectangle())
+                    #if os(tvOS)
+                        .padding(.leading, 40)
+                    #else
+                        .padding(.leading, 15)
+                    #endif
+
+                    HorizontalCells(items: store.contentItems)
                 }
+
                 .contentShape(Rectangle())
-            #if os(tvOS)
-                .padding(.leading, 40)
-            #else
-                .padding(.leading, 15)
-            #endif
-
-            HorizontalCells(items: store.contentItems)
-        }
-
-        .contentShape(Rectangle())
-        .opacity(dragging?.id == item.id ? 0.5 : 1)
-        .onAppear {
-            resource?.addObserver(store)
-            resource?.loadIfNeeded()
-        }
-        #if !os(tvOS)
-            .onDrag {
-                dragging = item
-                return NSItemProvider(object: item.id as NSString)
+                .opacity(dragging?.id == item.id ? 0.5 : 1)
+                .onAppear {
+                    resource?.addObserver(store)
+                    resource?.loadIfNeeded()
+                }
+                #if !os(tvOS)
+                    .onDrag {
+                        dragging = item
+                        return NSItemProvider(object: item.id as NSString)
+                    }
+                    .onDrop(
+                        of: [UTType.text],
+                        delegate: DropFavorite(item: item, favorites: $favorites, current: $dragging)
+                    )
+                #endif
             }
-            .onDrop(
-                of: [UTType.text],
-                delegate: DropFavorite(item: item, favorites: $favorites, current: $dragging)
-            )
-        #endif
+        }
+    }
+
+    private var isVisible: Bool {
+        switch item.section {
+        case .subscriptions:
+            return accounts.app.supportsSubscriptions
+        case .popular:
+            return accounts.app.supportsPopular
+        default:
+            return true
+        }
     }
 
     private var resource: Resource? {

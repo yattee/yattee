@@ -85,6 +85,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $navigation.presentingPlaylistForm) {
                 PlaylistFormView(playlist: $navigation.editedPlaylist)
+                    .environmentObject(accounts)
                     .environmentObject(playlists)
             }
             .sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {

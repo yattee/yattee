@@ -57,6 +57,10 @@ extension Defaults.Keys {
 
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
+
+    #if os(iOS)
+        static let tabNavigationSection = Key<TabNavigationSectionSetting>("tabNavigationSection", default: .trending)
+    #endif
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
@@ -92,3 +96,9 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
         #endif
     }
 }
+
+#if os(iOS)
+    enum TabNavigationSectionSetting: String, Defaults.Serializable {
+        case trending, popular
+    }
+#endif

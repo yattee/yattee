@@ -8,6 +8,8 @@ struct AppTabNavigation: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
+    @Default(.tabNavigationSection) private var tabNavigationSection
+
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
             NavigationView {
@@ -20,7 +22,7 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.favorites)
 
-            if accounts.app.supportsSubscriptions {
+            if subscriptionsVisible {
                 NavigationView {
                     LazyView(SubscriptionsView())
                         .toolbar { toolbarContent }
@@ -32,28 +34,20 @@ struct AppTabNavigation: View {
                 .tag(TabSelection.subscriptions)
             }
 
-            // TODO: reenable with settings
-            if accounts.app.supportsPopular && false {
-                NavigationView {
-                    LazyView(PopularView())
-                        .toolbar { toolbarContent }
+            if subscriptionsVisible {
+                if accounts.app.supportsPopular {
+                    if tabNavigationSection == .popular {
+                        popularNavigationView
+                    } else {
+                        trendingNavigationView
+                    }
                 }
-                .tabItem {
-                    Label("Popular", systemImage: "chart.bar")
-                        .accessibility(label: Text("Popular"))
+            } else {
+                if accounts.app.supportsPopular {
+                    popularNavigationView
                 }
-                .tag(TabSelection.popular)
+                trendingNavigationView
             }
-
-            NavigationView {
-                LazyView(TrendingView())
-                    .toolbar { toolbarContent }
-            }
-            .tabItem {
-                Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
-                    .accessibility(label: Text("Trending"))
-            }
-            .tag(TabSelection.trending)
 
             if accounts.app.supportsUserPlaylists {
                 NavigationView {
@@ -123,6 +117,34 @@ struct AppTabNavigation: View {
                 }
             }
         }
+    }
+
+    private var subscriptionsVisible: Bool {
+        accounts.app.supportsSubscriptions && !(accounts.current?.anonymous ?? true)
+    }
+
+    private var popularNavigationView: some View {
+        NavigationView {
+            LazyView(PopularView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Popular", systemImage: "chart.bar")
+                .accessibility(label: Text("Popular"))
+        }
+        .tag(TabSelection.popular)
+    }
+
+    private var trendingNavigationView: some View {
+        NavigationView {
+            LazyView(TrendingView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+                .accessibility(label: Text("Trending"))
+        }
+        .tag(TabSelection.trending)
     }
 
     private var playerNavigationLink: some View {

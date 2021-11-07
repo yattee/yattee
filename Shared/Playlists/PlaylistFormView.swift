@@ -14,7 +14,7 @@ struct PlaylistFormView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject<InvidiousAPI> private var api
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlaylistsModel> private var playlists
 
     var editing: Bool {
@@ -185,7 +185,7 @@ struct PlaylistFormView: View {
     }
 
     var resource: Resource? {
-        editing ? api.playlist(playlist.id) : api.playlists
+        editing ? accounts.api.playlist(playlist.id) : accounts.api.playlists
     }
 
     var visibilityFormItem: some View {
@@ -230,7 +230,7 @@ struct PlaylistFormView: View {
     }
 
     func deletePlaylistAndDismiss() {
-        api.playlist(playlist.id)?.request(.delete).onSuccess { _ in
+        accounts.api.playlist(playlist.id)?.request(.delete).onSuccess { _ in
             playlist = nil
             playlists.load(force: true)
             dismiss()

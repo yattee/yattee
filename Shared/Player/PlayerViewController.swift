@@ -8,15 +8,17 @@ final class PlayerViewController: UIViewController {
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
 
-    var aspectRatio: Double? {
-        let ratio = Double(playerViewController.videoBounds.width) / Double(playerViewController.videoBounds.height)
+    #if !os(tvOS)
+        var aspectRatio: Double? {
+            let ratio = Double(playerViewController.videoBounds.width) / Double(playerViewController.videoBounds.height)
 
-        if !ratio.isFinite {
-            return VideoPlayerView.defaultAspectRatio
+            guard ratio.isFinite else {
+                return VideoPlayerView.defaultAspectRatio // swiftlint:disable:this implicit_return
+            }
+
+            return [ratio, 1.0].max()!
         }
-
-        return [ratio, 1.0].max()!
-    }
+    #endif
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

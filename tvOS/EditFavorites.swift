@@ -44,7 +44,12 @@ struct EditFavorites: View {
 
                 ForEach(model.addableItems()) { item in
                     HStack {
-                        Text(label(item))
+                        HStack {
+                            Text(label(item))
+                            Spacer()
+                            Text("only with Invidious")
+                                .foregroundColor(.secondary)
+                        }
 
                         Spacer()
 
@@ -52,6 +57,7 @@ struct EditFavorites: View {
                             model.add(item)
                         } label: {
                             Label("Add to Favorites", systemImage: "heart")
+                                .font(.system(size: 30))
                         }
                     }
                 }
