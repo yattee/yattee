@@ -45,6 +45,9 @@ struct PlaylistFormView: View {
                     visibilityFormItem
                         .pickerStyle(.segmented)
                 }
+                #if os(macOS)
+                    .padding(.horizontal)
+                #endif
 
                 HStack {
                     if editing {
