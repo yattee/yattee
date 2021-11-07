@@ -53,34 +53,21 @@ final class AccountValidator: Service {
     func validateInstance() {
         reset()
 
-        // TODO: validation for Piped instances
-        guard app.wrappedValue == .invidious else {
-            isValid.wrappedValue = true
-            error?.wrappedValue = nil
-            isValidated.wrappedValue = true
-            isValidating.wrappedValue = false
-
-            return
-        }
-
-        stats
+        neverGonnaGiveYouUp
             .load()
             .onSuccess { response in
                 guard self.url == self.formObjectID.wrappedValue else {
                     return
                 }
 
-                if response
-                    .json
-                    .dictionaryValue["software"]?
-                    .dictionaryValue["name"]?
-                    .stringValue == "invidious"
-                {
+                let json = response.json.dictionaryValue
+                let author = self.app.wrappedValue == .invidious ? json["author"] : json["uploader"]
+
+                if author == "Rick Astley" {
                     self.isValid.wrappedValue = true
                     self.error?.wrappedValue = nil
                 } else {
                     self.isValid.wrappedValue = false
-                    self.error?.wrappedValue = "Not an Invidious Instance"
                 }
             }
             .onFailure { error in
@@ -133,11 +120,15 @@ final class AccountValidator: Service {
         "SID=\(account!.sid)"
     }
 
-    var stats: Resource {
-        resource("/api/v1/stats")
-    }
-
     var feed: Resource {
         resource("/api/v1/auth/feed")
+    }
+
+    var videoResourceBasePath: String {
+        app.wrappedValue == .invidious ? "/api/v1/videos" : "/streams"
+    }
+
+    var neverGonnaGiveYouUp: Resource {
+        resource("\(videoResourceBasePath)/dQw4w9WgXcQ")
     }
 }

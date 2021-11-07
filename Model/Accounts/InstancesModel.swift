@@ -27,7 +27,9 @@ final class InstancesModel: ObservableObject {
     }
 
     static func add(app: VideosApp, name: String, url: String) -> Instance {
-        let instance = Instance(app: app, id: UUID().uuidString, name: name, apiURL: url)
+        let instance = Instance(
+            app: app, id: UUID().uuidString, name: name, apiURL: standardizedURL(url)
+        )
         Defaults[.instances].append(instance)
 
         return instance
@@ -36,7 +38,7 @@ final class InstancesModel: ObservableObject {
     static func setFrontendURL(_ instance: Instance, _ url: String) {
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
             var instance = Defaults[.instances][index]
-            instance.frontendURL = url
+            instance.frontendURL = standardizedURL(url)
 
             Defaults[.instances][index] = instance
         }
@@ -47,6 +49,14 @@ final class InstancesModel: ObservableObject {
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
             Defaults[.instances].remove(at: index)
             accounts.forEach { AccountsModel.remove($0) }
+        }
+    }
+
+    static func standardizedURL(_ url: String) -> String {
+        if url.last == "/" {
+            return String(url.dropLast())
+        } else {
+            return url
         }
     }
 }

@@ -28,6 +28,7 @@ struct InstanceForm: View {
             }
             .frame(maxWidth: 1000)
         }
+        .onChange(of: app) { _ in validate() }
         .onChange(of: url) { _ in validate() }
         .onAppear(perform: initializeForm)
         #if os(iOS)
@@ -122,6 +123,7 @@ struct InstanceForm: View {
     }
 
     func validate() {
+        isValid = false
         validationDebounce.invalidate()
 
         guard !url.isEmpty else {

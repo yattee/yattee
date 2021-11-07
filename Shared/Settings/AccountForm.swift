@@ -105,6 +105,7 @@ struct AccountForm: View {
     }
 
     private func validate() {
+        isValid = false
         validationDebounce.invalidate()
 
         guard !sid.isEmpty else {

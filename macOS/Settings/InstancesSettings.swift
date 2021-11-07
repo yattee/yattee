@@ -83,18 +83,10 @@ struct InstancesSettings: View {
                         InstancesModel.setFrontendURL(selectedInstance, newValue)
                     }
                     .labelsHidden()
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("If provided, you can copy links from videos, channels and playlist using")
-                        .padding(.trailing, 2)
 
-                    HStack(spacing: 0) {
-                        Image(systemName: "command")
-
-                        Text("**+C**")
-                    }
-                }
-                .font(.caption)
-                .foregroundColor(.secondary)
+                Text("If provided, you can copy links from videos, channels and playlist")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
                 Spacer()
             }
