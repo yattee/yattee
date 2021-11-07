@@ -1194,6 +1194,8 @@
 				37C3A24427235DA70087A57A /* ChannelPlaylist.swift */,
 				37FB28402721B22200A57617 /* ContentItem.swift */,
 				37141672267A8E10006CA35D /* Country.swift */,
+				37599F2F272B42810087F250 /* FavoriteItem.swift */,
+				37599F33272B44000087F250 /* FavoritesModel.swift */,
 				371F2F19269B43D300E4A7AB /* NavigationModel.swift */,
 				376578882685471400D4EA09 /* Playlist.swift */,
 				37BA794226DBA973002A0235 /* PlaylistsModel.swift */,
@@ -1207,8 +1209,6 @@
 				37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
-				37599F2F272B42810087F250 /* FavoriteItem.swift */,
-				37599F33272B44000087F250 /* FavoritesModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";

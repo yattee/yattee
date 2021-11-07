@@ -19,7 +19,7 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
             case let .trending(country, category):
                 let trendingCountry = Country(rawValue: country)!
                 let trendingCategory = category.isNil ? nil : TrendingCategory(rawValue: category!)!
-                return "\(trendingCountry.flag) \(trendingCategory?.name ?? "")"
+                return "\(trendingCountry.flag) \(trendingCountry.id) \(trendingCategory?.name ?? "Trending")"
             case let .channel(_, name):
                 return name
             case let .channelPlaylist(_, name):
