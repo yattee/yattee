@@ -11,11 +11,6 @@ struct EditFavorites: View {
     var body: some View {
         VStack {
             ScrollView {
-                Text("Edit Favorites")
-                    .font(.system(size: 40))
-                    .fontWeight(.bold)
-                    .foregroundColor(.secondary)
-
                 ForEach(favorites) { item in
                     HStack {
                         Text(label(item))
@@ -75,6 +70,7 @@ struct EditFavorites: View {
             }
             .frame(width: 1000, alignment: .leading)
         }
+        .navigationTitle("Edit Favorites")
     }
 
     func label(_ item: FavoriteItem) -> String {

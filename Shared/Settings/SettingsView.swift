@@ -55,6 +55,12 @@ struct SettingsView: View {
                 List {
                     #if os(tvOS)
                         AccountSelectionView()
+
+                        Section(header: SettingsHeader(text: "Favorites")) {
+                            NavigationLink("Edit favorites...") {
+                                EditFavorites()
+                            }
+                        }
                     #endif
                     InstancesSettings()
                     BrowsingSettings()

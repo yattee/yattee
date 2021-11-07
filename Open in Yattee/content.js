@@ -17,7 +17,7 @@ function redirect() {
 }
 
 function replaceContentWithLink() {
-    document.querySelector('body').innerHTML = yatteeLink();
+    document.querySelector('body').innerHTML = '<h1>' + yatteeLink() + '</h1>';
 }
 
 function redirectAndReplaceContentWithLink(){

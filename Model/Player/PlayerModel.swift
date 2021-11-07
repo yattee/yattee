@@ -58,6 +58,15 @@ final class PlayerModel: ObservableObject {
 
     var playingInPictureInPicture = false
 
+    @Published var presentingErrorDetails = false
+    var playerError: Error? { didSet {
+        #if !os(tvOS)
+            if !playerError.isNil {
+                presentingErrorDetails = true
+            }
+        #endif
+    }}
+
     init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.instances = instances ?? InstancesModel()
@@ -123,6 +132,7 @@ final class PlayerModel: ObservableObject {
         of video: Video,
         preservingTime: Bool = false
     ) {
+        playerError = nil
         resetSegments()
         sponsorBlock.loadSegments(videoID: video.videoID, categories: Defaults[.sponsorBlockCategories])
 
@@ -298,8 +308,7 @@ final class PlayerModel: ObservableObject {
                     self.play()
                 }
             case .failed:
-                print("item error: \(String(describing: item.error))")
-                print((item.asset as! AVURLAsset).url)
+                self.playerError = item.error
 
             default:
                 return

@@ -26,7 +26,7 @@ struct Sidebar: View {
         }
         .navigationTitle("Yattee")
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
         #endif
     }
 

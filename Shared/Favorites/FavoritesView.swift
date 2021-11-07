@@ -10,24 +10,37 @@ struct FavoritesView: View {
     @State private var dragging: FavoriteItem?
     @State private var presentingEditFavorites = false
 
+    @State private var favoritesChanged = false
+
+    var favoritesObserver: Any?
+
+    #if !os(tvOS)
+        @Default(.favorites) private var favorites
+    #endif
+
     var body: some View {
         PlayerControlsView {
             ScrollView(.vertical, showsIndicators: false) {
                 if !accounts.current.isNil {
-                    ForEach(Defaults[.favorites]) { item in
-                        FavoriteItemView(item: item, dragging: $dragging)
-                    }
-
                     #if os(tvOS)
-                        Button {
-                            presentingEditFavorites = true
-                        } label: {
-                            Text("Edit Favorites...")
+                        ForEach(Defaults[.favorites]) { item in
+                            FavoriteItemView(item: item, dragging: $dragging)
+                        }
+                    #else
+                        ForEach(favorites) { item in
+                            FavoriteItemView(item: item, dragging: $dragging)
                         }
                     #endif
                 }
             }
-            .redrawOn(change: presentingEditFavorites)
+            .onAppear {
+                Defaults.observe(.favorites) { _ in
+                    favoritesChanged.toggle()
+                }
+                .tieToLifetime(of: accounts)
+            }
+            .redrawOn(change: favoritesChanged)
+
             #if os(tvOS)
                 .sheet(isPresented: $presentingEditFavorites) {
                     EditFavorites()

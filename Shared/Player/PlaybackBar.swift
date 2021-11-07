@@ -34,6 +34,14 @@ struct PlaybackBar: View {
                         Image(systemName: "dot.radiowaves.left.and.right")
                     } else if player.isLoadingAvailableStreams || player.isLoadingStream {
                         Image(systemName: "bolt.horizontal.fill")
+                    } else if !player.playerError.isNil {
+                        Button {
+                            player.presentingErrorDetails = true
+                        } label: {
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     streamControl
@@ -56,6 +64,9 @@ struct PlaybackBar: View {
             } else {
                 Spacer()
             }
+        }
+        .alert(player.playerError?.localizedDescription ?? "", isPresented: $player.presentingErrorDetails) {
+            Button("OK") {}
         }
         .environment(\.colorScheme, .dark)
         .frame(minWidth: 0, maxWidth: .infinity)
