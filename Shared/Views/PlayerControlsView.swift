@@ -36,7 +36,7 @@ struct PlayerControlsView<Content: View>: View {
                             .foregroundColor(model.currentItem.isNil ? .secondary : .accentColor)
                             .lineLimit(1)
 
-                        Text(model.currentItem?.video?.author ?? "Yattee v0.1")
+                        Text(model.currentItem?.video?.author ?? "Yattee v\(appVersion)")
                             .fontWeight(model.currentItem.isNil ? .light : .bold)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
@@ -107,6 +107,10 @@ struct PlayerControlsView<Content: View>: View {
                 model.presentingPlayer = true
             })
         #endif
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
     }
 
     private var progressViewValue: Double {
