@@ -29,12 +29,12 @@ struct AccountForm: View {
             .frame(maxWidth: 1000)
         }
         #if os(iOS)
-            .padding(.vertical)
+        .padding(.vertical)
         #elseif os(tvOS)
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .background(.thickMaterial)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        .background(.thickMaterial)
         #else
-            .frame(width: 400, height: 145)
+        .frame(width: 400, height: 145)
         #endif
     }
 
@@ -49,7 +49,7 @@ struct AccountForm: View {
                 dismiss()
             }
             #if !os(tvOS)
-                .keyboardShortcut(.cancelAction)
+            .keyboardShortcut(.cancelAction)
             #endif
         }
         .padding(.horizontal)
@@ -61,7 +61,7 @@ struct AccountForm: View {
                 Form {
                     formFields
                     #if os(macOS)
-                        .padding(.horizontal)
+                    .padding(.horizontal)
                     #endif
                 }
             #else
@@ -97,7 +97,7 @@ struct AccountForm: View {
         #if os(tvOS)
             .padding(.top, 30)
         #endif
-        .padding(.horizontal)
+            .padding(.horizontal)
     }
 
     private func initializeForm() {

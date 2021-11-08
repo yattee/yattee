@@ -87,7 +87,7 @@ struct ServicesSettings: View {
                 .contentShape(Rectangle())
             }
             #if !os(tvOS)
-                .buttonStyle(.plain)
+            .buttonStyle(.plain)
             #endif
         }
     }

@@ -22,17 +22,17 @@ struct PlayerQueueView: View {
                 }
             }
             #if !os(iOS)
-                .padding(.vertical, 5)
-                .listRowInsets(EdgeInsets())
+            .padding(.vertical, 5)
+            .listRowInsets(EdgeInsets())
             #endif
         }
 
         #if os(macOS)
-            .listStyle(.inset)
+        .listStyle(.inset)
         #elseif os(iOS)
-            .listStyle(.grouped)
+        .listStyle(.grouped)
         #else
-            .listStyle(.plain)
+        .listStyle(.plain)
         #endif
     }
 

@@ -49,79 +49,79 @@ struct TrendingView: View {
             }
         }
         #if os(tvOS)
-            .fullScreenCover(isPresented: $presentingCountrySelection) {
-                TrendingCountry(selectedCountry: $country)
-            }
+        .fullScreenCover(isPresented: $presentingCountrySelection) {
+            TrendingCountry(selectedCountry: $country)
+        }
         #else
-            .sheet(isPresented: $presentingCountrySelection) {
-                TrendingCountry(selectedCountry: $country)
-                #if os(macOS)
-                    .frame(minWidth: 400, minHeight: 400)
-                #endif
-            }
-            .navigationTitle("Trending")
-        #endif
-        .toolbar {
-            #if os(macOS)
-                ToolbarItemGroup {
-                    if let favoriteItem = favoriteItem {
-                        FavoriteButton(item: favoriteItem)
-                            .id(favoriteItem.id)
-                    }
-
-                    if accounts.app.supportsTrendingCategories {
-                        categoryButton
-                    }
-                    countryButton
+                .sheet(isPresented: $presentingCountrySelection) {
+                    TrendingCountry(selectedCountry: $country)
+                    #if os(macOS)
+                        .frame(minWidth: 400, minHeight: 400)
+                    #endif
                 }
-            #elseif os(iOS)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Group {
-                        HStack {
-                            if accounts.app.supportsTrendingCategories {
-                                Text("Category")
-                                    .foregroundColor(.secondary)
-
-                                categoryButton
-                                    // only way to disable Menu animation is to
-                                    // force redraw of the view when it changes
-                                    .id(UUID())
+                .navigationTitle("Trending")
+        #endif
+                .toolbar {
+                    #if os(macOS)
+                        ToolbarItemGroup {
+                            if let favoriteItem = favoriteItem {
+                                FavoriteButton(item: favoriteItem)
+                                    .id(favoriteItem.id)
                             }
-                        }
 
-                        Spacer()
-
-                        if let favoriteItem = favoriteItem {
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem.id)
-
-                            Spacer()
-                        }
-
-                        HStack {
-                            Text("Country")
-                                .foregroundColor(.secondary)
-
+                            if accounts.app.supportsTrendingCategories {
+                                categoryButton
+                            }
                             countryButton
                         }
-                    }
-                }
-            #endif
-        }
-        .onChange(of: resource) { _ in
-            resource.load()
-            updateFavoriteItem()
-        }
-        .onAppear {
-            if videos.isEmpty {
-                resource.addObserver(store)
-                resource.loadIfNeeded()
-            } else {
-                store.replace(videos)
-            }
+                    #elseif os(iOS)
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            Group {
+                                HStack {
+                                    if accounts.app.supportsTrendingCategories {
+                                        Text("Category")
+                                            .foregroundColor(.secondary)
 
-            updateFavoriteItem()
-        }
+                                        categoryButton
+                                            // only way to disable Menu animation is to
+                                            // force redraw of the view when it changes
+                                            .id(UUID())
+                                    }
+                                }
+
+                                Spacer()
+
+                                if let favoriteItem = favoriteItem {
+                                    FavoriteButton(item: favoriteItem)
+                                        .id(favoriteItem.id)
+
+                                    Spacer()
+                                }
+
+                                HStack {
+                                    Text("Country")
+                                        .foregroundColor(.secondary)
+
+                                    countryButton
+                                }
+                            }
+                        }
+                    #endif
+                }
+                .onChange(of: resource) { _ in
+                    resource.load()
+                    updateFavoriteItem()
+                }
+                .onAppear {
+                    if videos.isEmpty {
+                        resource.addObserver(store)
+                        resource.loadIfNeeded()
+                    } else {
+                        store.replace(videos)
+                    }
+
+                    updateFavoriteItem()
+                }
     }
 
     private var toolbar: some View {

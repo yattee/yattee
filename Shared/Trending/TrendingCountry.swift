@@ -48,7 +48,7 @@ struct TrendingCountry: View {
             .searchable(text: $query, placement: searchPlacement, prompt: Text(TrendingCountry.prompt))
         #endif
         #if os(tvOS)
-            .background(.thinMaterial)
+        .background(.thinMaterial)
         #endif
     }
 
@@ -72,8 +72,8 @@ struct TrendingCountry: View {
         }
 
         #if os(macOS)
-            .listStyle(.inset(alternatesRowBackgrounds: true))
-            .padding(.bottom, 5)
+        .listStyle(.inset(alternatesRowBackgrounds: true))
+        .padding(.bottom, 5)
 
         #endif
     }

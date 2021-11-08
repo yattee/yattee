@@ -4,7 +4,7 @@ import Siesta
 import SwiftUI
 
 struct VideoPlayerView: View {
-    static let defaultAspectRatio: Double = 1.77777778
+    static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
             300
@@ -76,14 +76,14 @@ struct VideoPlayerView: View {
                             }
                         }
                         #if os(iOS)
-                            .onSwipeGesture(
-                                up: {
-                                    withAnimation {
-                                        fullScreen = true
-                                    }
-                                },
-                                down: { dismiss() }
-                            )
+                        .onSwipeGesture(
+                            up: {
+                                withAnimation {
+                                    fullScreen = true
+                                }
+                            },
+                            down: { dismiss() }
+                        )
                         #endif
 
                         .background(.black)
@@ -104,7 +104,7 @@ struct VideoPlayerView: View {
                 #endif
             }
             #if os(macOS)
-                .frame(minWidth: 650)
+            .frame(minWidth: 650)
             #endif
             #if os(iOS)
                 if sidebarQueue {

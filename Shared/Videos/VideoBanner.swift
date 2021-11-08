@@ -58,7 +58,7 @@ struct VideoBanner: View {
         #if os(macOS)
             playbackTime.isNil ? .center : .top
         #else
-            .center
+                .center
         #endif
     }
 

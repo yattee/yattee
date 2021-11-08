@@ -52,7 +52,7 @@ struct InstanceForm: View {
                 dismiss()
             }
             #if !os(tvOS)
-                .keyboardShortcut(.cancelAction)
+            .keyboardShortcut(.cancelAction)
             #endif
         }
         .padding(.horizontal)
@@ -63,7 +63,7 @@ struct InstanceForm: View {
             Form {
                 formFields
                 #if os(macOS)
-                    .padding(.horizontal)
+                .padding(.horizontal)
                 #endif
             }
         #else
@@ -105,7 +105,7 @@ struct InstanceForm: View {
             #endif
         }
         #if os(tvOS)
-            .padding(.top, 30)
+        .padding(.top, 30)
         #endif
         .padding(.horizontal)
     }

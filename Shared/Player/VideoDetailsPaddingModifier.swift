@@ -6,7 +6,7 @@ struct VideoDetailsPaddingModifier: ViewModifier {
         #if os(macOS)
             30
         #else
-            35
+            40
         #endif
     }
 

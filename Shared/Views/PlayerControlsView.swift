@@ -14,8 +14,8 @@ struct PlayerControlsView<Content: View>: View {
         ZStack(alignment: .bottomLeading) {
             content
             #if !os(tvOS)
-                .frame(minHeight: 0, maxHeight: .infinity)
-                .padding(.bottom, 50)
+            .frame(minHeight: 0, maxHeight: .infinity)
+            .padding(.bottom, 50)
             #endif
 
             #if !os(tvOS)

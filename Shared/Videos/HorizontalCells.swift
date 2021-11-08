@@ -22,11 +22,11 @@ struct HorizontalCells: View {
                 }
             }
             #if os(tvOS)
-                .padding(.horizontal, 40)
-                .padding(.vertical, 30)
+            .padding(.horizontal, 40)
+            .padding(.vertical, 30)
             #else
-                .padding(.horizontal, 15)
-                .padding(.vertical, 10)
+            .padding(.horizontal, 15)
+            .padding(.vertical, 10)
             #endif
         }
         .frame(height: cellHeight)

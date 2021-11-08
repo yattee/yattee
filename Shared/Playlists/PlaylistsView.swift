@@ -49,73 +49,73 @@ struct PlaylistsView: View {
             }
         }
         #if os(tvOS)
-            .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-                PlaylistFormView(playlist: $createdPlaylist)
-                    .environmentObject(accounts)
-            }
-            .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
-                PlaylistFormView(playlist: $editedPlaylist)
-                    .environmentObject(accounts)
-            }
+        .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+            PlaylistFormView(playlist: $createdPlaylist)
+                .environmentObject(accounts)
+        }
+        .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+            PlaylistFormView(playlist: $editedPlaylist)
+                .environmentObject(accounts)
+        }
         #else
-            .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-                PlaylistFormView(playlist: $createdPlaylist)
-                    .environmentObject(accounts)
-            }
-            .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
-                PlaylistFormView(playlist: $editedPlaylist)
-                    .environmentObject(accounts)
-            }
-        #endif
-        .toolbar {
-            ToolbarItemGroup {
-                #if !os(iOS)
-                    if !model.isEmpty {
-                        selectPlaylistButton
-                            .prefersDefaultFocus(in: focusNamespace)
-                    }
-
-                    if currentPlaylist != nil {
-                        editPlaylistButton
-                    }
-                #endif
-                FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
-
-                newPlaylistButton
-            }
-
-            #if os(iOS)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Group {
-                        if model.isEmpty {
-                            Text("No Playlists")
-                                .foregroundColor(.secondary)
-                        } else {
-                            Text("Current Playlist")
-                                .foregroundColor(.secondary)
-
-                            selectPlaylistButton
-                        }
-
-                        Spacer()
-
-                        if currentPlaylist != nil {
-                            editPlaylistButton
-                        }
-                    }
-                    .transaction { t in t.animation = .none }
+                .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+                    PlaylistFormView(playlist: $createdPlaylist)
+                        .environmentObject(accounts)
                 }
-            #endif
-        }
-        #if os(tvOS)
-            .focusScope(focusNamespace)
+                .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+                    PlaylistFormView(playlist: $editedPlaylist)
+                        .environmentObject(accounts)
+                }
         #endif
-        .onAppear {
-            model.load()
-        }
-        .onChange(of: accounts.current) { _ in
-            model.load(force: true)
-        }
+                .toolbar {
+                    ToolbarItemGroup {
+                        #if !os(iOS)
+                            if !model.isEmpty {
+                                selectPlaylistButton
+                                    .prefersDefaultFocus(in: focusNamespace)
+                            }
+
+                            if currentPlaylist != nil {
+                                editPlaylistButton
+                            }
+                        #endif
+                        FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
+
+                        newPlaylistButton
+                    }
+
+                    #if os(iOS)
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            Group {
+                                if model.isEmpty {
+                                    Text("No Playlists")
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Text("Current Playlist")
+                                        .foregroundColor(.secondary)
+
+                                    selectPlaylistButton
+                                }
+
+                                Spacer()
+
+                                if currentPlaylist != nil {
+                                    editPlaylistButton
+                                }
+                            }
+                            .transaction { t in t.animation = .none }
+                        }
+                    #endif
+                }
+        #if os(tvOS)
+                .focusScope(focusNamespace)
+        #endif
+                .onAppear {
+                    model.load()
+                }
+                .onChange(of: accounts.current) { _ in
+                    model.load(force: true)
+                }
     }
 
     #if os(tvOS)

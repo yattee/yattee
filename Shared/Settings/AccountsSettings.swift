@@ -46,7 +46,7 @@ struct AccountsSettings: View {
             }
         }
         #if os(tvOS)
-            .frame(maxWidth: 1000)
+        .frame(maxWidth: 1000)
         #endif
 
         .navigationTitle(instance.description)
@@ -78,7 +78,7 @@ struct AccountsSettings: View {
             AccountForm(instance: instance)
         }
         #if !os(tvOS)
-            .listStyle(.insetGrouped)
+        .listStyle(.insetGrouped)
         #endif
     }
 

@@ -75,44 +75,44 @@ struct ChannelVideosView: View {
             .focusScope(focusNamespace)
         #endif
         #if !os(tvOS)
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet
-                    )
-                }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                ShareButton(
+                    contentItem: contentItem,
+                    presentingShareSheet: $presentingShareSheet
+                )
+            }
 
-                ToolbarItem {
-                    HStack {
-                        Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
-                            .foregroundColor(.secondary)
-                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+            ToolbarItem {
+                HStack {
+                    Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
+                        .foregroundColor(.secondary)
+                        .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
 
-                        subscriptionToggleButton
+                    subscriptionToggleButton
 
-                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
-                    }
+                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
                 }
             }
+        }
         #else
-            .background(.thickMaterial)
+                .background(.thickMaterial)
         #endif
         #if os(iOS)
-            .sheet(isPresented: $presentingShareSheet) {
-                if let url = accounts.api.shareURL(contentItem) {
-                    ShareSheet(activityItems: [url])
-                }
+        .sheet(isPresented: $presentingShareSheet) {
+            if let url = accounts.api.shareURL(contentItem) {
+                ShareSheet(activityItems: [url])
             }
+        }
         #endif
         .modifier(UnsubscribeAlertModifier())
-            .onAppear {
-                if store.item.isNil {
-                    resource.addObserver(store)
-                    resource.load()
-                }
+        .onAppear {
+            if store.item.isNil {
+                resource.addObserver(store)
+                resource.load()
             }
-            .navigationTitle(navigationTitle)
+        }
+        .navigationTitle(navigationTitle)
     }
 
     private var resource: Resource {

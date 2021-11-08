@@ -53,46 +53,46 @@ struct ContentView: View {
                 .environmentObject(navigation)
         }
         #if os(iOS)
-            .fullScreenCover(isPresented: $player.presentingPlayer) {
-                VideoPlayerView()
-                    .environmentObject(accounts)
-                    .environmentObject(instances)
-                    .environmentObject(navigation)
-                    .environmentObject(player)
-                    .environmentObject(playlists)
-                    .environmentObject(subscriptions)
-                    .environmentObject(thumbnailsModel)
-            }
+        .fullScreenCover(isPresented: $player.presentingPlayer) {
+            VideoPlayerView()
+                .environmentObject(accounts)
+                .environmentObject(instances)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(playlists)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+        }
         #elseif os(macOS)
-            .sheet(isPresented: $player.presentingPlayer) {
-                VideoPlayerView()
-                    .frame(minWidth: 900, minHeight: 800)
-                    .environmentObject(accounts)
-                    .environmentObject(instances)
-                    .environmentObject(navigation)
-                    .environmentObject(player)
-                    .environmentObject(playlists)
-                    .environmentObject(subscriptions)
-                    .environmentObject(thumbnailsModel)
-            }
+        .sheet(isPresented: $player.presentingPlayer) {
+            VideoPlayerView()
+                .frame(minWidth: 900, minHeight: 800)
+                .environmentObject(accounts)
+                .environmentObject(instances)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(playlists)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+        }
         #endif
         #if !os(tvOS)
-            .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
-            .onOpenURL(perform: handleOpenedURL)
-            .sheet(isPresented: $navigation.presentingAddToPlaylist) {
-                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-                    .environmentObject(playlists)
-            }
-            .sheet(isPresented: $navigation.presentingPlaylistForm) {
-                PlaylistFormView(playlist: $navigation.editedPlaylist)
-                    .environmentObject(accounts)
-                    .environmentObject(playlists)
-            }
-            .sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
-                SettingsView()
-                    .environmentObject(accounts)
-                    .environmentObject(instances)
-            }
+        .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
+        .onOpenURL(perform: handleOpenedURL)
+        .sheet(isPresented: $navigation.presentingAddToPlaylist) {
+            AddToPlaylistView(video: navigation.videoToAddToPlaylist)
+                .environmentObject(playlists)
+        }
+        .sheet(isPresented: $navigation.presentingPlaylistForm) {
+            PlaylistFormView(playlist: $navigation.editedPlaylist)
+                .environmentObject(accounts)
+                .environmentObject(playlists)
+        }
+        .sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
+            SettingsView()
+                .environmentObject(accounts)
+                .environmentObject(instances)
+        }
         #endif
     }
 

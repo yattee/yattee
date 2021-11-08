@@ -14,11 +14,11 @@ struct RelatedView: View {
             }
         }
         #if os(macOS)
-            .listStyle(.inset)
+        .listStyle(.inset)
         #elseif os(iOS)
-            .listStyle(.grouped)
+        .listStyle(.grouped)
         #else
-            .listStyle(.plain)
+        .listStyle(.plain)
         #endif
     }
 }

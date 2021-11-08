@@ -23,7 +23,7 @@ struct SignInRequiredView<Content: View>: View {
             }
         }
         #if !os(tvOS)
-            .navigationTitle(title)
+        .navigationTitle(title)
         #endif
     }
 

@@ -54,33 +54,33 @@ struct ChannelPlaylistView: View {
             VerticalCells(items: items)
         }
         #if os(iOS)
-            .sheet(isPresented: $presentingShareSheet) {
-                if let url = accounts.api.shareURL(contentItem) {
-                    ShareSheet(activityItems: [url])
-                }
+        .sheet(isPresented: $presentingShareSheet) {
+            if let url = accounts.api.shareURL(contentItem) {
+                ShareSheet(activityItems: [url])
             }
+        }
         #endif
         .onAppear {
             resource?.addObserver(store)
             resource?.loadIfNeeded()
         }
         #if !os(tvOS)
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet
-                    )
-                }
-
-                ToolbarItem {
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
-                }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                ShareButton(
+                    contentItem: contentItem,
+                    presentingShareSheet: $presentingShareSheet
+                )
             }
-            .navigationTitle(playlist.title)
+
+            ToolbarItem {
+                FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+            }
+        }
+        .navigationTitle(playlist.title)
 
         #else
-            .background(.thickMaterial)
+        .background(.thickMaterial)
         #endif
     }
 

@@ -46,7 +46,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
         #if os(iOS)
             verticalSizeClass == .regular ? .fit : .fill
         #else
-            .fit
+                .fit
         #endif
     }
 

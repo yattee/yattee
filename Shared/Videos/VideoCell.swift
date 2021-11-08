@@ -56,7 +56,7 @@ struct VideoCell: View {
             #endif
         }
         #if os(macOS)
-            .background()
+        .background()
         #endif
     }
 
@@ -171,11 +171,11 @@ struct VideoCell: View {
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                 }
                 #if os(tvOS)
-                    .frame(minHeight: channelOnThumbnail ? 80 : 120, alignment: .top)
+                .frame(minHeight: channelOnThumbnail ? 80 : 120, alignment: .top)
                 #elseif os(macOS)
-                    .frame(minHeight: 35, alignment: .top)
+                .frame(minHeight: 35, alignment: .top)
                 #else
-                    .frame(minHeight: 50, alignment: .top)
+                .frame(minHeight: 50, alignment: .top)
                 #endif
                 .padding(.bottom, 4)
 
@@ -316,9 +316,9 @@ struct VideoCell_Preview: PreviewProvider {
             VideoCell(video: Video.fixture)
         }
         #if os(macOS)
-            .frame(maxWidth: 300, maxHeight: 250)
+        .frame(maxWidth: 300, maxHeight: 250)
         #elseif os(iOS)
-            .frame(maxWidth: 300, maxHeight: 200)
+        .frame(maxWidth: 300, maxHeight: 200)
         #endif
         .injectFixtureEnvironmentObjects()
     }

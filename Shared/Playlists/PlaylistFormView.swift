@@ -46,7 +46,7 @@ struct PlaylistFormView: View {
                         .pickerStyle(.segmented)
                 }
                 #if os(macOS)
-                    .padding(.horizontal)
+                .padding(.horizontal)
                 #endif
 
                 HStack {
@@ -225,7 +225,7 @@ struct PlaylistFormView: View {
             )
         }
         #if os(macOS)
-            .foregroundColor(.red)
+        .foregroundColor(.red)
         #endif
     }
 

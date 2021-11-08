@@ -33,13 +33,13 @@ struct AddToPlaylistView: View {
             }
         }
         #if os(macOS)
-            .frame(width: 500, height: 270)
-            .padding(.vertical)
+        .frame(width: 500, height: 270)
+        .padding(.vertical)
         #elseif os(tvOS)
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .background(.thickMaterial)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        .background(.thickMaterial)
         #else
-            .padding(.vertical)
+        .padding(.vertical)
         #endif
     }
 
@@ -47,7 +47,7 @@ struct AddToPlaylistView: View {
         #if os(tvOS)
             600
         #else
-            .infinity
+                .infinity
         #endif
     }
 

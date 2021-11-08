@@ -50,7 +50,7 @@ struct VideoDetails: View {
                         toggleFullScreenDetailsButton
                     }
                     #if os(macOS)
-                        .padding(.top, 10)
+                    .padding(.top, 10)
                     #endif
 
                     if !video.isNil {
@@ -188,7 +188,7 @@ struct VideoDetails: View {
                                     confirmationShown = true
                                 }
                                 #if os(iOS)
-                                    .tint(.gray)
+                                .tint(.gray)
                                 #endif
                                 .confirmationDialog("Are you you want to unsubscribe from \(video!.channel.name)?", isPresented: $confirmationShown) {
                                     Button("Unsubscribe") {
@@ -309,9 +309,9 @@ struct VideoDetails: View {
             }
         }
         #if os(iOS)
-            .sheet(isPresented: $presentingShareSheet) {
-                ShareSheet(activityItems: [shareURL])
-            }
+        .sheet(isPresented: $presentingShareSheet) {
+            ShareSheet(activityItems: [shareURL])
+        }
         #endif
     }
 

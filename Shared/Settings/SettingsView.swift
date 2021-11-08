@@ -84,7 +84,7 @@ struct SettingsView: View {
                 #endif
             }
             #if os(tvOS)
-                .background(.black)
+            .background(.black)
             #endif
         #endif
     }

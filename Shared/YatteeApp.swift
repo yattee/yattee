@@ -12,11 +12,11 @@ struct YatteeApp: App {
             ContentView()
         }
         #if !os(tvOS)
-            .handlesExternalEvents(matching: Set(["*"]))
-            .commands {
-                SidebarCommands()
-                CommandGroup(replacing: .newItem, addition: {})
-            }
+        .handlesExternalEvents(matching: Set(["*"]))
+        .commands {
+            SidebarCommands()
+            CommandGroup(replacing: .newItem, addition: {})
+        }
         #endif
 
         #if os(macOS)

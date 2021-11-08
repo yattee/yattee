@@ -22,21 +22,21 @@ struct InstancesSettings: View {
                         }
                     }
                     #if os(iOS)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            removeInstanceButton(instance)
-                        }
-                        .buttonStyle(.plain)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        removeInstanceButton(instance)
+                    }
+                    .buttonStyle(.plain)
                     #else
-                        .contextMenu {
-                            removeInstanceButton(instance)
-                        }
+                    .contextMenu {
+                        removeInstanceButton(instance)
+                    }
                     #endif
                 }
 
                 addInstanceButton
             }
             #if os(iOS)
-                .listStyle(.insetGrouped)
+            .listStyle(.insetGrouped)
             #endif
         }
         .sheet(isPresented: $presentingInstanceForm) {

@@ -142,7 +142,7 @@ struct SearchView: View {
             state.changeQuery { query in query.duration = duration }
         }
         #if !os(tvOS)
-            .navigationTitle("Search")
+        .navigationTitle("Search")
         #endif
     }
 
@@ -194,13 +194,13 @@ struct SearchView: View {
                             state.changeQuery { query in query.query = item.title }
                         }
                         #if os(iOS)
-                            .swipeActions(edge: .trailing) {
-                                deleteButton(item)
-                            }
+                        .swipeActions(edge: .trailing) {
+                            deleteButton(item)
+                        }
                         #elseif os(tvOS)
-                            .contextMenu {
-                                deleteButton(item)
-                            }
+                        .contextMenu {
+                            deleteButton(item)
+                        }
                         #endif
                     }
                 }
@@ -212,7 +212,7 @@ struct SearchView: View {
             }
         }
         #if os(iOS)
-            .listStyle(.insetGrouped)
+        .listStyle(.insetGrouped)
         #endif
     }
 
