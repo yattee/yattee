@@ -22,7 +22,7 @@ extension PlayerModel {
         availableStreams = []
         var instancesWithLoadedStreams = [Instance]()
 
-        instances.all.forEach { instance in
+        InstancesModel.all.forEach { instance in
             fetchStreams(instance.anonymous.video(video.videoID), instance: instance, video: video) { _ in
                 self.completeIfAllInstancesLoaded(
                     instance: instance,
@@ -59,7 +59,7 @@ extension PlayerModel {
         instancesWithLoadedStreams.append(instance)
         rebuildTVMenu()
 
-        if instances.all.count == instancesWithLoadedStreams.count {
+        if InstancesModel.all.count == instancesWithLoadedStreams.count {
             completionHandler(streams.sorted { $0.kind < $1.kind })
         }
     }

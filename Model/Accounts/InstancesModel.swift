@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 
 final class InstancesModel: ObservableObject {
-    var all: [Instance] {
+    static var all: [Instance] {
         Defaults[.instances]
     }
 

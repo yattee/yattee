@@ -17,6 +17,8 @@ struct ContentView: View {
     @StateObject private var subscriptions = SubscriptionsModel()
     @StateObject private var thumbnailsModel = ThumbnailsModel()
 
+    @EnvironmentObject<MenuModel> private var menu
+
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
@@ -106,7 +108,7 @@ struct ContentView: View {
 
         if let account = accounts.lastUsed ??
             instances.lastUsed?.anonymousAccount ??
-            instances.all.first?.anonymousAccount
+            InstancesModel.all.first?.anonymousAccount
         {
             accounts.setCurrent(account)
         }
@@ -119,6 +121,10 @@ struct ContentView: View {
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
+
+        menu.accounts = accounts
+        menu.navigation = navigation
+        menu.player = player
 
         if !accounts.current.isNil {
             player.loadHistoryDetails()

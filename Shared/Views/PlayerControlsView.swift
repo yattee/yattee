@@ -48,9 +48,6 @@ struct PlayerControlsView<Content: View>: View {
                 .contentShape(Rectangle())
             }
             .padding(.vertical, 20)
-            #if !os(tvOS)
-                .keyboardShortcut("o")
-            #endif
 
             ZStack(alignment: .bottom) {
                 HStack {
@@ -72,10 +69,6 @@ struct PlayerControlsView<Content: View>: View {
                     }
                     .font(.system(size: 30))
                     .frame(minWidth: 30)
-
-                    #if !os(tvOS)
-                        .keyboardShortcut("p")
-                    #endif
 
                     Button(action: { model.advanceToNextItem() }) {
                         Label("Next", systemImage: "forward.fill")

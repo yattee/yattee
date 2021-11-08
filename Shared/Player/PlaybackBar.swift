@@ -6,7 +6,6 @@ struct PlaybackBar: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.inNavigationView) private var inNavigationView
 
-    @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
@@ -154,7 +153,7 @@ struct PlaybackBar: View {
     private var streamControl: some View {
         #if os(macOS)
             Picker("", selection: $player.streamSelection) {
-                ForEach(instances.all) { instance in
+                ForEach(InstancesModel.all) { instance in
                     let instanceStreams = availableStreamsForInstance(instance)
                     if !instanceStreams.values.isEmpty {
                         let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
@@ -175,7 +174,7 @@ struct PlaybackBar: View {
             }
         #else
             Menu {
-                ForEach(instances.all) { instance in
+                ForEach(InstancesModel.all) { instance in
                     let instanceStreams = availableStreamsForInstance(instance)
                     if !instanceStreams.values.isEmpty {
                         let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }

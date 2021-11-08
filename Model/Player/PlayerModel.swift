@@ -43,7 +43,6 @@ final class PlayerModel: ObservableObject {
     @Published var restoredSegments = [Segment]()
 
     var accounts: AccountsModel
-    var instances: InstancesModel
 
     var composition = AVMutableComposition()
 
@@ -67,9 +66,8 @@ final class PlayerModel: ObservableObject {
         #endif
     }}
 
-    init(accounts: AccountsModel? = nil, instances: InstancesModel? = nil) {
+    init(accounts: AccountsModel? = nil, instances _: InstancesModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
-        self.instances = instances ?? InstancesModel()
 
         addItemDidPlayToEndTimeObserver()
         addFrequentTimeObserver()
@@ -79,6 +77,10 @@ final class PlayerModel: ObservableObject {
 
     func presentPlayer() {
         presentingPlayer = true
+    }
+
+    func togglePlayer() {
+        presentingPlayer.toggle()
     }
 
     var isPlaying: Bool {
