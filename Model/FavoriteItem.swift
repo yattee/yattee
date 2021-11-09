@@ -9,6 +9,7 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
         case channel(String, String)
         case playlist(String)
         case channelPlaylist(String, String)
+        case searchQuery(String, String, String, String)
 
         var label: String {
             switch self {
@@ -24,6 +25,19 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
                 return name
             case let .channelPlaylist(_, name):
                 return name
+            case let .searchQuery(text, date, duration, order):
+                var label = "Search: \"\(text)\""
+                if !date.isEmpty, let date = SearchQuery.Date(rawValue: date), date != .any {
+                    label += " from \(date == .today ? date.name : " this \(date.name)")"
+                }
+                if !order.isEmpty, let order = SearchQuery.SortOrder(rawValue: order), order != .relevance {
+                    label += " by \(order.name)"
+                }
+                if !duration.isEmpty {
+                    label += " (\(duration))"
+                }
+
+                return label
             default:
                 return ""
             }

@@ -17,6 +17,8 @@ struct SearchView: View {
         @State private var recentsDebounce = Debounce()
     #endif
 
+    @State private var favoriteItem: FavoriteItem?
+
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -42,8 +44,17 @@ struct SearchView: View {
                 } else {
                     #if os(tvOS)
                         ScrollView(.vertical, showsIndicators: false) {
-                            if accounts.app.supportsSearchFilters {
-                                filtersHorizontalStack
+                            HStack(spacing: 0) {
+                                if accounts.app.supportsSearchFilters {
+                                    filtersHorizontalStack
+                                }
+
+                                if let favoriteItem = favoriteItem {
+                                    FavoriteButton(item: favoriteItem)
+                                        .id(favoriteItem.id)
+                                        .labelStyle(.iconOnly)
+                                        .font(.system(size: 25))
+                                }
                             }
 
                             HorizontalCells(items: items)
@@ -68,6 +79,13 @@ struct SearchView: View {
         .toolbar {
             #if !os(tvOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
+                    #if os(macOS)
+                        if let favoriteItem = favoriteItem {
+                            FavoriteButton(item: favoriteItem)
+                                .id(favoriteItem.id)
+                        }
+                    #endif
+
                     if accounts.app.supportsSearchFilters {
                         Section {
                             #if os(macOS)
@@ -84,9 +102,20 @@ struct SearchView: View {
                             #endif
                         }
                         .transaction { t in t.animation = .none }
+                    }
 
+                    #if os(iOS)
                         Spacer()
 
+                        if let favoriteItem = favoriteItem {
+                            FavoriteButton(item: favoriteItem)
+                                .id(favoriteItem.id)
+                        }
+
+                        Spacer()
+                    #endif
+
+                    if accounts.app.supportsSearchFilters {
                         filtersMenu
                     }
                 }
@@ -96,6 +125,7 @@ struct SearchView: View {
             if query != nil {
                 state.queryText = query!.query
                 state.resetQuery(query!)
+                updateFavoriteItem()
             }
 
             if !videos.isEmpty {
@@ -120,7 +150,10 @@ struct SearchView: View {
                 recentsDebounce.invalidate()
 
                 searchDebounce.debouncing(2) {
-                    state.changeQuery { query in query.query = newQuery }
+                    state.changeQuery { query in
+                        query.query = newQuery
+                        updateFavoriteItem()
+                    }
                 }
 
                 recentsDebounce.debouncing(10) {
@@ -131,15 +164,25 @@ struct SearchView: View {
         .onSubmit(of: .search) {
             state.changeQuery { query in query.query = state.queryText }
             recents.addQuery(state.queryText)
+            updateFavoriteItem()
         }
         .onChange(of: searchSortOrder) { order in
-            state.changeQuery { query in query.sortBy = order }
+            state.changeQuery { query in
+                query.sortBy = order
+                updateFavoriteItem()
+            }
         }
         .onChange(of: searchDate) { date in
-            state.changeQuery { query in query.date = date }
+            state.changeQuery { query in
+                query.date = date
+                updateFavoriteItem()
+            }
         }
         .onChange(of: searchDuration) { duration in
-            state.changeQuery { query in query.duration = duration }
+            state.changeQuery { query in
+                query.duration = duration
+                updateFavoriteItem()
+            }
         }
         #if !os(tvOS)
         .navigationTitle("Search")
@@ -192,6 +235,7 @@ struct SearchView: View {
                         Button(item.title) {
                             state.queryText = item.title
                             state.changeQuery { query in query.query = item.title }
+                            updateFavoriteItem()
                         }
                         #if os(iOS)
                         .swipeActions(edge: .trailing) {
@@ -312,21 +356,21 @@ struct SearchView: View {
                         .foregroundColor(.secondary)
                     searchSortOrderButton
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                .frame(maxWidth: 300, alignment: .trailing)
 
                 HStack(spacing: 30) {
                     Text("Duration")
                         .foregroundColor(.secondary)
                     searchDurationButton
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: 300)
 
                 HStack(spacing: 30) {
                     Text("Date")
                         .foregroundColor(.secondary)
                     searchDateButton
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: 300, alignment: .leading)
             }
             .font(.system(size: 30))
         }
@@ -348,8 +392,16 @@ struct SearchView: View {
             .foregroundColor(filtersActive ? .accentColor : .secondary)
             .transaction { t in t.animation = .none }
         }
-
     #endif
+
+    private func updateFavoriteItem() {
+        favoriteItem = FavoriteItem(section: .searchQuery(
+            state.query.query,
+            state.query.date?.rawValue ?? "",
+            state.query.duration?.rawValue ?? "",
+            state.query.sortBy.rawValue
+        ))
+    }
 }
 
 struct SearchView_Previews: PreviewProvider {

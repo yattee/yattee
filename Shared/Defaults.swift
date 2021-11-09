@@ -36,7 +36,10 @@ extension Defaults.Keys {
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
 
     static let favorites = Key<[FavoriteItem]>("favorites", default: [
-        .init(section: .trending("US", nil))
+        .init(section: .trending("US", nil)),
+        .init(section: .searchQuery("World Discoveries", "", "", "")),
+        .init(section: .searchQuery("Full Body Workout", "", "", "")),
+        .init(section: .searchQuery("Apple Pie Recipes", "", "", ""))
     ])
 
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)

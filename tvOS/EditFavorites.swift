@@ -64,7 +64,7 @@ struct EditFavorites: View {
                 .padding(.trailing, 40)
 
                 HStack {
-                    Text("Add more Channels and Playlists to your Favorites using button")
+                    Text("Add Channels, Playlists and Searches to Favorites using")
                     Button {} label: {
                         Label("Add to Favorites", systemImage: "heart")
                             .labelStyle(.iconOnly)

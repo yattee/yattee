@@ -105,6 +105,14 @@ struct FavoriteItemView: View {
 
         case let .playlist(id):
             return accounts.api.playlist(id)
+
+        case let .searchQuery(text, date, duration, order):
+            return accounts.api.search(.init(
+                query: text,
+                sortBy: SearchQuery.SortOrder(rawValue: order) ?? .uploadDate,
+                date: SearchQuery.Date(rawValue: date),
+                duration: SearchQuery.Duration(rawValue: duration)
+            ))
         }
 
         return nil
