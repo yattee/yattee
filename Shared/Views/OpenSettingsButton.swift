@@ -2,7 +2,10 @@ import SwiftUI
 
 struct OpenSettingsButton: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject<NavigationModel> private var navigation
+
+    #if !os(macOS)
+        @EnvironmentObject<NavigationModel> private var navigation
+    #endif
 
     var body: some View {
         Button {

@@ -15,7 +15,6 @@ struct InstancesSettings: View {
     @State private var frontendURL = ""
 
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<InstancesModel> private var model
 
     @Default(.instances) private var instances
 

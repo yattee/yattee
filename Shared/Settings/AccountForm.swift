@@ -17,8 +17,6 @@ struct AccountForm: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject<InstancesModel> private var instances
-
     var body: some View {
         VStack {
             Group {

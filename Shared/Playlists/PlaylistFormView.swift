@@ -95,59 +95,61 @@ struct PlaylistFormView: View {
         #endif
     }
 
-    var header: some View {
-        HStack(alignment: .center) {
-            Text(editing ? "Edit Playlist" : "Create Playlist")
-                .font(.title2.bold())
+    #if os(tvOS)
+        var header: some View {
+            HStack(alignment: .center) {
+                Text(editing ? "Edit Playlist" : "Create Playlist")
+                    .font(.title2.bold())
 
-            Spacer()
-
-            #if !os(tvOS)
-                Button("Cancel") {
-                    dismiss()
-                }
-                .keyboardShortcut(.cancelAction)
-            #endif
-        }
-        .padding(.horizontal)
-    }
-
-    var form: some View {
-        VStack(alignment: .trailing) {
-            VStack {
-                Text("Name")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                TextField("Playlist Name", text: $name, onCommit: validate)
-            }
-
-            HStack {
-                Text("Visibility")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                visibilityFormItem
-            }
-            .padding(.top, 10)
-
-            HStack {
                 Spacer()
 
-                Button("Save", action: submitForm).disabled(!valid)
+                #if !os(tvOS)
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                #endif
             }
-            .padding(.top, 40)
+            .padding(.horizontal)
+        }
 
-            if editing {
-                Divider()
+        var form: some View {
+            VStack(alignment: .trailing) {
+                VStack {
+                    Text("Name")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    TextField("Playlist Name", text: $name, onCommit: validate)
+                }
+
                 HStack {
-                    Text("Delete playlist")
-                        .font(.title2.bold())
+                    Text("Visibility")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    visibilityFormItem
+                }
+                .padding(.top, 10)
+
+                HStack {
                     Spacer()
-                    deletePlaylistButton
+
+                    Button("Save", action: submitForm).disabled(!valid)
+                }
+                .padding(.top, 40)
+
+                if editing {
+                    Divider()
+                    HStack {
+                        Text("Delete playlist")
+                            .font(.title2.bold())
+                        Spacer()
+                        deletePlaylistButton
+                    }
                 }
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
-    }
+    #endif
 
     func initializeForm() {
         focused = true

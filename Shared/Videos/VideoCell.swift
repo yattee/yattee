@@ -4,7 +4,6 @@ import SwiftUI
 
 struct VideoCell: View {
     var video: Video
-    @State private var mediumQualityThumbnail = false
 
     @Environment(\.inNavigationView) private var inNavigationView
 

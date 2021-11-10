@@ -8,8 +8,9 @@ struct ChannelPlaylistView: View {
 
     @StateObject private var store = Store<ChannelPlaylist>()
 
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.inNavigationView) private var inNavigationView
+    #if os(iOS)
+        @Environment(\.inNavigationView) private var inNavigationView
+    #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
 

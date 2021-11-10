@@ -126,24 +126,26 @@ struct AddToPlaylistView: View {
         .padding(.horizontal)
     }
 
-    private var selectPlaylistButton: some View {
-        Button(selectedPlaylist?.title ?? "Select playlist") {
-            guard selectedPlaylist != nil else {
-                return
-            }
-
-            selectedPlaylistID = model.all.next(after: selectedPlaylist!)!.id
-        }
-        .contextMenu {
-            ForEach(model.all) { playlist in
-                Button(playlist.title) {
-                    selectedPlaylistID = playlist.id
+    #if os(tvOS)
+        private var selectPlaylistButton: some View {
+            Button(selectedPlaylist?.title ?? "Select playlist") {
+                guard selectedPlaylist != nil else {
+                    return // swiftlint:disable:this implicit_return
                 }
-            }
 
-            Button("Cancel", role: .cancel) {}
+                selectedPlaylistID = model.all.next(after: selectedPlaylist!)!.id
+            }
+            .contextMenu {
+                ForEach(model.all) { playlist in
+                    Button(playlist.title) {
+                        selectedPlaylistID = playlist.id
+                    }
+                }
+
+                Button("Cancel", role: .cancel) {}
+            }
         }
-    }
+    #endif
 
     private func addToPlaylist() {
         guard let id = selectedPlaylist?.id else {

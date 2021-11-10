@@ -1612,7 +1612,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (iOS)\" \\\n  --targets \"Yattee (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nperiphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (iOS)\" \\\n  --targets \"Yattee (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
 		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1680,7 +1680,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (macOS)\" \\\n  --targets \"Yattee (macOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nperiphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (macOS)\" \\\n  --targets \"Yattee (macOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
 		};
 		37FD43EF2704A7780073EE42 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1697,7 +1697,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "periphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (Apple TV)\" \\\n  --targets \"Yattee (Apple TV)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nperiphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (tvOS)\" \\\n  --targets \"Yattee (tvOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

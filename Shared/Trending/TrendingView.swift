@@ -124,37 +124,39 @@ struct TrendingView: View {
                 }
     }
 
-    private var toolbar: some View {
-        HStack {
-            if accounts.app.supportsTrendingCategories {
+    #if os(tvOS)
+        private var toolbar: some View {
+            HStack {
+                if accounts.app.supportsTrendingCategories {
+                    HStack {
+                        Text("Category")
+                            .foregroundColor(.secondary)
+
+                        categoryButton
+                    }
+                }
+
+                #if os(iOS)
+                    Spacer()
+                #endif
+
                 HStack {
-                    Text("Category")
+                    Text("Country")
                         .foregroundColor(.secondary)
 
-                    categoryButton
+                    countryButton
                 }
+
+                #if os(tvOS)
+                    if let favoriteItem = favoriteItem {
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem.id)
+                            .labelStyle(.iconOnly)
+                    }
+                #endif
             }
-
-            #if os(iOS)
-                Spacer()
-            #endif
-
-            HStack {
-                Text("Country")
-                    .foregroundColor(.secondary)
-
-                countryButton
-            }
-
-            #if os(tvOS)
-                if let favoriteItem = favoriteItem {
-                    FavoriteButton(item: favoriteItem)
-                        .id(favoriteItem.id)
-                        .labelStyle(.iconOnly)
-                }
-            #endif
         }
-    }
+    #endif
 
     private var categoryButton: some View {
         #if os(tvOS)

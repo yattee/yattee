@@ -23,7 +23,6 @@ struct VideoDetails: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Default(.showKeywords) private var showKeywords
@@ -263,7 +262,7 @@ struct VideoDetails: View {
             if let video = player.currentVideo {
                 HStack {
                     ShareButton(
-                        contentItem: ContentItem(video: video),
+                        contentItem: contentItem,
                         presentingShareSheet: $presentingShareSheet,
                         shareURL: $shareURL
                     )
