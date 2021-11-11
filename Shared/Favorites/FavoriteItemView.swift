@@ -71,7 +71,7 @@ struct FavoriteItemView: View {
     private var isVisible: Bool {
         switch item.section {
         case .subscriptions:
-            return accounts.app.supportsSubscriptions
+            return accounts.app.supportsSubscriptions && accounts.signedIn
         case .popular:
             return accounts.app.supportsPopular
         default:
@@ -93,7 +93,7 @@ struct FavoriteItemView: View {
 
         case let .trending(country, category):
             let trendingCountry = Country(rawValue: country)!
-            let trendingCategory = category.isNil ? nil : TrendingCategory(rawValue: category!)!
+            let trendingCategory = category.isNil ? nil : TrendingCategory(rawValue: category!)
 
             return accounts.api.trending(country: trendingCountry, category: trendingCategory)
 

@@ -182,6 +182,7 @@
 		3765917C27237D21009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917B27237D21009F956E /* PINCache */; };
 		3765917E27237D2A009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917D27237D2A009F956E /* PINCache */; };
 		37666BAA27023AF000F869E5 /* AccountSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37666BA927023AF000F869E5 /* AccountSelectionView.swift */; };
+		3766AFD2273DA97D00686348 /* Int+FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA796D26DC412E002A0235 /* Int+FormatTests.swift */; };
 		376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		376A33E12720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		376A33E22720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
@@ -2044,6 +2045,7 @@
 				3774123327387CB000423605 /* Defaults.swift in Sources */,
 				3774123527387CC700423605 /* PipedAPI.swift in Sources */,
 				3774124E27387D2300423605 /* Playlist.swift in Sources */,
+				3766AFD2273DA97D00686348 /* Int+FormatTests.swift in Sources */,
 				3774124F27387D2300423605 /* SubscriptionsModel.swift in Sources */,
 				3774126127387D2D00423605 /* AccountsModel.swift in Sources */,
 			);

@@ -2,32 +2,16 @@ import Defaults
 import Foundation
 
 extension Defaults.Keys {
-    static let invidiousInstanceID = "default-invidious-instance"
-    static let pipedInstanceID = "default-piped-instance"
-    static let privateAccountID = "default-private-invidious-account"
-
     static let instances = Key<[Instance]>("instances", default: [
         .init(
             app: .piped,
-            id: pipedInstanceID,
-            name: "Public",
+            id: "default-piped-instance",
+            name: "Kavin",
             apiURL: "https://pipedapi.kavin.rocks",
             frontendURL: "https://piped.kavin.rocks"
-        ),
-        .init(app: .invidious,
-              id: invidiousInstanceID,
-              name: "Private",
-              apiURL: "https://invidious.home.arekf.net")
-    ])
-    static let accounts = Key<[Account]>("accounts", default: [
-        .init(
-            id: privateAccountID,
-            instanceID: invidiousInstanceID,
-            name: "arekf",
-            url: "https://invidious.home.arekf.net",
-            sid: "ki55SJbaQmm0bOxUWctGAQLYPQRgk-CXDPw5Dp4oBmI="
         )
     ])
+    static let accounts = Key<[Account]>("accounts", default: [])
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
     static let lastUsedPlaylistID = Key<Playlist.ID?>("lastPlaylistID")
@@ -36,9 +20,8 @@ extension Defaults.Keys {
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
 
     static let favorites = Key<[FavoriteItem]>("favorites", default: [
-        .init(section: .trending("US", nil)),
-        .init(section: .searchQuery("World Discoveries", "", "", "")),
-        .init(section: .searchQuery("Full Body Workout", "", "", "")),
+        .init(section: .trending("US", "default")),
+        .init(section: .channel("UC-lHJZR3Gqxm24_Vd_AJ5Yw", "PewDiePie")),
         .init(section: .searchQuery("Apple Pie Recipes", "", "", ""))
     ])
 

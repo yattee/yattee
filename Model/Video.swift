@@ -85,11 +85,19 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var likesCount: String? {
-        likes?.formattedAsAbbreviation()
+        guard likes != -1 else {
+            return nil
+        }
+
+        return likes?.formattedAsAbbreviation()
     }
 
     var dislikesCount: String? {
-        dislikes?.formattedAsAbbreviation()
+        guard dislikes != -1 else {
+            return nil
+        }
+
+        return dislikes?.formattedAsAbbreviation()
     }
 
     func thumbnailURL(quality: Thumbnail.Quality) -> URL? {

@@ -33,18 +33,27 @@ struct VerticalCells: View {
     }
 
     var adaptiveItem: [GridItem] {
-        [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize))]
+        [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize, maximum: adaptiveGridItemMaximumSize))]
     }
 
     var adaptiveGridItemMinimumSize: Double {
         #if os(iOS)
             return verticalSizeClass == .regular ? 320 : 800
         #elseif os(tvOS)
-            return 500
+            return 600
         #else
             return 320
         #endif
     }
+
+    var adaptiveGridItemMaximumSize: Double {
+        #if os(tvOS)
+            return 600
+        #else
+            return .infinity
+        #endif
+    }
+
 
     var scrollViewShowsIndicators: Bool {
         #if !os(tvOS)
@@ -57,7 +66,7 @@ struct VerticalCells: View {
 
 struct VeticalCells_Previews: PreviewProvider {
     static var previews: some View {
-        VerticalCells(items: ContentItem.array(of: Video.allFixtures))
+        VerticalCells(items: ContentItem.array(of: Array(repeating: Video.fixture, count: 30)))
             .injectFixtureEnvironmentObjects()
     }
 }
