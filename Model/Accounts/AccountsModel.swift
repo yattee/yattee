@@ -23,7 +23,7 @@ final class AccountsModel: ObservableObject {
     }
 
     var app: VideosApp {
-        current?.instance.app ?? .invidious
+        current?.instance?.app ?? .invidious
     }
 
     var api: VideosAPI {

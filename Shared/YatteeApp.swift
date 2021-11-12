@@ -26,6 +26,7 @@ struct YatteeApp: App {
         #if os(macOS)
             Settings {
                 SettingsView()
+                    .environmentObject(AccountsModel())
                     .environmentObject(InstancesModel())
             }
         #endif

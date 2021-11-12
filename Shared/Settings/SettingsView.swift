@@ -13,11 +13,14 @@ struct SettingsView: View {
         @Environment(\.dismiss) private var dismiss
     #endif
 
+    @EnvironmentObject<AccountsModel> private var accounts
+
     var body: some View {
         #if os(macOS)
             TabView {
                 Form {
                     InstancesSettings()
+                        .environmentObject(accounts)
                 }
                 .tabItem {
                     Label("Instances", systemImage: "server.rack")
@@ -63,6 +66,7 @@ struct SettingsView: View {
                         }
                     #endif
                     InstancesSettings()
+                        .environmentObject(accounts)
                     BrowsingSettings()
                     PlaybackSettings()
                     ServicesSettings()

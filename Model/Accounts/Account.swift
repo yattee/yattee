@@ -28,8 +28,8 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         self.sid = sid ?? ""
     }
 
-    var instance: Instance {
-        Defaults[.instances].first { $0.id == instanceID }!
+    var instance: Instance! {
+        Defaults[.instances].first { $0.id == instanceID }
     }
 
     var anonymizedSID: String {

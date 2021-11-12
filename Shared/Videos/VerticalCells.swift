@@ -54,7 +54,6 @@ struct VerticalCells: View {
         #endif
     }
 
-
     var scrollViewShowsIndicators: Bool {
         #if !os(tvOS)
             true
