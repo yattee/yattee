@@ -80,6 +80,6 @@ extension VideosAPI {
             urlComponents.queryItems = queryItems
         }
 
-        return urlComponents.url!
+        return urlComponents.url
     }
 }

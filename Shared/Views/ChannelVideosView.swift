@@ -5,6 +5,7 @@ struct ChannelVideosView: View {
     let channel: Channel
 
     @State private var presentingShareSheet = false
+    @State private var shareURL: URL?
 
     @StateObject private var store = Store<Channel>()
 
@@ -79,7 +80,8 @@ struct ChannelVideosView: View {
             ToolbarItem(placement: .navigation) {
                 ShareButton(
                     contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet
+                    presentingShareSheet: $presentingShareSheet,
+                    shareURL: $shareURL
                 )
             }
 
@@ -100,8 +102,8 @@ struct ChannelVideosView: View {
         #endif
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
-            if let url = accounts.api.shareURL(contentItem) {
-                ShareSheet(activityItems: [url])
+            if let shareURL = shareURL {
+                ShareSheet(activityItems: [shareURL])
             }
         }
         #endif
