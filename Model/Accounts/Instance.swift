@@ -8,6 +8,8 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     let id: String
     let name: String
     let apiURL: String
+    let username: String?
+    let password: String?
     var frontendURL: String?
 
     init(app: VideosApp, id: String? = nil, name: String, apiURL: String, frontendURL: String? = nil) {
@@ -15,6 +17,8 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
         self.id = id ?? UUID().uuidString
         self.name = name
         self.apiURL = apiURL
+        self.username = apiURL.url?.user
+        self.password = apiURL.url?.password
         self.frontendURL = frontendURL
     }
 
