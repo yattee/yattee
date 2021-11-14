@@ -8,7 +8,9 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     let instanceID: String
     var name: String?
     let url: String
-    let sid: String
+    let username: String
+    let password: String?
+    var token: String?
     let anonymous: Bool
 
     init(
@@ -16,7 +18,9 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         instanceID: String? = nil,
         name: String? = nil,
         url: String? = nil,
-        sid: String? = nil,
+        username: String? = nil,
+        password: String? = nil,
+        token: String? = nil,
         anonymous: Bool = false
     ) {
         self.anonymous = anonymous
@@ -25,27 +29,29 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         self.instanceID = instanceID ?? UUID().uuidString
         self.name = name
         self.url = url ?? ""
-        self.sid = sid ?? ""
+        self.username = username ?? ""
+        self.token = token
+        self.password = password ?? ""
     }
 
     var instance: Instance! {
         Defaults[.instances].first { $0.id == instanceID }
     }
 
-    var anonymizedSID: String {
-        guard sid.count > 3 else {
-            return ""
+    var shortUsername: String {
+        guard username.count > 10 else {
+            return username
         }
 
-        let index = sid.index(sid.startIndex, offsetBy: 4)
-        return String(sid[..<index])
+        let index = username.index(username.startIndex, offsetBy: 11)
+        return String(username[..<index])
     }
 
     var description: String {
-        (name != nil && name!.isEmpty) ? "Unnamed (\(anonymizedSID))" : name!
+        (name != nil && name!.isEmpty) ? shortUsername : name!
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(sid)
+        hasher.combine(username)
     }
 }

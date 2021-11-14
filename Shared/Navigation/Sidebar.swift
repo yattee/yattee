@@ -3,6 +3,8 @@ import SwiftUI
 struct Sidebar: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     var body: some View {
         ScrollViewReader { scrollView in
@@ -13,11 +15,24 @@ struct Sidebar: View {
                     AppSidebarRecents()
                         .id("recentlyOpened")
 
-                    if accounts.signedIn {
-                        AppSidebarSubscriptions()
-                        AppSidebarPlaylists()
+                    if accounts.api.signedIn {
+                        if accounts.app.supportsSubscriptions {
+                            AppSidebarSubscriptions()
+                        }
+
+                        if accounts.app.supportsUserPlaylists {
+                            AppSidebarPlaylists()
+                        }
                     }
                 }
+            }
+            .onAppear {
+                subscriptions.load()
+                playlists.load()
+            }
+            .onChange(of: accounts.signedIn) { _ in
+                subscriptions.load(force: true)
+                playlists.load(force: true)
             }
             .onChange(of: navigation.sidebarSectionChanged) { _ in
                 scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)

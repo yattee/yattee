@@ -15,7 +15,8 @@ struct AccountsBridge: Defaults.Bridge {
             "instanceID": value.instanceID,
             "name": value.name ?? "",
             "apiURL": value.url,
-            "sid": value.sid
+            "username": value.username,
+            "password": value.password ?? ""
         ]
     }
 
@@ -25,13 +26,14 @@ struct AccountsBridge: Defaults.Bridge {
             let id = object["id"],
             let instanceID = object["instanceID"],
             let url = object["apiURL"],
-            let sid = object["sid"]
+            let username = object["username"]
         else {
             return nil
         }
 
         let name = object["name"] ?? ""
+        let password = object["password"]
 
-        return Account(id: id, instanceID: instanceID, name: name, url: url, sid: sid)
+        return Account(id: id, instanceID: instanceID, name: name, url: url, username: username, password: password)
     }
 }

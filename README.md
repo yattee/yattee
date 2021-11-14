@@ -20,8 +20,8 @@ Video player with support for [Invidious](https://github.com/iv-org/invidious) a
 ### Availability
 | Feature  | Invidious | Piped |
 | - | - | - |
-| User Accounts | ✅ | 🔴 |
-| Subscriptions | ✅ | 🔴 |
+| User Accounts | ✅ | ✅ |
+| Subscriptions | ✅ | ✅ |
 | Popular | ✅ | 🔴 |
 | User Playlists | ✅ | 🔴 |
 | Trending | ✅ | ✅ |

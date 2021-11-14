@@ -28,6 +28,11 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
+        guard !resource.isNil else {
+            playlists = []
+            return
+        }
+
         let request = force ? resource?.load() : resource?.loadIfNeeded()
 
         guard !request.isNil else {

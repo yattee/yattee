@@ -20,7 +20,8 @@ protocol VideosAPI {
     var popular: Resource? { get }
     var playlists: Resource? { get }
 
-    func channelSubscription(_ id: String) -> Resource?
+    func subscribe(_ channelID: String, onCompletion: @escaping () -> Void)
+    func unsubscribe(_ channelID: String, onCompletion: @escaping () -> Void)
 
     func playlist(_ id: String) -> Resource?
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource?

@@ -86,8 +86,6 @@ struct InstancesSettings: View {
                 Text("If provided, you can copy links from videos, channels and playlist")
                     .font(.caption)
                     .foregroundColor(.secondary)
-
-                Spacer()
             }
 
             if selectedInstance != nil, !selectedInstance.app.supportsAccounts {

@@ -15,7 +15,7 @@ struct AccountsMenuView: View {
                 }
             }
         } label: {
-            Label(model.current?.name ?? "Select Account", systemImage: "person.crop.circle")
+            Label(model.current?.description ?? "Select Account", systemImage: "person.crop.circle")
                 .labelStyle(.titleAndIcon)
         }
         .disabled(instances.isEmpty)
