@@ -339,6 +339,7 @@ struct VideoDetails: View {
                 VStack(alignment: .leading, spacing: 10) {
                     if let description = video.description {
                         Text(description)
+                            .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .font(.caption)
                             .padding(.bottom, 4)
