@@ -52,7 +52,7 @@ struct FavoriteItemView: View {
                 .opacity(dragging?.id == item.id ? 0.5 : 1)
                 .onAppear {
                     resource?.addObserver(store)
-                    resource?.loadIfNeeded()
+                    resource?.load()
                 }
                 #if !os(tvOS)
                 .onDrag {

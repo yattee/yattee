@@ -39,8 +39,13 @@ struct SubscriptionsView: View {
     fileprivate func loadResources(force: Bool = false) {
         feed?.addObserver(store)
 
-        if let request = force ? accounts.api.home?.load() : accounts.api.home?.loadIfNeeded() {
-            request.onSuccess { _ in
+        if accounts.app == .invidious {
+            // Invidious for some reason won't refresh feed until homepage is loaded
+            if let request = force ? accounts.api.home?.load() : accounts.api.home?.loadIfNeeded() {
+                request.onSuccess { _ in
+                    loadFeed(force: force)
+                }
+            } else {
                 loadFeed(force: force)
             }
         } else {

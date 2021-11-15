@@ -19,11 +19,15 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     func subscribe(_ channelID: String, onSuccess: @escaping () -> Void = {}) {
-        performRequest(channelID, method: .post, onSuccess: onSuccess)
+        accounts.api.subscribe(channelID) {
+            self.scheduleLoad(onSuccess: onSuccess)
+        }
     }
 
     func unsubscribe(_ channelID: String, onSuccess: @escaping () -> Void = {}) {
-        performRequest(channelID, method: .delete, onSuccess: onSuccess)
+        accounts.api.unsubscribe(channelID) {
+            self.scheduleLoad(onSuccess: onSuccess)
+        }
     }
 
     func isSubscribing(_ channelID: String) -> Bool {
@@ -31,6 +35,9 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
+        guard accounts.app.supportsSubscriptions else {
+            return
+        }
         let request = force ? resource?.load() : resource?.loadIfNeeded()
 
         request?
@@ -45,8 +52,8 @@ final class SubscriptionsModel: ObservableObject {
             }
     }
 
-    fileprivate func performRequest(_ channelID: String, method: RequestMethod, onSuccess: @escaping () -> Void = {}) {
-        accounts.api.channelSubscription(channelID)?.request(method).onCompletion { _ in
+    private func scheduleLoad(onSuccess: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.load(force: true, onSuccess: onSuccess)
         }
     }

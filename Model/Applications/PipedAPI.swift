@@ -4,6 +4,8 @@ import Siesta
 import SwiftyJSON
 
 final class PipedAPI: Service, ObservableObject, VideosAPI {
+    static var authorizedEndpoints = ["subscriptions", "subscribe", "unsubscribe"]
+
     @Published var account: Account!
 
     var anonymousAccount: Account {
@@ -27,8 +29,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     func configure() {
+        invalidateConfiguration()
+
         configure {
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
+        }
+
+        configure(whenURLMatches: { url in self.needsAuthorization(url) }) {
+            $0.headers["Authorization"] = self.account.token
         }
 
         configureTransformer(pathPattern("channel/*")) { (content: Entity<JSON>) -> Channel? in
@@ -54,6 +62,38 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         configureTransformer(pathPattern("suggestions")) { (content: Entity<JSON>) -> [String] in
             content.json.arrayValue.map(String.init)
         }
+
+        configureTransformer(pathPattern("subscriptions")) { (content: Entity<JSON>) -> [Channel] in
+            content.json.arrayValue.map { PipedAPI.extractChannel(from: $0)! }
+        }
+
+        configureTransformer(pathPattern("feed")) { (content: Entity<JSON>) -> [Video] in
+            content.json.arrayValue.map { PipedAPI.extractVideo(from: $0)! }
+        }
+
+        if account.token.isNil {
+            updateToken()
+        }
+    }
+
+    func needsAuthorization(_ url: URL) -> Bool {
+        PipedAPI.authorizedEndpoints.contains { url.absoluteString.contains($0) }
+    }
+
+    @discardableResult func updateToken() -> Request {
+        account.token = nil
+        return login.request(
+            .post,
+            json: ["username": account.username, "password": account.password]
+        )
+        .onSuccess { response in
+            self.account.token = response.json.dictionaryValue["token"]?.string ?? ""
+            self.configure()
+        }
+    }
+
+    var login: Resource {
+        resource(baseURL: account.url, path: "login")
     }
 
     func channel(_ id: String) -> Resource {
@@ -88,15 +128,34 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.instance.apiURL, path: "streams/\(id)")
     }
 
-    var signedIn: Bool { false }
+    var signedIn: Bool {
+        !account.anonymous && !(account.token?.isEmpty ?? true)
+    }
 
-    var subscriptions: Resource? { nil }
-    var feed: Resource? { nil }
+    var subscriptions: Resource? {
+        resource(baseURL: account.instance.apiURL, path: "subscriptions")
+    }
+
+    var feed: Resource? {
+        resource(baseURL: account.instance.apiURL, path: "feed")
+            .withParam("authToken", account.token)
+    }
+
     var home: Resource? { nil }
     var popular: Resource? { nil }
     var playlists: Resource? { nil }
 
-    func channelSubscription(_: String) -> Resource? { nil }
+    func subscribe(_ channelID: String, onCompletion: @escaping () -> Void = {}) {
+        resource(baseURL: account.instance.apiURL, path: "subscribe")
+            .request(.post, json: ["channelId": channelID])
+            .onCompletion { _ in onCompletion() }
+    }
+
+    func unsubscribe(_ channelID: String, onCompletion: @escaping () -> Void = {}) {
+        resource(baseURL: account.instance.apiURL, path: "unsubscribe")
+            .request(.post, json: ["channelId": channelID])
+            .onCompletion { _ in onCompletion() }
+    }
 
     func playlist(_: String) -> Resource? { nil }
     func playlistVideo(_: String, _: String) -> Resource? { nil }
@@ -211,13 +270,15 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
 
         let author = details["uploaderName"]?.stringValue ?? details["uploader"]!.stringValue
+        let published = (details["uploadedDate"] ?? details["uploadDate"])?.stringValue ??
+            (details["uploaded"]!.double! / 1000).formattedAsRelativeTime()!
 
         return Video(
             videoID: PipedAPI.extractID(from: content),
             title: details["title"]!.stringValue,
             author: author,
             length: details["duration"]!.doubleValue,
-            published: details["uploadedDate"]?.stringValue ?? details["uploadDate"]!.stringValue,
+            published: published,
             views: details["views"]!.intValue,
             description: PipedAPI.extractDescription(from: content),
             channel: Channel(id: channelId, name: author),

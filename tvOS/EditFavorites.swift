@@ -44,12 +44,7 @@ struct EditFavorites: View {
 
                 ForEach(model.addableItems()) { item in
                     HStack {
-                        HStack {
-                            Text(label(item))
-                            Spacer()
-                            Text("only with Invidious")
-                                .foregroundColor(.secondary)
-                        }
+                        Text(label(item))
 
                         Spacer()
 

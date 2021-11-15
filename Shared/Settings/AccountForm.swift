@@ -6,11 +6,13 @@ struct AccountForm: View {
     var selectedAccount: Binding<Account?>?
 
     @State private var name = ""
-    @State private var sid = ""
+    @State private var username = ""
+    @State private var password = ""
 
     @State private var isValid = false
     @State private var isValidated = false
     @State private var isValidating = false
+    @State private var validationError: String?
     @State private var validationDebounce = Debounce()
 
     @FocusState private var focused: Bool
@@ -67,21 +69,42 @@ struct AccountForm: View {
             #endif
         }
         .onAppear(perform: initializeForm)
-        .onChange(of: sid) { _ in validate() }
+        .onChange(of: username) { _ in validate() }
+        .onChange(of: password) { _ in validate() }
     }
 
     var formFields: some View {
         Group {
-            TextField("Name", text: $name, prompt: Text("Account Name (optional)"))
-                .focused($focused)
+            if !instance.app.accountsUsePassword {
+                TextField("Name", text: $name, prompt: Text("Account Name (optional)"))
+                    .focused($focused)
+            }
 
-            TextField("SID", text: $sid, prompt: Text("Invidious SID Cookie"))
+            TextField("Username", text: $username, prompt: usernamePrompt)
+
+            if instance.app.accountsUsePassword {
+                SecureField("Password", text: $password, prompt: Text("Password"))
+            }
+        }
+    }
+
+    var usernamePrompt: Text {
+        switch instance.app {
+        case .invidious:
+            return Text("SID Cookie")
+        default:
+            return Text("Username")
         }
     }
 
     var footer: some View {
         HStack {
-            AccountValidationStatus(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: .constant(nil))
+            AccountValidationStatus(
+                isValid: $isValid,
+                isValidated: $isValidated,
+                isValidating: $isValidating,
+                error: $validationError
+            )
 
             Spacer()
 
@@ -106,7 +129,9 @@ struct AccountForm: View {
         isValid = false
         validationDebounce.invalidate()
 
-        guard !sid.isEmpty else {
+        let passwordIsValid = instance.app.accountsUsePassword ? !password.isEmpty : true
+
+        guard !username.isEmpty, passwordIsValid else {
             validator.reset()
             return
         }
@@ -114,7 +139,7 @@ struct AccountForm: View {
         isValidating = true
 
         validationDebounce.debouncing(1) {
-            validator.validateInvidiousAccount()
+            validator.validateAccount()
         }
     }
 
@@ -123,7 +148,7 @@ struct AccountForm: View {
             return
         }
 
-        let account = AccountsModel.add(instance: instance, name: name, sid: sid)
+        let account = AccountsModel.add(instance: instance, name: name, username: username, password: password)
         selectedAccount?.wrappedValue = account
 
         dismiss()
@@ -133,11 +158,12 @@ struct AccountForm: View {
         AccountValidator(
             app: .constant(instance.app),
             url: instance.apiURL,
-            account: Account(instanceID: instance.id, url: instance.apiURL, sid: sid),
-            id: $sid,
+            account: Account(instanceID: instance.id, url: instance.apiURL, username: username, password: password),
+            id: $username,
             isValid: $isValid,
             isValidated: $isValidated,
-            isValidating: $isValidating
+            isValidating: $isValidating,
+            error: $validationError
         )
     }
 }

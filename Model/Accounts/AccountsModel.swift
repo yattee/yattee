@@ -35,7 +35,7 @@ final class AccountsModel: ObservableObject {
     }
 
     var signedIn: Bool {
-        !isEmpty && !current.anonymous
+        !isEmpty && !current.anonymous && api.signedIn
     }
 
     init() {
@@ -74,8 +74,14 @@ final class AccountsModel: ObservableObject {
         Defaults[.accounts].first { $0.id == id }
     }
 
-    static func add(instance: Instance, name: String, sid: String) -> Account {
-        let account = Account(instanceID: instance.id, name: name, url: instance.apiURL, sid: sid)
+    static func add(instance: Instance, name: String, username: String, password: String? = nil) -> Account {
+        let account = Account(
+            instanceID: instance.id,
+            name: name,
+            url: instance.apiURL,
+            username: username,
+            password: password
+        )
         Defaults[.accounts].append(account)
 
         return account

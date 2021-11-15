@@ -30,9 +30,6 @@ struct AppSidebarPlaylists: View {
             newPlaylistButton
                 .padding(.top, 8)
         }
-        .onAppear {
-            playlists.load()
-        }
     }
 
     var newPlaylistButton: some View {

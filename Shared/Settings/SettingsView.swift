@@ -52,7 +52,7 @@ struct SettingsView: View {
                 .tag(Tabs.services)
             }
             .padding(20)
-            .frame(width: 400, height: 310)
+            .frame(width: 400, height: 380)
         #else
             NavigationView {
                 List {

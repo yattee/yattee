@@ -22,8 +22,5 @@ struct AppSidebarSubscriptions: View {
                 .id("channel\(channel.id)")
             }
         }
-        .onAppear {
-            subscriptions.load()
-        }
     }
 }

@@ -5,6 +5,7 @@ struct ChannelPlaylistView: View {
     var playlist: ChannelPlaylist
 
     @State private var presentingShareSheet = false
+    @State private var shareURL: URL?
 
     @StateObject private var store = Store<ChannelPlaylist>()
 
@@ -56,8 +57,8 @@ struct ChannelPlaylistView: View {
         }
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
-            if let url = accounts.api.shareURL(contentItem) {
-                ShareSheet(activityItems: [url])
+            if let shareURL = shareURL {
+                ShareSheet(activityItems: [shareURL])
             }
         }
         #endif
@@ -70,7 +71,8 @@ struct ChannelPlaylistView: View {
             ToolbarItem(placement: .navigation) {
                 ShareButton(
                     contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet
+                    presentingShareSheet: $presentingShareSheet,
+                    shareURL: $shareURL
                 )
             }
 

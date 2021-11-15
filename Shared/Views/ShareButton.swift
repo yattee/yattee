@@ -3,7 +3,7 @@ import SwiftUI
 struct ShareButton: View {
     let contentItem: ContentItem
     @Binding var presentingShareSheet: Bool
-    @Binding var shareURL: String
+    @Binding var shareURL: URL?
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
@@ -11,11 +11,11 @@ struct ShareButton: View {
     init(
         contentItem: ContentItem,
         presentingShareSheet: Binding<Bool>,
-        shareURL: Binding<String>? = nil
+        shareURL: Binding<URL?>? = nil
     ) {
         self.contentItem = contentItem
         _presentingShareSheet = presentingShareSheet
-        _shareURL = shareURL ?? .constant("")
+        _shareURL = shareURL ?? .constant(nil)
     }
 
     var body: some View {
@@ -81,7 +81,7 @@ struct ShareButton: View {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(url.absoluteString, forType: .string)
         #else
-            shareURL = url.absoluteString
+            shareURL = url
             presentingShareSheet = true
         #endif
     }

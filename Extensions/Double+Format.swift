@@ -14,4 +14,13 @@ extension Double {
 
         return formatter.string(from: self)
     }
+
+    func formattedAsRelativeTime() -> String? {
+        let date = Date(timeIntervalSince1970: self)
+
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+
+        return formatter.localizedString(for: date, relativeTo: Date())
+    }
 }

@@ -5,7 +5,7 @@ import SwiftUI
 final class AccountValidator: Service {
     let app: Binding<VideosApp>
     let url: String
-    let account: Account?
+    let account: Account!
 
     var formObjectID: Binding<String>
     var isValid: Binding<Bool>
@@ -46,7 +46,11 @@ final class AccountValidator: Service {
                 return
             }
 
-            $0.headers["Cookie"] = self.cookieHeader
+            $0.headers["Cookie"] = self.invidiousCookieHeader
+        }
+
+        configure("/login", requestMethods: [.post]) {
+            $0.headers["Content-Type"] = "application/json"
         }
     }
 
@@ -84,20 +88,27 @@ final class AccountValidator: Service {
             }
     }
 
-    func validateInvidiousAccount() {
+    func validateAccount() {
         reset()
 
-        feed
-            .load()
-            .onSuccess { _ in
-                guard self.account!.sid == self.formObjectID.wrappedValue else {
+        accountRequest
+            .onSuccess { response in
+                guard self.account!.username == self.formObjectID.wrappedValue else {
                     return
                 }
 
-                self.isValid.wrappedValue = true
+                switch self.app.wrappedValue {
+                case .invidious:
+                    self.isValid.wrappedValue = true
+                case .piped:
+                    let error = response.json.dictionaryValue["error"]?.string
+                    let token = response.json.dictionaryValue["token"]?.string
+                    self.isValid.wrappedValue = error?.isEmpty ?? !(token?.isEmpty ?? true)
+                    self.error!.wrappedValue = error
+                }
             }
             .onFailure { _ in
-                guard self.account!.sid == self.formObjectID.wrappedValue else {
+                guard self.account!.username == self.formObjectID.wrappedValue else {
                     return
                 }
 
@@ -109,6 +120,15 @@ final class AccountValidator: Service {
             }
     }
 
+    var accountRequest: Request {
+        switch app.wrappedValue {
+        case .invidious:
+            return feed.load()
+        case .piped:
+            return login.request(.post, json: ["username": account.username, "password": account.password])
+        }
+    }
+
     func reset() {
         isValid.wrappedValue = false
         isValidated.wrappedValue = false
@@ -116,8 +136,12 @@ final class AccountValidator: Service {
         error?.wrappedValue = nil
     }
 
-    var cookieHeader: String {
-        "SID=\(account!.sid)"
+    var invidiousCookieHeader: String {
+        "SID=\(account.username)"
+    }
+
+    var login: Resource {
+        resource("/login")
     }
 
     var feed: Resource {

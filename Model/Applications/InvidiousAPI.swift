@@ -70,7 +70,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func configure() {
         configure {
-            if !self.account.sid.isEmpty {
+            if !self.account.username.isEmpty {
                 $0.headers["Cookie"] = self.cookieHeader
             }
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
@@ -160,7 +160,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private var cookieHeader: String {
-        "SID=\(account.sid)"
+        "SID=\(account.username)"
     }
 
     var popular: Resource? {
@@ -185,8 +185,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
     }
 
-    func channelSubscription(_ id: String) -> Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions")).child(id)
+    func subscribe(_ channelID: String, onCompletion: @escaping () -> Void = {}) {
+        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
+            .child(channelID)
+            .request(.post)
+            .onCompletion { _ in onCompletion() }
+    }
+
+    func unsubscribe(_ channelID: String, onCompletion: @escaping () -> Void) {
+        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
+            .child(channelID)
+            .request(.delete)
+            .onCompletion { _ in onCompletion() }
     }
 
     func channel(_ id: String) -> Resource {
@@ -202,7 +212,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     var playlists: Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/playlists"))
+        if account.isNil || account.anonymous {
+            return nil
+        }
+
+        return resource(baseURL: account.url, path: basePathAppending("auth/playlists"))
     }
 
     func playlist(_ id: String) -> Resource? {

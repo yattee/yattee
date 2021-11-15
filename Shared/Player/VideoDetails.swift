@@ -14,7 +14,7 @@ struct VideoDetails: View {
     @State private var confirmationShown = false
     @State private var presentingAddToPlaylist = false
     @State private var presentingShareSheet = false
-    @State private var shareURL = ""
+    @State private var shareURL: URL?
 
     @State private var currentPage = Page.details
 
@@ -309,7 +309,9 @@ struct VideoDetails: View {
         }
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
-            ShareSheet(activityItems: [shareURL])
+            if let shareURL = shareURL {
+                ShareSheet(activityItems: [shareURL])
+            }
         }
         #endif
     }
