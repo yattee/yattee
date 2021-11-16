@@ -3,19 +3,23 @@
 Video player with support for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped) instances built for iOS 15, tvOS 15 and macOS Monterey.
 
 
+[![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+![GitHub issues](https://img.shields.io/github/issues/yattee/app)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/app)
+[![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#yattee:matrix.org)
+
+
 ![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
 
 ## Features
 * Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/)
 * Multiple instances and accounts, fast switching
-* [SponsorBlock](https://sponsor.ajay.app/) with selection of categories to skip
+* [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 * Player queue and history
-* Fullscreen playback and Picture in Picture
+* Fullscreen playback, Picture in Picture and AirPlay support
 * Stream quality selection
 * Favorites: customizable section of channels, playlists, trending, searches and other views
-* AirPlay support
-* Safari Extension for macOS and iOS for redirecting to the app
-* URL Scheme for easy integrations
+* URL Scheme for integrations
 
 ### Availability
 | Feature  | Invidious | Piped |
@@ -34,24 +38,21 @@ Video player with support for [Invidious](https://github.com/iv-org/invidious) a
 
 ## Installation
 ### Requirements
-Application is built using latest APIs, that's why for now **only recent** software versions: iOS/tvOS 15 or macOS Monterey are supported.
+Only iOS/tvOS 15 and macOS Monterey are supported.
 
 ### How to install?
 #### [AltStore](https://altstore.io/)
 You can sideload IPA files that you can download from Releases page.
-Alternatively, if you have to access to the beta AltStore version (v1.5), you can add the following repository in `Browse > Sources` screen: `https://alt.yattee.stream`
+Alternatively, if you have to access to the beta AltStore version (v1.5), you can add the following repository in `Browse > Sources` screen:
+
+`https://alt.yattee.stream`
 
 #### Manual installation
 Download sources and compile them on a Mac using Xcode, install to your devices. Please note that if you are not registered in Apple Developer Program then the applications will require reinstalling every 7 days.
 
 ## Integrations
-### Safari
-macOS and iOS apps include Safari extension which will redirect opened YouTube tabs to the app.
-### Firefox
-You can use [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect) extension to make the videos open in the app. In extension settings put the following URL as Invidious instance: `https://r.yatte.stream`
-
 ### macOS
-With [Finicky](https://github.com/johnste/finicky) you can configure your systems so the video links across the entire system will get opened in the app. Example configuration:
+With [Finicky](https://github.com/johnste/finicky) you can configure your system to open all the video links in the app. Example configuration:
 ```js
 {
   match: [
@@ -61,6 +62,14 @@ With [Finicky](https://github.com/johnste/finicky) you can configure your system
   browser: "/Applications/Yattee.app"
 }
 ```
+
+### Experimental: Safari
+macOS and iOS apps include Safari extension which will redirect opened YouTube tabs to the app.
+
+### Expermiental: Firefox
+You can use [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect) extension to make the videos open in the app. In extension settings put the following URL as Invidious instance:
+
+`https://r.yatte.stream`
 
 ## Screenshots
 ### iOS
@@ -82,7 +91,7 @@ With [Finicky](https://github.com/johnste/finicky) you can configure your system
 
 ## Tips
 ### Settings
-* [tvOS] To open settings press Play/Pause button while hovering over navigation menu or video
+* [tvOS] To open settings, press Play/Pause button while hovering over navigation menu or video
 ### Navigation
 * Use videos context menus to add to queue, open or subscribe channel and add to playlist
 * [tvOS] Pressing buttons in the app trigger switch to next available option (for example: next account in Settings). If you want to access list of all options, press and hold to open the context menu.
@@ -101,11 +110,6 @@ With [Finicky](https://github.com/johnste/finicky) you can configure your system
 * `Command+P` - Play/Pause
 * `Command+S` - Play Next
 * `Command+O` - Toggle Player
-
-## Contributing
-Every contribution to make this tool better is very welcome. Start with [creating issue](https://github.com/yattee/app/issues/new) to have discussion which can be later transformed into a Pull Request.
-
-Review existing Issues and Pull Requests before creating new ones.
 
 ## License and Liability
 
