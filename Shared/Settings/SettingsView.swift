@@ -10,10 +10,15 @@ struct SettingsView: View {
     #endif
 
     #if os(iOS)
-        @Environment(\.dismiss) private var dismiss
+        @Environment(\.presentationMode) private var presentationMode
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+
+    @State private var presentingInstanceForm = false
+    @State private var savedFormInstanceID: Instance.ID?
+
+    @Default(.instances) private var instances
 
     var body: some View {
         #if os(macOS)
@@ -65,8 +70,14 @@ struct SettingsView: View {
                             }
                         }
                     #endif
-                    InstancesSettings()
-                        .environmentObject(accounts)
+
+                    Section(header: Text("Instances")) {
+                        ForEach(instances) { instance in
+                            AccountsNavigationLink(instance: instance)
+                        }
+                        addInstanceButton
+                    }
+
                     BrowsingSettings()
                     PlaybackSettings()
                     ServicesSettings()
@@ -76,7 +87,7 @@ struct SettingsView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         #if !os(tvOS)
                             Button("Done") {
-                                dismiss()
+                                presentationMode.wrappedValue.dismiss()
                             }
                             .keyboardShortcut(.cancelAction)
                         #endif
@@ -87,10 +98,19 @@ struct SettingsView: View {
                     .listStyle(.insetGrouped)
                 #endif
             }
+            .sheet(isPresented: $presentingInstanceForm) {
+                InstanceForm(savedInstanceID: $savedFormInstanceID)
+            }
             #if os(tvOS)
-            .background(.black)
+            .background(Color.black)
             #endif
         #endif
+    }
+
+    private var addInstanceButton: some View {
+        Button("Add Instance...") {
+            presentingInstanceForm = true
+        }
     }
 }
 

@@ -113,7 +113,7 @@ struct VideoContextMenuView: View {
     private var subscriptionButton: some View {
         Group {
             if subscriptions.isSubscribing(video.channel.id) {
-                Button(role: .destructive) {
+                Button {
                     #if os(tvOS)
                         subscriptions.unsubscribe(video.channel.id)
                     #else
@@ -143,7 +143,7 @@ struct VideoContextMenuView: View {
     }
 
     func removeFromPlaylistButton(playlistID: String) -> some View {
-        Button(role: .destructive) {
+        Button {
             playlists.removeVideo(videoIndexID: video.indexID!, playlistID: playlistID)
         } label: {
             Label("Remove from playlist", systemImage: "text.badge.minus")

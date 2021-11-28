@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "37D4B157267164AE00C925CA"
-               BuildableName = "Yattee (tvOS).app"
+               BuildableName = "Yattee.app"
                BlueprintName = "Yattee (tvOS)"
                ReferencedContainer = "container:Yattee.xcodeproj">
             </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D4B157267164AE00C925CA"
-            BuildableName = "Yattee (tvOS).app"
+            BuildableName = "Yattee.app"
             BlueprintName = "Yattee (tvOS)"
             ReferencedContainer = "container:Yattee.xcodeproj">
          </BuildableReference>
@@ -82,7 +82,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D4B157267164AE00C925CA"
-            BuildableName = "Yattee (tvOS).app"
+            BuildableName = "Yattee.app"
             BlueprintName = "Yattee (tvOS)"
             ReferencedContainer = "container:Yattee.xcodeproj">
          </BuildableReference>

@@ -172,11 +172,12 @@ struct TrendingView: View {
             }
 
         #else
-            Picker("Category", selection: $category) {
+            Picker(category.controlLabel, selection: $category) {
                 ForEach(TrendingCategory.allCases) { category in
                     Text(category.controlLabel).tag(category)
                 }
             }
+            .pickerStyle(.menu)
         #endif
     }
 

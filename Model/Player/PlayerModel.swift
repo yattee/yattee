@@ -45,6 +45,7 @@ final class PlayerModel: ObservableObject {
     var accounts: AccountsModel
 
     var composition = AVMutableComposition()
+    var loadedCompositionAssets = [AVMediaType]()
 
     private var currentArtwork: MPMediaItemArtwork?
     private var frequentTimeObserver: Any?
@@ -147,9 +148,7 @@ final class PlayerModel: ObservableObject {
             logger.info("composition audio asset: \(stream.audioAsset.url)")
             logger.info("composition video asset: \(stream.videoAsset.url)")
 
-            Task {
-                await self.loadComposition(stream, of: video, preservingTime: preservingTime)
-            }
+            loadComposition(stream, of: video, preservingTime: preservingTime)
         }
 
         updateCurrentArtwork()
@@ -228,46 +227,59 @@ final class PlayerModel: ObservableObject {
         _ stream: Stream,
         of video: Video,
         preservingTime: Bool = false
-    ) async {
-        await loadCompositionAsset(stream.audioAsset, type: .audio, of: video)
-        await loadCompositionAsset(stream.videoAsset, type: .video, of: video)
-
-        guard streamSelection == stream else {
-            logger.critical("IGNORING LOADED")
-            return
-        }
-
-        insertPlayerItem(stream, for: video, preservingTime: preservingTime)
+    ) {
+        loadedCompositionAssets = []
+        loadCompositionAsset(stream.audioAsset, stream: stream, type: .audio, of: video, preservingTime: preservingTime)
+        loadCompositionAsset(stream.videoAsset, stream: stream, type: .video, of: video, preservingTime: preservingTime)
     }
 
-    private func loadCompositionAsset(
+    func loadCompositionAsset(
         _ asset: AVURLAsset,
+        stream: Stream,
         type: AVMediaType,
-        of video: Video
-    ) async {
-        async let assetTracks = asset.loadTracks(withMediaType: type)
+        of video: Video,
+        preservingTime: Bool = false
+    ) {
+        asset.loadValuesAsynchronously(forKeys: ["playable"]) { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.logger.info("loading \(type.rawValue) track")
 
-        logger.info("loading \(type.rawValue) track")
-        guard let compositionTrack = composition.addMutableTrack(
-            withMediaType: type,
-            preferredTrackID: kCMPersistentTrackID_Invalid
-        ) else {
-            logger.critical("composition \(type.rawValue) addMutableTrack FAILED")
-            return
+            let assetTracks = asset.tracks(withMediaType: type)
+
+            guard let compositionTrack = self.composition.addMutableTrack(
+                withMediaType: type,
+                preferredTrackID: kCMPersistentTrackID_Invalid
+            ) else {
+                self.logger.critical("composition \(type.rawValue) addMutableTrack FAILED")
+                return
+            }
+
+            guard let assetTrack = assetTracks.first else {
+                self.logger.critical("asset \(type.rawValue) track FAILED")
+                return
+            }
+
+            try! compositionTrack.insertTimeRange(
+                CMTimeRange(start: .zero, duration: CMTime.secondsInDefaultTimescale(video.length)),
+                of: assetTrack,
+                at: .zero
+            )
+
+            self.logger.critical("\(type.rawValue) LOADED")
+
+            guard self.streamSelection == stream else {
+                self.logger.critical("IGNORING LOADED")
+                return
+            }
+
+            self.loadedCompositionAssets.append(type)
+
+            if self.loadedCompositionAssets.count == 2 {
+                self.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
+            }
         }
-
-        guard let assetTrack = try? await assetTracks.first else {
-            logger.critical("asset \(type.rawValue) track FAILED")
-            return
-        }
-
-        try! compositionTrack.insertTimeRange(
-            CMTimeRange(start: .zero, duration: CMTime.secondsInDefaultTimescale(video.length)),
-            of: assetTrack,
-            at: .zero
-        )
-
-        logger.critical("\(type.rawValue) LOADED")
     }
 
     private func playerItem(_ stream: Stream) -> AVPlayerItem? {

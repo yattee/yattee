@@ -26,8 +26,13 @@ struct DetailBadge: View {
 
     struct DefaultStyleModifier: ViewModifier {
         func body(content: Content) -> some View {
-            content
-                .background(.thinMaterial)
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                content
+                    .background(.thinMaterial)
+            } else {
+                content
+                    .background(Color.background)
+            }
         }
     }
 

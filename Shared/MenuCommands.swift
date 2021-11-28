@@ -10,7 +10,7 @@ struct MenuCommands: Commands {
     }
 
     private var navigationMenu: some Commands {
-        CommandMenu("Navigation") {
+        CommandGroup(before: .windowSize) {
             Button("Favorites") {
                 model.navigation?.tabSelection = .favorites
             }
@@ -19,7 +19,7 @@ struct MenuCommands: Commands {
             Button("Subscriptions") {
                 model.navigation?.tabSelection = .subscriptions
             }
-            .disabled(!(model.accounts?.app.supportsSubscriptions ?? true))
+            .disabled(subscriptionsDisabled)
             .keyboardShortcut("2")
 
             Button("Popular") {
@@ -37,7 +37,15 @@ struct MenuCommands: Commands {
                 model.navigation?.tabSelection = .search
             }
             .keyboardShortcut("f")
+
+            Divider()
         }
+    }
+
+    private var subscriptionsDisabled: Bool {
+        !(
+            (model.accounts?.app.supportsSubscriptions ?? false) && model.accounts?.signedIn ?? false
+        )
     }
 
     private var playbackMenu: some Commands {

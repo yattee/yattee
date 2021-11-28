@@ -10,6 +10,8 @@ final class SearchModel: ObservableObject {
     @Published var queryText = ""
     @Published var querySuggestions = Store<[String]>()
 
+    @Published var fieldIsFocused = false
+
     private var previousResource: Resource?
     private var resource: Resource!
 
@@ -80,6 +82,10 @@ final class SearchModel: ObservableObject {
     private var suggestionsDebounceTimer: Timer?
 
     func loadSuggestions(_ query: String) {
+        guard !query.isEmpty else {
+            return
+        }
+
         suggestionsDebounceTimer?.invalidate()
 
         suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in

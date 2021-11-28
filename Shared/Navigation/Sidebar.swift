@@ -46,7 +46,7 @@ struct Sidebar: View {
     }
 
     var mainNavigationLinks: some View {
-        Section("Videos") {
+        Section(header: Text("Videos")) {
             NavigationLink(destination: LazyView(FavoritesView()), tag: TabSelection.favorites, selection: $navigation.tabSelection) {
                 Label("Favorites", systemImage: "heart")
                     .accessibility(label: Text("Favorites"))
@@ -60,13 +60,13 @@ struct Sidebar: View {
 
             if accounts.app.supportsPopular {
                 NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
-                    Label("Popular", systemImage: "chart.bar")
+                    Label("Popular", systemImage: "arrow.up.right.circle")
                         .accessibility(label: Text("Popular"))
                 }
             }
 
             NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
-                Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+                Label("Trending", systemImage: "chart.bar")
                     .accessibility(label: Text("Trending"))
             }
 

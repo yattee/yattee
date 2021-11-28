@@ -44,16 +44,18 @@ struct PlayerQueueView: View {
             }
 
             ForEach(player.queue) { item in
-                PlayerQueueRow(item: item, fullScreen: $fullScreen)
+                let row = PlayerQueueRow(item: item, fullScreen: $fullScreen)
                     .contextMenu {
                         removeButton(item, history: false)
                         removeAllButton(history: false)
                     }
-                #if os(iOS)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                    row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         removeButton(item, history: false)
                     }
-                #endif
+                } else {
+                    row
+                }
             }
         }
     }
@@ -63,14 +65,18 @@ struct PlayerQueueView: View {
             if !player.history.isEmpty {
                 Section(header: Text("Played Previously")) {
                     ForEach(player.history) { item in
-                        PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
+                        let row = PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
                             .contextMenu {
                                 removeButton(item, history: true)
                                 removeAllButton(history: true)
                             }
                         #if os(iOS)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                removeButton(item, history: true)
+                            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                                row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    removeButton(item, history: true)
+                                }
+                            } else {
+                                row
                             }
                         #endif
                     }
@@ -100,27 +106,43 @@ struct PlayerQueueView: View {
     }
 
     private func removeButton(_ item: PlayerQueueItem, history: Bool) -> some View {
-        Button(role: .destructive) {
-            if history {
-                player.removeHistory(item)
-            } else {
-                player.remove(item)
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+            return Button(role: .destructive) {
+                removeButtonAction(item, history: history)
+            } label: {
+                Label("Remove", systemImage: "trash")
             }
-        } label: {
-            Label("Remove", systemImage: "trash")
+        } else {
+            return Button {
+                removeButtonAction(item, history: history)
+            } label: {
+                Label("Remove", systemImage: "trash")
+            }
         }
     }
 
+    private func removeButtonAction(_ item: PlayerQueueItem, history: Bool) {
+        _ = history ? player.removeHistory(item) : player.remove(item)
+    }
+
     private func removeAllButton(history: Bool) -> some View {
-        Button(role: .destructive) {
-            if history {
-                player.removeHistoryItems()
-            } else {
-                player.removeQueueItems()
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+            return Button(role: .destructive) {
+                removeAllButtonAction(history: history)
+            } label: {
+                Label("Remove All", systemImage: "trash.fill")
             }
-        } label: {
-            Label("Remove All", systemImage: "trash.fill")
+        } else {
+            return Button {
+                removeAllButtonAction(history: history)
+            } label: {
+                Label("Remove All", systemImage: "trash.fill")
+            }
         }
+    }
+
+    private func removeAllButtonAction(history: Bool) {
+        _ = history ? player.removeHistoryItems() : player.removeQueueItems()
     }
 }
 

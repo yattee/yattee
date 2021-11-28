@@ -9,7 +9,6 @@ struct SearchView: View {
     @State private var searchDate = SearchQuery.Date.any
     @State private var searchDuration = SearchQuery.Duration.any
 
-    @State private var presentingClearConfirmation = false
     @State private var recentsChanged = false
 
     #if os(tvOS)
@@ -31,50 +30,37 @@ struct SearchView: View {
         state.store.collection.sorted { $0 < $1 }
     }
 
-    init(_ query: SearchQuery? = nil, videos: [Video] = [Video]()) {
+    init(_ query: SearchQuery? = nil, videos: [Video] = []) {
         self.query = query
         self.videos = videos
     }
 
     var body: some View {
         PlayerControlsView {
-            VStack {
-                if showRecentQueries {
-                    recentQueries
-                } else {
-                    #if os(tvOS)
-                        ScrollView(.vertical, showsIndicators: false) {
-                            HStack(spacing: 0) {
-                                if accounts.app.supportsSearchFilters {
-                                    filtersHorizontalStack
-                                }
+            #if os(iOS)
+                VStack {
+                    SearchTextField()
 
-                                if let favoriteItem = favoriteItem {
-                                    FavoriteButton(item: favoriteItem)
-                                        .id(favoriteItem.id)
-                                        .labelStyle(.iconOnly)
-                                        .font(.system(size: 25))
-                                }
-                            }
-
-                            HorizontalCells(items: items)
-                        }
-                        .edgesIgnoringSafeArea(.horizontal)
-                    #else
-                        VerticalCells(items: items)
-                    #endif
-
-                    if noResults {
-                        Text("No results")
-
-                        if searchFiltersActive {
-                            Button("Reset search filters", action: resetFilters)
-                        }
-
-                        Spacer()
+                    if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                        SearchSuggestions()
+                    } else {
+                        results
                     }
                 }
-            }
+            #else
+                ZStack {
+                    results
+
+                    if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                        HStack {
+                            Spacer()
+                            SearchSuggestions()
+                                .borderLeading(width: 1, color: Color("ControlsBorderColor"))
+                                .frame(maxWidth: 280)
+                        }
+                    }
+                }
+            #endif
         }
         .toolbar {
             #if !os(tvOS)
@@ -118,6 +104,10 @@ struct SearchView: View {
                     if accounts.app.supportsSearchFilters {
                         filtersMenu
                     }
+
+                    #if os(macOS)
+                        SearchTextField()
+                    #endif
                 }
             #endif
         }
@@ -132,10 +122,11 @@ struct SearchView: View {
                 state.store.replace(ContentItem.array(of: videos))
             }
         }
-        .searchable(text: $state.queryText, placement: searchFieldPlacement) {
-            ForEach(state.querySuggestions.collection, id: \.self) { suggestion in
-                Text(suggestion)
-                    .searchCompletion(suggestion)
+        .onChange(of: state.query.query) { newQuery in
+            if newQuery.isEmpty {
+                favoriteItem = nil
+            } else {
+                updateFavoriteItem()
             }
         }
         .onChange(of: state.queryText) { newQuery in
@@ -161,11 +152,7 @@ struct SearchView: View {
                 }
             #endif
         }
-        .onSubmit(of: .search) {
-            state.changeQuery { query in query.query = state.queryText }
-            recents.addQuery(state.queryText)
-            updateFavoriteItem()
-        }
+
         .onChange(of: searchSortOrder) { order in
             state.changeQuery { query in
                 query.sortBy = order
@@ -185,19 +172,55 @@ struct SearchView: View {
             }
         }
         #if !os(tvOS)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationTitle("Search")
         #endif
-    }
-
-    var searchFieldPlacement: SearchFieldPlacement {
         #if os(iOS)
-            .navigationBarDrawer(displayMode: .always)
-        #else
-            .automatic
+        .navigationBarHidden(true)
         #endif
     }
 
-    var toolbarPlacement: ToolbarItemPlacement {
+    private var results: some View {
+        VStack {
+            if showRecentQueries {
+                recentQueries
+            } else {
+                #if os(tvOS)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            if accounts.app.supportsSearchFilters {
+                                filtersHorizontalStack
+                            }
+
+                            if let favoriteItem = favoriteItem {
+                                FavoriteButton(item: favoriteItem)
+                                    .id(favoriteItem.id)
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 25))
+                            }
+                        }
+
+                        HorizontalCells(items: items)
+                    }
+                    .edgesIgnoringSafeArea(.horizontal)
+                #else
+                    VerticalCells(items: items)
+                #endif
+
+                if noResults {
+                    Text("No results")
+
+                    if searchFiltersActive {
+                        Button("Reset search filters", action: resetFilters)
+                    }
+
+                    Spacer()
+                }
+            }
+        }
+    }
+
+    private var toolbarPlacement: ToolbarItemPlacement {
         #if os(iOS)
             .bottomBar
         #else
@@ -205,25 +228,25 @@ struct SearchView: View {
         #endif
     }
 
-    fileprivate var showRecentQueries: Bool {
+    private var showRecentQueries: Bool {
         navigationStyle == .tab && state.queryText.isEmpty
     }
 
-    fileprivate var filtersActive: Bool {
+    private var filtersActive: Bool {
         searchDuration != .any || searchDate != .any
     }
 
-    fileprivate func resetFilters() {
+    private func resetFilters() {
         searchSortOrder = .relevance
         searchDate = .any
         searchDuration = .any
     }
 
-    fileprivate var noResults: Bool {
+    private var noResults: Bool {
         items.isEmpty && !state.isLoading && !state.query.isEmpty
     }
 
-    var recentQueries: some View {
+    private var recentQueries: some View {
         VStack {
             List {
                 Section(header: Text("Recents")) {
@@ -237,22 +260,13 @@ struct SearchView: View {
                             state.changeQuery { query in query.query = item.title }
                             updateFavoriteItem()
                         }
-                        #if os(iOS)
-                        .swipeActions(edge: .trailing) {
-                            deleteButton(item)
-                        }
-                        #elseif os(tvOS)
                         .contextMenu {
                             deleteButton(item)
+                            deleteAllButton
                         }
-                        #endif
                     }
                 }
                 .redrawOn(change: recentsChanged)
-
-                if !recentItems.isEmpty {
-                    clearAllButton
-                }
             }
         }
         #if os(iOS)
@@ -260,37 +274,33 @@ struct SearchView: View {
         #endif
     }
 
-    #if !os(macOS)
-        func deleteButton(_ item: RecentItem) -> some View {
-            Button(role: .destructive) {
-                recents.close(item)
-                recentsChanged.toggle()
-            } label: {
-                Label("Delete", systemImage: "trash")
-            }
-        }
-    #endif
-
-    var clearAllButton: some View {
-        Button("Clear All", role: .destructive) {
-            presentingClearConfirmation = true
-        }
-        .confirmationDialog("Clear All", isPresented: $presentingClearConfirmation) {
-            Button("Clear All", role: .destructive) {
-                recents.clearQueries()
-            }
+    private func deleteButton(_ item: RecentItem) -> some View {
+        Button {
+            recents.close(item)
+            recentsChanged.toggle()
+        } label: {
+            Label("Delete", systemImage: "trash")
         }
     }
 
-    var searchFiltersActive: Bool {
+    private var deleteAllButton: some View {
+        Button {
+            recents.clearQueries()
+            recentsChanged.toggle()
+        } label: {
+            Label("Delete All", systemImage: "trash.fill")
+        }
+    }
+
+    private var searchFiltersActive: Bool {
         searchDate != .any || searchDuration != .any
     }
 
-    var recentItems: [RecentItem] {
+    private var recentItems: [RecentItem] {
         Defaults[.recentlyOpened].filter { $0.type == .query }.reversed()
     }
 
-    var searchSortOrderPicker: some View {
+    private var searchSortOrderPicker: some View {
         Picker("Sort", selection: $searchSortOrder) {
             ForEach(SearchQuery.SortOrder.allCases) { sortOrder in
                 Text(sortOrder.name).tag(sortOrder)
@@ -299,7 +309,7 @@ struct SearchView: View {
     }
 
     #if os(tvOS)
-        var searchSortOrderButton: some View {
+        private var searchSortOrderButton: some View {
             Button(action: { self.searchSortOrder = self.searchSortOrder.next() }) { Text(self.searchSortOrder.name)
                 .font(.system(size: 30))
                 .padding(.horizontal)
@@ -315,7 +325,7 @@ struct SearchView: View {
             }
         }
 
-        var searchDateButton: some View {
+        private var searchDateButton: some View {
             Button(action: { self.searchDate = self.searchDate.next() }) {
                 Text(self.searchDate.name)
                     .font(.system(size: 30))
@@ -332,7 +342,7 @@ struct SearchView: View {
             }
         }
 
-        var searchDurationButton: some View {
+        private var searchDurationButton: some View {
             Button(action: { self.searchDuration = self.searchDuration.next() }) {
                 Text(self.searchDuration.name)
                     .font(.system(size: 30))
@@ -349,7 +359,7 @@ struct SearchView: View {
             }
         }
 
-        var filtersHorizontalStack: some View {
+        private var filtersHorizontalStack: some View {
             HStack {
                 HStack(spacing: 30) {
                     Text("Sort")
@@ -375,7 +385,7 @@ struct SearchView: View {
             .font(.system(size: 30))
         }
     #else
-        var filtersMenu: some View {
+        private var filtersMenu: some View {
             Menu(filtersActive ? "Filter: active" : "Filter") {
                 Picker(selection: $searchDuration, label: Text("Duration")) {
                     ForEach(SearchQuery.Duration.allCases) { duration in

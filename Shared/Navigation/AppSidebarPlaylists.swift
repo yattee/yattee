@@ -12,6 +12,7 @@ struct AppSidebarPlaylists: View {
                     LazyView(PlaylistVideosView(playlist))
                 } label: {
                     Label(playlist.title, systemImage: AppSidebarNavigation.symbolSystemImage(playlist.title))
+                        .backport
                         .badge(Text("\(playlist.videos.count)"))
                 }
                 .id(playlist.id)

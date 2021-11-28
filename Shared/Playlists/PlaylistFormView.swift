@@ -10,9 +10,7 @@ struct PlaylistFormView: View {
     @State private var valid = false
     @State private var showingDeleteConfirmation = false
 
-    @FocusState private var focused: Bool
-
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlaylistsModel> private var playlists
@@ -22,77 +20,68 @@ struct PlaylistFormView: View {
     }
 
     var body: some View {
-        #if os(macOS) || os(iOS)
-            VStack(alignment: .leading) {
-                HStack(alignment: .center) {
-                    Text(editing ? "Edit Playlist" : "Create Playlist")
-                        .font(.title2.bold())
+        Group {
+            #if os(macOS) || os(iOS)
+                VStack(alignment: .leading) {
+                    HStack(alignment: .center) {
+                        Text(editing ? "Edit Playlist" : "Create Playlist")
+                            .font(.title2.bold())
 
-                    Spacer()
+                        Spacer()
 
-                    Button("Cancel") {
-                        dismiss()
-                    }.keyboardShortcut(.cancelAction)
+                        Button("Cancel") {
+                            presentationMode.wrappedValue.dismiss()
+                        }.keyboardShortcut(.cancelAction)
+                    }
+                    .padding(.horizontal)
+
+                    Form {
+                        TextField("Name", text: $name, onCommit: validate)
+                            .frame(maxWidth: 450)
+                            .padding(.leading, 10)
+
+                        visibilityFormItem
+                            .pickerStyle(.segmented)
+                    }
+                    #if os(macOS)
+                    .padding(.horizontal)
+                    #endif
+
+                    HStack {
+                        if editing {
+                            deletePlaylistButton
+                        }
+
+                        Spacer()
+
+                        Button("Save", action: submitForm)
+                            .disabled(!valid)
+                            .keyboardShortcut(.defaultAction)
+                    }
+                    .frame(minHeight: 35)
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
 
-                Form {
-                    TextField("Name", text: $name, onCommit: validate)
-                        .frame(maxWidth: 450)
-                        .padding(.leading, 10)
-                        .focused($focused)
-
-                    visibilityFormItem
-                        .pickerStyle(.segmented)
-                }
-                #if os(macOS)
-                .padding(.horizontal)
+                #if os(iOS)
+                .padding(.vertical)
+                #else
+                .frame(width: 400, height: 150)
                 #endif
 
-                HStack {
-                    if editing {
-                        deletePlaylistButton
-                    }
-
-                    Spacer()
-
-                    Button("Save", action: submitForm)
-                        .disabled(!valid)
-                        .keyboardShortcut(.defaultAction)
-                }
-                .frame(minHeight: 35)
-                .padding(.horizontal)
-            }
-            .onChange(of: name) { _ in validate() }
-            .onAppear(perform: initializeForm)
-            #if os(iOS)
-                .padding(.vertical)
             #else
-                .frame(width: 400, height: 150)
+                VStack {
+                    Group {
+                        header
+                        form
+                    }
+                    .frame(maxWidth: 1000)
+                }
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                .background(Color.tertiaryBackground)
             #endif
-
-        #else
-            VStack {
-                Group {
-                    header
-                    form
-                }
-                .frame(maxWidth: 1000)
-            }
-            .onAppear {
-                guard editing else {
-                    return
-                }
-
-                self.name = self.playlist.title
-                self.visibility = self.playlist.visibility
-
-                validate()
-            }
-
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .background(.thickMaterial)
-        #endif
+        }
+        .onChange(of: name) { _ in validate() }
+        .onAppear(perform: initializeForm)
     }
 
     #if os(tvOS)
@@ -152,16 +141,16 @@ struct PlaylistFormView: View {
     #endif
 
     func initializeForm() {
-        focused = true
-
         guard editing else {
             return
         }
 
-        name = playlist.title
-        visibility = playlist.visibility
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            name = playlist.title
+            visibility = playlist.visibility
 
-        validate()
+            validate()
+        }
     }
 
     func validate() {
@@ -182,7 +171,7 @@ struct PlaylistFormView: View {
 
             playlists.load(force: true)
 
-            dismiss()
+            presentationMode.wrappedValue.dismiss()
         }
     }
 
@@ -194,7 +183,7 @@ struct PlaylistFormView: View {
         #if os(macOS)
             Picker("Visibility", selection: $visibility) {
                 ForEach(Playlist.Visibility.allCases) { visibility in
-                    Text(visibility.name)
+                    Text(visibility.name).tag(visibility)
                 }
             }
         #else
@@ -216,9 +205,10 @@ struct PlaylistFormView: View {
     }
 
     var deletePlaylistButton: some View {
-        Button("Delete", role: .destructive) {
+        Button("Delete") {
             showingDeleteConfirmation = true
-        }.alert(isPresented: $showingDeleteConfirmation) {
+        }
+        .alert(isPresented: $showingDeleteConfirmation) {
             Alert(
                 title: Text("Are you sure you want to delete playlist?"),
                 message: Text("Playlist \"\(playlist.title)\" will be deleted.\nIt cannot be undone."),
@@ -226,16 +216,14 @@ struct PlaylistFormView: View {
                 secondaryButton: .cancel()
             )
         }
-        #if os(macOS)
         .foregroundColor(.red)
-        #endif
     }
 
     func deletePlaylistAndDismiss() {
         accounts.api.playlist(playlist.id)?.request(.delete).onSuccess { _ in
             playlist = nil
             playlists.load(force: true)
-            dismiss()
+            presentationMode.wrappedValue.dismiss()
         }
     }
 }

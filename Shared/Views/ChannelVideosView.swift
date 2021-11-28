@@ -9,7 +9,7 @@ struct ChannelVideosView: View {
 
     @StateObject private var store = Store<Channel>()
 
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
 
     #if os(iOS)
@@ -43,7 +43,7 @@ struct ChannelVideosView: View {
     }
 
     var content: some View {
-        VStack {
+        let content = VStack {
             #if os(tvOS)
                 HStack {
                     Text(navigationTitle)
@@ -65,40 +65,43 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            VerticalCells(items: videos)
-
-            #if !os(iOS)
-                .prefersDefaultFocus(in: focusNamespace)
+            #if os(iOS)
+                VerticalCells(items: videos)
+            #else
+                if #available(macOS 12.0, *) {
+                    VerticalCells(items: videos)
+                        .prefersDefaultFocus(in: focusNamespace)
+                } else {
+                    VerticalCells(items: videos)
+                }
             #endif
         }
         .environment(\.inChannelView, true)
-        #if !os(iOS)
-            .focusScope(focusNamespace)
-        #endif
+
         #if !os(tvOS)
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-                ShareButton(
-                    contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet,
-                    shareURL: $shareURL
-                )
-            }
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    ShareButton(
+                        contentItem: contentItem,
+                        presentingShareSheet: $presentingShareSheet,
+                        shareURL: $shareURL
+                    )
+                }
 
-            ToolbarItem {
-                HStack {
-                    Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
-                        .foregroundColor(.secondary)
-                        .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+                ToolbarItem {
+                    HStack {
+                        Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
+                            .foregroundColor(.secondary)
+                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
 
-                    subscriptionToggleButton
+                        subscriptionToggleButton
 
-                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                    }
                 }
             }
-        }
         #else
-                .background(.thickMaterial)
+                .background(Color.tertiaryBackground)
         #endif
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
@@ -107,7 +110,6 @@ struct ChannelVideosView: View {
             }
         }
         #endif
-        .modifier(UnsubscribeAlertModifier())
         .onAppear {
             if store.item.isNil {
                 resource.addObserver(store)
@@ -115,6 +117,17 @@ struct ChannelVideosView: View {
             }
         }
         .navigationTitle(navigationTitle)
+
+        return Group {
+            if #available(macOS 12.0, *) {
+                content
+                #if !os(iOS)
+                .focusScope(focusNamespace)
+                #endif
+            } else {
+                content
+            }
+        }
     }
 
     private var resource: Resource {

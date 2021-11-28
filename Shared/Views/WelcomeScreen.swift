@@ -2,14 +2,14 @@ import Defaults
 import SwiftUI
 
 struct WelcomeScreen: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     @EnvironmentObject<AccountsModel> private var accounts
 
     @Default(.accounts) private var allAccounts
 
     var body: some View {
-        VStack {
+        let welcomeScreen = VStack {
             Spacer()
 
             Text("Welcome")
@@ -26,7 +26,7 @@ struct WelcomeScreen: View {
                     AccountSelectionView(showHeader: false)
 
                     Button {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     } label: {
                         Text("Start")
                     }
@@ -36,7 +36,7 @@ struct WelcomeScreen: View {
                 #else
                     AccountsMenuView()
                         .onChange(of: accounts.current) { _ in
-                            dismiss()
+                            presentationMode.wrappedValue.dismiss()
                         }
                     #if os(macOS)
                         .frame(maxWidth: 280)
@@ -50,10 +50,16 @@ struct WelcomeScreen: View {
 
             Spacer()
         }
-        .interactiveDismissDisabled()
         #if os(macOS)
-            .frame(minWidth: 400, minHeight: 400)
+        .frame(minWidth: 400, minHeight: 400)
         #endif
+
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+            welcomeScreen
+                .interactiveDismissDisabled()
+        } else {
+            welcomeScreen
+        }
     }
 }
 

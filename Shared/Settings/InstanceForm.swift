@@ -13,9 +13,7 @@ struct InstanceForm: View {
     @State private var validationError: String?
     @State private var validationDebounce = Debounce()
 
-    @FocusState private var nameFieldFocused: Bool
-
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -30,12 +28,11 @@ struct InstanceForm: View {
         }
         .onChange(of: app) { _ in validate() }
         .onChange(of: url) { _ in validate() }
-        .onAppear(perform: initializeForm)
         #if os(iOS)
             .padding(.vertical)
         #elseif os(tvOS)
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .background(.thickMaterial)
+            .background(Color.tertiaryBackground)
         #else
             .frame(width: 400, height: 190)
         #endif
@@ -49,7 +46,7 @@ struct InstanceForm: View {
             Spacer()
 
             Button("Cancel") {
-                dismiss()
+                presentationMode.wrappedValue.dismiss()
             }
             #if !os(tvOS)
             .keyboardShortcut(.cancelAction)
@@ -80,10 +77,9 @@ struct InstanceForm: View {
             }
             .pickerStyle(.segmented)
 
-            TextField("Name", text: $name, prompt: Text("Instance Name (optional)"))
-                .focused($nameFieldFocused)
+            TextField("Name", text: $name)
 
-            TextField("API URL", text: $url, prompt: Text("https://invidious.home.net"))
+            TextField("API URL", text: $url)
 
             #if !os(macOS)
                 .autocapitalization(.none)
@@ -138,10 +134,6 @@ struct InstanceForm: View {
         }
     }
 
-    func initializeForm() {
-        nameFieldFocused = true
-    }
-
     func submitForm() {
         guard isValid else {
             return
@@ -149,7 +141,7 @@ struct InstanceForm: View {
 
         savedInstanceID = InstancesModel.add(app: app, name: name, url: url).id
 
-        dismiss()
+        presentationMode.wrappedValue.dismiss()
     }
 }
 

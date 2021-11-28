@@ -9,51 +9,34 @@ struct TrendingCountry: View {
     @State private var query: String = ""
     @State private var selection: Country?
 
-    @FocusState var countryIsFocused
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         VStack {
-            #if os(macOS)
+            #if !os(tvOS)
                 HStack {
-                    TextField("Country", text: $query, prompt: Text(TrendingCountry.prompt))
-                        .focused($countryIsFocused)
+                    if #available(iOS 15.0, macOS 12.0, *) {
+                        TextField("Country", text: $query, prompt: Text(TrendingCountry.prompt))
+                    } else {
+                        TextField(TrendingCountry.prompt, text: $query)
+                    }
 
                     Button("Done") { selectCountryAndDismiss() }
                         .keyboardShortcut(.defaultAction)
                         .keyboardShortcut(.cancelAction)
                 }
                 .padding([.horizontal, .top])
-
-                countriesList
-            #else
-                NavigationView {
-                    countriesList
-                        .toolbar {
-                            ToolbarItemGroup(placement: .navigationBarLeading) {
-                                Button("Done") { selectCountryAndDismiss() }
-                            }
-                        }
-                    #if os(iOS)
-                        .navigationBarTitle("Trending Country", displayMode: .automatic)
-                    #endif
-                }
             #endif
+            countriesList
         }
-        .onAppear {
-            countryIsFocused = true
-        }
-        .onSubmit { selectCountryAndDismiss() }
-        #if !os(macOS)
-            .searchable(text: $query, placement: searchPlacement, prompt: Text(TrendingCountry.prompt))
-        #endif
         #if os(tvOS)
-        .background(.thinMaterial)
+        .searchable(text: $query, placement: .automatic, prompt: Text(TrendingCountry.prompt))
+        .background(Color.black)
         #endif
     }
 
     var countriesList: some View {
-        ScrollViewReader { _ in
+        let list = ScrollViewReader { _ in
             List(store.collection, selection: $selection) { country in
                 #if os(macOS)
                     Text(country.name)
@@ -71,29 +54,29 @@ struct TrendingCountry: View {
             }
         }
 
-        #if os(macOS)
-        .listStyle(.inset(alternatesRowBackgrounds: true))
-        .padding(.bottom, 5)
-
-        #endif
-    }
-
-    #if !os(macOS)
-        var searchPlacement: SearchFieldPlacement {
-            #if os(iOS)
-                .navigationBarDrawer(displayMode: .always)
+        return Group {
+            #if os(macOS)
+                if #available(macOS 12.0, *) {
+                    list
+                        .listStyle(.inset(alternatesRowBackgrounds: true))
+                } else {
+                    list
+                }
             #else
-                .automatic
+                list
             #endif
         }
-    #endif
+        #if os(macOS)
+        .padding(.bottom, 5)
+        #endif
+    }
 
     func selectCountryAndDismiss(_ country: Country? = nil) {
         if let selected = country ?? selection {
             selectedCountry = selected
         }
 
-        dismiss()
+        presentationMode.wrappedValue.dismiss()
     }
 }
 
