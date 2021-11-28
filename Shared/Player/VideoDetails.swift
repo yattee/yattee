@@ -11,14 +11,14 @@ struct VideoDetails: View {
     @Binding var fullScreen: Bool
 
     @State private var subscribed = false
-    @State private var confirmationShown = false
+    @State private var presentingUnsubscribeAlert = false
     @State private var presentingAddToPlaylist = false
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
     @State private var currentPage = Page.details
 
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -82,7 +82,7 @@ struct VideoDetails: View {
                         if fullScreen {
                             fullScreen = false
                         } else {
-                            self.dismiss()
+                            self.presentationMode.wrappedValue.dismiss()
                         }
                     }
                 }
@@ -184,19 +184,26 @@ struct VideoDetails: View {
                         Section {
                             if subscribed {
                                 Button("Unsubscribe") {
-                                    confirmationShown = true
+                                    presentingUnsubscribeAlert = true
                                 }
                                 #if os(iOS)
+                                .backport
                                 .tint(.gray)
                                 #endif
-                                .confirmationDialog("Are you you want to unsubscribe from \(video!.channel.name)?", isPresented: $confirmationShown) {
-                                    Button("Unsubscribe") {
-                                        subscriptions.unsubscribe(video!.channel.id)
+                                .alert(isPresented: $presentingUnsubscribeAlert) {
+                                    Alert(
+                                        title: Text(
+                                            "Are you you want to unsubscribe from \(video!.channel.name)?"
+                                        ),
+                                        primaryButton: .destructive(Text("Unsubscribe")) {
+                                            subscriptions.unsubscribe(video!.channel.id)
 
-                                        withAnimation {
-                                            subscribed.toggle()
-                                        }
-                                    }
+                                            withAnimation {
+                                                subscribed.toggle()
+                                            }
+                                        },
+                                        secondaryButton: .cancel()
+                                    )
                                 }
                             } else {
                                 Button("Subscribe") {
@@ -206,12 +213,12 @@ struct VideoDetails: View {
                                         subscribed.toggle()
                                     }
                                 }
+                                .backport
                                 .tint(.blue)
                             }
                         }
                         .font(.system(size: 13))
                         .buttonStyle(.borderless)
-                        .buttonBorderShape(.roundedRectangle)
                     }
                 }
             }
@@ -241,13 +248,13 @@ struct VideoDetails: View {
                         Text(published)
                     }
 
-                    if let publishedAt = video.publishedAt {
+                    if let date = video.publishedAt {
                         if video.publishedDate != nil {
                             Text("•")
                                 .foregroundColor(.secondary)
                                 .opacity(0.3)
                         }
-                        Text(publishedAt.formatted(date: .abbreviated, time: .omitted))
+                        Text(formattedPublishedAt(date))
                     }
                 }
                 .font(.system(size: 12))
@@ -255,6 +262,15 @@ struct VideoDetails: View {
                 .foregroundColor(.secondary)
             }
         }
+    }
+
+    func formattedPublishedAt(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+
+        return dateFormatter.string(from: date)
     }
 
     var countsSection: some View {
@@ -338,11 +354,17 @@ struct VideoDetails: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     if let description = video.description {
-                        Text(description)
-                            .textSelection(.enabled)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.caption)
-                            .padding(.bottom, 4)
+                        Group {
+                            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                                Text(description)
+                                    .textSelection(.enabled)
+                            } else {
+                                Text(description)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.caption)
+                        .padding(.bottom, 4)
                     } else {
                         Text("No description")
                             .foregroundColor(.secondary)

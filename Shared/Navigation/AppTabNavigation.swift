@@ -41,6 +41,8 @@ struct AppTabNavigation: View {
                     } else {
                         trendingNavigationView
                     }
+                } else {
+                    trendingNavigationView
                 }
             } else {
                 if accounts.app.supportsPopular {
@@ -62,26 +64,7 @@ struct AppTabNavigation: View {
             }
 
             NavigationView {
-                LazyView(
-                    SearchView()
-                        .toolbar { toolbarContent }
-                        .searchable(text: $search.queryText, placement: .navigationBarDrawer(displayMode: .always)) {
-                            ForEach(search.querySuggestions.collection, id: \.self) { suggestion in
-                                Text(suggestion)
-                                    .searchCompletion(suggestion)
-                            }
-                        }
-                        .onChange(of: search.queryText) { query in
-                            search.loadSuggestions(query)
-                        }
-                        .onSubmit(of: .search) {
-                            search.changeQuery { query in
-                                query.query = search.queryText
-                            }
-
-                            recents.addQuery(search.queryText)
-                        }
-                )
+                LazyView(SearchView())
             }
             .tabItem {
                 Label("Search", systemImage: "magnifyingglass")
@@ -129,7 +112,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Popular", systemImage: "chart.bar")
+            Label("Popular", systemImage: "arrow.up.right.circle")
                 .accessibility(label: Text("Popular"))
         }
         .tag(TabSelection.popular)
@@ -141,7 +124,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Trending", systemImage: "chart.line.uptrend.xyaxis")
+            Label("Trending", systemImage: "chart.bar")
                 .accessibility(label: Text("Trending"))
         }
         .tag(TabSelection.trending)

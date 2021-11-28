@@ -9,8 +9,7 @@ struct ServicesSettings: View {
         Section(header: SettingsHeader(text: "SponsorBlock API")) {
             TextField(
                 "SponsorBlock API Instance",
-                text: $sponsorBlockInstance,
-                prompt: Text("SponsorBlock API URL, leave blank to disable")
+                text: $sponsorBlockInstance
             )
             .labelsHidden()
             #if !os(macOS)
@@ -21,7 +20,7 @@ struct ServicesSettings: View {
 
         Section(header: SettingsHeader(text: "Categories to Skip")) {
             #if os(macOS)
-                List(SponsorBlockAPI.categories, id: \.self) { category in
+                let list = List(SponsorBlockAPI.categories, id: \.self) { category in
                     SponsorBlockCategorySelectionRow(
                         title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
                         selected: sponsorBlockCategories.contains(category)
@@ -29,7 +28,16 @@ struct ServicesSettings: View {
                         toggleCategory(category, value: value)
                     }
                 }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+
+                Group {
+                    if #available(macOS 12.0, *) {
+                        list
+                            .listStyle(.inset(alternatesRowBackgrounds: true))
+                    } else {
+                        list
+                            .listStyle(.inset)
+                    }
+                }
                 Spacer()
             #else
                 ForEach(SponsorBlockAPI.categories, id: \.self) { category in

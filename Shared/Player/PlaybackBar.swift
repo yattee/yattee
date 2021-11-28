@@ -3,7 +3,8 @@ import Foundation
 import SwiftUI
 
 struct PlaybackBar: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
 
     @EnvironmentObject<PlayerModel> private var player
@@ -64,18 +65,20 @@ struct PlaybackBar: View {
                 Spacer()
             }
         }
-        .alert(player.playerError?.localizedDescription ?? "", isPresented: $player.presentingErrorDetails) {
-            Button("OK") {}
+        .alert(isPresented: $player.presentingErrorDetails) {
+            Alert(
+                title: Text("Error"),
+                message: Text(player.playerError?.localizedDescription ?? "")
+            )
         }
-        .environment(\.colorScheme, .dark)
         .frame(minWidth: 0, maxWidth: .infinity)
         .padding(4)
-        .background(.black)
+        .background(colorScheme == .dark ? Color.black : Color.white)
     }
 
     private var closeButton: some View {
         Button {
-            dismiss()
+            presentationMode.wrappedValue.dismiss()
         } label: {
             Label(
                 "Close",
@@ -105,10 +108,18 @@ struct PlaybackBar: View {
             return "less than a minute"
         }
 
-        let timeFinishAt = Date.now.addingTimeInterval(remainingSeconds)
-        let timeFinishAtString = timeFinishAt.formatted(date: .omitted, time: .shortened)
+        let timeFinishAt = Date().addingTimeInterval(remainingSeconds)
 
-        return "ends at \(timeFinishAtString)"
+        return "ends at \(formattedTimeFinishAt(timeFinishAt))"
+    }
+
+    private func formattedTimeFinishAt(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+
+        dateFormatter.dateStyle = .none
+        dateFormatter.timeStyle = .short
+
+        return dateFormatter.string(from: date)
     }
 
     private var rateMenu: some View {

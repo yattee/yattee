@@ -18,7 +18,6 @@ struct AppSidebarSubscriptions: View {
                         navigation.presentUnsubscribeAlert(channel)
                     }
                 }
-                .modifier(UnsubscribeAlertModifier())
                 .id("channel\(channel.id)")
             }
         }

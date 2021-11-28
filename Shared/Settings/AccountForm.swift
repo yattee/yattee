@@ -15,9 +15,7 @@ struct AccountForm: View {
     @State private var validationError: String?
     @State private var validationDebounce = Debounce()
 
-    @FocusState private var focused: Bool
-
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         VStack {
@@ -32,7 +30,7 @@ struct AccountForm: View {
         .padding(.vertical)
         #elseif os(tvOS)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .background(.thickMaterial)
+        .background(Color.tertiaryBackground)
         #else
         .frame(width: 400, height: 145)
         #endif
@@ -46,7 +44,7 @@ struct AccountForm: View {
             Spacer()
 
             Button("Cancel") {
-                dismiss()
+                presentationMode.wrappedValue.dismiss()
             }
             #if !os(tvOS)
             .keyboardShortcut(.cancelAction)
@@ -68,7 +66,6 @@ struct AccountForm: View {
                 formFields
             #endif
         }
-        .onAppear(perform: initializeForm)
         .onChange(of: username) { _ in validate() }
         .onChange(of: password) { _ in validate() }
     }
@@ -76,24 +73,23 @@ struct AccountForm: View {
     var formFields: some View {
         Group {
             if !instance.app.accountsUsePassword {
-                TextField("Name", text: $name, prompt: Text("Account Name (optional)"))
-                    .focused($focused)
+                TextField("Name", text: $name)
             }
 
-            TextField("Username", text: $username, prompt: usernamePrompt)
+            TextField(usernamePrompt, text: $username)
 
             if instance.app.accountsUsePassword {
-                SecureField("Password", text: $password, prompt: Text("Password"))
+                SecureField("Password", text: $password)
             }
         }
     }
 
-    var usernamePrompt: Text {
+    var usernamePrompt: String {
         switch instance.app {
         case .invidious:
-            return Text("SID Cookie")
+            return "SID Cookie"
         default:
-            return Text("Username")
+            return "Username"
         }
     }
 
@@ -119,10 +115,6 @@ struct AccountForm: View {
             .padding(.top, 30)
         #endif
             .padding(.horizontal)
-    }
-
-    private func initializeForm() {
-        focused = true
     }
 
     private func validate() {
@@ -151,7 +143,7 @@ struct AccountForm: View {
         let account = AccountsModel.add(instance: instance, name: name, username: username, password: password)
         selectedAccount?.wrappedValue = account
 
-        dismiss()
+        presentationMode.wrappedValue.dismiss()
     }
 
     private var validator: AccountValidator {

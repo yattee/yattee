@@ -1,11 +1,11 @@
 ![Yattee Banner](https://r.yattee.stream/icons/yattee-banner.png)
 
-Video player with support for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped) instances built for iOS 15, tvOS 15 and macOS Monterey.
+Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped) instances built for iOS, tvOS and macOS.
 
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
-![GitHub issues](https://img.shields.io/github/issues/yattee/app)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/app)
+[![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/yattee)](https://github.com/yattee/yattee/pulls)
 [![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#yattee:matrix.org)
 
 
@@ -19,7 +19,7 @@ Video player with support for [Invidious](https://github.com/iv-org/invidious) a
 * Fullscreen playback, Picture in Picture and AirPlay support
 * Stream quality selection
 * Favorites: customizable section of channels, playlists, trending, searches and other views
-* URL Scheme for integrations
+* `yattee://` URL Scheme for integrations
 
 ### Availability
 | Feature  | Invidious | Piped |
@@ -38,17 +38,24 @@ Video player with support for [Invidious](https://github.com/iv-org/invidious) a
 
 ## Installation
 ### Requirements
-Only iOS/tvOS 15 and macOS Monterey are supported.
+System requirements:
+* iOS 14 (or newer)
+* tvOS 15 (or newer)
+* macOS Big Sur (or newer)
 
 ### How to install?
-#### [AltStore](https://altstore.io/)
-You can sideload IPA files that you can download from Releases page.
-Alternatively, if you have to access to the beta AltStore version (v1.5), you can add the following repository in `Browse > Sources` screen:
+#### [AltStore](https://altstore.io/) (free)
+You can sideload IPA files downloaded from the [Releases](https://github.com/yattee/yattee/releases) page to your iOS or tvOS device - check [AltStore FAQ](https://altstore.io/faq/) for more information.
+
+If you have to access to the beta AltStore version (v1.5, for Patreons only), you can add the following repository in `Browse > Sources` screen:
 
 `https://alt.yattee.stream`
 
+#### Signing IPA files online (paid)
+[UDID Registrations](https://www.udidregistrations.com/) provides services to sign IPA files for your devices. Refer to: ***Break free from the App Store*** section of the website for more information.
+
 #### Manual installation
-Download sources and compile them on a Mac using Xcode, install to your devices. Please note that if you are not registered in Apple Developer Program then the applications will require reinstalling every 7 days.
+Download sources and compile them on a Mac using Xcode, install to your devices. Please note that if you are not registered in Apple Developer Program you will need to reinstall every 7 days.
 
 ## Integrations
 ### macOS
@@ -62,14 +69,6 @@ With [Finicky](https://github.com/johnste/finicky) you can configure your system
   browser: "/Applications/Yattee.app"
 }
 ```
-
-### Experimental: Safari
-macOS and iOS apps include Safari extension which will redirect opened YouTube tabs to the app.
-
-### Expermiental: Firefox
-You can use [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect) extension to make the videos open in the app. In extension settings put the following URL as Invidious instance:
-
-`https://r.yatte.stream`
 
 ## Screenshots
 ### iOS
@@ -110,6 +109,30 @@ You can use [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect)
 * `Command+P` - Play/Pause
 * `Command+S` - Play Next
 * `Command+O` - Toggle Player
+
+
+## Donations
+
+You can support development of this app with
+[Patreon](https://www.patreon.com/arekf) or cryptocurrencies:
+
+**Monero (XMR)**
+```
+48zfKjLmnXs21PinU2ucMiUPwhiKt5d7WJKiy3ACVS28BKqSn52c1TX8L337oESHJ5TZCyGkozjfWZG11h6C46mN9n4NPrD
+```
+**Bitcoin (BTC)**
+```
+bc1qe24zz5a5hm0trc7glwckz93py274eycxzju3mv
+```
+**Ethereum (ETH)**
+```
+0xa2f81A58Ec5E550132F03615c8d91954A4E37423
+```
+
+Donations will be used to cover development program access and domain renewal costs.
+
+## Contributing
+If you're interestred in contributing, you can browse the [issues](https://github.com/yattee/yattee/issues) list or create a new one to discuss your feature idea. Every contribution is very welcome.
 
 ## License and Liability
 

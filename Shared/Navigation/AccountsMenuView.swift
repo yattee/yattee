@@ -15,11 +15,23 @@ struct AccountsMenuView: View {
                 }
             }
         } label: {
-            Label(model.current?.description ?? "Select Account", systemImage: "person.crop.circle")
-                .labelStyle(.titleAndIcon)
+            if #available(iOS 15.0, macOS 12.0, *) {
+                label
+                    .labelStyle(.titleAndIcon)
+            } else {
+                HStack {
+                    Image(systemName: "person.crop.circle")
+                    label
+                        .labelStyle(.titleOnly)
+                }
+            }
         }
         .disabled(instances.isEmpty)
         .transaction { t in t.animation = .none }
+    }
+
+    private var label: some View {
+        Label(model.current?.description ?? "Select Account", systemImage: "person.crop.circle")
     }
 
     private var allAccounts: [Account] {

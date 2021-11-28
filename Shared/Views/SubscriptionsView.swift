@@ -31,9 +31,6 @@ struct SubscriptionsView: View {
                 FavoriteButton(item: FavoriteItem(section: .subscriptions))
             }
         }
-        .refreshable {
-            loadResources(force: true)
-        }
     }
 
     fileprivate func loadResources(force: Bool = false) {

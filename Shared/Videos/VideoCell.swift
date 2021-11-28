@@ -12,6 +12,7 @@ struct VideoCell: View {
         @Environment(\.horizontalCells) private var horizontalCells
     #endif
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
@@ -38,7 +39,13 @@ struct VideoCell: View {
         }
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: 12))
-        .contextMenu { VideoContextMenuView(video: video, playerNavigationLinkActive: $player.playerNavigationLinkActive) }
+        .contextMenu {
+            VideoContextMenuView(
+                video: video,
+                playerNavigationLinkActive: $player.playerNavigationLinkActive
+            )
+            .environmentObject(accounts)
+        }
     }
 
     var content: some View {
@@ -55,7 +62,7 @@ struct VideoCell: View {
             #endif
         }
         #if os(macOS)
-        .background()
+        .background(Color.tertiaryBackground)
         #endif
     }
 

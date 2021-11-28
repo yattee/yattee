@@ -40,7 +40,7 @@ struct InstancesSettings: View {
             if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
                 SettingsHeader(text: "Accounts")
 
-                List(selection: $selectedAccount) {
+                let list = List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
                         Text("You have no accounts for this instance")
                             .foregroundColor(.secondary)
@@ -51,7 +51,7 @@ struct InstancesSettings: View {
 
                             Spacer()
 
-                            Button("Remove", role: .destructive) {
+                            Button("Remove") {
                                 presentingAccountRemovalConfirmation = true
                             }
                             .foregroundColor(.red)
@@ -60,30 +60,40 @@ struct InstancesSettings: View {
                         .tag(account)
                     }
                 }
-                .confirmationDialog(
-                    "Are you sure you want to remove \(selectedAccount?.description ?? "") account?",
-                    isPresented: $presentingAccountRemovalConfirmation
-                ) {
-                    Button("Remove", role: .destructive) {
-                        AccountsModel.remove(selectedAccount!)
-                    }
+                .alert(isPresented: $presentingAccountRemovalConfirmation) {
+                    Alert(
+                        title: Text(
+                            "Are you sure you want to remove \(selectedAccount?.description ?? "") account?"
+                        ),
+                        message: Text("This cannot be undone"),
+                        primaryButton: .destructive(Text("Delete")) {
+                            AccountsModel.remove(selectedAccount!)
+                        },
+                        secondaryButton: .cancel()
+                    )
                 }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+
+                if #available(macOS 12.0, *) {
+                    list
+                        .listStyle(.inset(alternatesRowBackgrounds: true))
+                } else {
+                    list
+                }
             }
 
             if selectedInstance != nil, selectedInstance.app.hasFrontendURL {
                 SettingsHeader(text: "Frontend URL")
 
-                TextField("Frontend URL", text: $frontendURL, prompt: Text("Frontend URL"))
-                    .onAppear {
-                        frontendURL = selectedInstance.frontendURL ?? ""
+                TextField("Frontend URL", text: $frontendURL)
+                    .onChange(of: selectedInstance) { _ in
+                        frontendURL = selectedInstanceFrontendURL
                     }
                     .onChange(of: frontendURL) { newValue in
                         InstancesModel.setFrontendURL(selectedInstance, newValue)
                     }
                     .labelsHidden()
 
-                Text("If provided, you can copy links from videos, channels and playlist")
+                Text("Used to create links from videos, channels and playlist")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -105,23 +115,26 @@ struct InstancesSettings: View {
 
                     Spacer()
 
-                    Button("Remove Instance", role: .destructive) {
+                    Button("Remove Instance") {
                         presentingInstanceRemovalConfirmation = true
                     }
-                    .confirmationDialog(
-                        "Are you sure you want to remove \(selectedInstance!.longDescription) instance?",
-                        isPresented: $presentingInstanceRemovalConfirmation
-                    ) {
-                        Button("Remove Instance", role: .destructive) {
-                            if accounts.current?.instance == selectedInstance {
-                                accounts.setCurrent(nil)
-                            }
+                    .alert(isPresented: $presentingInstanceRemovalConfirmation) {
+                        Alert(
+                            title: Text(
+                                "Are you sure you want to remove \(selectedInstance!.longDescription) instance?"
+                            ),
+                            message: Text("This cannot be undone"),
+                            primaryButton: .destructive(Text("Remove")) {
+                                if accounts.current?.instance == selectedInstance {
+                                    accounts.setCurrent(nil)
+                                }
 
-                            InstancesModel.remove(selectedInstance!)
-                            selectedInstanceID = instances.last?.id
-                        }
+                                InstancesModel.remove(selectedInstance!)
+                                selectedInstanceID = instances.last?.id
+                            },
+                            secondaryButton: .cancel()
+                        )
                     }
-
                     .foregroundColor(.red)
                 }
             }
@@ -134,6 +147,7 @@ struct InstancesSettings: View {
 
         .onAppear {
             selectedInstanceID = instances.first?.id
+            frontendURL = selectedInstanceFrontendURL
         }
         .sheet(isPresented: $presentingAccountForm) {
             AccountForm(instance: selectedInstance, selectedAccount: $selectedAccount)
@@ -152,6 +166,10 @@ struct InstancesSettings: View {
 
     var selectedInstance: Instance! {
         InstancesModel.find(selectedInstanceID)
+    }
+
+    var selectedInstanceFrontendURL: String {
+        selectedInstance?.frontendURL ?? ""
     }
 
     private var selectedInstanceAccounts: [Account] {

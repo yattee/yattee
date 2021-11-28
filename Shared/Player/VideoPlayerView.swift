@@ -16,8 +16,10 @@ struct VideoPlayerView: View {
     @State private var playerSize: CGSize = .zero
     @State private var fullScreen = false
 
+    @Environment(\.colorScheme) private var colorScheme
+
     #if os(iOS)
-        @Environment(\.dismiss) private var dismiss
+        @Environment(\.presentationMode) private var presentationMode
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
@@ -82,11 +84,11 @@ struct VideoPlayerView: View {
                                     fullScreen = true
                                 }
                             },
-                            down: { dismiss() }
+                            down: { presentationMode.wrappedValue.dismiss() }
                         )
                         #endif
 
-                        .background(.black)
+                        .background(Color.black)
 
                         Group {
                             #if os(iOS)
@@ -98,7 +100,7 @@ struct VideoPlayerView: View {
                                 VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
                             #endif
                         }
-                        .background()
+                        .background(colorScheme == .dark ? Color.black : Color.white)
                         .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio, fullScreen: fullScreen))
                     }
                 #endif

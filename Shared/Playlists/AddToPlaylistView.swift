@@ -7,7 +7,7 @@ struct AddToPlaylistView: View {
 
     @State private var selectedPlaylistID: Playlist.ID = ""
 
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject<PlaylistsModel> private var model
 
     var body: some View {
@@ -37,7 +37,7 @@ struct AddToPlaylistView: View {
         .padding(.vertical)
         #elseif os(tvOS)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .background(.thickMaterial)
+        .background(Color.tertiaryBackground)
         #else
         .padding(.vertical)
         #endif
@@ -70,7 +70,7 @@ struct AddToPlaylistView: View {
 
             #if !os(tvOS)
                 Button("Cancel") {
-                    dismiss()
+                    presentationMode.wrappedValue.dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
             #endif
@@ -155,7 +155,7 @@ struct AddToPlaylistView: View {
         Defaults[.lastUsedPlaylistID] = id
 
         model.addVideo(playlistID: id, videoID: video.videoID) {
-            dismiss()
+            presentationMode.wrappedValue.dismiss()
         }
     }
 

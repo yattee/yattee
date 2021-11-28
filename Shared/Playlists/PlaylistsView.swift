@@ -71,17 +71,20 @@ struct PlaylistsView: View {
                     ToolbarItemGroup {
                         #if !os(iOS)
                             if !model.isEmpty {
-                                selectPlaylistButton
-                                    .prefersDefaultFocus(in: focusNamespace)
+                                if #available(macOS 12.0, *) {
+                                    selectPlaylistButton
+                                        .prefersDefaultFocus(in: focusNamespace)
+                                } else {
+                                    selectPlaylistButton
+                                }
                             }
 
                             if currentPlaylist != nil {
                                 editPlaylistButton
                             }
                         #endif
-                        FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
 
-                        newPlaylistButton
+                        FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
                     }
 
                     #if os(iOS)
@@ -98,6 +101,8 @@ struct PlaylistsView: View {
                                 }
 
                                 Spacer()
+
+                                newPlaylistButton
 
                                 if currentPlaylist != nil {
                                     editPlaylistButton
@@ -168,7 +173,7 @@ struct PlaylistsView: View {
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         #if os(macOS)
-            .background()
+            .background(Color.tertiaryBackground)
         #endif
     }
 

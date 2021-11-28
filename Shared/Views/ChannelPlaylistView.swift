@@ -83,7 +83,7 @@ struct ChannelPlaylistView: View {
         .navigationTitle(playlist.title)
 
         #else
-        .background(.thickMaterial)
+        .background(Color.tertiaryBackground)
         #endif
     }
 

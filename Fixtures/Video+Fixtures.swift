@@ -24,7 +24,7 @@ extension Video {
             thumbnails: Thumbnail.fixturesForAllQualities(videoId: id),
             live: false,
             upcoming: false,
-            publishedAt: Date.now,
+            publishedAt: Date(),
             likes: 37333,
             dislikes: 30,
             keywords: ["very", "cool", "video", "msfs 2020", "757", "747", "A380", "737-900", "MOD", "Zibo", "MD80", "MD11", "Rotate", "Laminar", "787", "A350", "MSFS", "MS2020", "Microsoft Flight Simulator", "Microsoft", "Flight", "Simulator", "SIM", "World", "Ortho", "Flying", "Boeing MAX"]

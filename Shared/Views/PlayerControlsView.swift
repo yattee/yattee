@@ -25,7 +25,7 @@ struct PlayerControlsView<Content: View>: View {
     }
 
     private var controls: some View {
-        HStack {
+        let controls = HStack {
             Button(action: {
                 model.presentingPlayer.toggle()
             }) {
@@ -92,14 +92,23 @@ struct PlayerControlsView<Content: View>: View {
         .padding(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 55)
         .padding(.vertical, 0)
-        .background(.ultraThinMaterial)
-        .borderTop(height: 0.4, color: Color("PlayerControlsBorderColor"))
-        .borderBottom(height: navigationStyle == .sidebar ? 0 : 0.4, color: Color("PlayerControlsBorderColor"))
+        .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
+        .borderBottom(height: navigationStyle == .sidebar ? 0 : 0.4, color: Color("ControlsBorderColor"))
         #if !os(tvOS)
             .onSwipeGesture(up: {
                 model.presentingPlayer = true
             })
         #endif
+
+        return Group {
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                controls
+                    .background(Material.ultraThinMaterial)
+            } else {
+                controls
+                    .background(Color.tertiaryBackground)
+            }
+        }
     }
 
     private var appVersion: String {

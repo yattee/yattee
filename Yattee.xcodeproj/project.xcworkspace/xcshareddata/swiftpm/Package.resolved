@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/sindresorhus/Defaults",
         "state": {
           "branch": null,
-          "revision": "63d93f97ad545c8bceb125a8a36175ea705f7cf5",
-          "version": "5.0.0"
+          "revision": "55f3302c3ab30a8760f10042d0ebc0a6907f865a",
+          "version": "6.1.0"
         }
       },
       {
@@ -33,7 +33,7 @@
         "repositoryURL": "https://github.com/pinterest/PINCache",
         "state": {
           "branch": "master",
-          "revision": "a16dae6cec4897a7a9710239e0cb50b6de935e7b",
+          "revision": "046f67609085a7d73d27105d2be91729d139208f",
           "version": null
         }
       },
