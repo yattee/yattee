@@ -42,9 +42,6 @@ struct FavoritesView: View {
             .redrawOn(change: favoritesChanged)
 
             #if os(tvOS)
-                .sheet(isPresented: $presentingEditFavorites) {
-                    EditFavorites()
-                }
                 .edgesIgnoringSafeArea(.horizontal)
             #else
                 .onDrop(of: [UTType.text], delegate: DropFavoriteOutside(current: $dragging))
