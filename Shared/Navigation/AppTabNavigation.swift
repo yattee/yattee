@@ -72,34 +72,39 @@ struct AppTabNavigation: View {
             }
             .tag(TabSelection.search)
         }
+        .id(accounts.current?.id ?? "")
         .environment(\.navigationStyle, .tab)
-        .sheet(isPresented: $navigation.presentingChannel, onDismiss: {
-            if let channel = recents.presentedChannel {
-                recents.close(RecentItem(from: channel))
-            }
-        }) {
-            if let channel = recents.presentedChannel {
-                NavigationView {
-                    ChannelVideosView(channel: channel)
-                        .environment(\.inChannelView, true)
-                        .environment(\.inNavigationView, true)
-                        .background(playerNavigationLink)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingChannel, onDismiss: {
+                if let channel = recents.presentedChannel {
+                    recents.close(RecentItem(from: channel))
+                }
+            }) {
+                if let channel = recents.presentedChannel {
+                    NavigationView {
+                        ChannelVideosView(channel: channel)
+                            .environment(\.inChannelView, true)
+                            .environment(\.inNavigationView, true)
+                            .background(playerNavigationLink)
+                    }
                 }
             }
-        }
-        .sheet(isPresented: $navigation.presentingPlaylist, onDismiss: {
-            if let playlist = recents.presentedPlaylist {
-                recents.close(RecentItem(from: playlist))
-            }
-        }) {
-            if let playlist = recents.presentedPlaylist {
-                NavigationView {
-                    ChannelPlaylistView(playlist: playlist)
-                        .environment(\.inNavigationView, true)
-                        .background(playerNavigationLink)
+        )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingPlaylist, onDismiss: {
+                if let playlist = recents.presentedPlaylist {
+                    recents.close(RecentItem(from: playlist))
+                }
+            }) {
+                if let playlist = recents.presentedPlaylist {
+                    NavigationView {
+                        ChannelPlaylistView(playlist: playlist)
+                            .environment(\.inNavigationView, true)
+                            .background(playerNavigationLink)
+                    }
                 }
             }
-        }
+        )
     }
 
     private var subscriptionsVisible: Bool {
