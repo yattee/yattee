@@ -16,13 +16,10 @@ struct PlaybackBar: View {
             if player.currentItem != nil {
                 HStack {
                     Text(playbackStatus)
-
                     Text("•")
-
                     rateMenu
                 }
                 .font(.caption2)
-                .foregroundColor(.gray)
 
                 Spacer()
 
@@ -59,12 +56,12 @@ struct PlaybackBar: View {
                     #endif
                 }
                 .transaction { t in t.animation = .none }
-                .foregroundColor(.gray)
                 .font(.caption2)
             } else {
                 Spacer()
             }
         }
+        .foregroundColor(colorScheme == .dark ? .gray : .black)
         .alert(isPresented: $player.presentingErrorDetails) {
             Alert(
                 title: Text("Error"),
