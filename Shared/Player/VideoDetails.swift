@@ -318,17 +318,21 @@ struct VideoDetails: View {
                 .foregroundColor(.secondary)
             }
         }
-        .sheet(isPresented: $presentingAddToPlaylist) {
-            if let video = video {
-                AddToPlaylistView(video: video)
+        .background(
+            EmptyView().sheet(isPresented: $presentingAddToPlaylist) {
+                if let video = video {
+                    AddToPlaylistView(video: video)
+                }
             }
-        }
+        )
         #if os(iOS)
-        .sheet(isPresented: $presentingShareSheet) {
-            if let shareURL = shareURL {
-                ShareSheet(activityItems: [shareURL])
+        .background(
+            EmptyView().sheet(isPresented: $presentingShareSheet) {
+                if let shareURL = shareURL {
+                    ShareSheet(activityItems: [shareURL])
+                }
             }
-        }
+        )
         #endif
     }
 

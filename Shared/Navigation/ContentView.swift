@@ -24,7 +24,7 @@ struct ContentView: View {
     #endif
 
     var body: some View {
-        Section {
+        Group {
             #if os(iOS)
                 if horizontalSizeClass == .compact {
                     AppTabNavigation()
@@ -49,53 +49,64 @@ struct ContentView: View {
         .environmentObject(subscriptions)
         .environmentObject(thumbnailsModel)
 
-        .sheet(isPresented: $navigation.presentingWelcomeScreen) {
-            WelcomeScreen()
-                .environmentObject(accounts)
-                .environmentObject(navigation)
-        }
+        // iOS 14 has problem with multiple sheets in one view
+        // but it's ok when it's in background
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingWelcomeScreen) {
+                WelcomeScreen()
+                    .environmentObject(accounts)
+                    .environmentObject(navigation)
+            }
+        )
         #if os(iOS)
-        .fullScreenCover(isPresented: $player.presentingPlayer) {
-            VideoPlayerView()
-                .environmentObject(accounts)
-                .environmentObject(instances)
-                .environmentObject(navigation)
-                .environmentObject(player)
-                .environmentObject(playlists)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnailsModel)
-        }
+        .background(
+            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
+                videoPlayer
+            }
+        )
         #elseif os(macOS)
-        .sheet(isPresented: $player.presentingPlayer) {
-            VideoPlayerView()
-                .frame(minWidth: 900, minHeight: 800)
-                .environmentObject(accounts)
-                .environmentObject(instances)
-                .environmentObject(navigation)
-                .environmentObject(player)
-                .environmentObject(playlists)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnailsModel)
-        }
+        .background(
+            EmptyView().sheet(isPresented: $player.presentingPlayer) {
+                videoPlayer
+                    .frame(minWidth: 900, minHeight: 800)
+            }
+        )
         #endif
         #if !os(tvOS)
         .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
         .onOpenURL(perform: handleOpenedURL)
-        .sheet(isPresented: $navigation.presentingAddToPlaylist) {
-            AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-                .environmentObject(playlists)
-        }
-        .sheet(isPresented: $navigation.presentingPlaylistForm) {
-            PlaylistFormView(playlist: $navigation.editedPlaylist)
-                .environmentObject(accounts)
-                .environmentObject(playlists)
-        }
-        .sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
-            SettingsView()
-                .environmentObject(accounts)
-                .environmentObject(instances)
-        }
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
+                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
+                    .environmentObject(playlists)
+            }
+        )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
+                PlaylistFormView(playlist: $navigation.editedPlaylist)
+                    .environmentObject(accounts)
+                    .environmentObject(playlists)
+            }
+        )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
+                SettingsView()
+                    .environmentObject(accounts)
+                    .environmentObject(instances)
+            }
+        )
         #endif
+    }
+
+    private var videoPlayer: some View {
+        VideoPlayerView()
+            .environmentObject(accounts)
+            .environmentObject(instances)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(playlists)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
     }
 
     func configure() {

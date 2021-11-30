@@ -58,14 +58,20 @@ struct PlaylistsView: View {
                 .environmentObject(accounts)
         }
         #else
-                .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-                    PlaylistFormView(playlist: $createdPlaylist)
-                        .environmentObject(accounts)
-                }
-                .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
-                    PlaylistFormView(playlist: $editedPlaylist)
-                        .environmentObject(accounts)
-                }
+                .background(
+                    EmptyView()
+                        .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+                            PlaylistFormView(playlist: $createdPlaylist)
+                                .environmentObject(accounts)
+                        }
+                )
+                .background(
+                    EmptyView()
+                        .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+                            PlaylistFormView(playlist: $editedPlaylist)
+                                .environmentObject(accounts)
+                        }
+                )
         #endif
                 .toolbar {
                     ToolbarItemGroup {
