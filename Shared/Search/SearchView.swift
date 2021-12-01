@@ -176,7 +176,7 @@ struct SearchView: View {
         .navigationTitle("Search")
         #endif
         #if os(iOS)
-        .navigationBarHidden(true)
+        .navigationBarHidden(!Defaults[.visibleSections].isEmpty || navigationStyle == .sidebar)
         #endif
     }
 

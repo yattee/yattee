@@ -8,69 +8,31 @@ struct AppTabNavigation: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
-    @Default(.tabNavigationSection) private var tabNavigationSection
+    @Default(.visibleSections) private var visibleSections
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            NavigationView {
-                LazyView(FavoritesView())
-                    .toolbar { toolbarContent }
-            }
-            .tabItem {
-                Label("Favorites", systemImage: "heart")
-                    .accessibility(label: Text("Favorites"))
-            }
-            .tag(TabSelection.favorites)
-
-            if subscriptionsVisible {
-                NavigationView {
-                    LazyView(SubscriptionsView())
-                        .toolbar { toolbarContent }
-                }
-                .tabItem {
-                    Label("Subscriptions", systemImage: "star.circle.fill")
-                        .accessibility(label: Text("Subscriptions"))
-                }
-                .tag(TabSelection.subscriptions)
+            if visibleSections.contains(.favorites) {
+                favoritesNavigationView
             }
 
             if subscriptionsVisible {
-                if accounts.app.supportsPopular {
-                    if tabNavigationSection == .popular {
-                        popularNavigationView
-                    } else {
-                        trendingNavigationView
-                    }
-                } else {
-                    trendingNavigationView
-                }
-            } else {
-                if accounts.app.supportsPopular {
-                    popularNavigationView
-                }
+                subscriptionsNavigationView
+            }
+
+            if visibleSections.contains(.popular), accounts.app.supportsPopular {
+                popularNavigationView
+            }
+
+            if visibleSections.contains(.trending) {
                 trendingNavigationView
             }
 
-            if accounts.app.supportsUserPlaylists {
-                NavigationView {
-                    LazyView(PlaylistsView())
-                        .toolbar { toolbarContent }
-                }
-                .tabItem {
-                    Label("Playlists", systemImage: "list.and.film")
-                        .accessibility(label: Text("Playlists"))
-                }
-                .tag(TabSelection.playlists)
+            if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
+                playlistsNavigationView
             }
 
-            NavigationView {
-                LazyView(SearchView())
-            }
-            .tabItem {
-                Label("Search", systemImage: "magnifyingglass")
-                    .accessibility(label: Text("Search"))
-            }
-            .tag(TabSelection.search)
+            searchNavigationView
         }
         .id(accounts.current?.id ?? "")
         .environment(\.navigationStyle, .tab)
@@ -107,8 +69,33 @@ struct AppTabNavigation: View {
         )
     }
 
+    private var favoritesNavigationView: some View {
+        NavigationView {
+            LazyView(FavoritesView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Favorites", systemImage: "heart")
+                .accessibility(label: Text("Favorites"))
+        }
+        .tag(TabSelection.favorites)
+    }
+
+    private var subscriptionsNavigationView: some View {
+        NavigationView {
+            LazyView(SubscriptionsView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Subscriptions", systemImage: "star.circle.fill")
+                .accessibility(label: Text("Subscriptions"))
+        }
+        .tag(TabSelection.subscriptions)
+    }
+
     private var subscriptionsVisible: Bool {
-        accounts.app.supportsSubscriptions && !(accounts.current?.anonymous ?? true)
+        visibleSections.contains(.subscriptions) &&
+            accounts.app.supportsSubscriptions && !(accounts.current?.anonymous ?? true)
     }
 
     private var popularNavigationView: some View {
@@ -133,6 +120,30 @@ struct AppTabNavigation: View {
                 .accessibility(label: Text("Trending"))
         }
         .tag(TabSelection.trending)
+    }
+
+    private var playlistsNavigationView: some View {
+        NavigationView {
+            LazyView(PlaylistsView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Playlists", systemImage: "list.and.film")
+                .accessibility(label: Text("Playlists"))
+        }
+        .tag(TabSelection.playlists)
+    }
+
+    private var searchNavigationView: some View {
+        NavigationView {
+            LazyView(SearchView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Search", systemImage: "magnifyingglass")
+                .accessibility(label: Text("Search"))
+        }
+        .tag(TabSelection.search)
     }
 
     private var playerNavigationLink: some View {

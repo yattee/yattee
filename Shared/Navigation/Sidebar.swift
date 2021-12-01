@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct Sidebar: View {
@@ -5,6 +6,8 @@ struct Sidebar: View {
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
+
+    @Default(.visibleSections) private var visibleSections
 
     var body: some View {
         ScrollViewReader { scrollView in
@@ -16,11 +19,11 @@ struct Sidebar: View {
                         .id("recentlyOpened")
 
                     if accounts.api.signedIn {
-                        if accounts.app.supportsSubscriptions {
+                        if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions {
                             AppSidebarSubscriptions()
                         }
 
-                        if accounts.app.supportsUserPlaylists {
+                        if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
                             AppSidebarPlaylists()
                         }
                     }
@@ -47,27 +50,33 @@ struct Sidebar: View {
 
     var mainNavigationLinks: some View {
         Section(header: Text("Videos")) {
-            NavigationLink(destination: LazyView(FavoritesView()), tag: TabSelection.favorites, selection: $navigation.tabSelection) {
-                Label("Favorites", systemImage: "heart")
-                    .accessibility(label: Text("Favorites"))
+            if visibleSections.contains(.favorites) {
+                NavigationLink(destination: LazyView(FavoritesView()), tag: TabSelection.favorites, selection: $navigation.tabSelection) {
+                    Label("Favorites", systemImage: "heart")
+                        .accessibility(label: Text("Favorites"))
+                }
             }
-            if accounts.app.supportsSubscriptions && accounts.signedIn {
+            if visibleSections.contains(.subscriptions),
+               accounts.app.supportsSubscriptions && accounts.signedIn
+            {
                 NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
                     Label("Subscriptions", systemImage: "star.circle")
                         .accessibility(label: Text("Subscriptions"))
                 }
             }
 
-            if accounts.app.supportsPopular {
+            if visibleSections.contains(.popular), accounts.app.supportsPopular {
                 NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
                     Label("Popular", systemImage: "arrow.up.right.circle")
                         .accessibility(label: Text("Popular"))
                 }
             }
 
-            NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
-                Label("Trending", systemImage: "chart.bar")
-                    .accessibility(label: Text("Trending"))
+            if visibleSections.contains(.trending) {
+                NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
+                    Label("Trending", systemImage: "chart.bar")
+                        .accessibility(label: Text("Trending"))
+                }
             }
 
             NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
@@ -78,7 +87,7 @@ struct Sidebar: View {
         }
     }
 
-    func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
+    private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
         if case .recentlyOpened = selection {
             scrollView.scrollTo("recentlyOpened")
         } else if case let .playlist(id) = selection {

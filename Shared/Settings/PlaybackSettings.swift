@@ -27,7 +27,6 @@ struct PlaybackSettings: View {
                     }
 
                     keywordsToggle
-                    saveHistoryToggle
                 }
             #else
                 Section(header: SettingsHeader(text: "Source")) {
@@ -45,7 +44,6 @@ struct PlaybackSettings: View {
                 #endif
 
                 keywordsToggle
-                saveHistoryToggle
             #endif
         }
 
@@ -108,10 +106,6 @@ struct PlaybackSettings: View {
 
     private var keywordsToggle: some View {
         Toggle("Show video keywords", isOn: $showKeywords)
-    }
-
-    private var saveHistoryToggle: some View {
-        Toggle("Save history of played videos", isOn: $saveHistory)
     }
 }
 

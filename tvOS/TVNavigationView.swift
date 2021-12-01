@@ -8,29 +8,34 @@ struct TVNavigationView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 
+    @Default(.visibleSections) private var visibleSections
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            FavoritesView()
-                .tabItem { Text("Favorites") }
-                .tag(TabSelection.favorites)
+            if visibleSections.contains(.favorites) {
+                FavoritesView()
+                    .tabItem { Text("Favorites") }
+                    .tag(TabSelection.favorites)
+            }
 
-            if accounts.app.supportsSubscriptions {
+            if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions {
                 SubscriptionsView()
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
             }
 
-            if accounts.app.supportsPopular {
+            if visibleSections.contains(.popular), accounts.app.supportsPopular {
                 PopularView()
                     .tabItem { Text("Popular") }
                     .tag(TabSelection.popular)
             }
 
-            TrendingView()
-                .tabItem { Text("Trending") }
-                .tag(TabSelection.trending)
+            if visibleSections.contains(.trending) {
+                TrendingView()
+                    .tabItem { Text("Trending") }
+                    .tag(TabSelection.trending)
+            }
 
-            if accounts.app.supportsUserPlaylists {
+            if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
                 PlaylistsView()
                     .tabItem { Text("Playlists") }
                     .tag(TabSelection.playlists)
