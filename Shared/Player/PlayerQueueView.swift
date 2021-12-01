@@ -44,18 +44,11 @@ struct PlayerQueueView: View {
             }
 
             ForEach(player.queue) { item in
-                let row = PlayerQueueRow(item: item, fullScreen: $fullScreen)
+                PlayerQueueRow(item: item, fullScreen: $fullScreen)
                     .contextMenu {
                         removeButton(item, history: false)
                         removeAllButton(history: false)
                     }
-                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                    row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        removeButton(item, history: false)
-                    }
-                } else {
-                    row
-                }
             }
         }
     }
@@ -65,20 +58,11 @@ struct PlayerQueueView: View {
             if !player.history.isEmpty {
                 Section(header: Text("Played Previously")) {
                     ForEach(player.history) { item in
-                        let row = PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
+                        PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
                             .contextMenu {
                                 removeButton(item, history: true)
                                 removeAllButton(history: true)
                             }
-                        #if os(iOS)
-                            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                                row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    removeButton(item, history: true)
-                                }
-                            } else {
-                                row
-                            }
-                        #endif
                     }
                 }
             }
@@ -106,18 +90,10 @@ struct PlayerQueueView: View {
     }
 
     private func removeButton(_ item: PlayerQueueItem, history: Bool) -> some View {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-            return Button(role: .destructive) {
-                removeButtonAction(item, history: history)
-            } label: {
-                Label("Remove", systemImage: "trash")
-            }
-        } else {
-            return Button {
-                removeButtonAction(item, history: history)
-            } label: {
-                Label("Remove", systemImage: "trash")
-            }
+        Button {
+            removeButtonAction(item, history: history)
+        } label: {
+            Label("Remove", systemImage: "trash")
         }
     }
 
@@ -126,18 +102,10 @@ struct PlayerQueueView: View {
     }
 
     private func removeAllButton(history: Bool) -> some View {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-            return Button(role: .destructive) {
-                removeAllButtonAction(history: history)
-            } label: {
-                Label("Remove All", systemImage: "trash.fill")
-            }
-        } else {
-            return Button {
-                removeAllButtonAction(history: history)
-            } label: {
-                Label("Remove All", systemImage: "trash.fill")
-            }
+        Button {
+            removeAllButtonAction(history: history)
+        } label: {
+            Label("Remove All", systemImage: "trash.fill")
         }
     }
 
