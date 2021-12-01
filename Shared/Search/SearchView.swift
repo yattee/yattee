@@ -24,6 +24,8 @@ struct SearchView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
+    @Default(.saveRecents) private var saveRecents
+
     private var videos = [Video]()
 
     var items: [ContentItem] {
@@ -229,7 +231,7 @@ struct SearchView: View {
     }
 
     private var showRecentQueries: Bool {
-        navigationStyle == .tab && state.queryText.isEmpty
+        navigationStyle == .tab && saveRecents && state.queryText.isEmpty
     }
 
     private var filtersActive: Bool {

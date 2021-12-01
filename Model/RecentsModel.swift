@@ -3,7 +3,7 @@ import Foundation
 
 final class RecentsModel: ObservableObject {
     @Default(.recentlyOpened) var items
-
+    @Default(.saveRecents) var saveRecents
     func clear() {
         items = []
     }
@@ -13,6 +13,14 @@ final class RecentsModel: ObservableObject {
     }
 
     func add(_ item: RecentItem) {
+        if !saveRecents {
+            clear()
+
+            if item.type != .channel {
+                return
+            }
+        }
+
         if let index = items.firstIndex(where: { $0.id == item.id }) {
             items.remove(at: index)
         }

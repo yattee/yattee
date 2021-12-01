@@ -141,6 +141,10 @@ struct ContentView: View {
             player.loadHistoryDetails()
         }
 
+        if !Defaults[.saveRecents] {
+            recents.clear()
+        }
+
         var section = Defaults[.visibleSections].min()?.tabSelection
 
         #if os(macOS)
