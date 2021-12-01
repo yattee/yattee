@@ -9,6 +9,18 @@ struct RelatedView: View {
                 Section(header: Text("Related")) {
                     ForEach(player.currentVideo!.related) { video in
                         PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: .constant(false))
+                            .contextMenu {
+                                Button {
+                                    player.playNext(video)
+                                } label: {
+                                    Label("Play Next", systemImage: "text.insert")
+                                }
+                                Button {
+                                    player.enqueueVideo(video)
+                                } label: {
+                                    Label("Play Last", systemImage: "text.append")
+                                }
+                            }
                     }
                 }
             }
