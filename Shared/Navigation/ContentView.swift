@@ -112,7 +112,7 @@ struct ContentView: View {
     func configure() {
         SiestaLog.Category.enabled = .common
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
-        SDWebImageManager.defaultImageCache = PINCache(name: "net.yattee.app")
+        SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
         #if !os(macOS)
             try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
         #endif
