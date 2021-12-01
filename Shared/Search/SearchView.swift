@@ -53,14 +53,16 @@ struct SearchView: View {
                 ZStack {
                     results
 
-                    if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
-                        HStack {
-                            Spacer()
-                            SearchSuggestions()
-                                .borderLeading(width: 1, color: Color("ControlsBorderColor"))
-                                .frame(maxWidth: 280)
+                    #if !os(tvOS)
+                        if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                            HStack {
+                                Spacer()
+                                SearchSuggestions()
+                                    .borderLeading(width: 1, color: Color("ControlsBorderColor"))
+                                    .frame(maxWidth: 280)
+                            }
                         }
-                    }
+                    #endif
                 }
             #endif
         }
@@ -173,9 +175,16 @@ struct SearchView: View {
                 updateFavoriteItem()
             }
         }
-        #if !os(tvOS)
-        .ignoresSafeArea(.keyboard, edges: .bottom)
-        .navigationTitle("Search")
+        #if os(tvOS)
+        .searchable(text: $state.queryText) {
+            ForEach(state.querySuggestions.collection, id: \.self) { suggestion in
+                Text(suggestion)
+                    .searchCompletion(suggestion)
+            }
+        }
+        #else
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+                .navigationTitle("Search")
         #endif
         #if os(iOS)
         .navigationBarHidden(!Defaults[.visibleSections].isEmpty || navigationStyle == .sidebar)
