@@ -44,9 +44,7 @@ extension Defaults.Keys {
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
-    #if os(iOS)
-        static let tabNavigationSection = Key<TabNavigationSectionSetting>("tabNavigationSection", default: .trending)
-    #endif
+    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
@@ -83,8 +81,48 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
     }
 }
 
-#if os(iOS)
-    enum TabNavigationSectionSetting: String, Defaults.Serializable {
-        case trending, popular
+enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
+    case favorites, subscriptions, popular, trending, playlists
+
+    static func from(_ string: String) -> VisibleSection {
+        allCases.first { $0.rawValue == string }!
     }
-#endif
+
+    var title: String {
+        rawValue.localizedCapitalized
+    }
+
+    var tabSelection: TabSelection {
+        switch self {
+        case .favorites:
+            return TabSelection.favorites
+        case .subscriptions:
+            return TabSelection.subscriptions
+        case .popular:
+            return TabSelection.popular
+        case .trending:
+            return TabSelection.trending
+        case .playlists:
+            return TabSelection.playlists
+        }
+    }
+
+    private var sortOrder: Int {
+        switch self {
+        case .favorites:
+            return 0
+        case .subscriptions:
+            return 1
+        case .popular:
+            return 2
+        case .trending:
+            return 3
+        case .playlists:
+            return 4
+        }
+    }
+
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.sortOrder < rhs.sortOrder
+    }
+}

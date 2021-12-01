@@ -140,6 +140,16 @@ struct ContentView: View {
         if !accounts.current.isNil {
             player.loadHistoryDetails()
         }
+
+        var section = Defaults[.visibleSections].min()?.tabSelection
+
+        #if os(macOS)
+            if section == .playlists {
+                section = .search
+            }
+        #endif
+
+        navigation.tabSelection = section ?? .search
     }
 
     func openWelcomeScreenIfAccountEmpty() {

@@ -23,7 +23,7 @@ final class NavigationModel: ObservableObject {
         }
     }
 
-    @Published var tabSelection: TabSelection! = .favorites
+    @Published var tabSelection: TabSelection!
 
     @Published var presentingAddToPlaylist = false
     @Published var videoToAddToPlaylist: Video!

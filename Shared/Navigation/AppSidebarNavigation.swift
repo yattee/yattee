@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 #if os(iOS)
     import Introspect
@@ -5,6 +6,9 @@ import SwiftUI
 
 struct AppSidebarNavigation: View {
     @EnvironmentObject<AccountsModel> private var accounts
+
+    @Default(.visibleSections) private var visibleSections
+
     #if os(iOS)
         @EnvironmentObject<NavigationModel> private var navigation
         @State private var didApplyPrimaryViewWorkAround = false
