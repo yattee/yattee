@@ -40,6 +40,7 @@ extension Defaults.Keys {
     static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
 
     static let saveHistory = Key<Bool>("saveHistory", default: true)
+    static let saveRecents = Key<Bool>("saveRecents", default: true)
 
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
