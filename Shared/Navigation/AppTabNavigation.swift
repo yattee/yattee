@@ -20,7 +20,7 @@ struct AppTabNavigation: View {
                 subscriptionsNavigationView
             }
 
-            if visibleSections.contains(.popular), accounts.app.supportsPopular {
+            if visibleSections.contains(.popular), accounts.app.supportsPopular, visibleSections.count < 5 {
                 popularNavigationView
             }
 

@@ -105,8 +105,9 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
+            .background(colorScheme == .dark ? Color.black : Color.white)
             #if os(macOS)
-            .frame(minWidth: 650)
+                .frame(minWidth: 650)
             #endif
             #if os(iOS)
                 if sidebarQueue {
