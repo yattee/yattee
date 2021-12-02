@@ -44,17 +44,21 @@ System requirements:
 * macOS Big Sur (or newer)
 
 ### How to install?
-#### [AltStore](https://altstore.io/) (free)
+
+#### macOS
+Download and run latest version from the [Releases](https://github.com/yattee/yattee/releases) page.
+
+#### iOS/tvOS: [AltStore](https://altstore.io/) (free)
 You can sideload IPA files downloaded from the [Releases](https://github.com/yattee/yattee/releases) page to your iOS or tvOS device - check [AltStore FAQ](https://altstore.io/faq/) for more information.
 
 If you have to access to the beta AltStore version (v1.5, for Patreons only), you can add the following repository in `Browse > Sources` screen:
 
 `https://alt.yattee.stream`
 
-#### Signing IPA files online (paid)
+#### iOS/tvOS: Signing IPA files online (paid)
 [UDID Registrations](https://www.udidregistrations.com/) provides services to sign IPA files for your devices. Refer to: ***Break free from the App Store*** section of the website for more information.
 
-#### Manual installation
+#### iOS/tvOS: Manual installation
 Download sources and compile them on a Mac using Xcode, install to your devices. Please note that if you are not registered in Apple Developer Program you will need to reinstall every 7 days.
 
 ## Integrations
