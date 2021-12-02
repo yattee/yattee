@@ -233,7 +233,7 @@ final class PlayerModel: ObservableObject {
         loadCompositionAsset(stream.videoAsset, stream: stream, type: .video, of: video, preservingTime: preservingTime)
     }
 
-    func loadCompositionAsset(
+    private func loadCompositionAsset(
         _ asset: AVURLAsset,
         stream: Stream,
         type: AVMediaType,
@@ -516,5 +516,11 @@ final class PlayerModel: ObservableObject {
         formatter.maximumFractionDigits = 2
 
         return "\(formatter.string(from: NSNumber(value: rate))!)×"
+    }
+
+    func closeCurrentItem() {
+        addCurrentItemToHistory()
+        currentItem = nil
+        player.replaceCurrentItem(with: nil)
     }
 }

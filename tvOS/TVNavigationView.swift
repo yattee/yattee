@@ -3,8 +3,8 @@ import SwiftUI
 
 struct TVNavigationView: View {
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
 

@@ -33,6 +33,13 @@ struct NowPlayingView: View {
                         } label: {
                             VideoBanner(video: item.video)
                         }
+                        .contextMenu {
+                            Button("Close Video") {
+                                player.closeCurrentItem()
+                            }
+
+                            Button("Cancel", role: .cancel) {}
+                        }
                     }
                     .onPlayPauseCommand(perform: player.togglePlay)
                 }

@@ -133,6 +133,17 @@ struct VideoDetails: View {
                     .onAppear {
                         currentPage = .details
                     }
+                    .contextMenu {
+                        Button {
+                            player.closeCurrentItem()
+                            if !sidebarQueue {
+                                currentPage = .queue
+                            }
+                        } label: {
+                            Label("Close Video", systemImage: "xmark.circle")
+                        }
+                        .disabled(player.currentItem.isNil)
+                    }
 
                     .font(.title2.bold())
             } else {
