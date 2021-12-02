@@ -5,6 +5,11 @@ struct FavoritesModel {
     static let shared = FavoritesModel()
 
     @Default(.favorites) var all
+    @Default(.visibleSections) var visibleSections
+
+    var isEnabled: Bool {
+        visibleSections.contains(.favorites)
+    }
 
     func contains(_ item: FavoriteItem) -> Bool {
         all.contains { $0 == item }

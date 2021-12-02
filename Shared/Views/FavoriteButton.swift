@@ -3,17 +3,19 @@ import Foundation
 import SwiftUI
 
 struct FavoriteButton: View {
-    let item: FavoriteItem
+    let item: FavoriteItem!
     let favorites = FavoritesModel.shared
 
     @State private var isFavorite = false
 
-    @Default(.visibleSections) private var visibleSections
-
     var body: some View {
         Group {
-            if visibleSections.contains(.favorites) {
+            if favorites.isEnabled {
                 Button {
+                    guard !item.isNil else {
+                        return
+                    }
+
                     favorites.toggle(item)
                     isFavorite.toggle()
                 } label: {
@@ -23,8 +25,9 @@ struct FavoriteButton: View {
                         Label("Add to Favorites", systemImage: "heart")
                     }
                 }
+                .disabled(item.isNil)
                 .onAppear {
-                    isFavorite = favorites.contains(item)
+                    isFavorite = item.isNil ? false : favorites.contains(item)
                 }
             } else {
                 EmptyView()

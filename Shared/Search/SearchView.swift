@@ -23,6 +23,7 @@ struct SearchView: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
+    private var favorites = FavoritesModel.shared
 
     @Default(.saveRecents) private var saveRecents
 
@@ -70,10 +71,8 @@ struct SearchView: View {
             #if !os(tvOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
                     #if os(macOS)
-                        if let favoriteItem = favoriteItem {
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem.id)
-                        }
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem?.id)
                     #endif
 
                     if accounts.app.supportsSearchFilters {
@@ -97,10 +96,8 @@ struct SearchView: View {
                     #if os(iOS)
                         Spacer()
 
-                        if let favoriteItem = favoriteItem {
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem.id)
-                        }
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem?.id)
 
                         Spacer()
                     #endif
@@ -188,6 +185,7 @@ struct SearchView: View {
         #endif
         #if os(iOS)
         .navigationBarHidden(!Defaults[.visibleSections].isEmpty || navigationStyle == .sidebar)
+        .navigationBarTitleDisplayMode(.inline)
         #endif
     }
 
@@ -203,12 +201,10 @@ struct SearchView: View {
                                 filtersHorizontalStack
                             }
 
-                            if let favoriteItem = favoriteItem {
-                                FavoriteButton(item: favoriteItem)
-                                    .id(favoriteItem.id)
-                                    .labelStyle(.iconOnly)
-                                    .font(.system(size: 25))
-                            }
+                            FavoriteButton(item: favoriteItem)
+                                .id(favoriteItem?.id)
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 25))
                         }
 
                         HorizontalCells(items: items)
@@ -233,9 +229,9 @@ struct SearchView: View {
 
     private var toolbarPlacement: ToolbarItemPlacement {
         #if os(iOS)
-            .bottomBar
+            accounts.app.supportsSearchFilters || favorites.isEnabled ? .bottomBar : .automatic
         #else
-            .automatic
+                .automatic
         #endif
     }
 
