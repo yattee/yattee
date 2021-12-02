@@ -68,7 +68,7 @@ struct ContentView: View {
         .background(
             EmptyView().sheet(isPresented: $player.presentingPlayer) {
                 videoPlayer
-                    .frame(minWidth: 900, minHeight: 800)
+                    .frame(minWidth: 1000, minHeight: 750)
             }
         )
         #endif

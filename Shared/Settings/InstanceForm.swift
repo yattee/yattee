@@ -76,6 +76,7 @@ struct InstanceForm: View {
                 }
             }
             .pickerStyle(.segmented)
+            .labelsHidden()
 
             TextField("Name", text: $name)
 

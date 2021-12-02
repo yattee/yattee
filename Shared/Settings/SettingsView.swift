@@ -44,7 +44,7 @@ struct SettingsView: View {
                     PlaybackSettings()
                 }
                 .tabItem {
-                    Label("Playback", systemImage: "play.rectangle.on.rectangle.fill")
+                    Label("Playback", systemImage: "play.rectangle")
                 }
                 .tag(Tabs.playback)
 
@@ -52,7 +52,7 @@ struct SettingsView: View {
                     ServicesSettings()
                 }
                 .tabItem {
-                    Label("Services", systemImage: "puzzlepiece.extension")
+                    Label("Services", systemImage: "puzzlepiece")
                 }
                 .tag(Tabs.services)
             }

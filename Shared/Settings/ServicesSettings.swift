@@ -20,7 +20,7 @@ struct ServicesSettings: View {
 
         Section(header: SettingsHeader(text: "Categories to Skip")) {
             #if os(macOS)
-                let list = List(SponsorBlockAPI.categories, id: \.self) { category in
+                let list = ForEach(SponsorBlockAPI.categories, id: \.self) { category in
                     SponsorBlockCategorySelectionRow(
                         title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
                         selected: sponsorBlockCategories.contains(category)

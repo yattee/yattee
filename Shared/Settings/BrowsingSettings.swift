@@ -18,7 +18,7 @@ struct BrowsingSettings: View {
             }
             Section(header: SettingsHeader(text: "Sections")) {
                 #if os(macOS)
-                    let list = List(VisibleSection.allCases, id: \.self) { section in
+                    let list = ForEach(VisibleSection.allCases, id: \.self) { section in
                         VisibleSectionSelectionRow(
                             title: section.title,
                             selected: visibleSections.contains(section)
@@ -35,6 +35,8 @@ struct BrowsingSettings: View {
                             list
                                 .listStyle(.inset)
                         }
+
+                        Spacer()
                     }
                 #else
                     ForEach(VisibleSection.allCases, id: \.self) { section in
