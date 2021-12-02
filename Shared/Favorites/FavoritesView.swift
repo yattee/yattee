@@ -29,6 +29,9 @@ struct FavoritesView: View {
                     #else
                         ForEach(favorites) { item in
                             FavoriteItemView(item: item, dragging: $dragging)
+                            #if os(macOS)
+                                .workaroundForVerticalScrollingBug()
+                            #endif
                         }
                     #endif
                 }
