@@ -31,7 +31,7 @@ struct DetailBadge: View {
                     .background(.thinMaterial)
             } else {
                 content
-                    .background(Color.background)
+                    .background(Color.background.opacity(0.95))
             }
         }
     }

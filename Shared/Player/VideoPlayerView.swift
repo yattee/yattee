@@ -116,7 +116,7 @@ struct VideoPlayerView: View {
             #elseif os(macOS)
                 if Defaults[.playerSidebar] != .never {
                     PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
-                        .frame(minWidth: 250)
+                        .frame(minWidth: 300)
                 }
             #endif
         }

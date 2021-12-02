@@ -14,6 +14,7 @@ struct InstancesSettings: View {
 
     @State private var frontendURL = ""
 
+    @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject<AccountsModel> private var accounts
 
     @Default(.instances) private var instances
@@ -54,7 +55,7 @@ struct InstancesSettings: View {
                             Button("Remove") {
                                 presentingAccountRemovalConfirmation = true
                             }
-                            .foregroundColor(.red)
+                            .foregroundColor(colorScheme == .dark ? .white : .red)
                             .opacity(account == selectedAccount ? 1 : 0)
                         }
                         .tag(account)

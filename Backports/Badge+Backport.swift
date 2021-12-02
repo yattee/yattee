@@ -5,7 +5,12 @@ extension Backport where Content: View {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             content.badge(count)
         } else {
-            content
+            HStack {
+                content
+                Spacer()
+                Text("\(count)")
+                    .foregroundColor(.secondary)
+            }
         }
     }
 }
