@@ -43,6 +43,7 @@ final class PlayerModel: ObservableObject {
     @Published var restoredSegments = [Segment]()
 
     var accounts: AccountsModel
+    var comments: CommentsModel
 
     var composition = AVMutableComposition()
     var loadedCompositionAssets = [AVMediaType]()
@@ -67,8 +68,9 @@ final class PlayerModel: ObservableObject {
         #endif
     }}
 
-    init(accounts: AccountsModel? = nil, instances _: InstancesModel? = nil) {
+    init(accounts: AccountsModel? = nil, comments: CommentsModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
+        self.comments = comments ?? CommentsModel()
 
         addItemDidPlayToEndTimeObserver()
         addFrequentTimeObserver()
@@ -138,6 +140,7 @@ final class PlayerModel: ObservableObject {
         playerError = nil
         resetSegments()
         sponsorBlock.loadSegments(videoID: video.videoID, categories: Defaults[.sponsorBlockCategories])
+        comments.load()
 
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")

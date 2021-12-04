@@ -90,9 +90,14 @@ struct ChannelVideosView: View {
 
                 ToolbarItem {
                     HStack {
-                        Text("**\(store.item?.subscriptionsString ?? "loading")** subscribers")
-                            .foregroundColor(.secondary)
-                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+                        HStack(spacing: 3) {
+                            Text("\(store.item?.subscriptionsString ?? "loading")")
+                                .fontWeight(.bold)
+                            Text(" subscribers")
+                        }
+                        .allowsTightening(true)
+                        .foregroundColor(.secondary)
+                        .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
 
                         subscriptionToggleButton
 

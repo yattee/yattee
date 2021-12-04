@@ -37,6 +37,7 @@ extension PlayerModel {
     }
 
     func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: TimeInterval? = nil) {
+        comments.clear()
         currentItem = item
 
         if !time.isNil {

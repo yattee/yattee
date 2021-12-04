@@ -6,6 +6,12 @@ struct SearchTextField: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
+    @Binding var favoriteItem: FavoriteItem?
+
+    init(favoriteItem: Binding<FavoriteItem?>? = nil) {
+        _favoriteItem = favoriteItem ?? .constant(nil)
+    }
+
     var body: some View {
         ZStack {
             #if os(macOS)
@@ -37,7 +43,14 @@ struct SearchTextField: View {
                 .padding(.leading)
                 .padding(.trailing, 15)
                 #endif
+
                 if !self.state.queryText.isEmpty {
+                    #if os(iOS)
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem?.id)
+                            .labelStyle(.iconOnly)
+                            .padding(.trailing)
+                    #endif
                     clearButton
                 }
             }

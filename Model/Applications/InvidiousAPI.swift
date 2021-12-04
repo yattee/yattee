@@ -30,7 +30,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         signedIn = false
 
         configure()
-        validate()
     }
 
     func validate() {
@@ -256,6 +255,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: basePathAppending("search/suggestions"))
             .withParam("q", query.lowercased())
     }
+
+    func comments(_: Video.ID, page _: String?) -> Resource? { nil }
 
     private func searchQuery(_ query: String) -> String {
         var searchQuery = query

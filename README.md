@@ -35,6 +35,7 @@ Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](ht
 | Search Suggestions | ✅ | ✅ |
 | Search Filters | ✅ | 🔴 |
 | Subtitles | 🔴 | ✅ |
+| Comments | 🔴 | ✅ |
 
 ## Installation
 ### Requirements

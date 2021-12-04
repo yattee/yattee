@@ -4,8 +4,13 @@ import SwiftUI
 struct ServicesSettings: View {
     @Default(.sponsorBlockInstance) private var sponsorBlockInstance
     @Default(.sponsorBlockCategories) private var sponsorBlockCategories
+    @Default(.commentsInstanceID) private var commentsInstanceID
 
     var body: some View {
+        Section(header: SettingsHeader(text: "Comments")) {
+            commentsInstancePicker
+        }
+
         Section(header: SettingsHeader(text: "SponsorBlock API")) {
             TextField(
                 "SponsorBlock API Instance",
@@ -50,6 +55,22 @@ struct ServicesSettings: View {
                 }
             #endif
         }
+    }
+
+    private var commentsInstancePicker: some View {
+        Picker("Comments", selection: $commentsInstanceID) {
+            Text("Disabled").tag(String?.none)
+
+            ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
+                Text(instance.description).tag(Optional(instance.id))
+            }
+        }
+        .labelsHidden()
+        #if os(iOS)
+            .pickerStyle(.automatic)
+        #elseif os(tvOS)
+            .pickerStyle(.inline)
+        #endif
     }
 
     func toggleCategory(_ category: String, value: Bool) {

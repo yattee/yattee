@@ -71,6 +71,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.map { PipedAPI.extractVideo(from: $0)! }
         }
 
+        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>) -> CommentsPage in
+            let comments = content.json.dictionaryValue["comments"]?.arrayValue.map { PipedAPI.extractComment(from: $0)! } ?? []
+            let nextPage = content.json.dictionaryValue["nextpage"]?.stringValue
+
+            return CommentsPage(comments: comments, nextPage: nextPage)
+        }
+
         if account.token.isNil {
             updateToken()
         }
@@ -80,9 +87,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         PipedAPI.authorizedEndpoints.contains { url.absoluteString.contains($0) }
     }
 
-    @discardableResult func updateToken() -> Request {
+    func updateToken() {
+        guard !account.anonymous else {
+            return
+        }
+
         account.token = nil
-        return login.request(
+
+        login.request(
             .post,
             json: ["username": account.username, "password": account.password]
         )
@@ -160,6 +172,17 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     func playlist(_: String) -> Resource? { nil }
     func playlistVideo(_: String, _: String) -> Resource? { nil }
     func playlistVideos(_: String) -> Resource? { nil }
+
+    func comments(_ id: Video.ID, page: String?) -> Resource? {
+        let path = page.isNil ? "comments/\(id)" : "nextpage/comments/\(id)"
+        let resource = resource(baseURL: account.url, path: path)
+
+        if page.isNil {
+            return resource
+        }
+
+        return resource.withParam("nextpage", page)
+    }
 
     private func pathPattern(_ path: String) -> String {
         "**\(path)"
@@ -394,5 +417,24 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .dictionaryValue["videoStreams"]?
             .arrayValue
             .filter { $0.dictionaryValue["format"] == "MPEG_4" } ?? []
+    }
+
+    private static func extractComment(from content: JSON) -> Comment? {
+        let details = content.dictionaryValue
+        let author = details["author"]?.stringValue ?? ""
+        let commentorUrl = details["commentorUrl"]?.stringValue
+        let channelId = commentorUrl?.components(separatedBy: "/")[2] ?? ""
+        return Comment(
+            id: details["commentId"]?.stringValue ?? UUID().uuidString,
+            author: author,
+            authorAvatarURL: details["thumbnail"]?.stringValue ?? "",
+            time: details["commentedTime"]?.stringValue ?? "",
+            pinned: details["pinned"]?.boolValue ?? false,
+            hearted: details["hearted"]?.boolValue ?? false,
+            likeCount: details["likeCount"]?.intValue ?? 0,
+            text: details["commentText"]?.stringValue ?? "",
+            repliesPage: details["repliesPage"]?.stringValue,
+            channel: Channel(id: channelId, name: author)
+        )
     }
 }

@@ -2,10 +2,11 @@ import Defaults
 import Foundation
 
 extension Defaults.Keys {
+    static let kavinPipedInstanceID = "kavin-piped"
     static let instances = Key<[Instance]>("instances", default: [
         .init(
             app: .piped,
-            id: "default-piped-instance",
+            id: kavinPipedInstanceID,
             name: "Kavin",
             apiURL: "https://pipedapi.kavin.rocks",
             frontendURL: "https://piped.kavin.rocks"
@@ -32,6 +33,7 @@ extension Defaults.Keys {
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
+    static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 

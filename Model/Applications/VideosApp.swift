@@ -38,4 +38,8 @@ enum VideosApp: String, CaseIterable {
     var hasFrontendURL: Bool {
         self == .piped
     }
+
+    var supportsComments: Bool {
+        self == .piped
+    }
 }

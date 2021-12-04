@@ -5,6 +5,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environmentObject(AccountsModel())
+            .environmentObject(CommentsModel())
             .environmentObject(InstancesModel())
             .environmentObject(invidious)
             .environmentObject(NavigationModel())

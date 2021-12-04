@@ -4,7 +4,7 @@ import SwiftUI
 
 struct VideoDetails: View {
     enum Page {
-        case details, queue, related
+        case info, queue, related, comments
     }
 
     @Binding var sidebarQueue: Bool
@@ -16,7 +16,7 @@ struct VideoDetails: View {
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
-    @State private var currentPage = Page.details
+    @State private var currentPage = Page.info
 
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
@@ -65,7 +65,7 @@ struct VideoDetails: View {
                 }
                 .padding(.horizontal)
 
-                if !sidebarQueue {
+                if CommentsModel.enabled {
                     pagePicker
                         .padding(.horizontal)
                 }
@@ -89,7 +89,7 @@ struct VideoDetails: View {
             )
 
             switch currentPage {
-            case .details:
+            case .info:
                 ScrollView(.vertical) {
                     detailsPage
                 }
@@ -99,6 +99,9 @@ struct VideoDetails: View {
 
             case .related:
                 RelatedView()
+                    .edgesIgnoringSafeArea(.horizontal)
+            case .comments:
+                CommentsView()
                     .edgesIgnoringSafeArea(.horizontal)
             }
         }
@@ -116,7 +119,7 @@ struct VideoDetails: View {
         .onChange(of: sidebarQueue) { queue in
             if queue {
                 if currentPage == .queue {
-                    currentPage = .details
+                    currentPage = .info
                 }
             } else if video.isNil {
                 currentPage = .queue
@@ -131,7 +134,7 @@ struct VideoDetails: View {
             if video != nil {
                 Text(video!.title)
                     .onAppear {
-                        currentPage = .details
+                        currentPage = .info
                     }
                     .contextMenu {
                         Button {
@@ -239,15 +242,23 @@ struct VideoDetails: View {
     var pagePicker: some View {
         Picker("Page", selection: $currentPage) {
             if !video.isNil {
-                Text("Details").tag(Page.details)
-                Text("Related").tag(Page.related)
+                Text("Info").tag(Page.info)
+                if !sidebarQueue {
+                    Text("Related").tag(Page.related)
+                }
+                if CommentsModel.enabled {
+                    Text("Comments")
+                        .tag(Page.comments)
+                }
             }
-            Text("Queue").tag(Page.queue)
+            if !sidebarQueue {
+                Text("Queue").tag(Page.queue)
+            }
         }
         .labelsHidden()
         .pickerStyle(.segmented)
         .onDisappear {
-            currentPage = .details
+            currentPage = .info
         }
     }
 
@@ -297,19 +308,19 @@ struct VideoDetails: View {
                     Spacer()
 
                     if let views = video.viewsCount {
-                        videoDetail(label: "Views", value: views, symbol: "eye.fill")
+                        videoDetail(label: "Views", value: views, symbol: "eye")
                     }
 
                     if let likes = video.likesCount {
                         Divider()
 
-                        videoDetail(label: "Likes", value: likes, symbol: "hand.thumbsup.circle.fill")
+                        videoDetail(label: "Likes", value: likes, symbol: "hand.thumbsup")
                     }
 
                     if let dislikes = video.dislikesCount {
                         Divider()
 
-                        videoDetail(label: "Dislikes", value: dislikes, symbol: "hand.thumbsdown.circle.fill")
+                        videoDetail(label: "Dislikes", value: dislikes, symbol: "hand.thumbsdown")
                     }
 
                     Spacer()
@@ -378,7 +389,8 @@ struct VideoDetails: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.caption)
+                        .font(.system(size: 14))
+                        .lineSpacing(3)
                         .padding(.bottom, 4)
                     } else {
                         Text("No description")

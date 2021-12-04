@@ -31,6 +31,8 @@ protocol VideosAPI {
 
     func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
     func shareURL(_ item: ContentItem, frontendHost: String?, time: CMTime?) -> URL?
+
+    func comments(_ id: Video.ID, page: String?) -> Resource?
 }
 
 extension VideosAPI {

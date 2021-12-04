@@ -8,6 +8,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var accounts = AccountsModel()
+    @StateObject private var comments = CommentsModel()
     @StateObject private var instances = InstancesModel()
     @StateObject private var navigation = NavigationModel()
     @StateObject private var player = PlayerModel()
@@ -40,6 +41,7 @@ struct ContentView: View {
         .onAppear(perform: configure)
 
         .environmentObject(accounts)
+        .environmentObject(comments)
         .environmentObject(instances)
         .environmentObject(navigation)
         .environmentObject(player)
@@ -58,20 +60,6 @@ struct ContentView: View {
                     .environmentObject(navigation)
             }
         )
-        #if os(iOS)
-        .background(
-            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                videoPlayer
-            }
-        )
-        #elseif os(macOS)
-        .background(
-            EmptyView().sheet(isPresented: $player.presentingPlayer) {
-                videoPlayer
-                    .frame(minWidth: 1000, minHeight: 750)
-            }
-        )
-        #endif
         #if !os(tvOS)
         .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
         .onOpenURL(perform: handleOpenedURL)
@@ -98,17 +86,6 @@ struct ContentView: View {
         #endif
     }
 
-    private var videoPlayer: some View {
-        VideoPlayerView()
-            .environmentObject(accounts)
-            .environmentObject(instances)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(playlists)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
-    }
-
     func configure() {
         SiestaLog.Category.enabled = .common
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
@@ -128,14 +105,19 @@ struct ContentView: View {
             navigation.presentingWelcomeScreen = true
         }
 
-        player.accounts = accounts
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
 
+        comments.accounts = accounts
+        comments.player = player
+
         menu.accounts = accounts
         menu.navigation = navigation
         menu.player = player
+
+        player.accounts = accounts
+        player.comments = comments
 
         if !accounts.current.isNil {
             player.loadHistoryDetails()

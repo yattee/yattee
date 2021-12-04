@@ -3,13 +3,17 @@ import SwiftUI
 
 struct NowPlayingView: View {
     enum ViewSection: CaseIterable {
-        case nowPlaying, playingNext, playedPreviously, related
+        case nowPlaying, playingNext, playedPreviously, related, comments
     }
 
-    var sections = ViewSection.allCases
+    var sections = [ViewSection.nowPlaying, .playingNext, .playedPreviously, .related]
     var inInfoViewController = false
 
+    @State private var repliesID: Comment.ID?
+
+    @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.saveHistory) private var saveHistory
 
@@ -108,6 +112,14 @@ struct NowPlayingView: View {
                                     player.removeHistoryItems()
                                 }
                             }
+                        }
+                    }
+                }
+
+                if sections.contains(.comments) {
+                    Section {
+                        ForEach(comments.all) { comment in
+                            CommentView(comment: comment, repliesID: $repliesID)
                         }
                     }
                 }

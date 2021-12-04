@@ -4,6 +4,7 @@ import SwiftUI
 
 final class PlayerViewController: UIViewController {
     var playerLoaded = false
+    var commentsModel: CommentsModel!
     var navigationModel: NavigationModel!
     var playerModel: PlayerModel!
     var playerViewController = AVPlayerViewController()
@@ -45,6 +46,7 @@ final class PlayerViewController: UIViewController {
         #if os(tvOS)
             playerModel.avPlayerViewController = playerViewController
             playerViewController.customInfoViewControllers = [
+                infoViewController([.comments], title: "Comments"),
                 infoViewController([.related], title: "Related"),
                 infoViewController([.playingNext, .playedPreviously], title: "Playing Next")
             ]
@@ -62,6 +64,7 @@ final class PlayerViewController: UIViewController {
                 AnyView(
                     NowPlayingView(sections: sections, inInfoViewController: true)
                         .frame(maxHeight: 600)
+                        .environmentObject(commentsModel)
                         .environmentObject(playerModel)
                 )
             )

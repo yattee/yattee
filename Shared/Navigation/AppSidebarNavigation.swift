@@ -6,11 +6,19 @@ import SwiftUI
 
 struct AppSidebarNavigation: View {
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<CommentsModel> private var comments
+    @EnvironmentObject<InstancesModel> private var instances
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var playlists
+    @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
 
     @Default(.visibleSections) private var visibleSections
 
     #if os(iOS)
-        @EnvironmentObject<NavigationModel> private var navigation
         @State private var didApplyPrimaryViewWorkAround = false
     #endif
 
@@ -42,13 +50,48 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: sidebarMinWidth)
 
             VStack {
-                Image(systemName: "play.tv")
-                    .renderingMode(.original)
-                    .font(.system(size: 60))
-                    .foregroundColor(.accentColor)
+                PlayerControlsView {
+                    HStack(alignment: .center) {
+                        Spacer()
+                        Image(systemName: "play.tv")
+                            .renderingMode(.original)
+                            .font(.system(size: 60))
+                            .foregroundColor(.accentColor)
+                        Spacer()
+                    }
+                }
             }
         }
+        #if os(iOS)
+        .background(
+            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
+                videoPlayer
+                    .environment(\.navigationStyle, .sidebar)
+            }
+        )
+        #elseif os(macOS)
+        .background(
+            EmptyView().sheet(isPresented: $player.presentingPlayer) {
+                videoPlayer
+                    .frame(minWidth: 1000, minHeight: 750)
+                    .environment(\.navigationStyle, .sidebar)
+            }
+        )
+        #endif
         .environment(\.navigationStyle, .sidebar)
+    }
+
+    private var videoPlayer: some View {
+        VideoPlayerView()
+            .environmentObject(accounts)
+            .environmentObject(comments)
+            .environmentObject(instances)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(playlists)
+            .environmentObject(recents)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
     }
 
     var toolbarContent: some ToolbarContent {

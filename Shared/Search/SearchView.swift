@@ -42,7 +42,7 @@ struct SearchView: View {
         PlayerControlsView {
             #if os(iOS)
                 VStack {
-                    SearchTextField()
+                    SearchTextField(favoriteItem: $favoriteItem)
 
                     if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
                         SearchSuggestions()
@@ -92,15 +92,6 @@ struct SearchView: View {
                         }
                         .transaction { t in t.animation = .none }
                     }
-
-                    #if os(iOS)
-                        Spacer()
-
-                        FavoriteButton(item: favoriteItem)
-                            .id(favoriteItem?.id)
-
-                        Spacer()
-                    #endif
 
                     if accounts.app.supportsSearchFilters {
                         filtersMenu

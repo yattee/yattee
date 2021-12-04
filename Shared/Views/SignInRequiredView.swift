@@ -34,9 +34,9 @@ struct SignInRequiredView<Content: View>: View {
 
             Group {
                 if instances.isEmpty {
-                    Text("You need to create an instance and accounts\nto access **\(title)** section")
+                    Text("You need to create an instance and accounts\nto access \(title) section")
                 } else {
-                    Text("You need to select an account\nto access **\(title)** section")
+                    Text("You need to select an account\nto access \(title) section")
                 }
             }
             .multilineTextAlignment(.center)

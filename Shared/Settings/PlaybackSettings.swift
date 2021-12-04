@@ -57,7 +57,7 @@ struct PlaybackSettings: View {
             Text("Best available stream").tag(String?.none)
 
             ForEach(instances) { instance in
-                Text(instance.longDescription).tag(Optional(instance.id))
+                Text(instance.description).tag(Optional(instance.id))
             }
         }
         .labelsHidden()
