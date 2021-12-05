@@ -72,10 +72,12 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>) -> CommentsPage in
-            let comments = content.json.dictionaryValue["comments"]?.arrayValue.map { PipedAPI.extractComment(from: $0)! } ?? []
-            let nextPage = content.json.dictionaryValue["nextpage"]?.stringValue
+            let details = content.json.dictionaryValue
+            let comments = details["comments"]?.arrayValue.map { PipedAPI.extractComment(from: $0)! } ?? []
+            let nextPage = details["nextpage"]?.stringValue
+            let disabled = details["disabled"]?.boolValue ?? false
 
-            return CommentsPage(comments: comments, nextPage: nextPage)
+            return CommentsPage(comments: comments, nextPage: nextPage, disabled: disabled)
         }
 
         if account.token.isNil {

@@ -4,15 +4,26 @@ import SwiftyJSON
 
 final class CommentsModel: ObservableObject {
     @Published var all = [Comment]()
-    @Published var replies = [Comment]()
 
     @Published var nextPage: String?
     @Published var firstPage = true
 
-    @Published var loaded = false
+    @Published var loaded = true
+    @Published var disabled = false
+
+    @Published var replies = [Comment]()
+    @Published var repliesLoaded = false
 
     var accounts: AccountsModel!
     var player: PlayerModel!
+
+    var instance: Instance? {
+        InstancesModel.find(Defaults[.commentsInstanceID])
+    }
+
+    var api: VideosAPI? {
+        instance.isNil ? nil : PipedAPI(account: instance!.anonymousAccount)
+    }
 
     static var enabled: Bool {
         !Defaults[.commentsInstanceID].isNil && !Defaults[.commentsInstanceID]!.isEmpty
@@ -27,23 +38,23 @@ final class CommentsModel: ObservableObject {
             return
         }
 
-        loaded = false
-        clear()
+        reset()
 
-        guard let instance = InstancesModel.find(Defaults[.commentsInstanceID]),
-              !player.currentVideo.isNil
+        guard !instance.isNil,
+              !(player?.currentVideo.isNil ?? true)
         else {
             return
         }
 
         firstPage = page.isNil || page!.isEmpty
 
-        PipedAPI(account: instance.anonymousAccount).comments(player.currentVideo!.videoID, page: page)?
+        api?.comments(player.currentVideo!.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {
                     self?.all = page.comments
                     self?.nextPage = page.nextPage
+                    self?.disabled = page.disabled
                 }
             }
             .onCompletion { [weak self] _ in
@@ -61,19 +72,27 @@ final class CommentsModel: ObservableObject {
         }
 
         replies = []
+        repliesLoaded = false
 
-        accounts.api.comments(player.currentVideo!.videoID, page: page)?.load().onSuccess { response in
-            if let page: CommentsPage = response.typedContent() {
-                self.replies = page.comments
+        api?.comments(player.currentVideo!.videoID, page: page)?
+            .load()
+            .onSuccess { [weak self] response in
+                if let page: CommentsPage = response.typedContent() {
+                    self?.replies = page.comments
+                }
             }
-        }
+            .onCompletion { [weak self] _ in
+                self?.repliesLoaded = true
+            }
     }
 
-    func clear() {
+    func reset() {
         all = []
-        replies = []
+        disabled = false
         firstPage = true
         nextPage = nil
         loaded = false
+        replies = []
+        repliesLoaded = false
     }
 }

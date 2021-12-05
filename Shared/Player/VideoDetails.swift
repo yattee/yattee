@@ -141,6 +141,8 @@ struct VideoDetails: View {
                             player.closeCurrentItem()
                             if !sidebarQueue {
                                 currentPage = .queue
+                            } else {
+                                currentPage = .info
                             }
                         } label: {
                             Label("Close Video", systemImage: "xmark.circle")

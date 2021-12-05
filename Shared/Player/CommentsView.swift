@@ -7,41 +7,73 @@ struct CommentsView: View {
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading) {
-                let last = comments.all.last
-                ForEach(comments.all) { comment in
-                    CommentView(comment: comment, repliesID: $repliesID)
+        Group {
+            if comments.disabled {
+                Text("Comments are disabled for this video")
+                    .foregroundColor(.secondary)
+            } else if comments.loaded && comments.all.isEmpty {
+                Text("No comments")
+                    .foregroundColor(.secondary)
+            } else if !comments.loaded {
+                progressView
+            } else {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        let last = comments.all.last
+                        ForEach(comments.all) { comment in
+                            CommentView(comment: comment, repliesID: $repliesID)
 
-                    if comment != last {
-                        Divider()
-                            .padding(.vertical, 5)
+                            if comment != last {
+                                Divider()
+                                    .padding(.vertical, 5)
+                            }
+                        }
+
+                        HStack {
+                            if comments.nextPageAvailable {
+                                Button {
+                                    repliesID = nil
+                                    comments.loadNextPage()
+                                } label: {
+                                    Label("Show more", systemImage: "arrow.turn.down.right")
+                                }
+                            }
+
+                            if !comments.firstPage {
+                                Button {
+                                    repliesID = nil
+                                    comments.load(page: nil)
+                                } label: {
+                                    Label("Show first", systemImage: "arrow.turn.down.left")
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 8)
+                        .foregroundColor(.secondary)
                     }
                 }
-
-                HStack {
-                    if comments.nextPageAvailable {
-                        Button {
-                            comments.loadNextPage()
-                        } label: {
-                            Label("Show more", systemImage: "arrow.turn.down.right")
-                        }
-                    }
-
-                    if !comments.firstPage {
-                        Button {
-                            comments.load(page: nil)
-                        } label: {
-                            Label("Show first", systemImage: "arrow.turn.down.left")
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-                .padding(.vertical, 5)
-                .foregroundColor(.secondary)
             }
         }
         .padding(.horizontal)
+        .onAppear {
+            if !comments.loaded {
+                comments.load()
+            }
+        }
+    }
+
+    private var progressView: some View {
+        VStack {
+            Spacer()
+
+            HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+            Spacer()
+        }
     }
 }
 

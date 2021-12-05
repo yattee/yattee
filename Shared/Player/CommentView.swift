@@ -40,7 +40,7 @@ struct CommentView: View {
 
                                 Spacer()
 
-                                VStack(spacing: 5) {
+                                VStack(alignment: .trailing, spacing: 8) {
                                     likes
                                     statusIcons
                                 }
@@ -65,7 +65,14 @@ struct CommentView: View {
                 commentText
 
                 if comment.hasReplies {
-                    repliesButton
+                    HStack(spacing: repliesButtonStackSpacing) {
+                        repliesButton
+
+                        ProgressView()
+                            .scaleEffect(progressViewScale, anchor: .center)
+                            .opacity(repliesID == comment.id && !comments.repliesLoaded ? 1 : 0)
+                            .frame(maxHeight: 0)
+                    }
 
                     if comment.id == repliesID {
                         repliesList
@@ -148,20 +155,37 @@ struct CommentView: View {
             comments.loadReplies(page: comment.repliesPage!)
         } label: {
             HStack(spacing: 5) {
-                Image(systemName: self.repliesID == comment.id ? "arrow.turn.left.up" : "arrow.turn.right.down")
+                Image(systemName: repliesID == comment.id ? "arrow.turn.left.up" : "arrow.turn.right.down")
                 Text("Replies")
             }
             #if os(tvOS)
             .padding(10)
             #endif
         }
-
         .buttonStyle(.plain)
-        .padding(.top, 2)
+        .padding(.vertical, 2)
         #if os(tvOS)
             .padding(.leading, 5)
         #else
             .foregroundColor(.secondary)
+        #endif
+    }
+
+    private var repliesButtonStackSpacing: Double {
+        #if os(tvOS)
+            24
+        #elseif os(iOS)
+            4
+        #else
+            2
+        #endif
+    }
+
+    private var progressViewScale: Double {
+        #if os(macOS)
+            0.4
+        #else
+            0.8
         #endif
     }
 
@@ -179,8 +203,8 @@ struct CommentView: View {
                         .padding(.vertical, 5)
                 }
             }
-            .padding(.leading, 22)
         }
+        .padding(.leading, 22)
     }
 
     private var commentText: some View {
@@ -217,5 +241,15 @@ struct CommentView: View {
                 navigation.tabSelection = .recentlyOpened(recent.tag)
             }
         }
+    }
+}
+
+struct CommentView_Previews: PreviewProvider {
+    static var fixture: Comment {
+        Comment.fixture
+    }
+
+    static var previews: some View {
+        CommentView(comment: fixture, repliesID: .constant(fixture.id))
     }
 }
