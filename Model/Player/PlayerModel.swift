@@ -481,16 +481,19 @@ final class PlayerModel: ObservableObject {
 
     fileprivate func updateNowPlayingInfo() {
         let duration: Int? = currentItem.video.live ? nil : Int(currentItem.videoDuration ?? 0)
-        let nowPlayingInfo: [String: AnyObject] = [
+        var nowPlayingInfo: [String: AnyObject] = [
             MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
             MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
-            MPMediaItemPropertyArtwork: currentArtwork as AnyObject,
             MPMediaItemPropertyPlaybackDuration: duration as AnyObject,
             MPNowPlayingInfoPropertyIsLiveStream: currentItem.video.live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime().seconds as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
         ]
+
+        if !currentArtwork.isNil {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
+        }
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
