@@ -27,7 +27,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         self.account = account
 
         validInstance = false
-        signedIn = false
+        signedIn = !account.anonymous
 
         configure()
     }
