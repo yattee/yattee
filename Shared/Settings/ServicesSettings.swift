@@ -59,7 +59,7 @@ struct ServicesSettings: View {
 
     private var commentsInstancePicker: some View {
         Picker("Comments", selection: $commentsInstanceID) {
-            Text("Disabled").tag(String?.none)
+            Text("Disabled").tag(Optional(""))
 
             ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
                 Text(instance.description).tag(Optional(instance.id))

@@ -15,7 +15,7 @@ final class CommentsModel: ObservableObject {
     var player: PlayerModel!
 
     static var enabled: Bool {
-        !Defaults[.commentsInstanceID].isNil
+        !Defaults[.commentsInstanceID].isNil && !Defaults[.commentsInstanceID]!.isEmpty
     }
 
     var nextPageAvailable: Bool {
