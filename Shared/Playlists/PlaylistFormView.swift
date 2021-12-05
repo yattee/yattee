@@ -10,6 +10,7 @@ struct PlaylistFormView: View {
     @State private var valid = false
     @State private var showingDeleteConfirmation = false
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -77,7 +78,7 @@ struct PlaylistFormView: View {
                     .frame(maxWidth: 1000)
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                .background(Color.tertiaryBackground)
+                .background(Color.background(scheme: colorScheme))
             #endif
         }
         .onChange(of: name) { _ in validate() }

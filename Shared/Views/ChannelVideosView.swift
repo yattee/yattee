@@ -9,6 +9,7 @@ struct ChannelVideosView: View {
 
     @StateObject private var store = Store<Channel>()
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
 
@@ -105,8 +106,6 @@ struct ChannelVideosView: View {
                     }
                 }
             }
-        #else
-                .background(Color.tertiaryBackground)
         #endif
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
@@ -126,6 +125,9 @@ struct ChannelVideosView: View {
         return Group {
             if #available(macOS 12.0, *) {
                 content
+                #if os(tvOS)
+                .background(Color.background(scheme: colorScheme))
+                #endif
                 #if !os(iOS)
                 .focusScope(focusNamespace)
                 #endif

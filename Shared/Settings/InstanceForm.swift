@@ -13,6 +13,7 @@ struct InstanceForm: View {
     @State private var validationError: String?
     @State private var validationDebounce = Debounce()
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
@@ -32,7 +33,7 @@ struct InstanceForm: View {
             .padding(.vertical)
         #elseif os(tvOS)
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .background(Color.tertiaryBackground)
+            .background(Color.background(scheme: colorScheme))
         #else
             .frame(width: 400, height: 190)
         #endif

@@ -9,6 +9,8 @@ struct ChannelPlaylistView: View {
 
     @StateObject private var store = Store<ChannelPlaylist>()
 
+    @Environment(\.colorScheme) private var colorScheme
+
     #if os(iOS)
         @Environment(\.inNavigationView) private var inNavigationView
     #endif
@@ -83,7 +85,7 @@ struct ChannelPlaylistView: View {
         .navigationTitle(playlist.title)
 
         #else
-        .background(Color.tertiaryBackground)
+        .background(Color.background(scheme: colorScheme))
         #endif
     }
 

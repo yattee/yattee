@@ -106,7 +106,9 @@ struct PlayerControlsView<Content: View>: View {
                     .background(Material.ultraThinMaterial)
             } else {
                 controls
-                    .background(Color.tertiaryBackground)
+                #if !os(tvOS)
+                .background(Color.tertiaryBackground)
+                #endif
             }
         }
     }

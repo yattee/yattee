@@ -9,6 +9,8 @@ struct SettingsView: View {
         }
     #endif
 
+    @Environment(\.colorScheme) private var colorScheme
+
     #if os(iOS)
         @Environment(\.presentationMode) private var presentationMode
     #endif
@@ -102,7 +104,7 @@ struct SettingsView: View {
                 InstanceForm(savedInstanceID: $savedFormInstanceID)
             }
             #if os(tvOS)
-            .background(Color.black)
+            .background(Color.background(scheme: colorScheme))
             #endif
         #endif
     }

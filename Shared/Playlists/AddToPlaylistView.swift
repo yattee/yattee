@@ -7,6 +7,7 @@ struct AddToPlaylistView: View {
 
     @State private var selectedPlaylistID: Playlist.ID = ""
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject<PlaylistsModel> private var model
 
@@ -37,7 +38,7 @@ struct AddToPlaylistView: View {
         .padding(.vertical)
         #elseif os(tvOS)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .background(Color.tertiaryBackground)
+        .background(Color.background(scheme: colorScheme))
         #else
         .padding(.vertical)
         #endif

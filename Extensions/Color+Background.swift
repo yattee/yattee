@@ -10,8 +10,8 @@ extension Color {
         static let secondaryBackground = Color(UIColor.secondarySystemBackground)
         static let tertiaryBackground = Color(UIColor.tertiarySystemBackground)
     #else
-        static let background = Color.black
-        static let secondaryBackground = Color.black
-        static let tertiaryBackground = Color.black
+        static func background(scheme: ColorScheme) -> Color {
+            scheme == .dark ? .black : .init(white: 0.8)
+        }
     #endif
 }
