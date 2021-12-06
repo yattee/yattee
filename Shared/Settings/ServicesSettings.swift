@@ -6,9 +6,17 @@ struct ServicesSettings: View {
     @Default(.sponsorBlockCategories) private var sponsorBlockCategories
     @Default(.commentsInstanceID) private var commentsInstanceID
 
+    #if !os(tvOS)
+        @Default(.commentsPlacement) private var commentsPlacement
+    #endif
+
     var body: some View {
         Section(header: SettingsHeader(text: "Comments")) {
             commentsInstancePicker
+            #if !os(tvOS)
+                commentsPlacementPicker
+                    .disabled(!CommentsModel.enabled)
+            #endif
         }
 
         Section(header: SettingsHeader(text: "SponsorBlock API")) {
@@ -58,7 +66,7 @@ struct ServicesSettings: View {
     }
 
     private var commentsInstancePicker: some View {
-        Picker("Comments", selection: $commentsInstanceID) {
+        Picker("Source", selection: $commentsInstanceID) {
             Text("Disabled").tag(Optional(""))
 
             ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
@@ -72,6 +80,19 @@ struct ServicesSettings: View {
             .pickerStyle(.inline)
         #endif
     }
+
+    #if !os(tvOS)
+        private var commentsPlacementPicker: some View {
+            Picker("Placement", selection: $commentsPlacement) {
+                Text("Below video description").tag(CommentsPlacement.info)
+                Text("Separate tab").tag(CommentsPlacement.separate)
+            }
+            .labelsHidden()
+            #if os(iOS)
+                .pickerStyle(.automatic)
+            #endif
+        }
+    #endif
 
     func toggleCategory(_ category: String, value: Bool) {
         if let index = sponsorBlockCategories.firstIndex(where: { $0 == category }), !value {

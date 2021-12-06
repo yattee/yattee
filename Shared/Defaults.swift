@@ -34,6 +34,9 @@ extension Defaults.Keys {
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
+    #if !os(tvOS)
+        static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
+    #endif
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 
@@ -129,3 +132,9 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
         lhs.sortOrder < rhs.sortOrder
     }
 }
+
+#if !os(tvOS)
+    enum CommentsPlacement: String, CaseIterable, Defaults.Serializable {
+        case info, separate
+    }
+#endif

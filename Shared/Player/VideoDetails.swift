@@ -65,7 +65,7 @@ struct VideoDetails: View {
                 }
                 .padding(.horizontal)
 
-                if CommentsModel.enabled {
+                if CommentsModel.enabled, CommentsModel.placement == .separate {
                     pagePicker
                         .padding(.horizontal)
                 }
@@ -245,12 +245,12 @@ struct VideoDetails: View {
         Picker("Page", selection: $currentPage) {
             if !video.isNil {
                 Text("Info").tag(Page.info)
-                if !sidebarQueue {
-                    Text("Related").tag(Page.related)
-                }
-                if CommentsModel.enabled {
+                if CommentsModel.enabled, CommentsModel.placement == .separate {
                     Text("Comments")
                         .tag(Page.comments)
+                }
+                if !sidebarQueue {
+                    Text("Related").tag(Page.related)
                 }
             }
             if !sidebarQueue {
@@ -366,65 +366,81 @@ struct VideoDetails: View {
 
     var detailsPage: some View {
         Group {
-            if let video = player.currentItem?.video {
-                Group {
-                    HStack {
-                        publishedDateSection
-                        Spacer()
+            Group {
+                if let video = player.currentItem?.video {
+                    Group {
+                        HStack {
+                            publishedDateSection
+                            Spacer()
+                        }
+
+                        Divider()
+
+                        countsSection
                     }
 
                     Divider()
 
-                    countsSection
-                }
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 10) {
-                    if let description = video.description {
-                        Group {
-                            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                                Text(description)
-                                    .textSelection(.enabled)
-                            } else {
-                                Text(description)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.system(size: 14))
-                        .lineSpacing(3)
-                        .padding(.bottom, 4)
-                    } else {
-                        Text("No description")
-                            .foregroundColor(.secondary)
-                    }
-
-                    if showKeywords {
-                        ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
-                            HStack {
-                                ForEach(video.keywords, id: \.self) { keyword in
-                                    HStack(alignment: .center, spacing: 0) {
-                                        Text("#")
-                                            .font(.system(size: 11).bold())
-
-                                        Text(keyword)
-                                            .frame(maxWidth: 500)
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                    .padding(.vertical, 4)
-                                    .padding(.horizontal, 8)
-                                    .background(Color("VideoDetailLikesSymbolColor"))
-                                    .mask(RoundedRectangle(cornerRadius: 3))
+                    VStack(alignment: .leading, spacing: 10) {
+                        if let description = video.description {
+                            Group {
+                                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                                    Text(description)
+                                        .textSelection(.enabled)
+                                } else {
+                                    Text(description)
                                 }
                             }
-                            .padding(.bottom, 10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .font(.system(size: 14))
+                            .lineSpacing(3)
+                        } else {
+                            Text("No description")
+                                .foregroundColor(.secondary)
+                        }
+
+                        if showKeywords {
+                            ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
+                                HStack {
+                                    ForEach(video.keywords, id: \.self) { keyword in
+                                        HStack(alignment: .center, spacing: 0) {
+                                            Text("#")
+                                                .font(.system(size: 11).bold())
+
+                                            Text(keyword)
+                                                .frame(maxWidth: 500)
+                                        }
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 4)
+                                        .padding(.horizontal, 8)
+                                        .background(Color("VideoDetailLikesSymbolColor"))
+                                        .mask(RoundedRectangle(cornerRadius: 3))
+                                    }
+                                }
+                                .padding(.bottom, 10)
+                            }
                         }
                     }
+                }
+
+                if !video.isNil, CommentsModel.placement == .info {
+                    Divider()
+                    #if os(macOS)
+                        .padding(.bottom, 20)
+                    #else
+                        .padding(.vertical, 10)
+                    #endif
+                }
+            }
+            .padding(.horizontal)
+
+            Group {
+                if !video.isNil, CommentsModel.placement == .info {
+                    CommentsView()
                 }
             }
         }
-        .padding(.horizontal)
     }
 
     func videoDetail(label: String, value: String, symbol: String) -> some View {

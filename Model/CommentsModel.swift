@@ -29,6 +29,12 @@ final class CommentsModel: ObservableObject {
         !Defaults[.commentsInstanceID].isNil && !Defaults[.commentsInstanceID]!.isEmpty
     }
 
+    #if !os(tvOS)
+        static var placement: CommentsPlacement {
+            Defaults[.commentsPlacement]
+        }
+    #endif
+
     var nextPageAvailable: Bool {
         !(nextPage?.isEmpty ?? true)
     }
