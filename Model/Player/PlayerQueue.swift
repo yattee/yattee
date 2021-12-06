@@ -29,6 +29,7 @@ extension PlayerModel {
     }
 
     func playNow(_ video: Video, at time: TimeInterval? = nil) {
+        player.replaceCurrentItem(with: nil)
         addCurrentItemToHistory()
 
         enqueueVideo(video, prepending: true) { _, item in
@@ -92,6 +93,7 @@ extension PlayerModel {
     }
 
     func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
+        player.replaceCurrentItem(with: nil)
         addCurrentItemToHistory()
 
         remove(newItem)
