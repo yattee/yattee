@@ -37,6 +37,7 @@ struct SearchTextField: View {
                     }
                 }
                 #if os(macOS)
+                .frame(maxWidth: 190)
                 .textFieldStyle(.plain)
                 #else
                 .textFieldStyle(.roundedBorder)
@@ -52,6 +53,11 @@ struct SearchTextField: View {
                             .padding(.trailing)
                     #endif
                     clearButton
+                } else {
+                    #if os(macOS)
+                        clearButton
+                            .opacity(0)
+                    #endif
                 }
             }
         }
