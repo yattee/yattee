@@ -66,6 +66,10 @@ struct FavoriteItemView: View {
                 #endif
             }
         }
+        .onChange(of: accounts.current) { _ in
+            resource?.addObserver(store)
+            resource?.load()
+        }
     }
 
     private var isVisible: Bool {
