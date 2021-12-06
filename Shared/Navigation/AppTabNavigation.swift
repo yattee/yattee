@@ -67,6 +67,7 @@ struct AppTabNavigation: View {
                     NavigationView {
                         ChannelPlaylistView(playlist: playlist)
                             .environment(\.inNavigationView, true)
+                            .environmentObject(subscriptions)
                             .background(playerNavigationLink)
                     }
                 }
