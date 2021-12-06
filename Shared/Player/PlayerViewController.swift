@@ -45,11 +45,16 @@ final class PlayerViewController: UIViewController {
 
         #if os(tvOS)
             playerModel.avPlayerViewController = playerViewController
-            playerViewController.customInfoViewControllers = [
-                infoViewController([.comments], title: "Comments"),
+            var infoViewControllers = [UIHostingController<AnyView>]()
+            if CommentsModel.enabled {
+                infoViewControllers.append(infoViewController([.comments], title: "Comments"))
+            }
+            infoViewControllers.append(contentsOf: [
                 infoViewController([.related], title: "Related"),
                 infoViewController([.playingNext, .playedPreviously], title: "Playing Next")
-            ]
+            ])
+
+            playerViewController.customInfoViewControllers = infoViewControllers
         #else
             embedViewController()
         #endif
