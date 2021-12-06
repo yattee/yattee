@@ -14,8 +14,9 @@ struct SearchSuggestions: View {
 
                 recents.addQuery(state.queryText)
             } label: {
-                HStack(spacing: 5) {
-                    Label(state.queryText, systemImage: "magnifyingglass")
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                    Text(state.queryText)
                         .lineLimit(1)
                 }
             }
@@ -27,15 +28,19 @@ struct SearchSuggestions: View {
                 Button {
                     state.queryText = suggestion
                 } label: {
-                    HStack(spacing: 0) {
-                        Label(state.queryText, systemImage: "arrow.up.left.circle")
-                            .lineLimit(1)
-                            .layoutPriority(2)
+                    HStack {
+                        Image(systemName: "arrow.up.left.circle")
                             .foregroundColor(.secondary)
+                        HStack(spacing: 0) {
+                            Text(state.suggestionsText)
+                                .lineLimit(1)
+                                .layoutPriority(2)
+                                .foregroundColor(.secondary)
 
-                        Text(querySuffix(suggestion))
-                            .lineLimit(1)
-                            .layoutPriority(1)
+                            Text(querySuffix(suggestion))
+                                .lineLimit(1)
+                                .layoutPriority(1)
+                        }
                     }
                 }
                 #if os(macOS)
@@ -55,7 +60,7 @@ struct SearchSuggestions: View {
     }
 
     private func querySuffix(_ suggestion: String) -> String {
-        suggestion.replacingFirstOccurrence(of: state.queryText.lowercased(), with: "")
+        suggestion.replacingFirstOccurrence(of: state.suggestionsText.lowercased(), with: "")
     }
 
     #if os(macOS)

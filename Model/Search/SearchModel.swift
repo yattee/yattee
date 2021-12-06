@@ -9,6 +9,7 @@ final class SearchModel: ObservableObject {
     @Published var query = SearchQuery()
     @Published var queryText = ""
     @Published var querySuggestions = Store<[String]>()
+    @Published var suggestionsText = ""
 
     @Published var fieldIsFocused = false
 
@@ -88,7 +89,7 @@ final class SearchModel: ObservableObject {
 
         suggestionsDebounceTimer?.invalidate()
 
-        suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
+        suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { _ in
             let resource = self.accounts.api.searchSuggestions(query: query)
 
             resource.addObserver(self.querySuggestions)
@@ -99,9 +100,11 @@ final class SearchModel: ObservableObject {
                     if let suggestions: [String] = response.typedContent() {
                         self.querySuggestions = Store<[String]>(suggestions)
                     }
+                    self.suggestionsText = query
                 }
             } else {
                 self.querySuggestions = Store<[String]>(self.querySuggestions.collection)
+                self.suggestionsText = query
             }
         }
     }
