@@ -1,6 +1,6 @@
 ![Yattee Banner](https://r.yattee.stream/icons/yattee-banner.png)
 
-Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped) instances built for iOS, tvOS and macOS.
+Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped)  built for iOS, tvOS and macOS.
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
@@ -9,7 +9,7 @@ Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](ht
 
 ![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
 
-## Major Features
+## Features
 * Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/)
 * Multiple instances and accounts, fast switching
 * [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
