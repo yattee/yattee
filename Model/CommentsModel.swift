@@ -12,6 +12,7 @@ final class CommentsModel: ObservableObject {
     @Published var disabled = false
 
     @Published var replies = [Comment]()
+    @Published var repliesPageID: String?
     @Published var repliesLoaded = false
 
     var accounts: AccountsModel!
@@ -77,7 +78,12 @@ final class CommentsModel: ObservableObject {
             return
         }
 
+        if page == repliesPageID {
+            return
+        }
+
         replies = []
+        repliesPageID = page
         repliesLoaded = false
 
         api?.comments(player.currentVideo!.videoID, page: page)?

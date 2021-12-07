@@ -144,10 +144,6 @@ struct CommentView: View {
         Button {
             repliesID = repliesID == comment.id ? nil : comment.id
 
-            if repliesID.isNil {
-                comments.replies = []
-            }
-
             guard !repliesID.isNil, !comment.repliesPage.isNil else {
                 return
             }
