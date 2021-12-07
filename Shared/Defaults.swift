@@ -51,6 +51,10 @@ extension Defaults.Keys {
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
     static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
+
+    #if os(macOS)
+        static let enableBetaChannel = Key<Bool>("enableBetaChannel", default: false)
+    #endif
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

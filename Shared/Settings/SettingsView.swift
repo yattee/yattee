@@ -5,7 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case instances, browsing, playback, services
+            case instances, browsing, playback, services, updates
         }
     #endif
 
@@ -57,6 +57,14 @@ struct SettingsView: View {
                     Label("Services", systemImage: "puzzlepiece")
                 }
                 .tag(Tabs.services)
+
+                Form {
+                    UpdatesSettings()
+                }
+                .tabItem {
+                    Label("Updates", systemImage: "gearshape.2")
+                }
+                .tag(Tabs.updates)
             }
             .padding(20)
             .frame(width: 400, height: 380)

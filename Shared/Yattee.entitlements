@@ -4,6 +4,11 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)-spki</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)-spks</string>
+	</array>
 	<key>com.apple.security.network.client</key>
 	<true/>
 </dict>

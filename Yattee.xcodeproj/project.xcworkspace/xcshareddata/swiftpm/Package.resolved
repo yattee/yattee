@@ -92,6 +92,15 @@
         }
       },
       {
+        "package": "Sparkle",
+        "repositoryURL": "https://github.com/sparkle-project/Sparkle",
+        "state": {
+          "branch": "2.x",
+          "revision": "831e9b4eb7e871a9c072469fb14049614fc92810",
+          "version": null
+        }
+      },
+      {
         "package": "swift-log",
         "repositoryURL": "https://github.com/apple/swift-log.git",
         "state": {
