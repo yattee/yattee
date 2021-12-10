@@ -1,6 +1,7 @@
-![Yattee Banner](https://r.yattee.stream/icons/yattee-banner.png)
-
-Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](https://github.com/TeamPiped/Piped)  built for iOS, tvOS and macOS.
+<div align="center">
+  <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
+  <h1>Yattee</h1>
+  <p>Videos browser and player for <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a> (alternative, privacy-friendly YouTube frontends)<br />built for iOS, tvOS and macOS.</p>
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
@@ -8,16 +9,15 @@ Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](ht
 [![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#yattee:matrix.org)
 
 ![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
+</div>
 
 ## Features
-* Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/)
+* Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/) with customization settings
 * Multiple instances and accounts, fast switching
 * [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 * Player queue and history
 * Fullscreen playback, Picture in Picture and AirPlay support
 * Stream quality selection
-* Favorites: customizable section of channels, playlists, trending, searches and other views
-* `yattee://` URL Scheme for integrations
 
 ### Availability
 | Feature  | Invidious | Piped |
@@ -38,11 +38,11 @@ Video player for [Invidious](https://github.com/iv-org/invidious) and [Piped](ht
 You can browse and use accounts from one app and play videos with another (for example: use Invidious account for subscriptions and use Piped as playback source). Comments can be displayed from Piped even when Invidious is used for browsing/playing.
 
 ## Documentation
-* [Installation Instructions](https://github.com/yattee/yattee/wiki/Installation-instructions)
-* [Integrations](https://github.com/yattee/yattee/wiki/Integrations)
+* [Installation Instructions](https://github.com/yattee/yattee/wiki/Installation-Instructions)
+* [FAQ](https://github.com/yattee/yattee/wiki)
 * [Screenshots Gallery](https://github.com/yattee/yattee/wiki/Screenshots-Gallery)
 * [Tips](https://github.com/yattee/yattee/wiki/Tips)
-* [FAQ](https://github.com/yattee/yattee/wiki)
+* [Integrations](https://github.com/yattee/yattee/wiki/Integrations)
 * [Donations](https://github.com/yattee/yattee/wiki/Donations)
 
 ## Contributing
