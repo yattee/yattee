@@ -25,6 +25,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func setAccount(_ account: Account) {
         self.account = account
+        signedIn = false
 
         validInstance = false
         signedIn = !account.anonymous
