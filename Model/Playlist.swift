@@ -22,11 +22,12 @@ struct Playlist: Identifiable, Equatable, Hashable {
 
     var videos = [Video]()
 
-    init(id: String, title: String, visibility: Visibility, updated: TimeInterval) {
+    init(id: String, title: String, visibility: Visibility, updated: TimeInterval, videos: [Video] = []) {
         self.id = id
         self.title = title
         self.visibility = visibility
         self.updated = updated
+        self.videos = videos
     }
 
     init(_ json: JSON) {
@@ -34,7 +35,6 @@ struct Playlist: Identifiable, Equatable, Hashable {
         title = json["title"].stringValue
         visibility = json["isListed"].boolValue ? .public : .private
         updated = json["updated"].doubleValue
-        videos = json["videos"].arrayValue.map { InvidiousAPI.extractVideo(from: $0) }
     }
 
     static func == (lhs: Playlist, rhs: Playlist) -> Bool {
