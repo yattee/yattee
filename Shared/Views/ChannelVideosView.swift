@@ -160,6 +160,17 @@ struct ChannelVideosView: View {
                 }
             }
         }
+        .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
+            Alert(
+                title: Text(
+                    "Are you sure you want to unsubscribe from \(channel.name)?"
+                ),
+                primaryButton: .destructive(Text("Unsubscribe")) {
+                    subscriptions.unsubscribe(channel.id)
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     private var contentItem: ContentItem {
