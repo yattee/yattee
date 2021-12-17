@@ -215,7 +215,29 @@ final class PlayerModel: ObservableObject {
 
             if self.isAutoplaying(playerItem!) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                    self?.play()
+                    guard let self = self else {
+                        return
+                    }
+
+                    if let segment = self.sponsorBlock.segments.first,
+                       segment.start < 3,
+                       self.lastSkipped.isNil
+                    {
+                        self.player.seek(
+                            to: segment.endTime,
+                            toleranceBefore: .secondsInDefaultTimescale(1),
+                            toleranceAfter: .zero
+                        ) { finished in
+                            guard finished else {
+                                return
+                            }
+
+                            self.lastSkipped = segment
+                            self.play()
+                        }
+                    } else {
+                        self.play()
+                    }
                 }
             }
         }
