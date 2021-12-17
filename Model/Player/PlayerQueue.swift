@@ -51,7 +51,8 @@ extension PlayerModel {
             currentItem.video = video!
         }
 
-        savedTime = currentItem.playbackTime
+        preservedTime = currentItem.playbackTime
+        restoreLoadedChannel()
 
         loadAvailableStreams(currentVideo!) { streams in
             guard let stream = self.preferredStream(streams) else {
@@ -126,7 +127,7 @@ extension PlayerModel {
     }
 
     func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        player.currentItem == item && presentingPlayer
+        player.currentItem == item && (presentingPlayer || playerNavigationLinkActive || playingInPictureInPicture)
     }
 
     @discardableResult func enqueueVideo(

@@ -33,14 +33,16 @@ final class PlayerModel: ObservableObject {
     @Published var currentItem: PlayerQueueItem! { didSet { Defaults[.lastPlayed] = currentItem } }
     @Published var history = [PlayerQueueItem]() { didSet { Defaults[.history] = history } }
 
-    @Published var savedTime: CMTime?
+    @Published var preservedTime: CMTime?
 
-    @Published var playerNavigationLinkActive = false
+    @Published var playerNavigationLinkActive = false { didSet { pauseOnChannelPlayerDismiss() } }
 
     @Published var sponsorBlock = SponsorBlockAPI()
     @Published var segmentRestorationTime: CMTime?
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
     @Published var restoredSegments = [Segment]()
+
+    @Published var channelWithDetails: Channel?
 
     var accounts: AccountsModel
     var comments: CommentsModel
@@ -177,6 +179,14 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    private func pauseOnChannelPlayerDismiss() {
+        if !playingInPictureInPicture, !playerNavigationLinkActive {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.pause()
+            }
+        }
+    }
+
     private func insertPlayerItem(
         _ stream: Stream,
         for video: Video,
@@ -212,18 +222,18 @@ final class PlayerModel: ObservableObject {
 
         let replaceItemAndSeek = {
             self.player.replaceCurrentItem(with: playerItem)
-            self.seekToSavedTime { finished in
+            self.seekToPreservedTime { finished in
                 guard finished else {
                     return
                 }
-                self.savedTime = nil
+                self.preservedTime = nil
 
                 startPlaying()
             }
         }
 
         if preservingTime {
-            if savedTime.isNil {
+            if preservedTime.isNil {
                 saveTime {
                     replaceItemAndSeek()
                     startPlaying()
@@ -394,13 +404,13 @@ final class PlayerModel: ObservableObject {
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.savedTime = currentTime
+            self?.preservedTime = currentTime
             completionHandler()
         }
     }
 
-    private func seekToSavedTime(completionHandler: @escaping (Bool) -> Void = { _ in }) {
-        guard let time = savedTime else {
+    private func seekToPreservedTime(completionHandler: @escaping (Bool) -> Void = { _ in }) {
+        guard let time = preservedTime else {
             return
         }
 
@@ -526,6 +536,36 @@ final class PlayerModel: ObservableObject {
         }
 
         currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
+    }
+
+    func loadCurrentItemChannelDetails() {
+        guard let video = currentVideo,
+              !video.channel.detailsLoaded
+        else {
+            return
+        }
+
+        if restoreLoadedChannel() {
+            return
+        }
+
+        accounts.api.channel(video.channel.id).load().onSuccess { [weak self] response in
+            if let channel: Channel = response.typedContent() {
+                self?.channelWithDetails = channel
+                withAnimation {
+                    self?.currentItem.video.channel = channel
+                }
+            }
+        }
+    }
+
+    @discardableResult func restoreLoadedChannel() -> Bool {
+        if !currentVideo.isNil, channelWithDetails?.id == currentVideo!.channel.id {
+            currentItem.video.channel = channelWithDetails!
+            return true
+        }
+
+        return false
     }
 
     func rateLabel(_ rate: Float) -> String {

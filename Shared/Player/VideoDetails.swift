@@ -1,5 +1,6 @@
 import Defaults
 import Foundation
+import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoDetails: View {
@@ -20,11 +21,15 @@ struct VideoDetails: View {
 
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @Default(.showChannelSubscribers) private var showChannelSubscribers
     @Default(.showKeywords) private var showKeywords
 
     init(
@@ -65,7 +70,9 @@ struct VideoDetails: View {
                 }
                 .padding(.horizontal)
 
-                if CommentsModel.enabled, CommentsModel.placement == .separate {
+                if !sidebarQueue ||
+                    (CommentsModel.enabled && CommentsModel.placement == .separate)
+                {
                     pagePicker
                         .padding(.horizontal)
                 }
@@ -178,21 +185,52 @@ struct VideoDetails: View {
         Group {
             if video != nil {
                 HStack(alignment: .center) {
-                    HStack(spacing: 4) {
-                        if subscribed {
-                            Image(systemName: "star.circle.fill")
-                        }
-                        VStack(alignment: .leading) {
-                            Text(video!.channel.name)
-                                .font(.system(size: 13))
-                                .bold()
-                            if let subscribers = video!.channel.subscriptionsString {
-                                Text("\(subscribers) subscribers")
+                    HStack(spacing: 10) {
+                        Group {
+                            ZStack(alignment: .bottomTrailing) {
+                                authorAvatar
+
+                                if subscribed {
+                                    Image(systemName: "star.circle.fill")
+                                        .background(Color.background)
+                                        .clipShape(Circle())
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            VStack(alignment: .leading) {
+                                Text(video!.channel.name)
+                                    .font(.system(size: 14))
+                                    .bold()
+
+                                if showChannelSubscribers {
+                                    Group {
+                                        if let subscribers = video!.channel.subscriptionsString {
+                                            Text("\(subscribers) subscribers")
+                                        }
+                                    }
+                                    .foregroundColor(.secondary)
                                     .font(.caption2)
+                                }
                             }
                         }
                     }
-                    .foregroundColor(.secondary)
+                    .contentShape(RoundedRectangle(cornerRadius: 12))
+                    .contextMenu {
+                        if let video = video {
+                            Button(action: {
+                                NavigationModel.openChannel(
+                                    video.channel,
+                                    player: player,
+                                    recents: recents,
+                                    navigation: navigation,
+                                    navigationStyle: navigationStyle
+                                )
+                            }) {
+                                Label("\(video.channel.name) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
+                            }
+                        }
+                    }
 
                     if accounts.app.supportsSubscriptions {
                         Spacer()
@@ -209,7 +247,7 @@ struct VideoDetails: View {
                                 .alert(isPresented: $presentingUnsubscribeAlert) {
                                     Alert(
                                         title: Text(
-                                            "Are you you want to unsubscribe from \(video!.channel.name)?"
+                                            "Are you sure you want to unsubscribe from \(video!.channel.name)?"
                                         ),
                                         primaryButton: .destructive(Text("Unsubscribe")) {
                                             subscriptions.unsubscribe(video!.channel.id)
@@ -362,6 +400,22 @@ struct VideoDetails: View {
 
     private var contentItem: ContentItem {
         ContentItem(video: player.currentVideo!)
+    }
+
+    private var authorAvatar: some View {
+        Group {
+            if let video = video, let url = video.channel.thumbnailURL {
+                WebImage(url: url)
+                    .resizable()
+                    .placeholder {
+                        Rectangle().fill(Color("PlaceholderColor"))
+                    }
+                    .retryOnAppear(false)
+                    .indicator(.activity)
+                    .clipShape(Circle())
+                    .frame(width: 45, height: 45, alignment: .leading)
+            }
+        }
     }
 
     var detailsPage: some View {

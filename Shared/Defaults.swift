@@ -33,6 +33,7 @@ extension Defaults.Keys {
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
+    static let showChannelSubscribers = Key<Bool>("showChannelSubscribers", default: true)
     static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)

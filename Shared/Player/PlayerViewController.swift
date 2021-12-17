@@ -1,5 +1,4 @@
 import AVKit
-import Logging
 import SwiftUI
 
 final class PlayerViewController: UIViewController {
@@ -7,6 +6,7 @@ final class PlayerViewController: UIViewController {
     var commentsModel: CommentsModel!
     var navigationModel: NavigationModel!
     var playerModel: PlayerModel!
+    var subscriptionsModel: SubscriptionsModel!
     var playerViewController = AVPlayerViewController()
 
     #if !os(tvOS)
@@ -71,6 +71,7 @@ final class PlayerViewController: UIViewController {
                         .frame(maxHeight: 600)
                         .environmentObject(commentsModel)
                         .environmentObject(playerModel)
+                        .environmentObject(subscriptionsModel)
                 )
             )
 

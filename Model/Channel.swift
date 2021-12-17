@@ -28,6 +28,10 @@ struct Channel: Identifiable, Hashable {
         self.videos = videos
     }
 
+    var detailsLoaded: Bool {
+        !subscriptionsString.isNil
+    }
+
     var subscriptionsString: String? {
         if subscriptionsCount != nil, subscriptionsCount! > 0 {
             return subscriptionsCount!.formattedAsAbbreviation()

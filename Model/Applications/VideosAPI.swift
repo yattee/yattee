@@ -55,11 +55,12 @@ extension VideosAPI {
     }
 
     func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {
-        guard let frontendHost = frontendHost ?? account.instance.frontendHost else {
+        guard let frontendHost = frontendHost ?? account?.instance?.frontendHost,
+              var urlComponents = account?.instance?.urlComponents
+        else {
             return nil
         }
 
-        var urlComponents = account.instance.urlComponents
         urlComponents.host = frontendHost
 
         var queryItems = [URLQueryItem]()

@@ -5,6 +5,7 @@ struct Player: UIViewControllerRepresentable {
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     var controller: PlayerViewController?
 
@@ -22,6 +23,7 @@ struct Player: UIViewControllerRepresentable {
         controller.commentsModel = comments
         controller.navigationModel = navigation
         controller.playerModel = player
+        controller.subscriptionsModel = subscriptions
         player.controller = controller
 
         return controller

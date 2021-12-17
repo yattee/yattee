@@ -7,6 +7,7 @@ struct PlaybackSettings: View {
     @Default(.quality) private var quality
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showKeywords) private var showKeywords
+    @Default(.showChannelSubscribers) private var channelSubscribers
     @Default(.saveHistory) private var saveHistory
 
     #if os(iOS)
@@ -27,6 +28,7 @@ struct PlaybackSettings: View {
                     }
 
                     keywordsToggle
+                    channelSubscribersToggle
                 }
             #else
                 Section(header: SettingsHeader(text: "Source")) {
@@ -44,6 +46,7 @@ struct PlaybackSettings: View {
                 #endif
 
                 keywordsToggle
+                channelSubscribersToggle
             #endif
         }
 
@@ -106,6 +109,10 @@ struct PlaybackSettings: View {
 
     private var keywordsToggle: some View {
         Toggle("Show video keywords", isOn: $showKeywords)
+    }
+
+    private var channelSubscribersToggle: some View {
+        Toggle("Show channel subscribers count", isOn: $channelSubscribers)
     }
 }
 
