@@ -8,18 +8,18 @@ struct ChannelCell: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
 
     var body: some View {
         Button {
-            let recent = RecentItem(from: channel)
-            recents.add(recent)
-            navigation.presentingChannel = true
-
-            if navigationStyle == .sidebar {
-                navigation.sidebarSectionChanged.toggle()
-                navigation.tabSelection = .recentlyOpened(recent.tag)
-            }
+            NavigationModel.openChannel(
+                channel,
+                player: player,
+                recents: recents,
+                navigation: navigation,
+                navigationStyle: navigationStyle
+            )
         } label: {
             content
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)

@@ -41,6 +41,32 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
+    static func openChannel(
+        _ channel: Channel,
+        player: PlayerModel,
+        recents: RecentsModel,
+        navigation: NavigationModel,
+        navigationStyle: NavigationStyle
+    ) {
+        let recent = RecentItem(from: channel)
+        player.presentingPlayer = false
+
+        let openRecent = {
+            recents.add(recent)
+            navigation.presentingChannel = true
+        }
+
+        if navigationStyle == .tab {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                openRecent()
+            }
+        } else if navigationStyle == .sidebar {
+            openRecent()
+            navigation.sidebarSectionChanged.toggle()
+            navigation.tabSelection = .recentlyOpened(recent.tag)
+        }
+    }
+
     var tabSelectionBinding: Binding<TabSelection> {
         Binding<TabSelection>(
             get: {
