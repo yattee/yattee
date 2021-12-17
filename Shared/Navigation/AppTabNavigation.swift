@@ -52,6 +52,12 @@ struct AppTabNavigation: View {
                         ChannelVideosView(channel: channel)
                             .environment(\.inChannelView, true)
                             .environment(\.inNavigationView, true)
+                            .environmentObject(accounts)
+                            .environmentObject(navigation)
+                            .environmentObject(player)
+                            .environmentObject(subscriptions)
+                            .environmentObject(thumbnailsModel)
+
                             .background(playerNavigationLink)
                     }
                 }
@@ -67,7 +73,12 @@ struct AppTabNavigation: View {
                     NavigationView {
                         ChannelPlaylistView(playlist: playlist)
                             .environment(\.inNavigationView, true)
+                            .environmentObject(accounts)
+                            .environmentObject(navigation)
+                            .environmentObject(player)
                             .environmentObject(subscriptions)
+                            .environmentObject(thumbnailsModel)
+
                             .background(playerNavigationLink)
                     }
                 }
@@ -76,7 +87,7 @@ struct AppTabNavigation: View {
         .background(
             EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
                 videoPlayer
-                    .environment(\.navigationStyle, .sidebar)
+                    .environment(\.navigationStyle, .tab)
             }
         )
     }
@@ -160,7 +171,7 @@ struct AppTabNavigation: View {
 
     private var playerNavigationLink: some View {
         NavigationLink(isActive: $player.playerNavigationLinkActive, destination: {
-            VideoPlayerView()
+            videoPlayer
                 .environment(\.inNavigationView, true)
         }) {
             EmptyView()
