@@ -7,7 +7,7 @@ import SwiftyJSON
 final class SponsorBlockAPI: ObservableObject {
     static let categories = ["sponsor", "selfpromo", "intro", "outro", "interaction", "music_offtopic"]
 
-    let logger = Logger(label: "net.yattee.app.sb")
+    let logger = Logger(label: "stream.yattee.app.sb")
 
     @Published var videoID: String?
     @Published var segments = [Segment]()
@@ -27,22 +27,27 @@ final class SponsorBlockAPI: ObservableObject {
         }
     }
 
-    func loadSegments(videoID: String, categories: Set<String>) {
+    func loadSegments(videoID: String, categories: Set<String>, completionHandler: @escaping () -> Void = {}) {
         guard !skipSegmentsURL.isNil, self.videoID != videoID else {
+            completionHandler()
             return
         }
 
         self.videoID = videoID
 
-        requestSegments(categories: categories)
+        requestSegments(categories: categories, completionHandler: completionHandler)
     }
 
-    private func requestSegments(categories: Set<String>) {
+    private func requestSegments(categories: Set<String>, completionHandler: @escaping () -> Void = {}) {
         guard let url = skipSegmentsURL, !categories.isEmpty else {
             return
         }
 
-        AF.request(url, parameters: parameters(categories: categories)).responseJSON { response in
+        AF.request(url, parameters: parameters(categories: categories)).responseJSON { [weak self] response in
+            guard let self = self else {
+                return
+            }
+
             switch response.result {
             case let .success(value):
                 self.segments = JSON(value).arrayValue.map(SponsorBlockSegment.init).sorted { $0.end < $1.end }
@@ -56,6 +61,8 @@ final class SponsorBlockAPI: ObservableObject {
 
                 self.logger.error("failed to load SponsorBlock segments: \(error.localizedDescription)")
             }
+
+            completionHandler()
         }
     }
 

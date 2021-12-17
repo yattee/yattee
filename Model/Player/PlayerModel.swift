@@ -128,19 +128,29 @@ final class PlayerModel: ObservableObject {
 
     func upgradeToStream(_ stream: Stream) {
         if !self.stream.isNil, self.stream != stream {
-            playStream(stream, of: currentVideo!, preservingTime: true)
+            playStream(stream, of: currentVideo!, preservingTime: true, upgrading: true)
         }
     }
 
     func playStream(
         _ stream: Stream,
         of video: Video,
-        preservingTime: Bool = false
+        preservingTime: Bool = false,
+        upgrading: Bool = false
     ) {
         playerError = nil
-        resetSegments()
-        sponsorBlock.loadSegments(videoID: video.videoID, categories: Defaults[.sponsorBlockCategories])
-        comments.load()
+        if !upgrading {
+            resetSegments()
+
+            sponsorBlock.loadSegments(
+                videoID: video.videoID,
+                categories: Defaults[.sponsorBlockCategories]
+            ) { [weak self] in
+                if Defaults[.showChannelSubscribers] {
+                    self?.loadCurrentItemChannelDetails()
+                }
+            }
+        }
 
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
@@ -154,7 +164,9 @@ final class PlayerModel: ObservableObject {
             loadComposition(stream, of: video, preservingTime: preservingTime)
         }
 
-        updateCurrentArtwork()
+        if !upgrading {
+            updateCurrentArtwork()
+        }
     }
 
     private func pauseOnPlayerDismiss() {
