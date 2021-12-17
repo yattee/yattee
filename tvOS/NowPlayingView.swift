@@ -117,9 +117,18 @@ struct NowPlayingView: View {
                 }
 
                 if sections.contains(.comments) {
-                    Section {
-                        ForEach(comments.all) { comment in
-                            CommentView(comment: comment, repliesID: $repliesID)
+                    if !comments.loaded {
+                        VStack(alignment: .center) {
+                            progressView
+                                .onAppear {
+                                    comments.load()
+                                }
+                        }
+                    } else {
+                        Section {
+                            ForEach(comments.all) { comment in
+                                CommentView(comment: comment, repliesID: $repliesID)
+                            }
                         }
                     }
                 }
@@ -136,6 +145,19 @@ struct NowPlayingView: View {
         Text(text)
             .font((inInfoViewController ? Font.system(size: 40) : .title3).bold())
             .foregroundColor(.secondary)
+    }
+
+    private var progressView: some View {
+        VStack {
+            Spacer()
+
+            HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+            Spacer()
+        }
     }
 }
 

@@ -1,65 +1,81 @@
 import SDWebImageSwiftUI
-
 import SwiftUI
 
 struct CommentView: View {
     let comment: Comment
     @Binding var repliesID: Comment.ID?
 
+    @State private var subscribed = false
+
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
+
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .center, spacing: 10) {
-                authorAvatar
+                HStack(spacing: 10) {
+                    ZStack(alignment: .bottomTrailing) {
+                        authorAvatar
 
-                #if os(iOS)
-                    Group {
-                        if horizontalSizeClass == .regular {
-                            HStack(spacing: 20) {
-                                authorAndTime
-
-                                Spacer()
-
-                                Group {
-                                    statusIcons
-                                    likes
-                                }
-                            }
-                        } else {
-                            HStack(alignment: .center, spacing: 20) {
-                                authorAndTime
-
-                                Spacer()
-
-                                VStack(alignment: .trailing, spacing: 8) {
-                                    likes
-                                    statusIcons
-                                }
-                            }
+                        if subscribed {
+                            Image(systemName: "star.circle.fill")
+                            #if os(tvOS)
+                                .background(Color.background(scheme: colorScheme))
+                            #else
+                                .background(Color.background)
+                            #endif
+                                .clipShape(Circle())
+                                .foregroundColor(.secondary)
                         }
                     }
-                    .font(.system(size: 15))
+                    .onAppear {
+                        subscribed = subscriptions.isSubscribing(comment.channel.id)
+                    }
 
-                #else
-                    HStack(spacing: 20) {
-                        authorAndTime
+                    authorAndTime
+                }
+                .contextMenu {
+                    Button(action: openChannelAction) {
+                        Label("\(comment.channel.name) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
+                    }
+                }
 
-                        Spacer()
+                Spacer()
 
+                Group {
+                    #if os(iOS)
+                        if horizontalSizeClass == .regular {
+                            Group {
+                                statusIcons
+                                likes
+                            }
+                        } else {
+                            VStack(alignment: .trailing, spacing: 8) {
+                                likes
+                                statusIcons
+                            }
+                        }
+                    #else
                         statusIcons
                         likes
-                    }
-                #endif
+                    #endif
+                }
             }
+            #if os(tvOS)
+            .font(.system(size: 25).bold())
+            #else
+            .font(.system(size: 15))
+            #endif
 
             Group {
                 commentText
@@ -94,23 +110,25 @@ struct CommentView: View {
             .retryOnAppear(false)
             .indicator(.activity)
             .mask(RoundedRectangle(cornerRadius: 60))
-            .frame(width: 45, height: 45, alignment: .leading)
-            .contextMenu {
-                Button(action: openChannelAction) {
-                    Label("\(comment.channel.name) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
-                }
-            }
         #if os(tvOS)
+            .frame(width: 80, height: 80, alignment: .leading)
             .focusable()
+        #else
+            .frame(width: 45, height: 45, alignment: .leading)
         #endif
     }
 
     private var authorAndTime: some View {
         VStack(alignment: .leading) {
             Text(comment.author)
-                .fontWeight(.bold)
+            #if os(tvOS)
+                .font(.system(size: 30).bold())
+            #else
+                .font(.system(size: 14).bold())
+            #endif
 
             Text(comment.time)
+                .font(.caption2)
                 .foregroundColor(.secondary)
         }
         .lineLimit(1)
@@ -125,6 +143,9 @@ struct CommentView: View {
                 Image(systemName: "heart.fill")
             }
         }
+        #if !os(tvOS)
+        .font(.system(size: 12))
+        #endif
         .foregroundColor(.secondary)
     }
 
@@ -135,6 +156,9 @@ struct CommentView: View {
                     Image(systemName: "hand.thumbsup")
                     Text("\(comment.likeCount.formattedAsAbbreviation())")
                 }
+                #if !os(tvOS)
+                .font(.system(size: 12))
+                #endif
             }
         }
         .foregroundColor(.secondary)
@@ -163,6 +187,7 @@ struct CommentView: View {
         #if os(tvOS)
             .padding(.leading, 5)
         #else
+            .font(.system(size: 13))
             .foregroundColor(.secondary)
         #endif
     }
@@ -181,7 +206,7 @@ struct CommentView: View {
         #if os(macOS)
             0.4
         #else
-            0.8
+            0.6
         #endif
     }
 
@@ -226,17 +251,13 @@ struct CommentView: View {
     }
 
     private func openChannelAction() {
-        player.presentingPlayer = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            let recent = RecentItem(from: comment.channel)
-            recents.add(recent)
-            navigation.presentingChannel = true
-
-            if navigationStyle == .sidebar {
-                navigation.sidebarSectionChanged.toggle()
-                navigation.tabSelection = .recentlyOpened(recent.tag)
-            }
-        }
+        NavigationModel.openChannel(
+            comment.channel,
+            player: player,
+            recents: recents,
+            navigation: navigation,
+            navigationStyle: navigationStyle
+        )
     }
 }
 
@@ -247,5 +268,7 @@ struct CommentView_Previews: PreviewProvider {
 
     static var previews: some View {
         CommentView(comment: fixture, repliesID: .constant(fixture.id))
+            .environmentObject(SubscriptionsModel())
+            .padding(5)
     }
 }

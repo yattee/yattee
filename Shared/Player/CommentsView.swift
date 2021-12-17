@@ -16,6 +16,9 @@ struct CommentsView: View {
                     .foregroundColor(.secondary)
             } else if !comments.loaded {
                 progressView
+                    .onAppear {
+                        comments.load()
+                    }
             } else {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading) {
@@ -48,6 +51,7 @@ struct CommentsView: View {
                                 }
                             }
                         }
+                        .font(.system(size: 13))
                         .buttonStyle(.plain)
                         .padding(.vertical, 8)
                         .foregroundColor(.secondary)
@@ -56,11 +60,6 @@ struct CommentsView: View {
             }
         }
         .padding(.horizontal)
-        .onAppear {
-            if !comments.loaded {
-                comments.load()
-            }
-        }
     }
 
     private var progressView: some View {

@@ -8,7 +8,8 @@ final class CommentsModel: ObservableObject {
     @Published var nextPage: String?
     @Published var firstPage = true
 
-    @Published var loaded = true
+    @Published var loading = false
+    @Published var loaded = false
     @Published var disabled = false
 
     @Published var replies = [Comment]()
@@ -18,16 +19,16 @@ final class CommentsModel: ObservableObject {
     var accounts: AccountsModel!
     var player: PlayerModel!
 
-    var instance: Instance? {
+    static var instance: Instance? {
         InstancesModel.find(Defaults[.commentsInstanceID])
     }
 
     var api: VideosAPI? {
-        instance.isNil ? nil : PipedAPI(account: instance!.anonymousAccount)
+        Self.instance.isNil ? nil : PipedAPI(account: Self.instance!.anonymousAccount)
     }
 
     static var enabled: Bool {
-        !Defaults[.commentsInstanceID].isNil && !Defaults[.commentsInstanceID]!.isEmpty
+        !instance.isNil
     }
 
     #if !os(tvOS)
@@ -41,13 +42,15 @@ final class CommentsModel: ObservableObject {
     }
 
     func load(page: String? = nil) {
-        guard Self.enabled else {
+        guard Self.enabled, !loading else {
             return
         }
 
         reset()
 
-        guard !instance.isNil,
+        loading = true
+
+        guard !Self.instance.isNil,
               !(player?.currentVideo.isNil ?? true)
         else {
             return
@@ -65,6 +68,7 @@ final class CommentsModel: ObservableObject {
                 }
             }
             .onCompletion { [weak self] _ in
+                self?.loading = false
                 self?.loaded = true
             }
     }
@@ -91,9 +95,10 @@ final class CommentsModel: ObservableObject {
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {
                     self?.replies = page.comments
+                    self?.repliesLoaded = true
                 }
             }
-            .onCompletion { [weak self] _ in
+            .onFailure { [weak self] _ in
                 self?.repliesLoaded = true
             }
     }
@@ -104,6 +109,7 @@ final class CommentsModel: ObservableObject {
         firstPage = true
         nextPage = nil
         loaded = false
+        loading = false
         replies = []
         repliesLoaded = false
     }
