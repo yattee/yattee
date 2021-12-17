@@ -16,6 +16,7 @@ struct ChannelPlaylistView: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<PlayerModel> private var player
 
     var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
@@ -83,9 +84,11 @@ struct ChannelPlaylistView: View {
             }
         }
         .navigationTitle(playlist.title)
-
+            #if os(iOS)
+                .navigationBarHidden(player.playerNavigationLinkActive)
+            #endif
         #else
-        .background(Color.background(scheme: colorScheme))
+                .background(Color.background(scheme: colorScheme))
         #endif
     }
 

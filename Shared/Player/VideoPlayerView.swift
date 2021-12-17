@@ -43,8 +43,8 @@ struct VideoPlayerView: View {
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
-                .navigationBarHidden(true)
             }
+            .navigationBarHidden(true)
         #endif
     }
 

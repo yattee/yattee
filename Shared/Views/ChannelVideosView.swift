@@ -19,6 +19,7 @@ struct ChannelVideosView: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Namespace private var focusNamespace
@@ -120,6 +121,9 @@ struct ChannelVideosView: View {
                 resource.load()
             }
         }
+        #if os(iOS)
+        .navigationBarHidden(player.playerNavigationLinkActive)
+        #endif
         .navigationTitle(navigationTitle)
 
         return Group {
