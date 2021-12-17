@@ -8,7 +8,10 @@ struct PlaylistFormView: View {
     @State private var visibility = Playlist.Visibility.public
 
     @State private var valid = false
-    @State private var showingDeleteConfirmation = false
+    @State private var presentingDeleteConfirmation = false
+
+    @State private var formError = ""
+    @State private var presentingErrorAlert = false
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
@@ -57,6 +60,12 @@ struct PlaylistFormView: View {
 
                         Button("Save", action: submitForm)
                             .disabled(!valid)
+                            .alert(isPresented: $presentingErrorAlert) {
+                                Alert(
+                                    title: Text("Error when accessing playlist"),
+                                    message: Text(formError)
+                                )
+                            }
                             .keyboardShortcut(.defaultAction)
                     }
                     .frame(minHeight: 35)
@@ -165,15 +174,21 @@ struct PlaylistFormView: View {
 
         let body = ["title": name, "privacy": visibility.rawValue]
 
-        resource?.request(editing ? .patch : .post, json: body).onSuccess { response in
-            if let modifiedPlaylist: Playlist = response.typedContent() {
-                playlist = modifiedPlaylist
+        resource?
+            .request(editing ? .patch : .post, json: body)
+            .onSuccess { response in
+                if let modifiedPlaylist: Playlist = response.typedContent() {
+                    playlist = modifiedPlaylist
+                }
+
+                playlists.load(force: true)
+
+                presentationMode.wrappedValue.dismiss()
             }
-
-            playlists.load(force: true)
-
-            presentationMode.wrappedValue.dismiss()
-        }
+            .onFailure { error in
+                formError = "(\(error.httpStatusCode ?? -1)) \(error.userMessage)"
+                presentingErrorAlert = true
+            }
     }
 
     var resource: Resource? {
@@ -207,9 +222,9 @@ struct PlaylistFormView: View {
 
     var deletePlaylistButton: some View {
         Button("Delete") {
-            showingDeleteConfirmation = true
+            presentingDeleteConfirmation = true
         }
-        .alert(isPresented: $showingDeleteConfirmation) {
+        .alert(isPresented: $presentingDeleteConfirmation) {
             Alert(
                 title: Text("Are you sure you want to delete playlist?"),
                 message: Text("Playlist \"\(playlist.title)\" will be deleted.\nIt cannot be undone."),
@@ -221,11 +236,17 @@ struct PlaylistFormView: View {
     }
 
     func deletePlaylistAndDismiss() {
-        accounts.api.playlist(playlist.id)?.request(.delete).onSuccess { _ in
-            playlist = nil
-            playlists.load(force: true)
-            presentationMode.wrappedValue.dismiss()
-        }
+        accounts.api.playlist(playlist.id)?
+            .request(.delete)
+            .onSuccess { _ in
+                playlist = nil
+                playlists.load(force: true)
+                presentationMode.wrappedValue.dismiss()
+            }
+            .onFailure { error in
+                formError = "(\(error.httpStatusCode ?? -1)) \(error.localizedDescription)"
+                presentingErrorAlert = true
+            }
     }
 }
 

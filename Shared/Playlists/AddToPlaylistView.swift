@@ -7,8 +7,12 @@ struct AddToPlaylistView: View {
 
     @State private var selectedPlaylistID: Playlist.ID = ""
 
+    @State private var error = ""
+    @State private var presentingErrorAlert = false
+
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
+
     @EnvironmentObject<PlaylistsModel> private var model
 
     var body: some View {
@@ -120,6 +124,12 @@ struct AddToPlaylistView: View {
             Button("Add to Playlist", action: addToPlaylist)
                 .disabled(selectedPlaylist.isNil)
                 .padding(.top, 30)
+                .alert(isPresented: $presentingErrorAlert) {
+                    Alert(
+                        title: Text("Error when accessing playlist"),
+                        message: Text(error)
+                    )
+                }
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
@@ -155,9 +165,17 @@ struct AddToPlaylistView: View {
 
         Defaults[.lastUsedPlaylistID] = id
 
-        model.addVideo(playlistID: id, videoID: video.videoID) {
-            presentationMode.wrappedValue.dismiss()
-        }
+        model.addVideo(
+            playlistID: id,
+            videoID: video.videoID,
+            onSuccess: {
+                presentationMode.wrappedValue.dismiss()
+            },
+            onFailure: { requestError in
+                error = "(\(requestError.httpStatusCode ?? -1)) \(requestError.userMessage)"
+                presentingErrorAlert = true
+            }
+        )
     }
 
     private var selectedPlaylist: Playlist? {

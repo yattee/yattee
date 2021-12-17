@@ -52,14 +52,22 @@ final class PlaylistsModel: ObservableObject {
             }
     }
 
-    func addVideo(playlistID: Playlist.ID, videoID: Video.ID, onSuccess: @escaping () -> Void = {}) {
+    func addVideo(
+        playlistID: Playlist.ID,
+        videoID: Video.ID,
+        onSuccess: @escaping () -> Void = {},
+        onFailure: @escaping (RequestError) -> Void = { _ in }
+    ) {
         let resource = accounts.api.playlistVideos(playlistID)
         let body = ["videoId": videoID]
 
-        resource?.request(.post, json: body).onSuccess { _ in
-            self.load(force: true)
-            onSuccess()
-        }
+        resource?
+            .request(.post, json: body)
+            .onSuccess { _ in
+                self.load(force: true)
+                onSuccess()
+            }
+            .onFailure(onFailure)
     }
 
     func removeVideo(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
