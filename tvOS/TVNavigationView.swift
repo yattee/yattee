@@ -17,7 +17,7 @@ struct TVNavigationView: View {
                     .tag(TabSelection.favorites)
             }
 
-            if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions {
+            if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
                 SubscriptionsView()
                     .tabItem { Text("Subscriptions") }
                     .tag(TabSelection.subscriptions)
