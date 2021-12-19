@@ -42,6 +42,15 @@ struct PlayerControlsView<Content: View>: View {
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                     }
+                    .contextMenu {
+                        Button {
+                            model.closeCurrentItem()
+                        } label: {
+                            Label("Close Video", systemImage: "xmark.circle")
+                                .labelStyle(.automatic)
+                        }
+                        .disabled(model.currentItem.isNil)
+                    }
 
                     Spacer()
                 }
