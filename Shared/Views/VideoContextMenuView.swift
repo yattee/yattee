@@ -8,6 +8,7 @@ struct VideoContextMenuView: View {
 
     @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.inChannelView) private var inChannelView
+    @Environment(\.inChannelPlaylistView) private var inChannelPlaylistView
     @Environment(\.navigationStyle) private var navigationStyle
     @Environment(\.currentPlaylistID) private var playlistID
 
@@ -28,11 +29,11 @@ struct VideoContextMenuView: View {
             addToQueueButton
         }
 
-        if !inChannelView {
+        if !inChannelView, !inChannelPlaylistView {
             Section {
                 openChannelButton
 
-                if accounts.app.supportsSubscriptions {
+                if accounts.app.supportsSubscriptions, accounts.api.signedIn {
                     subscriptionButton
                 }
             }

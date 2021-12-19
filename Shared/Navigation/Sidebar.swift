@@ -29,14 +29,6 @@ struct Sidebar: View {
                     }
                 }
             }
-            .onAppear {
-                subscriptions.load()
-                playlists.load()
-            }
-            .onChange(of: accounts.signedIn) { _ in
-                subscriptions.load(force: true)
-                playlists.load(force: true)
-            }
             .onChange(of: navigation.sidebarSectionChanged) { _ in
                 scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)
             }

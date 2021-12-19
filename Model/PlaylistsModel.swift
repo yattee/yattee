@@ -28,7 +28,7 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        guard !resource.isNil else {
+        guard accounts.app.supportsUserPlaylists, accounts.signedIn else {
             playlists = []
             return
         }

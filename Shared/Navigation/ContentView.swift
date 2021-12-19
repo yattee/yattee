@@ -39,6 +39,10 @@ struct ContentView: View {
             #endif
         }
         .onAppear(perform: configure)
+        .onChange(of: accounts.signedIn) { _ in
+            subscriptions.load(force: true)
+            playlists.load(force: true)
+        }
 
         .environmentObject(accounts)
         .environmentObject(comments)
@@ -83,6 +87,17 @@ struct ContentView: View {
             }
         )
         #endif
+        .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
+            Alert(
+                title: Text(
+                    "Are you sure you want to unsubscribe from \(navigation.channelToUnsubscribe.name)?"
+                ),
+                primaryButton: .destructive(Text("Unsubscribe")) {
+                    subscriptions.unsubscribe(navigation.channelToUnsubscribe.id)
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     func configure() {
@@ -135,6 +150,9 @@ struct ContentView: View {
         #endif
 
         navigation.tabSelection = section ?? .search
+
+        subscriptions.load()
+        playlists.load()
     }
 
     func openWelcomeScreenIfAccountEmpty() {

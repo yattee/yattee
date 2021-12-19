@@ -35,9 +35,11 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        guard accounts.app.supportsSubscriptions else {
+        guard accounts.app.supportsSubscriptions, accounts.signedIn else {
+            channels = []
             return
         }
+
         let request = force ? resource?.load() : resource?.loadIfNeeded()
 
         request?

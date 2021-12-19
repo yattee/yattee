@@ -9,6 +9,10 @@ private struct InChannelViewKey: EnvironmentKey {
     static let defaultValue = false
 }
 
+private struct InChannelPlaylistViewKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 private struct HorizontalCellsKey: EnvironmentKey {
     static let defaultValue = false
 }
@@ -34,6 +38,11 @@ extension EnvironmentValues {
     var inChannelView: Bool {
         get { self[InChannelViewKey.self] }
         set { self[InChannelViewKey.self] = newValue }
+    }
+
+    var inChannelPlaylistView: Bool {
+        get { self[InChannelPlaylistViewKey.self] }
+        set { self[InChannelPlaylistViewKey.self] = newValue }
     }
 
     var horizontalCells: Bool {

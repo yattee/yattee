@@ -67,46 +67,40 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            #if os(iOS)
-                VerticalCells(items: videos)
-            #else
-                if #available(macOS 12.0, *) {
-                    VerticalCells(items: videos)
-                        .prefersDefaultFocus(in: focusNamespace)
-                } else {
-                    VerticalCells(items: videos)
-                }
+            VerticalCells(items: videos)
+                .environment(\.inChannelView, true)
+            #if os(tvOS)
+                .prefersDefaultFocus(in: focusNamespace)
             #endif
         }
-        .environment(\.inChannelView, true)
 
         #if !os(tvOS)
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet,
-                        shareURL: $shareURL
-                    )
-                }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                ShareButton(
+                    contentItem: contentItem,
+                    presentingShareSheet: $presentingShareSheet,
+                    shareURL: $shareURL
+                )
+            }
 
-                ToolbarItem {
-                    HStack {
-                        HStack(spacing: 3) {
-                            Text("\(store.item?.subscriptionsString ?? "loading")")
-                                .fontWeight(.bold)
-                            Text(" subscribers")
-                        }
-                        .allowsTightening(true)
-                        .foregroundColor(.secondary)
-                        .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
-
-                        subscriptionToggleButton
-
-                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+            ToolbarItem {
+                HStack {
+                    HStack(spacing: 3) {
+                        Text("\(store.item?.subscriptionsString ?? "loading")")
+                            .fontWeight(.bold)
+                        Text(" subscribers")
                     }
+                    .allowsTightening(true)
+                    .foregroundColor(.secondary)
+                    .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+
+                    subscriptionToggleButton
+
+                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
                 }
             }
+        }
         #endif
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
@@ -163,17 +157,6 @@ struct ChannelVideosView: View {
                     }
                 }
             }
-        }
-        .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
-            Alert(
-                title: Text(
-                    "Are you sure you want to unsubscribe from \(channel.name)?"
-                ),
-                primaryButton: .destructive(Text("Unsubscribe")) {
-                    subscriptions.unsubscribe(channel.id)
-                },
-                secondaryButton: .cancel()
-            )
         }
     }
 

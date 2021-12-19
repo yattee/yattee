@@ -57,6 +57,7 @@ struct ChannelPlaylistView: View {
                 }
             #endif
             VerticalCells(items: items)
+                .environment(\.inChannelPlaylistView, true)
         }
         #if os(iOS)
         .sheet(isPresented: $presentingShareSheet) {
