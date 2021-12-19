@@ -27,7 +27,7 @@ struct PlayerControlsView<Content: View>: View {
     private var controls: some View {
         let controls = HStack {
             Button(action: {
-                model.presentingPlayer.toggle()
+                model.togglePlayer()
             }) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
@@ -96,7 +96,7 @@ struct PlayerControlsView<Content: View>: View {
         .borderBottom(height: navigationStyle == .sidebar ? 0 : 0.4, color: Color("ControlsBorderColor"))
         #if !os(tvOS)
             .onSwipeGesture(up: {
-                model.presentingPlayer = true
+                model.show()
             })
         #endif
 

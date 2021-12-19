@@ -144,7 +144,7 @@ struct PlaylistsView: View {
 
                 Button {
                     player.playAll(items.compactMap(\.video))
-                    player.presentPlayer()
+                    player.show()
                 } label: {
                     HStack(spacing: 15) {
                         Image(systemName: "play.fill")

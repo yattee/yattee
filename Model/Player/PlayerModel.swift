@@ -15,18 +15,15 @@ final class PlayerModel: ObservableObject {
     let logger = Logger(label: "stream.yattee.app")
 
     private(set) var player = AVPlayer()
-    private(set) var playerView = Player()
-    var controller: PlayerViewController? { didSet { playerView.controller = controller } }
-    #if os(tvOS)
-        var avPlayerViewController: AVPlayerViewController?
-    #endif
+    var playerView = Player()
+    var controller: PlayerViewController?
 
-    @Published var presentingPlayer = false { didSet { pauseOnPlayerDismiss() } }
+    @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
 
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { player.rate = currentRate } }
 
-    @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() }}
+    @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
@@ -35,7 +32,7 @@ final class PlayerModel: ObservableObject {
 
     @Published var preservedTime: CMTime?
 
-    @Published var playerNavigationLinkActive = false { didSet { pauseOnChannelPlayerDismiss() } }
+    @Published var playerNavigationLinkActive = false { didSet { handleNavigationViewPlayerPresentationChange() } }
 
     @Published var sponsorBlock = SponsorBlockAPI()
     @Published var segmentRestorationTime: CMTime?
@@ -70,6 +67,14 @@ final class PlayerModel: ObservableObject {
         #endif
     }}
 
+    @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    @Default(.closePiPOnNavigation) var closePiPOnNavigation
+    @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
+
+    #if !os(macOS)
+        @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
+    #endif
+
     init(accounts: AccountsModel? = nil, comments: CommentsModel? = nil) {
         self.accounts = accounts ?? AccountsModel()
         self.comments = comments ?? CommentsModel()
@@ -80,12 +85,41 @@ final class PlayerModel: ObservableObject {
         addPlayerTimeControlStatusObserver()
     }
 
-    func presentPlayer() {
+    func show() {
+        guard !presentingPlayer else {
+            #if os(macOS)
+                OpenWindow.player.focus()
+            #endif
+            return
+        }
+        #if os(macOS)
+            OpenWindow.player.open()
+            OpenWindow.player.focus()
+        #endif
         presentingPlayer = true
     }
 
+    func hide() {
+        guard presentingPlayer else {
+            return
+        }
+
+        presentingPlayer = false
+    }
+
     func togglePlayer() {
-        presentingPlayer.toggle()
+        #if os(macOS)
+            if !presentingPlayer {
+                OpenWindow.player.open()
+            }
+            OpenWindow.player.focus()
+        #else
+            if presentingPlayer {
+                hide()
+            } else {
+                show()
+            }
+        #endif
     }
 
     var isPlaying: Bool {
@@ -189,12 +223,29 @@ final class PlayerModel: ObservableObject {
             preservingTime: !currentItem.playbackTime.isNil
         )
     }
+
+    private func handlePresentationChange() {
+        if presentingPlayer, closePiPOnOpeningPlayer, playingInPictureInPicture {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.closePiP()
+            }
+        }
+
+        if !presentingPlayer, pauseOnHidingPlayer, !playingInPictureInPicture {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.pause()
+            }
+        }
+
+        if !presentingPlayer, !pauseOnHidingPlayer, isPlaying {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                self?.play()
             }
         }
     }
 
-    private func pauseOnChannelPlayerDismiss() {
-        if !playingInPictureInPicture, !playerNavigationLinkActive {
+    private func handleNavigationViewPlayerPresentationChange() {
+        if pauseOnHidingPlayer, !playingInPictureInPicture, !playerNavigationLinkActive {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.pause()
             }
@@ -371,6 +422,10 @@ final class PlayerModel: ObservableObject {
 
         item.preferredForwardBufferDuration = 5
 
+        observePlayerItemStatus(item)
+    }
+
+    private func observePlayerItemStatus(_ item: AVPlayerItem) {
         statusObservation?.invalidate()
         statusObservation = item.observe(\.status, options: [.old, .new]) { [weak self] playerItem, _ in
             guard let self = self else {
@@ -422,11 +477,9 @@ final class PlayerModel: ObservableObject {
             addCurrentItemToHistory()
             resetQueue()
             #if os(tvOS)
-                avPlayerViewController!.dismiss(animated: true) { [weak self] in
-                    self?.controller!.dismiss(animated: true)
-                }
+                controller?.dismiss(animated: true)
             #endif
-            presentingPlayer = false
+            hide()
         } else {
             advanceToNextItem()
         }
@@ -621,4 +674,70 @@ final class PlayerModel: ObservableObject {
         currentItem = nil
         player.replaceCurrentItem(with: nil)
     }
+
+    func closePiP() {
+        guard playingInPictureInPicture else {
+            return
+        }
+
+        let wasPlaying = isPlaying
+        pause()
+
+        #if os(tvOS)
+            show()
+            closePipByReplacingItem(wasPlaying: wasPlaying)
+        #else
+            closePiPByNilingPlayer(wasPlaying: wasPlaying)
+        #endif
+    }
+
+    private func closePipByReplacingItem(wasPlaying: Bool) {
+        let item = player.currentItem
+        let time = player.currentTime()
+
+        self.player.replaceCurrentItem(with: nil)
+
+        guard !item.isNil else {
+            return
+        }
+
+        self.player.seek(to: time)
+        self.player.replaceCurrentItem(with: item)
+
+        guard wasPlaying else {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.play()
+        }
+    }
+
+    private func closePiPByNilingPlayer(wasPlaying: Bool) {
+        controller?.playerView.player = nil
+        controller?.playerView.player = player
+
+        guard wasPlaying else {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.play()
+        }
+    }
+
+    #if os(macOS)
+        var windowTitle: String {
+            currentVideo.isNil ? "Not playing" : "\(currentVideo!.title) - \(currentVideo!.author)"
+        }
+    #else
+        func handleEnterForeground() {
+            guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
+                return
+            }
+
+            show()
+            closePiP()
+        }
+    #endif
 }

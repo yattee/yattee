@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -7,6 +8,8 @@ struct PlayerQueueRow: View {
     @Binding var fullScreen: Bool
 
     @EnvironmentObject<PlayerModel> private var player
+
+    @Default(.closePiPOnNavigation) var closePiPOnNavigation
 
     var body: some View {
         Group {
@@ -23,6 +26,10 @@ struct PlayerQueueRow: View {
                     withAnimation {
                         fullScreen = false
                     }
+                }
+
+                if closePiPOnNavigation, player.playingInPictureInPicture {
+                    player.closePiP()
                 }
             } label: {
                 VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)

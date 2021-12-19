@@ -1,4 +1,4 @@
-import AVFoundation
+import AVKit
 import Defaults
 import Foundation
 import Siesta
@@ -29,7 +29,10 @@ extension PlayerModel {
     }
 
     func playNow(_ video: Video, at time: TimeInterval? = nil) {
-        player.replaceCurrentItem(with: nil)
+        if !playingInPictureInPicture || closePiPOnNavigation {
+            closePiP()
+        }
+
         addCurrentItemToHistory()
 
         enqueueVideo(video, prepending: true) { _, item in
@@ -38,7 +41,12 @@ extension PlayerModel {
     }
 
     func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: TimeInterval? = nil) {
+        if !playingInPictureInPicture {
+            player.replaceCurrentItem(with: nil)
+        }
+
         comments.reset()
+        stream = nil
         currentItem = item
 
         if !time.isNil {
@@ -83,7 +91,6 @@ extension PlayerModel {
     }
 
     func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
-        player.replaceCurrentItem(with: nil)
         addCurrentItemToHistory()
 
         remove(newItem)
@@ -116,7 +123,7 @@ extension PlayerModel {
     }
 
     func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        player.currentItem == item && (presentingPlayer || playerNavigationLinkActive || playingInPictureInPicture)
+        player.currentItem == item
     }
 
     @discardableResult func enqueueVideo(

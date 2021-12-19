@@ -38,6 +38,13 @@ extension Defaults.Keys {
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
+    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: true)
+
+    static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
+    static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
+    #if !os(macOS)
+        static let closePiPAndOpenPlayerOnEnteringForeground = Key<Bool>("closePiPAndOpenPlayerOnEnteringForeground", default: false)
+    #endif
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 

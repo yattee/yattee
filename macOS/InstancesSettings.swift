@@ -94,7 +94,7 @@ struct InstancesSettings: View {
                     }
                     .labelsHidden()
 
-                Text("Used to create links from videos, channels and playlist")
+                Text("Used to create links from videos, channels and playlists")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

@@ -7,16 +7,16 @@ import Siesta
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var accounts = AccountsModel()
-    @StateObject private var comments = CommentsModel()
-    @StateObject private var instances = InstancesModel()
-    @StateObject private var navigation = NavigationModel()
-    @StateObject private var player = PlayerModel()
-    @StateObject private var playlists = PlaylistsModel()
-    @StateObject private var recents = RecentsModel()
-    @StateObject private var search = SearchModel()
-    @StateObject private var subscriptions = SubscriptionsModel()
-    @StateObject private var thumbnailsModel = ThumbnailsModel()
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<CommentsModel> private var comments
+    @EnvironmentObject<InstancesModel> private var instances
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var playlists
+    @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
 
     @EnvironmentObject<MenuModel> private var menu
 
@@ -61,7 +61,6 @@ struct ContentView: View {
             }
         )
         #if !os(tvOS)
-        .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
         .onOpenURL(perform: handleOpenedURL)
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
@@ -162,7 +161,7 @@ struct ContentView: View {
                 if let video: Video = response.typedContent() {
                     player.addCurrentItemToHistory()
                     self.player.playNow(video, at: parser.time)
-                    self.player.presentPlayer()
+                    self.player.show()
                 }
             }
         }

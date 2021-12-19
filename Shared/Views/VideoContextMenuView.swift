@@ -64,7 +64,7 @@ struct VideoContextMenuView: View {
             if inNavigationView {
                 playerNavigationLinkActive = true
             } else {
-                player.presentPlayer()
+                player.show()
             }
         } label: {
             Label("Play Now", systemImage: "play")

@@ -11,7 +11,9 @@ struct PlaybackBar: View {
 
     var body: some View {
         HStack {
-            closeButton
+            #if !os(macOS)
+                closeButton
+            #endif
 
             if player.currentItem != nil {
                 HStack {
@@ -20,6 +22,9 @@ struct PlaybackBar: View {
                     rateMenu
                 }
                 .font(.caption2)
+                #if os(macOS)
+                    .padding(.leading, 4)
+                #endif
 
                 Spacer()
 
@@ -68,7 +73,7 @@ struct PlaybackBar: View {
                 message: Text(player.playerError?.localizedDescription ?? "")
             )
         }
-        .frame(minWidth: 0, maxWidth: .infinity)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 20)
         .padding(4)
         .background(colorScheme == .dark ? Color.black : Color.white)
     }

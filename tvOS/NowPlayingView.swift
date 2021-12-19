@@ -33,7 +33,7 @@ struct NowPlayingView: View {
                 if sections.contains(.nowPlaying), let item = player.currentItem {
                     Section(header: Text("Now Playing")) {
                         Button {
-                            player.presentPlayer()
+                            player.show()
                         } label: {
                             VideoBanner(video: item.video)
                         }
@@ -59,7 +59,7 @@ struct NowPlayingView: View {
                         ForEach(player.queue) { item in
                             Button {
                                 player.advanceToItem(item)
-                                player.presentPlayer()
+                                player.show()
                             } label: {
                                 VideoBanner(video: item.video)
                             }
@@ -77,7 +77,7 @@ struct NowPlayingView: View {
                         ForEach(player.currentVideo!.related) { video in
                             Button {
                                 player.playNow(video)
-                                player.presentPlayer()
+                                player.show()
                             } label: {
                                 VideoBanner(video: video)
                             }
@@ -99,7 +99,7 @@ struct NowPlayingView: View {
                         ForEach(player.history) { item in
                             Button {
                                 player.playHistory(item)
-                                player.presentPlayer()
+                                player.show()
                             } label: {
                                 VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
                             }

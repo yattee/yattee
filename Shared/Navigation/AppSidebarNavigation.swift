@@ -62,23 +62,15 @@ struct AppSidebarNavigation: View {
                 }
             }
         }
-        #if os(iOS)
-        .background(
-            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                videoPlayer
-                    .environment(\.navigationStyle, .sidebar)
-            }
-        )
-        #elseif os(macOS)
-        .background(
-            EmptyView().sheet(isPresented: $player.presentingPlayer) {
-                videoPlayer
-                    .frame(minWidth: 1000, minHeight: 750)
-                    .environment(\.navigationStyle, .sidebar)
-            }
-        )
-        #endif
         .environment(\.navigationStyle, .sidebar)
+        #if os(iOS)
+            .background(
+                EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
+                    videoPlayer
+                        .environment(\.navigationStyle, .sidebar)
+                }
+            )
+        #endif
     }
 
     private var videoPlayer: some View {

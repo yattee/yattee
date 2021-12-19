@@ -62,10 +62,18 @@ struct MenuCommands: Commands {
             .disabled(model.player?.queue.isEmpty ?? true)
             .keyboardShortcut("s")
 
-            Button((model.player?.presentingPlayer ?? true) ? "Hide Player" : "Show Player") {
+            Button(togglePlayerLabel) {
                 model.player?.togglePlayer()
             }
             .keyboardShortcut("o")
         }
+    }
+
+    private var togglePlayerLabel: String {
+        #if os(macOS)
+            "Show Player"
+        #else
+            (model.player?.presentingPlayer ?? true) ? "Hide Player" : "Show Player"
+        #endif
     }
 }

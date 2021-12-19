@@ -8,15 +8,45 @@ struct YatteeApp: App {
         @StateObject private var updater = UpdaterModel()
     #endif
 
+    @StateObject private var accounts = AccountsModel()
+    @StateObject private var comments = CommentsModel()
+    @StateObject private var instances = InstancesModel()
     @StateObject private var menu = MenuModel()
+    @StateObject private var navigation = NavigationModel()
+    @StateObject private var player = PlayerModel()
+    @StateObject private var playlists = PlaylistsModel()
+    @StateObject private var recents = RecentsModel()
+    @StateObject private var search = SearchModel()
+    @StateObject private var subscriptions = SubscriptionsModel()
+    @StateObject private var thumbnails = ThumbnailsModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(accounts)
+                .environmentObject(comments)
+                .environmentObject(instances)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(playlists)
+                .environmentObject(recents)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnails)
                 .environmentObject(menu)
+                .environmentObject(search)
+            #if !os(macOS)
+                .onReceive(
+                    NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+                ) { _ in
+                    player.handleEnterForeground()
+                }
+            #endif
+            #if !os(tvOS)
+            .handlesExternalEvents(preferring: Set(["watch"]), allowing: Set(["watch"]))
+            #endif
         }
         #if !os(tvOS)
-        .handlesExternalEvents(matching: Set(["*"]))
+        .handlesExternalEvents(matching: Set(arrayLiteral: "watch"))
         .commands {
             SidebarCommands()
 
@@ -34,6 +64,24 @@ struct YatteeApp: App {
         #endif
 
         #if os(macOS)
+            WindowGroup(player.windowTitle) {
+                VideoPlayerView()
+                    .onAppear { player.presentingPlayer = true }
+                    .onDisappear { player.presentingPlayer = false }
+                    .environment(\.navigationStyle, .sidebar)
+                    .environmentObject(accounts)
+                    .environmentObject(comments)
+                    .environmentObject(instances)
+                    .environmentObject(navigation)
+                    .environmentObject(player)
+                    .environmentObject(playlists)
+                    .environmentObject(recents)
+                    .environmentObject(subscriptions)
+                    .environmentObject(thumbnails)
+                    .handlesExternalEvents(preferring: Set(["player"]), allowing: Set(["player"]))
+            }
+            .handlesExternalEvents(matching: Set(["player"]))
+
             Settings {
                 SettingsView()
                     .environmentObject(AccountsModel())

@@ -1,4 +1,5 @@
 import AVKit
+import Defaults
 import SwiftUI
 
 final class PlayerViewController: UIViewController {
@@ -7,11 +8,11 @@ final class PlayerViewController: UIViewController {
     var navigationModel: NavigationModel!
     var playerModel: PlayerModel!
     var subscriptionsModel: SubscriptionsModel!
-    var playerViewController = AVPlayerViewController()
+    var playerView = AVPlayerViewController()
 
     #if !os(tvOS)
         var aspectRatio: Double? {
-            let ratio = Double(playerViewController.videoBounds.width) / Double(playerViewController.videoBounds.height)
+            let ratio = Double(playerView.videoBounds.width) / Double(playerView.videoBounds.height)
 
             guard ratio.isFinite else {
                 return VideoPlayerView.defaultAspectRatio // swiftlint:disable:this implicit_return
@@ -27,11 +28,23 @@ final class PlayerViewController: UIViewController {
         loadPlayer()
 
         #if os(tvOS)
-            if !playerViewController.isBeingPresented, !playerViewController.isBeingDismissed {
-                present(playerViewController, animated: false)
+            if !playerView.isBeingPresented, !playerView.isBeingDismissed {
+                present(playerView, animated: false)
             }
         #endif
     }
+
+    #if os(tvOS)
+        override func viewDidDisappear(_ animated: Bool) {
+            super.viewDidDisappear(animated)
+
+            if !playerModel.presentingPlayer, !Defaults[.pauseOnHidingPlayer], !playerModel.isPlaying {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    self?.playerModel.play()
+                }
+            }
+        }
+    #endif
 
     func loadPlayer() {
         guard !playerLoaded else {
@@ -39,12 +52,11 @@ final class PlayerViewController: UIViewController {
         }
 
         playerModel.controller = self
-        playerViewController.player = playerModel.player
-        playerViewController.allowsPictureInPicturePlayback = true
-        playerViewController.delegate = self
+        playerView.player = playerModel.player
+        playerView.allowsPictureInPicturePlayback = true
+        playerView.delegate = self
 
         #if os(tvOS)
-            playerModel.avPlayerViewController = playerViewController
             var infoViewControllers = [UIHostingController<AnyView>]()
             if CommentsModel.enabled {
                 infoViewControllers.append(infoViewController([.comments], title: "Comments"))
@@ -54,7 +66,7 @@ final class PlayerViewController: UIViewController {
                 infoViewController([.playingNext, .playedPreviously], title: "Playing Next")
             ])
 
-            playerViewController.customInfoViewControllers = infoViewControllers
+            playerView.customInfoViewControllers = infoViewControllers
         #else
             embedViewController()
         #endif
@@ -81,12 +93,12 @@ final class PlayerViewController: UIViewController {
         }
     #else
         func embedViewController() {
-            playerViewController.view.frame = view.bounds
+            playerView.view.frame = view.bounds
 
-            addChild(playerViewController)
-            view.addSubview(playerViewController.view)
+            addChild(playerView)
+            view.addSubview(playerView.view)
 
-            playerViewController.didMove(toParent: self)
+            playerView.didMove(toParent: self)
         }
     #endif
 }
@@ -127,19 +139,19 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewController(
-        _ playerViewController: AVPlayerViewController,
+        _: AVPlayerViewController,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if self.navigationModel.presentingChannel {
                 self.playerModel.playerNavigationLinkActive = true
             } else {
-                self.playerModel.presentPlayer()
+                self.playerModel.show()
             }
 
             #if os(tvOS)
                 if self.playerModel.playingInPictureInPicture {
-                    self.present(playerViewController, animated: false) {
+                    self.present(self.playerView, animated: false) {
                         completionHandler(true)
                     }
                 }

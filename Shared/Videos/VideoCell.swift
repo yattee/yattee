@@ -31,7 +31,7 @@ struct VideoCell: View {
                 if inNavigationView {
                     player.playerNavigationLinkActive = true
                 } else {
-                    player.presentPlayer()
+                    player.show()
                 }
             }) {
                 content

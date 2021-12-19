@@ -4,7 +4,7 @@ import SwiftUI
 struct Player: NSViewControllerRepresentable {
     @EnvironmentObject<PlayerModel> private var player
 
-    var controller: PlayerViewController?
+    @State private var controller: PlayerViewController?
 
     init(controller: PlayerViewController? = nil) {
         self.controller = controller

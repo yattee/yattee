@@ -9,6 +9,12 @@ struct PlaybackSettings: View {
     @Default(.showKeywords) private var showKeywords
     @Default(.showChannelSubscribers) private var channelSubscribers
     @Default(.saveHistory) private var saveHistory
+    @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    @Default(.closePiPOnNavigation) private var closePiPOnNavigation
+    @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
+    #if !os(macOS)
+        @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
+    #endif
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
@@ -29,6 +35,13 @@ struct PlaybackSettings: View {
 
                     keywordsToggle
                     channelSubscribersToggle
+                    pauseOnHidingPlayerToggle
+                }
+
+                Section(header: SettingsHeader(text: "Picture in Picture")) {
+                    closePiPOnNavigationToggle
+                    closePiPOnOpeningPlayerToggle
+                    closePiPAndOpenPlayerOnEnteringForegroundToggle
                 }
             #else
                 Section(header: SettingsHeader(text: "Source")) {
@@ -47,6 +60,15 @@ struct PlaybackSettings: View {
 
                 keywordsToggle
                 channelSubscribersToggle
+                pauseOnHidingPlayerToggle
+
+                Section(header: SettingsHeader(text: "Picture in Picture")) {
+                    closePiPOnNavigationToggle
+                    closePiPOnOpeningPlayerToggle
+                    #if !os(macOS)
+                        closePiPAndOpenPlayerOnEnteringForegroundToggle
+                    #endif
+                }
             #endif
         }
 
@@ -114,6 +136,24 @@ struct PlaybackSettings: View {
     private var channelSubscribersToggle: some View {
         Toggle("Show channel subscribers count", isOn: $channelSubscribers)
     }
+
+    private var pauseOnHidingPlayerToggle: some View {
+        Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
+    }
+
+    private var closePiPOnNavigationToggle: some View {
+        Toggle("Close PiP when starting playing other video", isOn: $closePiPOnNavigation)
+    }
+
+    private var closePiPOnOpeningPlayerToggle: some View {
+        Toggle("Close PiP when player is opened", isOn: $closePiPOnOpeningPlayer)
+    }
+
+    #if !os(macOS)
+        private var closePiPAndOpenPlayerOnEnteringForegroundToggle: some View {
+            Toggle("Close PiP and open player when application enters foreground", isOn: $closePiPAndOpenPlayerOnEnteringForeground)
+        }
+    #endif
 }
 
 struct PlaybackSettings_Previews: PreviewProvider {

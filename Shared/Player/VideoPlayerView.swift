@@ -31,7 +31,8 @@ struct VideoPlayerView: View {
             HSplitView {
                 content
             }
-            .frame(idealWidth: 1000, maxWidth: 1100, minHeight: 700)
+            .onOpenURL(perform: handleOpenedURL)
+            .frame(minWidth: 950, minHeight: 700)
         #else
             GeometryReader { geometry in
                 HStack(spacing: 0) {
@@ -66,15 +67,16 @@ struct VideoPlayerView: View {
 
                             if player.currentItem.isNil {
                                 playerPlaceholder(geometry: geometry)
+                            } else if player.playingInPictureInPicture {
+                                pictureInPicturePlaceholder(geometry: geometry)
                             } else {
-                                #if os(macOS)
-                                    Player()
-                                        .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio))
-
-                                #else
-                                    player.playerView
-                                        .modifier(VideoPlayerSizeModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio))
-                                #endif
+                                player.playerView
+                                    .modifier(
+                                        VideoPlayerSizeModifier(
+                                            geometry: geometry,
+                                            aspectRatio: player.controller?.aspectRatio
+                                        )
+                                    )
                             }
                         }
                         #if os(iOS)
@@ -143,6 +145,35 @@ struct VideoPlayerView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
     }
 
+    func pictureInPicturePlaceholder(geometry: GeometryProxy) -> some View {
+        HStack {
+            Spacer()
+            VStack {
+                Spacer()
+                VStack(spacing: 10) {
+                    #if !os(tvOS)
+                        Image(systemName: "pip")
+                            .font(.system(size: 120))
+                    #endif
+
+                    Text("Playing in Picture in Picture")
+                }
+                Spacer()
+            }
+            .foregroundColor(.gray)
+            Spacer()
+        }
+        .contextMenu {
+            Button {
+                player.closePiP()
+            } label: {
+                Label("Exit Picture in Picture", systemImage: "pip.exit")
+            }
+        }
+        .contentShape(Rectangle())
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
+    }
+
     var sidebarQueue: Bool {
         switch Defaults[.playerSidebar] {
         case .never:
@@ -160,6 +191,27 @@ struct VideoPlayerView: View {
             set: { _ in }
         )
     }
+
+    #if !os(tvOS)
+        func handleOpenedURL(_ url: URL) {
+            guard !player.accounts.current.isNil else {
+                return
+            }
+
+            let parser = VideoURLParser(url: url)
+
+            guard let id = parser.id else {
+                return
+            }
+
+            player.accounts.api.video(id).load().onSuccess { response in
+                if let video: Video = response.typedContent() {
+                    self.player.playNow(video, at: parser.time)
+                    self.player.show()
+                }
+            }
+        }
+    #endif
 }
 
 struct VideoPlayerView_Previews: PreviewProvider {
