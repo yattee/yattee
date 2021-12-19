@@ -8,10 +8,6 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     @Published var account: Account!
 
-    var anonymousAccount: Account {
-        .init(instanceID: account.instance.id, name: "Anonymous", url: account.instance.apiURL)
-    }
-
     init(account: Account? = nil) {
         super.init()
 

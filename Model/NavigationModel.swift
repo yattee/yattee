@@ -74,7 +74,7 @@ final class NavigationModel: ObservableObject {
     var tabSelectionBinding: Binding<TabSelection> {
         Binding<TabSelection>(
             get: {
-                self.tabSelection ?? .favorites
+                self.tabSelection ?? .search
             },
             set: { newValue in
                 self.tabSelection = newValue

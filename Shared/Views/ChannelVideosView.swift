@@ -10,16 +10,15 @@ struct ChannelVideosView: View {
     @StateObject private var store = Store<Channel>()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.presentationMode) private var presentationMode
-    @Environment(\.inNavigationView) private var inNavigationView
 
     #if os(iOS)
+        @Environment(\.inNavigationView) private var inNavigationView
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+        @EnvironmentObject<PlayerModel> private var player
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Namespace private var focusNamespace

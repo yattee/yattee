@@ -4,8 +4,6 @@ import SwiftUI
 struct Sidebar: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Default(.visibleSections) private var visibleSections
 

@@ -5,7 +5,6 @@ import SwiftUI
 struct AccountSelectionView: View {
     var showHeader = true
 
-    @EnvironmentObject<InstancesModel> private var instancesModel
     @EnvironmentObject<AccountsModel> private var accountsModel
 
     @Default(.accounts) private var accounts

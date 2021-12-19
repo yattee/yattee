@@ -685,46 +685,47 @@ final class PlayerModel: ObservableObject {
 
         #if os(tvOS)
             show()
-            closePipByReplacingItem(wasPlaying: wasPlaying)
-        #else
-            closePiPByNilingPlayer(wasPlaying: wasPlaying)
         #endif
+
+        doClosePiP(wasPlaying: wasPlaying)
     }
 
-    private func closePipByReplacingItem(wasPlaying: Bool) {
-        let item = player.currentItem
-        let time = player.currentTime()
+    #if os(tvOS)
+        private func doClosePiP(wasPlaying: Bool) {
+            let item = player.currentItem
+            let time = player.currentTime()
 
-        self.player.replaceCurrentItem(with: nil)
+            self.player.replaceCurrentItem(with: nil)
 
-        guard !item.isNil else {
-            return
+            guard !item.isNil else {
+                return
+            }
+
+            self.player.seek(to: time)
+            self.player.replaceCurrentItem(with: item)
+
+            guard wasPlaying else {
+                return
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                self?.play()
+            }
         }
+    #else
+        private func doClosePiP(wasPlaying: Bool) {
+            controller?.playerView.player = nil
+            controller?.playerView.player = player
 
-        self.player.seek(to: time)
-        self.player.replaceCurrentItem(with: item)
+            guard wasPlaying else {
+                return
+            }
 
-        guard wasPlaying else {
-            return
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.play()
+            }
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.play()
-        }
-    }
-
-    private func closePiPByNilingPlayer(wasPlaying: Bool) {
-        controller?.playerView.player = nil
-        controller?.playerView.player = player
-
-        guard wasPlaying else {
-            return
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.play()
-        }
-    }
+    #endif
 
     #if os(macOS)
         var windowTitle: String {

@@ -179,7 +179,7 @@ struct PlaylistsView: View {
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         #if os(macOS)
-            .background(Color.tertiaryBackground)
+            .background(Color.secondaryBackground)
         #endif
     }
 

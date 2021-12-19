@@ -22,7 +22,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 37FD43E72704A2240073EE42 /* Build configuration list for PBXAggregateTarget "Periphery (macOS)" */;
 			buildPhases = (
-				37FD43EA2704A2350073EE42 /* ShellScript */,
+				37FD43EA2704A2350073EE42 /* Run Script */,
 			);
 			dependencies = (
 			);
@@ -369,7 +369,6 @@
 		37B81B0326D2CAE700675966 /* PlaybackBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81B0126D2CAE700675966 /* PlaybackBar.swift */; };
 		37BA793B26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */; };
 		37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */; };
-		37BA793D26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */; };
 		37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */; };
 		37BA794026DB8F97002A0235 /* ChannelVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */; };
 		37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */; };
@@ -1668,7 +1667,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nperiphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (iOS)\" \\\n  --targets \"Yattee (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=15.0\"\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nperiphery scan \\\n  --project \"Yattee.xcodeproj\" \\\n  --schemes \"Yattee (iOS)\" \\\n  --targets \"Yattee (iOS)\" \\\n  --retain-objc-accessible \\\n  --retain-public \\\n  -- -destination \"platform=iOS\\ Simulator,name=iPhone\\ 8,OS=14.5\"\n";
 		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1721,7 +1720,7 @@
 			shellPath = /bin/sh;
 			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
-		37FD43EA2704A2350073EE42 /* ShellScript */ = {
+		37FD43EA2704A2350073EE42 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1730,6 +1729,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -2231,7 +2231,6 @@
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
 				374C053727242D9F009BDDBE /* ServicesSettings.swift in Sources */,
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
-				37BA793D26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				3711404126B206A6005B3555 /* SearchModel.swift in Sources */,
 				37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,

@@ -51,7 +51,7 @@ struct FavoritesView: View {
                 .navigationTitle("Favorites")
             #endif
             #if os(macOS)
-            .background(Color.tertiaryBackground)
+            .background(Color.secondaryBackground)
             .frame(minWidth: 360)
             #endif
         }

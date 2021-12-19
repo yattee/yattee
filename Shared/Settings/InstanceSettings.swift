@@ -8,9 +8,6 @@ struct InstanceSettings: View {
 
     @State private var frontendURL = ""
 
-    @EnvironmentObject<AccountsModel> private var model
-    @EnvironmentObject<InstancesModel> private var instances
-
     var instance: Instance! {
         InstancesModel.find(instanceID)
     }

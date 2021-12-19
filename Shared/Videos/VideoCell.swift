@@ -62,7 +62,7 @@ struct VideoCell: View {
             #endif
         }
         #if os(macOS)
-        .background(Color.tertiaryBackground)
+        .background(Color.secondaryBackground)
         #endif
     }
 

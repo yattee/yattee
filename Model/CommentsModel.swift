@@ -16,7 +16,6 @@ final class CommentsModel: ObservableObject {
     @Published var repliesPageID: String?
     @Published var repliesLoaded = false
 
-    var accounts: AccountsModel!
     var player: PlayerModel!
 
     static var instance: Instance? {

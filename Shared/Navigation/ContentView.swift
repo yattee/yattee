@@ -123,7 +123,6 @@ struct ContentView: View {
         search.accounts = accounts
         subscriptions.accounts = accounts
 
-        comments.accounts = accounts
         comments.player = player
 
         menu.accounts = accounts

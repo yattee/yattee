@@ -8,7 +8,6 @@ struct PlaybackSettings: View {
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showKeywords) private var showKeywords
     @Default(.showChannelSubscribers) private var channelSubscribers
-    @Default(.saveHistory) private var saveHistory
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer

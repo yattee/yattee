@@ -141,12 +141,6 @@ struct NowPlayingView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 560, maxHeight: .infinity, alignment: .leading)
     }
 
-    func header(_ text: String) -> some View {
-        Text(text)
-            .font((inInfoViewController ? Font.system(size: 40) : .title3).bold())
-            .foregroundColor(.secondary)
-    }
-
     private var progressView: some View {
         VStack {
             Spacer()

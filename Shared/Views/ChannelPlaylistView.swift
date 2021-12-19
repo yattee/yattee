@@ -13,10 +13,10 @@ struct ChannelPlaylistView: View {
 
     #if os(iOS)
         @Environment(\.inNavigationView) private var inNavigationView
+        @EnvironmentObject<PlayerModel> private var player
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlayerModel> private var player
 
     var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])

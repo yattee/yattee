@@ -19,7 +19,7 @@ struct VerticalCells: View {
         }
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
-            .background(Color.tertiaryBackground)
+            .background(Color.secondaryBackground)
             .frame(minWidth: 360)
         #endif
     }

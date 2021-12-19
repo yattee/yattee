@@ -116,7 +116,7 @@ struct PlayerControlsView<Content: View>: View {
             } else {
                 controls
                 #if !os(tvOS)
-                .background(Color.tertiaryBackground)
+                .background(Color.secondaryBackground)
                 #endif
             }
         }

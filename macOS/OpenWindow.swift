@@ -32,7 +32,7 @@ enum OpenWindow: String, CaseIterable {
     func open() {
         switch self {
         case .player:
-            NSWorkspace.shared.open(URL(string: "yattee://player")!)
+            NSWorkspace.shared.open(URL(string: "yattee://\(location)")!)
         case .main:
             Self.main.focus()
         }

@@ -107,10 +107,6 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
 enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
     case favorites, subscriptions, popular, trending, playlists
 
-    static func from(_ string: String) -> VisibleSection {
-        allCases.first { $0.rawValue == string }!
-    }
-
     var title: String {
         rawValue.localizedCapitalized
     }

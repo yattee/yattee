@@ -6,20 +6,19 @@ import SwiftUI
 
 struct AppSidebarNavigation: View {
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<InstancesModel> private var instances
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
-
-    @Default(.visibleSections) private var visibleSections
 
     #if os(iOS)
         @State private var didApplyPrimaryViewWorkAround = false
+
+        @EnvironmentObject<CommentsModel> private var comments
+        @EnvironmentObject<InstancesModel> private var instances
+        @EnvironmentObject<NavigationModel> private var navigation
+        @EnvironmentObject<PlayerModel> private var player
+        @EnvironmentObject<PlaylistsModel> private var playlists
+        @EnvironmentObject<RecentsModel> private var recents
+        @EnvironmentObject<SearchModel> private var search
+        @EnvironmentObject<SubscriptionsModel> private var subscriptions
+        @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
     #endif
 
     var body: some View {
@@ -66,24 +65,20 @@ struct AppSidebarNavigation: View {
         #if os(iOS)
             .background(
                 EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                    videoPlayer
+                    VideoPlayerView()
+                        .environmentObject(accounts)
+                        .environmentObject(comments)
+                        .environmentObject(instances)
+                        .environmentObject(navigation)
+                        .environmentObject(player)
+                        .environmentObject(playlists)
+                        .environmentObject(recents)
+                        .environmentObject(subscriptions)
+                        .environmentObject(thumbnailsModel)
                         .environment(\.navigationStyle, .sidebar)
                 }
             )
         #endif
-    }
-
-    private var videoPlayer: some View {
-        VideoPlayerView()
-            .environmentObject(accounts)
-            .environmentObject(comments)
-            .environmentObject(instances)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(playlists)
-            .environmentObject(recents)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
     }
 
     var toolbarContent: some ToolbarContent {

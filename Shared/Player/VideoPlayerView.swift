@@ -14,7 +14,7 @@ struct VideoPlayerView: View {
     }
 
     @State private var playerSize: CGSize = .zero
-    @State private var fullScreen = false
+    @State private var fullScreenDetails = false
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -95,15 +95,15 @@ struct VideoPlayerView: View {
                         Group {
                             #if os(iOS)
                                 if verticalSizeClass == .regular {
-                                    VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
+                                    VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
                                 }
 
                             #else
-                                VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
+                                VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
                             #endif
                         }
                         .background(colorScheme == .dark ? Color.black : Color.white)
-                        .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio, fullScreen: fullScreen))
+                        .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio, fullScreen: fullScreenDetails))
                     }
                 #endif
             }
@@ -113,12 +113,12 @@ struct VideoPlayerView: View {
             #endif
             #if os(iOS)
                 if sidebarQueue {
-                    PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreen)
+                    PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreenDetails)
                         .frame(maxWidth: 350)
                 }
             #elseif os(macOS)
                 if Defaults[.playerSidebar] != .never {
-                    PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreen)
+                    PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
                         .frame(minWidth: 300)
                 }
             #endif

@@ -4,7 +4,6 @@ struct CommentsView: View {
     @State private var repliesID: Comment.ID?
 
     @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
         Group {

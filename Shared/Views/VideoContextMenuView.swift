@@ -80,14 +80,6 @@ struct VideoContextMenuView: View {
         }
     }
 
-    private var isShowingChannelButton: Bool {
-        if case .channel = navigation.tabSelection {
-            return false
-        }
-
-        return !inChannelView
-    }
-
     private var addToQueueButton: some View {
         Button {
             player.enqueueVideo(video)
