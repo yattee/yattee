@@ -85,7 +85,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var likesCount: String? {
-        guard likes != -1 else {
+        guard (likes ?? 0) > 0 else {
             return nil
         }
 
@@ -93,7 +93,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var dislikesCount: String? {
-        guard dislikes != -1 else {
+        guard (dislikes ?? 0) > 0 else {
             return nil
         }
 
