@@ -49,20 +49,22 @@ struct FavoriteItemView: View {
                 }
 
                 .contentShape(Rectangle())
-                .opacity(dragging?.id == item.id ? 0.5 : 1)
-                .onAppear {
-                    resource?.addObserver(store)
-                    resource?.load()
-                }
+                #if os(macOS)
+                    .opacity(dragging?.id == item.id ? 0.5 : 1)
+                #endif
+                    .onAppear {
+                        resource?.addObserver(store)
+                        resource?.load()
+                    }
                 #if !os(tvOS)
-                .onDrag {
-                    dragging = item
-                    return NSItemProvider(object: item.id as NSString)
-                }
-                .onDrop(
-                    of: [UTType.text],
-                    delegate: DropFavorite(item: item, favorites: $favorites, current: $dragging)
-                )
+                    .onDrag {
+                        dragging = item
+                        return NSItemProvider(object: item.id as NSString)
+                    }
+                    .onDrop(
+                        of: [UTType.text],
+                        delegate: DropFavorite(item: item, favorites: $favorites, current: $dragging)
+                    )
                 #endif
             }
         }
