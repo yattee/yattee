@@ -284,7 +284,8 @@ final class PlayerModel: ObservableObject {
                         return
                     }
 
-                    if let segment = self.sponsorBlock.segments.first,
+                    if !preservingTime,
+                       let segment = self.sponsorBlock.segments.first,
                        segment.start < 3,
                        self.lastSkipped.isNil
                     {
