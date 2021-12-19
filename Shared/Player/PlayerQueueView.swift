@@ -76,11 +76,16 @@ struct PlayerQueueView: View {
                     ForEach(player.currentVideo!.related) { video in
                         PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
                             .contextMenu {
-                                Button("Play Next") {
+                                Button {
                                     player.playNext(video)
+                                } label: {
+                                    Label("Play Next", systemImage: "text.insert")
                                 }
-                                Button("Play Last") {
+
+                                Button {
                                     player.enqueueVideo(video)
+                                } label: {
+                                    Label("Play Last", systemImage: "text.append")
                                 }
                             }
                     }
