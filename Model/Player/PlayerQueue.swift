@@ -54,21 +54,10 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
         restoreLoadedChannel()
 
-        loadAvailableStreams(currentVideo!) { streams in
-            guard let stream = self.preferredStream(streams) else {
-                return
-            }
-
-            self.streamSelection = stream
-            self.playStream(
-                stream,
-                of: self.currentVideo!,
-                preservingTime: !self.currentItem.playbackTime.isNil
-            )
-        }
+        loadAvailableStreams(currentVideo!)
     }
 
-    private func preferredStream(_ streams: [Stream]) -> Stream? {
+    func preferredStream(_ streams: [Stream]) -> Stream? {
         let quality = Defaults[.quality]
         var streams = streams
 

@@ -27,15 +27,13 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         self.account = account
         signedIn = false
 
-        if account.anonymous {
-            validInstance = true
-            return
-        }
-
-        validInstance = false
+        validInstance = account.anonymous
 
         configure()
-        validate()
+
+        if !account.anonymous {
+            validate()
+        }
     }
 
     func validate() {

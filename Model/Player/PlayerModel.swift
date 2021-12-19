@@ -26,7 +26,7 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { player.rate = currentRate } }
 
-    @Published var availableStreams = [Stream]() { didSet { rebuildTVMenu() } }
+    @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() }}
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
@@ -171,10 +171,24 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    private func pauseOnPlayerDismiss() {
-        if !playingInPictureInPicture, !presentingPlayer {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.pause()
+    private func handleAvailableStreamsChange() {
+        rebuildTVMenu()
+
+        guard stream.isNil else {
+            return
+        }
+
+        guard let stream = preferredStream(availableStreams) else {
+            return
+        }
+
+        streamSelection = stream
+        playStream(
+            stream,
+            of: currentVideo!,
+            preservingTime: !currentItem.playbackTime.isNil
+        )
+    }
             }
         }
     }

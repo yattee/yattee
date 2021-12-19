@@ -15,21 +15,20 @@ extension PlayerModel {
         availableStreams.sorted(by: streamsSorter)
     }
 
-    func loadAvailableStreams(
-        _ video: Video,
-        completionHandler: @escaping ([Stream]) -> Void = { _ in }
-    ) {
+    func loadAvailableStreams(_ video: Video) {
         availableStreams = []
-        var instancesWithLoadedStreams = [Instance]()
+        let playerInstance = InstancesModel.forPlayer ?? InstancesModel.all.first
 
-        InstancesModel.all.forEach { instance in
-            fetchStreams(instance.anonymous.video(video.videoID), instance: instance, video: video) { _ in
-                self.completeIfAllInstancesLoaded(
-                    instance: instance,
-                    streams: self.availableStreams,
-                    instancesWithLoadedStreams: &instancesWithLoadedStreams,
-                    completionHandler: completionHandler
-                )
+        guard !playerInstance.isNil else {
+            return
+        }
+
+        logger.info("loading streams from \(playerInstance!.description)")
+
+        fetchStreams(playerInstance!.anonymous.video(video.videoID), instance: playerInstance!, video: video) { _ in
+            InstancesModel.all.filter { $0 != playerInstance }.forEach { instance in
+                self.logger.info("loading streams from \(instance.description)")
+                self.fetchStreams(instance.anonymous.video(video.videoID), instance: instance, video: video)
             }
         }
     }
@@ -45,23 +44,11 @@ extension PlayerModel {
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
                     self.availableStreams += self.streamsWithInstance(instance: instance, streams: video.streams)
+                } else {
+                    self.logger.critical("no streams available from \(instance.description)")
                 }
             }
             .onCompletion(onCompletion)
-    }
-
-    private func completeIfAllInstancesLoaded(
-        instance: Instance,
-        streams: [Stream],
-        instancesWithLoadedStreams: inout [Instance],
-        completionHandler: @escaping ([Stream]) -> Void
-    ) {
-        instancesWithLoadedStreams.append(instance)
-        rebuildTVMenu()
-
-        if InstancesModel.all.count == instancesWithLoadedStreams.count {
-            completionHandler(streams.sorted { $0.kind < $1.kind })
-        }
     }
 
     func streamsWithInstance(instance: Instance, streams: [Stream]) -> [Stream] {

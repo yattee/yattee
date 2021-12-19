@@ -6,6 +6,14 @@ final class InstancesModel: ObservableObject {
         Defaults[.instances]
     }
 
+    static var forPlayer: Instance? {
+        guard let id = Defaults[.playerInstanceID] else {
+            return nil
+        }
+
+        return InstancesModel.find(id)
+    }
+
     var lastUsed: Instance? {
         guard let id = Defaults[.lastInstanceID] else {
             return nil
