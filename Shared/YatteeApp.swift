@@ -41,12 +41,14 @@ struct YatteeApp: App {
                     player.handleEnterForeground()
                 }
             #endif
-            #if !os(tvOS)
-            .handlesExternalEvents(preferring: Set(["watch"]), allowing: Set(["watch"]))
+            #if os(iOS)
+            .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
             #endif
         }
+        #if os(iOS)
+        .handlesExternalEvents(matching: Set(["*"]))
+        #endif
         #if !os(tvOS)
-        .handlesExternalEvents(matching: Set(arrayLiteral: "watch"))
         .commands {
             SidebarCommands()
 
@@ -78,14 +80,14 @@ struct YatteeApp: App {
                     .environmentObject(recents)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnails)
-                    .handlesExternalEvents(preferring: Set(["player"]), allowing: Set(["player"]))
+                    .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
             }
-            .handlesExternalEvents(matching: Set(["player"]))
+            .handlesExternalEvents(matching: Set(["player", "*"]))
 
             Settings {
                 SettingsView()
-                    .environmentObject(AccountsModel())
-                    .environmentObject(InstancesModel())
+                    .environmentObject(accounts)
+                    .environmentObject(instances)
                     .environmentObject(updater)
             }
         #endif

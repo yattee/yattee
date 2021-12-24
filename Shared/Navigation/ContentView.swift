@@ -65,7 +65,7 @@ struct ContentView: View {
             }
         )
         #if !os(tvOS)
-        .onOpenURL(perform: handleOpenedURL)
+        .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
                 AddToPlaylistView(video: navigation.videoToAddToPlaylist)
@@ -161,28 +161,6 @@ struct ContentView: View {
 
         navigation.presentingWelcomeScreen = true
     }
-
-    #if !os(tvOS)
-        func handleOpenedURL(_ url: URL) {
-            guard !accounts.current.isNil else {
-                return
-            }
-
-            let parser = VideoURLParser(url: url)
-
-            guard let id = parser.id else {
-                return
-            }
-
-            accounts.api.video(id).load().onSuccess { response in
-                if let video: Video = response.typedContent() {
-                    player.addCurrentItemToHistory()
-                    self.player.playNow(video, at: parser.time)
-                    self.player.show()
-                }
-            }
-        }
-    #endif
 }
 
 struct ContentView_Previews: PreviewProvider {

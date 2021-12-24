@@ -22,6 +22,10 @@ final class AccountsModel: ObservableObject {
         return AccountsModel.find(id)
     }
 
+    var any: Account? {
+        lastUsed ?? all.randomElement()
+    }
+
     var app: VideosApp {
         current?.instance?.app ?? .invidious
     }

@@ -24,6 +24,7 @@ struct VideoPlayerView: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
@@ -31,7 +32,7 @@ struct VideoPlayerView: View {
             HSplitView {
                 content
             }
-            .onOpenURL(perform: handleOpenedURL)
+            .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
             .frame(minWidth: 950, minHeight: 700)
         #else
             GeometryReader { geometry in
@@ -83,10 +84,10 @@ struct VideoPlayerView: View {
                         .onSwipeGesture(
                             up: {
                                 withAnimation {
-                                    fullScreen = true
+                                    fullScreenDetails = true
                                 }
                             },
-                            down: { presentationMode.wrappedValue.dismiss() }
+                            down: { player.hide() }
                         )
                         #endif
 
@@ -191,27 +192,6 @@ struct VideoPlayerView: View {
             set: { _ in }
         )
     }
-
-    #if !os(tvOS)
-        func handleOpenedURL(_ url: URL) {
-            guard !player.accounts.current.isNil else {
-                return
-            }
-
-            let parser = VideoURLParser(url: url)
-
-            guard let id = parser.id else {
-                return
-            }
-
-            player.accounts.api.video(id).load().onSuccess { response in
-                if let video: Video = response.typedContent() {
-                    self.player.playNow(video, at: parser.time)
-                    self.player.show()
-                }
-            }
-        }
-    #endif
 }
 
 struct VideoPlayerView_Previews: PreviewProvider {
