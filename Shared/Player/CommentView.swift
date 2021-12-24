@@ -107,7 +107,7 @@ struct CommentView: View {
             .placeholder {
                 Rectangle().fill(Color("PlaceholderColor"))
             }
-            .retryOnAppear(false)
+            .retryOnAppear(true)
             .indicator(.activity)
             .mask(RoundedRectangle(cornerRadius: 60))
         #if os(tvOS)

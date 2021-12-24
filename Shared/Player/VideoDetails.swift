@@ -410,7 +410,7 @@ struct VideoDetails: View {
                     .placeholder {
                         Rectangle().fill(Color("PlaceholderColor"))
                     }
-                    .retryOnAppear(false)
+                    .retryOnAppear(true)
                     .indicator(.activity)
                     .clipShape(Circle())
                     .frame(width: 45, height: 45, alignment: .leading)
