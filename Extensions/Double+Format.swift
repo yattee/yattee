@@ -2,7 +2,7 @@ import Foundation
 
 extension Double {
     func formattedAsPlaybackTime() -> String? {
-        guard !isZero else {
+        guard !isZero, isFinite else {
             return nil
         }
 
