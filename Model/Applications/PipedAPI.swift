@@ -298,6 +298,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let published = (details["uploadedDate"] ?? details["uploadDate"])?.stringValue ??
             (details["uploaded"]!.double! / 1000).formattedAsRelativeTime()!
+        let live = details["livestream"]?.boolValue ?? (details["duration"]?.intValue == -1)
 
         return Video(
             videoID: extractID(from: content),
@@ -309,6 +310,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             description: extractDescription(from: content),
             channel: Channel(id: channelId, name: author, thumbnailURL: authorThumbnailURL),
             thumbnails: thumbnails,
+            live: live,
             likes: details["likes"]?.int,
             dislikes: details["dislikes"]?.int,
             streams: extractStreams(from: content),
