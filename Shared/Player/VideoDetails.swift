@@ -365,16 +365,18 @@ struct VideoDetails: View {
 
                     Spacer()
 
-                    if accounts.app.supportsUserPlaylists {
-                        Button {
-                            presentingAddToPlaylist = true
-                        } label: {
-                            Label("Add to Playlist", systemImage: "text.badge.plus")
-                                .labelStyle(.iconOnly)
-                                .help("Add to Playlist...")
-                        }
-                        .buttonStyle(.plain)
+                    Button {
+                        presentingAddToPlaylist = true
+                    } label: {
+                        Label("Add to Playlist", systemImage: "text.badge.plus")
+                            .labelStyle(.iconOnly)
+                            .help("Add to Playlist...")
                     }
+                    .buttonStyle(.plain)
+                    .opacity(accounts.app.supportsUserPlaylists ? 1 : 0)
+                    #if os(macOS)
+                        .frame(minWidth: 35, alignment: .trailing)
+                    #endif
                 }
                 .frame(maxHeight: 35)
                 .foregroundColor(.secondary)
