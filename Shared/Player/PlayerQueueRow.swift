@@ -14,7 +14,7 @@ struct PlayerQueueRow: View {
     var body: some View {
         Group {
             Button {
-                player.addCurrentItemToHistory()
+                player.prepareCurrentItemForHistory()
 
                 if history {
                     player.playHistory(item)

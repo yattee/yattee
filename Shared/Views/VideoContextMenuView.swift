@@ -1,3 +1,4 @@
+import CoreData
 import Defaults
 import SwiftUI
 
@@ -19,7 +20,35 @@ struct VideoContextMenuView: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @FetchRequest private var watchRequest: FetchedResults<Watch>
+
+    @Default(.saveHistory) private var saveHistory
+
+    private var viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext
+
+    init(video: Video, playerNavigationLinkActive: Binding<Bool>) {
+        self.video = video
+        _playerNavigationLinkActive = playerNavigationLinkActive
+        _watchRequest = video.watchFetchRequest
+    }
+
     var body: some View {
+        if saveHistory {
+            Section {
+                if let watchedAtString = watchedAtString {
+                    Text(watchedAtString)
+                }
+
+                if !watch.isNil, !watch!.finished, !watchingNow {
+                    continueButton
+                }
+
+                if !watch.isNil, !watchingNow {
+                    removeFromHistoryButton
+                }
+            }
+        }
+
         Section {
             playNowButton
         }
@@ -54,19 +83,49 @@ struct VideoContextMenuView: View {
         #endif
     }
 
-    private var playNowButton: some View {
-        Button {
-            player.playNow(video)
+    private var watch: Watch? {
+        watchRequest.first
+    }
 
-            guard !player.playingInPictureInPicture else {
+    private var watchingNow: Bool {
+        player.currentVideo == video
+    }
+
+    private var watchedAtString: String? {
+        if watchingNow {
+            return "Watching now"
+        }
+
+        if let watch = watch, let watchedAtString = watch.watchedAtString {
+            return "Watched \(watchedAtString)"
+        }
+
+        return nil
+    }
+
+    private var continueButton: some View {
+        Button {
+            player.play(video, at: watch!.stoppedAt, inNavigationView: inNavigationView)
+        } label: {
+            Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime() ?? "where I left off")", systemImage: "playpause")
+        }
+    }
+
+    var removeFromHistoryButton: some View {
+        Button {
+            guard let watch = watch else {
                 return
             }
 
-            if inNavigationView {
-                playerNavigationLinkActive = true
-            } else {
-                player.show()
-            }
+            player.removeWatch(watch)
+        } label: {
+            Label("Remove from history", systemImage: "delete.left.fill")
+        }
+    }
+
+    private var playNowButton: some View {
+        Button {
+            player.play(video, inNavigationView: inNavigationView)
         } label: {
             Label("Play Now", systemImage: "play")
         }

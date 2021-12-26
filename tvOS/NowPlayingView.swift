@@ -1,3 +1,4 @@
+import CoreMedia
 import Defaults
 import SwiftUI
 
@@ -10,6 +11,9 @@ struct NowPlayingView: View {
     var inInfoViewController = false
 
     @State private var repliesID: Comment.ID?
+
+    @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
+    var watches: FetchedResults<Watch>
 
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<PlayerModel> private var player
@@ -94,22 +98,27 @@ struct NowPlayingView: View {
                     }
                 }
 
-                if sections.contains(.playedPreviously), saveHistory, !player.history.isEmpty {
+                if sections.contains(.playedPreviously), saveHistory, !visibleWatches.isEmpty {
                     Section(header: Text("Played Previously")) {
-                        ForEach(player.history) { item in
+                        ForEach(visibleWatches, id: \.videoID) { watch in
                             Button {
-                                player.playHistory(item)
+                                player.playHistory(
+                                    PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID))
+                                )
                                 player.show()
                             } label: {
-                                VideoBanner(video: item.video, playbackTime: item.playbackTime, videoDuration: item.videoDuration)
+                                VideoBanner(
+                                    video: player.historyVideo(watch.videoID),
+                                    playbackTime: CMTime.secondsInDefaultTimescale(watch.stoppedAt),
+                                    videoDuration: watch.videoDuration
+                                )
+                            }
+                            .onAppear {
+                                player.loadHistoryVideoDetails(watch.videoID)
                             }
                             .contextMenu {
                                 Button("Remove", role: .destructive) {
-                                    player.removeHistory(item)
-                                }
-
-                                Button("Remove All", role: .destructive) {
-                                    player.removeHistoryItems()
+                                    player.removeWatch(watch)
                                 }
                             }
                         }
@@ -139,6 +148,10 @@ struct NowPlayingView: View {
         .padding(.horizontal, inInfoViewController ? 40 : 0)
         .listStyle(.grouped)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 560, maxHeight: .infinity, alignment: .leading)
+    }
+
+    private var visibleWatches: [Watch] {
+        watches.filter { $0.videoID != player.currentVideo?.videoID }
     }
 
     private var progressView: some View {

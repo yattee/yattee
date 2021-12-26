@@ -80,7 +80,7 @@ struct PlaybackBar: View {
 
     private var closeButton: some View {
         Button {
-            presentationMode.wrappedValue.dismiss()
+            player.hide()
         } label: {
             Label(
                 "Close",

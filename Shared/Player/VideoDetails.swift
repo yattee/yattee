@@ -41,7 +41,7 @@ struct VideoDetails: View {
     }
 
     var video: Video? {
-        player.currentItem?.video
+        player.currentVideo
     }
 
     var body: some View {
@@ -423,7 +423,7 @@ struct VideoDetails: View {
     var detailsPage: some View {
         Group {
             Group {
-                if let video = player.currentItem?.video {
+                if let video = player.currentVideo {
                     Group {
                         HStack {
                             publishedDateSection

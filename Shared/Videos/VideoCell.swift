@@ -3,7 +3,7 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoCell: View {
-    var video: Video
+    private var video: Video
 
     @Environment(\.inNavigationView) private var inNavigationView
 
@@ -18,25 +18,25 @@ struct VideoCell: View {
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
+    @Default(.saveHistory) private var saveHistory
+    @Default(.showWatchingProgress) private var showWatchingProgress
+    @Default(.watchedVideoStyle) private var watchedVideoStyle
+    @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
+
+    @FetchRequest private var watchRequest: FetchedResults<Watch>
+
+    init(video: Video) {
+        self.video = video
+        _watchRequest = video.watchFetchRequest
+    }
 
     var body: some View {
         Group {
-            Button(action: {
-                player.playNow(video)
-
-                guard !player.playingInPictureInPicture else {
-                    return
-                }
-
-                if inNavigationView {
-                    player.playerNavigationLinkActive = true
-                } else {
-                    player.show()
-                }
-            }) {
+            Button(action: playAction) {
                 content
             }
         }
+        .opacity(contentOpacity)
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: 12))
         .contextMenu {
@@ -48,7 +48,50 @@ struct VideoCell: View {
         }
     }
 
-    var content: some View {
+    private func playAction() {
+        if watchingNow {
+            if !player.playingInPictureInPicture {
+                player.show()
+            }
+
+            if !playNowContinues {
+                player.player.seek(to: .zero)
+            }
+
+            player.play()
+
+            return
+        }
+
+        var playAt: TimeInterval?
+
+        if playNowContinues,
+           !watch.isNil,
+           !watch!.finished
+        {
+            playAt = watch!.stoppedAt
+        }
+
+        player.play(video, at: playAt, inNavigationView: inNavigationView)
+    }
+
+    private var playNowContinues: Bool {
+        watchedVideoPlayNowBehavior == .continue
+    }
+
+    private var watch: Watch? {
+        watchRequest.first
+    }
+
+    private var finished: Bool {
+        watch?.finished ?? false
+    }
+
+    private var watchingNow: Bool {
+        player.currentVideo == video
+    }
+
+    private var content: some View {
         VStack {
             #if os(iOS)
                 if verticalSizeClass == .compact, !horizontalCells {
@@ -66,8 +109,19 @@ struct VideoCell: View {
         #endif
     }
 
+    private var contentOpacity: Double {
+        guard saveHistory,
+              !watch.isNil,
+              watchedVideoStyle == .decreasedOpacity
+        else {
+            return 1
+        }
+
+        return watch!.finished ? 0.5 : 1
+    }
+
     #if os(iOS)
-        var horizontalRow: some View {
+        private var horizontalRow: some View {
             HStack(alignment: .top, spacing: 2) {
                 Section {
                     #if os(tvOS)
@@ -151,7 +205,7 @@ struct VideoCell: View {
         }
     #endif
 
-    var verticalRow: some View {
+    private var verticalRow: some View {
         VStack(alignment: .leading, spacing: 0) {
             thumbnail
 
@@ -201,7 +255,7 @@ struct VideoCell: View {
                         }
                     }
 
-                    if let time = video.length.formattedAsPlaybackTime(), !timeOnThumbnail {
+                    if let time = time, !timeOnThumbnail {
                         Spacer()
 
                         HStack(spacing: 2) {
@@ -225,13 +279,30 @@ struct VideoCell: View {
         }
     }
 
-    var additionalDetailsAvailable: Bool {
-        video.publishedDate != nil || video.views != 0 || (!timeOnThumbnail && !video.length.formattedAsPlaybackTime().isNil)
+    private var additionalDetailsAvailable: Bool {
+        video.publishedDate != nil || video.views != 0 ||
+            (!timeOnThumbnail && !video.length.formattedAsPlaybackTime().isNil)
     }
 
-    var thumbnail: some View {
+    private var thumbnail: some View {
         ZStack(alignment: .leading) {
-            thumbnailImage
+            ZStack(alignment: .bottomLeading) {
+                thumbnailImage
+                if saveHistory, showWatchingProgress, watch?.progress ?? 0 > 0 {
+                    ProgressView(value: watch!.progress, total: 100)
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color("WatchProgressBarColor")))
+                    #if os(tvOS)
+                        .padding(.horizontal, 16)
+                    #else
+                        .padding(.horizontal, 10)
+                    #endif
+                    #if os(macOS)
+                    .offset(x: 0, y: 4)
+                    #else
+                    .offset(x: 0, y: -3)
+                    #endif
+                }
+            }
 
             VStack {
                 HStack(alignment: .top) {
@@ -247,24 +318,49 @@ struct VideoCell: View {
                         DetailBadge(text: video.author, style: .prominent)
                     }
                 }
+                #if os(tvOS)
+                .padding(16)
+                #else
                 .padding(10)
+                #endif
 
                 Spacer()
 
-                HStack(alignment: .top) {
+                HStack(alignment: .center) {
+                    if saveHistory,
+                       watchedVideoStyle == .badge,
+                       watch?.finished ?? false
+                    {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(Color("WatchProgressBarColor"))
+                            .background(Color.white)
+                            .clipShape(Circle())
+                        #if os(tvOS)
+                            .font(.system(size: 40))
+                        #else
+                            .font(.system(size: 30))
+                        #endif
+                    }
                     Spacer()
 
-                    if timeOnThumbnail, let time = video.length.formattedAsPlaybackTime() {
+                    if timeOnThumbnail,
+                       !video.live,
+                       let time = time
+                    {
                         DetailBadge(text: time, style: .prominent)
                     }
                 }
+                #if os(tvOS)
+                .padding(16)
+                #else
                 .padding(10)
+                #endif
             }
             .lineLimit(1)
         }
     }
 
-    var thumbnailImage: some View {
+    private var thumbnailImage: some View {
         Group {
             if let url = thumbnails.best(video) {
                 WebImage(url: url)
@@ -293,7 +389,29 @@ struct VideoCell: View {
         .modifier(AspectRatioModifier())
     }
 
-    func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
+    private var time: String? {
+        guard var videoTime = video.length.formattedAsPlaybackTime() else {
+            return nil
+        }
+
+        if !saveHistory || !showWatchingProgress || watch?.finished ?? false {
+            return videoTime
+        }
+
+        if let stoppedAt = watch?.stoppedAt,
+           stoppedAt.isFinite,
+           let stoppedAtFormatted = stoppedAt.formattedAsPlaybackTime()
+        {
+            if watch?.videoDuration ?? 0 > 0 {
+                videoTime = watch!.videoDuration.formattedAsPlaybackTime() ?? "?"
+            }
+            return "\(stoppedAtFormatted) / \(videoTime)"
+        }
+
+        return videoTime
+    }
+
+    private func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
         Text(text)
             .fontWeight(.bold)
             .lineLimit(lineLimit)
@@ -309,7 +427,10 @@ struct VideoCell: View {
                     content
                 } else {
                     content
-                        .aspectRatio(1.777, contentMode: .fill)
+                        .aspectRatio(
+                            VideoPlayerView.defaultAspectRatio,
+                            contentMode: .fill
+                        )
                 }
             }
         }

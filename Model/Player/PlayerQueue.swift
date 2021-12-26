@@ -29,11 +29,11 @@ extension PlayerModel {
     }
 
     func playNow(_ video: Video, at time: TimeInterval? = nil) {
-        if !playingInPictureInPicture || closePiPOnNavigation {
+        if playingInPictureInPicture, closePiPOnNavigation {
             closePiP()
         }
 
-        addCurrentItemToHistory()
+        prepareCurrentItemForHistory()
 
         enqueueVideo(video, prepending: true) { _, item in
             self.advanceToItem(item, at: time)
@@ -83,7 +83,7 @@ extension PlayerModel {
     }
 
     func advanceToNextItem() {
-        addCurrentItemToHistory()
+        prepareCurrentItemForHistory()
 
         if let nextItem = queue.first {
             advanceToItem(nextItem)
@@ -91,7 +91,7 @@ extension PlayerModel {
     }
 
     func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
-        addCurrentItemToHistory()
+        prepareCurrentItemForHistory()
 
         remove(newItem)
 
@@ -148,18 +148,13 @@ extension PlayerModel {
         return item
     }
 
-    func addCurrentItemToHistory() {
-        if let item = currentItem, Defaults[.saveHistory] {
-            addItemToHistory(item)
+    func prepareCurrentItemForHistory(finished: Bool = false) {
+        if !currentItem.isNil, Defaults[.saveHistory] {
+            if let video = currentVideo, !historyVideos.contains(where: { $0 == video }) {
+                historyVideos.append(video)
+            }
+            updateWatch(finished: finished)
         }
-    }
-
-    func addItemToHistory(_ item: PlayerQueueItem) {
-        if let index = history.firstIndex(where: { $0.video?.videoID == item.video?.videoID }) {
-            history.remove(at: index)
-        }
-
-        history.insert(currentItem, at: 0)
     }
 
     func playHistory(_ item: PlayerQueueItem) {
@@ -172,67 +167,9 @@ extension PlayerModel {
         let newItem = enqueueVideo(item.video, atTime: time, prepending: true)
 
         advanceToItem(newItem!)
-
-        if let historyItemIndex = history.firstIndex(of: item) {
-            history.remove(at: historyItemIndex)
-        }
-    }
-
-    @discardableResult func removeHistory(_ item: PlayerQueueItem) -> PlayerQueueItem? {
-        if let index = history.firstIndex(where: { $0 == item }) {
-            return history.remove(at: index)
-        }
-
-        return nil
     }
 
     func removeQueueItems() {
         queue.removeAll()
-    }
-
-    func removeHistoryItems() {
-        history.removeAll()
-    }
-
-    func loadHistoryDetails() {
-        guard !accounts.current.isNil else {
-            return
-        }
-
-        queue = Defaults[.queue]
-        queue.forEach { item in
-            accounts.api.loadDetails(item) { newItem in
-                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
-                    self.queue[index] = newItem
-                }
-            }
-        }
-
-        var savedHistory = Defaults[.history]
-
-        if let lastPlayed = Defaults[.lastPlayed] {
-            if let index = savedHistory.firstIndex(where: { $0.videoID == lastPlayed.videoID }) {
-                var updatedLastPlayed = savedHistory[index]
-
-                updatedLastPlayed.playbackTime = lastPlayed.playbackTime
-                updatedLastPlayed.videoDuration = lastPlayed.videoDuration
-
-                savedHistory.remove(at: index)
-                savedHistory.insert(updatedLastPlayed, at: 0)
-            } else {
-                savedHistory.insert(lastPlayed, at: 0)
-            }
-
-            Defaults[.lastPlayed] = nil
-        }
-
-        history = savedHistory
-        history.forEach { item in
-            accounts.api.loadDetails(item) { newItem in
-                if let index = self.history.firstIndex(where: { $0.id == item.id }) {
-                    self.history[index] = newItem
-                }
-            }
-        }
     }
 }

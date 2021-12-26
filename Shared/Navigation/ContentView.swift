@@ -84,6 +84,7 @@ struct ContentView: View {
                 SettingsView()
                     .environmentObject(accounts)
                     .environmentObject(instances)
+                    .environmentObject(player)
             }
         )
         #endif
@@ -131,10 +132,6 @@ struct ContentView: View {
 
         player.accounts = accounts
         player.comments = comments
-
-        if !accounts.current.isNil {
-            player.loadHistoryDetails()
-        }
 
         if !Defaults[.saveRecents] {
             recents.clear()

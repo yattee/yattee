@@ -59,6 +59,12 @@
 		3711403F26B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
 		3711404026B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
 		3711404126B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
+		37130A5B277657090033018A /* Yattee.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 37130A59277657090033018A /* Yattee.xcdatamodeld */; };
+		37130A5C277657090033018A /* Yattee.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 37130A59277657090033018A /* Yattee.xcdatamodeld */; };
+		37130A5D277657090033018A /* Yattee.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 37130A59277657090033018A /* Yattee.xcdatamodeld */; };
+		37130A5F277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
+		37130A60277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
+		37130A61277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
 		3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
 		37141670267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
 		37141671267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
@@ -298,6 +304,9 @@
 		3784B23B272894DA00B09468 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23A272894DA00B09468 /* ShareSheet.swift */; };
 		3784B23D2728B85300B09468 /* ShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23C2728B85300B09468 /* ShareButton.swift */; };
 		3784B23E2728B85300B09468 /* ShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784B23C2728B85300B09468 /* ShareButton.swift */; };
+		3784CDE227772EE40055BBF2 /* Watch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784CDDE27772EE40055BBF2 /* Watch.swift */; };
+		3784CDE327772EE40055BBF2 /* Watch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784CDDE27772EE40055BBF2 /* Watch.swift */; };
+		3784CDE427772EE40055BBF2 /* Watch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3784CDDE27772EE40055BBF2 /* Watch.swift */; };
 		3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
 		3788AC2826F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
 		3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
@@ -387,6 +396,12 @@
 		37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 37BADCA42699FB72009BE4FB /* Alamofire */; };
 		37BADCA7269A552E009BE4FB /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 37BADCA6269A552E009BE4FB /* Alamofire */; };
 		37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 37BADCA8269A570B009BE4FB /* Alamofire */; };
+		37BC50A82778A84700510953 /* HistorySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50A72778A84700510953 /* HistorySettings.swift */; };
+		37BC50A92778A84700510953 /* HistorySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50A72778A84700510953 /* HistorySettings.swift */; };
+		37BC50AA2778A84700510953 /* HistorySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50A72778A84700510953 /* HistorySettings.swift */; };
+		37BC50AC2778BCBA00510953 /* HistoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50AB2778BCBA00510953 /* HistoryModel.swift */; };
+		37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50AB2778BCBA00510953 /* HistoryModel.swift */; };
+		37BC50AE2778BCBA00510953 /* HistoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BC50AB2778BCBA00510953 /* HistoryModel.swift */; };
 		37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD07B42698AA4D003EBB87 /* ContentView.swift */; };
 		37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 37BD07B62698AB2E003EBB87 /* Defaults */; };
 		37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 37BD07B82698AB2E003EBB87 /* Siesta */; };
@@ -584,6 +599,8 @@
 		3705B17F267B4DFB00704544 /* TrendingCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountry.swift; sourceTree = "<group>"; };
 		3705B181267B4E4900704544 /* TrendingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCategory.swift; sourceTree = "<group>"; };
 		3711403E26B206A6005B3555 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
+		37130A5A277657090033018A /* Yattee.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Yattee.xcdatamodel; sourceTree = "<group>"; };
+		37130A5E277657300033018A /* PersistenceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		3714166E267A8ACC006CA35D /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
 		37141672267A8E10006CA35D /* Country.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
 		37152EE926EFEB95004FB96D /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
@@ -652,6 +669,7 @@
 		3782B95C2755858100990149 /* NSTextField+FocusRingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSTextField+FocusRingType.swift"; sourceTree = "<group>"; };
 		3784B23A272894DA00B09468 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		3784B23C2728B85300B09468 /* ShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareButton.swift; sourceTree = "<group>"; };
+		3784CDDE27772EE40055BBF2 /* Watch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watch.swift; sourceTree = "<group>"; };
 		3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItemView.swift; sourceTree = "<group>"; };
 		378AE942274EF00A006A4EE1 /* Color+Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Background.swift"; sourceTree = "<group>"; };
 		378E50FA26FE8B9F00F49626 /* Instance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instance.swift; sourceTree = "<group>"; };
@@ -691,6 +709,8 @@
 		37BA794E26DC3E0E002A0235 /* Int+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Format.swift"; sourceTree = "<group>"; };
 		37BA796D26DC412E002A0235 /* Int+FormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+FormatTests.swift"; sourceTree = "<group>"; };
 		37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVNavigationView.swift; sourceTree = "<group>"; };
+		37BC50A72778A84700510953 /* HistorySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorySettings.swift; sourceTree = "<group>"; };
+		37BC50AB2778BCBA00510953 /* HistoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HistoryModel.swift; path = Model/HistoryModel.swift; sourceTree = SOURCE_ROOT; };
 		37BD07B42698AA4D003EBB87 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		37BD07BA2698AB60003EBB87 /* AppSidebarNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarNavigation.swift; sourceTree = "<group>"; };
 		37BD07C42698ADEE003EBB87 /* Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Yattee.entitlements; sourceTree = "<group>"; };
@@ -1016,6 +1036,7 @@
 				37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */,
 				37732FEF2703A26300F04329 /* AccountValidationStatus.swift */,
 				376BE50A27349108009AD608 /* BrowsingSettings.swift */,
+				37BC50A72778A84700510953 /* HistorySettings.swift */,
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
 				37484C2C26FC844700287258 /* InstanceSettings.swift */,
 				37484C1826FC837400287258 /* PlaybackSettings.swift */,
@@ -1275,8 +1296,10 @@
 				37141672267A8E10006CA35D /* Country.swift */,
 				37599F2F272B42810087F250 /* FavoriteItem.swift */,
 				37599F33272B44000087F250 /* FavoritesModel.swift */,
+				37BC50AB2778BCBA00510953 /* HistoryModel.swift */,
 				37EF5C212739D37B00B03725 /* MenuModel.swift */,
 				371F2F19269B43D300E4A7AB /* NavigationModel.swift */,
+				37130A5E277657300033018A /* PersistenceController.swift */,
 				376578882685471400D4EA09 /* Playlist.swift */,
 				37BA794226DBA973002A0235 /* PlaylistsModel.swift */,
 				37C194C626F6A9C8005D3B96 /* RecentsModel.swift */,
@@ -1289,6 +1312,8 @@
 				37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
+				3784CDDE27772EE40055BBF2 /* Watch.swift */,
+				37130A59277657090033018A /* Yattee.xcdatamodeld */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1797,6 +1822,7 @@
 				376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,
 				37BA793B26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */,
+				37130A5B277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37152EEA26EFEB95004FB96D /* LazyView.swift in Sources */,
 				3761ABFD26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				3782B94F27553A6700990149 /* SearchSuggestions.swift in Sources */,
@@ -1804,6 +1830,7 @@
 				37169AA62729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
 				37C7A1DA267CACF50010EAD6 /* TrendingCountry.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
 				37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37BE0BD626A1D4A90092E2DB /* PlayerViewController.swift in Sources */,
 				37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
@@ -1815,6 +1842,7 @@
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
 				37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */,
 				37C0698227260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
+				37BC50A82778A84700510953 /* HistorySettings.swift in Sources */,
 				37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				371B7E662759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				37BE0BD326A1D4780092E2DB /* Player.swift in Sources */,
@@ -1855,6 +1883,7 @@
 				37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */,
 				376A33E42720CB35000C1D6B /* Account.swift in Sources */,
 				37BA794326DBA973002A0235 /* PlaylistsModel.swift in Sources */,
+				37BC50AC2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37AAF29026740715007FC770 /* Channel.swift in Sources */,
 				3748186A26A764FB0084E870 /* Thumbnail+Fixtures.swift in Sources */,
 				37B81AFF26D2CA3700675966 /* VideoDetails.swift in Sources */,
@@ -1918,6 +1947,7 @@
 				37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
 				37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */,
 				37C3A241272359900087A57A /* Double+Format.swift in Sources */,
+				3784CDE227772EE40055BBF2 /* Watch.swift in Sources */,
 				37FB285E272225E800A57617 /* ContentItemView.swift in Sources */,
 				3797758B2689345500DD52A8 /* Store.swift in Sources */,
 				37B795902771DAE0001CF27B /* OpenURLHandler.swift in Sources */,
@@ -1954,6 +1984,7 @@
 				3743CA4F270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				374C053C2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
+				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
 				375DFB5926F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37FB285F272225E800A57617 /* ContentItemView.swift in Sources */,
@@ -1984,6 +2015,7 @@
 				37152EEB26EFEB95004FB96D /* LazyView.swift in Sources */,
 				377FC7E2267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */,
+				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				378E50FC26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37BE7AF12760013C00DBECED /* UpdatesSettings.swift in Sources */,
 				37169AA32729D98A0011DE61 /* InstancesBridge.swift in Sources */,
@@ -2034,6 +2066,7 @@
 				3797758C2689345500DD52A8 /* Store.swift in Sources */,
 				371B7E622759706A00D21217 /* CommentsView.swift in Sources */,
 				37141674267A8E10006CA35D /* Country.swift in Sources */,
+				37130A5C277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37C069782725962F00F7F6CB /* ScreenSaverManager.swift in Sources */,
 				37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */,
@@ -2046,6 +2079,7 @@
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				371B7E5D27596B8400D21217 /* Comment.swift in Sources */,
 				37EF5C232739D37B00B03725 /* MenuModel.swift in Sources */,
+				37BC50A92778A84700510953 /* HistorySettings.swift in Sources */,
 				37599F31272B42810087F250 /* FavoriteItem.swift in Sources */,
 				3730F75A2733481E00F385FC /* RelatedView.swift in Sources */,
 				37E04C0F275940FB00172673 /* VerticalScrollingFix.swift in Sources */,
@@ -2053,6 +2087,7 @@
 				37D526DF2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				373C8FE5275B955100CB5936 /* CommentsPage.swift in Sources */,
 				37D4B0E52671614900C925CA /* YatteeApp.swift in Sources */,
+				37130A60277657300033018A /* PersistenceController.swift in Sources */,
 				37BD07C12698AD3B003EBB87 /* TrendingCountry.swift in Sources */,
 				37BA794026DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				3711404026B206A6005B3555 /* SearchModel.swift in Sources */,
@@ -2169,6 +2204,7 @@
 				37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				3782B95727557E6E00990149 /* SearchSuggestions.swift in Sources */,
 				37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */,
+				37BC50AA2778A84700510953 /* HistorySettings.swift in Sources */,
 				376B2E0926F920D600B1D64D /* SignInRequiredView.swift in Sources */,
 				37141671267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				37C3A24727235DA70087A57A /* ChannelPlaylist.swift in Sources */,
@@ -2183,6 +2219,7 @@
 				37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C0697C2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
 				378AE93D274EDFB3006A4EE1 /* Backport.swift in Sources */,
+				37130A5D277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37C3A243272359900087A57A /* Double+Format.swift in Sources */,
 				37AAF29226740715007FC770 /* Channel.swift in Sources */,
 				37EAD86D267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
@@ -2198,6 +2235,7 @@
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
 				373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
+				3784CDE427772EE40055BBF2 /* Watch.swift in Sources */,
 				3730D8A02712E2B70020ED53 /* NowPlayingView.swift in Sources */,
 				37169AA42729D98A0011DE61 /* InstancesBridge.swift in Sources */,
 				37D4B18E26717B3800C925CA /* VideoCell.swift in Sources */,
@@ -2209,6 +2247,7 @@
 				37A9966026D6F9B9006E3224 /* FavoritesView.swift in Sources */,
 				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
+				37130A61277657300033018A /* PersistenceController.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				376A33E62720CB35000C1D6B /* Account.swift in Sources */,
 				37599F3A272B4D740087F250 /* FavoriteButton.swift in Sources */,
@@ -2256,6 +2295,7 @@
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
 				378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
+				37BC50AE2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37D526E02720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				37599F36272B44000087F250 /* FavoritesModel.swift in Sources */,
 				3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */,
@@ -3323,6 +3363,19 @@
 			productName = SDWebImagePINPlugin;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		37130A59277657090033018A /* Yattee.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				37130A5A277657090033018A /* Yattee.xcdatamodel */,
+			);
+			currentVersion = 37130A5A277657090033018A /* Yattee.xcdatamodel */;
+			path = Yattee.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 37D4B0BD2671614700C925CA /* Project object */;
 }

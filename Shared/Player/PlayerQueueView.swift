@@ -6,6 +6,10 @@ struct PlayerQueueView: View {
     @Binding var sidebarQueue: Bool
     @Binding var fullScreen: Bool
 
+    @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
+    var watches: FetchedResults<Watch>
+
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveHistory) private var saveHistory
@@ -46,23 +50,33 @@ struct PlayerQueueView: View {
             ForEach(player.queue) { item in
                 PlayerQueueRow(item: item, fullScreen: $fullScreen)
                     .contextMenu {
-                        removeButton(item, history: false)
-                        removeAllButton(history: false)
+                        removeButton(item)
+                        removeAllButton()
                     }
             }
         }
     }
 
+    private var visibleWatches: [Watch] {
+        watches.filter { $0.videoID != player.currentVideo?.videoID }
+    }
+
     var playedPreviously: some View {
         Group {
-            if !player.history.isEmpty {
+            if !visibleWatches.isEmpty {
                 Section(header: Text("Played Previously")) {
-                    ForEach(player.history) { item in
-                        PlayerQueueRow(item: item, history: true, fullScreen: $fullScreen)
-                            .contextMenu {
-                                removeButton(item, history: true)
-                                removeAllButton(history: true)
-                            }
+                    ForEach(visibleWatches, id: \.videoID) { watch in
+                        PlayerQueueRow(
+                            item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
+                            history: true,
+                            fullScreen: $fullScreen
+                        )
+                        .onAppear {
+                            player.loadHistoryVideoDetails(watch.videoID)
+                        }
+                        .contextMenu {
+                            removeHistoryButton(watch)
+                        }
                     }
                 }
             }
@@ -94,28 +108,28 @@ struct PlayerQueueView: View {
         }
     }
 
-    private func removeButton(_ item: PlayerQueueItem, history: Bool) -> some View {
+    private func removeButton(_ item: PlayerQueueItem) -> some View {
         Button {
-            removeButtonAction(item, history: history)
+            player.remove(item)
         } label: {
             Label("Remove", systemImage: "trash")
         }
     }
 
-    private func removeButtonAction(_ item: PlayerQueueItem, history: Bool) {
-        _ = history ? player.removeHistory(item) : player.remove(item)
-    }
-
-    private func removeAllButton(history: Bool) -> some View {
+    private func removeAllButton() -> some View {
         Button {
-            removeAllButtonAction(history: history)
+            player.removeQueueItems()
         } label: {
             Label("Remove All", systemImage: "trash.fill")
         }
     }
 
-    private func removeAllButtonAction(history: Bool) {
-        _ = history ? player.removeHistoryItems() : player.removeQueueItems()
+    private func removeHistoryButton(_ watch: Watch) -> some View {
+        Button {
+            player.removeWatch(watch)
+        } label: {
+            Label("Remove", systemImage: "trash")
+        }
     }
 }
 

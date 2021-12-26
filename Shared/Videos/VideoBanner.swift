@@ -96,7 +96,7 @@ struct VideoBanner: View {
 
     private var progressView: some View {
         Group {
-            if !playbackTime.isNil {
+            if !playbackTime.isNil, !(video?.live ?? false) {
                 ProgressView(value: progressViewValue, total: progressViewTotal)
                     .progressViewStyle(.linear)
                     .frame(maxWidth: thumbnailWidth)

@@ -32,7 +32,6 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
 
         player.currentItem = PlayerQueueItem(Video.fixture)
         player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
-        player.history = player.queue
 
         return player
     }

@@ -54,10 +54,12 @@ extension Defaults.Keys {
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 
     static let queue = Key<[PlayerQueueItem]>("queue", default: [])
-    static let history = Key<[PlayerQueueItem]>("history", default: [])
-    static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
 
     static let saveHistory = Key<Bool>("saveHistory", default: true)
+    static let showWatchingProgress = Key<Bool>("showWatchingProgress", default: true)
+    static let watchedThreshold = Key<Int>("watchedThreshold", default: 90)
+    static let watchedVideoStyle = Key<WatchedVideoStyle>("watchedVideoStyle", default: .badge)
+    static let watchedVideoPlayNowBehavior = Key<WatchedVideoPlayNowBehavior>("watchedVideoPlayNowBehavior", default: .continue)
     static let saveRecents = Key<Bool>("saveRecents", default: true)
 
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
@@ -144,6 +146,14 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
     static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.sortOrder < rhs.sortOrder
     }
+}
+
+enum WatchedVideoStyle: String, Defaults.Serializable {
+    case nothing, badge, decreasedOpacity
+}
+
+enum WatchedVideoPlayNowBehavior: String, Defaults.Serializable {
+    case `continue`, restart
 }
 
 #if !os(tvOS)

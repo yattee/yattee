@@ -4,8 +4,6 @@ import SwiftUI
 struct BrowsingSettings: View {
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
-    @Default(.saveRecents) private var saveRecents
-    @Default(.saveHistory) private var saveHistory
     @Default(.visibleSections) private var visibleSections
 
     var body: some View {
@@ -13,8 +11,6 @@ struct BrowsingSettings: View {
             Section(header: SettingsHeader(text: "Browsing")) {
                 Toggle("Show channel name on thumbnail", isOn: $channelOnThumbnail)
                 Toggle("Show video length on thumbnail", isOn: $timeOnThumbnail)
-                Toggle("Save recent queries and channels", isOn: $saveRecents)
-                Toggle("Save history of played videos", isOn: $saveHistory)
             }
             Section(header: SettingsHeader(text: "Sections")) {
                 #if os(macOS)

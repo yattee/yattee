@@ -1,4 +1,5 @@
 import AVKit
+import CoreData
 import Defaults
 import Foundation
 import Logging
@@ -27,8 +28,8 @@ final class PlayerModel: ObservableObject {
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
-    @Published var currentItem: PlayerQueueItem! { didSet { Defaults[.lastPlayed] = currentItem } }
-    @Published var history = [PlayerQueueItem]() { didSet { Defaults[.history] = history } }
+    @Published var currentItem: PlayerQueueItem!
+    @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
 
@@ -46,6 +47,8 @@ final class PlayerModel: ObservableObject {
 
     var composition = AVMutableComposition()
     var loadedCompositionAssets = [AVMediaType]()
+
+    var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
     private var currentArtwork: MPMediaItemArtwork?
     private var frequentTimeObserver: Any?
@@ -131,7 +134,7 @@ final class PlayerModel: ObservableObject {
     }
 
     var live: Bool {
-        currentItem?.video?.live ?? false
+        currentVideo?.live ?? false
     }
 
     var playerItemDuration: CMTime? {
@@ -162,9 +165,17 @@ final class PlayerModel: ObservableObject {
         player.pause()
     }
 
-    func upgradeToStream(_ stream: Stream) {
-        if !self.stream.isNil, self.stream != stream {
-            playStream(stream, of: currentVideo!, preservingTime: true, upgrading: true)
+    func play(_ video: Video, at time: TimeInterval? = nil, inNavigationView: Bool = false) {
+        playNow(video, at: time)
+
+        guard !playingInPictureInPicture else {
+            return
+        }
+
+        if inNavigationView {
+            playerNavigationLinkActive = true
+        } else {
+            show()
         }
     }
 
@@ -202,6 +213,12 @@ final class PlayerModel: ObservableObject {
 
         if !upgrading {
             updateCurrentArtwork()
+        }
+    }
+
+    func upgradeToStream(_ stream: Stream) {
+        if !self.stream.isNil, self.stream != stream {
+            playStream(stream, of: currentVideo!, preservingTime: true, upgrading: true)
         }
     }
 
@@ -469,18 +486,20 @@ final class PlayerModel: ObservableObject {
     }
 
     @objc func itemDidPlayToEndTime() {
-        currentItem.playbackTime = playerItemDuration
+        prepareCurrentItemForHistory(finished: true)
 
         if queue.isEmpty {
             #if !os(macOS)
                 try? AVAudioSession.sharedInstance().setActive(false)
             #endif
-            addCurrentItemToHistory()
             resetQueue()
             #if os(tvOS)
-                controller?.dismiss(animated: true)
+                controller?.playerView.dismiss(animated: false) { [weak self] in
+                    self?.controller?.dismiss(animated: true)
+                }
+            #else
+                hide()
             #endif
-            hide()
         } else {
             advanceToNextItem()
         }
@@ -551,7 +570,7 @@ final class PlayerModel: ObservableObject {
             }
 
             self.timeObserverThrottle.execute {
-                self.updateCurrentItemIntervals()
+                self.updateWatch()
             }
         }
     }
@@ -581,26 +600,15 @@ final class PlayerModel: ObservableObject {
             #endif
 
             self.timeObserverThrottle.execute {
-                self.updateCurrentItemIntervals()
+                self.updateWatch()
             }
         }
     }
 
-    private func updateCurrentItemIntervals() {
-        currentItem?.playbackTime = player.currentTime()
-        currentItem?.videoDuration = player.currentItem?.asset.duration.seconds
-    }
-
     fileprivate func updateNowPlayingInfo() {
-        var duration: Int?
-        if !currentItem.video.live {
-            let itemDuration = currentItem.videoDuration ?? 0
-            duration = itemDuration.isFinite ? Int(itemDuration) : nil
-        }
         var nowPlayingInfo: [String: AnyObject] = [
             MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
             MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
-            MPMediaItemPropertyPlaybackDuration: duration as AnyObject,
             MPNowPlayingInfoPropertyIsLiveStream: currentItem.video.live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime().seconds as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
@@ -609,6 +617,15 @@ final class PlayerModel: ObservableObject {
 
         if !currentArtwork.isNil {
             nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
+        }
+
+        if !currentItem.video.live {
+            let itemDuration = currentItem.videoDuration ?? 0
+            let duration = itemDuration.isFinite ? Int(itemDuration) : nil
+
+            if !duration.isNil {
+                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
+            }
         }
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
@@ -647,7 +664,7 @@ final class PlayerModel: ObservableObject {
             if let channel: Channel = response.typedContent() {
                 self?.channelWithDetails = channel
                 withAnimation {
-                    self?.currentItem.video.channel = channel
+                    self?.currentItem?.video.channel = channel
                 }
             }
         }
@@ -671,7 +688,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem() {
-        addCurrentItemToHistory()
+        prepareCurrentItemForHistory()
         currentItem = nil
         player.replaceCurrentItem(with: nil)
     }

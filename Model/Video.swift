@@ -1,6 +1,7 @@
 import Alamofire
 import AVKit
 import Foundation
+import SwiftUI
 import SwiftyJSON
 
 struct Video: Identifiable, Equatable, Hashable {
@@ -105,10 +106,24 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     static func == (lhs: Video, rhs: Video) -> Bool {
-        lhs.id == rhs.id
+        let videoIDIsEqual = lhs.videoID == rhs.videoID
+
+        if !lhs.indexID.isNil, !rhs.indexID.isNil {
+            return videoIDIsEqual && lhs.indexID == rhs.indexID
+        }
+
+        return videoIDIsEqual
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+
+    var watchFetchRequest: FetchRequest<Watch> {
+        FetchRequest<Watch>(
+            entity: Watch.entity(),
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "videoID = %@", videoID)
+        )
     }
 }

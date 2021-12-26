@@ -11,6 +11,15 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
 
+    static func from(_ watch: Watch, video: Video? = nil) -> Self {
+        .init(
+            video,
+            videoID: watch.videoID,
+            playbackTime: CMTime.secondsInDefaultTimescale(watch.stoppedAt),
+            videoDuration: watch.videoDuration
+        )
+    }
+
     init(_ video: Video? = nil, videoID: Video.ID? = nil, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
         self.video = video
         self.videoID = videoID ?? video!.videoID

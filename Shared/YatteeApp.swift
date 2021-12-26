@@ -20,9 +20,12 @@ struct YatteeApp: App {
     @StateObject private var subscriptions = SubscriptionsModel()
     @StateObject private var thumbnails = ThumbnailsModel()
 
+    let persistenceController = PersistenceController.shared
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(accounts)
                 .environmentObject(comments)
                 .environmentObject(instances)
@@ -70,6 +73,7 @@ struct YatteeApp: App {
                 VideoPlayerView()
                     .onAppear { player.presentingPlayer = true }
                     .onDisappear { player.presentingPlayer = false }
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.navigationStyle, .sidebar)
                     .environmentObject(accounts)
                     .environmentObject(comments)
@@ -86,8 +90,10 @@ struct YatteeApp: App {
 
             Settings {
                 SettingsView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environmentObject(accounts)
                     .environmentObject(instances)
+                    .environmentObject(player)
                     .environmentObject(updater)
             }
         #endif
