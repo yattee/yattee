@@ -97,8 +97,12 @@ struct VideoDetails: View {
 
             switch currentPage {
             case .info:
-                ScrollView(.vertical) {
-                    detailsPage
+                if player.isLoadingVideo {
+                    PlaceholderProgressView()
+                } else {
+                    ScrollView(.vertical) {
+                        detailsPage
+                    }
                 }
             case .queue:
                 PlayerQueueView(sidebarQueue: $sidebarQueue, fullScreen: $fullScreen)

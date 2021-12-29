@@ -206,6 +206,9 @@
 		3765917E27237D2A009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917D27237D2A009F956E /* PINCache */; };
 		37666BAA27023AF000F869E5 /* AccountSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37666BA927023AF000F869E5 /* AccountSelectionView.swift */; };
 		3766AFD2273DA97D00686348 /* Int+FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA796D26DC412E002A0235 /* Int+FormatTests.swift */; };
+		3769C02E2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */; };
+		3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */; };
+		3769C0302779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */; };
 		376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		376A33E12720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		376A33E22720CAD6000C1D6B /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
@@ -653,6 +656,7 @@
 		376578882685471400D4EA09 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
 		376578902685490700D4EA09 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
 		37666BA927023AF000F869E5 /* AccountSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSelectionView.swift; sourceTree = "<group>"; };
+		3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderProgressView.swift; sourceTree = "<group>"; };
 		376A33DF2720CAD6000C1D6B /* VideosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosApp.swift; sourceTree = "<group>"; };
 		376A33E32720CB35000C1D6B /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		376B2E0626F920D600B1D64D /* SignInRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRequiredView.swift; sourceTree = "<group>"; };
@@ -961,6 +965,7 @@
 				37AAF29F26741C97007FC770 /* SubscriptionsView.swift */,
 				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
 				37E70922271CD43000D34DDE /* WelcomeScreen.swift */,
+				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1938,6 +1943,7 @@
 				37E70927271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				37BE0BCF26A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
+				3769C02E2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				3758638A2721B0A9000CB14E /* ChannelCell.swift in Sources */,
 				37001563271B1F250049C794 /* AccountsModel.swift in Sources */,
 				37CC3F50270D010D00608308 /* VideoBanner.swift in Sources */,
@@ -2108,6 +2114,7 @@
 				373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				3763495226DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
 				371B7E672759786B00D21217 /* Comment+Fixtures.swift in Sources */,
+				3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				37CB127A2724C76D00213B45 /* VideoURLParser.swift in Sources */,
 				37BA794426DBA973002A0235 /* PlaylistsModel.swift in Sources */,
 			);
@@ -2196,6 +2203,7 @@
 				37977585268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				3700155D271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */,
+				3769C0302779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				37F4AE7426828F0900BD60EA /* VerticalCells.swift in Sources */,
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37D4B1802671650A00C925CA /* YatteeApp.swift in Sources */,

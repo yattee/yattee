@@ -14,7 +14,7 @@ struct CommentsView: View {
                 Text("No comments")
                     .foregroundColor(.secondary)
             } else if !comments.loaded {
-                progressView
+                PlaceholderProgressView()
                     .onAppear {
                         comments.load()
                     }
@@ -59,19 +59,6 @@ struct CommentsView: View {
             }
         }
         .padding(.horizontal)
-    }
-
-    private var progressView: some View {
-        VStack {
-            Spacer()
-
-            HStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-            }
-            Spacer()
-        }
     }
 }
 

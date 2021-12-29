@@ -125,6 +125,14 @@ final class PlayerModel: ObservableObject {
         #endif
     }
 
+    var isLoadingVideo: Bool {
+        guard !currentVideo.isNil else {
+            return false
+        }
+
+        return player.currentItem == nil || time == nil || !time!.isValid
+    }
+
     var isPlaying: Bool {
         player.timeControlStatus == .playing
     }

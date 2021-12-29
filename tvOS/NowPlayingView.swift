@@ -128,7 +128,7 @@ struct NowPlayingView: View {
                 if sections.contains(.comments) {
                     if !comments.loaded {
                         VStack(alignment: .center) {
-                            progressView
+                            PlaceholderProgressView()
                                 .onAppear {
                                     comments.load()
                                 }
@@ -152,19 +152,6 @@ struct NowPlayingView: View {
 
     private var visibleWatches: [Watch] {
         watches.filter { $0.videoID != player.currentVideo?.videoID }
-    }
-
-    private var progressView: some View {
-        VStack {
-            Spacer()
-
-            HStack {
-                Spacer()
-                ProgressView()
-                Spacer()
-            }
-            Spacer()
-        }
     }
 }
 

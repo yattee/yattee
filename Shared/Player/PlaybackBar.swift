@@ -99,7 +99,7 @@ struct PlaybackBar: View {
             return "LIVE"
         }
 
-        guard player.time != nil, player.time!.isValid, !player.currentVideo.isNil else {
+        guard !player.isLoadingVideo else {
             return "loading..."
         }
 
