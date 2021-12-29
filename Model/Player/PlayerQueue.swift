@@ -62,7 +62,13 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
         restoreLoadedChannel()
 
-        loadAvailableStreams(currentVideo!)
+        DispatchQueue.main.async { [weak self] in
+            guard let video = self?.currentVideo else {
+                return
+            }
+
+            self?.loadAvailableStreams(video)
+        }
     }
 
     func preferredStream(_ streams: [Stream]) -> Stream? {
@@ -94,6 +100,9 @@ extension PlayerModel {
         prepareCurrentItemForHistory()
 
         remove(newItem)
+
+        currentItem = newItem
+        player.pause()
 
         accounts.api.loadDetails(newItem) { newItem in
             self.playItem(newItem, video: newItem.video, at: time)
@@ -134,6 +143,12 @@ extension PlayerModel {
         videoDetailsLoadHandler: @escaping (Video, PlayerQueueItem) -> Void = { _, _ in }
     ) -> PlayerQueueItem? {
         let item = PlayerQueueItem(video, playbackTime: atTime)
+
+        if play {
+            currentItem = item
+            // pause playing current video as it's going to be replaced with next one
+            player.pause()
+        }
 
         queue.insert(item, at: prepending ? 0 : queue.endIndex)
 

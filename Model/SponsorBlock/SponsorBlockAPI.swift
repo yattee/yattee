@@ -35,7 +35,9 @@ final class SponsorBlockAPI: ObservableObject {
 
         self.videoID = videoID
 
-        requestSegments(categories: categories, completionHandler: completionHandler)
+        DispatchQueue.main.async { [weak self] in
+            self?.requestSegments(categories: categories, completionHandler: completionHandler)
+        }
     }
 
     private func requestSegments(categories: Set<String>, completionHandler: @escaping () -> Void = {}) {

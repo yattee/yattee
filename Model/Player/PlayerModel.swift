@@ -13,11 +13,13 @@ import SwiftyJSON
 
 final class PlayerModel: ObservableObject {
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
+    static let assetKeysToLoad = ["tracks", "playable", "duration"]
     let logger = Logger(label: "stream.yattee.app")
 
     private(set) var player = AVPlayer()
     var playerView = Player()
     var controller: PlayerViewController?
+    var playerItem: AVPlayerItem?
 
     @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
 
@@ -45,6 +47,7 @@ final class PlayerModel: ObservableObject {
     var accounts: AccountsModel
     var comments: CommentsModel
 
+    var asset: AVURLAsset?
     var composition = AVMutableComposition()
     var loadedCompositionAssets = [AVMediaType]()
 
@@ -82,7 +85,6 @@ final class PlayerModel: ObservableObject {
         self.accounts = accounts ?? AccountsModel()
         self.comments = comments ?? CommentsModel()
 
-        addItemDidPlayToEndTimeObserver()
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
         addPlayerTimeControlStatusObserver()
@@ -197,20 +199,21 @@ final class PlayerModel: ObservableObject {
         if !upgrading {
             resetSegments()
 
-            sponsorBlock.loadSegments(
-                videoID: video.videoID,
-                categories: Defaults[.sponsorBlockCategories]
-            ) { [weak self] in
-                if Defaults[.showChannelSubscribers] {
-                    self?.loadCurrentItemChannelDetails()
+            DispatchQueue.main.async { [weak self] in
+                self?.sponsorBlock.loadSegments(
+                    videoID: video.videoID,
+                    categories: Defaults[.sponsorBlockCategories]
+                ) { [weak self] in
+                    if Defaults[.showChannelSubscribers] {
+                        self?.loadCurrentItemChannelDetails()
+                    }
                 }
             }
         }
 
         if let url = stream.singleAssetURL {
             logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
-
-            insertPlayerItem(stream, for: video, preservingTime: preservingTime)
+            loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime)
         } else {
             logger.info("playing stream with many assets:")
             logger.info("composition audio asset: \(stream.audioAsset.url)")
@@ -282,11 +285,14 @@ final class PlayerModel: ObservableObject {
         for video: Video,
         preservingTime: Bool = false
     ) {
-        let playerItem = playerItem(stream)
+        removeItemDidPlayToEndTimeObserver()
+
+        playerItem = playerItem(stream)
         guard playerItem != nil else {
             return
         }
 
+        addItemDidPlayToEndTimeObserver()
         attachMetadata(to: playerItem!, video: video, for: stream)
 
         DispatchQueue.main.async { [weak self] in
@@ -296,6 +302,7 @@ final class PlayerModel: ObservableObject {
 
             self.stream = stream
             self.composition = AVMutableComposition()
+            self.asset = nil
         }
 
         let startPlaying = {
@@ -303,7 +310,7 @@ final class PlayerModel: ObservableObject {
                 try? AVAudioSession.sharedInstance().setActive(true)
             #endif
 
-            if self.isAutoplaying(playerItem!) {
+            if self.isAutoplaying(self.playerItem!) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
                     guard let self = self else {
                         return
@@ -334,7 +341,10 @@ final class PlayerModel: ObservableObject {
         }
 
         let replaceItemAndSeek = {
-            self.player.replaceCurrentItem(with: playerItem)
+            guard video == self.currentVideo else {
+                return
+            }
+            self.player.replaceCurrentItem(with: self.playerItem)
             self.seekToPreservedTime { finished in
                 guard finished else {
                     return
@@ -361,6 +371,30 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    private func loadSingleAsset(
+        _ url: URL,
+        stream: Stream,
+        of video: Video,
+        preservingTime: Bool = false
+    ) {
+        asset?.cancelLoading()
+        asset = AVURLAsset(url: url)
+        asset?.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
+            var error: NSError?
+
+            switch self?.asset?.statusOfValue(forKey: "duration", error: &error) {
+            case .loaded:
+                DispatchQueue.main.async { [weak self] in
+                    self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
+                }
+            case .failed:
+                self?.playerError = error
+            default:
+                return
+            }
+        }
+    }
+
     private func loadComposition(
         _ stream: Stream,
         of video: Video,
@@ -378,7 +412,7 @@ final class PlayerModel: ObservableObject {
         of video: Video,
         preservingTime: Bool = false
     ) {
-        asset.loadValuesAsynchronously(forKeys: ["playable"]) { [weak self] in
+        asset.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -420,9 +454,9 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    private func playerItem(_ stream: Stream) -> AVPlayerItem? {
-        if let url = stream.singleAssetURL {
-            return AVPlayerItem(asset: AVURLAsset(url: url))
+    private func playerItem(_: Stream) -> AVPlayerItem? {
+        if let asset = asset {
+            return AVPlayerItem(asset: asset)
         } else {
             return AVPlayerItem(asset: composition)
         }
@@ -489,7 +523,15 @@ final class PlayerModel: ObservableObject {
             self,
             selector: #selector(itemDidPlayToEndTime),
             name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-            object: nil
+            object: playerItem
+        )
+    }
+
+    private func removeItemDidPlayToEndTimeObserver() {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+            object: playerItem
         )
     }
 

@@ -43,6 +43,10 @@ extension PlayerModel {
             .load()
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
+                    guard video == self.currentVideo else {
+                        self.logger.info("ignoring loaded streams from \(instance.description) as current video has changed")
+                        return
+                    }
                     self.availableStreams += self.streamsWithInstance(instance: instance, streams: video.streams)
                 } else {
                     self.logger.critical("no streams available from \(instance.description)")
