@@ -474,7 +474,7 @@ struct VideoDetails: View {
                                         .foregroundColor(.white)
                                         .padding(.vertical, 4)
                                         .padding(.horizontal, 8)
-                                        .background(Color("VideoDetailLikesSymbolColor"))
+                                        .background(Color("KeywordBackgroundColor"))
                                         .mask(RoundedRectangle(cornerRadius: 3))
                                     }
                                 }
