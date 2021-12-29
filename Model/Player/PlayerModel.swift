@@ -670,8 +670,8 @@ final class PlayerModel: ObservableObject {
         }
 
         if !currentItem.video.live {
-            let itemDuration = currentItem.videoDuration ?? 0
-            let duration = itemDuration.isFinite ? Int(itemDuration) : nil
+            let itemDuration = currentItem.videoDuration ?? currentItem.duration
+            let duration = itemDuration.isFinite ? Double(itemDuration) : nil
 
             if !duration.isNil {
                 nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
