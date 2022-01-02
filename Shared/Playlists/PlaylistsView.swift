@@ -100,11 +100,11 @@ struct PlaylistsView: View {
                                     Text("No Playlists")
                                         .foregroundColor(.secondary)
                                 } else {
-                                    Text("Current Playlist")
-                                        .foregroundColor(.secondary)
-
                                     selectPlaylistButton
                                 }
+
+                                playButton
+                                shuffleButton
 
                                 Spacer()
 
@@ -142,23 +142,14 @@ struct PlaylistsView: View {
                     selectPlaylistButton
                 }
 
-                Button {
-                    player.playAll(items.compactMap(\.video))
-                    player.show()
-                } label: {
-                    HStack(spacing: 15) {
-                        Image(systemName: "play.fill")
-                        Text("Play All")
-                    }
-                }
-
-                if currentPlaylist != nil {
-                    editPlaylistButton
-                }
-
                 if let playlist = currentPlaylist {
+                    editPlaylistButton
+
                     FavoriteButton(item: FavoriteItem(section: .playlist(playlist.id)))
                         .labelStyle(.iconOnly)
+
+                    playButton
+                    shuffleButton
                 }
 
                 Spacer()
@@ -262,6 +253,22 @@ struct PlaylistsView: View {
                     Text("New Playlist")
                 #endif
             }
+        }
+    }
+
+    private var playButton: some View {
+        Button {
+            player.play(items.compactMap(\.video))
+        } label: {
+            Image(systemName: "play")
+        }
+    }
+
+    private var shuffleButton: some View {
+        Button {
+            player.play(items.compactMap(\.video), shuffling: true)
+        } label: {
+            Image(systemName: "shuffle")
         }
     }
 

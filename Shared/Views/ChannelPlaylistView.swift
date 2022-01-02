@@ -10,13 +10,10 @@ struct ChannelPlaylistView: View {
     @StateObject private var store = Store<ChannelPlaylist>()
 
     @Environment(\.colorScheme) private var colorScheme
-
-    #if os(iOS)
-        @Environment(\.inNavigationView) private var inNavigationView
-        @EnvironmentObject<PlayerModel> private var player
-    #endif
+    @Environment(\.inNavigationView) private var inNavigationView
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<PlayerModel> private var player
 
     var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
@@ -54,6 +51,11 @@ struct ChannelPlaylistView: View {
 
                     FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
                         .labelStyle(.iconOnly)
+
+                    playButton
+                        .labelStyle(.iconOnly)
+                    shuffleButton
+                        .labelStyle(.iconOnly)
                 }
             #endif
             VerticalCells(items: items)
@@ -70,7 +72,9 @@ struct ChannelPlaylistView: View {
             resource?.addObserver(store)
             resource?.loadIfNeeded()
         }
-        #if !os(tvOS)
+        #if os(tvOS)
+        .background(Color.background(scheme: colorScheme))
+        #else
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 ShareButton(
@@ -80,17 +84,48 @@ struct ChannelPlaylistView: View {
                 )
             }
 
-            ToolbarItem {
-                FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+            ToolbarItem(placement: playlistButtonsPlacement) {
+                HStack {
+                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+
+                    playButton
+                    shuffleButton
+                }
             }
         }
         .navigationTitle(playlist.title)
             #if os(iOS)
                 .navigationBarHidden(player.playerNavigationLinkActive)
             #endif
-        #else
-                .background(Color.background(scheme: colorScheme))
         #endif
+    }
+
+    private var playlistButtonsPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            .navigationBarTrailing
+        #else
+            .automatic
+        #endif
+    }
+
+    private var playButton: some View {
+        Button {
+            player.play(videos, inNavigationView: inNavigationView)
+        } label: {
+            Label("Play All", systemImage: "play")
+        }
+    }
+
+    private var shuffleButton: some View {
+        Button {
+            player.play(videos, shuffling: true, inNavigationView: inNavigationView)
+        } label: {
+            Label("Shuffle", systemImage: "shuffle")
+        }
+    }
+
+    private var videos: [Video] {
+        items.compactMap(\.video)
     }
 
     private var contentItem: ContentItem {

@@ -8,15 +8,29 @@ extension PlayerModel {
         currentItem?.video
     }
 
-    func playAll(_ videos: [Video]) {
-        let first = videos.first
+    func play(_ videos: [Video], shuffling: Bool = false, inNavigationView: Bool = false) {
+        let videosToPlay = shuffling ? videos.shuffled() : videos
 
-        videos.forEach { video in
-            enqueueVideo(video) { _, item in
+        guard let first = videosToPlay.first else {
+            return
+        }
+
+        enqueueVideo(first, prepending: true) { _, item in
+            self.advanceToItem(item)
+        }
+
+        videosToPlay.dropFirst().reversed().forEach { video in
+            enqueueVideo(video, prepending: true) { _, item in
                 if item.video == first {
                     self.advanceToItem(item)
                 }
             }
+        }
+
+        if inNavigationView {
+            playerNavigationLinkActive = true
+        } else {
+            show()
         }
     }
 
