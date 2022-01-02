@@ -1,4 +1,7 @@
 import AVKit
+#if os(iOS)
+    import CoreMotion
+#endif
 import Defaults
 import Siesta
 import SwiftUI
@@ -22,6 +25,16 @@ struct VideoPlayerView: View {
         @Environment(\.presentationMode) private var presentationMode
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+        @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
+        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
+        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
+
+        @State private var motionManager: CMMotionManager!
+        @State private var orientation = UIInterfaceOrientation.portrait
+        @State private var lastOrientation: UIInterfaceOrientation?
+
+        private var orientationThrottle = Throttle(interval: 2)
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -38,13 +51,36 @@ struct VideoPlayerView: View {
             GeometryReader { geometry in
                 HStack(spacing: 0) {
                     content
-                }
-                .onAppear {
-                    self.playerSize = geometry.size
+                        .onAppear {
+                            playerSize = geometry.size
+
+                            #if os(iOS)
+                                configureOrientationUpdatesBasedOnAccelerometer()
+                            #endif
+                        }
                 }
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
+                #if os(iOS)
+                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                    handleOrientationDidChangeNotification()
+                }
+                .onDisappear {
+                    guard !player.playingFullscreen else {
+                        return // swiftlint:disable:this implicit_return
+                    }
+
+                    if Defaults[.lockPortraitWhenBrowsing] {
+                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    } else {
+                        Orientation.lockOrientation(.allButUpsideDown)
+                    }
+
+                    motionManager?.stopAccelerometerUpdates()
+                    motionManager = nil
+                }
+                #endif
             }
             .navigationBarHidden(true)
         #endif
@@ -192,6 +228,110 @@ struct VideoPlayerView: View {
             set: { _ in }
         )
     }
+
+    #if os(iOS)
+        private func configureOrientationUpdatesBasedOnAccelerometer() {
+            if UIDevice.current.orientation.isLandscape, enterFullscreenInLandscape, !player.playingFullscreen {
+                DispatchQueue.main.async {
+                    player.enterFullScreen()
+                }
+            }
+
+            guard !honorSystemOrientationLock, motionManager.isNil else {
+                return
+            }
+
+            motionManager = CMMotionManager()
+            motionManager.accelerometerUpdateInterval = 0.2
+            motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, _ in
+                guard player.presentingPlayer, !data.isNil else {
+                    return
+                }
+
+                guard let acceleration = data?.acceleration else {
+                    return
+                }
+
+                var orientation = UIInterfaceOrientation.unknown
+
+                if acceleration.x >= 0.65 {
+                    orientation = .landscapeLeft
+                } else if acceleration.x <= -0.65 {
+                    orientation = .landscapeRight
+                } else if acceleration.y <= -0.65 {
+                    orientation = .portrait
+                } else if acceleration.y >= 0.65 {
+                    orientation = .portraitUpsideDown
+                }
+
+                guard lastOrientation != orientation else {
+                    return
+                }
+
+                lastOrientation = orientation
+
+                if orientation.isLandscape {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        guard enterFullscreenInLandscape else {
+                            return
+                        }
+
+                        player.enterFullScreen()
+
+                        let orientationLockMask = orientation == .landscapeLeft ? UIInterfaceOrientationMask.landscapeLeft : .landscapeRight
+
+                        Orientation.lockOrientation(orientationLockMask, andRotateTo: orientation)
+
+                        guard lockLandscapeWhenEnteringFullscreen else {
+                            return
+                        }
+
+                        player.lockedOrientation = orientation
+                    }
+                } else {
+                    guard abs(acceleration.z) <= 0.74,
+                          player.lockedOrientation.isNil,
+                          enterFullscreenInLandscape
+                    else {
+                        return
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        player.exitFullScreen()
+                    }
+
+                    Orientation.lockOrientation(.portrait)
+                }
+            }
+        }
+
+        private func handleOrientationDidChangeNotification() {
+            let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
+            if newOrientation?.isLandscape ?? false, player.presentingPlayer, lockLandscapeWhenEnteringFullscreen, !player.lockedOrientation.isNil {
+                Orientation.lockOrientation(.landscape, andRotateTo: newOrientation)
+                return
+            }
+
+            guard player.presentingPlayer, enterFullscreenInLandscape, honorSystemOrientationLock else {
+                return
+            }
+
+            if UIDevice.current.orientation.isLandscape {
+                DispatchQueue.main.async {
+                    player.lockedOrientation = newOrientation
+                    player.enterFullScreen()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    player.exitFullScreen()
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    player.exitFullScreen()
+                }
+            }
+        }
+    #endif
 }
 
 struct VideoPlayerView_Previews: PreviewProvider {

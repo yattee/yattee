@@ -10,6 +10,11 @@ struct PlaybackSettings: View {
     @Default(.showKeywords) private var showKeywords
     @Default(.showChannelSubscribers) private var channelSubscribers
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    #if os(iOS)
+        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
+        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
+        @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
+    #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
     #if !os(macOS)
@@ -37,6 +42,13 @@ struct PlaybackSettings: View {
                     showHistoryToggle
                     channelSubscribersToggle
                     pauseOnHidingPlayerToggle
+
+                    if idiom == .pad {
+                        enterFullscreenInLandscapeToggle
+                    }
+
+                    honorSystemOrientationLockToggle
+                    lockLandscapeWhenEnteringFullscreenToggle
                 }
 
                 Section(header: SettingsHeader(text: "Picture in Picture")) {
@@ -146,6 +158,22 @@ struct PlaybackSettings: View {
     private var pauseOnHidingPlayerToggle: some View {
         Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
     }
+
+    #if os(iOS)
+        private var honorSystemOrientationLockToggle: some View {
+            Toggle("Honor system orientation lock", isOn: $honorSystemOrientationLock)
+                .disabled(!enterFullscreenInLandscape)
+        }
+
+        private var enterFullscreenInLandscapeToggle: some View {
+            Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
+        }
+
+        private var lockLandscapeWhenEnteringFullscreenToggle: some View {
+            Toggle("Lock landscape orientation when entering fullscreen", isOn: $lockLandscapeWhenEnteringFullscreen)
+                .disabled(!enterFullscreenInLandscape)
+        }
+    #endif
 
     private var closePiPOnNavigationToggle: some View {
         Toggle("Close PiP when starting playing other video", isOn: $closePiPOnNavigation)

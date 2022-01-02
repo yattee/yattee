@@ -132,17 +132,32 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     func playerViewController(
         _: AVPlayerViewController,
         willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
-    ) {}
+    ) {
+        playerModel.playingFullscreen = true
+    }
 
     func playerViewController(
         _: AVPlayerViewController,
         willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator
     ) {
+        let wasPlaying = playerModel.isPlaying
         coordinator.animate(alongsideTransition: nil) { context in
+            #if os(iOS)
+                if wasPlaying {
+                    self.playerModel.play()
+                }
+            #endif
             if !context.isCancelled {
                 #if os(iOS)
-                    if self.traitCollection.verticalSizeClass == .compact {
-                        self.dismiss(animated: true)
+                    self.playerModel.lockedOrientation = nil
+                    if Defaults[.enterFullscreenInLandscape] {
+                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    }
+
+                    self.playerModel.playingFullscreen = false
+
+                    if wasPlaying {
+                        self.playerModel.play()
                     }
                 #endif
             }

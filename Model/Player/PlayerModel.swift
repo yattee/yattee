@@ -1,15 +1,18 @@
 import AVKit
 import CoreData
+#if os(iOS)
+    import CoreMotion
+#endif
 import Defaults
 import Foundation
 import Logging
 import MediaPlayer
-#if !os(macOS)
-    import UIKit
-#endif
 import Siesta
 import SwiftUI
 import SwiftyJSON
+#if !os(macOS)
+    import UIKit
+#endif
 
 final class PlayerModel: ObservableObject {
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
@@ -44,6 +47,12 @@ final class PlayerModel: ObservableObject {
 
     @Published var channelWithDetails: Channel?
 
+    #if os(iOS)
+        @Published var motionManager: CMMotionManager!
+        @Published var lockedOrientation: UIInterfaceOrientation?
+        @Published var lastOrientation: UIInterfaceOrientation?
+    #endif
+
     var accounts: AccountsModel
     var comments: CommentsModel
 
@@ -63,6 +72,7 @@ final class PlayerModel: ObservableObject {
     private var timeObserverThrottle = Throttle(interval: 2)
 
     var playingInPictureInPicture = false
+    var playingFullscreen = false
 
     @Published var presentingErrorDetails = false
     var playerError: Error? { didSet {
@@ -105,11 +115,8 @@ final class PlayerModel: ObservableObject {
     }
 
     func hide() {
-        guard presentingPlayer else {
-            return
-        }
-
         presentingPlayer = false
+        playerNavigationLinkActive = false
     }
 
     func togglePlayer() {
@@ -388,7 +395,9 @@ final class PlayerModel: ObservableObject {
                     self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
                 }
             case .failed:
-                self?.playerError = error
+                DispatchQueue.main.async { [weak self] in
+                    self?.playerError = error
+                }
             default:
                 return
             }
@@ -807,6 +816,28 @@ final class PlayerModel: ObservableObject {
 
             show()
             closePiP()
+        }
+
+        func enterFullScreen() {
+            guard !playingFullscreen else {
+                return
+            }
+
+            logger.info("entering fullscreen")
+
+            controller?.playerView
+                .perform(NSSelectorFromString("enterFullScreenAnimated:completionHandler:"), with: false, with: nil)
+        }
+
+        func exitFullScreen() {
+            guard playingFullscreen else {
+                return
+            }
+
+            logger.info("exiting fullscreen")
+
+            controller?.playerView
+                .perform(NSSelectorFromString("exitFullScreenAnimated:completionHandler:"), with: false, with: nil)
         }
     #endif
 }

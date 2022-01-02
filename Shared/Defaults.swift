@@ -82,6 +82,12 @@ extension Defaults.Keys {
     #if os(macOS)
         static let enableBetaChannel = Key<Bool>("enableBetaChannel", default: false)
     #endif
+
+    #if os(iOS)
+        static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
+        static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let lockLandscapeWhenEnteringFullscreen = Key<Bool>("lockLandscapeWhenEnteringFullscreen", default: false)
+    #endif
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
