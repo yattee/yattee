@@ -6,6 +6,8 @@ struct YatteeApp: App {
     #if os(macOS)
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
         @StateObject private var updater = UpdaterModel()
+    #elseif os(iOS)
+        @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #endif
 
     @StateObject private var accounts = AccountsModel()

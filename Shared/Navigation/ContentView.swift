@@ -109,6 +109,12 @@ struct ContentView: View {
             try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
         #endif
 
+        #if os(iOS)
+            if Defaults[.lockPortraitWhenBrowsing] {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
+        #endif
+
         if let account = accounts.lastUsed ??
             instances.lastUsed?.anonymousAccount ??
             InstancesModel.all.first?.anonymousAccount

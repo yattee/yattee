@@ -1,5 +1,8 @@
 import Defaults
 import Foundation
+#if os(iOS)
+    import UIKit
+#endif
 
 extension Defaults.Keys {
     static let kavinPipedInstanceID = "kavin-piped"
@@ -33,6 +36,9 @@ extension Defaults.Keys {
 
     #if !os(tvOS)
         static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: false)
+    #endif
+    #if os(iOS)
+        static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)

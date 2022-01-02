@@ -5,6 +5,9 @@ struct BrowsingSettings: View {
     #if !os(tvOS)
         @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
     #endif
+    #if os(iOS)
+        @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
+    #endif
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.visibleSections) private var visibleSections
@@ -14,6 +17,16 @@ struct BrowsingSettings: View {
             Section(header: SettingsHeader(text: "Browsing")) {
                 #if !os(tvOS)
                     Toggle("Show username in the account picker button", isOn: $accountPickerDisplaysUsername)
+                #endif
+                #if os(iOS)
+                    Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
+                        .onChange(of: lockPortraitWhenBrowsing) { lock in
+                            if lock {
+                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                            } else {
+                                Orientation.lockOrientation(.allButUpsideDown)
+                            }
+                        }
                 #endif
                 Toggle("Show channel name on thumbnail", isOn: $channelOnThumbnail)
                 Toggle("Show video length on thumbnail", isOn: $timeOnThumbnail)
