@@ -100,6 +100,16 @@ struct AppSidebarNavigation: View {
                             "Current User: \(accounts.current?.description ?? "Not set")"
                     )
             }
+
+            #if os(macOS)
+                ToolbarItem(placement: .navigation) {
+                    Button {
+                        NSApp.keyWindow?.firstResponder?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+                    } label: {
+                        Label("Toggle Sidebar", systemImage: "sidebar.left")
+                    }
+                }
+            #endif
         }
     }
 
