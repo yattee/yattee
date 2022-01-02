@@ -7,12 +7,7 @@ struct SearchSuggestions: View {
     var body: some View {
         List {
             Button {
-                state.changeQuery { query in
-                    query.query = state.queryText
-                    state.fieldIsFocused = false
-                }
-
-                recents.addQuery(state.queryText)
+                runQueryAction()
             } label: {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -20,28 +15,45 @@ struct SearchSuggestions: View {
                         .lineLimit(1)
                 }
             }
+            .padding(.vertical, 5)
+
             #if os(macOS)
-            .onHover(perform: onHover(_:))
+                .onHover(perform: onHover(_:))
             #endif
 
             ForEach(visibleSuggestions, id: \.self) { suggestion in
-                Button {
-                    state.queryText = suggestion
-                } label: {
-                    HStack {
-                        Image(systemName: "arrow.up.left.circle")
-                            .foregroundColor(.secondary)
-                        HStack(spacing: 0) {
-                            Text(state.suggestionsText)
-                                .lineLimit(1)
-                                .layoutPriority(2)
-                                .foregroundColor(.secondary)
+                HStack {
+                    Button {
+                        state.queryText = suggestion
+                        runQueryAction()
+                    } label: {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                            HStack(spacing: 0) {
+                                Text(state.suggestionsText)
+                                    .lineLimit(1)
+                                    .layoutPriority(2)
+                                    .foregroundColor(.secondary)
 
-                            Text(querySuffix(suggestion))
-                                .lineLimit(1)
-                                .layoutPriority(1)
+                                Text(querySuffix(suggestion))
+                                    .lineLimit(1)
+                                    .layoutPriority(1)
+                            }
                         }
                     }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    Button {
+                        state.queryText = suggestion
+                    } label: {
+                        Image(systemName: "arrow.up.left.circle")
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .buttonStyle(.plain)
                 }
                 #if os(macOS)
                 .onHover(perform: onHover(_:))
@@ -51,6 +63,15 @@ struct SearchSuggestions: View {
         #if os(macOS)
         .buttonStyle(.link)
         #endif
+    }
+
+    private func runQueryAction() {
+        state.changeQuery { query in
+            query.query = state.queryText
+            state.fieldIsFocused = false
+        }
+
+        recents.addQuery(state.queryText)
     }
 
     private var visibleSuggestions: [String] {
