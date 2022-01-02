@@ -36,6 +36,7 @@ extension Defaults.Keys {
     #endif
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
+    static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
 
     static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)

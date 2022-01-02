@@ -6,6 +6,7 @@ struct PlaybackSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
     @Default(.quality) private var quality
     @Default(.playerSidebar) private var playerSidebar
+    @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
     @Default(.showChannelSubscribers) private var channelSubscribers
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
@@ -33,6 +34,7 @@ struct PlaybackSettings: View {
                     }
 
                     keywordsToggle
+                    showHistoryToggle
                     channelSubscribersToggle
                     pauseOnHidingPlayerToggle
                 }
@@ -58,6 +60,7 @@ struct PlaybackSettings: View {
                 #endif
 
                 keywordsToggle
+                showHistoryToggle
                 channelSubscribersToggle
                 pauseOnHidingPlayerToggle
 
@@ -130,6 +133,10 @@ struct PlaybackSettings: View {
 
     private var keywordsToggle: some View {
         Toggle("Show video keywords", isOn: $showKeywords)
+    }
+
+    private var showHistoryToggle: some View {
+        Toggle("Show history of videos", isOn: $showHistory)
     }
 
     private var channelSubscribersToggle: some View {

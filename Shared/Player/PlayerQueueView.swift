@@ -13,6 +13,7 @@ struct PlayerQueueView: View {
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveHistory) private var saveHistory
+    @Default(.showHistoryInPlayer) private var showHistoryInPlayer
 
     var body: some View {
         List {
@@ -21,7 +22,7 @@ struct PlayerQueueView: View {
                 if sidebarQueue {
                     related
                 }
-                if saveHistory {
+                if saveHistory, showHistoryInPlayer {
                     playedPreviously
                 }
             }

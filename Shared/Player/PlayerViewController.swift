@@ -66,9 +66,15 @@ final class PlayerViewController: UIViewController {
             if CommentsModel.enabled {
                 infoViewControllers.append(infoViewController([.comments], title: "Comments"))
             }
+
+            var queueSections = [NowPlayingView.ViewSection.playingNext]
+            if Defaults[.showHistoryInPlayer] {
+                queueSections.append(.playedPreviously)
+            }
+
             infoViewControllers.append(contentsOf: [
                 infoViewController([.related], title: "Related"),
-                infoViewController([.playingNext, .playedPreviously], title: "Playing Next")
+                infoViewController(queueSections, title: "Queue")
             ])
 
             playerView.customInfoViewControllers = infoViewControllers
