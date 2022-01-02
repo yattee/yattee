@@ -13,7 +13,9 @@ struct HistorySettings: View {
     @Default(.showWatchingProgress) private var showWatchingProgress
     @Default(.watchedThreshold) private var watchedThreshold
     @Default(.watchedVideoStyle) private var watchedVideoStyle
+    @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
+    @Default(.resetWatchedStatusOnPlaying) private var resetWatchedStatusOnPlaying
 
     var body: some View {
         Group {
@@ -26,14 +28,18 @@ struct HistorySettings: View {
                 #if !os(tvOS)
                     watchedThresholdPicker
                     watchedVideoStylePicker
+                    watchedVideoBadgeColorPicker
                     watchedVideoPlayNowBehaviorPicker
+                    resetWatchedStatusOnPlayingToggle
                 #endif
             }
 
             #if os(tvOS)
                 watchedThresholdPicker
                 watchedVideoStylePicker
+                watchedVideoBadgeColorPicker
                 watchedVideoPlayNowBehaviorPicker
+                resetWatchedStatusOnPlayingToggle
             #endif
 
             #if os(macOS)
@@ -68,8 +74,28 @@ struct HistorySettings: View {
                 Text("Nothing").tag(WatchedVideoStyle.nothing)
                 Text("Badge").tag(WatchedVideoStyle.badge)
                 Text("Decreased opacity").tag(WatchedVideoStyle.decreasedOpacity)
+                Text("Badge & Decreased opacity").tag(WatchedVideoStyle.both)
             }
             .disabled(!saveHistory)
+            .labelsHidden()
+
+            #if os(iOS)
+                .pickerStyle(.automatic)
+            #elseif os(tvOS)
+                .pickerStyle(.inline)
+            #endif
+        }
+    }
+
+    private var watchedVideoBadgeColorPicker: some View {
+        Section(header: header("Badge color")) {
+            Picker("Badge color", selection: $watchedVideoBadgeColor) {
+                Text("Based on system color scheme").tag(WatchedVideoBadgeColor.colorSchemeBased)
+                Text("Blue").tag(WatchedVideoBadgeColor.blue)
+                Text("Red").tag(WatchedVideoBadgeColor.red)
+            }
+            .disabled(!saveHistory)
+            .disabled(watchedVideoStyle == .decreasedOpacity)
             .labelsHidden()
 
             #if os(iOS)
@@ -95,6 +121,10 @@ struct HistorySettings: View {
                 .pickerStyle(.inline)
             #endif
         }
+    }
+
+    private var resetWatchedStatusOnPlayingToggle: some View {
+        Toggle("Reset watched status when playing again", isOn: $resetWatchedStatusOnPlaying)
     }
 
     private var clearHistoryButton: some View {

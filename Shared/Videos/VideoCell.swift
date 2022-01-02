@@ -21,6 +21,7 @@ struct VideoCell: View {
     @Default(.saveHistory) private var saveHistory
     @Default(.showWatchingProgress) private var showWatchingProgress
     @Default(.watchedVideoStyle) private var watchedVideoStyle
+    @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
@@ -112,7 +113,7 @@ struct VideoCell: View {
     private var contentOpacity: Double {
         guard saveHistory,
               !watch.isNil,
-              watchedVideoStyle == .decreasedOpacity
+              watchedVideoStyle == .decreasedOpacity || watchedVideoStyle == .both
         else {
             return 1
         }
@@ -290,7 +291,7 @@ struct VideoCell: View {
                 thumbnailImage
                 if saveHistory, showWatchingProgress, watch?.progress ?? 0 > 0 {
                     ProgressView(value: watch!.progress, total: 100)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color("WatchProgressBarColor")))
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
                     #if os(tvOS)
                         .padding(.horizontal, 16)
                     #else
@@ -328,11 +329,14 @@ struct VideoCell: View {
 
                 HStack(alignment: .center) {
                     if saveHistory,
-                       watchedVideoStyle == .badge,
+                       watchedVideoStyle == .badge || watchedVideoStyle == .both,
                        watch?.finished ?? false
                     {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(Color("WatchProgressBarColor"))
+                            .foregroundColor(Color(
+                                watchedVideoBadgeColor == .colorSchemeBased ? "WatchProgressBarColor" :
+                                    watchedVideoBadgeColor == .red ? "AppRedColor" : "AppBlueColor"
+                            ))
                             .background(Color.white)
                             .clipShape(Circle())
                         #if os(tvOS)

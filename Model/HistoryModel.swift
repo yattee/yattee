@@ -1,5 +1,6 @@
 import CoreData
 import CoreMedia
+import Defaults
 import Foundation
 
 extension PlayerModel {
@@ -42,6 +43,10 @@ extension PlayerModel {
             watch.videoID = id
         } else {
             watch = results?.first
+
+            if !Defaults[.resetWatchedStatusOnPlaying], watch.finished {
+                return
+            }
         }
 
         if let seconds = playerItemDuration?.seconds {

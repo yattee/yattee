@@ -24,6 +24,11 @@ extension Watch {
         }
 
         let progress = (stoppedAt / videoDuration) * 100
+
+        if progress >= Double(watchedThreshold) {
+            return 100
+        }
+
         return min(max(progress, 0), 100)
     }
 

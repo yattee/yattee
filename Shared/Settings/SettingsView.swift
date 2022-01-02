@@ -75,7 +75,7 @@ struct SettingsView: View {
                 .tag(Tabs.updates)
             }
             .padding(20)
-            .frame(width: 400, height: 380)
+            .frame(width: 400, height: 400)
         #else
             NavigationView {
                 List {
