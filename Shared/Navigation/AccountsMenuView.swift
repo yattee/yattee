@@ -6,21 +6,29 @@ struct AccountsMenuView: View {
 
     @Default(.accounts) private var accounts
     @Default(.instances) private var instances
+    @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
 
     var body: some View {
         Menu {
             ForEach(allAccounts, id: \.id) { account in
-                Button(accountButtonTitle(account: account)) {
+                Button {
                     model.setCurrent(account)
+                } label: {
+                    HStack {
+                        Text(accountButtonTitle(account: account))
+
+                        Spacer()
+
+                        if model.current == account {
+                            Image(systemName: "checkmark")
+                        }
+                    }
                 }
             }
         } label: {
-            if #available(iOS 15.0, macOS 12.0, *) {
-                label
-                    .labelStyle(.titleAndIcon)
-            } else {
-                HStack {
-                    Image(systemName: "person.crop.circle")
+            HStack {
+                Image(systemName: "person.crop.circle")
+                if accountPickerDisplaysUsername {
                     label
                         .labelStyle(.titleOnly)
                 }

@@ -31,6 +31,9 @@ extension Defaults.Keys {
         .init(section: .searchQuery("Apple Pie Recipes", "", "", ""))
     ])
 
+    #if !os(tvOS)
+        static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: false)
+    #endif
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
 

@@ -2,6 +2,9 @@ import Defaults
 import SwiftUI
 
 struct BrowsingSettings: View {
+    #if !os(tvOS)
+        @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
+    #endif
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.visibleSections) private var visibleSections
@@ -9,6 +12,9 @@ struct BrowsingSettings: View {
     var body: some View {
         Group {
             Section(header: SettingsHeader(text: "Browsing")) {
+                #if !os(tvOS)
+                    Toggle("Show username in the account picker button", isOn: $accountPickerDisplaysUsername)
+                #endif
                 Toggle("Show channel name on thumbnail", isOn: $channelOnThumbnail)
                 Toggle("Show video length on thumbnail", isOn: $timeOnThumbnail)
             }
