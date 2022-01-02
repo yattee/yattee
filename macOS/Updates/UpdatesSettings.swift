@@ -21,6 +21,8 @@ struct UpdatesSettings: View {
         .frame(maxWidth: .infinity, alignment: .leading)
 
         Spacer()
+
+        CheckForUpdatesView()
     }
 }
 
