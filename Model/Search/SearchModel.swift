@@ -4,6 +4,7 @@ import SwiftUI
 
 final class SearchModel: ObservableObject {
     @Published var store = Store<[ContentItem]>()
+    @Published var page: SearchPage?
 
     var accounts = AccountsModel()
     @Published var query = SearchQuery()
@@ -13,7 +14,6 @@ final class SearchModel: ObservableObject {
 
     @Published var fieldIsFocused = false
 
-    private var previousResource: Resource?
     private var resource: Resource!
 
     var isLoading: Bool {
@@ -23,60 +23,54 @@ final class SearchModel: ObservableObject {
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
         changeHandler(query)
 
-        let newResource = accounts.api.search(query)
-        guard newResource != previousResource else {
+        let newResource = accounts.api.search(query, page: nil)
+        guard newResource != resource else {
             return
         }
 
-        previousResource?.removeObservers(ownedBy: store)
-        previousResource = newResource
+        page = nil
 
         resource = newResource
         resource.addObserver(store)
 
         if !query.isEmpty {
-            loadResourceIfNeededAndReplaceStore()
+            loadResource()
         }
     }
 
     func resetQuery(_ query: SearchQuery = SearchQuery()) {
         self.query = query
 
-        let newResource = accounts.api.search(query)
-        guard newResource != previousResource else {
+        let newResource = accounts.api.search(query, page: nil)
+        guard newResource != resource else {
             return
         }
 
+        page = nil
         store.replace([])
-
-        previousResource?.removeObservers(ownedBy: store)
-        previousResource = newResource
 
         resource = newResource
         resource.addObserver(store)
 
         if !query.isEmpty {
-            loadResourceIfNeededAndReplaceStore()
+            loadResource()
         }
     }
 
-    func loadResourceIfNeededAndReplaceStore() {
+    func loadResource() {
         let currentResource = resource!
 
-        if let request = resource.loadIfNeeded() {
-            request.onSuccess { response in
-                if let results: [ContentItem] = response.typedContent() {
-                    self.replace(results, for: currentResource)
-                }
+        resource.load().onSuccess { response in
+            if let page: SearchPage = response.typedContent() {
+                self.page = page
+                self.replace(page.results, for: currentResource)
             }
-        } else {
-            replace(store.collection, for: currentResource)
         }
     }
 
-    func replace(_ videos: [ContentItem], for resource: Resource) {
+    func replace(_ items: [ContentItem], for resource: Resource) {
         if self.resource == resource {
-            store = Store<[ContentItem]>(videos)
+            store = Store<[ContentItem]>(items)
         }
     }
 
@@ -107,5 +101,39 @@ final class SearchModel: ObservableObject {
                 self.suggestionsText = query
             }
         }
+    }
+
+    func loadNextPage() {
+        guard var pageToLoad = page, !pageToLoad.last else {
+            return
+        }
+
+        if pageToLoad.nextPage.isNil, accounts.app.searchUsesIndexedPages {
+            pageToLoad.nextPage = "2"
+        }
+
+        resource?.removeObservers(ownedBy: store)
+
+        resource = accounts.api.search(query, page: page?.nextPage)
+        resource.addObserver(store)
+
+        resource
+            .load()
+            .onSuccess { response in
+                if let page: SearchPage = response.typedContent() {
+                    var nextPage: Int?
+                    if self.accounts.app.searchUsesIndexedPages {
+                        nextPage = Int(pageToLoad.nextPage ?? "0")
+                    }
+
+                    self.page = page
+
+                    if self.accounts.app.searchUsesIndexedPages {
+                        self.page?.nextPage = String((nextPage ?? 1) + 1)
+                    }
+
+                    self.replace(self.store.collection + page.results, for: self.resource)
+                }
+            }
     }
 }

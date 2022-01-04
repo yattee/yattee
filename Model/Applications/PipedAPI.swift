@@ -51,8 +51,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             self.extractVideos(from: content.json)
         }
 
-        configureTransformer(pathPattern("search")) { (content: Entity<JSON>) -> [ContentItem] in
-            self.extractContentItems(from: content.json.dictionaryValue["items"]!)
+        configureTransformer(pathPattern("search")) { (content: Entity<JSON>) -> SearchPage in
+            let nextPage = content.json.dictionaryValue["nextpage"]?.stringValue
+            return SearchPage(
+                results: self.extractContentItems(from: content.json.dictionaryValue["items"]!),
+                nextPage: nextPage,
+                last: nextPage == "null"
+            )
         }
 
         configureTransformer(pathPattern("suggestions")) { (content: Entity<JSON>) -> [String] in
@@ -123,10 +128,18 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .withParam("region", country.rawValue)
     }
 
-    func search(_ query: SearchQuery) -> Resource {
-        resource(baseURL: account.instance.apiURL, path: "search")
+    func search(_ query: SearchQuery, page: String?) -> Resource {
+        let path = page.isNil ? "search" : "nextpage/search"
+
+        let resource = resource(baseURL: account.instance.apiURL, path: path)
             .withParam("q", query.query)
-            .withParam("filter", "")
+            .withParam("filter", "all")
+
+        if page.isNil {
+            return resource
+        }
+
+        return resource.withParam("nextpage", page)
     }
 
     func searchSuggestions(query: String) -> Resource {

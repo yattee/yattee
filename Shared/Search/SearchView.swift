@@ -199,10 +199,12 @@ struct SearchView: View {
                         }
 
                         HorizontalCells(items: items)
+                            .environment(\.loadMoreContentHandler) { state.loadNextPage() }
                     }
                     .edgesIgnoringSafeArea(.horizontal)
                 #else
                     VerticalCells(items: items)
+                        .environment(\.loadMoreContentHandler) { state.loadNextPage() }
                 #endif
 
                 if noResults {

@@ -174,6 +174,9 @@
 		375168D62700FAFF008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
 		375168D72700FDB8008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
 		375168D82700FDB9008F96A6 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375168D52700FAFF008F96A6 /* Debounce.swift */; };
+		3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
+		3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
+		3751B4B427836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
 		3758638A2721B0A9000CB14E /* ChannelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3743B86727216D3600261544 /* ChannelCell.swift */; };
 		37599F30272B42810087F250 /* FavoriteItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F2F272B42810087F250 /* FavoriteItem.swift */; };
 		37599F31272B42810087F250 /* FavoriteItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F2F272B42810087F250 /* FavoriteItem.swift */; };
@@ -648,6 +651,7 @@
 		374C0542272496E4009BDDBE /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = macOS/AppDelegate.swift; sourceTree = SOURCE_ROOT; };
 		374C0544272496FD009BDDBE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		375168D52700FAFF008F96A6 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
+		3751B4B127836902000B7DF4 /* SearchPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPage.swift; sourceTree = "<group>"; };
 		37599F2F272B42810087F250 /* FavoriteItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItem.swift; sourceTree = "<group>"; };
 		37599F33272B44000087F250 /* FavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesModel.swift; sourceTree = "<group>"; };
 		37599F37272B4D740087F250 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
@@ -1341,6 +1345,7 @@
 			isa = PBXGroup;
 			children = (
 				3711403E26B206A6005B3555 /* SearchModel.swift */,
+				3751B4B127836902000B7DF4 /* SearchPage.swift */,
 				373CFACA26966264003CB2C6 /* SearchQuery.swift */,
 			);
 			path = Search;
@@ -1868,6 +1873,7 @@
 				37599F34272B44000087F250 /* FavoritesModel.swift in Sources */,
 				37BA794726DC2E56002A0235 /* AppSidebarSubscriptions.swift in Sources */,
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
+				3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37FFC440272734C3009FFD26 /* Throttle.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
@@ -2035,6 +2041,7 @@
 				37169AA32729D98A0011DE61 /* InstancesBridge.swift in Sources */,
 				37B044B826F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3765788A2685471400D4EA09 /* Playlist.swift in Sources */,
+				3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */,
 				3782B9532755667600990149 /* String+Format.swift in Sources */,
 				37E2EEAC270656EC00170416 /* PlayerControlsView.swift in Sources */,
 				37BF662027308884008CCFB0 /* DropFavoriteOutside.swift in Sources */,
@@ -2262,6 +2269,7 @@
 				376BE50827347B57009AD608 /* SettingsHeader.swift in Sources */,
 				37A9966026D6F9B9006E3224 /* FavoritesView.swift in Sources */,
 				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,
+				3751B4B427836902000B7DF4 /* SearchPage.swift in Sources */,
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
 				37130A61277657300033018A /* PersistenceController.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,

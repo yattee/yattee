@@ -29,6 +29,12 @@ private struct CurrentPlaylistID: EnvironmentKey {
     static let defaultValue: String? = nil
 }
 
+private struct LoadMoreContentHandler: EnvironmentKey {
+    static let defaultValue: LoadMoreContentHandlerClosure = { print("infinite load") }
+}
+
+typealias LoadMoreContentHandlerClosure = () -> Void
+
 extension EnvironmentValues {
     var inNavigationView: Bool {
         get { self[InNavigationViewKey.self] }
@@ -58,5 +64,10 @@ extension EnvironmentValues {
     var currentPlaylistID: String? {
         get { self[CurrentPlaylistID.self] }
         set { self[CurrentPlaylistID.self] = newValue }
+    }
+
+    var loadMoreContentHandler: LoadMoreContentHandlerClosure {
+        get { self[LoadMoreContentHandler.self] }
+        set { self[LoadMoreContentHandler.self] = newValue }
     }
 }

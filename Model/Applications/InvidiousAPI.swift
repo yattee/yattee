@@ -91,17 +91,19 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.map(self.extractVideo)
         }
 
-        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> [ContentItem] in
-            content.json.arrayValue.map {
-                let type = $0.dictionaryValue["type"]?.stringValue
+        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
+            let results = content.json.arrayValue.compactMap { json -> ContentItem in
+                let type = json.dictionaryValue["type"]?.stringValue
 
                 if type == "channel" {
-                    return ContentItem(channel: self.extractChannel(from: $0))
+                    return ContentItem(channel: self.extractChannel(from: json))
                 } else if type == "playlist" {
-                    return ContentItem(playlist: self.extractChannelPlaylist(from: $0))
+                    return ContentItem(playlist: self.extractChannelPlaylist(from: json))
                 }
-                return ContentItem(video: self.extractVideo(from: $0))
+                return ContentItem(video: self.extractVideo(from: json))
             }
+
+            return SearchPage(results: results, last: results.isEmpty)
         }
 
         configureTransformer(pathPattern("search/suggestions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
@@ -238,7 +240,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: basePathAppending("playlists/\(id)"))
     }
 
-    func search(_ query: SearchQuery) -> Resource {
+    func search(_ query: SearchQuery, page: String?) -> Resource {
         var resource = resource(baseURL: account.url, path: basePathAppending("search"))
             .withParam("q", searchQuery(query.query))
             .withParam("sort_by", query.sortBy.parameter)
@@ -250,6 +252,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         if let duration = query.duration, duration != .any {
             resource = resource.withParam("duration", duration.rawValue)
+        }
+
+        if let page = page {
+            resource = resource.withParam("page", page)
         }
 
         return resource

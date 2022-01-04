@@ -42,4 +42,8 @@ enum VideosApp: String, CaseIterable {
     var supportsComments: Bool {
         self == .piped
     }
+
+    var searchUsesIndexedPages: Bool {
+        self == .invidious
+    }
 }

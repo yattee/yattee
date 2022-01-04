@@ -6,6 +6,8 @@ struct VerticalCells: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
+
     var items = [ContentItem]()
 
     var body: some View {
@@ -13,6 +15,7 @@ struct VerticalCells: View {
             LazyVGrid(columns: columns, alignment: .center) {
                 ForEach(items.sorted { $0 < $1 }) { item in
                     ContentItemView(item: item)
+                        .onAppear { loadMoreContentItemsIfNeeded(current: item) }
                 }
             }
             .padding()
@@ -22,6 +25,13 @@ struct VerticalCells: View {
             .background(Color.secondaryBackground)
             .frame(minWidth: 360)
         #endif
+    }
+
+    func loadMoreContentItemsIfNeeded(current item: ContentItem) {
+        let thresholdIndex = items.index(items.endIndex, offsetBy: -5)
+        if items.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
+            loadMoreContentHandler()
+        }
     }
 
     var columns: [GridItem] {

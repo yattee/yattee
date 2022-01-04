@@ -4,6 +4,8 @@ import SwiftUI
 struct HorizontalCells: View {
     var items = [ContentItem]()
 
+    @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
+
     @Default(.channelOnThumbnail) private var channelOnThumbnail
 
     var body: some View {
@@ -12,6 +14,7 @@ struct HorizontalCells: View {
                 ForEach(items) { item in
                     ContentItemView(item: item)
                         .environment(\.horizontalCells, true)
+                        .onAppear { loadMoreContentItemsIfNeeded(current: item) }
                     #if os(tvOS)
                         .frame(width: 580)
                         .padding(.trailing, 20)
@@ -31,6 +34,13 @@ struct HorizontalCells: View {
         }
         .frame(height: cellHeight)
         .edgesIgnoringSafeArea(.horizontal)
+    }
+
+    func loadMoreContentItemsIfNeeded(current item: ContentItem) {
+        let thresholdIndex = items.index(items.endIndex, offsetBy: -5)
+        if items.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
+            loadMoreContentHandler()
+        }
     }
 
     var cellHeight: Double {
