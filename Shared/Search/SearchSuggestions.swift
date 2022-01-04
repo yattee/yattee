@@ -38,9 +38,12 @@ struct SearchSuggestions: View {
                                 Text(querySuffix(suggestion))
                                     .lineLimit(1)
                                     .layoutPriority(1)
+                                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                                    .contentShape(Rectangle())
                             }
                         }
                     }
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     .buttonStyle(.plain)
 
                     Spacer()
