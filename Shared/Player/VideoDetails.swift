@@ -100,7 +100,7 @@ struct VideoDetails: View {
                 if player.isLoadingVideo {
                     PlaceholderProgressView()
                 } else {
-                    ScrollView(.vertical) {
+                    ScrollView(.vertical, showsIndicators: false) {
                         detailsPage
                     }
                 }
@@ -112,7 +112,7 @@ struct VideoDetails: View {
                 RelatedView()
                     .edgesIgnoringSafeArea(.horizontal)
             case .comments:
-                CommentsView()
+                CommentsView(embedInScrollView: true)
                     .edgesIgnoringSafeArea(.horizontal)
             }
         }
@@ -137,7 +137,7 @@ struct VideoDetails: View {
             }
         }
         .edgesIgnoringSafeArea(.horizontal)
-        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     }
 
     var title: some View {
@@ -288,8 +288,7 @@ struct VideoDetails: View {
             if !video.isNil {
                 Text("Info").tag(Page.info)
                 if CommentsModel.enabled, CommentsModel.placement == .separate {
-                    Text("Comments")
-                        .tag(Page.comments)
+                    Text("Comments").tag(Page.comments)
                 }
                 if !sidebarQueue {
                     Text("Related").tag(Page.related)
@@ -357,12 +356,14 @@ struct VideoDetails: View {
 
                     if let likes = video.likesCount {
                         Divider()
+                            .frame(minHeight: 35)
 
                         videoDetail(label: "Likes", value: likes, symbol: "hand.thumbsup")
                     }
 
                     if let dislikes = video.dislikesCount {
                         Divider()
+                            .frame(minHeight: 35)
 
                         videoDetail(label: "Dislikes", value: dislikes, symbol: "hand.thumbsdown")
                     }
@@ -428,7 +429,7 @@ struct VideoDetails: View {
         Group {
             Group {
                 if let video = player.currentVideo {
-                    Group {
+                    VStack(spacing: 6) {
                         HStack {
                             publishedDateSection
                             Spacer()
@@ -437,9 +438,9 @@ struct VideoDetails: View {
                         Divider()
 
                         countsSection
-                    }
 
-                    Divider()
+                        Divider()
+                    }
 
                     VStack(alignment: .leading, spacing: 10) {
                         if let description = video.description {
@@ -495,7 +496,7 @@ struct VideoDetails: View {
             }
             .padding(.horizontal)
 
-            Group {
+            LazyVStack {
                 if !video.isNil, CommentsModel.placement == .info {
                     CommentsView()
                 }

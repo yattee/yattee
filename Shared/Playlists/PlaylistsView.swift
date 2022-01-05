@@ -74,25 +74,6 @@ struct PlaylistsView: View {
                 )
         #endif
                 .toolbar {
-                    ToolbarItemGroup {
-                        #if !os(iOS)
-                            if !model.isEmpty {
-                                if #available(macOS 12.0, *) {
-                                    selectPlaylistButton
-                                        .prefersDefaultFocus(in: focusNamespace)
-                                } else {
-                                    selectPlaylistButton
-                                }
-                            }
-
-                            if currentPlaylist != nil {
-                                editPlaylistButton
-                            }
-                        #endif
-
-                        FavoriteButton(item: FavoriteItem(section: .playlist(selectedPlaylistID)))
-                    }
-
                     #if os(iOS)
                         ToolbarItemGroup(placement: .bottomBar) {
                             Group {
@@ -101,7 +82,7 @@ struct PlaylistsView: View {
                                         .foregroundColor(.secondary)
                                 } else {
                                     selectPlaylistButton
-                                        .frame(maxWidth: 140)
+                                        .transaction { t in t.animation = .none }
                                 }
 
                                 Spacer()
@@ -230,7 +211,7 @@ struct PlaylistsView: View {
                 Button("Cancel", role: .cancel) {}
             }
         #else
-            Menu(currentPlaylist?.title ?? "Select playlist") {
+            Menu {
                 ForEach(model.all) { playlist in
                     Button(action: { selectedPlaylistID = playlist.id }) {
                         if playlist == currentPlaylist {
@@ -240,6 +221,9 @@ struct PlaylistsView: View {
                         }
                     }
                 }
+            } label: {
+                Text(currentPlaylist?.title ?? "Select playlist")
+                    .frame(maxWidth: 140, alignment: .leading)
             }
         #endif
     }

@@ -7,6 +7,7 @@ disabled_rules:
   - multiline_arguments
 
 excluded:
+  - Vendor
   - Tests Apple TV
   - Tests iOS
   - Tests macOS
