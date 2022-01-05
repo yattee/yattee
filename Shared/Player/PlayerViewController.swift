@@ -123,11 +123,11 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
         true
     }
 
-    func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {}
-
-    func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {
+    func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
         dismiss(animated: false)
     }
+
+    func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {}
 
     func playerViewController(
         _: AVPlayerViewController,
