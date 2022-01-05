@@ -101,20 +101,28 @@ struct PlaylistsView: View {
                                         .foregroundColor(.secondary)
                                 } else {
                                     selectPlaylistButton
+                                        .frame(maxWidth: 140)
                                 }
-
-                                playButton
-                                shuffleButton
 
                                 Spacer()
 
-                                newPlaylistButton
-
                                 if currentPlaylist != nil {
-                                    editPlaylistButton
+                                    HStack(spacing: 10) {
+                                        playButton
+                                        shuffleButton
+                                    }
+
+                                    Spacer()
+                                }
+
+                                HStack(spacing: 2) {
+                                    newPlaylistButton
+
+                                    if currentPlaylist != nil {
+                                        editPlaylistButton
+                                    }
                                 }
                             }
-                            .transaction { t in t.animation = .none }
                         }
                     #endif
                 }
