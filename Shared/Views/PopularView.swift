@@ -30,5 +30,13 @@ struct PopularView: View {
                 FavoriteButton(item: FavoriteItem(section: .popular))
             }
         }
+        #if os(iOS)
+        .refreshControl { refreshControl in
+            resource?.load().onCompletion { _ in
+                refreshControl.endRefreshing()
+            }
+        }
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
     }
 }

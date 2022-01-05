@@ -27,10 +27,16 @@ struct FavoritesView: View {
                             FavoriteItemView(item: item, dragging: $dragging)
                         }
                     #else
+                        #if os(iOS)
+                            let first = favorites.first
+                        #endif
                         ForEach(favorites) { item in
                             FavoriteItemView(item: item, dragging: $dragging)
                             #if os(macOS)
                                 .workaroundForVerticalScrollingBug()
+                            #endif
+                            #if os(iOS)
+                            .padding(.top, item == first && RefreshControl.navigationBarTitleDisplayMode == .inline ? 10 : 0)
                             #endif
                         }
                     #endif
@@ -53,6 +59,9 @@ struct FavoritesView: View {
             #if os(macOS)
             .background(Color.secondaryBackground)
             .frame(minWidth: 360)
+            #endif
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
             #endif
         }
     }

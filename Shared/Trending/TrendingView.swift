@@ -48,6 +48,69 @@ struct TrendingView: View {
                 }
             }
         }
+
+        .toolbar {
+            #if os(macOS)
+                ToolbarItemGroup {
+                    if let favoriteItem = favoriteItem {
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem.id)
+                    }
+
+                    if accounts.app.supportsTrendingCategories {
+                        categoryButton
+                    }
+                    countryButton
+                }
+            #elseif os(iOS)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Group {
+                        if accounts.app.supportsTrendingCategories {
+                            HStack {
+                                Text("Category")
+                                    .foregroundColor(.secondary)
+
+                                categoryButton
+                                    // only way to disable Menu animation is to
+                                    // force redraw of the view when it changes
+                                    .id(UUID())
+                            }
+
+                            Spacer()
+                        }
+
+                        if let favoriteItem = favoriteItem {
+                            FavoriteButton(item: favoriteItem)
+                                .id(favoriteItem.id)
+
+                            Spacer()
+                        }
+
+                        HStack {
+                            Text("Country")
+                                .foregroundColor(.secondary)
+
+                            countryButton
+                        }
+                    }
+                }
+            #endif
+        }
+        .onChange(of: resource) { _ in
+            resource.load()
+            updateFavoriteItem()
+        }
+        .onAppear {
+            if videos.isEmpty {
+                resource.addObserver(store)
+                resource.loadIfNeeded()
+            } else {
+                store.replace(videos)
+            }
+
+            updateFavoriteItem()
+        }
+
         #if os(tvOS)
         .fullScreenCover(isPresented: $presentingCountrySelection) {
             TrendingCountry(selectedCountry: $country)
@@ -61,67 +124,14 @@ struct TrendingView: View {
                 }
                 .navigationTitle("Trending")
         #endif
-                .toolbar {
-                    #if os(macOS)
-                        ToolbarItemGroup {
-                            if let favoriteItem = favoriteItem {
-                                FavoriteButton(item: favoriteItem)
-                                    .id(favoriteItem.id)
-                            }
-
-                            if accounts.app.supportsTrendingCategories {
-                                categoryButton
-                            }
-                            countryButton
-                        }
-                    #elseif os(iOS)
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            Group {
-                                HStack {
-                                    if accounts.app.supportsTrendingCategories {
-                                        Text("Category")
-                                            .foregroundColor(.secondary)
-
-                                        categoryButton
-                                            // only way to disable Menu animation is to
-                                            // force redraw of the view when it changes
-                                            .id(UUID())
-                                    }
-                                }
-
-                                Spacer()
-
-                                if let favoriteItem = favoriteItem {
-                                    FavoriteButton(item: favoriteItem)
-                                        .id(favoriteItem.id)
-
-                                    Spacer()
-                                }
-
-                                HStack {
-                                    Text("Country")
-                                        .foregroundColor(.secondary)
-
-                                    countryButton
-                                }
-                            }
-                        }
-                    #endif
-                }
-                .onChange(of: resource) { _ in
-                    resource.load()
-                    updateFavoriteItem()
-                }
-                .onAppear {
-                    if videos.isEmpty {
-                        resource.addObserver(store)
-                        resource.loadIfNeeded()
-                    } else {
-                        store.replace(videos)
-                    }
-
-                    updateFavoriteItem()
-                }
+        #if os(iOS)
+        .refreshControl { refreshControl in
+            resource.load().onCompletion { _ in
+                refreshControl.endRefreshing()
+            }
+        }
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
     }
 
     #if os(tvOS)

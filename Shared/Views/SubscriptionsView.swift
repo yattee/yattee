@@ -24,6 +24,13 @@ struct SubscriptionsView: View {
                     .onChange(of: accounts.current) { _ in
                         loadResources(force: true)
                     }
+                #if os(iOS)
+                    .refreshControl { refreshControl in
+                        loadResources(force: true) {
+                            refreshControl.endRefreshing()
+                        }
+                    }
+                #endif
             }
         }
         .toolbar {
@@ -31,26 +38,35 @@ struct SubscriptionsView: View {
                 FavoriteButton(item: FavoriteItem(section: .subscriptions))
             }
         }
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
     }
 
-    fileprivate func loadResources(force: Bool = false) {
+    private func loadResources(force: Bool = false, onCompletion: @escaping () -> Void = {}) {
         feed?.addObserver(store)
 
         if accounts.app == .invidious {
             // Invidious for some reason won't refresh feed until homepage is loaded
             if let request = force ? accounts.api.home?.load() : accounts.api.home?.loadIfNeeded() {
                 request.onSuccess { _ in
-                    loadFeed(force: force)
+                    loadFeed(force: force, onCompletion: onCompletion)
                 }
             } else {
-                loadFeed(force: force)
+                loadFeed(force: force, onCompletion: onCompletion)
             }
         } else {
-            loadFeed(force: force)
+            loadFeed(force: force, onCompletion: onCompletion)
         }
     }
 
-    fileprivate func loadFeed(force: Bool = false) {
-        _ = force ? feed?.load() : feed?.loadIfNeeded()
+    private func loadFeed(force: Bool = false, onCompletion: @escaping () -> Void = {}) {
+        if let request = force ? feed?.load() : feed?.loadIfNeeded() {
+            request.onCompletion { _ in
+                onCompletion()
+            }
+        } else {
+            onCompletion()
+        }
     }
 }

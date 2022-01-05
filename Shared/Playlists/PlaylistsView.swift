@@ -127,6 +127,9 @@ struct PlaylistsView: View {
                 .onChange(of: accounts.current) { _ in
                     model.load(force: true)
                 }
+        #if os(iOS)
+                .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
     }
 
     #if os(tvOS)
