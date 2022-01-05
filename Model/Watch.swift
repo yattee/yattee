@@ -41,10 +41,6 @@ extension Watch {
             return nil
         }
 
-        if watchedAt.timeIntervalSinceNow < 5 {
-            return "just now"
-        }
-
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: watchedAt, relativeTo: Date())
