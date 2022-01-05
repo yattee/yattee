@@ -8,7 +8,6 @@ final class CommentsModel: ObservableObject {
     @Published var nextPage: String?
     @Published var firstPage = true
 
-    @Published var loading = false
     @Published var loaded = false
     @Published var disabled = false
 
@@ -41,17 +40,17 @@ final class CommentsModel: ObservableObject {
     }
 
     func load(page: String? = nil) {
-        guard Self.enabled, !loading else {
+        guard Self.enabled else {
             return
         }
-
-        reset()
-
-        loading = true
 
         guard !Self.instance.isNil,
               !(player?.currentVideo.isNil ?? true)
         else {
+            return
+        }
+
+        if !firstPage && !nextPageAvailable {
             return
         }
 
@@ -61,15 +60,21 @@ final class CommentsModel: ObservableObject {
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {
-                    self?.all = page.comments
+                    self?.all += page.comments
                     self?.nextPage = page.nextPage
                     self?.disabled = page.disabled
                 }
             }
             .onCompletion { [weak self] _ in
-                self?.loading = false
                 self?.loaded = true
             }
+    }
+
+    func loadNextPageIfNeeded(current comment: Comment) {
+        let thresholdIndex = all.index(all.endIndex, offsetBy: -5)
+        if all.firstIndex(where: { $0 == comment }) == thresholdIndex {
+            loadNextPage()
+        }
     }
 
     func loadNextPage() {
@@ -108,7 +113,6 @@ final class CommentsModel: ObservableObject {
         firstPage = true
         nextPage = nil
         loaded = false
-        loading = false
         replies = []
         repliesLoaded = false
     }

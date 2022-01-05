@@ -130,7 +130,11 @@ struct NowPlayingView: View {
                 }
 
                 if sections.contains(.comments) {
-                    if !comments.loaded {
+                    if comments.disabled {
+                        NoCommentsView(text: "Comments are disabled", systemImage: "xmark.circle.fill")
+                    } else if comments.loaded && comments.all.isEmpty {
+                        NoCommentsView(text: "No comments", systemImage: "0.circle.fill")
+                    } else if !comments.loaded {
                         VStack(alignment: .center) {
                             PlaceholderProgressView()
                                 .onAppear {
@@ -141,6 +145,14 @@ struct NowPlayingView: View {
                         Section {
                             ForEach(comments.all) { comment in
                                 CommentView(comment: comment, repliesID: $repliesID)
+                            }
+                            if comments.nextPageAvailable {
+                                Text("Scroll to load more...")
+                                    .foregroundColor(.secondary)
+                                    .padding(.leading)
+                                    .onAppear {
+                                        comments.loadNextPage()
+                                    }
                             }
                         }
                     }

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CommentsView: View {
+    var embedInScrollView = false
     @State private var repliesID: Comment.ID?
 
     @EnvironmentObject<CommentsModel> private var comments
@@ -8,53 +9,37 @@ struct CommentsView: View {
     var body: some View {
         Group {
             if comments.disabled {
-                Text("Comments are disabled for this video")
-                    .foregroundColor(.secondary)
+                NoCommentsView(text: "Comments are disabled", systemImage: "xmark.circle.fill")
             } else if comments.loaded && comments.all.isEmpty {
-                Text("No comments")
-                    .foregroundColor(.secondary)
+                NoCommentsView(text: "No comments", systemImage: "0.circle.fill")
             } else if !comments.loaded {
                 PlaceholderProgressView()
                     .onAppear {
                         comments.load()
                     }
             } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
-                        let last = comments.all.last
-                        ForEach(comments.all) { comment in
-                            CommentView(comment: comment, repliesID: $repliesID)
-
-                            if comment != last {
-                                Divider()
-                                    .padding(.vertical, 5)
+                let last = comments.all.last
+                let commentsStack = LazyVStack {
+                    ForEach(comments.all) { comment in
+                        CommentView(comment: comment, repliesID: $repliesID)
+                            .onAppear {
+                                comments.loadNextPageIfNeeded(current: comment)
                             }
+                            .padding(.bottom, comment == last ? 5 : 0)
+
+                        if comment != last {
+                            Divider()
+                                .padding(.vertical, 5)
                         }
-
-                        HStack {
-                            if comments.nextPageAvailable {
-                                Button {
-                                    repliesID = nil
-                                    comments.loadNextPage()
-                                } label: {
-                                    Label("Show more", systemImage: "arrow.turn.down.right")
-                                }
-                            }
-
-                            if !comments.firstPage {
-                                Button {
-                                    repliesID = nil
-                                    comments.load(page: nil)
-                                } label: {
-                                    Label("Show first", systemImage: "arrow.turn.down.left")
-                                }
-                            }
-                        }
-                        .font(.system(size: 13))
-                        .buttonStyle(.plain)
-                        .padding(.vertical, 8)
-                        .foregroundColor(.secondary)
                     }
+                }
+
+                if embedInScrollView {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        commentsStack
+                    }
+                } else {
+                    commentsStack
                 }
             }
         }
