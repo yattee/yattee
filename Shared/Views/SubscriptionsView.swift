@@ -38,6 +38,14 @@ struct SubscriptionsView: View {
                 FavoriteButton(item: FavoriteItem(section: .subscriptions))
             }
         }
+        #if !os(tvOS)
+        .background(
+            Button("Refresh") {
+                loadResources(force: true)
+            }
+            .keyboardShortcut("r")
+        )
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif

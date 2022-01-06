@@ -122,6 +122,12 @@ struct TrendingView: View {
                         .frame(minWidth: 400, minHeight: 400)
                     #endif
                 }
+                .background(
+                    Button("Refresh") {
+                        resource.load()
+                    }
+                    .keyboardShortcut("r")
+                )
                 .navigationTitle("Trending")
         #endif
         #if os(iOS)

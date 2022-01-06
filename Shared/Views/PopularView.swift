@@ -30,6 +30,14 @@ struct PopularView: View {
                 FavoriteButton(item: FavoriteItem(section: .popular))
             }
         }
+        #if !os(tvOS)
+        .background(
+            Button("Refresh") {
+                resource?.load()
+            }
+            .keyboardShortcut("r")
+        )
+        #endif
         #if os(iOS)
         .refreshControl { refreshControl in
             resource?.load().onCompletion { _ in
