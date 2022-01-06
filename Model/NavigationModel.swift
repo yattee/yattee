@@ -50,7 +50,7 @@ final class NavigationModel: ObservableObject {
     ) {
         let recent = RecentItem(from: channel)
         #if os(macOS)
-            OpenWindow.main.open()
+            Windows.main.open()
         #else
             player.hide()
         #endif

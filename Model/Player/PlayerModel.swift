@@ -33,7 +33,7 @@ final class PlayerModel: ObservableObject {
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
-    @Published var currentItem: PlayerQueueItem!
+    @Published var currentItem: PlayerQueueItem! { didSet { updateWindowTitle() }}
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
@@ -103,13 +103,13 @@ final class PlayerModel: ObservableObject {
     func show() {
         guard !presentingPlayer else {
             #if os(macOS)
-                OpenWindow.player.focus()
+                Windows.player.focus()
             #endif
             return
         }
         #if os(macOS)
-            OpenWindow.player.open()
-            OpenWindow.player.focus()
+            Windows.player.open()
+            Windows.player.focus()
         #endif
         presentingPlayer = true
     }
@@ -122,9 +122,9 @@ final class PlayerModel: ObservableObject {
     func togglePlayer() {
         #if os(macOS)
             if !presentingPlayer {
-                OpenWindow.player.open()
+                Windows.player.open()
             }
-            OpenWindow.player.focus()
+            Windows.player.focus()
         #else
             if presentingPlayer {
                 hide()
@@ -803,6 +803,12 @@ final class PlayerModel: ObservableObject {
             }
         }
     #endif
+
+    func updateWindowTitle() {
+        #if os(macOS)
+            Windows.player.window?.title = windowTitle
+        #endif
+    }
 
     #if os(macOS)
         var windowTitle: String {

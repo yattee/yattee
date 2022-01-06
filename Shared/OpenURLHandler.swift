@@ -14,7 +14,7 @@ struct OpenURLHandler {
         }
 
         #if os(macOS)
-            guard url.host != OpenWindow.player.location else {
+            guard url.host != Windows.player.location else {
                 return
             }
         #endif
@@ -28,7 +28,7 @@ struct OpenURLHandler {
         }
 
         #if os(macOS)
-            OpenWindow.main.open()
+            Windows.main.open()
         #endif
 
         accounts.api.video(id).load().onSuccess { response in

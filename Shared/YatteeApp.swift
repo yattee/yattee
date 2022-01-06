@@ -47,12 +47,18 @@ struct YatteeApp: App {
                 .environmentObject(thumbnails)
                 .environmentObject(menu)
                 .environmentObject(search)
-            #if !os(macOS)
-                .onReceive(
-                    NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
-                ) { _ in
-                    player.handleEnterForeground()
-                }
+            #if os(macOS)
+                .background(
+                    HostingWindowFinder { window in
+                        Windows.mainWindow = window
+                    }
+                )
+            #else
+                    .onReceive(
+                        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+                    ) { _ in
+                        player.handleEnterForeground()
+                    }
             #endif
             #if os(iOS)
             .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
@@ -81,6 +87,11 @@ struct YatteeApp: App {
         #if os(macOS)
             WindowGroup(player.windowTitle) {
                 VideoPlayerView()
+                    .background(
+                        HostingWindowFinder { window in
+                            Windows.playerWindow = window
+                        }
+                    )
                     .onAppear { player.presentingPlayer = true }
                     .onDisappear { player.presentingPlayer = false }
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)

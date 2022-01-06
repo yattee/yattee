@@ -240,7 +240,7 @@
 		37732FF22703A26300F04329 /* AccountValidationStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37732FEF2703A26300F04329 /* AccountValidationStatus.swift */; };
 		37732FF42703D32400F04329 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37732FF32703D32400F04329 /* Sidebar.swift */; };
 		37732FF52703D32400F04329 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37732FF32703D32400F04329 /* Sidebar.swift */; };
-		37737786276F9858000521C1 /* OpenWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37737785276F9858000521C1 /* OpenWindow.swift */; };
+		37737786276F9858000521C1 /* Windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37737785276F9858000521C1 /* Windows.swift */; };
 		3774122A27387B6C00423605 /* InstancesModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3774122927387B6C00423605 /* InstancesModelTests.swift */; };
 		3774122F27387C7600423605 /* VideosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376A33DF2720CAD6000C1D6B /* VideosApp.swift */; };
 		3774123327387CB000423605 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
@@ -690,7 +690,7 @@
 		376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Instance+Fixtures.swift"; sourceTree = "<group>"; };
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
-		37737785276F9858000521C1 /* OpenWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenWindow.swift; sourceTree = "<group>"; };
+		37737785276F9858000521C1 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
 		3774122927387B6C00423605 /* InstancesModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesModelTests.swift; sourceTree = "<group>"; };
 		377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedContentAccessors.swift; sourceTree = "<group>"; };
 		3782B94E27553A6700990149 /* SearchSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestions.swift; sourceTree = "<group>"; };
@@ -1182,7 +1182,7 @@
 				37BE7AF227601DBF00DBECED /* Updates */,
 				374C0542272496E4009BDDBE /* AppDelegate.swift */,
 				37FD43DB270470B70073EE42 /* InstancesSettings.swift */,
-				37737785276F9858000521C1 /* OpenWindow.swift */,
+				37737785276F9858000521C1 /* Windows.swift */,
 				374108D0272B11B2006C5CC8 /* PictureInPictureDelegate.swift */,
 				37BE0BDB26A2367F0092E2DB /* Player.swift */,
 				37BE0BD926A214630092E2DB /* PlayerViewController.swift */,
@@ -2060,7 +2060,7 @@
 				374710062755291C00CE0F87 /* SearchField.swift in Sources */,
 				378AE93F274EDFB5006A4EE1 /* Tint+Backport.swift in Sources */,
 				37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
-				37737786276F9858000521C1 /* OpenWindow.swift in Sources */,
+				37737786276F9858000521C1 /* Windows.swift in Sources */,
 				37BE0BDC26A2367F0092E2DB /* Player.swift in Sources */,
 				3743CA53270F284F00E4D32B /* View+Borders.swift in Sources */,
 				37599F39272B4D740087F250 /* FavoriteButton.swift in Sources */,
