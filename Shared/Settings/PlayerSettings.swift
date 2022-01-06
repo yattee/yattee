@@ -1,10 +1,16 @@
 import Defaults
 import SwiftUI
 
-struct PlaybackSettings: View {
+struct PlayerSettings: View {
     @Default(.instances) private var instances
     @Default(.playerInstanceID) private var playerInstanceID
     @Default(.quality) private var quality
+    @Default(.commentsInstanceID) private var commentsInstanceID
+
+    #if !os(tvOS)
+        @Default(.commentsPlacement) private var commentsPlacement
+    #endif
+
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
@@ -29,66 +35,74 @@ struct PlaybackSettings: View {
 
     var body: some View {
         Group {
-            #if os(iOS)
-                Section(header: SettingsHeader(text: "Player")) {
-                    sourcePicker
-                    qualityPicker
+            #if os(macOS)
+                sections
 
+                Spacer()
+            #else
+                List {
+                    sections
+                }
+            #endif
+        }
+        #if os(tvOS)
+        .frame(maxWidth: 1000)
+        #elseif os(iOS)
+        .listStyle(.insetGrouped)
+        #endif
+        .navigationTitle("Player")
+    }
+
+    private var sections: some View {
+        Group {
+            Section(header: SettingsHeader(text: "Playback")) {
+                sourcePicker
+                qualityPicker
+                pauseOnHidingPlayerToggle
+            }
+
+            Section(header: SettingsHeader(text: "Comments")) {
+                commentsInstancePicker
+                #if !os(tvOS)
+                    commentsPlacementPicker
+                        .disabled(!CommentsModel.enabled)
+                #endif
+            }
+
+            Section(header: SettingsHeader(text: "Interface")) {
+                #if os(iOS)
                     if idiom == .pad {
                         sidebarPicker
                     }
-
-                    keywordsToggle
-                    showHistoryToggle
-                    channelSubscribersToggle
-                    pauseOnHidingPlayerToggle
-
-                    if idiom == .pad {
-                        enterFullscreenInLandscapeToggle
-                    }
-
-                    honorSystemOrientationLockToggle
-                    lockLandscapeWhenEnteringFullscreenToggle
-                }
-
-                Section(header: SettingsHeader(text: "Picture in Picture")) {
-                    closePiPOnNavigationToggle
-                    closePiPOnOpeningPlayerToggle
-                    closePiPAndOpenPlayerOnEnteringForegroundToggle
-                }
-            #else
-                Section(header: SettingsHeader(text: "Source")) {
-                    sourcePicker
-                }
-
-                Section(header: SettingsHeader(text: "Quality")) {
-                    qualityPicker
-                }
+                #endif
 
                 #if os(macOS)
-                    Section(header: SettingsHeader(text: "Sidebar")) {
-                        sidebarPicker
-                    }
+                    sidebarPicker
                 #endif
 
                 keywordsToggle
                 showHistoryToggle
                 channelSubscribersToggle
-                pauseOnHidingPlayerToggle
+            }
 
-                Section(header: SettingsHeader(text: "Picture in Picture")) {
-                    closePiPOnNavigationToggle
-                    closePiPOnOpeningPlayerToggle
-                    #if !os(macOS)
-                        closePiPAndOpenPlayerOnEnteringForegroundToggle
-                    #endif
+            #if os(iOS)
+                Section(header: SettingsHeader(text: "Orientation")) {
+                    if idiom == .pad {
+                        enterFullscreenInLandscapeToggle
+                    }
+                    honorSystemOrientationLockToggle
+                    lockLandscapeWhenEnteringFullscreenToggle
                 }
             #endif
-        }
 
-        #if os(macOS)
-            Spacer()
-        #endif
+            Section(header: SettingsHeader(text: "Picture in Picture")) {
+                closePiPOnNavigationToggle
+                closePiPOnOpeningPlayerToggle
+                #if !os(macOS)
+                    closePiPAndOpenPlayerOnEnteringForegroundToggle
+                #endif
+            }
+        }
     }
 
     private var sourcePicker: some View {
@@ -122,17 +136,46 @@ struct PlaybackSettings: View {
         #endif
     }
 
+    private var commentsInstancePicker: some View {
+        Picker("Source", selection: $commentsInstanceID) {
+            Text("Disabled").tag(Optional(""))
+
+            ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
+                Text(instance.description).tag(Optional(instance.id))
+            }
+        }
+        .labelsHidden()
+        #if os(iOS)
+            .pickerStyle(.automatic)
+        #elseif os(tvOS)
+            .pickerStyle(.inline)
+        #endif
+    }
+
+    #if !os(tvOS)
+        private var commentsPlacementPicker: some View {
+            Picker("Placement", selection: $commentsPlacement) {
+                Text("Below video description").tag(CommentsPlacement.info)
+                Text("Separate tab").tag(CommentsPlacement.separate)
+            }
+            .labelsHidden()
+            #if os(iOS)
+                .pickerStyle(.automatic)
+            #endif
+        }
+    #endif
+
     private var sidebarPicker: some View {
         Picker("Sidebar", selection: $playerSidebar) {
             #if os(macOS)
-                Text("Show").tag(PlayerSidebarSetting.always)
+                Text("Show sidebar").tag(PlayerSidebarSetting.always)
             #endif
 
             #if os(iOS)
                 Text("Show sidebar when space permits").tag(PlayerSidebarSetting.whenFits)
             #endif
 
-            Text("Hide").tag(PlayerSidebarSetting.never)
+            Text("Hide sidebar").tag(PlayerSidebarSetting.never)
         }
         .labelsHidden()
 
@@ -144,15 +187,15 @@ struct PlaybackSettings: View {
     }
 
     private var keywordsToggle: some View {
-        Toggle("Show video keywords", isOn: $showKeywords)
+        Toggle("Show keywords", isOn: $showKeywords)
     }
 
     private var showHistoryToggle: some View {
-        Toggle("Show history of videos", isOn: $showHistory)
+        Toggle("Show history", isOn: $showHistory)
     }
 
     private var channelSubscribersToggle: some View {
-        Toggle("Show channel subscribers count", isOn: $channelSubscribers)
+        Toggle("Show subscribers count", isOn: $channelSubscribers)
     }
 
     private var pauseOnHidingPlayerToggle: some View {
@@ -161,7 +204,7 @@ struct PlaybackSettings: View {
 
     #if os(iOS)
         private var honorSystemOrientationLockToggle: some View {
-            Toggle("Honor system orientation lock", isOn: $honorSystemOrientationLock)
+            Toggle("Honor orientation lock", isOn: $honorSystemOrientationLock)
                 .disabled(!enterFullscreenInLandscape)
         }
 
@@ -170,7 +213,7 @@ struct PlaybackSettings: View {
         }
 
         private var lockLandscapeWhenEnteringFullscreenToggle: some View {
-            Toggle("Lock landscape orientation when entering fullscreen", isOn: $lockLandscapeWhenEnteringFullscreen)
+            Toggle("Lock landscape on rotation", isOn: $lockLandscapeWhenEnteringFullscreen)
                 .disabled(!enterFullscreenInLandscape)
         }
     #endif
@@ -192,7 +235,7 @@ struct PlaybackSettings: View {
 
 struct PlaybackSettings_Previews: PreviewProvider {
     static var previews: some View {
-        PlaybackSettings()
+        PlayerSettings()
             .injectFixtureEnvironmentObjects()
     }
 }

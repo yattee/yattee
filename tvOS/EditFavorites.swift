@@ -71,7 +71,7 @@ struct EditFavorites: View {
             }
             .frame(width: 1000, alignment: .leading)
         }
-        .navigationTitle("Edit Favorites")
+        .navigationTitle("Favorites")
     }
 
     func label(_ item: FavoriteItem) -> String {

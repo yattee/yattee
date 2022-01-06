@@ -15,10 +15,10 @@ struct AccountsNavigationLink: View {
     }
 
     private func removeInstanceButton(_ instance: Instance) -> some View {
-        if #available(iOS 15.0, *) {
-            return Button("Remove", role: .destructive) { removeAction(instance) }
-        } else {
-            return Button("Remove") { removeAction(instance) }
+        Button {
+            removeAction(instance)
+        } label: {
+            Label("Remove", systemImage: "trash")
         }
     }
 

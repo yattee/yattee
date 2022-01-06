@@ -11,7 +11,7 @@ struct AccountSelectionView: View {
     @Default(.instances) private var instances
 
     var body: some View {
-        Section(header: SettingsHeader(text: showHeader ? "Current Account" : "")) {
+        Section(header: Text(showHeader ? "Current Account" : "")) {
             Button(accountButtonTitle(account: accountsModel.current, long: true)) {
                 if let account = nextAccount {
                     accountsModel.setCurrent(account)

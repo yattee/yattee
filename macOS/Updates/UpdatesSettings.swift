@@ -22,6 +22,9 @@ struct UpdatesSettings: View {
 
         Spacer()
 
+        Text("Yattee \(YatteeApp.version) (build \(YatteeApp.build))")
+            .foregroundColor(.secondary)
+
         CheckForUpdatesView()
     }
 }

@@ -5,8 +5,10 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case instances, browsing, history, playback, services, updates
+            case instances, browsing, player, history, sponsorBlock, updates, help
         }
+
+        @State private var selection = Tabs.instances
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -24,7 +26,7 @@ struct SettingsView: View {
 
     var body: some View {
         #if os(macOS)
-            TabView {
+            TabView(selection: $selection) {
                 Form {
                     InstancesSettings()
                         .environmentObject(accounts)
@@ -43,6 +45,14 @@ struct SettingsView: View {
                 .tag(Tabs.browsing)
 
                 Form {
+                    PlayerSettings()
+                }
+                .tabItem {
+                    Label("Player", systemImage: "play.rectangle")
+                }
+                .tag(Tabs.player)
+
+                Form {
                     HistorySettings()
                 }
                 .tabItem {
@@ -51,20 +61,12 @@ struct SettingsView: View {
                 .tag(Tabs.history)
 
                 Form {
-                    PlaybackSettings()
+                    SponsorBlockSettings()
                 }
                 .tabItem {
-                    Label("Playback", systemImage: "play.rectangle")
+                    Label("SponsorBlock", systemImage: "dollarsign.circle")
                 }
-                .tag(Tabs.playback)
-
-                Form {
-                    ServicesSettings()
-                }
-                .tabItem {
-                    Label("Services", systemImage: "puzzlepiece")
-                }
-                .tag(Tabs.services)
+                .tag(Tabs.sponsorBlock)
 
                 Form {
                     UpdatesSettings()
@@ -73,20 +75,22 @@ struct SettingsView: View {
                     Label("Updates", systemImage: "gearshape.2")
                 }
                 .tag(Tabs.updates)
+
+                Form {
+                    Help()
+                }
+                .tabItem {
+                    Label("Help", systemImage: "questionmark.circle")
+                }
+                .tag(Tabs.help)
             }
             .padding(20)
-            .frame(width: 400, height: 400)
+            .frame(width: 480, height: windowHeight)
         #else
             NavigationView {
                 List {
                     #if os(tvOS)
                         AccountSelectionView()
-
-                        Section(header: SettingsHeader(text: "Favorites")) {
-                            NavigationLink("Edit favorites...") {
-                                EditFavorites()
-                            }
-                        }
                     #endif
 
                     Section(header: Text("Instances")) {
@@ -96,14 +100,55 @@ struct SettingsView: View {
                         addInstanceButton
                     }
 
-                    BrowsingSettings()
-                    HistorySettings()
-                    PlaybackSettings()
-                    ServicesSettings()
+                    #if os(tvOS)
+                        Divider()
+                    #endif
+
+                    Section {
+                        #if os(tvOS)
+                            NavigationLink {
+                                EditFavorites()
+                            } label: {
+                                Label("Favorites", systemImage: "heart.fill")
+                            }
+                        #endif
+
+                        NavigationLink {
+                            BrowsingSettings()
+                        } label: {
+                            Label("Browsing", systemImage: "list.and.film")
+                        }
+
+                        NavigationLink {
+                            PlayerSettings()
+                        } label: {
+                            Label("Player", systemImage: "play.rectangle")
+                        }
+
+                        NavigationLink {
+                            HistorySettings()
+                        } label: {
+                            Label("History", systemImage: "clock.arrow.circlepath")
+                        }
+
+                        NavigationLink {
+                            SponsorBlockSettings()
+                        } label: {
+                            Label("SponsorBlock", systemImage: "dollarsign.circle")
+                        }
+                    }
+
+                    Section(footer: versionString) {
+                        NavigationLink {
+                            Help()
+                        } label: {
+                            Label("Help", systemImage: "questionmark.circle")
+                        }
+                    }
                 }
                 .navigationTitle("Settings")
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                    ToolbarItem(placement: .navigationBarLeading) {
                         #if !os(tvOS)
                             Button("Done") {
                                 presentationMode.wrappedValue.dismiss()
@@ -126,9 +171,39 @@ struct SettingsView: View {
         #endif
     }
 
+    #if os(macOS)
+        private var windowHeight: Double {
+            switch selection {
+            case .instances:
+                return 390
+            case .browsing:
+                return 350
+            case .player:
+                return 450
+            case .history:
+                return 480
+            case .sponsorBlock:
+                return 290
+            case .updates:
+                return 200
+            case .help:
+                return 570
+            }
+        }
+    #endif
+
+    private var versionString: some View {
+        Text("Yattee \(YatteeApp.version) (build \(YatteeApp.build))")
+        #if os(tvOS)
+            .foregroundColor(.secondary)
+        #endif
+    }
+
     private var addInstanceButton: some View {
-        Button("Add Instance...") {
+        Button {
             presentingInstanceForm = true
+        } label: {
+            Label("Add Instance...", systemImage: "plus")
         }
     }
 }

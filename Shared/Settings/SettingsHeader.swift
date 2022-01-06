@@ -2,13 +2,28 @@ import SwiftUI
 
 struct SettingsHeader: View {
     var text: String
+    var secondary = false
 
     var body: some View {
-        Text(text)
-        #if os(macOS) || os(tvOS)
-            .font(.title3)
-            .foregroundColor(.secondary)
-            .focusable(false)
+        Group {
+            #if os(iOS)
+                if secondary {
+                    EmptyView()
+                } else {
+                    Text(text)
+                }
+            #else
+                Text(text)
+            #endif
+        }
+        #if os(tvOS)
+        .font(secondary ? .footnote : .title3)
+        .foregroundColor(.secondary)
+        .focusable(false)
+        #endif
+        #if os(macOS)
+        .font(secondary ? .system(size: 13) : .system(size: 15))
+        .foregroundColor(secondary ? Color.primary : .secondary)
         #endif
     }
 }

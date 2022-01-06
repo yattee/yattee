@@ -19,31 +19,66 @@ struct HistorySettings: View {
 
     var body: some View {
         Group {
-            Section(header: SettingsHeader(text: "History")) {
-                Toggle("Save recent queries and channels", isOn: $saveRecents)
-                Toggle("Save history of played videos", isOn: $saveHistory)
-                Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
-                    .disabled(!saveHistory)
+            #if os(macOS)
+                sections
+            #else
+                List {
+                    sections
+                }
+            #endif
+        }
+        #if os(tvOS)
+        .frame(maxWidth: 1000)
+        #elseif os(iOS)
+        .listStyle(.insetGrouped)
+        #endif
+        .navigationTitle("History")
+    }
 
-                #if !os(tvOS)
+    private var sections: some View {
+        Group {
+            #if os(tvOS)
+                Section(header: SettingsHeader(text: "History")) {
+                    Toggle("Save history of searches, channels and playlists", isOn: $saveRecents)
+                    Toggle("Save history of played videos", isOn: $saveHistory)
+                    Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
+                        .disabled(!saveHistory)
+
+                    watchedVideoPlayNowBehaviorPicker
+
                     watchedThresholdPicker
+                    resetWatchedStatusOnPlayingToggle
                     watchedVideoStylePicker
                     watchedVideoBadgeColorPicker
+                }
+            #else
+                Section(header: SettingsHeader(text: "History")) {
+                    Toggle("Save history of searches, channels and playlists", isOn: $saveRecents)
+                    Toggle("Save history of played videos", isOn: $saveHistory)
+                    Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
+                        .disabled(!saveHistory)
+                }
+
+                Section(header: SettingsHeader(text: "Watched")) {
                     watchedVideoPlayNowBehaviorPicker
+                    #if os(macOS)
+                    .padding(.top, 1)
+                    #endif
+                    watchedThresholdPicker
                     resetWatchedStatusOnPlayingToggle
+                }
+
+                Section(header: SettingsHeader(text: "Interface")) {
+                    watchedVideoStylePicker
+                    #if os(macOS)
+                    .padding(.top, 1)
+                    #endif
+                    watchedVideoBadgeColorPicker
+                }
+
+                #if os(macOS)
+                    Spacer()
                 #endif
-            }
-
-            #if os(tvOS)
-                watchedThresholdPicker
-                watchedVideoStylePicker
-                watchedVideoBadgeColorPicker
-                watchedVideoPlayNowBehaviorPicker
-                resetWatchedStatusOnPlayingToggle
-            #endif
-
-            #if os(macOS)
-                Spacer()
             #endif
 
             clearHistoryButton
@@ -51,7 +86,7 @@ struct HistorySettings: View {
     }
 
     private var watchedThresholdPicker: some View {
-        Section(header: header("Mark video as watched after playing")) {
+        Section(header: SettingsHeader(text: "Mark video as watched after playing", secondary: true)) {
             Picker("Mark video as watched after playing", selection: $watchedThreshold) {
                 ForEach(Self.watchedThresholds, id: \.self) { threshold in
                     Text("\(threshold)%").tag(threshold)
@@ -69,7 +104,7 @@ struct HistorySettings: View {
     }
 
     private var watchedVideoStylePicker: some View {
-        Section(header: header("Mark watched videos with")) {
+        Section(header: SettingsHeader(text: "Mark watched videos with", secondary: true)) {
             Picker("Mark watched videos with", selection: $watchedVideoStyle) {
                 Text("Nothing").tag(WatchedVideoStyle.nothing)
                 Text("Badge").tag(WatchedVideoStyle.badge)
@@ -88,7 +123,7 @@ struct HistorySettings: View {
     }
 
     private var watchedVideoBadgeColorPicker: some View {
-        Section(header: header("Badge color")) {
+        Section(header: SettingsHeader(text: "Badge color", secondary: true)) {
             Picker("Badge color", selection: $watchedVideoBadgeColor) {
                 Text("Based on system color scheme").tag(WatchedVideoBadgeColor.colorSchemeBased)
                 Text("Blue").tag(WatchedVideoBadgeColor.blue)
@@ -96,6 +131,7 @@ struct HistorySettings: View {
             }
             .disabled(!saveHistory)
             .disabled(watchedVideoStyle == .decreasedOpacity)
+            .disabled(watchedVideoStyle == .nothing)
             .labelsHidden()
 
             #if os(iOS)
@@ -107,7 +143,7 @@ struct HistorySettings: View {
     }
 
     private var watchedVideoPlayNowBehaviorPicker: some View {
-        Section(header: header("When partially watched video is played")) {
+        Section(header: SettingsHeader(text: "When partially watched video is played", secondary: true)) {
             Picker("When partially watched video is played", selection: $watchedVideoPlayNowBehavior) {
                 Text("Continue").tag(WatchedVideoPlayNowBehavior.continue)
                 Text("Restart").tag(WatchedVideoPlayNowBehavior.restart)
@@ -125,6 +161,7 @@ struct HistorySettings: View {
 
     private var resetWatchedStatusOnPlayingToggle: some View {
         Toggle("Reset watched status when playing again", isOn: $resetWatchedStatusOnPlaying)
+            .disabled(!saveHistory)
     }
 
     private var clearHistoryButton: some View {
@@ -148,19 +185,6 @@ struct HistorySettings: View {
         }
         .foregroundColor(.red)
         .disabled(!saveHistory)
-    }
-
-    private func header(_ text: String) -> some View {
-        #if os(iOS)
-            return EmptyView()
-        #elseif os(macOS)
-            return Text(text)
-                .opacity(saveHistory ? 1 : 0.3)
-        #else
-            return Text(text)
-                .foregroundColor(.secondary)
-                .opacity(saveHistory ? 1 : 0.2)
-        #endif
     }
 }
 

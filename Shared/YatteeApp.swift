@@ -3,6 +3,14 @@ import SwiftUI
 
 @main
 struct YatteeApp: App {
+    static var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+    }
+
+    static var build: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+    }
+
     #if os(macOS)
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
         @StateObject private var updater = UpdaterModel()

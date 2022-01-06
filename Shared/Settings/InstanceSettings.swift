@@ -14,25 +14,7 @@ struct InstanceSettings: View {
 
     var body: some View {
         List {
-            if instance.app.hasFrontendURL {
-                Section(header: Text("Frontend URL")) {
-                    TextField(
-                        "Frontend URL",
-                        text: $frontendURL
-                    )
-                    .onAppear {
-                        frontendURL = instance.frontendURL ?? ""
-                    }
-                    .onChange(of: frontendURL) { newValue in
-                        InstancesModel.setFrontendURL(instance, newValue)
-                    }
-                    .labelsHidden()
-                    .autocapitalization(.none)
-                    .keyboardType(.URL)
-                }
-            }
-
-            Section(header: Text("Accounts"), footer: sectionFooter) {
+            Section(header: Text("Accounts")) {
                 if instance.app.supportsAccounts {
                     ForEach(InstancesModel.accounts(instanceID), id: \.self) { account in
                         #if os(tvOS)
@@ -54,15 +36,21 @@ struct InstanceSettings: View {
                                     Spacer()
                                 }
                                 .contextMenu {
-                                    Button("Remove") { removeAccount(account) }
+                                    Button {
+                                        removeAccount(account)
+                                    } label: {
+                                        Label("Remove", systemImage: "trash")
+                                    }
                                 }
                             }
                         #endif
                     }
                     .redrawOn(change: accountsChanged)
 
-                    Button("Add account...") {
+                    Button {
                         presentingAccountForm = true
+                    } label: {
+                        Label("Add Account...", systemImage: "plus")
                     }
                     .sheet(isPresented: $presentingAccountForm, onDismiss: { accountsChanged.toggle() }) {
                         AccountForm(instance: instance)
@@ -75,6 +63,23 @@ struct InstanceSettings: View {
                         .foregroundColor(.secondary)
                 }
             }
+            if instance.app.hasFrontendURL {
+                Section(header: Text("Frontend URL")) {
+                    TextField(
+                        "Frontend URL",
+                        text: $frontendURL
+                    )
+                    .onAppear {
+                        frontendURL = instance.frontendURL ?? ""
+                    }
+                    .onChange(of: frontendURL) { newValue in
+                        InstancesModel.setFrontendURL(instance, newValue)
+                    }
+                    .labelsHidden()
+                    .autocapitalization(.none)
+                    .keyboardType(.URL)
+                }
+            }
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -83,15 +88,6 @@ struct InstanceSettings: View {
         #endif
 
         .navigationTitle(instance.description)
-    }
-
-    private var sectionFooter: some View {
-        if !instance.app.supportsAccounts {
-            return Text("")
-        }
-
-        return Text("Tap and hold to remove account")
-            .foregroundColor(.secondary)
     }
 
     private func removeAccount(_ account: Account) {
