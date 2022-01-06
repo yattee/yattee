@@ -18,6 +18,7 @@ struct VideoCell: View {
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
+    @Default(.roundedThumbnails) private var roundedThumbnails
     @Default(.saveHistory) private var saveHistory
     @Default(.showWatchingProgress) private var showWatchingProgress
     @Default(.watchedVideoStyle) private var watchedVideoStyle
@@ -39,7 +40,7 @@ struct VideoCell: View {
         }
         .opacity(contentOpacity)
         .buttonStyle(.plain)
-        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .contextMenu {
             VideoContextMenuView(
                 video: video,
@@ -47,6 +48,14 @@ struct VideoCell: View {
             )
             .environmentObject(accounts)
         }
+    }
+
+    private var thumbnailRoundingCornerRadius: Double {
+        #if os(tvOS)
+            return Double(12)
+        #else
+            return Double(roundedThumbnails ? 12 : 0)
+        #endif
     }
 
     private func playAction() {
@@ -389,7 +398,7 @@ struct VideoCell: View {
                 .font(.system(size: 30))
             }
         }
-        .mask(RoundedRectangle(cornerRadius: 12))
+        .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .modifier(AspectRatioModifier())
     }
 

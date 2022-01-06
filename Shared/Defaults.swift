@@ -41,12 +41,13 @@ extension Defaults.Keys {
     #endif
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
-    static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
+    static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
 
     static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
+    static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
     static let showChannelSubscribers = Key<Bool>("showChannelSubscribers", default: true)
     static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
     #if !os(tvOS)
@@ -104,7 +105,7 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
     var description: String {
         switch self {
         case .best:
-            return "Best available"
+            return "Best available quality"
         default:
             return value.name
         }

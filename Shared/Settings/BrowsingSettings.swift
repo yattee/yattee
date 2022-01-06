@@ -4,6 +4,7 @@ import SwiftUI
 struct BrowsingSettings: View {
     #if !os(tvOS)
         @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
+        @Default(.roundedThumbnails) private var roundedThumbnails
     #endif
     #if os(iOS)
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
@@ -14,61 +15,101 @@ struct BrowsingSettings: View {
 
     var body: some View {
         Group {
-            Section(header: SettingsHeader(text: "Browsing")) {
-                #if !os(tvOS)
-                    Toggle("Show username in the account picker button", isOn: $accountPickerDisplaysUsername)
-                #endif
+            #if os(macOS)
+                sections
+            #else
+                List {
+                    sections
+                }
                 #if os(iOS)
-                    Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
-                        .onChange(of: lockPortraitWhenBrowsing) { lock in
-                            if lock {
-                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                            } else {
-                                Orientation.lockOrientation(.allButUpsideDown)
-                            }
-                        }
+                .listStyle(.insetGrouped)
                 #endif
-                Toggle("Show channel name on thumbnail", isOn: $channelOnThumbnail)
-                Toggle("Show video length on thumbnail", isOn: $timeOnThumbnail)
-            }
-            Section(header: SettingsHeader(text: "Sections")) {
-                #if os(macOS)
-                    let list = ForEach(VisibleSection.allCases, id: \.self) { section in
-                        VisibleSectionSelectionRow(
-                            title: section.title,
-                            selected: visibleSections.contains(section)
-                        ) { value in
-                            toggleSection(section, value: value)
-                        }
-                    }
-
-                    Group {
-                        if #available(macOS 12.0, *) {
-                            list
-                                .listStyle(.inset(alternatesRowBackgrounds: true))
-                        } else {
-                            list
-                                .listStyle(.inset)
-                        }
-
-                        Spacer()
-                    }
-                #else
-                    ForEach(VisibleSection.allCases, id: \.self) { section in
-                        VisibleSectionSelectionRow(
-                            title: section.title,
-                            selected: visibleSections.contains(section)
-                        ) { value in
-                            toggleSection(section, value: value)
-                        }
-                    }
-                #endif
-            }
+            #endif
         }
+        #if os(tvOS)
+        .frame(maxWidth: 1000)
+        #else
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+        #endif
+        .navigationTitle("Browsing")
     }
 
-    func toggleSection(_ section: VisibleSection, value: Bool) {
+    private var sections: some View {
+        Group {
+            #if !os(tvOS)
+                interfaceSettings
+            #endif
+            thumbnailsSettings
+            visibleSectionsSettings
+        }
+    }
+
+    private var interfaceSettings: some View {
+        Section(header: SettingsHeader(text: "Interface")) {
+            #if os(iOS)
+                Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
+                    .onChange(of: lockPortraitWhenBrowsing) { lock in
+                        if lock {
+                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown)
+                        }
+                    }
+            #endif
+
+            #if !os(tvOS)
+                Toggle("Show account username", isOn: $accountPickerDisplaysUsername)
+            #endif
+        }
+    }
+
+    private var thumbnailsSettings: some View {
+        Section(header: SettingsHeader(text: "Thumbnails")) {
+            #if !os(tvOS)
+                Toggle("Round corners", isOn: $roundedThumbnails)
+            #endif
+            Toggle("Show channel name", isOn: $channelOnThumbnail)
+            Toggle("Show video length", isOn: $timeOnThumbnail)
+        }
+    }
+
+    private var visibleSectionsSettings: some View {
+        Section(header: SettingsHeader(text: "Sections")) {
+            #if os(macOS)
+                let list = ForEach(VisibleSection.allCases, id: \.self) { section in
+                    VisibleSectionSelectionRow(
+                        title: section.title,
+                        selected: visibleSections.contains(section)
+                    ) { value in
+                        toggleSection(section, value: value)
+                    }
+                }
+
+                Group {
+                    if #available(macOS 12.0, *) {
+                        list
+                            .listStyle(.inset(alternatesRowBackgrounds: true))
+                    } else {
+                        list
+                            .listStyle(.inset)
+                    }
+
+                    Spacer()
+                }
+            #else
+                ForEach(VisibleSection.allCases, id: \.self) { section in
+                    VisibleSectionSelectionRow(
+                        title: section.title,
+                        selected: visibleSections.contains(section)
+                    ) { value in
+                        toggleSection(section, value: value)
+                    }
+                }
+            #endif
+        }
+    }
+
+    private func toggleSection(_ section: VisibleSection, value: Bool) {
         if value {
             visibleSections.insert(section)
         } else {
