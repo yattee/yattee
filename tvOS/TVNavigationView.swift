@@ -8,6 +8,7 @@ struct TVNavigationView: View {
     @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.visibleSections) private var visibleSections
+
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
             if visibleSections.contains(.favorites) {

@@ -10,6 +10,8 @@ final class PlayerViewController: UIViewController {
     var subscriptionsModel: SubscriptionsModel!
     var playerView = AVPlayerViewController()
 
+    let persistenceController = PersistenceController.shared
+
     #if !os(tvOS)
         var aspectRatio: Double? {
             let ratio = Double(playerView.videoBounds.width) / Double(playerView.videoBounds.height)
@@ -95,6 +97,7 @@ final class PlayerViewController: UIViewController {
                         .environmentObject(commentsModel)
                         .environmentObject(playerModel)
                         .environmentObject(subscriptionsModel)
+                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 )
             )
 
