@@ -11,7 +11,7 @@ struct AppSidebarSubscriptions: View {
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
                     LazyView(ChannelVideosView(channel: channel))
                 } label: {
-                    Label(channel.name, systemImage: AppSidebarNavigation.symbolSystemImage(channel.name))
+                    Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                 }
                 .contextMenu {
                     Button("Unsubscribe") {

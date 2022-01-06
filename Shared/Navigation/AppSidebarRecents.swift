@@ -88,6 +88,6 @@ struct RecentNavigationLink<DestinationContent: View>: View {
     }
 
     var labelSystemImage: String {
-        systemImage != nil ? systemImage! : AppSidebarNavigation.symbolSystemImage(recent.title)
+        systemImage != nil ? systemImage! : RecentsModel.symbolSystemImage(recent.title)
     }
 }

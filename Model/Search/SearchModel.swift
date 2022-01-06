@@ -78,6 +78,7 @@ final class SearchModel: ObservableObject {
 
     func loadSuggestions(_ query: String) {
         guard !query.isEmpty else {
+            querySuggestions.replace([])
             return
         }
 

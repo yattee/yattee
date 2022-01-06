@@ -21,6 +21,8 @@ struct SearchView: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
     private var favorites = FavoritesModel.shared
@@ -255,14 +257,51 @@ struct SearchView: View {
                             .foregroundColor(.secondary)
                     }
                     ForEach(recentItems) { item in
-                        Button(item.title) {
-                            state.queryText = item.title
-                            state.changeQuery { query in query.query = item.title }
-                            updateFavoriteItem()
+                        Button {
+                            switch item.type {
+                            case .query:
+                                state.queryText = item.title
+                                state.changeQuery { query in query.query = item.title }
+
+                                updateFavoriteItem()
+                                recents.add(item)
+                            case .channel:
+                                guard let channel = item.channel else {
+                                    return
+                                }
+
+                                NavigationModel.openChannel(
+                                    channel,
+                                    player: player,
+                                    recents: recents,
+                                    navigation: navigation,
+                                    navigationStyle: navigationStyle,
+                                    delay: false
+                                )
+                            case .playlist:
+                                guard let playlist = item.playlist else {
+                                    return
+                                }
+
+                                NavigationModel.openChannelPlaylist(
+                                    playlist,
+                                    player: player,
+                                    recents: recents,
+                                    navigation: navigation,
+                                    navigationStyle: navigationStyle,
+                                    delay: false
+                                )
+                            }
+                        } label: {
+                            let systemImage = item.type == .query ? "magnifyingglass" :
+                                item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
+                                "list.and.film"
+                            Label(item.title, systemImage: systemImage)
+                                .lineLimit(1)
                         }
                         .contextMenu {
-                            deleteButton(item)
-                            deleteAllButton
+                            removeButton(item)
+                            removeAllButton
                         }
                     }
                 }
@@ -274,21 +313,21 @@ struct SearchView: View {
         #endif
     }
 
-    private func deleteButton(_ item: RecentItem) -> some View {
+    private func removeButton(_ item: RecentItem) -> some View {
         Button {
             recents.close(item)
             recentsChanged.toggle()
         } label: {
-            Label("Delete", systemImage: "trash")
+            Label("Remove", systemImage: "trash")
         }
     }
 
-    private var deleteAllButton: some View {
+    private var removeAllButton: some View {
         Button {
             recents.clearQueries()
             recentsChanged.toggle()
         } label: {
-            Label("Delete All", systemImage: "trash.fill")
+            Label("Remove All", systemImage: "trash.fill")
         }
     }
 
@@ -297,7 +336,7 @@ struct SearchView: View {
     }
 
     private var recentItems: [RecentItem] {
-        Defaults[.recentlyOpened].filter { $0.type == .query }.reversed()
+        Defaults[.recentlyOpened].reversed()
     }
 
     private var searchSortOrderPicker: some View {

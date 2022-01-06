@@ -15,6 +15,8 @@ struct AppTabNavigation: View {
 
     @Default(.visibleSections) private var visibleSections
 
+    let persistenceController = PersistenceController.shared
+
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
             if visibleSections.contains(.favorites) {
@@ -42,14 +44,11 @@ struct AppTabNavigation: View {
         .id(accounts.current?.id ?? "")
         .environment(\.navigationStyle, .tab)
         .background(
-            EmptyView().sheet(isPresented: $navigation.presentingChannel, onDismiss: {
-                if let channel = recents.presentedChannel {
-                    recents.close(RecentItem(from: channel))
-                }
-            }) {
+            EmptyView().sheet(isPresented: $navigation.presentingChannel) {
                 if let channel = recents.presentedChannel {
                     NavigationView {
                         ChannelVideosView(channel: channel)
+                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environment(\.inChannelView, true)
                             .environment(\.inNavigationView, true)
                             .environmentObject(accounts)
@@ -64,14 +63,11 @@ struct AppTabNavigation: View {
             }
         )
         .background(
-            EmptyView().sheet(isPresented: $navigation.presentingPlaylist, onDismiss: {
-                if let playlist = recents.presentedPlaylist {
-                    recents.close(RecentItem(from: playlist))
-                }
-            }) {
+            EmptyView().sheet(isPresented: $navigation.presentingPlaylist) {
                 if let playlist = recents.presentedPlaylist {
                     NavigationView {
                         ChannelPlaylistView(playlist: playlist)
+                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environment(\.inNavigationView, true)
                             .environmentObject(accounts)
                             .environmentObject(navigation)
@@ -87,6 +83,7 @@ struct AppTabNavigation: View {
         .background(
             EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
                 videoPlayer
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.navigationStyle, .tab)
             }
         )

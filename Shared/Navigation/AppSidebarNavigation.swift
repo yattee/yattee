@@ -120,13 +120,4 @@ struct AppSidebarNavigation: View {
             return .automatic
         #endif
     }
-
-    static func symbolSystemImage(_ name: String) -> String {
-        let firstLetter = name.first?.lowercased()
-        let regex = #"^[a-z0-9]$"#
-
-        let symbolName = firstLetter?.range(of: regex, options: .regularExpression) != nil ? firstLetter! : "questionmark"
-
-        return "\(symbolName).circle"
-    }
 }

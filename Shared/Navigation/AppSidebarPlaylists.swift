@@ -11,7 +11,7 @@ struct AppSidebarPlaylists: View {
                 NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $navigation.tabSelection) {
                     LazyView(PlaylistVideosView(playlist))
                 } label: {
-                    Label(playlist.title, systemImage: AppSidebarNavigation.symbolSystemImage(playlist.title))
+                    Label(playlist.title, systemImage: RecentsModel.symbolSystemImage(playlist.title))
                         .backport
                         .badge(Text("\(playlist.videos.count)"))
                 }

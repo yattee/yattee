@@ -46,7 +46,8 @@ final class NavigationModel: ObservableObject {
         player: PlayerModel,
         recents: RecentsModel,
         navigation: NavigationModel,
-        navigationStyle: NavigationStyle
+        navigationStyle: NavigationStyle,
+        delay: Bool = false
     ) {
         let recent = RecentItem(from: channel)
         #if os(macOS)
@@ -61,7 +62,46 @@ final class NavigationModel: ObservableObject {
         }
 
         if navigationStyle == .tab {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if delay {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    openRecent()
+                }
+            } else {
+                openRecent()
+            }
+        } else if navigationStyle == .sidebar {
+            openRecent()
+            navigation.sidebarSectionChanged.toggle()
+            navigation.tabSelection = .recentlyOpened(recent.tag)
+        }
+    }
+
+    static func openChannelPlaylist(
+        _ playlist: ChannelPlaylist,
+        player: PlayerModel,
+        recents: RecentsModel,
+        navigation: NavigationModel,
+        navigationStyle: NavigationStyle,
+        delay: Bool = false
+    ) {
+        let recent = RecentItem(from: playlist)
+        #if os(macOS)
+            Windows.main.open()
+        #else
+            player.hide()
+        #endif
+
+        let openRecent = {
+            recents.add(recent)
+            navigation.presentingPlaylist = true
+        }
+
+        if navigationStyle == .tab {
+            if delay {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    openRecent()
+                }
+            } else {
                 openRecent()
             }
         } else if navigationStyle == .sidebar {

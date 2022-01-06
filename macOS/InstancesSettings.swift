@@ -67,7 +67,7 @@ struct InstancesSettings: View {
                             "Are you sure you want to remove \(selectedAccount?.description ?? "") account?"
                         ),
                         message: Text("This cannot be undone"),
-                        primaryButton: .destructive(Text("Delete")) {
+                        primaryButton: .destructive(Text("Remove")) {
                             AccountsModel.remove(selectedAccount!)
                         },
                         secondaryButton: .cancel()
