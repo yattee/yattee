@@ -27,7 +27,9 @@ extension PlayerModel {
             return
         }
 
-        let time = player.currentTime().seconds
+        let time = player.currentTime()
+        let seconds = time.seconds
+        currentItem.playbackTime = time
 
         let watch: Watch!
         let watchFetchRequest = Watch.fetchRequest()
@@ -36,7 +38,7 @@ extension PlayerModel {
         let results = try? context.fetch(watchFetchRequest)
 
         if results?.isEmpty ?? true {
-            if time < 1 {
+            if seconds < 1 {
                 return
             }
             watch = Watch(context: context)
@@ -55,8 +57,8 @@ extension PlayerModel {
 
         if finished {
             watch.stoppedAt = watch.videoDuration
-        } else if time.isFinite, time > 0 {
-            watch.stoppedAt = time
+        } else if seconds.isFinite, seconds > 0 {
+            watch.stoppedAt = seconds
         }
 
         watch.watchedAt = Date()
