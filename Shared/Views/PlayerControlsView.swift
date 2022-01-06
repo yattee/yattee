@@ -132,7 +132,7 @@ struct PlayerControlsView<Content: View>: View {
     }
 
     private var progressViewTotal: Double {
-        model.playerItemDuration?.seconds ?? model.currentVideo?.length ?? 100
+        model.videoDuration ?? 100
     }
 }
 

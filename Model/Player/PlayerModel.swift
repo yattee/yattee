@@ -159,7 +159,7 @@ final class PlayerModel: ObservableObject {
     }
 
     var videoDuration: TimeInterval? {
-        currentItem?.duration ?? currentVideo?.length
+        currentItem?.duration ?? currentVideo?.length ?? player.currentItem?.asset.duration.seconds
     }
 
     func togglePlay() {
