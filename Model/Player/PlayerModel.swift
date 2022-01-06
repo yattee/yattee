@@ -33,7 +33,7 @@ final class PlayerModel: ObservableObject {
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
-    @Published var currentItem: PlayerQueueItem! { didSet { updateWindowTitle() }}
+    @Published var currentItem: PlayerQueueItem! { didSet { updateWindowTitle() } }
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?

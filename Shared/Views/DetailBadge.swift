@@ -34,7 +34,7 @@ struct DetailBadge: View {
             } else {
                 content
                 #if os(macOS)
-                .background(VisualEffectBlur())
+                .background(VisualEffectBlur(material: .hudWindow))
                 #elseif os(iOS)
                 .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
                 #endif

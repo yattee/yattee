@@ -119,7 +119,7 @@ struct PlayerControlsView<Content: View>: View {
             } else {
                 controls
                 #if os(macOS)
-                .background(VisualEffectBlur())
+                .background(VisualEffectBlur(material: .hudWindow))
                 #elseif os(iOS)
                 .background(VisualEffectBlur(blurStyle: .systemUltraThinMaterial))
                 #endif
