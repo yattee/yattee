@@ -33,10 +33,10 @@ struct DetailBadge: View {
                     .background(.thinMaterial)
             } else {
                 content
-                #if os(tvOS)
-                .background(Color.background(scheme: colorScheme))
-                #else
-                .background(Color.background.opacity(0.95))
+                #if os(macOS)
+                .background(VisualEffectBlur())
+                #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
                 #endif
             }
         }

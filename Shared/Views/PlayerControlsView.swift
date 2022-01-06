@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+
 struct PlayerControlsView<Content: View>: View {
     let content: Content
 
@@ -36,11 +37,13 @@ struct PlayerControlsView<Content: View>: View {
                             .foregroundColor(model.currentItem.isNil ? .secondary : .accentColor)
                             .lineLimit(1)
 
-                        Text(model.currentVideo?.author ?? "Yattee v\(appVersion) (build \(appBuild))")
-                            .fontWeight(model.currentItem.isNil ? .light : .bold)
-                            .font(.system(size: 10))
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
+                        if let video = model.currentVideo {
+                            Text(video.author)
+                                .fontWeight(.bold)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
                     }
                     .contextMenu {
                         Button {
@@ -115,19 +118,13 @@ struct PlayerControlsView<Content: View>: View {
                     .background(Material.ultraThinMaterial)
             } else {
                 controls
-                #if !os(tvOS)
-                .background(Color.secondaryBackground)
+                #if os(macOS)
+                .background(VisualEffectBlur())
+                #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemUltraThinMaterial))
                 #endif
             }
         }
-    }
-
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-    }
-
-    private var appBuild: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
     }
 
     private var progressViewValue: Double {
@@ -135,7 +132,7 @@ struct PlayerControlsView<Content: View>: View {
     }
 
     private var progressViewTotal: Double {
-        model.playerItemDuration?.seconds ?? model.currentVideo?.length ?? progressViewValue
+        model.playerItemDuration?.seconds ?? model.currentVideo?.length ?? 100
     }
 }
 
