@@ -16,6 +16,7 @@ struct AccountForm: View {
     @State private var validationDebounce = Debounce()
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.openURL) private var openURL
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
@@ -62,6 +63,10 @@ struct AccountForm: View {
                     #if os(macOS)
                     .padding(.horizontal)
                     #endif
+
+                    #if os(iOS)
+                        helpButton
+                    #endif
                 }
             #else
                 formFields
@@ -69,6 +74,22 @@ struct AccountForm: View {
         }
         .onChange(of: username) { _ in validate() }
         .onChange(of: password) { _ in validate() }
+    }
+
+    var helpButton: some View {
+        Group {
+            if instance.app == .invidious {
+                Button {
+                    openURL(URL(string: "https://github.com/yattee/yattee/wiki/Adding-Invidious-instance-and-account")!)
+                } label: {
+                    Label("How to add Invidious account?", systemImage: "questionmark.circle")
+                    #if os(macOS)
+                        .help("How to add Invidious account?")
+                        .labelStyle(.iconOnly)
+                    #endif
+                }
+            }
+        }
     }
 
     var formFields: some View {
@@ -104,6 +125,10 @@ struct AccountForm: View {
             )
 
             Spacer()
+
+            #if os(macOS)
+                helpButton
+            #endif
 
             Button("Save", action: submitForm)
                 .disabled(!isValid)
