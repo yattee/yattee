@@ -44,6 +44,7 @@ struct SubscriptionsView: View {
                 loadResources(force: true)
             }
             .keyboardShortcut("r")
+            .opacity(0)
         )
         #endif
         #if os(iOS)

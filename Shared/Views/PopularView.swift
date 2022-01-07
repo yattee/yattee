@@ -36,6 +36,7 @@ struct PopularView: View {
                 resource?.load()
             }
             .keyboardShortcut("r")
+            .opacity(0)
         )
         #endif
         #if os(iOS)

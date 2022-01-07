@@ -127,6 +127,7 @@ struct TrendingView: View {
                         resource.load()
                     }
                     .keyboardShortcut("r")
+                    .opacity(0)
                 )
                 .navigationTitle("Trending")
         #endif
