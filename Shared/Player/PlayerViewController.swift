@@ -127,6 +127,9 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
+        if Defaults[.pauseOnHidingPlayer] {
+            playerModel.pause()
+        }
         dismiss(animated: false)
     }
 
