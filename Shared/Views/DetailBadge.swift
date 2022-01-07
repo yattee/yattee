@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct DetailBadge: View {
@@ -82,12 +83,17 @@ struct DetailBadge: View {
     var text: String
     var style: Style = .default
 
+    @Default(.roundedThumbnails) private var roundedThumbnails
+
     var body: some View {
         Text(text)
             .truncationMode(.middle)
-            .padding(10)
+            .padding(4)
+        #if os(tvOS)
+            .padding(.horizontal, 5)
+        #endif
             .modifier(StyleModifier(style: style))
-            .mask(RoundedRectangle(cornerRadius: 12))
+            .mask(RoundedRectangle(cornerRadius: roundedThumbnails ? 6 : 0))
     }
 }
 
