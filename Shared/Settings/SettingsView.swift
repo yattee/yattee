@@ -183,7 +183,7 @@ struct SettingsView: View {
             case .history:
                 return 480
             case .sponsorBlock:
-                return 290
+                return 660
             case .updates:
                 return 200
             case .help:

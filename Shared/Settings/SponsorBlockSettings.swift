@@ -39,7 +39,7 @@ struct SponsorBlockSettings: View {
                 #endif
             }
 
-            Section(header: SettingsHeader(text: "Categories to Skip")) {
+            Section(header: SettingsHeader(text: "Categories to Skip"), footer: categoriesDetails) {
                 #if os(macOS)
                     let list = ForEach(SponsorBlockAPI.categories, id: \.self) { category in
                         SponsorBlockCategorySelectionRow(
@@ -72,6 +72,24 @@ struct SponsorBlockSettings: View {
                 #endif
             }
         }
+    }
+
+    private var categoriesDetails: some View {
+        VStack(alignment: .leading) {
+            ForEach(SponsorBlockAPI.categories, id: \.self) { category in
+                Text(SponsorBlockAPI.categoryDescription(category) ?? "Category")
+                    .fontWeight(.bold)
+                #if os(tvOS)
+                    .focusable()
+                #endif
+
+                Text(SponsorBlockAPI.categoryDetails(category) ?? "Details")
+                    .padding(.bottom, 3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .foregroundColor(.secondary)
+        .padding(.top, 3)
     }
 
     func toggleCategory(_ category: String, value: Bool) {
@@ -123,7 +141,7 @@ struct SponsorBlockSettings: View {
     }
 }
 
-struct ServicesSettings_Previews: PreviewProvider {
+struct SponsorBlockSettings_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             SponsorBlockSettings()

@@ -20,10 +20,44 @@ final class SponsorBlockAPI: ObservableObject {
         switch name {
         case "selfpromo":
             return "Self-promotion"
+
         case "music_offtopic":
             return "Offtopic in Music Videos"
+
         default:
             return name.capitalized
+        }
+    }
+
+    static func categoryDetails(_ name: String) -> String? {
+        guard SponsorBlockAPI.categories.contains(name) else {
+            return nil
+        }
+
+        switch name {
+        case "sponsor":
+            return "Part of a video promoting a product or service not directly related to the creator. " +
+                "The creator will receive payment or compensation in the form of money or free products."
+
+        case "selfpromo":
+            return "Promoting a product or service that is directly related to the creator themselves. " +
+                "This usually includes merchandise or promotion of monetized platforms."
+
+        case "intro":
+            return "Segments typically found at the start of a video that include an animation, " +
+                "still frame or clip which are also seen in other videos by the same creator."
+
+        case "outro":
+            return "Typically near or at the end of the video when the credits pop up and/or endcards are shown."
+
+        case "interaction":
+            return "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)."
+
+        case "music_offtopic":
+            return "For videos which feature music as the primary content."
+
+        default:
+            return nil
         }
     }
 
