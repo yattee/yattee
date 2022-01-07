@@ -20,6 +20,7 @@ struct NowPlayingView: View {
     @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.saveHistory) private var saveHistory
+    @Default(.showHistoryInPlayer) private var showHistoryInPlayer
 
     var body: some View {
         if inInfoViewController {
@@ -102,7 +103,7 @@ struct NowPlayingView: View {
                     }
                 }
 
-                if sections.contains(.playedPreviously), saveHistory, !visibleWatches.isEmpty {
+                if sections.contains(.playedPreviously), saveHistory, showHistoryInPlayer, !visibleWatches.isEmpty {
                     Section(header: Text("Played Previously")) {
                         ForEach(visibleWatches, id: \.videoID) { watch in
                             Button {
