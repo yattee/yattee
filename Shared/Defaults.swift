@@ -86,6 +86,7 @@ extension Defaults.Keys {
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let lockLandscapeOnRotation = Key<Bool>("lockLandscapeOnRotation", default: false)
         static let lockLandscapeWhenEnteringFullscreen = Key<Bool>("lockLandscapeWhenEnteringFullscreen", default: false)
     #endif
 }

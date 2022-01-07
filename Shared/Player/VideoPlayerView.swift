@@ -28,13 +28,11 @@ struct VideoPlayerView: View {
 
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
+        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
 
         @State private var motionManager: CMMotionManager!
         @State private var orientation = UIInterfaceOrientation.portrait
         @State private var lastOrientation: UIInterfaceOrientation?
-
-        private var orientationThrottle = Throttle(interval: 2)
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -140,7 +138,11 @@ struct VideoPlayerView: View {
                             #endif
                         }
                         .background(colorScheme == .dark ? Color.black : Color.white)
-                        .modifier(VideoDetailsPaddingModifier(geometry: geometry, aspectRatio: player.controller?.aspectRatio, fullScreen: fullScreenDetails))
+                        .modifier(VideoDetailsPaddingModifier(
+                            geometry: geometry,
+                            aspectRatio: player.controller?.aspectRatio,
+                            fullScreen: fullScreenDetails
+                        ))
                     }
                 #endif
             }
@@ -231,7 +233,11 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         private func configureOrientationUpdatesBasedOnAccelerometer() {
-            if UIDevice.current.orientation.isLandscape, enterFullscreenInLandscape, !player.playingFullscreen {
+            if UIDevice.current.orientation.isLandscape,
+               enterFullscreenInLandscape,
+               !player.playingFullscreen,
+               !player.playingInPictureInPicture
+            {
                 DispatchQueue.main.async {
                     player.enterFullScreen()
                 }
@@ -244,7 +250,7 @@ struct VideoPlayerView: View {
             motionManager = CMMotionManager()
             motionManager.accelerometerUpdateInterval = 0.2
             motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, _ in
-                guard player.presentingPlayer, !data.isNil else {
+                guard player.presentingPlayer, !player.playingInPictureInPicture, !data.isNil else {
                     return
                 }
 
@@ -278,11 +284,12 @@ struct VideoPlayerView: View {
 
                         player.enterFullScreen()
 
-                        let orientationLockMask = orientation == .landscapeLeft ? UIInterfaceOrientationMask.landscapeLeft : .landscapeRight
+                        let orientationLockMask = orientation == .landscapeLeft ?
+                            UIInterfaceOrientationMask.landscapeLeft : .landscapeRight
 
                         Orientation.lockOrientation(orientationLockMask, andRotateTo: orientation)
 
-                        guard lockLandscapeWhenEnteringFullscreen else {
+                        guard lockLandscapeOnRotation else {
                             return
                         }
 
@@ -307,7 +314,11 @@ struct VideoPlayerView: View {
 
         private func handleOrientationDidChangeNotification() {
             let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
-            if newOrientation?.isLandscape ?? false, player.presentingPlayer, lockLandscapeWhenEnteringFullscreen, !player.lockedOrientation.isNil {
+            if newOrientation?.isLandscape ?? false,
+               player.presentingPlayer,
+               lockLandscapeOnRotation,
+               !player.lockedOrientation.isNil
+            {
                 Orientation.lockOrientation(.landscape, andRotateTo: newOrientation)
                 return
             }

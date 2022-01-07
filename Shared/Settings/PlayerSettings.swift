@@ -18,8 +18,9 @@ struct PlayerSettings: View {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
+        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
+        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
@@ -85,16 +86,6 @@ struct PlayerSettings: View {
                 channelSubscribersToggle
             }
 
-            #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation")) {
-                    if idiom == .pad {
-                        enterFullscreenInLandscapeToggle
-                    }
-                    honorSystemOrientationLockToggle
-                    lockLandscapeWhenEnteringFullscreenToggle
-                }
-            #endif
-
             Section(header: SettingsHeader(text: "Picture in Picture")) {
                 closePiPOnNavigationToggle
                 closePiPOnOpeningPlayerToggle
@@ -102,6 +93,17 @@ struct PlayerSettings: View {
                     closePiPAndOpenPlayerOnEnteringForegroundToggle
                 #endif
             }
+
+            #if os(iOS)
+                Section(header: SettingsHeader(text: "Orientation"), footer: orientationFooter) {
+                    if idiom == .pad {
+                        enterFullscreenInLandscapeToggle
+                    }
+                    honorSystemOrientationLockToggle
+                    lockLandscapeOnRotationToggle
+                    lockLandscapeWhenEnteringFullscreenToggle
+                }
+            #endif
         }
     }
 
@@ -212,9 +214,17 @@ struct PlayerSettings: View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
         }
 
-        private var lockLandscapeWhenEnteringFullscreenToggle: some View {
-            Toggle("Lock landscape on rotation", isOn: $lockLandscapeWhenEnteringFullscreen)
+        private var lockLandscapeOnRotationToggle: some View {
+            Toggle("Lock landscape on rotation", isOn: $lockLandscapeOnRotation)
                 .disabled(!enterFullscreenInLandscape)
+        }
+
+        private var lockLandscapeWhenEnteringFullscreenToggle: some View {
+            Toggle("Rotate and lock landscape on entering fullscreen", isOn: $lockLandscapeWhenEnteringFullscreen)
+        }
+
+        private var orientationFooter: some View {
+            Text("Orientation settings are experimental and do not yet work properly with all devices and iOS versions")
         }
     #endif
 

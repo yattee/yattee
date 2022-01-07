@@ -137,9 +137,15 @@ extension PlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewController(
         _: AVPlayerViewController,
-        willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
+        willBeginFullScreenPresentationWithAnimationCoordinator context: UIViewControllerTransitionCoordinator
     ) {
         playerModel.playingFullscreen = true
+
+        #if os(iOS)
+            if !context.isCancelled, Defaults[.lockLandscapeWhenEnteringFullscreen] {
+                Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
+            }
+        #endif
     }
 
     func playerViewController(
