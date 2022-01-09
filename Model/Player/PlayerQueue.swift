@@ -201,4 +201,21 @@ extension PlayerModel {
     func removeQueueItems() {
         queue.removeAll()
     }
+
+    func restoreQueue() {
+        guard !accounts.current.isNil else {
+            return
+        }
+
+        queue = ([Defaults[.lastPlayed]] + Defaults[.queue]).compactMap { $0 }
+        Defaults[.lastPlayed] = nil
+
+        queue.forEach { item in
+            accounts.api.loadDetails(item) { newItem in
+                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
+                    self.queue[index] = newItem
+                }
+            }
+        }
+    }
 }

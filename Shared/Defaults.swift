@@ -64,6 +64,7 @@ extension Defaults.Keys {
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 
     static let queue = Key<[PlayerQueueItem]>("queue", default: [])
+    static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
 
     static let saveHistory = Key<Bool>("saveHistory", default: true)
     static let showWatchingProgress = Key<Bool>("showWatchingProgress", default: true)

@@ -32,9 +32,9 @@ struct SearchSuggestions: View {
                             HStack(spacing: 0) {
                                 if suggestion.hasPrefix(state.suggestionsText.lowercased()) {
                                     Text(state.suggestionsText.lowercased())
-                                    .lineLimit(1)
-                                    .layoutPriority(2)
-                                    .foregroundColor(.secondary)
+                                        .lineLimit(1)
+                                        .layoutPriority(2)
+                                        .foregroundColor(.secondary)
                                 }
 
                                 Text(querySuffix(suggestion))

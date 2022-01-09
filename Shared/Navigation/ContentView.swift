@@ -139,6 +139,10 @@ struct ContentView: View {
         player.accounts = accounts
         player.comments = comments
 
+        if !accounts.current.isNil {
+            player.restoreQueue()
+        }
+
         if !Defaults[.saveRecents] {
             recents.clear()
         }

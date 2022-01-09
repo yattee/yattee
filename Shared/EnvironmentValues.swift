@@ -30,7 +30,7 @@ private struct CurrentPlaylistID: EnvironmentKey {
 }
 
 private struct LoadMoreContentHandler: EnvironmentKey {
-    static let defaultValue: LoadMoreContentHandlerType = { }
+    static let defaultValue: LoadMoreContentHandlerType = {}
 }
 
 typealias LoadMoreContentHandlerType = () -> Void
