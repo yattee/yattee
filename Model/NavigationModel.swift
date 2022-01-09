@@ -47,7 +47,7 @@ final class NavigationModel: ObservableObject {
         recents: RecentsModel,
         navigation: NavigationModel,
         navigationStyle: NavigationStyle,
-        delay: Bool = false
+        delay: Bool = true
     ) {
         let recent = RecentItem(from: channel)
         #if os(macOS)
