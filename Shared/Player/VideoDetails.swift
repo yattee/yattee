@@ -5,7 +5,7 @@ import SwiftUI
 
 struct VideoDetails: View {
     enum Page {
-        case info, queue, related, comments
+        case info, comments, related, queue
     }
 
     @Binding var sidebarQueue: Bool
@@ -129,7 +129,7 @@ struct VideoDetails: View {
         }
         .onChange(of: sidebarQueue) { queue in
             if queue {
-                if currentPage == .queue {
+                if currentPage == .related || currentPage == .queue {
                     currentPage = .info
                 }
             } else if video.isNil {
