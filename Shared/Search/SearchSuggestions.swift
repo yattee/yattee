@@ -30,10 +30,12 @@ struct SearchSuggestions: View {
                         HStack {
                             Image(systemName: "magnifyingglass")
                             HStack(spacing: 0) {
-                                Text(state.suggestionsText)
+                                if suggestion.hasPrefix(state.suggestionsText.lowercased()) {
+                                    Text(state.suggestionsText.lowercased())
                                     .lineLimit(1)
                                     .layoutPriority(2)
                                     .foregroundColor(.secondary)
+                                }
 
                                 Text(querySuffix(suggestion))
                                     .lineLimit(1)
