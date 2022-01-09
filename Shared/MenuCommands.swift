@@ -25,7 +25,7 @@ struct MenuCommands: Commands {
             Button("Popular") {
                 model.navigation?.tabSelection = .popular
             }
-            .disabled(!(model.accounts?.app.supportsPopular ?? true))
+            .disabled(!(model.accounts?.app.supportsPopular ?? false))
             .keyboardShortcut("3")
 
             Button("Trending") {
