@@ -13,6 +13,8 @@ final class FavoriteResourceObserver: ObservableObject, ResourceObserver {
             contentItems = playlist.videos.map { ContentItem(video: $0) }
         } else if let playlist: Playlist = resource.typedContent() {
             contentItems = playlist.videos.map { ContentItem(video: $0) }
+        } else if let page: SearchPage = resource.typedContent() {
+            contentItems = page.results
         } else if let items: [ContentItem] = resource.typedContent() {
             contentItems = items
         }
