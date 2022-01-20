@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchSuggestions: View {
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
@@ -76,7 +77,7 @@ struct SearchSuggestions: View {
             state.fieldIsFocused = false
         }
 
-        recents.addQuery(state.queryText)
+        recents.addQuery(state.queryText, navigation: navigation)
     }
 
     private var visibleSuggestions: [String] {

@@ -3,6 +3,7 @@ import SwiftUI
 struct SearchTextField: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
@@ -29,7 +30,7 @@ struct SearchTextField: View {
                 #endif
                 TextField("Search...", text: $state.queryText) {
                     state.changeQuery { query in query.query = state.queryText }
-                    recents.addQuery(state.queryText)
+                    recents.addQuery(state.queryText, navigation: navigation)
                 }
                 .onChange(of: state.queryText) { _ in
                     if state.query.query.compare(state.queryText, options: .caseInsensitive) == .orderedSame {

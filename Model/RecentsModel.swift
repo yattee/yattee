@@ -34,8 +34,9 @@ final class RecentsModel: ObservableObject {
         }
     }
 
-    func addQuery(_ query: String) {
+    func addQuery(_ query: String, navigation: NavigationModel? = nil) {
         if !query.isEmpty {
+            navigation?.tabSelection = .search
             add(.init(from: query))
         }
     }
