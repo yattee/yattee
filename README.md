@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
   <h1>Yattee</h1>
-  <p>Videos browser and player for <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a> (alternative, privacy-friendly YouTube frontends)<br />built for iOS, tvOS and macOS.</p>
+  <p>Alternative YouTube frontend for iOS, tvOS and macOS<br />built with <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a></p>
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
