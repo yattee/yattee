@@ -177,9 +177,38 @@ struct SearchView: View {
                 .navigationTitle("Search")
         #endif
         #if os(iOS)
-        .navigationBarHidden(!Defaults[.visibleSections].isEmpty || navigationStyle == .sidebar)
+        .navigationBarHidden(navigationBarHidden)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+    }
+
+    private var navigationBarHidden: Bool {
+        if navigationStyle == .sidebar {
+            return true
+        }
+
+        let preferred = Defaults[.visibleSections]
+        var visibleSections = [VisibleSection]()
+
+        if accounts.app.supportsPopular && preferred.contains(.popular) {
+            visibleSections.append(.popular)
+        }
+
+        if accounts.app.supportsSubscriptions && accounts.signedIn && preferred.contains(.subscriptions) {
+            visibleSections.append(.subscriptions)
+        }
+
+        if accounts.app.supportsUserPlaylists && preferred.contains(.playlists) {
+            visibleSections.append(.playlists)
+        }
+
+        [VisibleSection.favorites, .trending].forEach { section in
+            if preferred.contains(section) {
+                visibleSections.append(section)
+            }
+        }
+
+        return !visibleSections.isEmpty
     }
 
     private var results: some View {

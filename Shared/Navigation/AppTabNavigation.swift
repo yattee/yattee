@@ -35,7 +35,7 @@ struct AppTabNavigation: View {
                 trendingNavigationView
             }
 
-            if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
+            if playlistsVisible {
                 playlistsNavigationView
             }
 
@@ -116,6 +116,11 @@ struct AppTabNavigation: View {
     private var subscriptionsVisible: Bool {
         visibleSections.contains(.subscriptions) &&
             accounts.app.supportsSubscriptions && !(accounts.current?.anonymous ?? true)
+    }
+
+    private var playlistsVisible: Bool {
+        visibleSections.contains(.playlists) &&
+            accounts.app.supportsUserPlaylists && !(accounts.current?.anonymous ?? true)
     }
 
     private var popularNavigationView: some View {
