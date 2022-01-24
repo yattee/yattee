@@ -95,7 +95,9 @@ extension PlayerModel {
 
         switch quality {
         case .best:
-            return streams.first { $0.kind == .hls } ?? streams.first
+            return streams.first { $0.kind == .hls } ??
+                streams.filter { $0.kind == .stream }.max { $0.resolution < $1.resolution } ??
+                streams.first
         default:
             let sorted = streams.filter { $0.kind != .hls }.sorted { $0.resolution > $1.resolution }
             return sorted.first(where: { $0.resolution.height <= quality.value.height })
