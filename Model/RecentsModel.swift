@@ -16,7 +16,7 @@ final class RecentsModel: ObservableObject {
         if !saveRecents {
             clear()
 
-            if item.type != .channel {
+            if item.type == .query {
                 return
             }
         }
