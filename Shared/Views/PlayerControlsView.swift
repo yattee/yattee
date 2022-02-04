@@ -1,14 +1,20 @@
 import Foundation
 import SwiftUI
 
-struct PlayerControlsView<Content: View>: View {
+struct PlayerControlsView<Content: View, Toolbar: View>: View {
     let content: Content
+    let toolbar: Toolbar?
 
     @Environment(\.navigationStyle) private var navigationStyle
     @EnvironmentObject<PlayerModel> private var model
 
-    init(@ViewBuilder content: @escaping () -> Content) {
+    init(@ViewBuilder toolbar: @escaping () -> Toolbar? = { nil }, @ViewBuilder content: @escaping () -> Content) {
         self.content = content()
+        self.toolbar = toolbar()
+    }
+
+    init(@ViewBuilder content: @escaping () -> Content) where Toolbar == EmptyView {
+        self.init(toolbar: { EmptyView() }, content: content)
     }
 
     var body: some View {
@@ -16,17 +22,30 @@ struct PlayerControlsView<Content: View>: View {
             content
             #if !os(tvOS)
             .frame(minHeight: 0, maxHeight: .infinity)
-            .padding(.bottom, 50)
             #endif
 
-            #if !os(tvOS)
-                controls
+            Group {
+                #if !os(tvOS)
+                    #if !os(macOS)
+                        toolbar
+                            .frame(height: 100)
+                            .offset(x: 0, y: -28)
+                    #endif
+                    controls
+
+                #endif
+            }
+            .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
+            #if os(macOS)
+                .background(VisualEffectBlur(material: .sidebar))
+            #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemThinMaterial).edgesIgnoringSafeArea(.all))
             #endif
         }
     }
 
     private var controls: some View {
-        let controls = HStack {
+        HStack {
             Button(action: {
                 model.togglePlayer()
             }) {
@@ -57,6 +76,7 @@ struct PlayerControlsView<Content: View>: View {
 
                     Spacer()
                 }
+                .padding(.vertical)
                 .contentShape(Rectangle())
             }
             .padding(.vertical, 20)
@@ -84,6 +104,8 @@ struct PlayerControlsView<Content: View>: View {
 
                     Button(action: { model.advanceToNextItem() }) {
                         Label("Next", systemImage: "forward.fill")
+                            .padding(.vertical)
+                            .contentShape(Rectangle())
                     }
                     .disabled(model.queue.isEmpty)
                 }
@@ -91,10 +113,9 @@ struct PlayerControlsView<Content: View>: View {
                 ProgressView(value: progressViewValue, total: progressViewTotal)
                     .progressViewStyle(.linear)
                 #if os(iOS)
-                    .offset(x: 0, y: 8)
                     .frame(maxWidth: 60)
                 #else
-                    .offset(x: 0, y: 15)
+                    .offset(y: 6)
                     .frame(maxWidth: 70)
                 #endif
             }
@@ -111,20 +132,6 @@ struct PlayerControlsView<Content: View>: View {
                 model.show()
             })
         #endif
-
-        return Group {
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                controls
-                    .background(Material.ultraThinMaterial)
-            } else {
-                controls
-                #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-                #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemUltraThinMaterial))
-                #endif
-            }
-        }
     }
 
     private var progressViewValue: Double {
