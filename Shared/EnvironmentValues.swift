@@ -29,11 +29,15 @@ private struct CurrentPlaylistID: EnvironmentKey {
     static let defaultValue: String? = nil
 }
 
+typealias LoadMoreContentHandlerType = () -> Void
+
 private struct LoadMoreContentHandler: EnvironmentKey {
     static let defaultValue: LoadMoreContentHandlerType = {}
 }
 
-typealias LoadMoreContentHandlerType = () -> Void
+private struct ScrollViewBottomPaddingKey: EnvironmentKey {
+    static let defaultValue: Double = 30
+}
 
 extension EnvironmentValues {
     var inNavigationView: Bool {
@@ -69,5 +73,10 @@ extension EnvironmentValues {
     var loadMoreContentHandler: LoadMoreContentHandlerType {
         get { self[LoadMoreContentHandler.self] }
         set { self[LoadMoreContentHandler.self] = newValue }
+    }
+
+    var scrollViewBottomPadding: Double {
+        get { self[ScrollViewBottomPaddingKey.self] }
+        set { self[ScrollViewBottomPaddingKey.self] = newValue }
     }
 }
