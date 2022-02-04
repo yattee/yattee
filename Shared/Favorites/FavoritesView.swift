@@ -39,6 +39,7 @@ struct FavoritesView: View {
                             .padding(.top, item == first && RefreshControl.navigationBarTitleDisplayMode == .inline ? 10 : 0)
                             #endif
                         }
+                        Color.clear.padding(.bottom, 30)
                     #endif
                 }
             }
