@@ -5,6 +5,12 @@ import SwiftUI
 struct FavoriteButton: View {
     let item: FavoriteItem!
     let favorites = FavoritesModel.shared
+    let labelPadding: Bool
+
+    init(item: FavoriteItem?, labelPadding: Bool = false) {
+        self.item = item
+        self.labelPadding = labelPadding
+    }
 
     @State private var isFavorite = false
 
@@ -19,11 +25,17 @@ struct FavoriteButton: View {
                     favorites.toggle(item)
                     isFavorite.toggle()
                 } label: {
-                    if isFavorite {
-                        Label("Remove from Favorites", systemImage: "heart.fill")
-                    } else {
-                        Label("Add to Favorites", systemImage: "heart")
+                    Group {
+                        if isFavorite {
+                            Label("Remove from Favorites", systemImage: "heart.fill")
+                        } else {
+                            Label("Add to Favorites", systemImage: "heart")
+                        }
                     }
+                    #if os(iOS)
+                    .padding(labelPadding ? 10 : 0)
+                    .contentShape(Rectangle())
+                    #endif
                 }
                 .disabled(item.isNil)
                 .onAppear {

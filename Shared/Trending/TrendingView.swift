@@ -33,7 +33,39 @@ struct TrendingView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        PlayerControlsView(toolbar: {
+            HStack {
+                if accounts.app.supportsTrendingCategories {
+                    HStack {
+                        Text("Category")
+                            .foregroundColor(.secondary)
+
+                        categoryButton
+                            // only way to disable Menu animation is to
+                            // force redraw of the view when it changes
+                            .id(UUID())
+                    }
+
+                    Spacer()
+                }
+
+                if let favoriteItem = favoriteItem {
+                    FavoriteButton(item: favoriteItem, labelPadding: true)
+                        .id(favoriteItem.id)
+                        .labelStyle(.iconOnly)
+
+                    Spacer()
+                }
+
+                HStack {
+                    Text("Country")
+                        .foregroundColor(.secondary)
+
+                    countryButton
+                }
+            }
+            .padding(.horizontal)
+        }) {
             Section {
                 VStack(alignment: .center, spacing: 0) {
                     #if os(tvOS)
@@ -44,6 +76,7 @@ struct TrendingView: View {
                         Spacer()
                     #else
                         VerticalCells(items: trending)
+                            .environment(\.scrollViewBottomPadding, 70)
                     #endif
                 }
             }
@@ -61,38 +94,6 @@ struct TrendingView: View {
                         categoryButton
                     }
                     countryButton
-                }
-            #elseif os(iOS)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Group {
-                        if accounts.app.supportsTrendingCategories {
-                            HStack {
-                                Text("Category")
-                                    .foregroundColor(.secondary)
-
-                                categoryButton
-                                    // only way to disable Menu animation is to
-                                    // force redraw of the view when it changes
-                                    .id(UUID())
-                            }
-
-                            Spacer()
-                        }
-
-                        if let favoriteItem = favoriteItem {
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem.id)
-
-                            Spacer()
-                        }
-
-                        HStack {
-                            Text("Country")
-                                .foregroundColor(.secondary)
-
-                            countryButton
-                        }
-                    }
                 }
             #endif
         }

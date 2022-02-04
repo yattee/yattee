@@ -41,7 +41,23 @@ struct SearchView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        PlayerControlsView(toolbar: {
+            #if os(iOS)
+                if accounts.app.supportsSearchFilters {
+                    HStack(spacing: 0) {
+                        Menu("Sort: \(searchSortOrder.name)") {
+                            searchSortOrderPicker
+                        }
+                        .transaction { t in t.animation = .none }
+
+                        Spacer()
+
+                        filtersMenu
+                    }
+                    .padding()
+                }
+            #endif
+        }) {
             #if os(iOS)
                 VStack {
                     SearchTextField(favoriteItem: $favoriteItem)
@@ -70,27 +86,19 @@ struct SearchView: View {
             #endif
         }
         .toolbar {
-            #if !os(tvOS)
+            #if os(macOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
-                    #if os(macOS)
-                        FavoriteButton(item: favoriteItem)
-                            .id(favoriteItem?.id)
-                    #endif
+                    FavoriteButton(item: favoriteItem)
+                        .id(favoriteItem?.id)
 
                     if accounts.app.supportsSearchFilters {
                         Section {
-                            #if os(macOS)
-                                HStack {
-                                    Text("Sort:")
-                                        .foregroundColor(.secondary)
+                            HStack {
+                                Text("Sort:")
+                                    .foregroundColor(.secondary)
 
-                                    searchSortOrderPicker
-                                }
-                            #else
-                                Menu("Sort: \(searchSortOrder.name)") {
-                                    searchSortOrderPicker
-                                }
-                            #endif
+                                searchSortOrderPicker
+                            }
                         }
                         .transaction { t in t.animation = .none }
                     }
@@ -99,9 +107,7 @@ struct SearchView: View {
                         filtersMenu
                     }
 
-                    #if os(macOS)
-                        SearchTextField()
-                    #endif
+                    SearchTextField()
                 }
             #endif
         }
