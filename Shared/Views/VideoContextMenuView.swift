@@ -195,7 +195,7 @@ struct VideoContextMenuView: View {
         Button {
             navigation.presentAddToPlaylist(video)
         } label: {
-            Label("Add to playlist...", systemImage: "text.badge.plus")
+            Label("Add to Playlist...", systemImage: "text.badge.plus")
         }
     }
 
@@ -203,7 +203,7 @@ struct VideoContextMenuView: View {
         Button {
             playlists.removeVideo(index: video.indexID!, playlistID: playlistID)
         } label: {
-            Label("Remove from playlist", systemImage: "text.badge.minus")
+            Label("Remove from Playlist", systemImage: "text.badge.minus")
         }
     }
 }
