@@ -56,7 +56,7 @@ extension PlayerModel {
 
     func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: TimeInterval? = nil) {
         if !playingInPictureInPicture {
-            player.replaceCurrentItem(with: nil)
+            backend.closeItem()
         }
 
         comments.reset()
@@ -92,13 +92,13 @@ extension PlayerModel {
             streams = streams.filter { $0.instance.id == id }
         }
 
+        streams = streams.filter { backend.canPlay($0) }
+
         switch quality {
         case .best:
-            return streams.first { $0.kind == .hls } ??
-                streams.filter { $0.kind == .stream }.max { $0.resolution < $1.resolution } ??
-                streams.first
+            return backend.bestPlayable(streams)
         default:
-            let sorted = streams.filter { $0.kind != .hls }.sorted { $0.resolution > $1.resolution }
+            let sorted = streams.filter { $0.kind != .hls }.sorted { $0.resolution > $1.resolution }.sorted { $0.kind < $1.kind }
             return sorted.first(where: { $0.resolution.height <= quality.value.height })
         }
     }
@@ -117,7 +117,7 @@ extension PlayerModel {
         remove(newItem)
 
         currentItem = newItem
-        player.pause()
+        pause()
 
         accounts.api.loadDetails(newItem) { newItem in
             self.playItem(newItem, video: newItem.video, at: time)
@@ -143,11 +143,7 @@ extension PlayerModel {
             self.removeQueueItems()
         }
 
-        player.replaceCurrentItem(with: nil)
-    }
-
-    func isAutoplaying(_ item: AVPlayerItem) -> Bool {
-        player.currentItem == item
+        backend.closeItem()
     }
 
     @discardableResult func enqueueVideo(
@@ -162,7 +158,7 @@ extension PlayerModel {
         if play {
             currentItem = item
             // pause playing current video as it's going to be replaced with next one
-            player.pause()
+            pause()
         }
 
         queue.insert(item, at: prepending ? 0 : queue.endIndex)

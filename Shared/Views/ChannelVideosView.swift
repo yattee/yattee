@@ -33,12 +33,12 @@ struct ChannelVideosView: View {
             if inNavigationView {
                 content
             } else {
-                PlayerControlsView {
+                BrowserPlayerControls {
                     content
                 }
             }
         #else
-            PlayerControlsView {
+            BrowserPlayerControls {
                 content
             }
         #endif

@@ -33,7 +33,7 @@ struct TrendingView: View {
     }
 
     var body: some View {
-        PlayerControlsView(toolbar: {
+        BrowserPlayerControls(toolbar: {
             HStack {
                 if accounts.app.supportsTrendingCategories {
                     HStack {

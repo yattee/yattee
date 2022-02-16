@@ -7,6 +7,7 @@ struct AppTabNavigation: View {
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
@@ -95,7 +96,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Favorites", systemImage: "heart")
+            Label("Favorites", systemImage: "heart.fill")
                 .accessibility(label: Text("Favorites"))
         }
         .tag(TabSelection.favorites)
@@ -129,7 +130,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Popular", systemImage: "arrow.up.right.circle")
+            Label("Popular", systemImage: "arrow.up.right.circle.fill")
                 .accessibility(label: Text("Popular"))
         }
         .tag(TabSelection.popular)
@@ -141,7 +142,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Trending", systemImage: "chart.bar")
+            Label("Trending", systemImage: "chart.bar.fill")
                 .accessibility(label: Text("Trending"))
         }
         .tag(TabSelection.trending)
@@ -187,6 +188,7 @@ struct AppTabNavigation: View {
             .environmentObject(instances)
             .environmentObject(navigation)
             .environmentObject(player)
+            .environmentObject(playerControls)
             .environmentObject(playlists)
             .environmentObject(recents)
             .environmentObject(subscriptions)

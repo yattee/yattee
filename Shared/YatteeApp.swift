@@ -24,6 +24,7 @@ struct YatteeApp: App {
     @StateObject private var menu = MenuModel()
     @StateObject private var navigation = NavigationModel()
     @StateObject private var player = PlayerModel()
+    @StateObject private var playerControls = PlayerControlsModel()
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
@@ -41,6 +42,7 @@ struct YatteeApp: App {
                 .environmentObject(instances)
                 .environmentObject(navigation)
                 .environmentObject(player)
+                .environmentObject(playerControls)
                 .environmentObject(playlists)
                 .environmentObject(recents)
                 .environmentObject(subscriptions)
@@ -101,6 +103,7 @@ struct YatteeApp: App {
                     .environmentObject(instances)
                     .environmentObject(navigation)
                     .environmentObject(player)
+                    .environmentObject(playerControls)
                     .environmentObject(playlists)
                     .environmentObject(recents)
                     .environmentObject(subscriptions)
@@ -115,6 +118,7 @@ struct YatteeApp: App {
                     .environmentObject(accounts)
                     .environmentObject(instances)
                     .environmentObject(player)
+                    .environmentObject(playerControls)
                     .environmentObject(updater)
             }
         #endif

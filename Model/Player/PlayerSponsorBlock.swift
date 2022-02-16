@@ -38,9 +38,12 @@ extension PlayerModel {
             return
         }
 
-        player.seek(to: segment.endTime)
-        lastSkipped = segment
-        segmentRestorationTime = time
+        backend.seek(to: segment.endTime)
+
+        DispatchQueue.main.async { [weak self] in
+            self?.lastSkipped = segment
+            self?.segmentRestorationTime = time
+        }
         logger.info("SponsorBlock skipping to: \(segment.end)")
     }
 
@@ -63,13 +66,15 @@ extension PlayerModel {
         }
 
         restoredSegments.append(segment)
-        player.seek(to: time)
+        backend.seek(to: time)
         resetLastSegment()
     }
 
     private func resetLastSegment() {
-        lastSkipped = nil
-        segmentRestorationTime = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.lastSkipped = nil
+            self?.segmentRestorationTime = nil
+        }
     }
 
     func resetSegments() {

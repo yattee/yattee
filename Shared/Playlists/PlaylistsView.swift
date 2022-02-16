@@ -53,7 +53,7 @@ struct PlaylistsView: View {
     }
 
     var body: some View {
-        PlayerControlsView(toolbar: {
+        BrowserPlayerControls(toolbar: {
             HStack {
                 HStack {
                     newPlaylistButton

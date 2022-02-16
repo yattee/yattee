@@ -45,7 +45,7 @@ struct ShareButton: View {
                         shareAction(
                             accounts.api.shareURL(
                                 contentItem,
-                                time: player.player.currentTime()
+                                time: player.backend.currentTime
                             )!
                         )
                     }
@@ -67,7 +67,7 @@ struct ShareButton: View {
                             accounts.api.shareURL(
                                 contentItem,
                                 frontendHost: "www.youtube.com",
-                                time: player.player.currentTime()
+                                time: player.backend.currentTime
                             )!
                         )
                     }
