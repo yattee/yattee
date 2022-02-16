@@ -90,7 +90,9 @@ struct PlayerControls: View {
         HStack(spacing: 4) {
             hidePlayerButton
             Text(playbackStatus)
+
             Spacer()
+
             ToggleBackendButton()
             Text("•")
             StreamControl()
@@ -106,6 +108,7 @@ struct PlayerControls: View {
         } label: {
             Image(systemName: "chevron.down.circle.fill")
         }
+        .keyboardShortcut(.cancelAction)
     }
 
     private var playbackStatus: String {
