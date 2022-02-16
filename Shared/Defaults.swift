@@ -43,6 +43,7 @@ extension Defaults.Keys {
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
 
+    static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
     static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")

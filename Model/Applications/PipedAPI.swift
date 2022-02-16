@@ -481,11 +481,19 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             streams.append(Stream(hlsURL: hlsURL))
         }
 
-        guard let audioStream = compatibleAudioStreams(from: content).first else {
+        let audioStreams = content
+            .dictionaryValue["audioStreams"]?
+            .arrayValue
+            .filter { $0.dictionaryValue["format"]?.stringValue == "M4A" }
+            .sorted {
+                $0.dictionaryValue["bitrate"]?.intValue ?? 0 > $1.dictionaryValue["bitrate"]?.intValue ?? 0
+            } ?? []
+
+        guard let audioStream = audioStreams.first else {
             return streams
         }
 
-        let videoStreams = compatibleVideoStream(from: content)
+        let videoStreams = content.dictionaryValue["videoStreams"]?.arrayValue ?? []
 
         videoStreams.forEach { videoStream in
             let audioAsset = AVURLAsset(url: audioStream.dictionaryValue["url"]!.url!)
@@ -493,10 +501,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
             let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
             let resolution = Stream.Resolution.from(resolution: videoStream.dictionaryValue["quality"]!.stringValue)
+            let videoFormat = videoStream.dictionaryValue["format"]?.stringValue
 
             if videoOnly {
                 streams.append(
-                    Stream(audioAsset: audioAsset, videoAsset: videoAsset, resolution: resolution, kind: .adaptive)
+                    Stream(audioAsset: audioAsset, videoAsset: videoAsset, resolution: resolution, kind: .adaptive, videoFormat: videoFormat)
                 )
             } else {
                 streams.append(
@@ -513,23 +522,6 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .dictionaryValue["relatedStreams"]?
             .arrayValue
             .compactMap(extractVideo(from:)) ?? []
-    }
-
-    private func compatibleAudioStreams(from content: JSON) -> [JSON] {
-        content
-            .dictionaryValue["audioStreams"]?
-            .arrayValue
-            .filter { $0.dictionaryValue["format"]?.stringValue == "M4A" }
-            .sorted {
-                $0.dictionaryValue["bitrate"]?.intValue ?? 0 > $1.dictionaryValue["bitrate"]?.intValue ?? 0
-            } ?? []
-    }
-
-    private func compatibleVideoStream(from content: JSON) -> [JSON] {
-        content
-            .dictionaryValue["videoStreams"]?
-            .arrayValue
-            .filter { $0.dictionaryValue["format"] == "MPEG_4" } ?? []
     }
 
     private func extractComment(from content: JSON) -> Comment? {

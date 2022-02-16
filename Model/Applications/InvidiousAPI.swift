@@ -466,7 +466,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return []
         }
 
-        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/mp4") && $0["encoding"].stringValue == "h264" }
+        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/") }
 
         return videoAssetsURLs.map {
             Stream(
@@ -474,7 +474,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 videoAsset: AVURLAsset(url: $0["url"].url!),
                 resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
                 kind: .adaptive,
-                encoding: $0["encoding"].stringValue
+                encoding: $0["encoding"].stringValue,
+                videoFormat: $0["type"].stringValue
             )
         }
     }

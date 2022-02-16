@@ -12,6 +12,7 @@ struct ContentView: View {
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
@@ -135,9 +136,11 @@ struct ContentView: View {
         menu.accounts = accounts
         menu.navigation = navigation
         menu.player = player
+        playerControls.player = player
 
         player.accounts = accounts
         player.comments = comments
+        player.controls = playerControls
 
         if !accounts.current.isNil {
             player.restoreQueue()

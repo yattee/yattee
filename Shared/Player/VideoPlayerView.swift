@@ -22,7 +22,6 @@ struct VideoPlayerView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     #if os(iOS)
-        @Environment(\.presentationMode) private var presentationMode
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
 
@@ -36,6 +35,7 @@ struct VideoPlayerView: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
@@ -60,12 +60,15 @@ struct VideoPlayerView: View {
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
+                .onChange(of: fullScreenDetails) { value in
+                    player.backend.setNeedsDrawing(!value)
+                }
                 #if os(iOS)
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     handleOrientationDidChangeNotification()
                 }
                 .onDisappear {
-                    guard !player.playingFullscreen else {
+                    guard !playerControls.playingFullscreen else {
                         return // swiftlint:disable:this implicit_return
                     }
 
@@ -80,7 +83,6 @@ struct VideoPlayerView: View {
                 }
                 #endif
             }
-            .navigationBarHidden(true)
         #endif
     }
 
@@ -89,79 +91,117 @@ struct VideoPlayerView: View {
             Group {
                 #if os(tvOS)
                     player.playerView
+                        .ignoresSafeArea(.all, edges: .all)
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
-                            #if os(iOS)
-                                if verticalSizeClass == .regular {
+                            if !playerControls.playingFullscreen {
+                                #if os(macOS)
                                     PlaybackBar()
-                                }
-                            #elseif os(macOS)
-                                PlaybackBar()
-                            #endif
+                                #endif
+                            }
 
                             if player.currentItem.isNil {
                                 playerPlaceholder(geometry: geometry)
                             } else if player.playingInPictureInPicture {
                                 pictureInPicturePlaceholder(geometry: geometry)
                             } else {
-                                player.playerView
-                                    .modifier(
-                                        VideoPlayerSizeModifier(
-                                            geometry: geometry,
-                                            aspectRatio: player.controller?.aspectRatio
-                                        )
+                                ZStack(alignment: .top) {
+                                    switch player.activeBackend {
+                                    case .mpv:
+                                        player.mpvPlayerView
+                                            .overlay(GeometryReader { proxy in
+                                                Color.clear
+                                                    .onAppear {
+                                                        player.playerSize = proxy.size
+                                                        player.mpvBackend.client?.setSize(proxy.size.width, proxy.size.height)
+                                                    }
+                                                    .onChange(of: proxy.size) { _ in
+                                                        player.playerSize = proxy.size
+                                                        player.mpvBackend.client?.setSize(proxy.size.width, proxy.size.height)
+                                                    }
+                                            })
+                                    case .appleAVPlayer:
+                                        player.avPlayerView
+                                    }
+
+                                    PlayerGestures()
+
+                                    PlayerControls(player: player)
+                                }
+                                .modifier(
+                                    VideoPlayerSizeModifier(
+                                        geometry: geometry,
+                                        aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
+                                        fullScreen: playerControls.playingFullscreen
                                     )
+                                )
                             }
                         }
+                        .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
+
                         #if os(iOS)
-                        .onSwipeGesture(
-                            up: {
-                                withAnimation {
-                                    fullScreenDetails = true
-                                }
-                            },
-                            down: { player.hide() }
-                        )
+                            .onSwipeGesture(
+                                up: {
+                                    withAnimation {
+                                        fullScreenDetails = true
+                                    }
+                                },
+                                down: { player.hide() }
+                            )
+                            .onHover { hovering in
+                                hovering ? playerControls.show() : playerControls.hide()
+                            }
                         #endif
 
-                        .background(Color.black)
+                            .background(Color.black)
 
-                        Group {
-                            #if os(iOS)
-                                if verticalSizeClass == .regular {
+                        if !playerControls.playingFullscreen {
+                            Group {
+                                #if os(iOS)
+                                    if verticalSizeClass == .regular {
+                                        VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
+                                    }
+
+                                #else
                                     VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                                }
-
-                            #else
-                                VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                            #endif
+                                #endif
+                            }
+                            .background(colorScheme == .dark ? Color.black : Color.white)
+                            .modifier(VideoDetailsPaddingModifier(
+                                geometry: geometry,
+                                aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
+                                fullScreen: fullScreenDetails
+                            ))
                         }
-                        .background(colorScheme == .dark ? Color.black : Color.white)
-                        .modifier(VideoDetailsPaddingModifier(
-                            geometry: geometry,
-                            aspectRatio: player.controller?.aspectRatio,
-                            fullScreen: fullScreenDetails
-                        ))
                     }
                 #endif
             }
-            .background(colorScheme == .dark ? Color.black : Color.white)
+            .background(((colorScheme == .dark || fullScreenLayout) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
-            #if os(iOS)
-                if sidebarQueue {
-                    PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreenDetails)
-                        .frame(maxWidth: 350)
-                }
-            #elseif os(macOS)
-                if Defaults[.playerSidebar] != .never {
-                    PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                        .frame(minWidth: 300)
-                }
-            #endif
+            if !playerControls.playingFullscreen {
+                #if os(iOS)
+                    if sidebarQueue {
+                        PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreenDetails)
+                            .frame(maxWidth: 350)
+                    }
+                #elseif os(macOS)
+                    if Defaults[.playerSidebar] != .never {
+                        PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
+                            .frame(minWidth: 300)
+                    }
+                #endif
+            }
         }
+        .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
+        .statusBar(hidden: playerControls.playingFullscreen)
+        .navigationBarHidden(true)
+    }
+
+    var fullScreenLayout: Bool {
+        playerControls.playingFullscreen || verticalSizeClass == .compact
     }
 
     func playerPlaceholder(geometry: GeometryProxy) -> some View {
@@ -235,7 +275,7 @@ struct VideoPlayerView: View {
         private func configureOrientationUpdatesBasedOnAccelerometer() {
             if UIDevice.current.orientation.isLandscape,
                enterFullscreenInLandscape,
-               !player.playingFullscreen,
+               !playerControls.playingFullscreen,
                !player.playingInPictureInPicture
             {
                 DispatchQueue.main.async {

@@ -1,0 +1,229 @@
+import Foundation
+import Logging
+#if !os(macOS)
+    import CoreMedia
+    import Siesta
+    import UIKit
+#endif
+
+final class MPVClient: ObservableObject {
+    private var logger = Logger(label: "mpv-client")
+
+    var mpv: OpaquePointer!
+    var mpvGL: OpaquePointer!
+    var queue: DispatchQueue!
+    var glView: MPVOGLView!
+    var backend: MPVBackend!
+
+    func create(frame: CGRect) -> MPVOGLView {
+        glView = MPVOGLView(frame: frame)
+
+        mpv = mpv_create()
+        if mpv == nil {
+            print("failed creating context\n")
+            exit(1)
+        }
+
+        checkError(mpv_request_log_messages(mpv, "warn"))
+        checkError(mpv_initialize(mpv))
+        checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
+        checkError(mpv_set_option_string(mpv, "hwdec", "yes"))
+
+        checkError(mpv_set_option_string(mpv, "override-display-fps", "\(UIScreen.main.maximumFramesPerSecond)"))
+        checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
+
+        let api = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
+        var initParams = mpv_opengl_init_params(
+            get_proc_address: getProcAddress(_:_:),
+            get_proc_address_ctx: nil,
+            extra_exts: nil
+        )
+
+        withUnsafeMutablePointer(to: &initParams) { initParams in
+            var params = [
+                mpv_render_param(type: MPV_RENDER_PARAM_API_TYPE, data: api),
+                mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, data: initParams),
+                mpv_render_param()
+            ]
+
+            var mpvGL: OpaquePointer?
+
+            if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
+                puts("failed to initialize mpv GL context")
+                exit(1)
+            }
+
+            glView.mpvGL = UnsafeMutableRawPointer(mpvGL)
+
+            mpv_render_context_set_update_callback(
+                mpvGL,
+                glUpdate(_:),
+                UnsafeMutableRawPointer(Unmanaged.passUnretained(glView).toOpaque())
+            )
+        }
+
+        queue = DispatchQueue(label: "mpv", qos: .background)
+        queue!.async {
+            mpv_set_wakeup_callback(self.mpv, wakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+        }
+
+        return glView
+    }
+
+    func readEvents() {
+        queue?.async { [self] in
+            while self.mpv != nil {
+                let event = mpv_wait_event(self.mpv, 0)
+                if event!.pointee.event_id == MPV_EVENT_NONE {
+                    break
+                }
+                backend.handle(event)
+            }
+        }
+    }
+
+    func loadFile(_ url: URL, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
+        var args = [url.absoluteString]
+        if let time = time {
+            args.append("replace")
+            args.append("start=\(Int(time.seconds))")
+        }
+
+        command("loadfile", args: args, returnValueCallback: completionHandler)
+    }
+
+    func addAudio(_ url: URL, completionHandler: ((Int32) -> Void)? = nil) {
+        command("audio-add", args: [url.absoluteString], returnValueCallback: completionHandler)
+    }
+
+    func play() {
+        setFlagAsync("pause", false)
+    }
+
+    func pause() {
+        setFlagAsync("pause", true)
+    }
+
+    func togglePlay() {
+        command("cycle", args: ["pause"])
+    }
+
+    func stop() {
+        command("stop")
+    }
+
+    var currentTime: CMTime {
+        CMTime.secondsInDefaultTimescale(getDouble("time-pos"))
+    }
+
+    var duration: CMTime {
+        CMTime.secondsInDefaultTimescale(getDouble("duration"))
+    }
+
+    func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
+        command("seek", args: [String(time.seconds)]) { _ in
+            completionHandler?(true)
+        }
+    }
+
+    func seek(to time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
+        command("seek", args: [String(time.seconds), "absolute"]) { _ in
+            completionHandler?(true)
+        }
+    }
+
+    func setSize(_ width: Double, _ height: Double) {
+        logger.info("setting player size to \(width),\(height)")
+        #if !os(macOS)
+            guard width <= UIScreen.main.bounds.width, height <= UIScreen.main.bounds.height else {
+                logger.info("requested size is greater than screen size, ignoring")
+                return
+            }
+        #endif
+
+        glView?.frame = CGRect(x: 0, y: 0, width: width, height: height)
+    }
+
+    func setNeedsDrawing(_ needsDrawing: Bool) {
+        logger.info("needs drawing: \(needsDrawing)")
+        glView.needsDrawing = needsDrawing
+    }
+
+    func command(
+        _ command: String,
+        args: [String?] = [],
+        checkForErrors: Bool = true,
+        returnValueCallback: ((Int32) -> Void)? = nil
+    ) {
+        guard mpv != nil else {
+            return
+        }
+        var cargs = makeCArgs(command, args).map { $0.flatMap { UnsafePointer<CChar>(strdup($0)) } }
+        defer {
+            for ptr in cargs where ptr != nil {
+                free(UnsafeMutablePointer(mutating: ptr!))
+            }
+        }
+        logger.info("\(command) -- \(args)")
+        let returnValue = mpv_command(mpv, &cargs)
+        if checkForErrors {
+            checkError(returnValue)
+        }
+        if let cb = returnValueCallback {
+            cb(returnValue)
+        }
+    }
+
+    private func setFlagAsync(_ name: String, _ flag: Bool) {
+        var data: Int = flag ? 1 : 0
+        mpv_set_property_async(mpv, 0, name, MPV_FORMAT_FLAG, &data)
+    }
+
+    private func getDouble(_ name: String) -> Double {
+        var data = Double()
+        mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &data)
+        return data
+    }
+
+    private func makeCArgs(_ command: String, _ args: [String?]) -> [String?] {
+        if !args.isEmpty, args.last == nil {
+            fatalError("Command do not need a nil suffix")
+        }
+
+        var strArgs = args
+        strArgs.insert(command, at: 0)
+        strArgs.append(nil)
+
+        return strArgs
+    }
+
+    func checkError(_ status: CInt) {
+        if status < 0 {
+            logger.error(.init(stringLiteral: "MPV API error: \(String(cString: mpv_error_string(status)))\n"))
+        }
+    }
+}
+
+private func getProcAddress(_: UnsafeMutableRawPointer?, _ name: UnsafePointer<Int8>?) -> UnsafeMutableRawPointer? {
+    let symbolName = CFStringCreateWithCString(kCFAllocatorDefault, name, CFStringBuiltInEncodings.ASCII.rawValue)
+    let addr = CFBundleGetFunctionPointerForName(CFBundleGetBundleWithIdentifier("com.apple.opengles" as CFString), symbolName)
+
+    return addr
+}
+
+private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
+    let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
+
+    guard glView.needsDrawing else {
+        return
+    }
+
+    DispatchQueue.main.async {
+        glView.setNeedsDisplay()
+    }
+}
+
+private func wakeUp(_ context: UnsafeMutableRawPointer?) {
+    let client = unsafeBitCast(context, to: MPVClient.self)
+    client.readEvents()
+}
