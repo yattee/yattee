@@ -5,6 +5,7 @@ struct PlayerControls: View {
     static let animation = Animation.easeInOut(duration: 0)
 
     private var player: PlayerModel!
+
     @EnvironmentObject<PlayerControlsModel> private var model
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
