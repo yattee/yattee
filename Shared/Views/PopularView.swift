@@ -15,7 +15,7 @@ struct PopularView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             VerticalCells(items: videos)
                 .onAppear {
                     resource?.addObserver(store)

@@ -23,13 +23,14 @@ extension PlayerModel {
     }
 
     func updateWatch(finished: Bool = false) {
-        guard let id = currentVideo?.videoID else {
+        guard let id = currentVideo?.videoID,
+              Defaults[.saveHistory]
+        else {
             return
         }
 
-        let time = player.currentTime()
-        let seconds = time.seconds
-        currentItem.playbackTime = time
+        let time = backend.currentTime
+        let seconds = time?.seconds ?? 0
 
         let watch: Watch!
         let watchFetchRequest = Watch.fetchRequest()
