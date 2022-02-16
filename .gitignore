@@ -97,3 +97,5 @@ iOSInjectionProject/
 
 # User-specific xcconfig files
 Xcode-config/DEVELOPMENT_TEAM.xcconfig
+# disable simulator libraries - to be removed when replaced with framework for mpv
+Vendor/mpv/iOS/lib_sim

@@ -5,7 +5,7 @@ import Foundation
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
-        case hd1440p60, hd1440p, hd1080p60, hd1080p, hd720p60, hd720p, sd480p, sd360p, sd240p, sd144p, unknown
+        case hd2160p, hd1440p60, hd1440p, hd1080p60, hd1080p, hd720p60, hd720p, sd480p, sd360p, sd240p, sd144p, unknown
 
         var name: String {
             "\(height)p\(refreshRate != -1 ? ", \(refreshRate) fps" : "")"
@@ -68,6 +68,7 @@ class Stream: Equatable, Hashable, Identifiable {
     var kind: Kind!
 
     var encoding: String!
+    var videoFormat: String!
 
     init(
         instance: Instance? = nil,
@@ -76,7 +77,8 @@ class Stream: Equatable, Hashable, Identifiable {
         hlsURL: URL? = nil,
         resolution: Resolution? = nil,
         kind: Kind = .hls,
-        encoding: String? = nil
+        encoding: String? = nil,
+        videoFormat: String? = nil
     ) {
         self.instance = instance
         self.audioAsset = audioAsset
@@ -85,14 +87,35 @@ class Stream: Equatable, Hashable, Identifiable {
         self.resolution = resolution
         self.kind = kind
         self.encoding = encoding
+        self.videoFormat = videoFormat
     }
 
     var quality: String {
-        kind == .hls ? "adaptive (HLS)" : "\(resolution.name) \(kind == .stream ? "(\(kind.rawValue))" : "")"
+        if resolution == .hd2160p {
+            return "4K (2160p)"
+        }
+
+        return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
+    }
+
+    var format: String {
+        let lowercasedFormat = (videoFormat ?? "unknown").lowercased()
+        if lowercasedFormat.contains("webm") {
+            return "WEBM"
+        } else if lowercasedFormat.contains("avc1") {
+            return "avc1"
+        } else if lowercasedFormat.contains("av01") {
+            return "AV1"
+        } else if lowercasedFormat.contains("mpeg_4") || lowercasedFormat.contains("mp4") {
+            return "MP4"
+        } else {
+            return lowercasedFormat
+        }
     }
 
     var description: String {
-        "\(quality) - \(instance?.description ?? "")"
+        let formatString = format == "unknown" ? "" : " (\(format))"
+        return "\(quality)\(formatString) - \(instance?.description ?? "")"
     }
 
     var assets: [AVURLAsset] {
