@@ -5,6 +5,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
     let geometry: GeometryProxy
     let aspectRatio: Double?
     let minimumHeightLeft: Double
+    let fullScreen: Bool
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -13,18 +14,19 @@ struct VideoPlayerSizeModifier: ViewModifier {
     init(
         geometry: GeometryProxy,
         aspectRatio: Double? = nil,
-        minimumHeightLeft: Double? = nil
+        minimumHeightLeft: Double? = nil,
+        fullScreen: Bool = false
     ) {
         self.geometry = geometry
         self.aspectRatio = aspectRatio ?? VideoPlayerView.defaultAspectRatio
         self.minimumHeightLeft = minimumHeightLeft ?? VideoPlayerView.defaultMinimumHeightLeft
+        self.fullScreen = fullScreen
     }
 
     func body(content: Content) -> some View {
         content
-            .frame(maxHeight: maxHeight)
-            .aspectRatio(usedAspectRatio, contentMode: usedAspectRatioContentMode)
-            .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+            .frame(maxHeight: fullScreen ? .infinity : maxHeight)
+            .aspectRatio(usedAspectRatio, contentMode: .fit)
     }
 
     var usedAspectRatio: Double {
@@ -44,7 +46,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
 
     var usedAspectRatioContentMode: ContentMode {
         #if os(iOS)
-            verticalSizeClass == .regular ? .fit : .fill
+            !fullScreen ? .fit : .fill
         #else
                 .fit
         #endif
@@ -58,15 +60,5 @@ struct VideoPlayerSizeModifier: ViewModifier {
         #endif
 
         return [height, 0].max()!
-    }
-
-    var edgesIgnoringSafeArea: Edge.Set {
-        let empty = Edge.Set()
-
-        #if os(iOS)
-            return verticalSizeClass == .compact ? .all : empty
-        #else
-            return empty
-        #endif
     }
 }
