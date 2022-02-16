@@ -19,7 +19,7 @@ struct FavoritesView: View {
     #endif
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             ScrollView(.vertical, showsIndicators: false) {
                 if !accounts.current.isNil {
                     #if os(tvOS)

@@ -60,7 +60,7 @@ struct SignInRequiredView<Content: View>: View {
 
 struct SignInRequiredView_Previews: PreviewProvider {
     static var previews: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             SignInRequiredView(title: "Subscriptions") {
                 Text("Only when signed in")
             }

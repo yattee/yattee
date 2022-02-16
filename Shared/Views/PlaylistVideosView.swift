@@ -46,7 +46,7 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             VerticalCells(items: contentItems)
                 .onAppear {
                     if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
