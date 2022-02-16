@@ -91,3 +91,6 @@ iOSInjectionProject/
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
+
+# disable simulator libraries - to be removed when replaced with framework for mpv
+Vendor/mpv/iOS/lib_sim
