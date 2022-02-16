@@ -65,7 +65,7 @@ struct VideoCell: View {
             }
 
             if !playNowContinues {
-                player.player.seek(to: .zero)
+                player.backend.seek(to: .zero)
             }
 
             player.play()
@@ -252,7 +252,6 @@ struct VideoCell: View {
                 HStack(spacing: 8) {
                     if let date = video.publishedDate {
                         HStack(spacing: 2) {
-                            Image(systemName: "calendar")
                             Text(date)
                                 .allowsTightening(true)
                         }
@@ -269,7 +268,6 @@ struct VideoCell: View {
                         Spacer()
 
                         HStack(spacing: 2) {
-                            Image(systemName: "clock")
                             Text(time)
                         }
                     }
