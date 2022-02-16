@@ -224,11 +224,13 @@ final class MPVBackend: PlayerBackend {
             updateControls()
         }
 
+        model.updateNowPlayingInfo()
+
         if let currentTime = currentTime {
             model.handleSegments(at: currentTime)
         }
 
-        self.timeObserverThrottle.execute {
+        timeObserverThrottle.execute {
             self.model.updateWatch()
         }
     }

@@ -40,7 +40,6 @@ final class AVPlayerBackend: PlayerBackend {
     private var composition = AVMutableComposition()
     private var loadedCompositionAssets = [AVMediaType]()
 
-    private var currentArtwork: MPMediaItemArtwork?
     private var frequentTimeObserver: Any?
     private var infrequentTimeObserver: Any?
     private var playerTimeControlStatusObserver: Any?
@@ -73,7 +72,7 @@ final class AVPlayerBackend: PlayerBackend {
         _ stream: Stream,
         of video: Video,
         preservingTime: Bool,
-        upgrading: Bool
+        upgrading _: Bool
     ) {
         if let url = stream.singleAssetURL {
             model.logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
@@ -84,10 +83,6 @@ final class AVPlayerBackend: PlayerBackend {
             model.logger.info("composition video asset: \(stream.videoAsset.url)")
 
             loadComposition(stream, of: video, preservingTime: preservingTime)
-        }
-
-        if !upgrading {
-            updateCurrentArtwork()
         }
     }
 
@@ -501,7 +496,7 @@ final class AVPlayerBackend: PlayerBackend {
             self.controls.currentTime = self.currentTime ?? .zero
 
             #if !os(tvOS)
-                self.updateNowPlayingInfo()
+                self.model.updateNowPlayingInfo()
             #endif
 
             if let currentTime = self.currentTime {
@@ -565,49 +560,5 @@ final class AVPlayerBackend: PlayerBackend {
                 self.model.updateWatch()
             }
         }
-    }
-
-    private func updateCurrentArtwork() {
-        guard let thumbnailData = try? Data(contentsOf: model.currentItem.video.thumbnailURL(quality: .medium)!) else {
-            return
-        }
-
-        #if os(macOS)
-            let image = NSImage(data: thumbnailData)
-        #else
-            let image = UIImage(data: thumbnailData)
-        #endif
-
-        if image.isNil {
-            return
-        }
-
-        currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
-    }
-
-    fileprivate func updateNowPlayingInfo() {
-        var nowPlayingInfo: [String: AnyObject] = [
-            MPMediaItemPropertyTitle: model.currentItem.video.title as AnyObject,
-            MPMediaItemPropertyArtist: model.currentItem.video.author as AnyObject,
-            MPNowPlayingInfoPropertyIsLiveStream: model.currentItem.video.live as AnyObject,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: avPlayer.currentTime().seconds as AnyObject,
-            MPNowPlayingInfoPropertyPlaybackQueueCount: model.queue.count as AnyObject,
-            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
-        ]
-
-        if !currentArtwork.isNil {
-            nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
-        }
-
-        if !model.currentItem.video.live {
-            let itemDuration = model.currentItem.videoDuration ?? model.currentItem.duration
-            let duration = itemDuration.isFinite ? Double(itemDuration) : nil
-
-            if !duration.isNil {
-                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
-            }
-        }
-
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
 }
