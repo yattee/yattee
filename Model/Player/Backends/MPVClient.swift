@@ -15,6 +15,8 @@ final class MPVClient: ObservableObject {
     var glView: MPVOGLView!
     var backend: MPVBackend!
 
+    var seeking = false
+
     func create(frame: CGRect) -> MPVOGLView {
         glView = MPVOGLView(frame: frame)
 
@@ -121,13 +123,27 @@ final class MPVClient: ObservableObject {
     }
 
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        command("seek", args: [String(time.seconds)]) { _ in
+        guard !seeking else {
+            logger.warning("ignoring seek, another in progress")
+            return
+        }
+
+        seeking = true
+        command("seek", args: [String(time.seconds)]) { [weak self] _ in
+            self?.seeking = false
             completionHandler?(true)
         }
     }
 
     func seek(to time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        command("seek", args: [String(time.seconds), "absolute"]) { _ in
+        guard !seeking else {
+            logger.warning("ignoring seek, another in progress")
+            return
+        }
+
+        seeking = true
+        command("seek", args: [String(time.seconds), "absolute"]) { [weak self] _ in
+            self?.seeking = false
             completionHandler?(true)
         }
     }
