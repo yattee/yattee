@@ -41,7 +41,7 @@ struct SearchView: View {
     }
 
     var body: some View {
-        PlayerControlsView(toolbar: {
+        BrowserPlayerControls(toolbar: {
             #if os(iOS)
                 if accounts.app.supportsSearchFilters {
                     HStack(spacing: 0) {

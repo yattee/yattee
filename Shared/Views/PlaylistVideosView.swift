@@ -20,7 +20,7 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             VerticalCells(items: contentItems)
             #if !os(tvOS)
                 .navigationTitle("\(playlist.title) Playlist")

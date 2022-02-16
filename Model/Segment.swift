@@ -17,6 +17,10 @@ class Segment: ObservableObject, Hashable {
         segment.last!
     }
 
+    var duration: Double {
+        end - start
+    }
+
     var endTime: CMTime {
         CMTime(seconds: end, preferredTimescale: 1000)
     }

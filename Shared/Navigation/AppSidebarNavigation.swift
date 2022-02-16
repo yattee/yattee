@@ -49,7 +49,7 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: sidebarMinWidth)
 
             VStack {
-                PlayerControlsView {
+                BrowserPlayerControls {
                     HStack(alignment: .center) {
                         Spacer()
                         Image(systemName: "play.tv")
