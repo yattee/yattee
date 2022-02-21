@@ -33,14 +33,14 @@ final class MPVOGLView: GLKView {
         glClear(UInt32(GL_COLOR_BUFFER_BIT))
     }
 
-    override func draw(_: CGRect) {
+    override func draw(_ rect: CGRect) {
         glGetIntegerv(UInt32(GL_FRAMEBUFFER_BINDING), &defaultFBO!)
 
         if mpvGL != nil {
             var data = mpv_opengl_fbo(
                 fbo: Int32(defaultFBO!),
-                w: Int32(bounds.size.width) * Int32(contentScaleFactor),
-                h: Int32(bounds.size.height) * Int32(contentScaleFactor),
+                w: Int32(rect.size.width) * Int32(contentScaleFactor),
+                h: Int32(rect.size.height) * Int32(contentScaleFactor),
                 internal_format: 0
             )
             var flip: CInt = 1

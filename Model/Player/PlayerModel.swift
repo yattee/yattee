@@ -300,6 +300,9 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handleNavigationViewPlayerPresentationChange() {
+        backend.setNeedsDrawing(playerNavigationLinkActive)
+        controls.hide()
+
         if pauseOnHidingPlayer, !playingInPictureInPicture, !playerNavigationLinkActive {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.pause()
