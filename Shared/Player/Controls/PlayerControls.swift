@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct PlayerControls: View {
-    static let animation = Animation.easeInOut(duration: 0)
+    static let animation = Animation.easeInOut(duration: 0.2)
 
     private var player: PlayerModel!
 
@@ -60,12 +60,8 @@ struct PlayerControls: View {
     }
 
     var controlsBackground: some View {
-        model.presentingControls ?
-            AnyView(
-                PlayerGestures()
-                    .background(Color.black.opacity(0.5))
-            ) :
-            AnyView(Color.clear)
+        PlayerGestures()
+            .background(Color.black.opacity(model.presentingControls ? 0.5 : 0))
     }
 
     var timeline: some View {
@@ -145,7 +141,7 @@ struct PlayerControls: View {
         HStack {
             fullscreenButton
             Spacer()
-            button("Music Mode", systemImage: "music.note")
+//            button("Music Mode", systemImage: "music.note")
         }
     }
 
