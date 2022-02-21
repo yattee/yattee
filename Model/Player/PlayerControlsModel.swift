@@ -52,8 +52,9 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func show() {
+        player.backend.updateControls()
+
         withAnimation(PlayerControls.animation) {
-            player.backend.updateControls()
             presentingControls = true
         }
     }
@@ -65,11 +66,11 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func toggle() {
-        withAnimation(PlayerControls.animation) {
-            if !presentingControls {
-                player.backend.updateControls()
-            }
+        if !presentingControls {
+            player.backend.updateControls()
+        }
 
+        withAnimation(PlayerControls.animation) {
             presentingControls.toggle()
         }
     }
