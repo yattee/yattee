@@ -2,9 +2,9 @@ import SwiftUI
 
 #if !os(macOS)
     struct MPVPlayerView: UIViewControllerRepresentable {
-        @EnvironmentObject<PlayerModel> private var player
-
         @State private var controller = MPVViewController()
+
+        @EnvironmentObject<PlayerModel> private var player
 
         func makeUIViewController(context _: Context) -> some UIViewController {
             player.mpvBackend.controller = controller
@@ -17,15 +17,23 @@ import SwiftUI
     }
 #else
     struct MPVPlayerView: NSViewRepresentable {
-        let layer: VideoLayer
+        @State private var client = MPVClient()
+        @State private var layer = VideoLayer()
+
+        @EnvironmentObject<PlayerModel> private var player
 
         func makeNSView(context _: Context) -> some NSView {
-            let vview = VideoView()
+            client.layer = layer
+            layer.client = client
 
-            vview.layer = layer
-            vview.wantsLayer = true
+            let view = MPVOGLView()
 
-            return vview
+            view.layer = client.layer
+            view.wantsLayer = true
+
+            player.mpvBackend.client = client
+
+            return view
         }
 
         func updateNSView(_: NSViewType, context _: Context) {}
