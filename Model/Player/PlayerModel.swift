@@ -429,11 +429,15 @@ final class PlayerModel: ObservableObject {
     #endif
 
     func updateNowPlayingInfo() {
+        guard let video = currentItem?.video else {
+            return
+        }
+
         let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
         var nowPlayingInfo: [String: AnyObject] = [
-            MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
-            MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
-            MPNowPlayingInfoPropertyIsLiveStream: currentItem.video.live as AnyObject,
+            MPMediaItemPropertyTitle: video.title as AnyObject,
+            MPMediaItemPropertyArtist: video.author as AnyObject,
+            MPNowPlayingInfoPropertyIsLiveStream: video.live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
@@ -444,7 +448,7 @@ final class PlayerModel: ObservableObject {
             nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
         }
 
-        if !currentItem.video.live {
+        if !video.live {
             let itemDuration = (backend.playerItemDuration ?? .zero).seconds
             let duration = itemDuration.isFinite ? Double(itemDuration) : nil
 

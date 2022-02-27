@@ -271,11 +271,9 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
 
         case MPV_EVENT_END_FILE:
-            break
-            // DispatchQueue.main.async { [weak self] in
-            // TODO: handle EOF
-            // self?.handleEndOfFile(event)
-            // }
+            DispatchQueue.main.async { [weak self] in
+                self?.handleEndOfFile(event)
+            }
 
         default:
             logger.info(.init(stringLiteral: "event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))

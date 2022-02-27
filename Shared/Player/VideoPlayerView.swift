@@ -114,7 +114,7 @@ struct VideoPlayerView: View {
                                                 Color.clear
                                                     .onAppear {
                                                         player.playerSize = proxy.size
-                                                        // TODO move to backend method
+                                                        // TODO: move to backend method
                                                         player.mpvBackend.client?.setSize(proxy.size.width, proxy.size.height)
                                                     }
                                                     .onChange(of: proxy.size) { _ in
