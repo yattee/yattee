@@ -2,7 +2,9 @@ import AVFoundation
 import Defaults
 import Foundation
 import MediaPlayer
-import UIKit
+#if !os(macOS)
+    import UIKit
+#endif
 
 final class AVPlayerBackend: PlayerBackend {
     static let assetKeysToLoad = ["tracks", "playable", "duration"]
@@ -34,6 +36,7 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     private(set) var avPlayer = AVPlayer()
+
     var controller: AppleAVPlayerViewController?
 
     private var asset: AVURLAsset?
