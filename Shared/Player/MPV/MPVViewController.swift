@@ -16,7 +16,8 @@ final class MPVViewController: UIViewController {
     override func viewDidLoad() {
         super.loadView()
 
-        glView = client.create(frame: view.frame)
+        client.create(frame: view.frame)
+        glView = client.glView
 
         view.addSubview(glView)
 
