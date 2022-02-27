@@ -8,7 +8,9 @@ struct PlayerControls: View {
 
     @EnvironmentObject<PlayerControlsModel> private var model
 
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #if os(iOS)
+        @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #endif
 
     init(player: PlayerModel) {
         self.player = player
@@ -84,7 +86,9 @@ struct PlayerControls: View {
 
     var statusBar: some View {
         HStack(spacing: 4) {
-            hidePlayerButton
+            #if os(iOS)
+                hidePlayerButton
+            #endif
             Text(playbackStatus)
 
             Spacer()
@@ -92,6 +96,9 @@ struct PlayerControls: View {
             ToggleBackendButton()
             Text("•")
             StreamControl()
+            #if os(macOS)
+                .frame(maxWidth: 160)
+            #endif
         }
         .foregroundColor(.primary)
         .padding(.trailing, 4)
@@ -215,6 +222,7 @@ struct PlayerControls: View {
                 .padding()
                 .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .foregroundColor(.primary)
         .frame(width: size, height: size)
         #if os(macOS)
@@ -226,7 +234,11 @@ struct PlayerControls: View {
     }
 
     var fullScreenLayout: Bool {
-        model.playingFullscreen || verticalSizeClass == .compact
+        #if !os(macOS)
+            model.playingFullscreen || verticalSizeClass == .compact
+        #else
+            model.playingFullscreen
+        #endif
     }
 }
 
