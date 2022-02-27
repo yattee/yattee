@@ -1,7 +1,7 @@
+import CoreMedia
 import Foundation
 import Logging
 #if !os(macOS)
-    import CoreMedia
     import Siesta
     import UIKit
 #endif
@@ -12,13 +12,22 @@ final class MPVClient: ObservableObject {
     var mpv: OpaquePointer!
     var mpvGL: OpaquePointer!
     var queue: DispatchQueue!
-    var glView: MPVOGLView!
+    #if os(macOS)
+        var layer: VideoLayer!
+        var link: CVDisplayLink!
+    #else
+        var glView: MPVOGLView!
+    #endif
     var backend: MPVBackend!
 
     var seeking = false
 
-    func create(frame: CGRect) -> MPVOGLView {
-        glView = MPVOGLView(frame: frame)
+    func create(frame: CGRect? = nil) {
+        #if !os(macOS)
+        if let frame = frame {
+            glView = MPVOGLView(frame: frame)
+        }
+        #endif
 
         mpv = mpv_create()
         if mpv == nil {
@@ -27,19 +36,26 @@ final class MPVClient: ObservableObject {
         }
 
         checkError(mpv_request_log_messages(mpv, "warn"))
-        checkError(mpv_initialize(mpv))
-        checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
-        checkError(mpv_set_option_string(mpv, "hwdec", "yes"))
 
-        checkError(mpv_set_option_string(mpv, "override-display-fps", "\(UIScreen.main.maximumFramesPerSecond)"))
-        checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
+        #if os(macOS)
+            checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))
+        #else
+            checkError(mpv_set_option_string(mpv, "hwdec", "yes"))
+            checkError(mpv_set_option_string(mpv, "override-display-fps", "\(UIScreen.main.maximumFramesPerSecond)"))
+            checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
+        #endif
+        checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
+
+        checkError(mpv_initialize(mpv))
 
         let api = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
         var initParams = mpv_opengl_init_params(
-            get_proc_address: getProcAddress(_:_:),
+            get_proc_address: getProcAddress,
             get_proc_address_ctx: nil,
             extra_exts: nil
         )
+
+        queue = DispatchQueue(label: "mpv", qos: .background)
 
         withUnsafeMutablePointer(to: &initParams) { initParams in
             var params = [
@@ -48,28 +64,31 @@ final class MPVClient: ObservableObject {
                 mpv_render_param()
             ]
 
-            var mpvGL: OpaquePointer?
-
             if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
                 puts("failed to initialize mpv GL context")
                 exit(1)
             }
 
-            glView.mpvGL = UnsafeMutableRawPointer(mpvGL)
+            #if os(macOS)
+                mpv_render_context_set_update_callback(
+                    mpvGL,
+                    glUpdate,
+                    UnsafeMutableRawPointer(Unmanaged.passUnretained(layer).toOpaque())
+                )
+            #else
+                glView.mpvGL = UnsafeMutableRawPointer(mpvGL)
 
-            mpv_render_context_set_update_callback(
-                mpvGL,
-                glUpdate(_:),
-                UnsafeMutableRawPointer(Unmanaged.passUnretained(glView).toOpaque())
-            )
+                mpv_render_context_set_update_callback(
+                    mpvGL,
+                    glUpdate(_:),
+                    UnsafeMutableRawPointer(Unmanaged.passUnretained(glView).toOpaque())
+                )
+            #endif
         }
 
-        queue = DispatchQueue(label: "mpv", qos: .background)
         queue!.async {
             mpv_set_wakeup_callback(self.mpv, wakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
         }
-
-        return glView
     }
 
     func readEvents() {
@@ -155,14 +174,16 @@ final class MPVClient: ObservableObject {
                 logger.info("requested size is greater than screen size, ignoring")
                 return
             }
-        #endif
 
-        glView?.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            glView?.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        #endif
     }
 
     func setNeedsDrawing(_ needsDrawing: Bool) {
         logger.info("needs drawing: \(needsDrawing)")
-        glView.needsDrawing = needsDrawing
+        #if !os(macOS)
+            glView.needsDrawing = needsDrawing
+        #endif
     }
 
     func command(
@@ -220,25 +241,44 @@ final class MPVClient: ObservableObject {
     }
 }
 
-private func getProcAddress(_: UnsafeMutableRawPointer?, _ name: UnsafePointer<Int8>?) -> UnsafeMutableRawPointer? {
-    let symbolName = CFStringCreateWithCString(kCFAllocatorDefault, name, CFStringBuiltInEncodings.ASCII.rawValue)
-    let addr = CFBundleGetFunctionPointerForName(CFBundleGetBundleWithIdentifier("com.apple.opengles" as CFString), symbolName)
+#if os(macOS)
+    func getProcAddress(_: UnsafeMutableRawPointer?, _ name: UnsafePointer<Int8>?) -> UnsafeMutableRawPointer? {
+        let symbolName = CFStringCreateWithCString(kCFAllocatorDefault, name, CFStringBuiltInEncodings.ASCII.rawValue)
+        let identifier = CFBundleGetBundleWithIdentifier("com.apple.opengl" as CFString)
 
-    return addr
-}
-
-private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
-    let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
-
-    guard glView.needsDrawing else {
-        return
+        return CFBundleGetFunctionPointerForName(identifier, symbolName)
     }
 
-    DispatchQueue.main.async {
-        glView.setNeedsDisplay()
-    }
-}
+    func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
+        let videoLayer = unsafeBitCast(ctx, to: VideoLayer.self)
 
+        videoLayer.client?.queue?.async {
+            if !videoLayer.isAsynchronous {
+                videoLayer.display()
+            }
+        }
+    }
+#else
+    func getProcAddress(_: UnsafeMutableRawPointer?, _ name: UnsafePointer<Int8>?) -> UnsafeMutableRawPointer? {
+        let symbolName = CFStringCreateWithCString(kCFAllocatorDefault, name, CFStringBuiltInEncodings.ASCII.rawValue)
+        let identifier = CFBundleGetBundleWithIdentifier("com.apple.opengles" as CFString)
+
+        return CFBundleGetFunctionPointerForName(identifier, symbolName)
+    }
+
+    private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
+        let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
+
+        guard glView.needsDrawing else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            glView.setNeedsDisplay()
+        }
+    }
+
+#endif
 private func wakeUp(_ context: UnsafeMutableRawPointer?) {
     let client = unsafeBitCast(context, to: MPVClient.self)
     client.readEvents()

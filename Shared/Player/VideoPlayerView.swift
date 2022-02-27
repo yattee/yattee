@@ -17,6 +17,7 @@ struct VideoPlayerView: View {
     }
 
     @State private var playerSize: CGSize = .zero
+    @State private var hoveringPlayer = false
     @State private var fullScreenDetails = false
 
     @Environment(\.colorScheme) private var colorScheme
@@ -32,6 +33,8 @@ struct VideoPlayerView: View {
         @State private var motionManager: CMMotionManager!
         @State private var orientation = UIInterfaceOrientation.portrait
         @State private var lastOrientation: UIInterfaceOrientation?
+    #elseif os(macOS)
+        var mouseLocation: CGPoint { NSEvent.mouseLocation }
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -95,12 +98,6 @@ struct VideoPlayerView: View {
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
-                            if !playerControls.playingFullscreen {
-                                #if os(macOS)
-                                    PlaybackBar()
-                                #endif
-                            }
-
                             if player.currentItem.isNil {
                                 playerPlaceholder(geometry: geometry)
                             } else if player.playingInPictureInPicture {
@@ -140,22 +137,33 @@ struct VideoPlayerView: View {
                             }
                         }
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
-
+                        .onHover { hovering in
+                            hoveringPlayer = hovering
+                            hovering ? playerControls.show() : playerControls.hide()
+                        }
                         #if os(iOS)
-                            .onSwipeGesture(
-                                up: {
-                                    withAnimation {
-                                        fullScreenDetails = true
-                                    }
-                                },
-                                down: { player.hide() }
-                            )
-                            .onHover { hovering in
-                                hovering ? playerControls.show() : playerControls.hide()
+                        .onSwipeGesture(
+                            up: {
+                                withAnimation {
+                                    fullScreenDetails = true
+                                }
+                            },
+                            down: { player.hide() }
+                        )
+
+                        #elseif os(macOS)
+                        .onAppear(perform: {
+                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                if hoveringPlayer {
+                                    playerControls.resetTimer()
+                                }
+
+                                return $0
                             }
+                        })
                         #endif
 
-                            .background(Color.black)
+                        .background(Color.black)
 
                         if !playerControls.playingFullscreen {
                             Group {
@@ -197,12 +205,18 @@ struct VideoPlayerView: View {
             }
         }
         .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
-        .statusBar(hidden: playerControls.playingFullscreen)
-        .navigationBarHidden(true)
+        #if !os(macOS)
+            .statusBar(hidden: playerControls.playingFullscreen)
+            .navigationBarHidden(true)
+        #endif
     }
 
     var fullScreenLayout: Bool {
-        playerControls.playingFullscreen || verticalSizeClass == .compact
+        #if !os(macOS)
+            playerControls.playingFullscreen || verticalSizeClass == .compact
+        #else
+            playerControls.playingFullscreen
+        #endif
     }
 
     func playerPlaceholder(geometry: GeometryProxy) -> some View {

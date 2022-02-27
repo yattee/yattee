@@ -166,9 +166,11 @@ struct ContentView: View {
     }
 
     func setupNowPlayingInfoCenter() {
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        #if !os(macOS)
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
 
-        UIApplication.shared.beginReceivingRemoteControlEvents()
+            UIApplication.shared.beginReceivingRemoteControlEvents()
+        #endif
 
         MPRemoteCommandCenter.shared().playCommand.addTarget { _ in
             player.play()

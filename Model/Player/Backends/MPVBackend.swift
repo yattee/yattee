@@ -15,7 +15,11 @@ final class MPVBackend: PlayerBackend {
     var currentTime: CMTime?
 
     var loadedVideo = false
-    var isLoadingVideo = true
+    var isLoadingVideo = true { didSet {
+        DispatchQueue.main.async { [weak self] in
+            self?.controls.isLoadingVideo = self?.isLoadingVideo ?? true
+        }
+    }}
 
     var isPlaying = true { didSet {
         if isPlaying {
@@ -28,7 +32,9 @@ final class MPVBackend: PlayerBackend {
     }}
     var playerItemDuration: CMTime?
 
-    var controller: MPVViewController!
+    #if !os(macOS)
+        var controller: MPVViewController!
+    #endif
     var client: MPVClient! { didSet { client.backend = self } }
 
     private var clientTimer: RepeatingTimer!
@@ -104,26 +110,26 @@ final class MPVBackend: PlayerBackend {
             self.stop()
 
             if let url = stream.singleAssetURL {
-                self.onFileLoaded = { [weak self] in
-                    self?.setIsLoadingVideo(false)
+                self.onFileLoaded = {
                     updateCurrentStream()
                     startPlaying()
                 }
 
                 self.client.loadFile(url, time: time) { [weak self] _ in
-                    self?.setIsLoadingVideo(true)
+                    self?.isLoadingVideo = true
                 }
             } else {
                 self.onFileLoaded = { [weak self] in
-                    self?.client.addAudio(stream.audioAsset.url) { _ in
-                        self?.setIsLoadingVideo(false)
-                        updateCurrentStream()
-                        startPlaying()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self?.client.addAudio(stream.audioAsset.url) { _ in
+                            updateCurrentStream()
+                            startPlaying()
+                        }
                     }
                 }
 
                 self.client.loadFile(stream.videoAsset.url, time: time) { [weak self] _ in
-                    self?.setIsLoadingVideo(true)
+                    self?.isLoadingVideo = true
                     self?.pause()
                 }
             }
@@ -245,13 +251,6 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    private func setIsLoadingVideo(_ value: Bool) {
-        isLoadingVideo = value
-        DispatchQueue.main.async { [weak self] in
-            self?.controls.isLoadingVideo = value
-        }
-    }
-
     func handle(_ event: UnsafePointer<mpv_event>!) {
         logger.info("\(String(cString: mpv_event_name(event.pointee.event_id)))")
 
@@ -269,6 +268,9 @@ final class MPVBackend: PlayerBackend {
         case MPV_EVENT_FILE_LOADED:
             onFileLoaded?()
             onFileLoaded = nil
+
+        case MPV_EVENT_UNPAUSE:
+            isLoadingVideo = false
 
         case MPV_EVENT_END_FILE:
             DispatchQueue.main.async { [weak self] in

@@ -82,14 +82,16 @@ final class PlayerControlsModel: ObservableObject {
                 playingFullscreen = !value
             }
 
-            if playingFullscreen {
-                guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
-                    return
+            #if os(iOS)
+                if playingFullscreen {
+                    guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
+                        return
+                    }
+                    Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
+                } else {
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                 }
-                Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
-            } else {
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-            }
+            #endif
         }
     }
 

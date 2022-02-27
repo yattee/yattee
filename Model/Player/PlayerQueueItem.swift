@@ -28,7 +28,7 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     }
 
     var duration: TimeInterval {
-        videoDuration ?? video.length
+        videoDuration ?? video?.length ?? .zero
     }
 
     var shouldRestartPlaying: Bool {
