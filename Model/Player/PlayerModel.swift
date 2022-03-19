@@ -62,6 +62,8 @@ final class PlayerModel: ObservableObject {
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
     @Published var restoredSegments = [Segment]()
 
+    @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
+
     #if os(iOS)
         @Published var motionManager: CMMotionManager!
         @Published var lockedOrientation: UIInterfaceOrientation?
@@ -222,6 +224,10 @@ final class PlayerModel: ObservableObject {
                     if Defaults[.showChannelSubscribers] {
                         self?.loadCurrentItemChannelDetails()
                     }
+                }
+
+                self?.returnYouTubeDislike.loadDislikes(videoID: video.videoID) { [weak self] dislikes in
+                    self?.currentItem?.video?.dislikes = dislikes
                 }
             }
         }
