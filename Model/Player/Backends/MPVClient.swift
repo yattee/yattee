@@ -24,9 +24,9 @@ final class MPVClient: ObservableObject {
 
     func create(frame: CGRect? = nil) {
         #if !os(macOS)
-        if let frame = frame {
-            glView = MPVOGLView(frame: frame)
-        }
+            if let frame = frame {
+                glView = MPVOGLView(frame: frame)
+            }
         #endif
 
         mpv = mpv_create()

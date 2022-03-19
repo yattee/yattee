@@ -267,6 +267,7 @@ final class MPVBackend: PlayerBackend {
 
         case MPV_EVENT_FILE_LOADED:
             onFileLoaded?()
+            startClientUpdates()
             onFileLoaded = nil
 
         case MPV_EVENT_UNPAUSE:
