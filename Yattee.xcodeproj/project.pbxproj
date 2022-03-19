@@ -282,6 +282,9 @@
 		3751BA7B27E63A54007B1A60 /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */; };
 		3751BA7E27E63F1D007B1A60 /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */; };
 		3751BA8027E64244007B1A60 /* VideoLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7F27E64244007B1A60 /* VideoLayer.swift */; };
+		3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */; };
+		3751BA8427E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */; };
+		3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */; };
 		37579D5D27864F5F00FD0B98 /* Help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37579D5C27864F5F00FD0B98 /* Help.swift */; };
 		37579D5E27864F5F00FD0B98 /* Help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37579D5C27864F5F00FD0B98 /* Help.swift */; };
 		37579D5F27864F5F00FD0B98 /* Help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37579D5C27864F5F00FD0B98 /* Help.swift */; };
@@ -896,6 +899,7 @@
 		3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Workaround.swift"; sourceTree = "<group>"; };
 		3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		3751BA7F27E64244007B1A60 /* VideoLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLayer.swift; sourceTree = "<group>"; };
+		3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnYouTubeDislikeAPI.swift; sourceTree = "<group>"; };
 		37579D5C27864F5F00FD0B98 /* Help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Help.swift; sourceTree = "<group>"; };
 		37599F2F272B42810087F250 /* FavoriteItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItem.swift; sourceTree = "<group>"; };
 		37599F33272B44000087F250 /* FavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesModel.swift; sourceTree = "<group>"; };
@@ -1507,6 +1511,14 @@
 			path = SponsorBlock;
 			sourceTree = "<group>";
 		};
+		3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */ = {
+			isa = PBXGroup;
+			children = (
+				3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */,
+			);
+			path = ReturnYouTubeDislike;
+			sourceTree = "<group>";
+		};
 		375E45F327B1973400BA7902 /* MPV */ = {
 			isa = PBXGroup;
 			children = (
@@ -1762,6 +1774,7 @@
 				3743B86627216A1E00261544 /* Accounts */,
 				3743B864272169E200261544 /* Applications */,
 				3743B86527216A0600261544 /* Player */,
+				3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */,
 				37FB283F2721B20800A57617 /* Search */,
 				374C0539272436DA009BDDBE /* SponsorBlock */,
 				37AAF28F26740715007FC770 /* Channel.swift */,
@@ -2468,6 +2481,7 @@
 				3751BA7927E63A54007B1A60 /* Defaults+Workaround.swift in Sources */,
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
+				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
@@ -2539,6 +2553,7 @@
 				37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				37C3A24E272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
+				3751BA8427E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				3782B95027553A6700990149 /* SearchSuggestions.swift in Sources */,
 				371B7E6B2759791900D21217 /* CommentsModel.swift in Sources */,
 				371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */,
@@ -2826,6 +2841,7 @@
 				37E64DD326D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,
+				3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				37030FFD27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
 				373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
