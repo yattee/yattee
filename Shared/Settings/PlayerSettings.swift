@@ -27,6 +27,8 @@ struct PlayerSettings: View {
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
     #endif
 
+    @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
+
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
             UIDevice.current.userInterfaceIdiom
@@ -82,6 +84,7 @@ struct PlayerSettings: View {
 
                 keywordsToggle
                 showHistoryToggle
+                returnYouTubeDislikeToggle
             }
 
             Section(header: SettingsHeader(text: "Picture in Picture")) {
@@ -192,6 +195,10 @@ struct PlayerSettings: View {
 
     private var showHistoryToggle: some View {
         Toggle("Show history", isOn: $showHistory)
+    }
+
+    private var returnYouTubeDislikeToggle: some View {
+        Toggle("Enable Return YouTube Dislike", isOn: $enableReturnYouTubeDislike)
     }
 
     private var pauseOnHidingPlayerToggle: some View {
