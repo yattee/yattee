@@ -23,6 +23,8 @@ extension Defaults.Keys {
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
 
+    static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
+
     static let favorites = Key<[FavoriteItem]>("favorites", default: [
         .init(section: .trending("US", "default")),
         .init(section: .trending("GB", "default")),

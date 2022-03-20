@@ -23,6 +23,8 @@ import SwiftUI
         @EnvironmentObject<PlayerModel> private var player
 
         func makeNSView(context _: Context) -> some NSView {
+            player.mpvBackend.client = client
+
             client.layer = layer
             layer.client = client
 
@@ -30,8 +32,6 @@ import SwiftUI
 
             view.layer = client.layer
             view.wantsLayer = true
-
-            player.mpvBackend.client = client
 
             return view
         }
