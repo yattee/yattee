@@ -226,6 +226,10 @@ final class PlayerModel: ObservableObject {
                     }
                 }
 
+                guard Defaults[.enableReturnYouTubeDislike] else {
+                    return
+                }
+
                 self?.returnYouTubeDislike.loadDislikes(videoID: video.videoID) { [weak self] dislikes in
                     self?.currentItem?.video?.dislikes = dislikes
                 }
