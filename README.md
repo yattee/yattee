@@ -19,8 +19,13 @@
 * Fullscreen playback, Picture in Picture and AirPlay support
 * Stream quality selection
 
+### Features in alpha testing for iOS and macOS
+* New player component with custom controls, gestures and support for 4K playback
+
+You can leave your feedback in [discussion on v1.4 release](https://github.com/yattee/yattee/discussions/75).
+
 ### Availability
-| Feature  | Invidious | Piped |
+|| Invidious | Piped |
 | - | - | - |
 | User Accounts | ✅ | ✅ |
 | Subscriptions | ✅ | ✅ |
