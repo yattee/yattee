@@ -309,8 +309,12 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let author = details["uploaderName"]?.stringValue ?? details["uploader"]!.stringValue
         let authorThumbnailURL = details["avatarUrl"]?.url ?? details["uploaderAvatar"]?.url ?? details["avatar"]?.url
 
-        let published = (details["uploadedDate"] ?? details["uploadDate"])?.stringValue ??
-            (details["uploaded"]!.double! / 1000).formattedAsRelativeTime()!
+        let uploaded = details["uploaded"]?.doubleValue
+        var published = uploaded.isNil ? nil : (uploaded! / 1000).formattedAsRelativeTime()
+        if published.isNil {
+            published = (details["uploadedDate"] ?? details["uploadDate"])?.stringValue ?? ""
+        }
+
         let live = details["livestream"]?.boolValue ?? (details["duration"]?.intValue == -1)
 
         return Video(
@@ -318,7 +322,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             title: details["title"]!.stringValue,
             author: author,
             length: details["duration"]!.doubleValue,
-            published: published,
+            published: published!,
             views: details["views"]!.intValue,
             description: extractDescription(from: content),
             channel: Channel(id: channelId, name: author, thumbnailURL: authorThumbnailURL),
