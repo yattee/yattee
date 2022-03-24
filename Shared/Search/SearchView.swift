@@ -353,7 +353,7 @@ struct SearchView: View {
 
     private var removeAllButton: some View {
         Button {
-            recents.clearQueries()
+            recents.clear()
             recentsChanged.toggle()
         } label: {
             Label("Remove All", systemImage: "trash.fill")
