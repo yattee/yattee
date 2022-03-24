@@ -514,6 +514,9 @@
 		37D526E02720AC4400ED2F5E /* VideosAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D526DD2720AC4400ED2F5E /* VideosAPI.swift */; };
 		37D526E32720B4BE00ED2F5E /* View+SwipeGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D526E22720B4BE00ED2F5E /* View+SwipeGesture.swift */; };
 		37D526E42720B4BE00ED2F5E /* View+SwipeGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D526E22720B4BE00ED2F5E /* View+SwipeGesture.swift */; };
+		37D6F3A127ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6F3A027ECA1FF006FE38B /* Defaults+Workaround.swift */; };
+		37D6F3A227ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6F3A027ECA1FF006FE38B /* Defaults+Workaround.swift */; };
+		37D6F3A327ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6F3A027ECA1FF006FE38B /* Defaults+Workaround.swift */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -791,6 +794,7 @@
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37D526DD2720AC4400ED2F5E /* VideosAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosAPI.swift; sourceTree = "<group>"; };
 		37D526E22720B4BE00ED2F5E /* View+SwipeGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+SwipeGesture.swift"; sourceTree = "<group>"; };
+		37D6F3A027ECA1FF006FE38B /* Defaults+Workaround.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Defaults+Workaround.swift"; sourceTree = "<group>"; };
 		37D9169A27388A81002B1BAA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStreams.swift; sourceTree = "<group>"; };
 		37DD9DA22785BBC900539416 /* NoCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCommentsView.swift; sourceTree = "<group>"; };
@@ -1257,6 +1261,7 @@
 				371AAE2826CEC7D900901972 /* Views */,
 				375168D52700FAFF008F96A6 /* Debounce.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
+				37D6F3A027ECA1FF006FE38B /* Defaults+Workaround.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
@@ -2009,6 +2014,7 @@
 				37484C2526FC83E000287258 /* InstanceForm.swift in Sources */,
 				37DD9DBD2785D60300539416 /* ScrollViewMatcher.swift in Sources */,
 				37B767DB2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
+				37D6F3A127ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */,
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
@@ -2099,6 +2105,7 @@
 				37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */,
 				378AE944274EF00A006A4EE1 /* Color+Background.swift in Sources */,
 				37F49BA426CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
+				37D6F3A227ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */,
 				37EAD870267B9ED100D9E01B /* Segment.swift in Sources */,
 				3788AC2826F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				378AE93A274EDFAF006A4EE1 /* Badge+Backport.swift in Sources */,
@@ -2379,6 +2386,7 @@
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37B2631C2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
+				37D6F3A327ECA1FF006FE38B /* Defaults+Workaround.swift in Sources */,
 				37484C2B26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
