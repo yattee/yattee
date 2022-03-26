@@ -236,7 +236,7 @@ struct VideoDetails: View {
                         }
                     }
 
-                    if accounts.app.supportsSubscriptions {
+                    if accounts.app.supportsSubscriptions, accounts.signedIn {
                         Spacer()
 
                         Section {
