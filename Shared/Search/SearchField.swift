@@ -29,7 +29,10 @@ struct SearchTextField: View {
                         .opacity(0.8)
                 #endif
                 TextField("Search...", text: $state.queryText) {
-                    state.changeQuery { query in query.query = state.queryText }
+                    state.changeQuery { query in
+                        query.query = state.queryText
+                        navigation.hideKeyboard()
+                    }
                     recents.addQuery(state.queryText, navigation: navigation)
                 }
                 .onChange(of: state.queryText) { _ in

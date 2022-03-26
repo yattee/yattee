@@ -141,6 +141,12 @@ final class NavigationModel: ObservableObject {
         channelToUnsubscribe = channel
         presentingUnsubscribeAlert = channelToUnsubscribe != nil
     }
+
+    func hideKeyboard() {
+        #if os(iOS)
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
+    }
 }
 
 typealias TabSelection = NavigationModel.TabSelection

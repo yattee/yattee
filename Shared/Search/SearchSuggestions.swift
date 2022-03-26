@@ -75,6 +75,7 @@ struct SearchSuggestions: View {
         state.changeQuery { query in
             query.query = state.queryText
             state.fieldIsFocused = false
+            navigation.hideKeyboard()
         }
 
         recents.addQuery(state.queryText, navigation: navigation)
