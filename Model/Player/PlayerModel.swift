@@ -556,8 +556,6 @@ final class PlayerModel: ObservableObject {
                 controller?.playerView.dismiss(animated: false) { [weak self] in
                     self?.controller?.dismiss(animated: true)
                 }
-            #else
-                hide()
             #endif
         } else {
             advanceToNextItem()
