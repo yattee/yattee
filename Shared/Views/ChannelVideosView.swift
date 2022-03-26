@@ -6,6 +6,7 @@ struct ChannelVideosView: View {
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
+    @State private var subscriptionToggleButtonDisabled = false
 
     @StateObject private var store = Store<Channel>()
 
@@ -146,17 +147,25 @@ struct ChannelVideosView: View {
             if accounts.app.supportsSubscriptions && accounts.signedIn {
                 if subscriptions.isSubscribing(channel.id) {
                     Button("Unsubscribe") {
-                        navigation.presentUnsubscribeAlert(channel)
+                        subscriptionToggleButtonDisabled = true
+
+                        subscriptions.unsubscribe(channel.id) {
+                            self.subscriptionToggleButtonDisabled = false
+                        }
                     }
                 } else {
                     Button("Subscribe") {
+                        subscriptionToggleButtonDisabled = true
+
                         subscriptions.subscribe(channel.id) {
+                            subscriptionToggleButtonDisabled = false
                             navigation.sidebarSectionChanged.toggle()
                         }
                     }
                 }
             }
         }
+        .disabled(subscriptionToggleButtonDisabled)
     }
 
     private var contentItem: ContentItem {
