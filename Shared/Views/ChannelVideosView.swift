@@ -150,7 +150,7 @@ struct ChannelVideosView: View {
                         subscriptionToggleButtonDisabled = true
 
                         subscriptions.unsubscribe(channel.id) {
-                            self.subscriptionToggleButtonDisabled = false
+                            subscriptionToggleButtonDisabled = false
                         }
                     }
                 } else {

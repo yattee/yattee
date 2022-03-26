@@ -12,6 +12,7 @@ struct VideoDetails: View {
     @Binding var fullScreen: Bool
 
     @State private var subscribed = false
+    @State private var subscriptionToggleButtonDisabled = false
     @State private var presentingUnsubscribeAlert = false
     @State private var presentingAddToPlaylist = false
     @State private var presentingShareSheet = false
@@ -254,10 +255,13 @@ struct VideoDetails: View {
                                             "Are you sure you want to unsubscribe from \(video!.channel.name)?"
                                         ),
                                         primaryButton: .destructive(Text("Unsubscribe")) {
-                                            subscriptions.unsubscribe(video!.channel.id)
+                                            subscriptionToggleButtonDisabled = true
 
-                                            withAnimation {
-                                                subscribed.toggle()
+                                            subscriptions.unsubscribe(video!.channel.id) {
+                                                withAnimation {
+                                                    subscriptionToggleButtonDisabled = false
+                                                    subscribed.toggle()
+                                                }
                                             }
                                         },
                                         secondaryButton: .cancel()
@@ -265,16 +269,20 @@ struct VideoDetails: View {
                                 }
                             } else {
                                 Button("Subscribe") {
-                                    subscriptions.subscribe(video!.channel.id)
+                                    subscriptionToggleButtonDisabled = true
 
-                                    withAnimation {
-                                        subscribed.toggle()
+                                    subscriptions.subscribe(video!.channel.id) {
+                                        withAnimation {
+                                            subscriptionToggleButtonDisabled = false
+                                            subscribed.toggle()
+                                        }
                                     }
                                 }
                                 .backport
-                                .tint(.blue)
+                                .tint(subscriptionToggleButtonDisabled ? .gray : .blue)
                             }
                         }
+                        .disabled(subscriptionToggleButtonDisabled)
                         .font(.system(size: 13))
                         .buttonStyle(.borderless)
                     }
