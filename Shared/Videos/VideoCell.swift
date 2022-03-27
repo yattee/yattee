@@ -6,6 +6,7 @@ struct VideoCell: View {
     private var video: Video
 
     @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.navigationStyle) private var navigationStyle
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -13,7 +14,9 @@ struct VideoCell: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
@@ -147,9 +150,7 @@ struct VideoCell: View {
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
                     if !channelOnThumbnail {
-                        Text(video.channel.name)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.secondary)
+                        channelButton(badge: false)
                     }
 
                     if additionalDetailsAvailable {
@@ -231,9 +232,7 @@ struct VideoCell: View {
                             .frame(minHeight: 40, alignment: .top)
                         #endif
                         if !channelOnThumbnail {
-                            Text(video.channel.name)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
+                            channelButton(badge: false)
                                 .padding(.top, 4)
                                 .padding(.bottom, 6)
                         }
@@ -289,6 +288,29 @@ struct VideoCell: View {
         }
     }
 
+    private func channelButton(badge: Bool = true) -> some View {
+        Button {
+            NavigationModel.openChannel(
+                video.channel,
+                player: player,
+                recents: recents,
+                navigation: navigation,
+                navigationStyle: navigationStyle
+            )
+        } label: {
+            if badge {
+                DetailBadge(text: video.author, style: .prominent)
+                    .foregroundColor(.primary)
+            } else {
+                Text(video.channel.name)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .help("\(video.channel.name) Channel")
+    }
+
     private var additionalDetailsAvailable: Bool {
         video.publishedDate != nil || video.views != 0 ||
             (!timeOnThumbnail && !video.length.formattedAsPlaybackTime().isNil)
@@ -325,7 +347,7 @@ struct VideoCell: View {
                     Spacer()
 
                     if channelOnThumbnail {
-                        DetailBadge(text: video.author, style: .prominent)
+                        channelButton()
                     }
                 }
                 #if os(tvOS)
@@ -415,7 +437,7 @@ struct VideoCell: View {
            stoppedAt.isFinite,
            let stoppedAtFormatted = stoppedAt.formattedAsPlaybackTime()
         {
-            if watch?.videoDuration ?? 0 > 0 {
+            if (watch?.videoDuration ?? 0) > 0 {
                 videoTime = watch!.videoDuration.formattedAsPlaybackTime() ?? "?"
             }
             return "\(stoppedAtFormatted) / \(videoTime)"
