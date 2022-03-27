@@ -1,17 +1,21 @@
 import GLKit
+import Logging
 import OpenGLES
 
 final class MPVOGLView: GLKView {
+    private var logger = Logger(label: "stream.yattee.mpv.oglview")
     private var defaultFBO: GLint?
 
     var mpvGL: UnsafeMutableRawPointer?
     var needsDrawing = true
 
     override init(frame: CGRect) {
-        guard let context = EAGLContext(api: .openGLES2) else {
+        guard let context = EAGLContext(api: .openGLES3) else {
             print("Failed to initialize OpenGLES 2.0 context")
             exit(1)
         }
+
+        logger.info("frame size: \(frame.width) x \(frame.height)")
 
         super.init(frame: frame, context: context)
         contentMode = .redraw
@@ -33,14 +37,17 @@ final class MPVOGLView: GLKView {
         glClear(UInt32(GL_COLOR_BUFFER_BIT))
     }
 
-    override func draw(_ rect: CGRect) {
+    override func draw(_: CGRect) {
         glGetIntegerv(UInt32(GL_FRAMEBUFFER_BINDING), &defaultFBO!)
+
+        var dims: [GLint] = [0, 0, 0, 0]
+        glGetIntegerv(GLenum(GL_VIEWPORT), &dims)
 
         if mpvGL != nil {
             var data = mpv_opengl_fbo(
                 fbo: Int32(defaultFBO!),
-                w: Int32(rect.size.width) * Int32(contentScaleFactor),
-                h: Int32(rect.size.height) * Int32(contentScaleFactor),
+                w: Int32(dims[2]),
+                h: Int32(dims[3]),
                 internal_format: 0
             )
             var flip: CInt = 1

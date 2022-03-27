@@ -152,6 +152,10 @@ final class MPVBackend: PlayerBackend {
         isPlaying = true
         startClientUpdates()
 
+        if controls.presentingControls {
+            startControlsUpdates()
+        }
+
         client?.play()
     }
 
@@ -304,5 +308,9 @@ final class MPVBackend: PlayerBackend {
 
     func setNeedsDrawing(_ needsDrawing: Bool) {
         client?.setNeedsDrawing(needsDrawing)
+    }
+
+    func setSize(_ width: Double, _ height: Double) {
+        self.client?.setSize(width, height)
     }
 }

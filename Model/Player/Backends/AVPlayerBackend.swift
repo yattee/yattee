@@ -183,11 +183,6 @@ final class AVPlayerBackend: PlayerBackend {
         }
     #endif
 
-    func updateControls() {}
-    func startControlsUpdates() {}
-    func stopControlsUpdates() {}
-    func setNeedsDrawing(_: Bool) {}
-
     private func loadSingleAsset(
         _ url: URL,
         stream: Stream,
@@ -564,4 +559,10 @@ final class AVPlayerBackend: PlayerBackend {
             }
         }
     }
+
+    func updateControls() {}
+    func startControlsUpdates() {}
+    func stopControlsUpdates() {}
+    func setNeedsDrawing(_: Bool) {}
+    func setSize(_: Double, _: Double) {}
 }

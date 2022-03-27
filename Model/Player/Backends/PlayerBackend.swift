@@ -50,6 +50,7 @@ protocol PlayerBackend {
     func stopControlsUpdates()
 
     func setNeedsDrawing(_ needsDrawing: Bool)
+    func setSize(_ width: Double, _ height: Double)
 }
 
 extension PlayerBackend {

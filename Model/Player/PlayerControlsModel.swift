@@ -101,6 +101,10 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func resetTimer() {
+        if !presentingControls {
+            show()
+        }
+
         removeTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
             withAnimation(PlayerControls.animation) { [weak self] in

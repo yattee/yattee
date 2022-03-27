@@ -42,7 +42,9 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    @Published var playerSize: CGSize = .zero
+    @Published var playerSize: CGSize = .zero { didSet {
+        backend.setSize(playerSize.width, playerSize.height)
+    }}
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
 

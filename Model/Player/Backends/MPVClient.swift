@@ -168,14 +168,23 @@ final class MPVClient: ObservableObject {
     }
 
     func setSize(_ width: Double, _ height: Double) {
-        logger.info("setting player size to \(width),\(height)")
+        let roundedWidth = width.rounded()
+        let roundedHeight = height.rounded()
+
+        guard width > 0, height > 0 else {
+            return
+        }
+
+        logger.info("setting player size to \(roundedWidth),\(roundedHeight)")
         #if !os(macOS)
-            guard width <= UIScreen.main.bounds.width, height <= UIScreen.main.bounds.height else {
+            guard roundedWidth <= UIScreen.main.bounds.width, roundedHeight <= UIScreen.main.bounds.height else {
                 logger.info("requested size is greater than screen size, ignoring")
+                logger.info("width: \(roundedWidth) <= \(UIScreen.main.bounds.width)")
+                logger.info("height: \(roundedHeight) <= \(UIScreen.main.bounds.height)")
                 return
             }
 
-            glView?.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            glView?.frame = CGRect(x: 0, y: 0, width: roundedWidth, height: roundedHeight)
         #endif
     }
 
