@@ -11,7 +11,7 @@ struct HorizontalCells: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 20) {
-                ForEach(items) { item in
+                ForEach(contentItems) { item in
                     ContentItemView(item: item)
                         .environment(\.horizontalCells, true)
                         .onAppear { loadMoreContentItemsIfNeeded(current: item) }
@@ -34,6 +34,14 @@ struct HorizontalCells: View {
         }
         .frame(height: cellHeight)
         .edgesIgnoringSafeArea(.horizontal)
+    }
+
+    var contentItems: [ContentItem] {
+        items.isEmpty ? placeholders : items
+    }
+
+    var placeholders: [ContentItem] {
+        (0 ..< 9).map { _ in .init() }
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {

@@ -11,8 +11,10 @@ struct ContentItemView: View {
                 ChannelPlaylistCell(playlist: item.playlist)
             case .channel:
                 ChannelCell(channel: item.channel)
-            default:
+            case .video:
                 VideoCell(video: item.video)
+            default:
+                PlaceholderCell()
             }
         }
     }

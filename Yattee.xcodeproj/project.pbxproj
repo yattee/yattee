@@ -590,6 +590,9 @@
 		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
+		37FEF11327EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
+		37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
+		37FEF11527EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
 		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
@@ -822,6 +825,7 @@
 		37FB285D272225E800A57617 /* ContentItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentItemView.swift; sourceTree = "<group>"; };
 		37FD43DB270470B70073EE42 /* InstancesSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettings.swift; sourceTree = "<group>"; };
 		37FD43E22704847C0073EE42 /* View+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Fixtures.swift"; sourceTree = "<group>"; };
+		37FEF11227EFD8580033912F /* PlaceholderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderCell.swift; sourceTree = "<group>"; };
 		37FFC43F272734C3009FFD26 /* Throttle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1005,6 +1009,7 @@
 				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
 				37E70922271CD43000D34DDE /* WelcomeScreen.swift */,
 				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
+				37FEF11227EFD8580033912F /* PlaceholderCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2021,6 +2026,7 @@
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				37141673267A8E10006CA35D /* Country.swift in Sources */,
+				37FEF11327EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37B2631A2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
 				3748186E26A769D60084E870 /* DetailBadge.swift in Sources */,
 				376BE50B27349108009AD608 /* BrowsingSettings.swift in Sources */,
@@ -2167,6 +2173,7 @@
 				3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				3784B23E2728B85300B09468 /* ShareButton.swift in Sources */,
 				37BE0BDA26A214630092E2DB /* PlayerViewController.swift in Sources */,
+				37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37E64DD226D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				374108D1272B11B2006C5CC8 /* PictureInPictureDelegate.swift in Sources */,
 				37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
@@ -2392,6 +2399,7 @@
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
 				3711404126B206A6005B3555 /* SearchModel.swift in Sources */,
+				37FEF11527EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,

@@ -9,11 +9,12 @@ struct VerticalCells: View {
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
 
     var items = [ContentItem]()
+    var allowEmpty = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
             LazyVGrid(columns: columns, alignment: .center) {
-                ForEach(items.sorted { $0 < $1 }) { item in
+                ForEach(contentItems) { item in
                     ContentItemView(item: item)
                         .onAppear { loadMoreContentItemsIfNeeded(current: item) }
                 }
@@ -25,6 +26,14 @@ struct VerticalCells: View {
             .background(Color.secondaryBackground)
             .frame(minWidth: 360)
         #endif
+    }
+
+    var contentItems: [ContentItem] {
+        items.isEmpty ? (allowEmpty ? items : placeholders) : items.sorted { $0 < $1 }
+    }
+
+    var placeholders: [ContentItem] {
+        (0 ..< 9).map { _ in .init() }
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {

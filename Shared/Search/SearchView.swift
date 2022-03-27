@@ -234,7 +234,7 @@ struct SearchView: View {
                     }
                     .edgesIgnoringSafeArea(.horizontal)
                 #else
-                    VerticalCells(items: items)
+                    VerticalCells(items: items, allowEmpty: state.query.isEmpty)
                         .environment(\.loadMoreContentHandler) { state.loadNextPage() }
                 #endif
 

@@ -232,6 +232,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             if let channel = extractChannel(from: content) {
                 return ContentItem(channel: channel)
             }
+        default:
+            return nil
         }
 
         return nil

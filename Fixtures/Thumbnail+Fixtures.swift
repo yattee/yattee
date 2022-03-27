@@ -10,7 +10,7 @@ extension Thumbnail {
     }
 
     private static var fixturesHost: String {
-        "https://invidious.home.arekf.net"
+        "https://invidious.snopyta.org"
     }
 
     private static func fixtureUrl(videoId: String, quality: Thumbnail.Quality) -> URL {

@@ -2,7 +2,7 @@ import Foundation
 
 struct ContentItem: Identifiable {
     enum ContentType: String {
-        case video, playlist, channel
+        case video, playlist, channel, placeholder
 
         private var sortOrder: Int {
             switch self {
@@ -35,6 +35,6 @@ struct ContentItem: Identifiable {
     }
 
     var contentType: ContentType {
-        video.isNil ? (channel.isNil ? .playlist : .channel) : .video
+        video.isNil ? (channel.isNil ? (playlist.isNil ? .placeholder : .playlist) : .channel) : .video
     }
 }

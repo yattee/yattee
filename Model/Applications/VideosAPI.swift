@@ -74,6 +74,8 @@ extension VideosAPI {
         case .playlist:
             urlComponents.path = "/playlist"
             queryItems.append(.init(name: "list", value: item.playlist.id))
+        default:
+            return nil
         }
 
         if !time.isNil, time!.seconds.isFinite {

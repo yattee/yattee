@@ -7,7 +7,7 @@ extension Video {
 
         return Video(
             videoID: UUID().uuidString,
-            title: "Relaxing Piano Music that will make you feel amazingly good",
+            title: "Relaxing Piano Music to feel good",
             author: "Fancy Videotuber",
             length: 582,
             published: "7 years ago",
