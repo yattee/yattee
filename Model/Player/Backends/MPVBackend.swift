@@ -148,6 +148,8 @@ final class MPVBackend: PlayerBackend {
         } else {
             replaceItem(nil)
         }
+
+        startClientUpdates()
     }
 
     func play() {
