@@ -62,6 +62,10 @@ struct VideoCell: View {
     }
 
     private func playAction() {
+        guard video.videoID != Video.fixtureID else {
+            return
+        }
+
         if watchingNow {
             if !player.playingInPictureInPicture {
                 player.show()

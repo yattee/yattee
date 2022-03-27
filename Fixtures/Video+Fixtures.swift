@@ -1,12 +1,15 @@
 import Foundation
 
 extension Video {
+    static var fixtureID: Video.ID {
+        "FIXTURE"
+    }
+
     static var fixture: Video {
-        let id = "D2sxamzaHkM"
         let thumbnailURL = "https://yt3.ggpht.com/ytc/AKedOLR-pT_JEsz_hcaA4Gjx8DHcqJ8mS42aTRqcVy6P7w=s88-c-k-c0x00ffffff-no-rj-mo"
 
         return Video(
-            videoID: UUID().uuidString,
+            videoID: fixtureID,
             title: "Relaxing Piano Music to feel good",
             author: "Fancy Videotuber",
             length: 582,
@@ -21,7 +24,7 @@ extension Video {
                 subscriptionsCount: 2300,
                 videos: []
             ),
-            thumbnails: Thumbnail.fixturesForAllQualities(videoId: id),
+            thumbnails: [],
             live: false,
             upcoming: false,
             publishedAt: Date(),

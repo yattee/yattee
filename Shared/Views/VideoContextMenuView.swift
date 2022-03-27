@@ -33,6 +33,12 @@ struct VideoContextMenuView: View {
     }
 
     var body: some View {
+        if video.videoID != Video.fixtureID {
+            contextMenu
+        }
+    }
+
+    @ViewBuilder var contextMenu: some View {
         if saveHistory {
             Section {
                 if let watchedAtString = watchedAtString {
