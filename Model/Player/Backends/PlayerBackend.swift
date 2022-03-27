@@ -16,7 +16,7 @@ protocol PlayerBackend {
     var isPlaying: Bool { get }
     var playerItemDuration: CMTime? { get }
 
-    func bestPlayable(_ streams: [Stream]) -> Stream?
+    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
     func canPlay(_ stream: Stream) -> Bool
 
     func playStream(

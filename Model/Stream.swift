@@ -5,7 +5,18 @@ import Foundation
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
-        case hd2160p, hd1440p60, hd1440p, hd1080p60, hd1080p, hd720p60, hd720p, sd480p, sd360p, sd240p, sd144p, unknown
+        case hd2160p
+        case hd1440p60
+        case hd1440p
+        case hd1080p60
+        case hd1080p
+        case hd720p60
+        case hd720p
+        case sd480p
+        case sd360p
+        case sd240p
+        case sd144p
+        case unknown
 
         var name: String {
             "\(height)p\(refreshRate != -1 ? ", \(refreshRate) fps" : "")"
