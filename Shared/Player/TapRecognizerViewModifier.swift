@@ -6,11 +6,18 @@ struct TapRecognizerViewModifier: ViewModifier {
     var tapSensitivity: Double
     var singleTapAction: () -> Void
     var doubleTapAction: () -> Void
+    var anyTapAction: () -> Void
 
-    init(tapSensitivity: Double, singleTapAction: @escaping () -> Void, doubleTapAction: @escaping () -> Void) {
+    init(
+        tapSensitivity: Double,
+        singleTapAction: @escaping () -> Void,
+        doubleTapAction: @escaping () -> Void,
+        anyTapAction: @escaping () -> Void
+    ) {
         self.tapSensitivity = tapSensitivity
         self.singleTapAction = singleTapAction
         self.doubleTapAction = doubleTapAction
+        self.anyTapAction = anyTapAction
     }
 
     func body(content: Content) -> some View {
@@ -19,6 +26,8 @@ struct TapRecognizerViewModifier: ViewModifier {
 
     private var singleTapGesture: some Gesture {
         TapGesture(count: 1).onEnded {
+            anyTapAction()
+
             singleTapIsTaped = true
 
             DispatchQueue.main.asyncAfter(deadline: .now() + tapSensitivity) {
@@ -42,7 +51,19 @@ struct TapRecognizerViewModifier: ViewModifier {
 }
 
 extension View {
-    func tapRecognizer(tapSensitivity: Double, singleTapAction: @escaping () -> Void, doubleTapAction: @escaping () -> Void) -> some View {
-        modifier(TapRecognizerViewModifier(tapSensitivity: tapSensitivity, singleTapAction: singleTapAction, doubleTapAction: doubleTapAction))
+    func tapRecognizer(
+        tapSensitivity: Double,
+        singleTapAction: @escaping () -> Void,
+        doubleTapAction: @escaping () -> Void,
+        anyTapAction: @escaping () -> Void = {}
+    ) -> some View {
+        modifier(
+            TapRecognizerViewModifier(
+                tapSensitivity: tapSensitivity,
+                singleTapAction: singleTapAction,
+                doubleTapAction: doubleTapAction,
+                anyTapAction: anyTapAction
+            )
+        )
     }
 }
