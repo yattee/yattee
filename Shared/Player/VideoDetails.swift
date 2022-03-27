@@ -89,7 +89,7 @@ struct VideoDetails: View {
                         if fullScreen {
                             fullScreen = false
                         } else {
-                            self.presentationMode.wrappedValue.dismiss()
+                            self.player.hide()
                         }
                     }
                 }

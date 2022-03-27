@@ -212,7 +212,6 @@
 		373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
 		373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
 		373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
-		3740457227E91A4C00DC8A64 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
 		374108D1272B11B2006C5CC8 /* PictureInPictureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374108D0272B11B2006C5CC8 /* PictureInPictureDelegate.swift */; };
 		3741A32C27E7EFFD00D266D1 /* PlayerControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37030FFE27B04DCC00ECDDAA /* PlayerControls.swift */; };
 		3743B86927216D3600261544 /* ChannelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3743B86727216D3600261544 /* ChannelCell.swift */; };
@@ -2942,7 +2941,6 @@
 				3743CA50270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				376BE50827347B57009AD608 /* SettingsHeader.swift in Sources */,
 				37A9966026D6F9B9006E3224 /* FavoritesView.swift in Sources */,
-				3740457227E91A4C00DC8A64 /* StreamControl.swift in Sources */,
 				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,
 				3751B4B427836902000B7DF4 /* SearchPage.swift in Sources */,
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
