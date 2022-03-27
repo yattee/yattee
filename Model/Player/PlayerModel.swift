@@ -131,8 +131,15 @@ final class PlayerModel: ObservableObject {
     }
 
     func hide() {
+        controls.playingFullscreen = false
         presentingPlayer = false
         playerNavigationLinkActive = false
+
+        #if os(iOS)
+            if Defaults[.lockPortraitWhenBrowsing] {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
+        #endif
     }
 
     func togglePlayer() {
