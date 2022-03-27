@@ -66,7 +66,7 @@ extension PlayerModel {
 
     func rebuildTVMenu() {
         #if os(tvOS)
-            controller?.playerView.transportBarCustomMenuItems = [
+            avPlayerBackend.controller?.playerView.transportBarCustomMenuItems = [
                 restoreLastSkippedSegmentAction,
                 rateMenu,
                 streamsMenu
