@@ -60,7 +60,7 @@ final class AVPlayerBackend: PlayerBackend {
         addPlayerTimeControlStatusObserver()
     }
 
-    func bestPlayable(_ streams: [Stream]) -> Stream? {
+    func bestPlayable(_ streams: [Stream], maxResolution _: ResolutionSetting) -> Stream? {
         streams.first { $0.kind == .hls } ??
             streams.filter { $0.kind == .adaptive }.max { $0.resolution < $1.resolution } ??
             streams.first

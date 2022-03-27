@@ -52,8 +52,10 @@ final class MPVBackend: PlayerBackend {
         clientTimer.eventHandler = getClientUpdates
     }
 
-    func bestPlayable(_ streams: [Stream]) -> Stream? {
-        streams.filter { $0.kind == .adaptive }.max { $0.resolution < $1.resolution } ??
+    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
+        streams
+            .filter { $0.kind == .adaptive && $0.resolution <= maxResolution.value }
+            .max { $0.resolution < $1.resolution } ??
             streams.first { $0.kind == .hls } ??
             streams.first
     }

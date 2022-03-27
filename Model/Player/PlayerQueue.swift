@@ -94,13 +94,7 @@ extension PlayerModel {
 
         streams = streams.filter { backend.canPlay($0) }
 
-        switch quality {
-        case .best:
-            return backend.bestPlayable(streams)
-        default:
-            let sorted = streams.filter { $0.kind != .hls }.sorted { $0.resolution > $1.resolution }.sorted { $0.kind < $1.kind }
-            return sorted.first(where: { $0.resolution.height <= quality.value.height })
-        }
+        return backend.bestPlayable(streams, maxResolution: quality)
     }
 
     func advanceToNextItem() {
