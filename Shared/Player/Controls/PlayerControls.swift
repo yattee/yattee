@@ -10,6 +10,14 @@ struct PlayerControls: View {
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #elseif os(tvOS)
+        enum Field: Hashable {
+            case play
+            case backward
+            case forward
+        }
+
+        @FocusState private var focusedField: Field?
     #endif
 
     init(player: PlayerModel) {
@@ -57,14 +65,27 @@ struct PlayerControls: View {
             }
             .opacity(model.presentingControls ? 1 : 0)
         }
-        .background(controlsBackground)
-        .environment(\.colorScheme, .dark)
+        #if os(tvOS)
+        .onChange(of: model.presentingControls) { _ in
+            if model.presentingControls {
+                focusedField = .play
+            }
+        }
+        .onChange(of: focusedField) { _ in
+            model.resetTimer()
+        }
+        #else
+                .background(controlsBackground)
+        #endif
+                .environment(\.colorScheme, .dark)
     }
 
-    var controlsBackground: some View {
-        PlayerGestures()
-            .background(Color.black.opacity(model.presentingControls ? 0.5 : 0))
-    }
+    #if !os(tvOS)
+        var controlsBackground: some View {
+            PlayerGestures()
+                .background(Color.black.opacity(model.presentingControls ? 0.5 : 0))
+        }
+    #endif
 
     var timeline: some View {
         TimelineView(duration: durationBinding, current: currentTimeBinding, cornerRadius: 0)
@@ -93,11 +114,16 @@ struct PlayerControls: View {
 
             Spacer()
 
-            ToggleBackendButton()
-            Text("•")
-            StreamControl()
-            #if os(macOS)
-                .frame(maxWidth: 160)
+            #if !os(tvOS)
+                ToggleBackendButton()
+                Text("•")
+
+                StreamControl()
+                #if os(macOS)
+                    .frame(maxWidth: 160)
+                #endif
+            #else
+                Text(player.stream?.description ?? "")
             #endif
         }
         .foregroundColor(.primary)
@@ -111,7 +137,9 @@ struct PlayerControls: View {
         } label: {
             Image(systemName: "chevron.down.circle.fill")
         }
+        #if !os(tvOS)
         .keyboardShortcut(.cancelAction)
+        #endif
     }
 
     private var playbackStatus: String {
@@ -146,7 +174,9 @@ struct PlayerControls: View {
 
     var buttonsBar: some View {
         HStack {
-            fullscreenButton
+            #if !os(tvOS)
+                fullscreenButton
+            #endif
             Spacer()
 //            button("Music Mode", systemImage: "music.note")
         }
@@ -159,15 +189,26 @@ struct PlayerControls: View {
         ) {
             model.toggleFullscreen(fullScreenLayout)
         }
+        #if !os(tvOS)
         .keyboardShortcut(fullScreenLayout ? .cancelAction : .defaultAction)
+        #endif
     }
 
     var mediumButtonsBar: some View {
         HStack {
-            button("Seek Backward", systemImage: "gobackward.10", size: 50, cornerRadius: 10) {
-                player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-            }
-            .keyboardShortcut("k")
+            #if !os(tvOS)
+                button("Seek Backward", systemImage: "gobackward.10", size: 50, cornerRadius: 10) {
+                    player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                }
+
+                #if os(tvOS)
+                .focused($focusedField, equals: .backward)
+                #else
+                .keyboardShortcut("k")
+                .keyboardShortcut(.leftArrow)
+                #endif
+
+            #endif
 
             Spacer()
 
@@ -179,15 +220,27 @@ struct PlayerControls: View {
             ) {
                 player.backend.togglePlay()
             }
+            #if os(tvOS)
+            .focused($focusedField, equals: .play)
+            #else
             .keyboardShortcut("p")
+            .keyboardShortcut(.space)
+            #endif
             .disabled(model.isLoadingVideo)
 
             Spacer()
 
-            button("Seek Forward", systemImage: "goforward.10", size: 50, cornerRadius: 10) {
-                player.backend.seek(relative: .secondsInDefaultTimescale(10))
-            }
-            .keyboardShortcut("l")
+            #if !os(tvOS)
+                button("Seek Forward", systemImage: "goforward.10", size: 50, cornerRadius: 10) {
+                    player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                }
+                #if os(tvOS)
+                .focused($focusedField, equals: .forward)
+                #else
+                .keyboardShortcut("l")
+                .keyboardShortcut(.rightArrow)
+                #endif
+            #endif
         }
         .font(.system(size: 30))
         .padding(.horizontal, 4)
@@ -234,7 +287,7 @@ struct PlayerControls: View {
     }
 
     var fullScreenLayout: Bool {
-        #if !os(macOS)
+        #if os(iOS)
             model.playingFullscreen || verticalSizeClass == .compact
         #else
             model.playingFullscreen
