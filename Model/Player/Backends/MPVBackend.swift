@@ -276,6 +276,13 @@ final class MPVBackend: PlayerBackend {
             startClientUpdates()
             onFileLoaded = nil
 
+        case MPV_EVENT_PLAYBACK_RESTART:
+            isLoadingVideo = false
+
+            onFileLoaded?()
+            startClientUpdates()
+            onFileLoaded = nil
+
         case MPV_EVENT_UNPAUSE:
             isLoadingVideo = false
 
