@@ -45,6 +45,7 @@ struct Sidebar: View {
                     Label("Favorites", systemImage: "heart")
                         .accessibility(label: Text("Favorites"))
                 }
+                .id("favorites")
             }
             if visibleSections.contains(.subscriptions),
                accounts.app.supportsSubscriptions && accounts.signedIn
@@ -53,6 +54,7 @@ struct Sidebar: View {
                     Label("Subscriptions", systemImage: "star.circle")
                         .accessibility(label: Text("Subscriptions"))
                 }
+                .id("subscriptions")
             }
 
             if visibleSections.contains(.popular), accounts.app.supportsPopular {
@@ -60,6 +62,7 @@ struct Sidebar: View {
                     Label("Popular", systemImage: "arrow.up.right.circle")
                         .accessibility(label: Text("Popular"))
                 }
+                .id("popular")
             }
 
             if visibleSections.contains(.trending) {
@@ -67,12 +70,14 @@ struct Sidebar: View {
                     Label("Trending", systemImage: "chart.bar")
                         .accessibility(label: Text("Trending"))
                 }
+                .id("trending")
             }
 
             NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
                 Label("Search", systemImage: "magnifyingglass")
                     .accessibility(label: Text("Search"))
             }
+            .id("search")
             .keyboardShortcut("f")
         }
     }
@@ -80,8 +85,12 @@ struct Sidebar: View {
     private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
         if case .recentlyOpened = selection {
             scrollView.scrollTo("recentlyOpened")
+            return
         } else if case let .playlist(id) = selection {
             scrollView.scrollTo(id)
+            return
         }
+
+        scrollView.scrollTo(selection.stringValue)
     }
 }

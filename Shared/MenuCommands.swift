@@ -12,34 +12,43 @@ struct MenuCommands: Commands {
     private var navigationMenu: some Commands {
         CommandGroup(before: .windowSize) {
             Button("Favorites") {
-                model.navigation?.tabSelection = .favorites
+                setTabSelection(.favorites)
             }
             .keyboardShortcut("1")
 
             Button("Subscriptions") {
-                model.navigation?.tabSelection = .subscriptions
+                setTabSelection(.subscriptions)
             }
             .disabled(subscriptionsDisabled)
             .keyboardShortcut("2")
 
             Button("Popular") {
-                model.navigation?.tabSelection = .popular
+                setTabSelection(.popular)
             }
             .disabled(!(model.accounts?.app.supportsPopular ?? false))
             .keyboardShortcut("3")
 
             Button("Trending") {
-                model.navigation?.tabSelection = .trending
+                setTabSelection(.trending)
             }
             .keyboardShortcut("4")
 
             Button("Search") {
-                model.navigation?.tabSelection = .search
+                setTabSelection(.search)
             }
             .keyboardShortcut("f")
 
             Divider()
         }
+    }
+
+    private func setTabSelection(_ tabSelection: NavigationModel.TabSelection) {
+        guard let navigation = model.navigation else {
+            return
+        }
+
+        navigation.sidebarSectionChanged.toggle()
+        navigation.tabSelection = tabSelection
     }
 
     private var subscriptionsDisabled: Bool {

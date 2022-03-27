@@ -14,6 +14,31 @@ final class NavigationModel: ObservableObject {
         case nowPlaying
         case search
 
+        var stringValue: String {
+            switch self {
+            case .favorites:
+                return "favorites"
+            case .subscriptions:
+                return "subscriptions"
+            case .popular:
+                return "popular"
+            case .trending:
+                return "trending"
+            case .playlists:
+                return "playlists"
+            case let .channel(string):
+                return "channel\(string)"
+            case let .playlist(string):
+                return "playlist\(string)"
+            case .recentlyOpened:
+                return "recentlyOpened"
+            case .search:
+                return "search"
+            default:
+                return ""
+            }
+        }
+
         var playlistID: Playlist.ID? {
             if case let .playlist(id) = self {
                 return id
