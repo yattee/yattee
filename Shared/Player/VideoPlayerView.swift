@@ -93,8 +93,26 @@ struct VideoPlayerView: View {
         Group {
             Group {
                 #if os(tvOS)
-                    player.playerView
+                    playerView
                         .ignoresSafeArea(.all, edges: .all)
+                        .onMoveCommand { direction in
+                            if direction == .left {
+                                playerControls.resetTimer()
+                                player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                            }
+                            if direction == .right {
+                                playerControls.resetTimer()
+                                player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                            }
+                            if direction == .up {
+                                playerControls.show()
+                                playerControls.resetTimer()
+                            }
+                            if direction == .down {
+                                playerControls.show()
+                                playerControls.resetTimer()
+                            }
+                        }
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
@@ -103,30 +121,8 @@ struct VideoPlayerView: View {
                             } else if player.playingInPictureInPicture {
                                 pictureInPicturePlaceholder(geometry: geometry)
                             } else {
-                                ZStack(alignment: .top) {
-                                    switch player.activeBackend {
-                                    case .mpv:
-                                        player.mpvPlayerView
-                                            .overlay(GeometryReader { proxy in
-                                                Color.clear
-                                                    .onAppear {
-                                                        player.playerSize = proxy.size
-                                                        // TODO: move to backend method
-                                                        player.mpvBackend.client?.setSize(proxy.size.width, proxy.size.height)
-                                                    }
-                                                    .onChange(of: proxy.size) { _ in
-                                                        player.playerSize = proxy.size
-                                                        player.mpvBackend.client?.setSize(proxy.size.width, proxy.size.height)
-                                                    }
-                                            })
-                                    case .appleAVPlayer:
-                                        player.avPlayerView
-                                    }
-
-                                    PlayerGestures()
-
-                                    PlayerControls(player: player)
-                                }
+                                playerView
+                                #if !os(tvOS)
                                 .modifier(
                                     VideoPlayerSizeModifier(
                                         geometry: geometry,
@@ -134,6 +130,7 @@ struct VideoPlayerView: View {
                                         fullScreen: playerControls.playingFullscreen
                                     )
                                 )
+                                #endif
                             }
                         }
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
@@ -165,24 +162,26 @@ struct VideoPlayerView: View {
 
                         .background(Color.black)
 
-                        if !playerControls.playingFullscreen {
-                            Group {
-                                #if os(iOS)
-                                    if verticalSizeClass == .regular {
-                                        VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                                    }
+                        #if !os(tvOS)
+                            if !playerControls.playingFullscreen {
+                                Group {
+                                    #if os(iOS)
+                                        if verticalSizeClass == .regular {
+                                            VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
+                                        }
 
-                                #else
-                                    VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                                #endif
+                                    #else
+                                        VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
+                                    #endif
+                                }
+                                .background(colorScheme == .dark ? Color.black : Color.white)
+                                .modifier(VideoDetailsPaddingModifier(
+                                    geometry: geometry,
+                                    aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
+                                    fullScreen: fullScreenDetails
+                                ))
                             }
-                            .background(colorScheme == .dark ? Color.black : Color.white)
-                            .modifier(VideoDetailsPaddingModifier(
-                                geometry: geometry,
-                                aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
-                                fullScreen: fullScreenDetails
-                            ))
-                        }
+                        #endif
                     }
                 #endif
             }
@@ -205,14 +204,40 @@ struct VideoPlayerView: View {
             }
         }
         .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
-        #if !os(macOS)
+        #if os(iOS)
             .statusBar(hidden: playerControls.playingFullscreen)
             .navigationBarHidden(true)
         #endif
     }
 
+    var playerView: some View {
+        ZStack(alignment: .top) {
+            switch player.activeBackend {
+            case .mpv:
+                player.mpvPlayerView
+                    .overlay(GeometryReader { proxy in
+                        Color.clear
+                            .onAppear {
+                                player.playerSize = proxy.size
+                            }
+                            .onChange(of: proxy.size) { _ in
+                                player.playerSize = proxy.size
+                            }
+                    })
+            case .appleAVPlayer:
+                player.avPlayerView
+            }
+
+            #if !os(tvOS)
+                PlayerGestures()
+            #endif
+
+            PlayerControls(player: player)
+        }
+    }
+
     var fullScreenLayout: Bool {
-        #if !os(macOS)
+        #if os(iOS)
             playerControls.playingFullscreen || verticalSizeClass == .compact
         #else
             playerControls.playingFullscreen
