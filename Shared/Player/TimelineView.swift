@@ -47,6 +47,7 @@ struct TimelineView: View {
 
                 .frame(maxHeight: height * 2)
 
+            #if !os(tvOS)
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
@@ -79,6 +80,7 @@ struct TimelineView: View {
                             controls.resetTimer()
                         }
                 )
+            #endif
 
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -100,11 +102,13 @@ struct TimelineView: View {
                     self.size = size
                 }
         })
+        #if !os(tvOS)
         .gesture(DragGesture(minimumDistance: 0).onEnded { value in
             let target = (value.location.x / size.width) * units
             current = target
             player.backend.seek(to: target)
         })
+        #endif
     }
 
     var projectedValue: Double {
