@@ -45,7 +45,7 @@ struct VerticalCells: View {
 
     var columns: [GridItem] {
         #if os(tvOS)
-            items.count < 3 ? Array(repeating: GridItem(.fixed(500)), count: [items.count, 1].max()!) : adaptiveItem
+            contentItems.count < 3 ? Array(repeating: GridItem(.fixed(500)), count: [contentItems.count, 1].max()!) : adaptiveItem
         #else
             adaptiveItem
         #endif
