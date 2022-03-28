@@ -22,7 +22,7 @@
 ### Features in alpha testing
 * New player component with custom controls, gestures and support for 4K playback
 
-You can leave your feedback in [discussion on v1.4 release](https://github.com/yattee/yattee/discussions/93). Thanks!
+You can leave your feedback in [discussion on v1.4 release](https://github.com/yattee/yattee/discussions/93) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
 
 ### Availability
 || Invidious | Piped |
@@ -53,6 +53,7 @@ You can browse and use accounts from one app and play videos with another (for e
 ## Contributing
 If you're interestred in contributing, you can browse the [issues](https://github.com/yattee/yattee/issues) list or create a new one to discuss your feature idea. Every contribution is very welcome.
 
+Join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you need an advice or want to discuss the project.
 ## License and Liability
 
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
