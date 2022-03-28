@@ -92,15 +92,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
-            let results = content.json.arrayValue.compactMap { json -> ContentItem in
+            let results = content.json.arrayValue.compactMap { json -> ContentItem? in
                 let type = json.dictionaryValue["type"]?.stringValue
 
                 if type == "channel" {
                     return ContentItem(channel: self.extractChannel(from: json))
                 } else if type == "playlist" {
                     return ContentItem(playlist: self.extractChannelPlaylist(from: json))
+                } else if type == "video" {
+                    return ContentItem(video: self.extractVideo(from: json))
                 }
-                return ContentItem(video: self.extractVideo(from: json))
+
+                return nil
             }
 
             return SearchPage(results: results, last: results.isEmpty)

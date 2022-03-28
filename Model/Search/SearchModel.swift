@@ -115,7 +115,7 @@ final class SearchModel: ObservableObject {
 
         resource?.removeObservers(ownedBy: store)
 
-        resource = accounts.api.search(query, page: page?.nextPage)
+        resource = accounts.api.search(query, page: pageToLoad.nextPage)
         resource.addObserver(store)
 
         resource
