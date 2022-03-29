@@ -255,7 +255,7 @@ final class MPVBackend: PlayerBackend {
 
     private func updateControlsIsPlaying() {
         DispatchQueue.main.async { [weak self] in
-            self?.controls.isPlaying = self?.isPlaying ?? false
+            self?.controls?.isPlaying = self?.isPlaying ?? false
         }
     }
 
