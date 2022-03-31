@@ -103,7 +103,11 @@ struct PlaybackBar: View {
             return "loading..."
         }
 
-        let videoLengthAtRate = player.currentVideo!.length / Double(player.currentRate)
+        guard let video = player.currentVideo else {
+            return ""
+        }
+
+        let videoLengthAtRate = video.length / Double(player.currentRate)
         let remainingSeconds = videoLengthAtRate - player.time!.seconds
 
         if remainingSeconds < 60 {
