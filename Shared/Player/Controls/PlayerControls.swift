@@ -204,8 +204,8 @@ struct PlayerControls: View {
                 #if os(tvOS)
                 .focused($focusedField, equals: .backward)
                 #else
-                .keyboardShortcut("k")
-                .keyboardShortcut(.leftArrow)
+                .keyboardShortcut("k", modifiers: [])
+                .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [])
                 #endif
 
             #endif
@@ -237,8 +237,8 @@ struct PlayerControls: View {
                 #if os(tvOS)
                 .focused($focusedField, equals: .forward)
                 #else
-                .keyboardShortcut("l")
-                .keyboardShortcut(.rightArrow)
+                .keyboardShortcut("l", modifiers: [])
+                .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
                 #endif
             #endif
         }
