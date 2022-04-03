@@ -92,6 +92,16 @@ struct YatteeApp: App {
                     .background(
                         HostingWindowFinder { window in
                             Windows.playerWindow = window
+
+                            NotificationCenter.default.addObserver(
+                                forName: NSWindow.willExitFullScreenNotification,
+                                object: window,
+                                queue: OperationQueue.main
+                            ) { _ in
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    self.player.controls.playingFullscreen = false
+                                }
+                            }
                         }
                     )
                     .onAppear { player.presentingPlayer = true }

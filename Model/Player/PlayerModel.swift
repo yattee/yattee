@@ -382,8 +382,8 @@ final class PlayerModel: ObservableObject {
         return "\(formatter.string(from: NSNumber(value: rate))!)×"
     }
 
-    func closeCurrentItem() {
-        prepareCurrentItemForHistory()
+    func closeCurrentItem(finished: Bool = false) {
+        prepareCurrentItemForHistory(finished: finished)
         currentItem = nil
 
         backend.closeItem()
@@ -497,5 +497,26 @@ final class PlayerModel: ObservableObject {
         }
 
         currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
+    }
+
+    func toggleFullscreen(_ isFullScreen: Bool) {
+        controls.resetTimer()
+
+        #if os(macOS)
+            Windows.player.toggleFullScreen()
+        #endif
+
+        controls.playingFullscreen = !isFullScreen
+
+        #if os(iOS)
+            if controls.playingFullscreen {
+                guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
+                    return
+                }
+                Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
+            } else {
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+            }
+        #endif
     }
 }

@@ -88,26 +88,6 @@ final class PlayerControlsModel: ObservableObject {
         }
     }
 
-    func toggleFullscreen(_ value: Bool) {
-        withAnimation(Animation.easeOut) {
-            resetTimer()
-            withAnimation(PlayerControls.animation) {
-                playingFullscreen = !value
-            }
-
-            #if os(iOS)
-                if playingFullscreen {
-                    guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
-                        return
-                    }
-                    Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
-                } else {
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                }
-            #endif
-        }
-    }
-
     func reset() {
         currentTime = .zero
         duration = .zero
