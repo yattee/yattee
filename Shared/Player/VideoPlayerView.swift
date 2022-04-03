@@ -49,36 +49,43 @@ struct VideoPlayerView: View {
             .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
             .frame(minWidth: 950, minHeight: 700)
         #else
-            HStack(spacing: 0) {
-                content
-                    .onAppear {
-                        #if os(iOS)
-                            configureOrientationUpdatesBasedOnAccelerometer()
-                        #endif
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    content
+                        .onAppear {
+                            playerSize = geometry.size
+
+                            #if os(iOS)
+                                configureOrientationUpdatesBasedOnAccelerometer()
+                            #endif
+                        }
+                }
+                .onChange(of: geometry.size) { size in
+                    self.playerSize = size
+                }
+                .onChange(of: fullScreenDetails) { value in
+                    player.backend.setNeedsDrawing(!value)
+                }
+                #if os(iOS)
+                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                    handleOrientationDidChangeNotification()
+                }
+                .onDisappear {
+                    guard !playerControls.playingFullscreen else {
+                        return // swiftlint:disable:this implicit_return
                     }
-            }
-            .onChange(of: fullScreenDetails) { value in
-                player.backend.setNeedsDrawing(!value)
-            }
-            #if os(iOS)
-            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                handleOrientationDidChangeNotification()
-            }
-            .onDisappear {
-                guard !playerControls.playingFullscreen else {
-                    return // swiftlint:disable:this implicit_return
-                }
 
-                if Defaults[.lockPortraitWhenBrowsing] {
-                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                } else {
-                    Orientation.lockOrientation(.allButUpsideDown)
-                }
+                    if Defaults[.lockPortraitWhenBrowsing] {
+                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    } else {
+                        Orientation.lockOrientation(.allButUpsideDown)
+                    }
 
-                motionManager?.stopAccelerometerUpdates()
-                motionManager = nil
+                    motionManager?.stopAccelerometerUpdates()
+                    motionManager = nil
+                }
+                #endif
             }
-            #endif
         #endif
     }
 
