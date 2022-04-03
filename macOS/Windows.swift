@@ -42,6 +42,10 @@ enum Windows: String, CaseIterable {
             Self.main.focus()
         }
     }
+
+    func toggleFullScreen() {
+        window?.toggleFullScreen(nil)
+    }
 }
 
 struct HostingWindowFinder: NSViewRepresentable {

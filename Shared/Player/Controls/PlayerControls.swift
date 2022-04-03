@@ -187,7 +187,7 @@ struct PlayerControls: View {
             "Fullscreen",
             systemImage: fullScreenLayout ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
         ) {
-            model.toggleFullscreen(fullScreenLayout)
+            player.toggleFullscreen(fullScreenLayout)
         }
         #if !os(tvOS)
         .keyboardShortcut(fullScreenLayout ? .cancelAction : .defaultAction)
