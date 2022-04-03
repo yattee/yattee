@@ -39,6 +39,10 @@ final class MPVBackend: PlayerBackend {
         }
 
         updateControlsIsPlaying()
+
+        #if !os(macOS)
+            UIApplication.shared.isIdleTimerDisabled = model.presentingPlayer && isPlaying
+        #endif
     }}
     var playerItemDuration: CMTime?
 
@@ -77,6 +81,12 @@ final class MPVBackend: PlayerBackend {
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading _: Bool) {
         handleEOF = false
+        #if !os(macOS)
+            if model.presentingPlayer {
+                UIApplication.shared.isIdleTimerDisabled = true
+            }
+        #endif
+
         let updateCurrentStream = {
             DispatchQueue.main.async { [weak self] in
                 self?.stream = stream
