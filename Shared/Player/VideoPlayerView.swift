@@ -53,15 +53,10 @@ struct VideoPlayerView: View {
                 HStack(spacing: 0) {
                     content
                         .onAppear {
-                            playerSize = geometry.size
-
                             #if os(iOS)
                                 configureOrientationUpdatesBasedOnAccelerometer()
                             #endif
                         }
-                }
-                .onChange(of: geometry.size) { size in
-                    self.playerSize = size
                 }
                 .onChange(of: fullScreenDetails) { value in
                     player.backend.setNeedsDrawing(!value)
