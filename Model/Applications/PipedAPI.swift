@@ -161,7 +161,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     var signedIn: Bool {
-        !account.anonymous && !(account.token?.isEmpty ?? true)
+        guard let account = account else {
+            return false
+        }
+
+        return !account.anonymous && !(account.token?.isEmpty ?? true)
     }
 
     var subscriptions: Resource? {
