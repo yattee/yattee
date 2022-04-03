@@ -299,6 +299,10 @@ final class PlayerModel: ObservableObject {
         backend.setNeedsDrawing(presentingPlayer)
         controls.hide()
 
+        #if !os(macOS)
+            UIApplication.shared.isIdleTimerDisabled = presentingPlayer
+        #endif
+
         if presentingPlayer, closePiPOnOpeningPlayer, playingInPictureInPicture {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.closePiP()
