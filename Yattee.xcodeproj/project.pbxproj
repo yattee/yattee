@@ -1961,6 +1961,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		37FF8BFC27F9A7AD0038199F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37FF8BFD27F9A7B20038199F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37FF8BFE27F9A7BA0038199F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37FF8BFF27F9A7BC0038199F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1968,6 +1996,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (macOS)" */;
 			buildPhases = (
+				37FF8BFF27F9A7BC0038199F /* Headers */,
 				37A3B15327255E7F000FB5EE /* Sources */,
 				37A3B15427255E7F000FB5EE /* Frameworks */,
 				37A3B15527255E7F000FB5EE /* Resources */,
@@ -1985,6 +2014,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (iOS)" */;
 			buildPhases = (
+				37FF8BFE27F9A7BA0038199F /* Headers */,
 				37A3B1752725735F000FB5EE /* Sources */,
 				37A3B1762725735F000FB5EE /* Frameworks */,
 				37A3B1772725735F000FB5EE /* Resources */,
@@ -2034,6 +2064,7 @@
 			buildConfigurationList = 37D4B0EF2671614900C925CA /* Build configuration list for PBXNativeTarget "Yattee (macOS)" */;
 			buildPhases = (
 				37CC3F4A270CE8D000608308 /* ShellScript */,
+				37FF8BFC27F9A7AD0038199F /* Headers */,
 				37D4B0CB2671614900C925CA /* Sources */,
 				37D4B0CC2671614900C925CA /* Frameworks */,
 				37D4B0CD2671614900C925CA /* Resources */,
@@ -2108,6 +2139,7 @@
 			buildConfigurationList = 37D4B177267164B000C925CA /* Build configuration list for PBXNativeTarget "Yattee (tvOS)" */;
 			buildPhases = (
 				37CC3F49270CE8CA00608308 /* ShellScript */,
+				37FF8BFD27F9A7B20038199F /* Headers */,
 				37D4B154267164AE00C925CA /* Sources */,
 				37D4B155267164AE00C925CA /* Frameworks */,
 				37D4B156267164AE00C925CA /* Resources */,
