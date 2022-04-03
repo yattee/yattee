@@ -17,7 +17,17 @@ final class MPVBackend: PlayerBackend {
     var loadedVideo = false
     var isLoadingVideo = true { didSet {
         DispatchQueue.main.async { [weak self] in
-            self?.controls.isLoadingVideo = self?.isLoadingVideo ?? true
+            guard let self = self else {
+                return
+            }
+
+            self.controls.isLoadingVideo = self.isLoadingVideo
+
+            if !self.isLoadingVideo {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                    self?.handleEOF = true
+                }
+            }
         }
     }}
 
@@ -39,6 +49,7 @@ final class MPVBackend: PlayerBackend {
 
     private var clientTimer: RepeatingTimer!
 
+    private var handleEOF = false
     private var onFileLoaded: (() -> Void)?
 
     private var controlsUpdates = false
@@ -65,6 +76,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading _: Bool) {
+        handleEOF = false
         let updateCurrentStream = {
             DispatchQueue.main.async { [weak self] in
                 self?.stream = stream
@@ -299,7 +311,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func handleEndOfFile(_: UnsafePointer<mpv_event>!) {
-        guard !isLoadingVideo else {
+        guard handleEOF, !isLoadingVideo else {
             return
         }
 
