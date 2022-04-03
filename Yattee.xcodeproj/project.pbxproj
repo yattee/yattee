@@ -3089,7 +3089,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3102,7 +3102,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.4.alpha.1;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -3123,7 +3123,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -3136,7 +3136,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.4.alpha.1;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -3155,7 +3155,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
@@ -3167,7 +3167,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.alpha.1;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -3187,7 +3187,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
@@ -3199,7 +3199,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.alpha.1;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -3351,7 +3351,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3375,7 +3375,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
 				);
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.alpha;
 				PRODUCT_NAME = Yattee;
@@ -3393,7 +3393,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "GLES_SILENCE_DEPRECATION=1";
@@ -3413,7 +3413,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
 				);
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.alpha;
 				PRODUCT_NAME = Yattee;
@@ -3435,7 +3435,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3454,7 +3454,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv/macOS/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
@@ -3473,7 +3473,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3492,7 +3492,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv/macOS/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
@@ -3609,7 +3609,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -3629,7 +3629,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv",
 					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
 				);
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.alpha;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
@@ -3647,7 +3647,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
@@ -3667,7 +3667,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv",
 					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
 				);
-				MARKETING_VERSION = 1.4.alpha.2;
+				MARKETING_VERSION = 1.4.alpha.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.alpha;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
