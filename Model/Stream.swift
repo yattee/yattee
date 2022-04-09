@@ -5,6 +5,7 @@ import Foundation
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
+        case hd2160p60
         case hd2160p
         case hd1440p60
         case hd1440p
