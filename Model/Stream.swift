@@ -6,12 +6,20 @@ import Foundation
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
         case hd2160p60
+        case hd2160p50
+        case hd2160p48
         case hd2160p
         case hd1440p60
+        case hd1440p50
+        case hd1440p48
         case hd1440p
         case hd1080p60
+        case hd1080p50
+        case hd1080p48
         case hd1080p
         case hd720p60
+        case hd720p50
+        case hd720p48
         case hd720p
         case sd480p
         case sd360p
