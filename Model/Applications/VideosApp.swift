@@ -32,6 +32,10 @@ enum VideosApp: String, CaseIterable {
     }
 
     var supportsUserPlaylists: Bool {
+        true
+    }
+
+    var userPlaylistsEndpointIncludesVideos: Bool {
         self == .invidious
     }
 

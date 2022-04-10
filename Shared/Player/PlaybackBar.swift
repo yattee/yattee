@@ -104,7 +104,8 @@ struct PlaybackBar: View {
         }
 
         guard let video = player.currentVideo,
-              let time = player.time else {
+              let time = player.time
+        else {
             return ""
         }
 

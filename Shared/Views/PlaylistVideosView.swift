@@ -7,8 +7,17 @@ struct PlaylistVideosView: View {
     @Environment(\.inNavigationView) private var inNavigationView
     @EnvironmentObject<PlayerModel> private var player
 
+    @StateObject private var store = Store<ChannelPlaylist>()
+
     var contentItems: [ContentItem] {
-        ContentItem.array(of: playlist.videos)
+        ContentItem.array(of: playlist.videos.isEmpty ? (store.item?.videos ?? []) : playlist.videos)
+    }
+
+    private var resource: Resource? {
+        let resource = player.accounts.api.playlist(playlist.id)
+        resource?.addObserver(store)
+
+        return resource
     }
 
     var videos: [Video] {
@@ -22,6 +31,11 @@ struct PlaylistVideosView: View {
     var body: some View {
         PlayerControlsView {
             VerticalCells(items: contentItems)
+                .onAppear {
+                    if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
+                        resource?.loadIfNeeded()
+                    }
+                }
             #if !os(tvOS)
                 .navigationTitle("\(playlist.title) Playlist")
             #endif

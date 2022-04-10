@@ -4,7 +4,7 @@ import Siesta
 import SwiftyJSON
 
 final class PipedAPI: Service, ObservableObject, VideosAPI {
-    static var authorizedEndpoints = ["subscriptions", "subscribe", "unsubscribe"]
+    static var authorizedEndpoints = ["subscriptions", "subscribe", "unsubscribe", "user/playlists"]
 
     @Published var account: Account!
 
@@ -79,6 +79,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             let disabled = details["disabled"]?.boolValue ?? false
 
             return CommentsPage(comments: comments, nextPage: nextPage, disabled: disabled)
+        }
+
+        configureTransformer(pathPattern("user/playlists")) { (content: Entity<JSON>) -> [Playlist] in
+            content.json.arrayValue.map { self.extractUserPlaylist(from: $0)! }
         }
 
         if account.token.isNil {
@@ -166,7 +170,9 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     var home: Resource? { nil }
     var popular: Resource? { nil }
-    var playlists: Resource? { nil }
+    var playlists: Resource? {
+        resource(baseURL: account.instance.apiURL, path: "user/playlists")
+    }
 
     func subscribe(_ channelID: String, onCompletion: @escaping () -> Void = {}) {
         resource(baseURL: account.instance.apiURL, path: "subscribe")
@@ -180,7 +186,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .onCompletion { _ in onCompletion() }
     }
 
-    func playlist(_: String) -> Resource? { nil }
+    func playlist(_ id: String) -> Resource? {
+        channelPlaylist(id)
+    }
+
     func playlistVideo(_: String, _: String) -> Resource? { nil }
     func playlistVideos(_: String) -> Resource? { nil }
 
@@ -357,6 +366,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .replacingOccurrences(of: "hqdefault", with: quality.filename)
             .replacingOccurrences(of: "maxresdefault", with: quality.filename)
         )!
+    }
+
+    private func extractUserPlaylist(from json: JSON) -> Playlist? {
+        let id = json["id"].stringValue
+        let title = json["name"].stringValue
+        let visibility = Playlist.Visibility.private
+
+        return Playlist(id: id, title: title, visibility: visibility)
     }
 
     private func extractDescription(from content: JSON) -> String? {

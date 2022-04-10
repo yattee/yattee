@@ -11,9 +11,7 @@ struct AppSidebarPlaylists: View {
                 NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $navigation.tabSelection) {
                     LazyView(PlaylistVideosView(playlist))
                 } label: {
-                    Label(playlist.title, systemImage: RecentsModel.symbolSystemImage(playlist.title))
-                        .backport
-                        .badge(Text("\(playlist.videos.count)"))
+                    playlistLabel(playlist)
                 }
                 .id(playlist.id)
                 .contextMenu {
@@ -31,6 +29,18 @@ struct AppSidebarPlaylists: View {
 
             newPlaylistButton
                 .padding(.top, 8)
+        }
+    }
+
+    @ViewBuilder func playlistLabel(_ playlist: Playlist) -> some View {
+        let label = Label(playlist.title, systemImage: RecentsModel.symbolSystemImage(playlist.title))
+
+        if player.accounts.app.userPlaylistsEndpointIncludesVideos {
+            label
+                .backport
+                .badge(Text("\(playlist.videos.count)"))
+        } else {
+            label
         }
     }
 
