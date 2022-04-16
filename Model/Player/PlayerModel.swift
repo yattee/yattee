@@ -229,11 +229,7 @@ final class PlayerModel: ObservableObject {
                 self?.sponsorBlock.loadSegments(
                     videoID: video.videoID,
                     categories: Defaults[.sponsorBlockCategories]
-                ) {
-                    if Defaults[.showChannelSubscribers] {
-                        self?.loadCurrentItemChannelDetails()
-                    }
-                }
+                )
 
                 guard Defaults[.enableReturnYouTubeDislike] else {
                     return
