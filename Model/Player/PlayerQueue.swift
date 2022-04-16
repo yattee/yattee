@@ -74,7 +74,6 @@ extension PlayerModel {
         }
 
         preservedTime = currentItem.playbackTime
-        restoreLoadedChannel()
 
         DispatchQueue.main.async { [weak self] in
             guard let video = self?.currentVideo else {

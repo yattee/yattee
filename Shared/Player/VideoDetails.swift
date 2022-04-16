@@ -30,7 +30,6 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
-    @Default(.showChannelSubscribers) private var showChannelSubscribers
     @Default(.showKeywords) private var showKeywords
 
     init(
@@ -208,15 +207,13 @@ struct VideoDetails: View {
                                     .font(.system(size: 14))
                                     .bold()
 
-                                if showChannelSubscribers {
-                                    Group {
-                                        if let subscribers = video!.channel.subscriptionsString {
-                                            Text("\(subscribers) subscribers")
-                                        }
+                                Group {
+                                    if let subscribers = video!.channel.subscriptionsString {
+                                        Text("\(subscribers) subscribers")
                                     }
-                                    .foregroundColor(.secondary)
-                                    .font(.caption2)
                                 }
+                                .foregroundColor(.secondary)
+                                .font(.caption2)
                             }
                         }
                     }

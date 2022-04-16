@@ -45,8 +45,6 @@ final class PlayerModel: ObservableObject {
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
     @Published var restoredSegments = [Segment]()
 
-    @Published var channelWithDetails: Channel?
-
     #if os(iOS)
         @Published var motionManager: CMMotionManager!
         @Published var lockedOrientation: UIInterfaceOrientation?
@@ -210,11 +208,7 @@ final class PlayerModel: ObservableObject {
                 self?.sponsorBlock.loadSegments(
                     videoID: video.videoID,
                     categories: Defaults[.sponsorBlockCategories]
-                ) { [weak self] in
-                    if Defaults[.showChannelSubscribers] {
-                        self?.loadCurrentItemChannelDetails()
-                    }
-                }
+                )
             }
         }
 
@@ -704,36 +698,6 @@ final class PlayerModel: ObservableObject {
         }
 
         currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
-    }
-
-    func loadCurrentItemChannelDetails() {
-        guard let video = currentVideo,
-              !video.channel.detailsLoaded
-        else {
-            return
-        }
-
-        if restoreLoadedChannel() {
-            return
-        }
-
-        accounts.api.channel(video.channel.id).load().onSuccess { [weak self] response in
-            if let channel: Channel = response.typedContent() {
-                self?.channelWithDetails = channel
-                withAnimation {
-                    self?.currentItem?.video.channel = channel
-                }
-            }
-        }
-    }
-
-    @discardableResult func restoreLoadedChannel() -> Bool {
-        if !currentVideo.isNil, channelWithDetails?.id == currentVideo!.channel.id {
-            currentItem.video.channel = channelWithDetails!
-            return true
-        }
-
-        return false
     }
 
     func rateLabel(_ rate: Float) -> String {

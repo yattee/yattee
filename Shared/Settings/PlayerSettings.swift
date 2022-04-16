@@ -14,7 +14,6 @@ struct PlayerSettings: View {
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
-    @Default(.showChannelSubscribers) private var channelSubscribers
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
@@ -83,7 +82,6 @@ struct PlayerSettings: View {
 
                 keywordsToggle
                 showHistoryToggle
-                channelSubscribersToggle
             }
 
             Section(header: SettingsHeader(text: "Picture in Picture")) {
@@ -194,10 +192,6 @@ struct PlayerSettings: View {
 
     private var showHistoryToggle: some View {
         Toggle("Show history", isOn: $showHistory)
-    }
-
-    private var channelSubscribersToggle: some View {
-        Toggle("Show subscribers count", isOn: $channelSubscribers)
     }
 
     private var pauseOnHidingPlayerToggle: some View {
