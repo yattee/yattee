@@ -338,6 +338,7 @@ final class PlayerModel: ObservableObject {
         }
 
         inactiveBackends().forEach { $0.pause() }
+        backend.setRate(currentRate)
 
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
