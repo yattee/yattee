@@ -122,8 +122,10 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
         switch self {
         case .best:
             return "Best available quality"
-        case .hd2160p:
+        case .hd2160p60:
             return "4K, 60fps"
+        case .hd2160p:
+            return "4K"
         default:
             return value.name
         }
