@@ -176,8 +176,10 @@ struct PlayerControls: View {
         HStack {
             #if !os(tvOS)
                 fullscreenButton
+                rateButton
+
+                Spacer()
             #endif
-            Spacer()
 //            button("Music Mode", systemImage: "music.note")
         }
     }
@@ -192,6 +194,41 @@ struct PlayerControls: View {
         #if !os(tvOS)
         .keyboardShortcut(fullScreenLayout ? .cancelAction : .defaultAction)
         #endif
+    }
+
+    private var rateButton: some View {
+        #if os(macOS)
+            ratePicker
+                .labelsHidden()
+                .frame(maxWidth: 70)
+        #else
+            Menu {
+                ratePicker
+                    .frame(width: 45, height: 30)
+                #if os(iOS)
+                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                #endif
+                    .mask(RoundedRectangle(cornerRadius: 3))
+            } label: {
+                Text(player.rateLabel(player.currentRate))
+                    .foregroundColor(.primary)
+                    .frame(maxWidth: .infinity)
+            }
+
+        #endif
+    }
+
+    var ratePicker: some View {
+        Picker("Rate", selection: rateBinding) {
+            ForEach(PlayerModel.availableRates, id: \.self) { rate in
+                Text(player.rateLabel(rate)).tag(rate)
+            }
+        }
+        .transaction { t in t.animation = .none }
+    }
+
+    private var rateBinding: Binding<Float> {
+        .init(get: { player.currentRate }, set: { rate in player.currentRate = rate })
     }
 
     var mediumButtonsBar: some View {
