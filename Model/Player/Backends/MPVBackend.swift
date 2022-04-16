@@ -216,8 +216,8 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    func setRate(_: Float) {
-        // TODO: Implement rate change
+    func setRate(_ rate: Float) {
+        client.setDoubleAsync("speed", Double(rate))
     }
 
     func closeItem() {}

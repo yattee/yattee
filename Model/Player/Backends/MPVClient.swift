@@ -225,6 +225,11 @@ final class MPVClient: ObservableObject {
         mpv_set_property_async(mpv, 0, name, MPV_FORMAT_FLAG, &data)
     }
 
+    func setDoubleAsync(_ name: String, _ value: Double) {
+        var data = value
+        mpv_set_property_async(mpv, 0, name, MPV_FORMAT_DOUBLE, &data)
+    }
+
     private func getDouble(_ name: String) -> Double {
         var data = Double()
         mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &data)
