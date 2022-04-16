@@ -1,9 +1,8 @@
 import Foundation
 
 extension Video {
-    static var fixtureID: Video.ID {
-        "FIXTURE"
-    }
+    static var fixtureID: Video.ID = "video-fixture"
+    static var fixtureChannelID: Channel.ID = "channel-fixture"
 
     static var fixture: Video {
         let thumbnailURL = "https://yt3.ggpht.com/ytc/AKedOLR-pT_JEsz_hcaA4Gjx8DHcqJ8mS42aTRqcVy6P7w=s88-c-k-c0x00ffffff-no-rj-mo"
@@ -18,7 +17,7 @@ extension Video {
             description: "Some relaxing live piano music",
             genre: "Music",
             channel: Channel(
-                id: "AbCdEFgHI",
+                id: fixtureChannelID,
                 name: "The Channel",
                 thumbnailURL: URL(string: thumbnailURL)!,
                 subscriptionsCount: 2300,

@@ -74,6 +74,10 @@ final class NavigationModel: ObservableObject {
         navigationStyle: NavigationStyle,
         delay: Bool = true
     ) {
+        guard channel.id != Video.fixtureChannelID else {
+            return
+        }
+
         let recent = RecentItem(from: channel)
         #if os(macOS)
             Windows.main.open()
