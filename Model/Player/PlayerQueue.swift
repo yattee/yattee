@@ -198,8 +198,17 @@ extension PlayerModel {
             return
         }
 
-        queue = ([Defaults[.lastPlayed]] + Defaults[.queue]).compactMap { $0 }
-        Defaults[.lastPlayed] = nil
+        var restoredQueue = [PlayerQueueItem?]()
+
+        if let lastPlayed = Defaults[.lastPlayed],
+           !Defaults[.queue].contains(where: { $0.videoID == lastPlayed.videoID })
+        {
+            restoredQueue.append(lastPlayed)
+            Defaults[.lastPlayed] = nil
+        }
+
+        restoredQueue.append(contentsOf: Defaults[.queue])
+        queue = restoredQueue.compactMap { $0 }
 
         queue.forEach { item in
             accounts.api.loadDetails(item) { newItem in
