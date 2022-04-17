@@ -111,7 +111,7 @@ struct VideoContextMenuView: View {
 
     private var continueButton: some View {
         Button {
-            player.play(video, at: watch!.stoppedAt, inNavigationView: inNavigationView)
+            player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt), inNavigationView: inNavigationView)
         } label: {
             Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime() ?? "where I left off")", systemImage: "playpause")
         }
