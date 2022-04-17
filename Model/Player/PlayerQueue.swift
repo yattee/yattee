@@ -42,7 +42,7 @@ extension PlayerModel {
         }
     }
 
-    func playNow(_ video: Video, at time: TimeInterval? = nil) {
+    func playNow(_ video: Video, at time: CMTime? = nil) {
         if playingInPictureInPicture, closePiPOnNavigation {
             closePiP()
         }
@@ -54,7 +54,7 @@ extension PlayerModel {
         }
     }
 
-    func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: TimeInterval? = nil) {
+    func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: CMTime? = nil) {
         if !playingInPictureInPicture {
             backend.closeItem()
         }
@@ -64,7 +64,7 @@ extension PlayerModel {
         currentItem = item
 
         if !time.isNil {
-            currentItem.playbackTime = .secondsInDefaultTimescale(time!)
+            currentItem.playbackTime = time
         } else if currentItem.playbackTime.isNil {
             currentItem.playbackTime = .zero
         }
@@ -105,7 +105,7 @@ extension PlayerModel {
         }
     }
 
-    func advanceToItem(_ newItem: PlayerQueueItem, at time: TimeInterval? = nil) {
+    func advanceToItem(_ newItem: PlayerQueueItem, at time: CMTime? = nil) {
         prepareCurrentItemForHistory()
 
         remove(newItem)
@@ -177,8 +177,8 @@ extension PlayerModel {
         }
     }
 
-    func playHistory(_ item: PlayerQueueItem) {
-        var time = item.playbackTime
+    func playHistory(_ item: PlayerQueueItem, at time: CMTime? = nil) {
+        var time = time ?? item.playbackTime
 
         if item.shouldRestartPlaying {
             time = .zero

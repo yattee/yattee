@@ -1,3 +1,4 @@
+import CoreMedia
 import Foundation
 
 struct VideoURLParser {
@@ -11,7 +12,7 @@ struct VideoURLParser {
         return queryItemValue("v")
     }
 
-    var time: TimeInterval? {
+    var time: CMTime? {
         guard let time = queryItemValue("t") else {
             return nil
         }
@@ -24,13 +25,13 @@ struct VideoURLParser {
               let seconds = TimeInterval(timeComponents["seconds"] ?? "0")
         else {
             if let time = TimeInterval(time) {
-                return time
+                return .secondsInDefaultTimescale(time)
             }
 
             return nil
         }
 
-        return seconds + (minutes * 60) + (hours * 60 * 60)
+        return .secondsInDefaultTimescale(seconds + (minutes * 60) + (hours * 60 * 60))
     }
 
     func queryItemValue(_ name: String) -> String? {

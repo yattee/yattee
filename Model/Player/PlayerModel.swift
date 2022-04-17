@@ -201,7 +201,7 @@ final class PlayerModel: ObservableObject {
         backend.pause()
     }
 
-    func play(_ video: Video, at time: TimeInterval? = nil, inNavigationView: Bool = false) {
+    func play(_ video: Video, at time: CMTime? = nil, inNavigationView: Bool = false) {
         playNow(video, at: time)
 
         guard !playingInPictureInPicture else {
