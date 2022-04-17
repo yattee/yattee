@@ -1,3 +1,4 @@
+import CoreMedia
 import Defaults
 import SDWebImageSwiftUI
 import SwiftUI
@@ -62,34 +63,36 @@ struct VideoCell: View {
     }
 
     private func playAction() {
-        guard video.videoID != Video.fixtureID else {
-            return
-        }
-
-        if watchingNow {
-            if !player.playingInPictureInPicture {
-                player.show()
+        DispatchQueue.main.async {
+            guard video.videoID != Video.fixtureID else {
+                return
             }
 
-            if !playNowContinues {
-                player.backend.seek(to: .zero)
+            if watchingNow {
+                if !player.playingInPictureInPicture {
+                    player.show()
+                }
+
+                if !playNowContinues {
+                    player.backend.seek(to: .zero)
+                }
+
+                player.play()
+
+                return
             }
 
-            player.play()
+            var playAt: CMTime?
 
-            return
+            if playNowContinues,
+               !watch.isNil,
+               !watch!.finished
+            {
+                playAt = .secondsInDefaultTimescale(watch!.stoppedAt)
+            }
+
+            player.play(video, at: playAt, inNavigationView: inNavigationView)
         }
-
-        var playAt: TimeInterval?
-
-        if playNowContinues,
-           !watch.isNil,
-           !watch!.finished
-        {
-            playAt = watch!.stoppedAt
-        }
-
-        player.play(video, at: playAt, inNavigationView: inNavigationView)
     }
 
     private var playNowContinues: Bool {
