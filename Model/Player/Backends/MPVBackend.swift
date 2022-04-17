@@ -250,6 +250,8 @@ final class MPVBackend: PlayerBackend {
         clientTimer.resume()
     }
 
+    private var handleSegmentsThrottle = Throttle(interval: 1)
+
     private func getClientUpdates() {
         self.logger.info("getting client updates")
 
@@ -262,8 +264,10 @@ final class MPVBackend: PlayerBackend {
 
         model.updateNowPlayingInfo()
 
-        if let currentTime = currentTime {
-            model.handleSegments(at: currentTime)
+        handleSegmentsThrottle.execute {
+            if let currentTime = currentTime {
+                model.handleSegments(at: currentTime)
+            }
         }
 
         timeObserverThrottle.execute {
