@@ -30,7 +30,7 @@ You can leave your feedback in [discussion on v1.4 release](https://github.com/y
 | User Accounts | ✅ | ✅ |
 | Subscriptions | ✅ | ✅ |
 | Popular | ✅ | 🔴 |
-| User Playlists | ✅ | 🔴 |
+| User Playlists | ✅ | ✅ |
 | Trending | ✅ | ✅ |
 | Channels | ✅ | ✅ |
 | Channel Playlists | ✅ | ✅ |
