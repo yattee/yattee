@@ -96,6 +96,8 @@ extension Defaults.Keys {
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
     case best
+    case hd4320p60
+    case hd4320p
     case hd2160p60
     case hd2160p
     case hd1440p60
@@ -112,7 +114,7 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
     var value: Stream.Resolution {
         switch self {
         case .best:
-            return .hd2160p60
+            return .hd4320p60
         default:
             return Stream.Resolution(rawValue: rawValue)!
         }
@@ -122,6 +124,10 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
         switch self {
         case .best:
             return "Best available quality"
+        case .hd4320p60:
+            return "8K, 60fps"
+        case .hd4320p:
+            return "8K"
         case .hd2160p60:
             return "4K, 60fps"
         case .hd2160p:
