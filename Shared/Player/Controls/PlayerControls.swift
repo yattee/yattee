@@ -29,14 +29,18 @@ struct PlayerControls: View {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 0) {
                     Group {
-                        statusBar
-                            .padding(3)
-                        #if os(macOS)
-                            .background(VisualEffectBlur(material: .hudWindow))
-                        #elseif os(iOS)
-                            .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                        #endif
-                            .mask(RoundedRectangle(cornerRadius: 3))
+                        HStack {
+                            statusBar
+                                .padding(3)
+                            #if os(macOS)
+                                .background(VisualEffectBlur(material: .hudWindow))
+                            #elseif os(iOS)
+                                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                            #endif
+                                .mask(RoundedRectangle(cornerRadius: 3))
+
+                            Spacer()
+                        }
 
                         buttonsBar
                             .padding(.top, 4)
@@ -75,17 +79,10 @@ struct PlayerControls: View {
             model.resetTimer()
         }
         #else
-                .background(controlsBackground)
+                .background(PlayerGestures())
         #endif
                 .environment(\.colorScheme, .dark)
     }
-
-    #if !os(tvOS)
-        var controlsBackground: some View {
-            PlayerGestures()
-                .background(Color.black.opacity(model.presentingControls ? 0.5 : 0))
-        }
-    #endif
 
     var timeline: some View {
         TimelineView(duration: durationBinding, current: currentTimeBinding, cornerRadius: 0)
@@ -112,7 +109,7 @@ struct PlayerControls: View {
             #endif
             Text(playbackStatus)
 
-            Spacer()
+            Text("•")
 
             #if !os(tvOS)
                 ToggleBackendButton()
