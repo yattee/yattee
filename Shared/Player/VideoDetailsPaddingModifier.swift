@@ -26,7 +26,7 @@ struct VideoDetailsPaddingModifier: ViewModifier {
         self.geometry = geometry
         self.aspectRatio = aspectRatio ?? VideoPlayerView.defaultAspectRatio
         self.minimumHeightLeft = minimumHeightLeft ?? VideoPlayerView.defaultMinimumHeightLeft
-        self.additionalPadding = additionalPadding ?? VideoDetailsPaddingModifier.defaultAdditionalDetailsPadding
+        self.additionalPadding = additionalPadding ?? Self.defaultAdditionalDetailsPadding
         self.fullScreen = fullScreen
     }
 

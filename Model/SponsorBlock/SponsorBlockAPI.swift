@@ -13,7 +13,7 @@ final class SponsorBlockAPI: ObservableObject {
     @Published var segments = [Segment]()
 
     static func categoryDescription(_ name: String) -> String? {
-        guard SponsorBlockAPI.categories.contains(name) else {
+        guard Self.categories.contains(name) else {
             return nil
         }
 
@@ -30,7 +30,7 @@ final class SponsorBlockAPI: ObservableObject {
     }
 
     static func categoryDetails(_ name: String) -> String? {
-        guard SponsorBlockAPI.categories.contains(name) else {
+        guard Self.categories.contains(name) else {
             return nil
         }
 
