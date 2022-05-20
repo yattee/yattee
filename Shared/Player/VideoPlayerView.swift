@@ -274,7 +274,7 @@ struct VideoPlayerView: View {
             Spacer()
         }
         .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
     }
 
     func pictureInPicturePlaceholder(geometry: GeometryProxy) -> some View {
@@ -303,7 +303,7 @@ struct VideoPlayerView: View {
             }
         }
         .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
     }
 
     var sidebarQueue: Bool {

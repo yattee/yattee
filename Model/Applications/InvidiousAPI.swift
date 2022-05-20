@@ -160,11 +160,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func pathPattern(_ path: String) -> String {
-        "**\(InvidiousAPI.basePath)/\(path)"
+        "**\(Self.basePath)/\(path)"
     }
 
     private func basePathAppending(_ path: String) -> String {
-        "\(InvidiousAPI.basePath)/\(path)"
+        "\(Self.basePath)/\(path)"
     }
 
     private var cookieHeader: String {
@@ -172,11 +172,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     var popular: Resource? {
-        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/popular")
+        resource(baseURL: account.url, path: "\(Self.basePath)/popular")
     }
 
     func trending(country: Country, category: TrendingCategory?) -> Resource {
-        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/trending")
+        resource(baseURL: account.url, path: "\(Self.basePath)/trending")
             .withParam("type", category?.name)
             .withParam("region", country.rawValue)
     }
@@ -186,7 +186,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     var feed: Resource? {
-        resource(baseURL: account.url, path: "\(InvidiousAPI.basePath)/auth/feed")
+        resource(baseURL: account.url, path: "\(Self.basePath)/auth/feed")
     }
 
     var subscriptions: Resource? {
