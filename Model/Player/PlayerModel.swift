@@ -83,6 +83,8 @@ final class PlayerModel: ObservableObject {
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
     @Published var playingInPictureInPicture = false
+    var pipController: AVPictureInPictureController?
+    var pipDelegate = PiPDelegate()
 
     @Published var presentingErrorDetails = false
     var playerError: Error? { didSet {
@@ -102,6 +104,9 @@ final class PlayerModel: ObservableObject {
     #endif
 
     private var currentArtwork: MPMediaItemArtwork?
+    #if !os(macOS)
+        var playerLayerView: PlayerLayerView!
+    #endif
 
     init(accounts: AccountsModel? = nil, comments: CommentsModel? = nil, controls: PlayerControlsModel? = nil) {
         self.accounts = accounts ?? AccountsModel()

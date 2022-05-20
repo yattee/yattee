@@ -41,7 +41,9 @@ final class MPVBackend: PlayerBackend {
         updateControlsIsPlaying()
 
         #if !os(macOS)
-            UIApplication.shared.isIdleTimerDisabled = model.presentingPlayer && isPlaying
+            DispatchQueue.main.async {
+                UIApplication.shared.isIdleTimerDisabled = self.model.presentingPlayer && self.isPlaying
+            }
         #endif
     }}
     var playerItemDuration: CMTime?

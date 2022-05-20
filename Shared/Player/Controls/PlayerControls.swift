@@ -173,6 +173,9 @@ struct PlayerControls: View {
         HStack {
             #if !os(tvOS)
                 fullscreenButton
+                #if os(iOS)
+                    pipButton
+                #endif
                 rateButton
 
                 Spacer()
@@ -233,6 +236,26 @@ struct PlayerControls: View {
 
     private var rateBinding: Binding<Float> {
         .init(get: { player.currentRate }, set: { rate in player.currentRate = rate })
+    }
+
+    private var pipButton: some View {
+        button("PiP", systemImage: "pip") {
+            if player.activeBackend == .mpv {
+                player.avPlayerBackend.switchToMPVOnPipClose = true
+            }
+
+            if player.activeBackend != PlayerBackendType.appleAVPlayer {
+                player.saveTime {
+                    player.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
+                }
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                print(player.pipController?.isPictureInPicturePossible ?? false ? "possible" : "NOT possible")
+                player.avPlayerBackend.enterPiPOnPlay = true
+                player.pipController?.startPictureInPicture()
+            }
+        }
     }
 
     var mediumButtonsBar: some View {
