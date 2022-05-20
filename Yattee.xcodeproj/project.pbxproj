@@ -190,6 +190,11 @@
 		372915E62687E3B900F5A35B /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
 		372915E72687E3B900F5A35B /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
 		372915E82687E3B900F5A35B /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
+		372D85DE283841B800FF3C7D /* PiPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F428383A89000CFD59 /* PiPDelegate.swift */; };
+		372D85DF283842EC00FF3C7D /* PiPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F428383A89000CFD59 /* PiPDelegate.swift */; };
+		372D85E0283842EE00FF3C7D /* PlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F22838388A000CFD59 /* PlayerLayerView.swift */; };
+		373031F32838388A000CFD59 /* PlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F22838388A000CFD59 /* PlayerLayerView.swift */; };
+		373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F428383A89000CFD59 /* PiPDelegate.swift */; };
 		3730D8A02712E2B70020ED53 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3730D89F2712E2B70020ED53 /* NowPlayingView.swift */; };
 		3730F75A2733481E00F385FC /* RelatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373197D82732015300EF734F /* RelatedView.swift */; };
 		373197D92732015300EF734F /* RelatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373197D82732015300EF734F /* RelatedView.swift */; };
@@ -864,6 +869,8 @@
 		3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisualEffectBlur-iOS.swift"; sourceTree = "<group>"; };
 		3729037D2739E47400EA99F6 /* MenuCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCommands.swift; sourceTree = "<group>"; };
 		372915E52687E3B900F5A35B /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
+		373031F22838388A000CFD59 /* PlayerLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerLayerView.swift; sourceTree = "<group>"; };
+		373031F428383A89000CFD59 /* PiPDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPDelegate.swift; sourceTree = "<group>"; };
 		3730D89F2712E2B70020ED53 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
 		37319F0427103F94004ECCD0 /* PlayerQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueue.swift; sourceTree = "<group>"; };
@@ -1351,6 +1358,7 @@
 				37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */,
 				37E8B0EB27B326C00024006F /* TimelineView.swift */,
 				37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */,
+				373031F22838388A000CFD59 /* PlayerLayerView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1439,6 +1447,7 @@
 			isa = PBXGroup;
 			children = (
 				37EBD8C227AF0D7C00F1C24B /* Backends */,
+				373031F428383A89000CFD59 /* PiPDelegate.swift */,
 				37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */,
 				37319F0427103F94004ECCD0 /* PlayerQueue.swift */,
 				37CC3F44270CE30600608308 /* PlayerQueueItem.swift */,
@@ -2548,6 +2557,7 @@
 				37EF9A76275BEB8E0043B585 /* CommentView.swift in Sources */,
 				373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */,
 				3700155B271B0D4D0049C794 /* PipedAPI.swift in Sources */,
+				373031F32838388A000CFD59 /* PlayerLayerView.swift in Sources */,
 				37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37C3A251272366440087A57A /* ChannelPlaylistView.swift in Sources */,
@@ -2600,6 +2610,7 @@
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
+				373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */,
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
@@ -2758,6 +2769,7 @@
 				37A9965F26D6F9B9006E3224 /* FavoritesView.swift in Sources */,
 				37F4AE7326828F0900BD60EA /* VerticalCells.swift in Sources */,
 				37001560271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
+				372D85DE283841B800FF3C7D /* PiPDelegate.swift in Sources */,
 				37B81AFD26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */,
 				37C0697F2725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
 				37A9965B26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
@@ -3000,6 +3012,8 @@
 				37B17DA0268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
 				37BE0BD726A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */,
 				37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */,
+				372D85DF283842EC00FF3C7D /* PiPDelegate.swift in Sources */,
+				372D85E0283842EE00FF3C7D /* PlayerLayerView.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37B2631C2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,

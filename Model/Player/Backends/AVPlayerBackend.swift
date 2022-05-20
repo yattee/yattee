@@ -36,8 +36,9 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     private(set) var avPlayer = AVPlayer()
-
     var controller: AppleAVPlayerViewController?
+    var enterPiPOnPlay = false
+    var switchToMPVOnPipClose = false
 
     private var asset: AVURLAsset?
     private var composition = AVMutableComposition()
@@ -535,13 +536,26 @@ final class AVPlayerBackend: PlayerBackend {
             }
 
             if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
+                if let controller = self.model.pipController {
+                    if controller.isPictureInPicturePossible {
+                        if self.enterPiPOnPlay {
+                            self.enterPiPOnPlay = false
+                            DispatchQueue.main.async { [weak self] in
+                                self?.model.pipController?.startPictureInPicture()
+                            }
+                        }
+                    }
+                }
+
                 DispatchQueue.main.async { [weak self] in
                     self?.model.objectWillChange.send()
                 }
             }
 
-            if player.timeControlStatus == .playing, player.rate != self.model.currentRate {
-                player.rate = self.model.currentRate
+            if player.timeControlStatus == .playing {
+                if player.rate != self.model.currentRate {
+                    player.rate = self.model.currentRate
+                }
             }
 
             #if os(macOS)
