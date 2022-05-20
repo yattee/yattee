@@ -53,7 +53,7 @@ final class InstancesModel: ObservableObject {
     }
 
     static func remove(_ instance: Instance) {
-        let accounts = InstancesModel.accounts(instance.id)
+        let accounts = Self.accounts(instance.id)
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
             Defaults[.instances].remove(at: index)
             accounts.forEach { AccountsModel.remove($0) }

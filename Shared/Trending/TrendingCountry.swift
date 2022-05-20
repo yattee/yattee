@@ -16,9 +16,9 @@ struct TrendingCountry: View {
             #if !os(tvOS)
                 HStack {
                     if #available(iOS 15.0, macOS 12.0, *) {
-                        TextField("Country", text: $query, prompt: Text(TrendingCountry.prompt))
+                        TextField("Country", text: $query, prompt: Text(Self.prompt))
                     } else {
-                        TextField(TrendingCountry.prompt, text: $query)
+                        TextField(Self.prompt, text: $query)
                     }
 
                     Button("Done") { selectCountryAndDismiss() }
@@ -30,7 +30,7 @@ struct TrendingCountry: View {
             countriesList
         }
         #if os(tvOS)
-        .searchable(text: $query, placement: .automatic, prompt: Text(TrendingCountry.prompt))
+        .searchable(text: $query, placement: .automatic, prompt: Text(Self.prompt))
         .background(Color.black)
         #endif
     }
