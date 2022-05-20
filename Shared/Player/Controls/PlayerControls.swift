@@ -196,12 +196,12 @@ struct PlayerControls: View {
         #endif
     }
 
-    private var rateButton: some View {
+    @ViewBuilder private var rateButton: some View {
         #if os(macOS)
             ratePicker
                 .labelsHidden()
                 .frame(maxWidth: 70)
-        #else
+        #elseif os(iOS)
             Menu {
                 ratePicker
                     .frame(width: 45, height: 30)
@@ -212,9 +212,16 @@ struct PlayerControls: View {
             } label: {
                 Text(player.rateLabel(player.currentRate))
                     .foregroundColor(.primary)
-                    .frame(maxWidth: .infinity)
             }
-
+            .buttonStyle(.plain)
+            .foregroundColor(.primary)
+            .frame(width: 50, height: 30)
+            #if os(macOS)
+                .background(VisualEffectBlur(material: .hudWindow))
+            #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+            #endif
+                .mask(RoundedRectangle(cornerRadius: 3))
         #endif
     }
 
