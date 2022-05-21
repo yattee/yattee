@@ -30,6 +30,8 @@ struct PlayerQueueRow: View {
             Button {
                 player.prepareCurrentItemForHistory()
 
+                player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
+
                 if history {
                     player.playHistory(item, at: watchStoppedAt)
                 } else {
