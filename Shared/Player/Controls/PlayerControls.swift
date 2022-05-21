@@ -117,7 +117,7 @@ struct PlayerControls: View {
 
                 StreamControl()
                 #if os(macOS)
-                    .frame(maxWidth: 160)
+                    .frame(maxWidth: 300)
                 #endif
             #else
                 Text(player.stream?.description ?? "")
