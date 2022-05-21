@@ -128,7 +128,7 @@ final class MPVBackend: PlayerBackend {
 
                 if !preservingTime,
                    let segment = self.model.sponsorBlock.segments.first,
-                   segment.start < 3,
+                   segment.start > 4,
                    self.model.lastSkipped.isNil
                 {
                     self.seek(to: segment.endTime) { finished in
