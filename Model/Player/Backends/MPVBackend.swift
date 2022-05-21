@@ -201,6 +201,8 @@ final class MPVBackend: PlayerBackend {
             startControlsUpdates()
         }
 
+        setRate(model.currentRate)
+
         client?.play()
     }
 
