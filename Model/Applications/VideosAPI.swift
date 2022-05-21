@@ -27,6 +27,34 @@ protocol VideosAPI {
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource?
     func playlistVideos(_ id: String) -> Resource?
 
+    func addVideoToPlaylist(
+        _ videoID: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    )
+
+    func removeVideoFromPlaylist(
+        _ index: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    )
+
+    func playlistForm(
+        _ name: String,
+        _ visibility: String,
+        playlist: Playlist?,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping (Playlist?) -> Void
+    )
+
+    func deletePlaylist(
+        _ playlist: Playlist,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    )
+
     func channelPlaylist(_ id: String) -> Resource?
 
     func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)

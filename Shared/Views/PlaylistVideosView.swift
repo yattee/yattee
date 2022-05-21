@@ -6,11 +6,28 @@ struct PlaylistVideosView: View {
 
     @Environment(\.inNavigationView) private var inNavigationView
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var model
 
     @StateObject private var store = Store<ChannelPlaylist>()
 
     var contentItems: [ContentItem] {
-        ContentItem.array(of: playlist.videos.isEmpty ? (store.item?.videos ?? []) : playlist.videos)
+        var videos = playlist.videos
+
+        if videos.isEmpty {
+            videos = store.item?.videos ?? []
+            if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
+                var i = 0
+
+                for index in videos.indices {
+                    var video = videos[index]
+                    video.indexID = "\(i)"
+                    i += 1
+                    videos[index] = video
+                }
+            }
+        }
+
+        return ContentItem.array(of: videos)
     }
 
     private var resource: Resource? {
@@ -33,8 +50,11 @@ struct PlaylistVideosView: View {
             VerticalCells(items: contentItems)
                 .onAppear {
                     if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
-                        resource?.loadIfNeeded()
+                        resource?.load()
                     }
+                }
+                .onChange(of: model.reloadPlaylists) { _ in
+                    resource?.load()
                 }
             #if !os(tvOS)
                 .navigationTitle("\(playlist.title) Playlist")

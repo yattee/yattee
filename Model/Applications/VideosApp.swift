@@ -39,6 +39,14 @@ enum VideosApp: String, CaseIterable {
         self == .invidious
     }
 
+    var userPlaylistsHaveVisibility: Bool {
+        self == .invidious
+    }
+
+    var userPlaylistsAreEditable: Bool {
+        self == .invidious
+    }
+
     var hasFrontendURL: Bool {
         self == .piped
     }

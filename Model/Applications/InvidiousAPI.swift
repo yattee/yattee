@@ -239,6 +239,66 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         playlist(playlistID)?.child("videos").child(videoID)
     }
 
+    func addVideoToPlaylist(
+        _ videoID: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void = { _ in },
+        onSuccess: @escaping () -> Void = {}
+    ) {
+        let resource = playlistVideos(playlistID)
+        let body = ["videoId": videoID]
+
+        resource?
+            .request(.post, json: body)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
+
+    func removeVideoFromPlaylist(
+        _ index: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    ) {
+        let resource = playlistVideo(playlistID, index)
+
+        resource?
+            .request(.delete)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
+
+    func playlistForm(
+        _ name: String,
+        _ visibility: String,
+        playlist: Playlist?,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping (Playlist?) -> Void
+    ) {
+        let body = ["title": name, "privacy": visibility]
+        let resource = !playlist.isNil ? self.playlist(playlist!.id) : playlists
+
+        resource?
+            .request(!playlist.isNil ? .patch : .post, json: body)
+            .onSuccess { response in
+                if let modifiedPlaylist: Playlist = response.typedContent() {
+                    onSuccess(modifiedPlaylist)
+                }
+            }
+            .onFailure(onFailure)
+    }
+
+    func deletePlaylist(
+        _ playlist: Playlist,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    ) {
+        self.playlist(playlist.id)?
+            .request(.delete)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
+
     func channelPlaylist(_ id: String) -> Resource? {
         resource(baseURL: account.url, path: basePathAppending("playlists/\(id)"))
     }

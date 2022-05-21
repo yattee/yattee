@@ -43,6 +43,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             self.extractChannelPlaylist(from: content.json)
         }
 
+        configureTransformer(pathPattern("user/playlists/create")) { (_: Entity<JSON>) in }
+        configureTransformer(pathPattern("user/playlists/delete")) { (_: Entity<JSON>) in }
+        configureTransformer(pathPattern("user/playlists/add")) { (_: Entity<JSON>) in }
+        configureTransformer(pathPattern("user/playlists/remove")) { (_: Entity<JSON>) in }
+
         configureTransformer(pathPattern("streams/*")) { (content: Entity<JSON>) -> Video? in
             self.extractVideo(from: content.json)
         }
@@ -192,6 +197,72 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func playlistVideo(_: String, _: String) -> Resource? { nil }
     func playlistVideos(_: String) -> Resource? { nil }
+
+    func addVideoToPlaylist(
+        _ videoID: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void = { _ in },
+        onSuccess: @escaping () -> Void = {}
+    ) {
+        let resource = resource(baseURL: account.instance.apiURL, path: "user/playlists/add")
+        let body = ["videoId": videoID, "playlistId": playlistID]
+
+        resource
+            .request(.post, json: body)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
+
+    func removeVideoFromPlaylist(
+        _ index: String,
+        _ playlistID: String,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    ) {
+        let resource = resource(baseURL: account.instance.apiURL, path: "user/playlists/remove")
+        let body: [String: Any] = ["index": Int(index)!, "playlistId": playlistID]
+
+        resource
+            .request(.post, json: body)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
+
+    func playlistForm(
+        _ name: String,
+        _: String,
+        playlist: Playlist?,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping (Playlist?) -> Void
+    ) {
+        let body = ["name": name]
+        let resource = playlist.isNil ? resource(baseURL: account.instance.apiURL, path: "user/playlists/create") : nil
+
+        resource?
+            .request(.post, json: body)
+            .onSuccess { response in
+                if let modifiedPlaylist: Playlist = response.typedContent() {
+                    onSuccess(modifiedPlaylist)
+                } else {
+                    onSuccess(nil)
+                }
+            }
+            .onFailure(onFailure)
+    }
+
+    func deletePlaylist(
+        _ playlist: Playlist,
+        onFailure: @escaping (RequestError) -> Void,
+        onSuccess: @escaping () -> Void
+    ) {
+        let resource = resource(baseURL: account.instance.apiURL, path: "user/playlists/delete")
+        let body = ["playlistId": playlist.id]
+
+        resource
+            .request(.post, json: body)
+            .onSuccess { _ in onSuccess() }
+            .onFailure(onFailure)
+    }
 
     func comments(_ id: Video.ID, page: String?) -> Resource? {
         let path = page.isNil ? "comments/\(id)" : "nextpage/comments/\(id)"

@@ -17,7 +17,7 @@ struct Video: Identifiable, Equatable, Hashable {
     var genre: String?
 
     // index used when in the Playlist
-    let indexID: String?
+    var indexID: String?
 
     var live: Bool
     var upcoming: Bool

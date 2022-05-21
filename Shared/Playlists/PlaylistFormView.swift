@@ -43,9 +43,12 @@ struct PlaylistFormView: View {
                         TextField("Name", text: $name, onCommit: validate)
                             .frame(maxWidth: 450)
                             .padding(.leading, 10)
+                            .disabled(editing && !accounts.app.userPlaylistsAreEditable)
 
-                        visibilityFormItem
-                            .pickerStyle(.segmented)
+                        if accounts.app.userPlaylistsHaveVisibility {
+                            visibilityFormItem
+                                .pickerStyle(.segmented)
+                        }
                     }
                     #if os(macOS)
                     .padding(.horizontal)
@@ -59,7 +62,7 @@ struct PlaylistFormView: View {
                         Spacer()
 
                         Button("Save", action: submitForm)
-                            .disabled(!valid)
+                            .disabled(!valid || (editing && !accounts.app.userPlaylistsAreEditable))
                             .alert(isPresented: $presentingErrorAlert) {
                                 Alert(
                                     title: Text("Error when accessing playlist"),
@@ -75,7 +78,7 @@ struct PlaylistFormView: View {
                 #if os(iOS)
                 .padding(.vertical)
                 #else
-                .frame(width: 400, height: 150)
+                .frame(width: 400, height: accounts.app.userPlaylistsHaveVisibility ? 150 : 120)
                 #endif
 
             #else
@@ -119,6 +122,7 @@ struct PlaylistFormView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     TextField("Playlist Name", text: $name, onCommit: validate)
+                        .disabled(editing && !accounts.app.userPlaylistsAreEditable)
                 }
 
                 HStack {
@@ -132,7 +136,8 @@ struct PlaylistFormView: View {
                 HStack {
                     Spacer()
 
-                    Button("Save", action: submitForm).disabled(!valid)
+                    Button("Save", action: submitForm)
+                        .disabled(!valid || (editing && !accounts.app.userPlaylistsAreEditable))
                 }
                 .padding(.top, 40)
 
@@ -172,27 +177,15 @@ struct PlaylistFormView: View {
             return
         }
 
-        let body = ["title": name, "privacy": visibility.rawValue]
+        accounts.api.playlistForm(name, visibility.rawValue, playlist: playlist, onFailure: { error in
+            formError = "(\(error.httpStatusCode ?? -1)) \(error.userMessage)"
+            presentingErrorAlert = true
+        }) { modifiedPlaylist in
+            self.playlist = modifiedPlaylist
+            playlists.load(force: true)
 
-        resource?
-            .request(editing ? .patch : .post, json: body)
-            .onSuccess { response in
-                if let modifiedPlaylist: Playlist = response.typedContent() {
-                    playlist = modifiedPlaylist
-                }
-
-                playlists.load(force: true)
-
-                presentationMode.wrappedValue.dismiss()
-            }
-            .onFailure { error in
-                formError = "(\(error.httpStatusCode ?? -1)) \(error.userMessage)"
-                presentingErrorAlert = true
-            }
-    }
-
-    var resource: Resource? {
-        editing ? accounts.api.playlist(playlist.id) : accounts.api.playlists
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 
     var visibilityFormItem: some View {
@@ -236,17 +229,14 @@ struct PlaylistFormView: View {
     }
 
     func deletePlaylistAndDismiss() {
-        accounts.api.playlist(playlist.id)?
-            .request(.delete)
-            .onSuccess { _ in
-                playlist = nil
-                playlists.load(force: true)
-                presentationMode.wrappedValue.dismiss()
-            }
-            .onFailure { error in
-                formError = "(\(error.httpStatusCode ?? -1)) \(error.localizedDescription)"
-                presentingErrorAlert = true
-            }
+        accounts.api.deletePlaylist(playlist, onFailure: { error in
+            formError = "(\(error.httpStatusCode ?? -1)) \(error.localizedDescription)"
+            presentingErrorAlert = true
+        }) {
+            playlist = nil
+            playlists.load(force: true)
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 }
 

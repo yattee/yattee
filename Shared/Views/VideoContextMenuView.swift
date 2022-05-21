@@ -201,7 +201,7 @@ struct VideoContextMenuView: View {
 
     func removeFromPlaylistButton(playlistID: String) -> some View {
         Button {
-            playlists.removeVideo(videoIndexID: video.indexID!, playlistID: playlistID)
+            playlists.removeVideo(index: video.indexID!, playlistID: playlistID)
         } label: {
             Label("Remove from playlist", systemImage: "text.badge.minus")
         }

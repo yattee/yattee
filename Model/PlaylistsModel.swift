@@ -4,6 +4,7 @@ import SwiftUI
 
 final class PlaylistsModel: ObservableObject {
     @Published var playlists = [Playlist]()
+    @Published var reloadPlaylists = false
 
     var accounts = AccountsModel()
 
@@ -58,24 +59,17 @@ final class PlaylistsModel: ObservableObject {
         onSuccess: @escaping () -> Void = {},
         onFailure: @escaping (RequestError) -> Void = { _ in }
     ) {
-        let resource = accounts.api.playlistVideos(playlistID)
-        let body = ["videoId": videoID]
-
-        resource?
-            .request(.post, json: body)
-            .onSuccess { _ in
-                self.load(force: true)
-                onSuccess()
-            }
-            .onFailure(onFailure)
+        accounts.api.addVideoToPlaylist(videoID, playlistID, onFailure: onFailure) {
+            self.load(force: true, onSuccess: onSuccess)
+        }
     }
 
-    func removeVideo(videoIndexID: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
-        let resource = accounts.api.playlistVideo(playlistID, videoIndexID)
-
-        resource?.request(.delete).onSuccess { _ in
-            self.load(force: true)
-            onSuccess()
+    func removeVideo(index: String, playlistID: Playlist.ID, onSuccess: @escaping () -> Void = {}) {
+        accounts.api.removeVideoFromPlaylist(index, playlistID, onFailure: { _ in }) {
+            self.load(force: true) {
+                self.reloadPlaylists.toggle()
+                onSuccess()
+            }
         }
     }
 
