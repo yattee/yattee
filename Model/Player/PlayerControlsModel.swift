@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 final class PlayerControlsModel: ObservableObject {
-    @Published var isLoadingVideo = true
+    @Published var isLoadingVideo = false
     @Published var isPlaying = true
     @Published var currentTime = CMTime.zero
     @Published var duration = CMTime.zero

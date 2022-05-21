@@ -13,7 +13,10 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
 
     func pictureInPictureControllerWillStartPictureInPicture(_: AVPictureInPictureController) {}
 
-    func pictureInPictureControllerDidStartPictureInPicture(_: AVPictureInPictureController) {}
+    func pictureInPictureControllerDidStartPictureInPicture(_: AVPictureInPictureController) {
+        player?.playingInPictureInPicture = true
+        player?.avPlayerBackend.startPictureInPictureOnPlay = false
+    }
 
     func pictureInPictureControllerDidStopPictureInPicture(_: AVPictureInPictureController) {
         if player?.avPlayerBackend.switchToMPVOnPipClose ?? false {
@@ -24,12 +27,16 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
                 }
             }
         }
+
+        player?.playingInPictureInPicture = false
     }
 
     func pictureInPictureControllerWillStopPictureInPicture(_: AVPictureInPictureController) {}
 
     func pictureInPictureController(
         _: AVPictureInPictureController,
-        restoreUserInterfaceForPictureInPictureStopWithCompletionHandler _: @escaping (Bool) -> Void
-    ) {}
+        restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
+    ) {
+        completionHandler(true)
+    }
 }
