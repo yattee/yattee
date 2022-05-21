@@ -69,16 +69,33 @@ final class MPVBackend: PlayerBackend {
         clientTimer.eventHandler = getClientUpdates
     }
 
+    typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
+
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
         streams
             .filter { $0.kind == .adaptive && $0.resolution <= maxResolution.value }
-            .max { $0.resolution < $1.resolution } ??
+            .max { lhs, rhs in
+                let predicates: [AreInIncreasingOrder] = [
+                    { $0.format > $1.format },
+                    { $0.resolution < $1.resolution }
+                ]
+
+                for predicate in predicates {
+                    if !predicate(lhs, rhs), !predicate(rhs, lhs) {
+                        continue
+                    }
+
+                    return predicate(lhs, rhs)
+                }
+
+                return false
+            } ??
             streams.first { $0.kind == .hls } ??
             streams.first
     }
 
     func canPlay(_ stream: Stream) -> Bool {
-        stream.resolution != .unknown && stream.format != "AV1"
+        stream.resolution != .unknown && stream.format != .av1
     }
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading _: Bool) {
