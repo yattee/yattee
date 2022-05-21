@@ -252,7 +252,7 @@ struct PlayerControls: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 print(player.pipController?.isPictureInPicturePossible ?? false ? "possible" : "NOT possible")
-                player.avPlayerBackend.enterPiPOnPlay = true
+                player.avPlayerBackend.startPictureInPictureOnPlay = true
                 player.pipController?.startPictureInPicture()
             }
         }

@@ -91,6 +91,8 @@ struct VideoCell: View {
                 playAt = .secondsInDefaultTimescale(watch!.stoppedAt)
             }
 
+            player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
+
             player.play(video, at: playAt, inNavigationView: inNavigationView)
         }
     }

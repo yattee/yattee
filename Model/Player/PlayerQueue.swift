@@ -111,7 +111,6 @@ extension PlayerModel {
         remove(newItem)
 
         currentItem = newItem
-        pause()
 
         accounts.api.loadDetails(newItem) { newItem in
             self.playItem(newItem, video: newItem.video, at: time)
@@ -152,7 +151,6 @@ extension PlayerModel {
         if play {
             currentItem = item
             // pause playing current video as it's going to be replaced with next one
-            pause()
         }
 
         queue.insert(item, at: prepending ? 0 : queue.endIndex)
