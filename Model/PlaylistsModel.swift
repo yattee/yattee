@@ -60,7 +60,10 @@ final class PlaylistsModel: ObservableObject {
         onFailure: @escaping (RequestError) -> Void = { _ in }
     ) {
         accounts.api.addVideoToPlaylist(videoID, playlistID, onFailure: onFailure) {
-            self.load(force: true, onSuccess: onSuccess)
+            self.load(force: true) {
+                self.reloadPlaylists.toggle()
+                onSuccess()
+            }
         }
     }
 
