@@ -37,7 +37,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     private(set) var avPlayer = AVPlayer()
     var controller: AppleAVPlayerViewController?
-    var enterPiPOnPlay = false
+    var startPictureInPictureOnPlay = false
     var switchToMPVOnPipClose = false
 
     private var asset: AVURLAsset?
@@ -323,6 +323,8 @@ final class AVPlayerBackend: PlayerBackend {
                     }
                 }
             }
+
+            self.setRate(self.model.currentRate)
         }
 
         let replaceItemAndSeek = {
@@ -442,7 +444,7 @@ final class AVPlayerBackend: PlayerBackend {
             self,
             selector: #selector(itemDidPlayToEndTime),
             name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-            object: playerItem
+            object: model.playerItem
         )
     }
 
@@ -450,7 +452,7 @@ final class AVPlayerBackend: PlayerBackend {
         NotificationCenter.default.removeObserver(
             self,
             name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-            object: playerItem
+            object: model.playerItem
         )
     }
 
@@ -470,6 +472,9 @@ final class AVPlayerBackend: PlayerBackend {
                 model.hide()
             #endif
         } else {
+            if model.playingInPictureInPicture {
+                startPictureInPictureOnPlay = true
+            }
             model.advanceToNextItem()
         }
     }
@@ -538,10 +543,10 @@ final class AVPlayerBackend: PlayerBackend {
             if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
                 if let controller = self.model.pipController {
                     if controller.isPictureInPicturePossible {
-                        if self.enterPiPOnPlay {
-                            self.enterPiPOnPlay = false
-                            DispatchQueue.main.async { [weak self] in
-                                self?.model.pipController?.startPictureInPicture()
+                        if self.startPictureInPictureOnPlay {
+                            self.startPictureInPictureOnPlay = false
+                            DispatchQueue.main.async {
+                                self.model.pipController?.startPictureInPicture()
                             }
                         }
                     }
