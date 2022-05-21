@@ -79,6 +79,49 @@ class Stream: Equatable, Hashable, Identifiable {
         }
     }
 
+    enum Format: String, Comparable {
+        case webm
+        case avc1
+        case av1
+        case mp4
+        case unknown
+
+        private var sortOrder: Int {
+            switch self {
+            case .webm:
+                return 0
+            case .mp4:
+                return 1
+            case .avc1:
+                return 2
+            case .av1:
+                return 3
+            case .unknown:
+                return 4
+            }
+        }
+
+        static func < (lhs: Self, rhs: Self) -> Bool {
+            lhs.sortOrder < rhs.sortOrder
+        }
+
+        static func from(_ string: String) -> Self {
+            let lowercased = string.lowercased()
+
+            if lowercased.contains("webm") {
+                return .webm
+            } else if lowercased.contains("avc1") {
+                return .avc1
+            } else if lowercased.contains("av01") {
+                return .av1
+            } else if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
+                return .mp4
+            } else {
+                return .unknown
+            }
+        }
+    }
+
     let id = UUID()
 
     var instance: Instance!
@@ -88,6 +131,7 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var resolution: Resolution!
     var kind: Kind!
+    var format: Format!
 
     var encoding: String!
     var videoFormat: String!
@@ -109,7 +153,7 @@ class Stream: Equatable, Hashable, Identifiable {
         self.resolution = resolution
         self.kind = kind
         self.encoding = encoding
-        self.videoFormat = videoFormat
+        format = .from(videoFormat ?? "")
     }
 
     var quality: String {
@@ -120,23 +164,8 @@ class Stream: Equatable, Hashable, Identifiable {
         return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
     }
 
-    var format: String {
-        let lowercasedFormat = (videoFormat ?? "unknown").lowercased()
-        if lowercasedFormat.contains("webm") {
-            return "WEBM"
-        } else if lowercasedFormat.contains("avc1") {
-            return "avc1"
-        } else if lowercasedFormat.contains("av01") {
-            return "AV1"
-        } else if lowercasedFormat.contains("mpeg_4") || lowercasedFormat.contains("mp4") {
-            return "MP4"
-        } else {
-            return lowercasedFormat
-        }
-    }
-
     var description: String {
-        let formatString = format == "unknown" ? "" : " (\(format))"
+        let formatString = format == .unknown ? "" : " (\(format.rawValue))"
         return "\(quality)\(formatString) - \(instance?.description ?? "")"
     }
 
