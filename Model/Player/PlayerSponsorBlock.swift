@@ -50,7 +50,8 @@ extension PlayerModel {
     private func shouldSkip(_ segment: Segment, at time: CMTime) -> Bool {
         guard isPlaying,
               !restoredSegments.contains(segment),
-              Defaults[.sponsorBlockCategories].contains(segment.category)
+              Defaults[.sponsorBlockCategories].contains(segment.category),
+              segment.start > 4
         else {
             return false
         }
