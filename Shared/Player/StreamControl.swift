@@ -15,7 +15,7 @@ struct StreamControl: View {
                             Section(header: Text(instance.longDescription)) {
                                 ForEach(kinds, id: \.self) { key in
                                     ForEach(instanceStreams[key] ?? []) { stream in
-                                        Text(stream.quality).tag(Stream?.some(stream))
+                                        Text(stream.description).tag(Stream?.some(stream))
                                     }
 
                                     if kinds.count > 1 {
