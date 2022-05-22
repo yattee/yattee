@@ -22,14 +22,13 @@
 ### Features in alpha testing
 * New player component with custom controls, gestures and support for 4K playback
 
-You can leave your feedback in [discussion on v1.4 release](https://github.com/yattee/yattee/discussions/93) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
+You can leave your feedback in [discussion on v1.4.alpha.4 release](https://github.com/yattee/yattee/discussions/132) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
 
 ### Availability
 || Invidious | Piped |
 | - | - | - |
 | User Accounts | ✅ | ✅ |
 | Subscriptions | ✅ | ✅ |
-| Popular | ✅ | 🔴 |
 | User Playlists | ✅ | ✅ |
 | Trending | ✅ | ✅ |
 | Channels | ✅ | ✅ |
@@ -37,13 +36,15 @@ You can leave your feedback in [discussion on v1.4 release](https://github.com/y
 | Search | ✅ | ✅ |
 | Search Suggestions | ✅ | ✅ |
 | Search Filters | ✅ | 🔴 |
+| Popular | ✅ | 🔴 |
 | Subtitles | 🔴 | ✅ |
 | Comments | 🔴 | ✅ |
 
 You can browse and use accounts from one app and play videos with another (for example: use Invidious account for subscriptions and use Piped as playback source). Comments can be displayed from Piped even when Invidious is used for browsing/playing.
 
 ## Documentation
-* [Installation Instructions](https://github.com/yattee/yattee/wiki/Installation-Instructions)
+* [Installation](https://github.com/yattee/yattee/wiki/Installation-Instructions)
+* [Building](https://github.com/yattee/yattee/wiki/Building-instructions)
 * [FAQ](https://github.com/yattee/yattee/wiki)
 * [Screenshots Gallery](https://github.com/yattee/yattee/wiki/Screenshots-Gallery)
 * [Tips](https://github.com/yattee/yattee/wiki/Tips)
@@ -57,7 +58,5 @@ Join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you 
 ## License and Liability
 
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
-
-Contributors take no responsibility for the use of the tool (Point 16. of the license). We strongly recommend you abide by the valid official regulations in your country. Furthermore, we refuse liability for any inappropriate use of the tool, such as downloading materials without proper consent.
 
 This tool is an open source software built for learning and research purposes.
