@@ -54,9 +54,10 @@ You can browse and use accounts from one app and play videos with another (for e
 ## Contributing
 If you're interestred in contributing, you can browse the [issues](https://github.com/yattee/yattee/issues) list or create a new one to discuss your feature idea. Every contribution is very welcome.
 
+Use [building instructions](https://github.com/yattee/yattee/wiki/Building-instructions) or
 Join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you need an advice or want to discuss the project.
-## License and Liability
 
+## License
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
 
 This tool is an open source software built for learning and research purposes.
