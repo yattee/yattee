@@ -99,7 +99,7 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
                             }
                         }
                     }
-                    .disabled(playerControls.isLoadingVideo)
+                    .disabled(playerControls.isLoadingVideo || model.currentItem.isNil)
                     .font(.system(size: 30))
                     .frame(minWidth: 30)
 
