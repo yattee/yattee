@@ -9,6 +9,7 @@ struct AddToPlaylistView: View {
 
     @State private var error = ""
     @State private var presentingErrorAlert = false
+    @State private var submitButtonDisabled = false
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
@@ -122,7 +123,7 @@ struct AddToPlaylistView: View {
         HStack {
             Spacer()
             Button("Add to Playlist", action: addToPlaylist)
-                .disabled(selectedPlaylist.isNil)
+                .disabled(submitButtonDisabled || selectedPlaylist.isNil)
                 .padding(.top, 30)
                 .alert(isPresented: $presentingErrorAlert) {
                     Alert(
@@ -165,6 +166,8 @@ struct AddToPlaylistView: View {
 
         Defaults[.lastUsedPlaylistID] = id
 
+        submitButtonDisabled = true
+
         model.addVideo(
             playlistID: id,
             videoID: video.videoID,
@@ -174,6 +177,7 @@ struct AddToPlaylistView: View {
             onFailure: { requestError in
                 error = "(\(requestError.httpStatusCode ?? -1)) \(requestError.userMessage)"
                 presentingErrorAlert = true
+                submitButtonDisabled = false
             }
         )
     }

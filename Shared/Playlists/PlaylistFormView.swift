@@ -125,13 +125,15 @@ struct PlaylistFormView: View {
                         .disabled(editing && !accounts.app.userPlaylistsAreEditable)
                 }
 
-                HStack {
-                    Text("Visibility")
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if accounts.app.userPlaylistsHaveVisibility {
+                    HStack {
+                        Text("Visibility")
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                    visibilityFormItem
+                        visibilityFormItem
+                    }
+                    .padding(.top, 10)
                 }
-                .padding(.top, 10)
 
                 HStack {
                     Spacer()

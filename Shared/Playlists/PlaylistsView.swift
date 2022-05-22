@@ -11,6 +11,8 @@ struct PlaylistsView: View {
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
 
+    @StateObject private var store = Store<ChannelPlaylist>()
+
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var model
@@ -18,7 +20,36 @@ struct PlaylistsView: View {
     @Namespace private var focusNamespace
 
     var items: [ContentItem] {
-        ContentItem.array(of: currentPlaylist?.videos ?? [])
+        var videos = currentPlaylist?.videos ?? []
+
+        if videos.isEmpty {
+            videos = store.item?.videos ?? []
+            if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
+                var i = 0
+
+                for index in videos.indices {
+                    var video = videos[index]
+                    video.indexID = "\(i)"
+                    i += 1
+                    videos[index] = video
+                }
+            }
+        }
+
+        return ContentItem.array(of: videos)
+    }
+
+    private var resource: Resource? {
+        guard !player.accounts.app.userPlaylistsEndpointIncludesVideos,
+              let playlist = currentPlaylist
+        else {
+            return nil
+        }
+
+        let resource = player.accounts.api.playlist(playlist.id)
+        resource?.addObserver(store)
+
+        return resource
     }
 
     var body: some View {
@@ -112,9 +143,16 @@ struct PlaylistsView: View {
         #endif
                 .onAppear {
                     model.load()
+                    resource?.load()
                 }
                 .onChange(of: accounts.current) { _ in
                     model.load(force: true)
+                }
+                .onChange(of: selectedPlaylistID) { _ in
+                    resource?.load()
+                }
+                .onChange(of: model.reloadPlaylists) { _ in
+                    resource?.load()
                 }
         #if os(iOS)
                 .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)

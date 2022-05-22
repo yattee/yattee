@@ -360,7 +360,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
         return ChannelPlaylist(
             id: id,
-            title: details["name"]!.stringValue,
+            title: details["name"]?.stringValue ?? "",
             thumbnailURL: thumbnailURL,
             channel: extractChannel(from: json)!,
             videos: videos,
