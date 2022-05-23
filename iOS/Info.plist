@@ -24,5 +24,7 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Need camera access to take pictures</string>
 </dict>
 </plist>
