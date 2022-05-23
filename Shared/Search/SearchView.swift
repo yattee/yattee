@@ -198,7 +198,7 @@ struct SearchView: View {
             visibleSections.append(.subscriptions)
         }
 
-        if accounts.app.supportsUserPlaylists && preferred.contains(.playlists) {
+        if accounts.app.supportsUserPlaylists && accounts.signedIn && preferred.contains(.playlists) {
             visibleSections.append(.playlists)
         }
 
