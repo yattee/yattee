@@ -1,4 +1,7 @@
 <div align="center">
+  <h3><strong>📣 <a href="https://yattee.stream/beta">TestFlight beta</a> now available 📣 </strong></h3>
+  <hr />
+
   <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
   <h1>Yattee</h1>
   <p>Alternative YouTube frontend for iOS, tvOS and macOS<br />built with <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a></p>
@@ -19,7 +22,7 @@
 * Fullscreen playback, Picture in Picture and AirPlay support
 * Stream quality selection
 
-### Features in alpha testing
+### Features in development
 * New player component with custom controls, gestures and support for 4K playback
 
 You can leave your feedback in [discussion on v1.4.alpha.4 release](https://github.com/yattee/yattee/discussions/132) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
@@ -59,5 +62,11 @@ Join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you 
 
 ## License
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
+
+
+## Disclaimer
+The Yattee project and its contents are not affiliated with, funded, authorized, endorsed by, or in any way accociated with YouTube, Google LLC or any of its affiliates and subsidaries. The official YouTube website can be found at www.youtube.com.
+
+Any trademark, service mark, trade name, or other intellectual property rights used in the Yattee project are owned by the respective owners.
 
 This tool is an open source software built for learning and research purposes.
