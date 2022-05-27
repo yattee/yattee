@@ -38,7 +38,6 @@ struct TimelineView: View {
 
                 segmentsLayers
             }
-            .mask(RoundedRectangle(cornerRadius: 3))
 
             Circle()
                 .strokeBorder(.gray, lineWidth: 1)
@@ -114,7 +113,7 @@ struct TimelineView: View {
     var projectedValue: Double {
         let change = (dragOffset / size.width) * units
         let projected = draggedFrom + change
-        return projected.isFinite ? (duration - projected < (0.03 * duration) ? duration : projected) : start
+        return projected.isFinite ? (duration - projected < (0.01 * duration) ? duration : projected) : start
     }
 
     var thumbOffset: Double {
