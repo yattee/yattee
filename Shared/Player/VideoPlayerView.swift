@@ -276,14 +276,17 @@ struct VideoPlayerView: View {
                 Spacer()
             }
 
-            Button {
-                player.hide()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 40))
-            }
-            .padding(10)
-            .foregroundColor(.gray)
+            #if os(iOS)
+                Button {
+                    player.hide()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 40))
+                }
+                .buttonStyle(.plain)
+                .padding(10)
+                .foregroundColor(.gray)
+            #endif
         }
         .contentShape(Rectangle())
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)

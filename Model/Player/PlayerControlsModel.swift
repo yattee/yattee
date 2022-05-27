@@ -43,7 +43,7 @@ final class PlayerControlsModel: ObservableObject {
     func handlePresentationChange() {
         if presentingControls {
             DispatchQueue.main.async { [weak self] in
-                self?.player.backend.startControlsUpdates()
+                self?.player?.backend.startControlsUpdates()
                 self?.resetTimer()
             }
         } else {
