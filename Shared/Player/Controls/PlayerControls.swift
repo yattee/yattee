@@ -53,18 +53,21 @@ struct PlayerControls: View {
 
                     Spacer()
 
-                    timeline
-                        .offset(y: 10)
-                        .zIndex(1)
+                    Group {
+                        timeline
+                            .offset(y: 10)
+                            .zIndex(1)
 
-                    bottomBar
+                        bottomBar
 
-                    #if os(macOS)
-                    .background(VisualEffectBlur(material: .hudWindow))
-                    #elseif os(iOS)
-                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                    #endif
-                    .mask(RoundedRectangle(cornerRadius: 3))
+                        #if os(macOS)
+                        .background(VisualEffectBlur(material: .hudWindow))
+                        #elseif os(iOS)
+                        .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                        #endif
+                        .mask(RoundedRectangle(cornerRadius: 3))
+                    }
+                    .padding(.horizontal, 16)
                 }
             }
             .opacity(model.presentingControls ? 1 : 0)
@@ -104,9 +107,6 @@ struct PlayerControls: View {
 
     var statusBar: some View {
         HStack(spacing: 4) {
-            #if os(iOS)
-                hidePlayerButton
-            #endif
             Text(playbackStatus)
 
             Text("•")
@@ -129,11 +129,10 @@ struct PlayerControls: View {
     }
 
     private var hidePlayerButton: some View {
-        Button {
+        button("Hide", systemImage: "chevron.down") {
             player.hide()
-        } label: {
-            Image(systemName: "chevron.down.circle.fill")
         }
+
         #if !os(tvOS)
         .keyboardShortcut(.cancelAction)
         #endif
@@ -170,13 +169,17 @@ struct PlayerControls: View {
     }
 
     var buttonsBar: some View {
-        HStack {
+        HStack(spacing: 20) {
             #if !os(tvOS)
+                hidePlayerButton
+
                 fullscreenButton
                 #if os(iOS)
                     pipButton
                 #endif
                 rateButton
+
+                closeVideoButton
 
                 Spacer()
             #endif
@@ -225,6 +228,19 @@ struct PlayerControls: View {
         #endif
     }
 
+    private var closeVideoButton: some View {
+        button("Close", systemImage: "xmark") {
+            player.pause()
+
+            player.hide()
+            player.closePiP()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                player.closeCurrentItem()
+            }
+        }
+    }
+
     var ratePicker: some View {
         Picker("Rate", selection: rateBinding) {
             ForEach(PlayerModel.availableRates, id: \.self) { rate in
@@ -244,6 +260,8 @@ struct PlayerControls: View {
                 player.avPlayerBackend.switchToMPVOnPipClose = true
             }
 
+            player.exitFullScreen()
+
             if player.activeBackend != PlayerBackendType.appleAVPlayer {
                 player.saveTime {
                     player.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
@@ -261,7 +279,7 @@ struct PlayerControls: View {
     var mediumButtonsBar: some View {
         HStack {
             #if !os(tvOS)
-                button("Seek Backward", systemImage: "gobackward.10", size: 50, cornerRadius: 10) {
+                button("Seek Backward", systemImage: "gobackward.10", size: 30, cornerRadius: 5) {
                     player.backend.seek(relative: .secondsInDefaultTimescale(-10))
                 }
 
@@ -279,8 +297,7 @@ struct PlayerControls: View {
             button(
                 model.isPlaying ? "Pause" : "Play",
                 systemImage: model.isPlaying ? "pause.fill" : "play.fill",
-                size: 50,
-                cornerRadius: 10
+                size: 30, cornerRadius: 5
             ) {
                 player.backend.togglePlay()
             }
@@ -295,7 +312,7 @@ struct PlayerControls: View {
             Spacer()
 
             #if !os(tvOS)
-                button("Seek Forward", systemImage: "goforward.10", size: 50, cornerRadius: 10) {
+                button("Seek Forward", systemImage: "goforward.10", size: 30, cornerRadius: 5) {
                     player.backend.seek(relative: .secondsInDefaultTimescale(10))
                 }
                 #if os(tvOS)
@@ -306,7 +323,7 @@ struct PlayerControls: View {
                 #endif
             #endif
         }
-        .font(.system(size: 30))
+        .font(.system(size: 20))
         .padding(.horizontal, 4)
     }
 
@@ -361,6 +378,25 @@ struct PlayerControls: View {
 
 struct PlayerControls_Previews: PreviewProvider {
     static var previews: some View {
-        PlayerControls(player: PlayerModel())
+        let model = PlayerControlsModel()
+        model.presentingControls = true
+        model.currentTime = .secondsInDefaultTimescale(0)
+        model.duration = .secondsInDefaultTimescale(120)
+
+        let view = ZStack {
+            Color.red
+
+            PlayerControls(player: PlayerModel())
+                .injectFixtureEnvironmentObjects()
+                .environmentObject(model)
+        }
+
+        return Group {
+            if #available(iOS 15.0, *) {
+                view.previewInterfaceOrientation(.landscapeLeft)
+            } else {
+                view
+            }
+        }
     }
 }
