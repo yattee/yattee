@@ -241,7 +241,11 @@ final class MPVBackend: PlayerBackend {
         client?.setDoubleAsync("speed", Double(rate))
     }
 
-    func closeItem() {}
+    func closeItem() {
+        handleEOF = false
+        client?.pause()
+        client?.stop()
+    }
 
     func enterFullScreen() {}
 

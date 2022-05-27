@@ -371,7 +371,11 @@ final class PlayerModel: ObservableObject {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.upgradeToStream(stream, force: true)
+            guard let self = self else {
+                return
+            }
+            self.upgradeToStream(stream, force: true)
+            self.setNeedsDrawing(self.presentingPlayer)
         }
     }
 
@@ -447,6 +451,10 @@ final class PlayerModel: ObservableObject {
             }
 
             logger.info("exiting fullscreen")
+
+            if controls.playingFullscreen {
+                toggleFullscreen(true)
+            }
 
             backend.exitFullScreen()
         }

@@ -10,7 +10,7 @@ struct TimelineView: View {
     @State private var draggedFrom: Double = 0
 
     private var start: Double = 0.0
-    private var height = 10.0
+    private var height = 8.0
 
     var cornerRadius: Double
     var thumbTooltipWidth: Double = 100
@@ -26,26 +26,26 @@ struct TimelineView: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .foregroundColor(.blue)
-                .frame(maxHeight: height)
+            Group {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .foregroundColor(.blue)
+                    .frame(maxHeight: height)
 
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(
-                    Color.green
-                )
-                .frame(maxHeight: height)
-                .frame(width: current * oneUnitWidth)
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(Color.green)
+                    .frame(maxHeight: height)
+                    .frame(width: current * oneUnitWidth)
 
-            segmentsLayers
+                segmentsLayers
+            }
+            .mask(RoundedRectangle(cornerRadius: 3))
 
             Circle()
                 .strokeBorder(.gray, lineWidth: 1)
                 .background(Circle().fill(dragging ? .gray : .white))
                 .offset(x: thumbOffset)
                 .foregroundColor(.red.opacity(0.6))
-
-                .frame(maxHeight: height * 2)
+                .frame(maxHeight: height * 4)
 
             #if !os(tvOS)
                 .gesture(
@@ -114,7 +114,7 @@ struct TimelineView: View {
     var projectedValue: Double {
         let change = (dragOffset / size.width) * units
         let projected = draggedFrom + change
-        return projected.isFinite ? projected : start
+        return projected.isFinite ? (duration - projected < (0.03 * duration) ? duration : projected) : start
     }
 
     var thumbOffset: Double {
@@ -192,6 +192,7 @@ struct TimelineView_Previews: PreviewProvider {
             TimelineView(duration: .constant(100), current: .constant(90))
             TimelineView(duration: .constant(100), current: .constant(100))
         }
+        .environmentObject(PlayerModel())
         .padding()
     }
 }
