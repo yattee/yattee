@@ -58,14 +58,17 @@ struct PlayerControls: View {
                             .offset(y: 10)
                             .zIndex(1)
 
-                        bottomBar
+                        HStack {
+                            Spacer()
 
-                        #if os(macOS)
-                        .background(VisualEffectBlur(material: .hudWindow))
-                        #elseif os(iOS)
-                        .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                        #endif
-                        .mask(RoundedRectangle(cornerRadius: 3))
+                            bottomBar
+                            #if os(macOS)
+                            .background(VisualEffectBlur(material: .hudWindow))
+                            #elseif os(iOS)
+                            .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                            #endif
+                            .mask(RoundedRectangle(cornerRadius: 3))
+                        }
                     }
                     .padding(.horizontal, 16)
                 }
@@ -171,7 +174,9 @@ struct PlayerControls: View {
     var buttonsBar: some View {
         HStack(spacing: 20) {
             #if !os(tvOS)
-                hidePlayerButton
+                #if os(iOS)
+                    hidePlayerButton
+                #endif
 
                 fullscreenButton
                 #if os(iOS)
@@ -235,7 +240,11 @@ struct PlayerControls: View {
             player.hide()
             player.closePiP()
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var delay = 0.3
+            #if os(macOS)
+                delay = 0.0
+            #endif
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 player.closeCurrentItem()
             }
         }
@@ -260,7 +269,9 @@ struct PlayerControls: View {
                 player.avPlayerBackend.switchToMPVOnPipClose = true
             }
 
-            player.exitFullScreen()
+            #if !os(macOS)
+                player.exitFullScreen()
+            #endif
 
             if player.activeBackend != PlayerBackendType.appleAVPlayer {
                 player.saveTime {
@@ -329,8 +340,6 @@ struct PlayerControls: View {
 
     var bottomBar: some View {
         HStack {
-            Spacer()
-
             Text(model.playbackTime)
         }
         .font(.system(size: 15))
@@ -384,7 +393,7 @@ struct PlayerControls_Previews: PreviewProvider {
         model.duration = .secondsInDefaultTimescale(120)
 
         let view = ZStack {
-            Color.red
+            Color.gray
 
             PlayerControls(player: PlayerModel())
                 .injectFixtureEnvironmentObjects()
@@ -392,7 +401,7 @@ struct PlayerControls_Previews: PreviewProvider {
         }
 
         return Group {
-            if #available(iOS 15.0, *) {
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
                 view.previewInterfaceOrientation(.landscapeLeft)
             } else {
                 view
