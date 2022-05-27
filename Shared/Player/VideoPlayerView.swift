@@ -138,17 +138,7 @@ struct VideoPlayerView: View {
                             hoveringPlayer = hovering
                             hovering ? playerControls.show() : playerControls.hide()
                         }
-                        #if os(iOS)
-                        .onSwipeGesture(
-                            up: {
-                                withAnimation {
-                                    fullScreenDetails = true
-                                }
-                            },
-                            down: { player.hide() }
-                        )
-
-                        #elseif os(macOS)
+                        #if os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
                                 if hoveringPlayer {
@@ -269,20 +259,31 @@ struct VideoPlayerView: View {
     }
 
     func playerPlaceholder(geometry: GeometryProxy) -> some View {
-        HStack {
-            Spacer()
-            VStack {
+        ZStack(alignment: .topLeading) {
+            HStack {
                 Spacer()
-                VStack(spacing: 10) {
-                    #if !os(tvOS)
-                        Image(systemName: "ticket")
-                            .font(.system(size: 120))
-                    #endif
+                VStack {
+                    Spacer()
+                    VStack(spacing: 10) {
+                        #if !os(tvOS)
+                            Image(systemName: "ticket")
+                                .font(.system(size: 120))
+                        #endif
+                    }
+                    Spacer()
                 }
+                .foregroundColor(.gray)
                 Spacer()
             }
+
+            Button {
+                player.hide()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 40))
+            }
+            .padding(10)
             .foregroundColor(.gray)
-            Spacer()
         }
         .contentShape(Rectangle())
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
