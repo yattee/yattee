@@ -5,9 +5,6 @@ import SwiftUI
 struct VideoContextMenuView: View {
     let video: Video
 
-    @Binding var playerNavigationLinkActive: Bool
-
-    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inChannelPlaylistView) private var inChannelPlaylistView
     @Environment(\.navigationStyle) private var navigationStyle
@@ -26,9 +23,8 @@ struct VideoContextMenuView: View {
 
     private var viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
-    init(video: Video, playerNavigationLinkActive: Binding<Bool>) {
+    init(video: Video) {
         self.video = video
-        _playerNavigationLinkActive = playerNavigationLinkActive
         _watchRequest = video.watchFetchRequest
     }
 
@@ -111,7 +107,7 @@ struct VideoContextMenuView: View {
 
     private var continueButton: some View {
         Button {
-            player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt), inNavigationView: inNavigationView)
+            player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt))
         } label: {
             Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime() ?? "where I left off")", systemImage: "playpause")
         }
@@ -131,7 +127,7 @@ struct VideoContextMenuView: View {
 
     private var playNowButton: some View {
         Button {
-            player.play(video, inNavigationView: inNavigationView)
+            player.play(video)
         } label: {
             Label("Play Now", systemImage: "play")
         }

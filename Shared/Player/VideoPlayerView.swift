@@ -37,6 +37,10 @@ struct VideoPlayerView: View {
         var mouseLocation: CGPoint { NSEvent.mouseLocation }
     #endif
 
+    #if !os(macOS)
+        @State private var playerOffset = UIScreen.main.bounds.height
+    #endif
+
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlayerModel> private var player
@@ -54,10 +58,6 @@ struct VideoPlayerView: View {
                     content
                         .onAppear {
                             playerSize = geometry.size
-
-                            #if os(iOS)
-                                configureOrientationUpdatesBasedOnAccelerometer()
-                            #endif
                         }
                 }
                 .onChange(of: geometry.size) { size in
@@ -70,22 +70,10 @@ struct VideoPlayerView: View {
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     handleOrientationDidChangeNotification()
                 }
-                .onDisappear {
-                    guard !playerControls.playingFullscreen else {
-                        return // swiftlint:disable:this implicit_return
-                    }
-
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                    } else {
-                        Orientation.lockOrientation(.allButUpsideDown)
-                    }
-
-                    motionManager?.stopAccelerometerUpdates()
-                    motionManager = nil
-                }
                 #endif
             }
+            .offset(y: playerOffset)
+            .animation(.easeIn(duration: 0.2), value: playerOffset)
         #endif
     }
 
@@ -138,6 +126,59 @@ struct VideoPlayerView: View {
                             hoveringPlayer = hovering
                             hovering ? playerControls.show() : playerControls.hide()
                         }
+                        #if !os(tvOS)
+                        .onChange(of: player.presentingPlayer) { newValue in
+                            if newValue {
+                                playerOffset = 0
+                                #if os(iOS)
+                                    configureOrientationUpdatesBasedOnAccelerometer()
+                                #endif
+                            } else {
+                                #if !os(macOS)
+                                    playerOffset = UIScreen.main.bounds.height
+
+                                    #if os(iOS)
+                                        if Defaults[.lockPortraitWhenBrowsing] {
+                                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                                        } else {
+                                            Orientation.lockOrientation(.allButUpsideDown)
+                                        }
+
+                                        motionManager?.stopAccelerometerUpdates()
+                                        motionManager = nil
+                                    #endif
+                                #endif
+                            }
+                        }
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    guard !fullScreenLayout else {
+                                        return
+                                    }
+
+                                    player.backend.setNeedsDrawing(false)
+                                    let drag = value.translation.height
+
+                                    guard drag > 0 else {
+                                        return
+                                    }
+
+                                    withAnimation(.easeIn(duration: 0.2)) {
+                                        playerOffset = drag
+                                    }
+                                }
+                                .onEnded { _ in
+                                    if playerOffset > 100 {
+                                        player.backend.setNeedsDrawing(true)
+                                        player.hide()
+                                    } else {
+                                        player.show()
+                                        playerOffset = 0
+                                    }
+                                }
+                        )
+                        #endif
                         #if os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
@@ -406,7 +447,8 @@ struct VideoPlayerView: View {
                 } else {
                     guard abs(acceleration.z) <= 0.74,
                           player.lockedOrientation.isNil,
-                          enterFullscreenInLandscape
+                          enterFullscreenInLandscape,
+                          !lockLandscapeOnRotation
                     else {
                         return
                     }
@@ -421,6 +463,7 @@ struct VideoPlayerView: View {
         }
 
         private func handleOrientationDidChangeNotification() {
+            playerOffset = playerOffset == 0 ? 0 : UIScreen.main.bounds.height
             let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
             if newOrientation?.isLandscape ?? false,
                player.presentingPlayer,

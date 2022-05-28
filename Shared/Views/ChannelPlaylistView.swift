@@ -10,7 +10,6 @@ struct ChannelPlaylistView: View {
     @StateObject private var store = Store<ChannelPlaylist>()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.inNavigationView) private var inNavigationView
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
@@ -24,19 +23,9 @@ struct ChannelPlaylistView: View {
     }
 
     var body: some View {
-        #if os(iOS)
-            if inNavigationView {
-                content
-            } else {
-                BrowserPlayerControls {
-                    content
-                }
-            }
-        #else
-            BrowserPlayerControls {
-                content
-            }
-        #endif
+        BrowserPlayerControls {
+            content
+        }
     }
 
     var content: some View {
@@ -94,9 +83,6 @@ struct ChannelPlaylistView: View {
             }
         }
         .navigationTitle(playlist.title)
-            #if os(iOS)
-                .navigationBarHidden(player.playerNavigationLinkActive)
-            #endif
         #endif
     }
 
@@ -110,7 +96,7 @@ struct ChannelPlaylistView: View {
 
     private var playButton: some View {
         Button {
-            player.play(videos, inNavigationView: inNavigationView)
+            player.play(videos)
         } label: {
             Label("Play All", systemImage: "play")
         }
@@ -118,7 +104,7 @@ struct ChannelPlaylistView: View {
 
     private var shuffleButton: some View {
         Button {
-            player.play(videos, shuffling: true, inNavigationView: inNavigationView)
+            player.play(videos, shuffling: true)
         } label: {
             Label("Shuffle", systemImage: "shuffle")
         }
