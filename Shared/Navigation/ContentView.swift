@@ -57,50 +57,54 @@ struct ContentView: View {
         .environmentObject(subscriptions)
         .environmentObject(thumbnailsModel)
 
-        // iOS 14 has problem with multiple sheets in one view
-        // but it's ok when it's in background
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingWelcomeScreen) {
-                WelcomeScreen()
-                    .environmentObject(accounts)
-                    .environmentObject(navigation)
-            }
-        )
-        #if !os(tvOS)
-        .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
-                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-                    .environmentObject(playlists)
-            }
-        )
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
-                PlaylistFormView(playlist: $navigation.editedPlaylist)
-                    .environmentObject(accounts)
-                    .environmentObject(playlists)
-            }
-        )
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
-                SettingsView()
-                    .environmentObject(accounts)
-                    .environmentObject(instances)
-                    .environmentObject(player)
-            }
-        )
+        #if !os(macOS)
+            .overlay(videoPlayer)
         #endif
-        .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
-            Alert(
-                title: Text(
-                    "Are you sure you want to unsubscribe from \(navigation.channelToUnsubscribe.name)?"
-                ),
-                primaryButton: .destructive(Text("Unsubscribe")) {
-                    subscriptions.unsubscribe(navigation.channelToUnsubscribe.id)
-                },
-                secondaryButton: .cancel()
+
+            // iOS 14 has problem with multiple sheets in one view
+            // but it's ok when it's in background
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingWelcomeScreen) {
+                    WelcomeScreen()
+                        .environmentObject(accounts)
+                        .environmentObject(navigation)
+                }
             )
-        }
+        #if !os(tvOS)
+            .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
+                    AddToPlaylistView(video: navigation.videoToAddToPlaylist)
+                        .environmentObject(playlists)
+                }
+            )
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
+                    PlaylistFormView(playlist: $navigation.editedPlaylist)
+                        .environmentObject(accounts)
+                        .environmentObject(playlists)
+                }
+            )
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
+                    SettingsView()
+                        .environmentObject(accounts)
+                        .environmentObject(instances)
+                        .environmentObject(player)
+                }
+            )
+        #endif
+            .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
+                Alert(
+                    title: Text(
+                        "Are you sure you want to unsubscribe from \(navigation.channelToUnsubscribe.name)?"
+                    ),
+                    primaryButton: .destructive(Text("Unsubscribe")) {
+                        subscriptions.unsubscribe(navigation.channelToUnsubscribe.id)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
     }
 
     func configure() {
@@ -221,6 +225,21 @@ struct ContentView: View {
         }
 
         navigation.presentingWelcomeScreen = true
+    }
+
+    var videoPlayer: some View {
+        VideoPlayerView()
+            .environmentObject(accounts)
+            .environmentObject(comments)
+            .environmentObject(instances)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(playerControls)
+            .environmentObject(playlists)
+            .environmentObject(recents)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
+            .environment(\.navigationStyle, .sidebar)
     }
 }
 

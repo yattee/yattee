@@ -13,7 +13,6 @@ struct ChannelVideosView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     #if os(iOS)
-        @Environment(\.inNavigationView) private var inNavigationView
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @EnvironmentObject<PlayerModel> private var player
     #endif
@@ -29,19 +28,9 @@ struct ChannelVideosView: View {
     }
 
     var body: some View {
-        #if os(iOS)
-            if inNavigationView {
-                content
-            } else {
-                BrowserPlayerControls {
-                    content
-                }
-            }
-        #else
-            BrowserPlayerControls {
-                content
-            }
-        #endif
+        BrowserPlayerControls {
+            content
+        }
     }
 
     var content: some View {
@@ -115,9 +104,6 @@ struct ChannelVideosView: View {
                 resource.load()
             }
         }
-        #if os(iOS)
-        .navigationBarHidden(player.playerNavigationLinkActive)
-        #endif
         .navigationTitle(navigationTitle)
 
         return Group {
