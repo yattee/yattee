@@ -6,7 +6,6 @@ import SwiftUI
 struct VideoCell: View {
     private var video: Video
 
-    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.navigationStyle) private var navigationStyle
 
     #if os(iOS)
@@ -46,11 +45,8 @@ struct VideoCell: View {
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .contextMenu {
-            VideoContextMenuView(
-                video: video,
-                playerNavigationLinkActive: $player.playerNavigationLinkActive
-            )
-            .environmentObject(accounts)
+            VideoContextMenuView(video: video)
+                .environmentObject(accounts)
         }
     }
 
@@ -93,7 +89,7 @@ struct VideoCell: View {
 
             player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
-            player.play(video, at: playAt, inNavigationView: inNavigationView)
+            player.play(video, at: playAt)
         }
     }
 

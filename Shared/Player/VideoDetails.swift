@@ -21,7 +21,6 @@ struct VideoDetails: View {
     @State private var currentPage = Page.info
 
     @Environment(\.presentationMode) private var presentationMode
-    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -112,7 +111,6 @@ struct VideoDetails: View {
                     .edgesIgnoringSafeArea(.horizontal)
             }
         }
-        .padding(.top, inNavigationView && fullScreen ? 10 : 0)
         .onAppear {
             if video.isNil && !sidebarQueue {
                 currentPage = .queue
