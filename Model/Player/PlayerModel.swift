@@ -57,8 +57,6 @@ final class PlayerModel: ObservableObject {
 
     @Published var preservedTime: CMTime?
 
-    @Published var playerNavigationLinkActive = false { didSet { handleNavigationViewPlayerPresentationChange() } }
-
     @Published var sponsorBlock = SponsorBlockAPI()
     @Published var segmentRestorationTime: CMTime?
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
@@ -120,23 +118,24 @@ final class PlayerModel: ObservableObject {
     }
 
     func show() {
-        guard !presentingPlayer else {
-            #if os(macOS)
+        #if os(macOS)
+            if presentingPlayer {
                 Windows.player.focus()
-            #endif
-            return
-        }
+                return
+            }
+        #endif
+
+        presentingPlayer = true
+
         #if os(macOS)
             Windows.player.open()
             Windows.player.focus()
         #endif
-        presentingPlayer = true
     }
 
     func hide() {
         controls.playingFullscreen = false
         presentingPlayer = false
-        playerNavigationLinkActive = false
 
         #if os(iOS)
             if Defaults[.lockPortraitWhenBrowsing] {
@@ -206,18 +205,25 @@ final class PlayerModel: ObservableObject {
         backend.pause()
     }
 
-    func play(_ video: Video, at time: CMTime? = nil, inNavigationView: Bool = false) {
-        playNow(video, at: time)
+    func play(_ video: Video, at time: CMTime? = nil) {
+        var delay = 0.0
+        #if !os(macOS)
+            delay = 0.3
+        #endif
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            self.playNow(video, at: time)
+        }
 
         guard !playingInPictureInPicture else {
             return
         }
 
-        if inNavigationView {
-            playerNavigationLinkActive = true
-        } else {
-            show()
-        }
+        show()
     }
 
     func playStream(
@@ -297,7 +303,18 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
-        backend.setNeedsDrawing(presentingPlayer)
+        var delay = 0.0
+
+        #if os(iOS)
+            if presentingPlayer {
+                delay = 0.2
+            }
+        #endif
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.backend.setNeedsDrawing(self?.presentingPlayer ?? false)
+        }
+
         controls.hide()
 
         #if !os(macOS)
@@ -319,17 +336,6 @@ final class PlayerModel: ObservableObject {
         if !presentingPlayer, !pauseOnHidingPlayer, backend.isPlaying {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.play()
-            }
-        }
-    }
-
-    private func handleNavigationViewPlayerPresentationChange() {
-        backend.setNeedsDrawing(playerNavigationLinkActive)
-        controls.hide()
-
-        if pauseOnHidingPlayer, !playingInPictureInPicture, !playerNavigationLinkActive {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.pause()
             }
         }
     }

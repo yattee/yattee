@@ -63,24 +63,6 @@ struct AppSidebarNavigation: View {
             }
         }
         .environment(\.navigationStyle, .sidebar)
-        #if os(iOS)
-            .background(
-                EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                    VideoPlayerView()
-                        .environmentObject(accounts)
-                        .environmentObject(comments)
-                        .environmentObject(instances)
-                        .environmentObject(navigation)
-                        .environmentObject(player)
-                        .environmentObject(playerControls)
-                        .environmentObject(playlists)
-                        .environmentObject(recents)
-                        .environmentObject(subscriptions)
-                        .environmentObject(thumbnailsModel)
-                        .environment(\.navigationStyle, .sidebar)
-                }
-            )
-        #endif
     }
 
     var toolbarContent: some ToolbarContent {

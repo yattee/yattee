@@ -240,7 +240,7 @@ struct PlayerControls: View {
             player.hide()
             player.closePiP()
 
-            var delay = 0.3
+            var delay = 0.2
             #if os(macOS)
                 delay = 0.0
             #endif

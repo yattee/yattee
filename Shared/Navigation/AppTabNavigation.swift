@@ -51,14 +51,11 @@ struct AppTabNavigation: View {
                         ChannelVideosView(channel: channel)
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environment(\.inChannelView, true)
-                            .environment(\.inNavigationView, true)
                             .environmentObject(accounts)
                             .environmentObject(navigation)
                             .environmentObject(player)
                             .environmentObject(subscriptions)
                             .environmentObject(thumbnailsModel)
-
-                            .background(playerNavigationLink)
                     }
                 }
             }
@@ -69,23 +66,13 @@ struct AppTabNavigation: View {
                     NavigationView {
                         ChannelPlaylistView(playlist: playlist)
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                            .environment(\.inNavigationView, true)
                             .environmentObject(accounts)
                             .environmentObject(navigation)
                             .environmentObject(player)
                             .environmentObject(subscriptions)
                             .environmentObject(thumbnailsModel)
-
-                            .background(playerNavigationLink)
                     }
                 }
-            }
-        )
-        .background(
-            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                videoPlayer
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environment(\.navigationStyle, .tab)
             }
         )
     }
@@ -170,15 +157,6 @@ struct AppTabNavigation: View {
                 .accessibility(label: Text("Search"))
         }
         .tag(TabSelection.search)
-    }
-
-    private var playerNavigationLink: some View {
-        NavigationLink(isActive: $player.playerNavigationLinkActive, destination: {
-            videoPlayer
-                .environment(\.inNavigationView, true)
-        }) {
-            EmptyView()
-        }
     }
 
     private var videoPlayer: some View {

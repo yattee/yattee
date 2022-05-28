@@ -1,10 +1,6 @@
 import Foundation
 import SwiftUI
 
-private struct InNavigationViewKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
 private struct InChannelViewKey: EnvironmentKey {
     static let defaultValue = false
 }
@@ -40,11 +36,6 @@ private struct ScrollViewBottomPaddingKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var inNavigationView: Bool {
-        get { self[InNavigationViewKey.self] }
-        set { self[InNavigationViewKey.self] = newValue }
-    }
-
     var inChannelView: Bool {
         get { self[InChannelViewKey.self] }
         set { self[InChannelViewKey.self] = newValue }

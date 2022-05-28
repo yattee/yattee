@@ -1,5 +1,6 @@
 import AVFAudio
 import CoreMedia
+import Defaults
 import Foundation
 import Logging
 import SwiftUI
@@ -247,7 +248,13 @@ final class MPVBackend: PlayerBackend {
         client?.stop()
     }
 
-    func enterFullScreen() {}
+    func enterFullScreen() {
+        model.toggleFullscreen(controls?.playingFullscreen ?? false)
+
+        if Defaults[.lockLandscapeWhenEnteringFullscreen] {
+            Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
+        }
+    }
 
     func exitFullScreen() {}
 

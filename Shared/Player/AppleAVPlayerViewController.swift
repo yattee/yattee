@@ -178,11 +178,7 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if self.navigationModel.presentingChannel {
-                self.playerModel.playerNavigationLinkActive = true
-            } else {
-                self.playerModel.show()
-            }
+            self.playerModel.show()
 
             #if os(tvOS)
                 if self.playerModel.playingInPictureInPicture {
@@ -198,7 +194,6 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {
         playerModel.playingInPictureInPicture = true
-        playerModel.playerNavigationLinkActive = false
     }
 
     func playerViewControllerWillStopPictureInPicture(_: AVPlayerViewController) {

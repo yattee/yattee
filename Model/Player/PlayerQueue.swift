@@ -8,7 +8,7 @@ extension PlayerModel {
         currentItem?.video
     }
 
-    func play(_ videos: [Video], shuffling: Bool = false, inNavigationView: Bool = false) {
+    func play(_ videos: [Video], shuffling: Bool = false) {
         let videosToPlay = shuffling ? videos.shuffled() : videos
 
         guard let first = videosToPlay.first else {
@@ -27,11 +27,7 @@ extension PlayerModel {
             }
         }
 
-        if inNavigationView {
-            playerNavigationLinkActive = true
-        } else {
-            show()
-        }
+        show()
     }
 
     func playNext(_ video: Video) {

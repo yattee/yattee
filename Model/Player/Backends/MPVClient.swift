@@ -134,11 +134,11 @@ final class MPVClient: ObservableObject {
     }
 
     var currentTime: CMTime {
-        CMTime.secondsInDefaultTimescale(getDouble("time-pos"))
+        CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("time-pos"))
     }
 
     var duration: CMTime {
-        CMTime.secondsInDefaultTimescale(getDouble("duration"))
+        CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("duration"))
     }
 
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
