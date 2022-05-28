@@ -26,12 +26,6 @@ extension Defaults.Keys {
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
     static let favorites = Key<[FavoriteItem]>("favorites", default: [
-        .init(section: .trending("US", "default")),
-        .init(section: .trending("GB", "default")),
-        .init(section: .trending("ES", "default")),
-        .init(section: .channel("UC-lHJZR3Gqxm24_Vd_AJ5Yw", "PewDiePie")),
-        .init(section: .channel("UCXuqSBlHAE6Xw-yeJA0Tunw", "Linus Tech Tips")),
-        .init(section: .channel("UCBJycsmduvYEL83R_U4JriQ", "Marques Brownlee")),
         .init(section: .channel("UCE_M8A5yxnLfW0KghEeajjw", "Apple"))
     ])
 
