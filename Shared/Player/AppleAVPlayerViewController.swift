@@ -179,6 +179,7 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
     ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.playerModel.show()
+            self.playerModel.setNeedsDrawing(true)
 
             #if os(tvOS)
                 if self.playerModel.playingInPictureInPicture {
