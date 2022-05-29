@@ -78,6 +78,7 @@ final class NavigationModel: ObservableObject {
             return
         }
 
+        navigation.presentingPlaylist = false
         navigation.presentingChannel = false
 
         let recent = RecentItem(from: channel)
@@ -115,6 +116,9 @@ final class NavigationModel: ObservableObject {
         navigationStyle: NavigationStyle,
         delay: Bool = false
     ) {
+        navigation.presentingChannel = false
+        navigation.presentingPlaylist = false
+
         let recent = RecentItem(from: playlist)
         #if os(macOS)
             Windows.main.open()
