@@ -8,9 +8,9 @@ import SwiftUI
 
 struct VideoPlayerView: View {
     #if os(iOS)
-    static let hiddenPlayerOffset = UIScreen.main.bounds.height + 100
+        static let hiddenPlayerOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
     #else
-    static let hiddenPlayerOffset = 0.0
+        static let hiddenPlayerOffset = 0.0
     #endif
 
     static let defaultAspectRatio = 16 / 9.0
@@ -93,8 +93,7 @@ struct VideoPlayerView: View {
 
                             motionManager?.stopAccelerometerUpdates()
                             motionManager = nil
-                        #else
-                        playerOffset = Self.hiddenPlayerOffset
+                            playerOffset = Self.hiddenPlayerOffset
                         #endif
                     }
                 }
@@ -155,46 +154,47 @@ struct VideoPlayerView: View {
                         }
                         #if !os(macOS)
                         .gesture(
-                            DragGesture(minimumDistance: 0)
+                            DragGesture(coordinateSpace: .global)
                                 .onChanged { value in
                                     guard !fullScreenLayout else {
-                                        return
+                                        return // swiftlint:disable:this implicit_return
                                     }
 
                                     player.backend.setNeedsDrawing(false)
                                     let drag = value.translation.height
 
                                     guard drag > 0 else {
-                                        return
+                                        return // swiftlint:disable:this implicit_return
                                     }
 
-                                    withAnimation(.easeIn(duration: 0.2)) {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
                                         playerOffset = drag
                                     }
                                 }
                                 .onEnded { _ in
                                     if playerOffset > 100 {
-                                        player.backend.setNeedsDrawing(true)
+                                        player.backend.setNeedsDrawing(false)
                                         player.hide()
                                     } else {
-                                        player.show()
                                         playerOffset = 0
+                                        player.backend.setNeedsDrawing(true)
+                                        player.show()
                                     }
                                 }
                         )
                         #else
-                        .onAppear(perform: {
-                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                if hoveringPlayer {
-                                    playerControls.resetTimer()
-                                }
+                                .onAppear(perform: {
+                                    NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                        if hoveringPlayer {
+                                            playerControls.resetTimer()
+                                        }
 
-                                return $0
-                            }
-                        })
+                                        return $0
+                                    }
+                                })
                         #endif
 
-                        .background(Color.black)
+                                .background(Color.black)
 
                         #if !os(tvOS)
                             if !playerControls.playingFullscreen {
