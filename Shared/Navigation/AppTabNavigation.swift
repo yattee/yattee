@@ -43,8 +43,8 @@ struct AppTabNavigation: View {
             searchNavigationView
         }
         .id(accounts.current?.id ?? "")
-        .overlay(channelView)
         .overlay(playlistView)
+        .overlay(channelView)
         .environment(\.navigationStyle, .tab)
     }
 
