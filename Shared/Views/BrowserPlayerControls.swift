@@ -65,15 +65,6 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
                                 .lineLimit(1)
                         }
                     }
-                    .contextMenu {
-                        Button {
-                            model.closeCurrentItem()
-                        } label: {
-                            Label("Close Video", systemImage: "xmark.circle")
-                                .labelStyle(.automatic)
-                        }
-                        .disabled(model.currentItem.isNil)
-                    }
 
                     Spacer()
                 }
@@ -82,43 +73,41 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
             }
             .padding(.vertical, 20)
 
-            ZStack(alignment: .bottom) {
-                HStack {
-                    Group {
-                        if playerControls.isPlaying {
-                            Button(action: {
-                                model.pause()
-                            }) {
-                                Label("Pause", systemImage: "pause.fill")
-                            }
-                        } else {
-                            Button(action: {
-                                model.play()
-                            }) {
-                                Label("Play", systemImage: "play.fill")
-                            }
+            HStack {
+                Group {
+                    if !model.currentItem.isNil {
+                        Button {
+                            model.closeCurrentItem()
+                            model.closePiP()
+                        } label: {
+                            Label("Close Video", systemImage: "xmark")
                         }
                     }
-                    .disabled(playerControls.isLoadingVideo || model.currentItem.isNil)
-                    .font(.system(size: 30))
-                    .frame(minWidth: 30)
 
-                    Button(action: { model.advanceToNextItem() }) {
-                        Label("Next", systemImage: "forward.fill")
-                            .padding(.vertical)
-                            .contentShape(Rectangle())
+                    if playerControls.isPlaying {
+                        Button(action: {
+                            model.pause()
+                        }) {
+                            Label("Pause", systemImage: "pause.fill")
+                        }
+                    } else {
+                        Button(action: {
+                            model.play()
+                        }) {
+                            Label("Play", systemImage: "play.fill")
+                        }
                     }
-                    .disabled(model.queue.isEmpty)
                 }
+                .disabled(playerControls.isLoadingVideo || model.currentItem.isNil)
+                .font(.system(size: 30))
+                .frame(minWidth: 30)
 
-                ProgressView(value: progressViewValue, total: progressViewTotal)
-                    .progressViewStyle(.linear)
-                #if os(iOS)
-                    .frame(maxWidth: 60)
-                #else
-                    .offset(y: 6)
-                    .frame(maxWidth: 70)
-                #endif
+                Button(action: { model.advanceToNextItem() }) {
+                    Label("Next", systemImage: "forward.fill")
+                        .padding(.vertical)
+                        .contentShape(Rectangle())
+                }
+                .disabled(model.queue.isEmpty)
             }
         }
         .buttonStyle(.plain)
