@@ -205,7 +205,7 @@ final class PlayerModel: ObservableObject {
         backend.pause()
     }
 
-    func play(_ video: Video, at time: CMTime? = nil) {
+    func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
         var delay = 0.0
         #if !os(macOS)
             delay = 0.3
@@ -223,7 +223,9 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        show()
+        if showingPlayer {
+            show()
+        }
     }
 
     func playStream(
@@ -268,6 +270,7 @@ final class PlayerModel: ObservableObject {
 
     func saveTime(completionHandler: @escaping () -> Void = {}) {
         guard let currentTime = backend.currentTime, currentTime.seconds > 0 else {
+            completionHandler()
             return
         }
 
@@ -341,6 +344,10 @@ final class PlayerModel: ObservableObject {
     }
 
     func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType) {
+        guard activeBackend != to else {
+            return
+        }
+
         Defaults[.activeBackend] = to
         self.activeBackend = to
 

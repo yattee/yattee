@@ -265,25 +265,7 @@ struct PlayerControls: View {
 
     private var pipButton: some View {
         button("PiP", systemImage: "pip") {
-            if player.activeBackend == .mpv {
-                player.avPlayerBackend.switchToMPVOnPipClose = true
-            }
-
-            #if !os(macOS)
-                player.exitFullScreen()
-            #endif
-
-            if player.activeBackend != PlayerBackendType.appleAVPlayer {
-                player.saveTime {
-                    player.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
-                }
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                print(player.pipController?.isPictureInPicturePossible ?? false ? "possible" : "NOT possible")
-                player.avPlayerBackend.startPictureInPictureOnPlay = true
-                player.pipController?.startPictureInPicture()
-            }
+            model.startPiP()
         }
     }
 
