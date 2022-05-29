@@ -8,9 +8,7 @@ import SwiftUI
 
 struct VideoPlayerView: View {
     #if os(iOS)
-        static let hiddenPlayerOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
-    #else
-        static let hiddenPlayerOffset = 0.0
+        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
     #endif
 
     static let defaultAspectRatio = 16 / 9.0
@@ -44,7 +42,7 @@ struct VideoPlayerView: View {
     #endif
 
     #if !os(macOS)
-        @State private var playerOffset = Self.hiddenPlayerOffset
+        @State private var viewVerticalOffset = Self.hiddenOffset
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -79,7 +77,7 @@ struct VideoPlayerView: View {
                 #endif
                 .onChange(of: player.presentingPlayer) { newValue in
                     if newValue {
-                        playerOffset = 0
+                        viewVerticalOffset = 0
                         #if os(iOS)
                             configureOrientationUpdatesBasedOnAccelerometer()
                         #endif
@@ -93,13 +91,14 @@ struct VideoPlayerView: View {
 
                             motionManager?.stopAccelerometerUpdates()
                             motionManager = nil
-                            playerOffset = Self.hiddenPlayerOffset
+                            viewVerticalOffset = Self.hiddenOffset
                         #endif
                     }
                 }
             }
-            .offset(y: playerOffset)
-            .animation(.easeIn(duration: 0.2), value: playerOffset)
+            .offset(y: viewVerticalOffset)
+            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
+            .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
         #endif
     }
 
@@ -168,15 +167,15 @@ struct VideoPlayerView: View {
                                     }
 
                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                        playerOffset = drag
+                                        viewVerticalOffset = drag
                                     }
                                 }
                                 .onEnded { _ in
-                                    if playerOffset > 100 {
+                                    if viewVerticalOffset > 100 {
                                         player.backend.setNeedsDrawing(false)
                                         player.hide()
                                     } else {
-                                        playerOffset = 0
+                                        viewVerticalOffset = 0
                                         player.backend.setNeedsDrawing(true)
                                         player.show()
                                     }
@@ -466,7 +465,7 @@ struct VideoPlayerView: View {
         }
 
         private func handleOrientationDidChangeNotification() {
-            playerOffset = playerOffset == 0 ? 0 : Self.hiddenPlayerOffset
+            viewVerticalOffset = viewVerticalOffset == 0 ? 0 : Self.hiddenOffset
             let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
             if newOrientation?.isLandscape ?? false,
                player.presentingPlayer,
