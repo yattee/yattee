@@ -17,9 +17,8 @@ struct PlayerSettings: View {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
+        @Default(.lockOrientationInFullScreen) private var lockOrientationInFullScreen
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
-        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
@@ -96,13 +95,12 @@ struct PlayerSettings: View {
             }
 
             #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation"), footer: orientationFooter) {
+                Section(header: SettingsHeader(text: "Orientation")) {
                     if idiom == .pad {
                         enterFullscreenInLandscapeToggle
                     }
                     honorSystemOrientationLockToggle
-                    lockLandscapeOnRotationToggle
-                    lockLandscapeWhenEnteringFullscreenToggle
+                    lockOrientationInFullScreenToggle
                 }
             #endif
         }
@@ -215,17 +213,9 @@ struct PlayerSettings: View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
         }
 
-        private var lockLandscapeOnRotationToggle: some View {
-            Toggle("Lock landscape on rotation", isOn: $lockLandscapeOnRotation)
+        private var lockOrientationInFullScreenToggle: some View {
+            Toggle("Lock orientation in fullscreen", isOn: $lockOrientationInFullScreen)
                 .disabled(!enterFullscreenInLandscape)
-        }
-
-        private var lockLandscapeWhenEnteringFullscreenToggle: some View {
-            Toggle("Rotate and lock landscape on entering fullscreen", isOn: $lockLandscapeWhenEnteringFullscreen)
-        }
-
-        private var orientationFooter: some View {
-            Text("Orientation settings are experimental and do not yet work properly with all devices and iOS versions")
         }
     #endif
 
