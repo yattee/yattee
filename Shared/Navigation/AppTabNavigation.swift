@@ -44,22 +44,8 @@ struct AppTabNavigation: View {
         }
         .id(accounts.current?.id ?? "")
         .environment(\.navigationStyle, .tab)
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingChannel) {
-                if let channel = recents.presentedChannel {
-                    NavigationView {
-                        ChannelVideosView(channel: channel)
-                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                            .environment(\.inChannelView, true)
-                            .environmentObject(accounts)
-                            .environmentObject(navigation)
-                            .environmentObject(player)
-                            .environmentObject(subscriptions)
-                            .environmentObject(thumbnailsModel)
-                    }
-                }
-            }
-        )
+        .overlay(channelView)
+
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingPlaylist) {
                 if let playlist = recents.presentedPlaylist {
@@ -187,5 +173,17 @@ struct AppTabNavigation: View {
                 }
             }
         #endif
+    }
+
+    private var channelView: some View {
+        ChannelVideosView()
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .environment(\.inChannelView, true)
+            .environment(\.navigationStyle, .tab)
+            .environmentObject(accounts)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
     }
 }

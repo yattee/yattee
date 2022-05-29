@@ -549,4 +549,8 @@ final class PlayerModel: ObservableObject {
             }
         #endif
     }
+
+    func setNeedsDrawing(_ needsDrawing: Bool) {
+        backends.forEach { $0.setNeedsDrawing(needsDrawing) }
+    }
 }
