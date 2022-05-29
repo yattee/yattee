@@ -426,7 +426,7 @@ struct VideoDetails: View {
 
     var detailsPage: some View {
         Group {
-            Group {
+            VStack(alignment: .leading, spacing: 0) {
                 if let video = player.currentVideo {
                     VStack(spacing: 6) {
                         HStack {
@@ -440,6 +440,7 @@ struct VideoDetails: View {
 
                         Divider()
                     }
+                    .padding(.bottom, 6)
 
                     VStack(alignment: .leading, spacing: 10) {
                         if let description = video.description {
