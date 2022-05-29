@@ -33,7 +33,7 @@ struct ChannelVideosView: View {
     @Namespace private var focusNamespace
 
     var presentedChannel: Channel? {
-        recents.presentedChannel ?? channel
+        channel ?? recents.presentedChannel
     }
 
     var videos: [ContentItem] {
@@ -50,13 +50,15 @@ struct ChannelVideosView: View {
             #if os(iOS)
             .onChange(of: navigation.presentingChannel) { newValue in
                 if newValue {
-                    resource?.load()
+                    store.clear()
                     viewVerticalOffset = 0
+                    resource?.load()
                 } else {
                     viewVerticalOffset = Self.hiddenOffset
                 }
             }
             .offset(y: viewVerticalOffset)
+            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
             #endif
         } else {
