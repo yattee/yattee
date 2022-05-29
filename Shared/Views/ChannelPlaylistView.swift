@@ -2,29 +2,71 @@ import Siesta
 import SwiftUI
 
 struct ChannelPlaylistView: View {
-    var playlist: ChannelPlaylist
+    #if os(iOS)
+        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
+    #endif
+
+    var playlist: ChannelPlaylist?
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
+    #if os(iOS)
+        @State private var viewVerticalOffset = Self.hiddenOffset
+    #endif
+
     @StateObject private var store = Store<ChannelPlaylist>()
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
 
-    var items: [ContentItem] {
+    private var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
     }
 
-    var resource: Resource? {
-        accounts.api.channelPlaylist(playlist.id)
+    private var presentedPlaylist: ChannelPlaylist? {
+        recents.presentedPlaylist ?? playlist
+    }
+
+    private var resource: Resource? {
+        guard let playlist = presentedPlaylist else {
+            return nil
+        }
+
+        let resource = accounts.api.channelPlaylist(playlist.id)
+        resource?.addObserver(store)
+
+        return resource
     }
 
     var body: some View {
-        BrowserPlayerControls {
-            content
+        if navigationStyle == .tab {
+            NavigationView {
+                BrowserPlayerControls {
+                    content
+                }
+            }
+            #if os(iOS)
+            .onChange(of: navigation.presentingPlaylist) { newValue in
+                if newValue {
+                    viewVerticalOffset = 0
+                    resource?.load()
+                } else {
+                    viewVerticalOffset = Self.hiddenOffset
+                }
+            }
+            .offset(y: viewVerticalOffset)
+            .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
+            #endif
+        } else {
+            BrowserPlayerControls {
+                content
+            }
         }
     }
 
@@ -58,7 +100,6 @@ struct ChannelPlaylistView: View {
         }
         #endif
         .onAppear {
-            resource?.addObserver(store)
             resource?.loadIfNeeded()
         }
         #if os(tvOS)
@@ -66,23 +107,31 @@ struct ChannelPlaylistView: View {
         #else
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                ShareButton(
-                    contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet,
-                    shareURL: $shareURL
-                )
+                if navigationStyle == .tab {
+                    Button("Done") {
+                        navigation.presentingPlaylist = false
+                    }
+                }
             }
 
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                    ShareButton(
+                        contentItem: contentItem,
+                        presentingShareSheet: $presentingShareSheet,
+                        shareURL: $shareURL
+                    )
+
+                    if let playlist = presentedPlaylist {
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                    }
 
                     playButton
                     shuffleButton
                 }
             }
         }
-        .navigationTitle(playlist.title)
+        .navigationTitle(presentedPlaylist?.title ?? "")
         #endif
     }
 
