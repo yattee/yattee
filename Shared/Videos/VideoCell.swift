@@ -80,7 +80,8 @@ struct VideoCell: View {
 
             var playAt: CMTime?
 
-            if playNowContinues,
+            if saveHistory,
+               playNowContinues,
                !watch.isNil,
                !watch!.finished
             {
