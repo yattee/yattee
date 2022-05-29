@@ -1,4 +1,5 @@
 import CoreData
+import CoreMedia
 import Defaults
 import SwiftUI
 
@@ -53,6 +54,9 @@ struct VideoContextMenuView: View {
 
         Section {
             playNowButton
+            #if os(iOS)
+                playNowInPictureInPictureButton
+            #endif
         }
 
         Section {
@@ -130,6 +134,26 @@ struct VideoContextMenuView: View {
             player.play(video)
         } label: {
             Label("Play Now", systemImage: "play")
+        }
+    }
+
+    private var playNowInPictureInPictureButton: some View {
+        Button {
+            player.controls.startPiP(startImmediately: false)
+
+            var time: CMTime?
+            if saveHistory,
+               let stoppedAt = watch?.stoppedAt,
+               !watch!.finished
+            {
+                time = .secondsInDefaultTimescale(stoppedAt)
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                player.play(video, at: time, showingPlayer: false)
+            }
+        } label: {
+            Label("Play in PiP", systemImage: "pip")
         }
     }
 
