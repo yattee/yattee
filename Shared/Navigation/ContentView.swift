@@ -26,6 +26,8 @@ struct ContentView: View {
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
+    let persistenceController = PersistenceController.shared
+
     var body: some View {
         Group {
             #if os(iOS)

@@ -78,6 +78,8 @@ final class NavigationModel: ObservableObject {
             return
         }
 
+        navigation.presentingChannel = false
+
         let recent = RecentItem(from: channel)
         #if os(macOS)
             Windows.main.open()
