@@ -19,16 +19,21 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     }
 
     func pictureInPictureControllerDidStopPictureInPicture(_: AVPictureInPictureController) {
-        if player?.avPlayerBackend.switchToMPVOnPipClose ?? false {
-            DispatchQueue.main.async { [weak player] in
-                player?.avPlayerBackend.switchToMPVOnPipClose = false
-                player?.saveTime { [weak player] in
-                    player?.changeActiveBackend(from: .appleAVPlayer, to: .mpv)
+        guard let player = player else {
+            return
+        }
+
+        if player.avPlayerBackend.switchToMPVOnPipClose,
+           !player.currentItem.isNil {
+            DispatchQueue.main.async {
+                player.avPlayerBackend.switchToMPVOnPipClose = false
+                player.saveTime {
+                    player.changeActiveBackend(from: .appleAVPlayer, to: .mpv)
                 }
             }
         }
 
-        player?.playingInPictureInPicture = false
+        player.playingInPictureInPicture = false
     }
 
     func pictureInPictureControllerWillStopPictureInPicture(_: AVPictureInPictureController) {}
@@ -37,7 +42,10 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         _: AVPictureInPictureController,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
-        player?.show()
+        if !player.currentItem.isNil {
+            player?.show()
+        }
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             completionHandler(true)
         }

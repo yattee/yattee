@@ -169,8 +169,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
     #else
         func closePiP(wasPlaying: Bool) {
-            controller?.playerView.player = nil
-            controller?.playerView.player = avPlayer
+            model.pipController?.stopPictureInPicture()
 
             guard wasPlaying else {
                 return

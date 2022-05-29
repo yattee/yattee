@@ -113,7 +113,7 @@ struct ChannelVideosView: View {
             ToolbarItem {
                 HStack {
                     HStack(spacing: 3) {
-                        Text("\(store.item?.subscriptionsString ?? "loading")")
+                        Text("\(store.item?.subscriptionsString ?? "")")
                             .fontWeight(.bold)
                         Text(" subscribers")
                             .allowsTightening(true)
