@@ -1407,6 +1407,7 @@
 				37152EE926EFEB95004FB96D /* LazyView.swift */,
 				37030FF627B0347C00ECDDAA /* MPVPlayerView.swift */,
 				37E70926271CDDAE00D34DDE /* OpenSettingsButton.swift */,
+				37FEF11227EFD8580033912F /* PlaceholderCell.swift */,
 				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
 				37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
@@ -1415,7 +1416,6 @@
 				37AAF29F26741C97007FC770 /* SubscriptionsView.swift */,
 				37B17D9F268A1F25006AEE9B /* VideoContextMenuView.swift */,
 				37E70922271CD43000D34DDE /* WelcomeScreen.swift */,
-				37FEF11227EFD8580033912F /* PlaceholderCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

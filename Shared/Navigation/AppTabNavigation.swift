@@ -43,24 +43,9 @@ struct AppTabNavigation: View {
             searchNavigationView
         }
         .id(accounts.current?.id ?? "")
-        .environment(\.navigationStyle, .tab)
         .overlay(channelView)
-
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingPlaylist) {
-                if let playlist = recents.presentedPlaylist {
-                    NavigationView {
-                        ChannelPlaylistView(playlist: playlist)
-                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                            .environmentObject(accounts)
-                            .environmentObject(navigation)
-                            .environmentObject(player)
-                            .environmentObject(subscriptions)
-                            .environmentObject(thumbnailsModel)
-                    }
-                }
-            }
-        )
+        .overlay(playlistView)
+        .environment(\.navigationStyle, .tab)
     }
 
     private var favoritesNavigationView: some View {
@@ -180,6 +165,16 @@ struct AppTabNavigation: View {
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .environment(\.inChannelView, true)
             .environment(\.navigationStyle, .tab)
+            .environmentObject(accounts)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
+    }
+
+    private var playlistView: some View {
+        ChannelPlaylistView()
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .environmentObject(accounts)
             .environmentObject(navigation)
             .environmentObject(player)
