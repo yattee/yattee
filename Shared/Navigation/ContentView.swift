@@ -57,7 +57,7 @@ struct ContentView: View {
         .environmentObject(subscriptions)
         .environmentObject(thumbnailsModel)
 
-        #if !os(macOS)
+        #if os(iOS)
             .overlay(videoPlayer)
         #endif
 

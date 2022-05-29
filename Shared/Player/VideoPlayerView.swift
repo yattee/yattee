@@ -7,6 +7,12 @@ import Siesta
 import SwiftUI
 
 struct VideoPlayerView: View {
+    #if os(iOS)
+    static let hiddenPlayerOffset = UIScreen.main.bounds.height + 100
+    #else
+    static let hiddenPlayerOffset = 0.0
+    #endif
+
     static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
@@ -38,7 +44,7 @@ struct VideoPlayerView: View {
     #endif
 
     #if !os(macOS)
-        @State private var playerOffset = UIScreen.main.bounds.height
+        @State private var playerOffset = Self.hiddenPlayerOffset
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -71,6 +77,27 @@ struct VideoPlayerView: View {
                     handleOrientationDidChangeNotification()
                 }
                 #endif
+                .onChange(of: player.presentingPlayer) { newValue in
+                    if newValue {
+                        playerOffset = 0
+                        #if os(iOS)
+                            configureOrientationUpdatesBasedOnAccelerometer()
+                        #endif
+                    } else {
+                        #if os(iOS)
+                            if Defaults[.lockPortraitWhenBrowsing] {
+                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                            } else {
+                                Orientation.lockOrientation(.allButUpsideDown)
+                            }
+
+                            motionManager?.stopAccelerometerUpdates()
+                            motionManager = nil
+                        #else
+                        playerOffset = Self.hiddenPlayerOffset
+                        #endif
+                    }
+                }
             }
             .offset(y: playerOffset)
             .animation(.easeIn(duration: 0.2), value: playerOffset)
@@ -126,30 +153,7 @@ struct VideoPlayerView: View {
                             hoveringPlayer = hovering
                             hovering ? playerControls.show() : playerControls.hide()
                         }
-                        #if !os(tvOS)
-                        .onChange(of: player.presentingPlayer) { newValue in
-                            if newValue {
-                                playerOffset = 0
-                                #if os(iOS)
-                                    configureOrientationUpdatesBasedOnAccelerometer()
-                                #endif
-                            } else {
-                                #if !os(macOS)
-                                    playerOffset = UIScreen.main.bounds.height
-
-                                    #if os(iOS)
-                                        if Defaults[.lockPortraitWhenBrowsing] {
-                                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                                        } else {
-                                            Orientation.lockOrientation(.allButUpsideDown)
-                                        }
-
-                                        motionManager?.stopAccelerometerUpdates()
-                                        motionManager = nil
-                                    #endif
-                                #endif
-                            }
-                        }
+                        #if !os(macOS)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
@@ -178,8 +182,7 @@ struct VideoPlayerView: View {
                                     }
                                 }
                         )
-                        #endif
-                        #if os(macOS)
+                        #else
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
                                 if hoveringPlayer {
@@ -463,7 +466,7 @@ struct VideoPlayerView: View {
         }
 
         private func handleOrientationDidChangeNotification() {
-            playerOffset = playerOffset == 0 ? 0 : UIScreen.main.bounds.height
+            playerOffset = playerOffset == 0 ? 0 : Self.hiddenPlayerOffset
             let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
             if newOrientation?.isLandscape ?? false,
                player.presentingPlayer,
