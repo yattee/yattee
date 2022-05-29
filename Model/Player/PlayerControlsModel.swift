@@ -94,9 +94,11 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func resetTimer() {
-        if !presentingControls {
-            show()
-        }
+        #if os(tvOS)
+            if !presentingControls {
+                show()
+            }
+        #endif
 
         removeTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
