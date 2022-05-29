@@ -141,16 +141,8 @@ struct VideoContextMenuView: View {
         Button {
             player.controls.startPiP(startImmediately: false)
 
-            var time: CMTime?
-            if saveHistory,
-               let stoppedAt = watch?.stoppedAt,
-               !watch!.finished
-            {
-                time = .secondsInDefaultTimescale(stoppedAt)
-            }
-
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                player.play(video, at: time, showingPlayer: false)
+                player.play(video, at: watch?.timeToRestart, showingPlayer: false)
             }
         } label: {
             Label("Play in PiP", systemImage: "pip")
