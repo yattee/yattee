@@ -374,7 +374,7 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        if !backend.canPlay(stream) {
+        if !backend.canPlay(stream) || (to == .mpv && !stream.hlsURL.isNil) {
             guard let preferredStream = preferredStream(availableStreams) else {
                 return
             }
