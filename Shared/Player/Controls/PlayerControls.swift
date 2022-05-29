@@ -272,6 +272,9 @@ struct PlayerControls: View {
     var mediumButtonsBar: some View {
         HStack {
             #if !os(tvOS)
+                restartVideoButton
+                    .padding(.trailing, 15)
+
                 button("Seek Backward", systemImage: "gobackward.10", size: 30, cornerRadius: 5) {
                     player.backend.seek(relative: .secondsInDefaultTimescale(-10))
                 }
@@ -314,10 +317,26 @@ struct PlayerControls: View {
                 .keyboardShortcut("l", modifiers: [])
                 .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
                 #endif
+
+                advanceToNextItemButton
+                    .padding(.leading, 15)
             #endif
         }
         .font(.system(size: 20))
         .padding(.horizontal, 4)
+    }
+
+    private var restartVideoButton: some View {
+        button("Restart video", systemImage: "backward.end.fill", size: 30, cornerRadius: 5) {
+            player.backend.seek(to: 0.0)
+        }
+    }
+
+    private var advanceToNextItemButton: some View {
+        button("Next", systemImage: "forward.fill", size: 30, cornerRadius: 5) {
+            player.advanceToNextItem()
+        }
+        .disabled(player.queue.isEmpty)
     }
 
     var bottomBar: some View {
