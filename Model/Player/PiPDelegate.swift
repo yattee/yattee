@@ -37,6 +37,9 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         _: AVPictureInPictureController,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
-        completionHandler(true)
+        player?.show()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            completionHandler(true)
+        }
     }
 }
