@@ -141,7 +141,7 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
         willBeginFullScreenPresentationWithAnimationCoordinator context: UIViewControllerTransitionCoordinator
     ) {
         #if os(iOS)
-            if !context.isCancelled, Defaults[.lockLandscapeWhenEnteringFullscreen] {
+            if !context.isCancelled, Defaults[.lockOrientationInFullScreen] {
                 Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
             }
         #endif
