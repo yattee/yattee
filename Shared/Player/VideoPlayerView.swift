@@ -34,7 +34,7 @@ struct VideoPlayerView: View {
 
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
+        @Default(.lockOrientationInFullScreen) private var lockOrientationInFullScreen
 
         @State private var motionManager: CMMotionManager!
         @State private var orientation = UIInterfaceOrientation.portrait
@@ -441,7 +441,7 @@ struct VideoPlayerView: View {
 
                         Orientation.lockOrientation(orientationLockMask, andRotateTo: orientation)
 
-                        guard lockLandscapeOnRotation else {
+                        guard lockOrientationInFullScreen else {
                             return
                         }
 
@@ -451,7 +451,7 @@ struct VideoPlayerView: View {
                     guard abs(acceleration.z) <= 0.74,
                           player.lockedOrientation.isNil,
                           enterFullscreenInLandscape,
-                          !lockLandscapeOnRotation
+                          !lockOrientationInFullScreen
                     else {
                         return
                     }
@@ -470,7 +470,7 @@ struct VideoPlayerView: View {
             let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
             if newOrientation?.isLandscape ?? false,
                player.presentingPlayer,
-               lockLandscapeOnRotation,
+               lockOrientationInFullScreen,
                !player.lockedOrientation.isNil
             {
                 Orientation.lockOrientation(.landscape, andRotateTo: newOrientation)
