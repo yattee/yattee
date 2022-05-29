@@ -4,6 +4,7 @@ import Foundation
 final class RecentsModel: ObservableObject {
     @Default(.recentlyOpened) var items
     @Default(.saveRecents) var saveRecents
+
     func clear() {
         items = []
     }

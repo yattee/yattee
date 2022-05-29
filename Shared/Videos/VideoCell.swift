@@ -7,6 +7,7 @@ struct VideoCell: View {
     private var video: Video
 
     @Environment(\.navigationStyle) private var navigationStyle
+    @Environment(\.inChannelView) private var inChannelView
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -294,6 +295,10 @@ struct VideoCell: View {
 
     private func channelButton(badge: Bool = true) -> some View {
         Button {
+            guard !inChannelView else {
+                return
+            }
+
             NavigationModel.openChannel(
                 video.channel,
                 player: player,
