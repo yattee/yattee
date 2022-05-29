@@ -62,7 +62,6 @@ struct ChannelPlaylistView: View {
                 }
             }
             .offset(y: viewVerticalOffset)
-            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
             #endif
         } else {
@@ -76,14 +75,16 @@ struct ChannelPlaylistView: View {
         VStack(alignment: .leading) {
             #if os(tvOS)
                 HStack {
-                    Text(playlist.title)
-                        .font(.title2)
-                        .frame(alignment: .leading)
+                    if let playlist = presentedPlaylist {
+                        Text(playlist.title)
+                            .font(.title2)
+                            .frame(alignment: .leading)
 
-                    Spacer()
+                        Spacer()
 
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
-                        .labelStyle(.iconOnly)
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                            .labelStyle(.iconOnly)
+                    }
 
                     playButton
                         .labelStyle(.iconOnly)

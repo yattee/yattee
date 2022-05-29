@@ -41,7 +41,7 @@ struct VideoPlayerView: View {
         var mouseLocation: CGPoint { NSEvent.mouseLocation }
     #endif
 
-    #if !os(macOS)
+    #if os(iOS)
         @State private var viewVerticalOffset = Self.hiddenOffset
     #endif
 
@@ -74,31 +74,28 @@ struct VideoPlayerView: View {
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     handleOrientationDidChangeNotification()
                 }
-                #endif
                 .onChange(of: player.presentingPlayer) { newValue in
                     if newValue {
                         viewVerticalOffset = 0
-                        #if os(iOS)
-                            configureOrientationUpdatesBasedOnAccelerometer()
-                        #endif
+                        configureOrientationUpdatesBasedOnAccelerometer()
                     } else {
-                        #if os(iOS)
-                            if Defaults[.lockPortraitWhenBrowsing] {
-                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                            } else {
-                                Orientation.lockOrientation(.allButUpsideDown)
-                            }
+                        if Defaults[.lockPortraitWhenBrowsing] {
+                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown)
+                        }
 
-                            motionManager?.stopAccelerometerUpdates()
-                            motionManager = nil
-                            viewVerticalOffset = Self.hiddenOffset
-                        #endif
+                        motionManager?.stopAccelerometerUpdates()
+                        motionManager = nil
+                        viewVerticalOffset = Self.hiddenOffset
                     }
                 }
+                #endif
             }
+            #if os(iOS)
             .offset(y: viewVerticalOffset)
-            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
+            #endif
         #endif
     }
 

@@ -24,7 +24,8 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         }
 
         if player.avPlayerBackend.switchToMPVOnPipClose,
-           !player.currentItem.isNil {
+           !player.currentItem.isNil
+        {
             DispatchQueue.main.async {
                 player.avPlayerBackend.switchToMPVOnPipClose = false
                 player.saveTime {
@@ -45,7 +46,7 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         if !player.currentItem.isNil {
             player?.show()
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             completionHandler(true)
         }
