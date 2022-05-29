@@ -58,7 +58,6 @@ struct ChannelVideosView: View {
                 }
             }
             .offset(y: viewVerticalOffset)
-            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
             #endif
         } else {
