@@ -30,7 +30,7 @@ struct ChannelPlaylistView: View {
     }
 
     private var presentedPlaylist: ChannelPlaylist? {
-        recents.presentedPlaylist ?? playlist
+        playlist ?? recents.presentedPlaylist
     }
 
     private var resource: Resource? {
@@ -54,6 +54,7 @@ struct ChannelPlaylistView: View {
             #if os(iOS)
             .onChange(of: navigation.presentingPlaylist) { newValue in
                 if newValue {
+                    store.clear()
                     viewVerticalOffset = 0
                     resource?.load()
                 } else {
@@ -61,6 +62,7 @@ struct ChannelPlaylistView: View {
                 }
             }
             .offset(y: viewVerticalOffset)
+            .opacity(viewVerticalOffset == Self.hiddenOffset ? 0 : 1)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
             #endif
         } else {

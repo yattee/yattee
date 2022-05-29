@@ -22,4 +22,8 @@ final class Store<Data>: ResourceObserver, ObservableObject {
     func replace(_ items: Data) {
         all = items
     }
+
+    func clear() {
+        all = nil
+    }
 }
