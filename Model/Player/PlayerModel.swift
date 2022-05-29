@@ -281,8 +281,12 @@ final class PlayerModel: ObservableObject {
     }
 
     func upgradeToStream(_ stream: Stream, force: Bool = false) {
+        guard let video = currentVideo else {
+            return
+        }
+
         if !self.stream.isNil, force || self.stream != stream {
-            playStream(stream, of: currentVideo!, preservingTime: true, upgrading: true)
+            playStream(stream, of: video, preservingTime: true, upgrading: true)
         }
     }
 
