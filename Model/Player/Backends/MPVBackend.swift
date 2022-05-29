@@ -251,9 +251,11 @@ final class MPVBackend: PlayerBackend {
     func enterFullScreen() {
         model.toggleFullscreen(controls?.playingFullscreen ?? false)
 
+        #if os(iOS)
         if Defaults[.lockLandscapeWhenEnteringFullscreen] {
             Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
         }
+        #endif
     }
 
     func exitFullScreen() {}
