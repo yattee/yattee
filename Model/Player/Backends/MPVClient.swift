@@ -103,12 +103,20 @@ final class MPVClient: ObservableObject {
         }
     }
 
-    func loadFile(_ url: URL, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
+    func loadFile(_ url: URL, audio: URL? = nil, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
         var args = [url.absoluteString]
+        var options = [String]()
+
         if let time = time {
             args.append("replace")
-            args.append("start=\(Int(time.seconds))")
+            options.append("start=\(Int(time.seconds))")
         }
+
+        if let audioURL = audio?.absoluteString {
+            options.append("audio-files-append=\"\(audioURL)\"")
+        }
+
+        args.append(options.joined(separator: ","))
 
         command("loadfile", args: args, returnValueCallback: completionHandler)
     }
