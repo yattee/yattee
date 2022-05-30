@@ -153,28 +153,30 @@ final class MPVBackend: PlayerBackend {
 
             self.stop()
 
-            if let url = stream.singleAssetURL {
-                self.onFileLoaded = {
-                    updateCurrentStream()
-                    startPlaying()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
                 }
 
-                self.client.loadFile(url, time: time) { [weak self] _ in
-                    self?.isLoadingVideo = true
-                }
-            } else {
-                self.onFileLoaded = { [weak self] in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        self?.client.addAudio(stream.audioAsset.url) { _ in
-                            updateCurrentStream()
-                            startPlaying()
-                        }
+                if let url = stream.singleAssetURL {
+                    self.onFileLoaded = {
+                        updateCurrentStream()
+                        startPlaying()
                     }
-                }
 
-                self.client.loadFile(stream.videoAsset.url, time: time) { [weak self] _ in
-                    self?.isLoadingVideo = true
-                    self?.pause()
+                    self.client.loadFile(url, time: time) { [weak self] _ in
+                        self?.isLoadingVideo = true
+                    }
+                } else {
+                    self.onFileLoaded = { [weak self] in
+                        updateCurrentStream()
+                        startPlaying()
+                    }
+
+                    self.client.loadFile(stream.videoAsset.url, audio: stream.audioAsset.url, time: time) { [weak self] _ in
+                        self?.isLoadingVideo = true
+                        self?.pause()
+                    }
                 }
             }
         }
