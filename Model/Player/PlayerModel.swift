@@ -206,9 +206,11 @@ final class PlayerModel: ObservableObject {
     }
 
     func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
+        pause()
+
         var delay = 0.0
-        #if !os(macOS)
-            delay = 0.3
+        #if os(iOS)
+            delay = 0.5
         #endif
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
