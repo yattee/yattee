@@ -22,9 +22,7 @@ body:
     attributes:
       label: Describe your idea or suggested feature
       description: Provide a clear description of the idea or feature that you're requesting to have implemented. Also in a image/video of the feature request if available.
-      placeholder: |
-        Example:
-          "The feature should work like this..."
+      placeholder: The feature should work like this...
     validations:
       required: true
 
