@@ -61,6 +61,11 @@ struct YatteeApp: App {
                     ) { _ in
                         player.handleEnterForeground()
                     }
+                    .onReceive(
+                        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+                    ) { _ in
+                        player.handleEnterBackground()
+                    }
             #endif
             #if os(iOS)
             .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
