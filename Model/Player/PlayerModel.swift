@@ -446,12 +446,18 @@ final class PlayerModel: ObservableObject {
         }
     #else
         func handleEnterForeground() {
+            setNeedsDrawing(true)
+
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
             }
 
             show()
             closePiP()
+        }
+
+        func handleEnterBackground() {
+            setNeedsDrawing(false)
         }
 
         func enterFullScreen() {
