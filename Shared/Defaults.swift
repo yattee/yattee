@@ -5,6 +5,12 @@ import Foundation
 #endif
 
 extension Defaults.Keys {
+    #if os(tvOS)
+        static let defaultForPauseOnHidingPlayer = true
+    #else
+        static let defaultForPauseOnHidingPlayer = false
+    #endif
+
     static let kavinPipedInstanceID = "kavin-piped"
     static let instances = Key<[Instance]>("instances", default: [
         .init(
@@ -49,7 +55,7 @@ extension Defaults.Keys {
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
-    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: true)
+    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: defaultForPauseOnHidingPlayer)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
