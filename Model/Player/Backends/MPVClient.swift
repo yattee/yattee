@@ -121,10 +121,6 @@ final class MPVClient: ObservableObject {
         command("loadfile", args: args, returnValueCallback: completionHandler)
     }
 
-    func addAudio(_ url: URL, completionHandler: ((Int32) -> Void)? = nil) {
-        command("audio-add", args: [url.absoluteString], returnValueCallback: completionHandler)
-    }
-
     func play() {
         setFlagAsync("pause", false)
     }
@@ -228,6 +224,22 @@ final class MPVClient: ObservableObject {
         }
     }
 
+    func addVideoTrack(_ url: URL) {
+        command("video-add", args: [url.absoluteString])
+    }
+
+    func setVideoToAuto() {
+        setString("video", "auto")
+    }
+
+    func setVideoToNo() {
+        setString("video", "no")
+    }
+
+    var tracksCount: Int {
+        Int(getString("track-list/count") ?? "-1") ?? -1
+    }
+
     private func setFlagAsync(_ name: String, _ flag: Bool) {
         var data: Int = flag ? 1 : 0
         mpv_set_property_async(mpv, 0, name, MPV_FORMAT_FLAG, &data)
@@ -242,6 +254,23 @@ final class MPVClient: ObservableObject {
         var data = Double()
         mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &data)
         return data
+    }
+
+    private func getInt(_ name: String) -> Int {
+        var data = Int64()
+        mpv_get_property(mpv, name, MPV_FORMAT_INT64, &data)
+        return Int(data)
+    }
+
+    func getString(_ name: String) -> String? {
+        let cstr = mpv_get_property_string(mpv, name)
+        let str: String? = cstr == nil ? nil : String(cString: cstr!)
+        mpv_free(cstr)
+        return str
+    }
+
+    private func setString(_ name: String, _ value: String) {
+        mpv_set_property_string(mpv, name, value)
     }
 
     private func makeCArgs(_ command: String, _ args: [String?]) -> [String?] {

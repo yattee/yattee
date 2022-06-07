@@ -168,12 +168,15 @@ final class MPVBackend: PlayerBackend {
                         self?.isLoadingVideo = true
                     }
                 } else {
-                    self.onFileLoaded = { [weak self] in
+                    self.onFileLoaded = {
                         updateCurrentStream()
                         startPlaying()
                     }
 
-                    self.client.loadFile(stream.videoAsset.url, audio: stream.audioAsset.url, time: time) { [weak self] _ in
+                    let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
+                    let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
+
+                    self.client.loadFile(fileToLoad, audio: audioTrack, time: time) { [weak self] _ in
                         self?.isLoadingVideo = true
                         self?.pause()
                     }
@@ -385,5 +388,17 @@ final class MPVBackend: PlayerBackend {
 
     func setSize(_ width: Double, _ height: Double) {
         self.client?.setSize(width, height)
+    }
+
+    func addVideoTrack(_ url: URL) {
+        self.client?.addVideoTrack(url)
+    }
+
+    func setVideoToAuto() {
+        self.client?.setVideoToAuto()
+    }
+
+    func setVideoToNo() {
+        self.client?.setVideoToNo()
     }
 }
