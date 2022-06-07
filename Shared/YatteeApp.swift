@@ -13,7 +13,6 @@ struct YatteeApp: App {
 
     #if os(macOS)
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-        @StateObject private var updater = UpdaterModel()
     #elseif os(iOS)
         @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #endif
@@ -80,13 +79,6 @@ struct YatteeApp: App {
 
             CommandGroup(replacing: .newItem, addition: {})
 
-            #if os(macOS)
-                CommandGroup(after: .appInfo) {
-                    CheckForUpdatesView()
-                        .environmentObject(updater)
-                }
-            #endif
-
             MenuCommands(model: Binding<MenuModel>(get: { menu }, set: { _ in }))
         }
         #endif
@@ -134,7 +126,6 @@ struct YatteeApp: App {
                     .environmentObject(instances)
                     .environmentObject(player)
                     .environmentObject(playerControls)
-                    .environmentObject(updater)
             }
         #endif
     }

@@ -5,7 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case instances, browsing, player, history, sponsorBlock, updates, help
+            case instances, browsing, player, history, sponsorBlock, help
         }
 
         @State private var selection = Tabs.instances
@@ -67,14 +67,6 @@ struct SettingsView: View {
                     Label("SponsorBlock", systemImage: "dollarsign.circle")
                 }
                 .tag(Tabs.sponsorBlock)
-
-                Form {
-                    UpdatesSettings()
-                }
-                .tabItem {
-                    Label("Updates", systemImage: "gearshape.2")
-                }
-                .tag(Tabs.updates)
 
                 Form {
                     Help()
@@ -184,8 +176,6 @@ struct SettingsView: View {
                 return 480
             case .sponsorBlock:
                 return 660
-            case .updates:
-                return 200
             case .help:
                 return 570
             }
