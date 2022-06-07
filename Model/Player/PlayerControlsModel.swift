@@ -68,9 +68,15 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func hide() {
-        player?.backend.stopControlsUpdates()
+        guard let player = player,
+              !player.musicMode
+        else {
+            return
+        }
 
-        guard !(player?.currentItem.isNil ?? true) else {
+        player.backend.stopControlsUpdates()
+
+        guard !player.currentItem.isNil else {
             return
         }
 
@@ -83,9 +89,7 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func toggle() {
-        withAnimation(PlayerControls.animation) {
-            presentingControls.toggle()
-        }
+        presentingControls ? hide() : show()
     }
 
     func reset() {
@@ -101,6 +105,11 @@ final class PlayerControlsModel: ObservableObject {
         #endif
 
         removeTimer()
+
+        guard !player.musicMode else {
+            return
+        }
+
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
             withAnimation(PlayerControls.animation) { [weak self] in
                 self?.presentingControls = false

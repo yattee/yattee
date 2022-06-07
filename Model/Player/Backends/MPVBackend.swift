@@ -62,6 +62,10 @@ final class MPVBackend: PlayerBackend {
     private var controlsUpdates = false
     private var timeObserverThrottle = Throttle(interval: 2)
 
+    var tracks: Int {
+        client?.tracksCount ?? -1
+    }
+
     init(model: PlayerModel, controls: PlayerControlsModel? = nil) {
         self.model = model
         self.controls = controls

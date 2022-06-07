@@ -48,6 +48,7 @@ struct VideoPlayerView: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
     var body: some View {
         #if os(macOS)
@@ -126,9 +127,7 @@ struct VideoPlayerView: View {
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
-                            if player.currentItem.isNil {
-                                playerPlaceholder(geometry: geometry)
-                            } else if player.playingInPictureInPicture {
+                            if player.playingInPictureInPicture {
                                 pictureInPicturePlaceholder(geometry: geometry)
                             } else {
                                 playerView
@@ -140,6 +139,7 @@ struct VideoPlayerView: View {
                                         fullScreen: playerControls.playingFullscreen
                                     )
                                 )
+                                .overlay(playerPlaceholder(geometry: geometry))
                                 #endif
                             }
                         }
@@ -273,7 +273,7 @@ struct VideoPlayerView: View {
                 PlayerGestures()
             #endif
 
-            PlayerControls(player: player)
+            PlayerControls(player: player, thumbnails: thumbnails)
         }
         #if os(iOS)
         .onAppear {
@@ -298,38 +298,41 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    func playerPlaceholder(geometry: GeometryProxy) -> some View {
-        ZStack(alignment: .topLeading) {
-            HStack {
-                Spacer()
-                VStack {
+    @ViewBuilder func playerPlaceholder(geometry: GeometryProxy) -> some View {
+        if player.currentItem.isNil {
+            ZStack(alignment: .topLeading) {
+                HStack {
                     Spacer()
-                    VStack(spacing: 10) {
-                        #if !os(tvOS)
-                            Image(systemName: "ticket")
-                                .font(.system(size: 120))
-                        #endif
+                    VStack {
+                        Spacer()
+                        VStack(spacing: 10) {
+                            #if !os(tvOS)
+                                Image(systemName: "ticket")
+                                    .font(.system(size: 120))
+                            #endif
+                        }
+                        Spacer()
                     }
+                    .foregroundColor(.gray)
                     Spacer()
                 }
-                .foregroundColor(.gray)
-                Spacer()
-            }
 
-            #if os(iOS)
-                Button {
-                    player.hide()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 40))
-                }
-                .buttonStyle(.plain)
-                .padding(10)
-                .foregroundColor(.gray)
-            #endif
+                #if os(iOS)
+                    Button {
+                        player.hide()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 40))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(10)
+                    .foregroundColor(.gray)
+                #endif
+            }
+            .background(Color.black)
+            .contentShape(Rectangle())
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
         }
-        .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
     }
 
     func pictureInPicturePlaceholder(geometry: GeometryProxy) -> some View {

@@ -1,10 +1,12 @@
 import Foundation
+import SDWebImageSwiftUI
 import SwiftUI
 
 struct PlayerControls: View {
     static let animation = Animation.easeInOut(duration: 0.2)
 
     private var player: PlayerModel!
+    private var thumbnails: ThumbnailsModel!
 
     @EnvironmentObject<PlayerControlsModel> private var model
 
@@ -20,8 +22,9 @@ struct PlayerControls: View {
         @FocusState private var focusedField: Field?
     #endif
 
-    init(player: PlayerModel) {
+    init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
+        self.thumbnails = thumbnails
     }
 
     var body: some View {
@@ -86,8 +89,24 @@ struct PlayerControls: View {
         }
         #else
                 .background(PlayerGestures())
+                .background(controlsBackground)
         #endif
                 .environment(\.colorScheme, .dark)
+    }
+
+    @ViewBuilder var controlsBackground: some View {
+        if player.musicMode,
+           let item = self.player.currentItem,
+           let url = thumbnails.best(item.video)
+        {
+            WebImage(url: url)
+                .resizable()
+                .placeholder {
+                    Rectangle().fill(Color("PlaceholderColor"))
+                }
+                .retryOnAppear(true)
+                .indicator(.activity)
+        }
     }
 
     var timeline: some View {
@@ -186,9 +205,11 @@ struct PlayerControls: View {
 
                 closeVideoButton
 
+                button("Music Mode", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
+                    .disabled(player.activeBackend == .appleAVPlayer)
+
                 Spacer()
             #endif
-//            button("Music Mode", systemImage: "music.note")
         }
     }
 
@@ -355,6 +376,7 @@ struct PlayerControls: View {
         systemImage: String = "arrow.up.left.and.arrow.down.right",
         size: Double = 30,
         cornerRadius: Double = 3,
+        active: Bool = false,
         action: @escaping () -> Void = {}
     ) -> some View {
         Button {
@@ -367,7 +389,7 @@ struct PlayerControls: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundColor(.primary)
+        .foregroundColor(active ? .accentColor : .primary)
         .frame(width: size, height: size)
         #if os(macOS)
             .background(VisualEffectBlur(material: .hudWindow))
@@ -396,7 +418,7 @@ struct PlayerControls_Previews: PreviewProvider {
         let view = ZStack {
             Color.gray
 
-            PlayerControls(player: PlayerModel())
+            PlayerControls(player: PlayerModel(), thumbnails: ThumbnailsModel())
                 .injectFixtureEnvironmentObjects()
                 .environmentObject(model)
         }
