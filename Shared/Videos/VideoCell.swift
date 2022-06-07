@@ -65,6 +65,10 @@ struct VideoCell: View {
                 return
             }
 
+            if player.musicMode {
+                player.toggleMusicMode()
+            }
+
             if watchingNow {
                 if !player.playingInPictureInPicture {
                     player.show()

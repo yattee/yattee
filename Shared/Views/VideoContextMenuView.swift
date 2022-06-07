@@ -57,6 +57,9 @@ struct VideoContextMenuView: View {
             #if os(iOS)
                 playNowInPictureInPictureButton
             #endif
+            #if !os(tvOS)
+                playNowInMusicMode
+            #endif
         }
 
         Section {
@@ -131,6 +134,10 @@ struct VideoContextMenuView: View {
 
     private var playNowButton: some View {
         Button {
+            if player.musicMode {
+                player.toggleMusicMode()
+            }
+
             player.play(video)
         } label: {
             Label("Play Now", systemImage: "play")
@@ -146,6 +153,18 @@ struct VideoContextMenuView: View {
             }
         } label: {
             Label("Play in PiP", systemImage: "pip")
+        }
+    }
+
+    private var playNowInMusicMode: some View {
+        Button {
+            if !player.musicMode {
+                player.toggleMusicMode()
+            }
+
+            player.play(video, at: watch?.timeToRestart, showingPlayer: false)
+        } label: {
+            Label("Play Music", systemImage: "music.note")
         }
     }
 
