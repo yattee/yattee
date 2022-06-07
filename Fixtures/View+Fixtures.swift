@@ -11,6 +11,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(NavigationModel())
             .environmentObject(PipedAPI())
             .environmentObject(player)
+            .environmentObject(PlayerControlsModel())
             .environmentObject(PlaylistsModel())
             .environmentObject(RecentsModel())
             .environmentObject(SearchModel())
