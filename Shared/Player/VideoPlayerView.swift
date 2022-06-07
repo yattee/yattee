@@ -152,10 +152,6 @@ struct VideoPlayerView: View {
                         .gesture(
                             DragGesture(coordinateSpace: .global)
                                 .onChanged { value in
-                                    guard !fullScreenLayout else {
-                                        return // swiftlint:disable:this implicit_return
-                                    }
-
                                     player.backend.setNeedsDrawing(false)
                                     let drag = value.translation.height
 
