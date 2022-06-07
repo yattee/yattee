@@ -24,7 +24,7 @@ extension PlayerModel {
         }
 
         if let segmentToSkip = nextSegments.last(where: { $0.endTime <= playerItemDuration ?? .zero }),
-           self.shouldSkip(segmentToSkip, at: time)
+           shouldSkip(segmentToSkip, at: time)
         {
             skip(segmentToSkip, at: time)
         }
@@ -51,7 +51,7 @@ extension PlayerModel {
         guard isPlaying,
               !restoredSegments.contains(segment),
               Defaults[.sponsorBlockCategories].contains(segment.category),
-              segment.start > 4
+              segment.end < 4
         else {
             return false
         }
