@@ -578,6 +578,12 @@ final class PlayerModel: ObservableObject {
                 avPlayerBackend.switchToMPVOnPipClose = false
                 closePiP()
             }
+            #if os(macOS)
+                // TODO: initialize mpv on startup on mac
+                if mpvBackend.client.isNil {
+                    Windows.player.open()
+                }
+            #endif
             changeActiveBackend(from: .appleAVPlayer, to: .mpv)
             controls.presentingControls = true
             controls.removeTimer()
