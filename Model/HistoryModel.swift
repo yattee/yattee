@@ -32,39 +32,46 @@ extension PlayerModel {
         let time = backend.currentTime
         let seconds = time?.seconds ?? 0
 
-        let watch: Watch!
         let watchFetchRequest = Watch.fetchRequest()
         watchFetchRequest.predicate = NSPredicate(format: "videoID = %@", id as String)
 
-        let results = try? context.fetch(watchFetchRequest)
+        let results = try? backgroundContext.fetch(watchFetchRequest)
 
-        if results?.isEmpty ?? true {
-            if seconds < 1 {
+        backgroundContext.perform { [weak self] in
+            guard let self = self else {
                 return
             }
-            watch = Watch(context: context)
-            watch.videoID = id
-        } else {
-            watch = results?.first
 
-            if !Defaults[.resetWatchedStatusOnPlaying], watch.finished {
-                return
+            let watch: Watch!
+
+            if results?.isEmpty ?? true {
+                if seconds < 1 {
+                    return
+                }
+                watch = Watch(context: self.backgroundContext)
+                watch.videoID = id
+            } else {
+                watch = results?.first
+
+                if !Defaults[.resetWatchedStatusOnPlaying], watch.finished {
+                    return
+                }
             }
+
+            if let seconds = self.playerItemDuration?.seconds {
+                watch.videoDuration = seconds
+            }
+
+            if finished {
+                watch.stoppedAt = watch.videoDuration
+            } else if seconds.isFinite, seconds > 0 {
+                watch.stoppedAt = seconds
+            }
+
+            watch.watchedAt = Date()
+
+            try? self.backgroundContext.save()
         }
-
-        if let seconds = playerItemDuration?.seconds {
-            watch.videoDuration = seconds
-        }
-
-        if finished {
-            watch.stoppedAt = watch.videoDuration
-        } else if seconds.isFinite, seconds > 0 {
-            watch.stoppedAt = seconds
-        }
-
-        watch.watchedAt = Date()
-
-        try? context.save()
     }
 
     func removeWatch(_ watch: Watch) {
