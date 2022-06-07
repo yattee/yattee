@@ -275,19 +275,6 @@ struct VideoPlayerView: View {
 
             PlayerControls(player: player, thumbnails: thumbnails)
         }
-        #if os(iOS)
-        .onAppear {
-            // ugly patch for #78
-            guard player.activeBackend == .mpv else {
-                return
-            }
-
-            player.activeBackend = .appleAVPlayer
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                player.activeBackend = .mpv
-            }
-        }
-        #endif
     }
 
     var fullScreenLayout: Bool {
