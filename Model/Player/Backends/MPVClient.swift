@@ -229,7 +229,7 @@ final class MPVClient: ObservableObject {
     }
 
     func setVideoToAuto() {
-        setString("video", "auto")
+        setString("video", "1")
     }
 
     func setVideoToNo() {
