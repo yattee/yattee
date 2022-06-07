@@ -80,6 +80,7 @@ final class PlayerModel: ObservableObject {
         }
     }}
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
+    var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
     @Published var playingInPictureInPicture = false
     var pipController: AVPictureInPictureController?
