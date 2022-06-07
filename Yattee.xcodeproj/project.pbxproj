@@ -499,6 +499,8 @@
 		37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
+		37ABBC55284FDACE003DC934 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37ABBC54284FDACE003DC934 /* SDWebImage */; };
+		37ABBC57284FDAE6003DC934 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37ABBC56284FDAE6003DC934 /* SDWebImage */; };
 		37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
 		37B044B826F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
 		37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
@@ -1160,6 +1162,7 @@
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				3749BF8A27ADA135000480FF /* libavformat.a in Frameworks */,
 				377FC7DB267A080300A6BBAF /* Logging in Frameworks */,
+				37ABBC55284FDACE003DC934 /* SDWebImage in Frameworks */,
 				3749BF8E27ADA135000480FF /* libswresample.a in Frameworks */,
 				3749BF8427ADA135000480FF /* libfreetype.a in Frameworks */,
 			);
@@ -1193,6 +1196,7 @@
 				370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */,
 				370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */,
 				3703206627D2BB35007A0CB8 /* PINCache in Frameworks */,
+				37ABBC57284FDAE6003DC934 /* SDWebImage in Frameworks */,
 				370F4FD927CC16CB001B35DC /* libxcb-shm.0.0.0.dylib in Frameworks */,
 				370F4FCA27CC16CB001B35DC /* libXau.6.dylib in Frameworks */,
 				370F4FD527CC16CB001B35DC /* libfontconfig.1.dylib in Frameworks */,
@@ -2063,6 +2067,7 @@
 				37FB284C2722099E00A57617 /* SDWebImageWebPCoder */,
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
 				3765917B27237D21009F956E /* PINCache */,
+				37ABBC54284FDACE003DC934 /* SDWebImage */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2095,6 +2100,7 @@
 				3703206527D2BB35007A0CB8 /* PINCache */,
 				3703206727D2BB45007A0CB8 /* Defaults */,
 				3703206927D2BB49007A0CB8 /* Alamofire */,
+				37ABBC56284FDAE6003DC934 /* SDWebImage */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2260,6 +2266,7 @@
 				37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */,
 				3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */,
 				37C90AED275F9CC00015EAF7 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -3919,6 +3926,14 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amonshiz/SDWebImage";
+			requirement = {
+				kind = revision;
+				revision = c2313209136a735147a3807423bbbccf00b47853;
+			};
+		};
 		37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-log.git";
@@ -4090,6 +4105,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
 			productName = Siesta;
+		};
+		37ABBC54284FDACE003DC934 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		37ABBC56284FDAE6003DC934 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
 		};
 		37B767DF2678C5BF0098BAA8 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
