@@ -192,24 +192,25 @@ struct PlayerControls: View {
     }
 
     var buttonsBar: some View {
-        HStack(spacing: 20) {
+        HStack {
             #if !os(tvOS)
                 #if os(iOS)
                     hidePlayerButton
                 #endif
 
                 fullscreenButton
+
                 #if os(iOS)
                     pipButton
                 #endif
-                rateButton
-
-                closeVideoButton
-
-                button("Music Mode", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
-                    .disabled(player.activeBackend == .appleAVPlayer)
 
                 Spacer()
+
+                rateButton
+
+                musicModeButton
+
+                closeVideoButton
             #endif
         }
     }
@@ -270,6 +271,11 @@ struct PlayerControls: View {
                 player.closeCurrentItem()
             }
         }
+    }
+
+    private var musicModeButton: some View {
+        button("Music Mode", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
+            .disabled(player.activeBackend == .appleAVPlayer)
     }
 
     var ratePicker: some View {
