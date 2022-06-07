@@ -106,7 +106,7 @@ final class PlayerControlsModel: ObservableObject {
 
         removeTimer()
 
-        guard !player.musicMode else {
+        guard let player = player, !player.musicMode else {
             return
         }
 

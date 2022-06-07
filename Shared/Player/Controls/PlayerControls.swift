@@ -34,6 +34,7 @@ struct PlayerControls: View {
                     Group {
                         HStack {
                             statusBar
+                                .lineLimit(1)
                                 .padding(3)
                             #if os(macOS)
                                 .background(VisualEffectBlur(material: .hudWindow))
@@ -415,20 +416,12 @@ struct PlayerControls_Previews: PreviewProvider {
         model.currentTime = .secondsInDefaultTimescale(0)
         model.duration = .secondsInDefaultTimescale(120)
 
-        let view = ZStack {
+        return ZStack {
             Color.gray
 
             PlayerControls(player: PlayerModel(), thumbnails: ThumbnailsModel())
                 .injectFixtureEnvironmentObjects()
                 .environmentObject(model)
-        }
-
-        return Group {
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                view.previewInterfaceOrientation(.landscapeLeft)
-            } else {
-                view
-            }
         }
     }
 }
