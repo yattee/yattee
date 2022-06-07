@@ -50,7 +50,7 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
             }
         #endif
 
-        if !player.currentItem.isNil {
+        if !player.currentItem.isNil, !player.musicMode {
             player?.show()
         }
 

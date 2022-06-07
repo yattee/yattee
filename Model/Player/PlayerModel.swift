@@ -62,6 +62,7 @@ final class PlayerModel: ObservableObject {
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
     @Published var restoredSegments = [Segment]()
 
+    @Published var musicMode = false
     @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
 
     #if os(iOS)
@@ -114,7 +115,7 @@ final class PlayerModel: ObservableObject {
         self.avPlayerBackend = AVPlayerBackend(model: self, controls: controls)
         self.mpvBackend = MPVBackend(model: self)
 
-        self.activeBackend = Defaults[.activeBackend]
+        Defaults[.activeBackend] = .mpv
     }
 
     func show() {
@@ -361,6 +362,12 @@ final class PlayerModel: ObservableObject {
             return
         }
 
+        if to == .mpv {
+            addVideoTrackFromStream()
+        } else {
+            musicMode = false
+        }
+
         inactiveBackends().forEach { $0.pause() }
 
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
@@ -560,5 +567,38 @@ final class PlayerModel: ObservableObject {
 
     func setNeedsDrawing(_ needsDrawing: Bool) {
         backends.forEach { $0.setNeedsDrawing(needsDrawing) }
+    }
+
+    func toggleMusicMode() {
+        musicMode.toggle()
+
+        if musicMode {
+            if playingInPictureInPicture {
+                avPlayerBackend.pause()
+                avPlayerBackend.switchToMPVOnPipClose = false
+                closePiP()
+            }
+            changeActiveBackend(from: .appleAVPlayer, to: .mpv)
+            controls.presentingControls = true
+            controls.removeTimer()
+            mpvBackend.setVideoToNo()
+        } else {
+            addVideoTrackFromStream()
+            mpvBackend.setVideoToAuto()
+
+            controls.resetTimer()
+        }
+    }
+
+    func addVideoTrackFromStream() {
+        if let videoTrackURL = stream?.videoAsset?.url,
+           mpvBackend.tracks < 2
+        {
+            logger.info("adding video track")
+
+            mpvBackend.addVideoTrack(videoTrackURL)
+        }
+
+        mpvBackend.setVideoToAuto()
     }
 }
