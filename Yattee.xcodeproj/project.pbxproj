@@ -498,8 +498,6 @@
 		37AAF2A026741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A126741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
 		37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF29F26741C97007FC770 /* SubscriptionsView.swift */; };
-		37ABBC55284FDACE003DC934 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37ABBC54284FDACE003DC934 /* SDWebImage */; };
-		37ABBC57284FDAE6003DC934 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37ABBC56284FDAE6003DC934 /* SDWebImage */; };
 		37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
 		37B044B826F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
 		37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B044B626F7AB9000E1419D /* SettingsView.swift */; };
@@ -627,6 +625,9 @@
 		37CEE4C12677B697005A1EFE /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEE4C02677B697005A1EFE /* Stream.swift */; };
 		37CEE4C22677B697005A1EFE /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEE4C02677B697005A1EFE /* Stream.swift */; };
 		37CEE4C32677B697005A1EFE /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEE4C02677B697005A1EFE /* Stream.swift */; };
+		37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8328535E4F00B71E37 /* SDWebImage */; };
+		37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8528535E5A00B71E37 /* SDWebImage */; };
+		37CF8B8828535E6300B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8728535E6300B71E37 /* SDWebImage */; };
 		37D4B0D92671614900C925CA /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0D82671614900C925CA /* Tests_iOS.swift */; };
 		37D4B0E32671614900C925CA /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0E22671614900C925CA /* Tests_macOS.swift */; };
 		37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
@@ -1155,7 +1156,7 @@
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				3749BF8A27ADA135000480FF /* libavformat.a in Frameworks */,
 				377FC7DB267A080300A6BBAF /* Logging in Frameworks */,
-				37ABBC55284FDACE003DC934 /* SDWebImage in Frameworks */,
+				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
 				3749BF8E27ADA135000480FF /* libswresample.a in Frameworks */,
 				3749BF8427ADA135000480FF /* libfreetype.a in Frameworks */,
 			);
@@ -1188,7 +1189,6 @@
 				370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */,
 				370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */,
 				3703206627D2BB35007A0CB8 /* PINCache in Frameworks */,
-				37ABBC57284FDAE6003DC934 /* SDWebImage in Frameworks */,
 				370F4FD927CC16CB001B35DC /* libxcb-shm.0.0.0.dylib in Frameworks */,
 				370F4FCA27CC16CB001B35DC /* libXau.6.dylib in Frameworks */,
 				370F4FD527CC16CB001B35DC /* libfontconfig.1.dylib in Frameworks */,
@@ -1197,6 +1197,7 @@
 				370F4FD827CC16CB001B35DC /* libcrypto.3.dylib in Frameworks */,
 				370F4FDE27CC16CB001B35DC /* libavcodec.59.18.100.dylib in Frameworks */,
 				3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */,
+				37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */,
 				3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */,
 				370F4FD627CC16CB001B35DC /* libbrotlidec.1.0.9.dylib in Frameworks */,
 				370F4FCD27CC16CB001B35DC /* libfribidi.0.dylib in Frameworks */,
@@ -1243,6 +1244,7 @@
 				3772002B27E8EDF000CB2475 /* libavcodec.a in Frameworks */,
 				3765917E27237D2A009F956E /* PINCache in Frameworks */,
 				3772003E27E8EEEB00CB2475 /* VideoToolbox.framework in Frameworks */,
+				37CF8B8828535E6300B71E37 /* SDWebImage in Frameworks */,
 				3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */,
 				3772002C27E8EDF000CB2475 /* libpostproc.a in Frameworks */,
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
@@ -2048,7 +2050,7 @@
 				37FB284C2722099E00A57617 /* SDWebImageWebPCoder */,
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
 				3765917B27237D21009F956E /* PINCache */,
-				37ABBC54284FDACE003DC934 /* SDWebImage */,
+				37CF8B8328535E4F00B71E37 /* SDWebImage */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2080,7 +2082,7 @@
 				3703206527D2BB35007A0CB8 /* PINCache */,
 				3703206727D2BB45007A0CB8 /* Defaults */,
 				3703206927D2BB49007A0CB8 /* Alamofire */,
-				37ABBC56284FDAE6003DC934 /* SDWebImage */,
+				37CF8B8528535E5A00B71E37 /* SDWebImage */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2154,6 +2156,7 @@
 				37FB2848272207F000A57617 /* SDWebImageWebPCoder */,
 				37FB285327220D8400A57617 /* SDWebImagePINPlugin */,
 				3765917D27237D2A009F956E /* PINCache */,
+				37CF8B8728535E6300B71E37 /* SDWebImage */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2245,7 +2248,7 @@
 				37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
 				37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */,
 				3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */,
-				37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -3902,14 +3905,6 @@
 				minimumVersion = 1.5.0;
 			};
 		};
-		37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/amonshiz/SDWebImage";
-			requirement = {
-				kind = revision;
-				revision = c2313209136a735147a3807423bbbccf00b47853;
-			};
-		};
 		37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-log.git";
@@ -3932,6 +3927,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.1.3;
+			};
+		};
+		37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
+			requirement = {
+				branch = master;
+				kind = branch;
 			};
 		};
 		37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
@@ -4069,16 +4072,6 @@
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
 			productName = Siesta;
 		};
-		37ABBC54284FDACE003DC934 /* SDWebImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */;
-			productName = SDWebImage;
-		};
-		37ABBC56284FDAE6003DC934 /* SDWebImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37ABBC53284FDACE003DC934 /* XCRemoteSwiftPackageReference "SDWebImage" */;
-			productName = SDWebImage;
-		};
 		37B767DF2678C5BF0098BAA8 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
@@ -4108,6 +4101,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = Introspect;
+		};
+		37CF8B8328535E4F00B71E37 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		37CF8B8528535E5A00B71E37 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+		37CF8B8728535E6300B71E37 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
 		};
 		37D4B19C2671817900C925CA /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
