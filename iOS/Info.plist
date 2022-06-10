@@ -23,5 +23,7 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Need camera access to take pictures</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

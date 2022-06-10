@@ -15,11 +15,7 @@
 			</array>
 		</dict>
 	</array>
-	<key>SUEnableInstallerLauncherService</key>
-	<true/>
-	<key>SUFeedURL</key>
-	<string>https://repos.yattee.stream/appcast.xml</string>
-	<key>SUPublicEDKey</key>
-	<string>73U5at3utQRS7F/z/7nztpjp3l1gw1Ih+ztOelRLSx4=</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
