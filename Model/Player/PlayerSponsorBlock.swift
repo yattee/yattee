@@ -51,7 +51,7 @@ extension PlayerModel {
         guard isPlaying,
               !restoredSegments.contains(segment),
               Defaults[.sponsorBlockCategories].contains(segment.category),
-              segment.end < 4
+              segment.end > 4
         else {
             return false
         }
