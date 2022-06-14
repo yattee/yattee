@@ -22,7 +22,7 @@ class Segment: ObservableObject, Hashable {
     }
 
     var endTime: CMTime {
-        CMTime(seconds: end, preferredTimescale: 1000)
+        .secondsInDefaultTimescale(end)
     }
 
     init(category: String, segment: [Double], uuid: String, videoDuration: Int) {
