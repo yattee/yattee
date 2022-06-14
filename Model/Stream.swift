@@ -164,6 +164,22 @@ class Stream: Equatable, Hashable, Identifiable {
         return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
     }
 
+    var shortQuality: String {
+        if resolution == .hd4320p60 || resolution == .hd4320p {
+            return "8K"
+        } else if resolution == .hd2160p60 ||
+            resolution == .hd2160p50 ||
+            resolution == .hd2160p48 ||
+            resolution == .hd2160p
+        {
+            return "4K"
+        } else if kind == .hls {
+            return "HLS"
+        } else {
+            return resolution.name
+        }
+    }
+
     var description: String {
         let formatString = format == .unknown ? "" : " (\(format.rawValue))"
         return "\(quality)\(formatString) - \(instance?.description ?? "")"
