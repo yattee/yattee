@@ -1,7 +1,4 @@
 <div align="center">
-  <h3><strong>📣 <a href="https://yattee.stream/beta">TestFlight beta</a> now available 📣 </strong></h3>
-  <hr />
-
   <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
   <h1>Yattee</h1>
   <p>Alternative YouTube frontend for iOS, tvOS and macOS<br />built with <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a></p>
@@ -25,7 +22,7 @@
 ### Features in development
 * New player component with custom controls, gestures and support for 4K playback
 
-You can leave your feedback in [discussion on v1.4.alpha.4 release](https://github.com/yattee/yattee/discussions/132) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
+You can leave your feedback in [discussions](https://github.com/yattee/yattee/discussions) or join [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat. Thanks!
 
 ### Availability
 || Invidious | Piped |
