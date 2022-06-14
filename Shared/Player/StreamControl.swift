@@ -29,27 +29,22 @@ struct StreamControl: View {
                 .disabled(player.isLoadingAvailableStreams)
 
             #else
-                Menu {
+                Picker("", selection: $player.streamSelection) {
                     ForEach(InstancesModel.all) { instance in
                         let instanceStreams = availableStreamsForInstance(instance)
                         if !instanceStreams.values.isEmpty {
                             let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
-                            Picker("", selection: $player.streamSelection) {
-                                ForEach(kinds, id: \.self) { key in
-                                    ForEach(instanceStreams[key] ?? []) { stream in
-                                        Text(stream.description).tag(Stream?.some(stream))
-                                    }
 
-                                    if kinds.count > 1 {
-                                        Divider()
-                                    }
+                            ForEach(kinds, id: \.self) { key in
+                                ForEach(instanceStreams[key] ?? []) { stream in
+                                    Text(stream.description).tag(Stream?.some(stream))
                                 }
                             }
                         }
                     }
-                } label: {
-                    Text(player.streamSelection?.quality ?? "no playable streams")
                 }
+                .frame(minWidth: 110)
+                .fixedSize(horizontal: true, vertical: true)
                 .disabled(player.isLoadingAvailableStreams)
             #endif
         }

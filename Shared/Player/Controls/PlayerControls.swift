@@ -30,26 +30,17 @@ struct PlayerControls: View {
     var body: some View {
         VStack {
             ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    Group {
-                        HStack {
-                            statusBar
-                                .lineLimit(1)
-                                .padding(3)
-                            #if os(macOS)
-                                .background(VisualEffectBlur(material: .hudWindow))
-                            #elseif os(iOS)
-                                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                            #endif
-                                .mask(RoundedRectangle(cornerRadius: 3))
-
-                            Spacer()
-                        }
-
+                VStack(alignment: .trailing, spacing: 4) {
+                    #if !os(tvOS)
                         buttonsBar
-                            .padding(.top, 4)
-                            .padding(.horizontal, 4)
-                    }
+
+                        HStack(spacing: 4) {
+                            qualityButton
+                            backendButton
+                        }
+                    #else
+                        Text(player.stream?.description ?? "")
+                    #endif
 
                     Spacer()
 
@@ -77,6 +68,8 @@ struct PlayerControls: View {
                     .padding(.horizontal, 16)
                 }
             }
+            .padding(.top, 4)
+            .padding(.horizontal, 4)
             .opacity(model.presentingControls ? 1 : 0)
         }
         #if os(tvOS)
@@ -126,29 +119,6 @@ struct PlayerControls: View {
             get: { model.currentTime.seconds },
             set: { value in model.currentTime = .secondsInDefaultTimescale(value) }
         )
-    }
-
-    var statusBar: some View {
-        HStack(spacing: 4) {
-            Text(playbackStatus)
-
-            Text("•")
-
-            #if !os(tvOS)
-                ToggleBackendButton()
-                Text("•")
-
-                StreamControl()
-                #if os(macOS)
-                    .frame(maxWidth: 300)
-                #endif
-            #else
-                Text(player.stream?.description ?? "")
-            #endif
-        }
-        .foregroundColor(.primary)
-        .padding(.trailing, 4)
-        .font(.system(size: 14))
     }
 
     private var hidePlayerButton: some View {
@@ -256,6 +226,45 @@ struct PlayerControls: View {
         #endif
     }
 
+    @ViewBuilder private var qualityButton: some View {
+        #if os(macOS)
+            StreamControl()
+                .labelsHidden()
+                .frame(maxWidth: 300)
+        #elseif os(iOS)
+            Menu {
+                StreamControl()
+                    .frame(width: 45, height: 30)
+                #if os(iOS)
+                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                #endif
+                    .mask(RoundedRectangle(cornerRadius: 3))
+            } label: {
+                Text(player.streamSelection?.shortQuality ?? "loading")
+                    .frame(width: 140, height: 30)
+                    .foregroundColor(.primary)
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.primary)
+            .frame(width: 140, height: 30)
+            #if os(macOS)
+                .background(VisualEffectBlur(material: .hudWindow))
+            #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+            #endif
+                .mask(RoundedRectangle(cornerRadius: 3))
+        #endif
+    }
+
+    @ViewBuilder private var backendButton: some View {
+        button(player.activeBackend.label, width: 100) {
+            player.saveTime {
+                player.changeActiveBackend(from: player.activeBackend, to: player.activeBackend.next())
+                model.resetTimer()
+            }
+        }
+    }
+
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
             player.pause()
@@ -351,7 +360,6 @@ struct PlayerControls: View {
             #endif
         }
         .font(.system(size: 20))
-        .padding(.horizontal, 4)
     }
 
     private var restartVideoButton: some View {
@@ -380,8 +388,10 @@ struct PlayerControls: View {
 
     func button(
         _ label: String,
-        systemImage: String = "arrow.up.left.and.arrow.down.right",
+        systemImage: String? = nil,
         size: Double = 30,
+        width: Double? = nil,
+        height: Double? = nil,
         cornerRadius: Double = 3,
         active: Bool = false,
         action: @escaping () -> Void = {}
@@ -390,14 +400,21 @@ struct PlayerControls: View {
             action()
             model.resetTimer()
         } label: {
-            Label(label, systemImage: systemImage)
-                .labelStyle(.iconOnly)
-                .padding()
-                .contentShape(Rectangle())
+            Group {
+                if let image = systemImage {
+                    Label(label, systemImage: image)
+                        .labelStyle(.iconOnly)
+                } else {
+                    Label(label, systemImage: "")
+                        .labelStyle(.titleOnly)
+                }
+            }
+            .padding()
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .foregroundColor(active ? .accentColor : .primary)
-        .frame(width: size, height: size)
+        .frame(width: width ?? size, height: height ?? size)
         #if os(macOS)
             .background(VisualEffectBlur(material: .hudWindow))
         #elseif os(iOS)
