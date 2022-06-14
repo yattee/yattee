@@ -9,6 +9,7 @@ struct TrendingCountry: View {
     @State private var query: String = ""
     @State private var selection: Country?
 
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
@@ -30,8 +31,8 @@ struct TrendingCountry: View {
             countriesList
         }
         #if os(tvOS)
-        .searchable(text: $query, placement: .automatic, prompt: Text(TrendingCountry.prompt))
-        .background(Color.black)
+        .searchable(text: $query, placement: .automatic, prompt: Text(Self.prompt))
+        .background(Color.background(scheme: colorScheme))
         #endif
     }
 
