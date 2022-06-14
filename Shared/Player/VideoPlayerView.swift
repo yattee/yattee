@@ -152,11 +152,20 @@ struct VideoPlayerView: View {
                         .gesture(
                             DragGesture(coordinateSpace: .global)
                                 .onChanged { value in
+                                    guard player.presentingPlayer else {
+                                        return // swiftlint:disable:this implicit_return
+                                    }
+
                                     player.backend.setNeedsDrawing(false)
                                     let drag = value.translation.height
 
                                     guard drag > 0 else {
                                         return // swiftlint:disable:this implicit_return
+                                    }
+
+                                    guard drag < 100 else {
+                                        player.hide()
+                                        return
                                     }
 
                                     withAnimation(.easeInOut(duration: 0.2)) {
