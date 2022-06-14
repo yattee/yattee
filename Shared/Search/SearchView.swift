@@ -286,52 +286,7 @@ struct SearchView: View {
                             .foregroundColor(.secondary)
                     }
                     ForEach(recentItems) { item in
-                        Button {
-                            switch item.type {
-                            case .query:
-                                state.queryText = item.title
-                                state.changeQuery { query in query.query = item.title }
-
-                                updateFavoriteItem()
-                                recents.add(item)
-                            case .channel:
-                                guard let channel = item.channel else {
-                                    return
-                                }
-
-                                NavigationModel.openChannel(
-                                    channel,
-                                    player: player,
-                                    recents: recents,
-                                    navigation: navigation,
-                                    navigationStyle: navigationStyle,
-                                    delay: false
-                                )
-                            case .playlist:
-                                guard let playlist = item.playlist else {
-                                    return
-                                }
-
-                                NavigationModel.openChannelPlaylist(
-                                    playlist,
-                                    player: player,
-                                    recents: recents,
-                                    navigation: navigation,
-                                    navigationStyle: navigationStyle,
-                                    delay: false
-                                )
-                            }
-                        } label: {
-                            let systemImage = item.type == .query ? "magnifyingglass" :
-                                item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
-                                "list.and.film"
-                            Label(item.title, systemImage: systemImage)
-                                .lineLimit(1)
-                        }
-                        .contextMenu {
-                            removeButton(item)
-                            removeAllButton
-                        }
+                        recentItemButton(item)
                     }
                 }
                 .redrawOn(change: recentsChanged)
@@ -340,6 +295,55 @@ struct SearchView: View {
         #if os(iOS)
         .listStyle(.insetGrouped)
         #endif
+    }
+
+    private func recentItemButton(_ item: RecentItem) -> some View {
+        Button {
+            switch item.type {
+            case .query:
+                state.queryText = item.title
+                state.changeQuery { query in query.query = item.title }
+
+                updateFavoriteItem()
+                recents.add(item)
+            case .channel:
+                guard let channel = item.channel else {
+                    return
+                }
+
+                NavigationModel.openChannel(
+                    channel,
+                    player: player,
+                    recents: recents,
+                    navigation: navigation,
+                    navigationStyle: navigationStyle,
+                    delay: false
+                )
+            case .playlist:
+                guard let playlist = item.playlist else {
+                    return
+                }
+
+                NavigationModel.openChannelPlaylist(
+                    playlist,
+                    player: player,
+                    recents: recents,
+                    navigation: navigation,
+                    navigationStyle: navigationStyle,
+                    delay: false
+                )
+            }
+        } label: {
+            let systemImage = item.type == .query ? "magnifyingglass" :
+                item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
+                "list.and.film"
+            Label(item.title, systemImage: systemImage)
+                .lineLimit(1)
+        }
+        .contextMenu {
+            removeButton(item)
+            removeAllButton
+        }
     }
 
     private func removeButton(_ item: RecentItem) -> some View {
