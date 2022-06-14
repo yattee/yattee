@@ -393,7 +393,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let subscriptionsCount = details["uploaderSubscriberCount"]?.int
 
         let uploaded = details["uploaded"]?.doubleValue
-        var published = uploaded.isNil ? nil : (uploaded! / 1000).formattedAsRelativeTime()
+        var published = (uploaded.isNil || uploaded == -1) ? nil : (uploaded! / 1000).formattedAsRelativeTime()
         if published.isNil {
             published = (details["uploadedDate"] ?? details["uploadDate"])?.stringValue ?? ""
         }
