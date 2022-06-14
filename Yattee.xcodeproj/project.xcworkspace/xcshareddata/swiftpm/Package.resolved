@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/Defaults",
       "state" : {
-        "revision" : "119f654d44f7b90f00dc11f7dd1c94a36f12576b",
-        "version" : "6.2.1"
+        "revision" : "981ccb0a01c54abbe3c12ccb8226108527bbf115",
+        "version" : "6.3.0"
       }
     },
     {
@@ -48,10 +48,10 @@
     {
       "identity" : "sdwebimage",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "2e63d0061da449ad0ed130768d05dceb1496de44",
-        "version" : "5.12.5"
+        "revision" : "b729cc14f65e1412efc781a4cc46bd7f4720a3ae",
+        "version" : "5.12.6"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/sparkle-project/Sparkle",
       "state" : {
         "branch" : "2.x",
-        "revision" : "503830bf24f679b7a9199be85ee7c8d012528d09"
+        "revision" : "308ba94373a7f47b368cb592166c577d6b24a1fd"
       }
     },
     {
