@@ -136,8 +136,6 @@
 		371114EB27B94C8800C2EF7B /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EA27B94C8800C2EF7B /* RepeatingTimer.swift */; };
 		371114EC27B94C8800C2EF7B /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EA27B94C8800C2EF7B /* RepeatingTimer.swift */; };
 		371114ED27B94C8800C2EF7B /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EA27B94C8800C2EF7B /* RepeatingTimer.swift */; };
-		371114EF27B951B800C2EF7B /* ToggleBackendButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EE27B951B800C2EF7B /* ToggleBackendButton.swift */; };
-		371114F027B951B800C2EF7B /* ToggleBackendButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EE27B951B800C2EF7B /* ToggleBackendButton.swift */; };
 		3711403F26B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
 		3711404026B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
 		3711404126B206A6005B3555 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3711403E26B206A6005B3555 /* SearchModel.swift */; };
@@ -349,7 +347,6 @@
 		376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
-		3772000F27E8EC8800CB2475 /* ToggleBackendButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371114EE27B951B800C2EF7B /* ToggleBackendButton.swift */; };
 		3772002727E8EDF000CB2475 /* libmpv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001327E8ED1600CB2475 /* libmpv.a */; };
 		3772002827E8EDF000CB2475 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001A27E8ED1700CB2475 /* libswscale.a */; };
 		3772002927E8EDF000CB2475 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001627E8ED1700CB2475 /* libavutil.a */; };
@@ -847,7 +844,6 @@
 		370F4FC827CC16CB001B35DC /* libbrotlicommon.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libbrotlicommon.1.dylib; sourceTree = "<group>"; };
 		370F500A27CC176F001B35DC /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		371114EA27B94C8800C2EF7B /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
-		371114EE27B951B800C2EF7B /* ToggleBackendButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleBackendButton.swift; sourceTree = "<group>"; };
 		3711403E26B206A6005B3555 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		37130A5A277657090033018A /* Yattee.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Yattee.xcdatamodel; sourceTree = "<group>"; };
 		37130A5E277657300033018A /* PersistenceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
@@ -1315,7 +1311,6 @@
 			isa = PBXGroup;
 			children = (
 				37030FFE27B04DCC00ECDDAA /* PlayerControls.swift */,
-				371114EE27B951B800C2EF7B /* ToggleBackendButton.swift */,
 			);
 			path = Controls;
 			sourceTree = "<group>";
@@ -2620,7 +2615,6 @@
 				37732FF42703D32400F04329 /* Sidebar.swift in Sources */,
 				37D4B19726717E1500C925CA /* Video.swift in Sources */,
 				37484C2926FC83FF00287258 /* AccountForm.swift in Sources */,
-				371114EF27B951B800C2EF7B /* ToggleBackendButton.swift in Sources */,
 				37E70927271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				37EBD8C627AF26B300F1C24B /* AVPlayerBackend.swift in Sources */,
@@ -2742,7 +2736,6 @@
 				37B795912771DAE0001CF27B /* OpenURLHandler.swift in Sources */,
 				37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				376578922685490700D4EA09 /* PlaylistsView.swift in Sources */,
-				371114F027B951B800C2EF7B /* ToggleBackendButton.swift in Sources */,
 				37F9619C27BD89E000058149 /* TapRecognizerViewModifier.swift in Sources */,
 				37484C2626FC83E000287258 /* InstanceForm.swift in Sources */,
 				37D526E42720B4BE00ED2F5E /* View+SwipeGesture.swift in Sources */,
@@ -3035,7 +3028,6 @@
 				37BC50AE2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37D526E02720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				37599F36272B44000087F250 /* FavoritesModel.swift in Sources */,
-				3772000F27E8EC8800CB2475 /* ToggleBackendButton.swift in Sources */,
 				3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37E084AD2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */,
 				371B7E6C2759791900D21217 /* CommentsModel.swift in Sources */,

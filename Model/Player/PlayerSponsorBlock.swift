@@ -1,5 +1,5 @@
-import CoreMedia
 import AVFAudio
+import CoreMedia
 import Defaults
 import Foundation
 
@@ -33,7 +33,6 @@ extension PlayerModel {
     private func skip(_ segment: Segment, at time: CMTime) {
         if let duration = playerItemDuration, segment.endTime.seconds >= duration.seconds - 3 {
             logger.error("segment end time is: \(segment.end) when player item duration is: \(duration.seconds)")
-
 
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {
