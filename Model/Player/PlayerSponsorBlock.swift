@@ -1,4 +1,5 @@
 import CoreMedia
+import AVFAudio
 import Defaults
 import Foundation
 
@@ -18,23 +19,42 @@ extension PlayerModel {
         var nextSegments = [firstSegment]
 
         while let segment = sponsorBlock.segments.first(where: {
-            $0.timeInSegment(.secondsInDefaultTimescale(nextSegments.last!.end + 2))
+            !nextSegments.contains($0) &&
+                $0.timeInSegment(.secondsInDefaultTimescale(nextSegments.last!.end + 2))
         }) {
             nextSegments.append(segment)
         }
 
-        if let segmentToSkip = nextSegments.last(where: { $0.endTime <= playerItemDuration ?? .zero }),
-           shouldSkip(segmentToSkip, at: time)
-        {
+        if let segmentToSkip = nextSegments.last, shouldSkip(segmentToSkip, at: time) {
             skip(segmentToSkip, at: time)
         }
     }
 
     private func skip(_ segment: Segment, at time: CMTime) {
-        guard segment.endTime.seconds <= playerItemDuration?.seconds ?? .infinity else {
-            logger.error(
-                "segment end time is: \(segment.end) when player item duration is: \(playerItemDuration?.seconds ?? .infinity)"
-            )
+        if let duration = playerItemDuration, segment.endTime.seconds >= duration.seconds - 3 {
+            logger.error("segment end time is: \(segment.end) when player item duration is: \(duration.seconds)")
+
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                self.prepareCurrentItemForHistory(finished: true)
+                self.pause()
+
+                if self.queue.isEmpty {
+                    #if !os(macOS)
+                        try? AVAudioSession.sharedInstance().setActive(false)
+                    #endif
+
+                    self.resetQueue()
+                    self.hide()
+                } else {
+                    self.advanceToNextItem()
+                }
+            }
+
             return
         }
 
