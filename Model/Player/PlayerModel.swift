@@ -142,6 +142,8 @@ final class PlayerModel: ObservableObject {
         #if os(iOS)
             if Defaults[.lockPortraitWhenBrowsing] {
                 Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            } else {
+                Orientation.lockOrientation(.allButUpsideDown)
             }
         #endif
     }
