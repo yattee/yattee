@@ -284,7 +284,7 @@ struct VideoCell: View {
                 }
                 .lineLimit(1)
                 .foregroundColor(.secondary)
-                .frame(minHeight: 30, alignment: .top)
+                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
                 #if os(tvOS)
                     .padding(.bottom, 10)
                 #endif
