@@ -410,11 +410,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func extractChannel(from json: JSON) -> Channel {
         var thumbnailURL = json["authorThumbnails"].arrayValue.last?.dictionaryValue["url"]?.stringValue ?? ""
 
-        // append https protocol to unproxied thumbnail URL if it's missing
+        // append protocol to unproxied thumbnail URL if it's missing
         if thumbnailURL.count > 2,
-           String(thumbnailURL[..<thumbnailURL.index(thumbnailURL.startIndex, offsetBy: 2)]) == "//"
+           String(thumbnailURL[..<thumbnailURL.index(thumbnailURL.startIndex, offsetBy: 2)]) == "//",
+           let accountUrlComponents = URLComponents(string: account.url)
         {
-            thumbnailURL = "https:\(thumbnailURL)"
+            thumbnailURL = "\(accountUrlComponents.scheme ?? "https"):\(thumbnailURL)"
         }
 
         return Channel(
@@ -442,14 +443,15 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         details["videoThumbnails"].arrayValue.compactMap { json in
             guard let url = json["url"].url,
                   var components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                  let quality = json["quality"].string
+                  let quality = json["quality"].string,
+                  let accountUrlComponents = URLComponents(string: account.url)
             else {
                 return nil
             }
 
-            // some of instances are not configured properly and return http thumbnails links
-            // http connections are not allowed in the app so we can safely convert it to https
-            components.scheme = "https"
+            // some of instances are not configured properly and return thumbnails links
+            // with incorrect scheme
+            components.scheme = accountUrlComponents.scheme
 
             guard let thumbnailUrl = components.url else {
                 return nil
