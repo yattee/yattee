@@ -439,8 +439,23 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractThumbnails(from details: JSON) -> [Thumbnail] {
-        details["videoThumbnails"].arrayValue.map { json in
-            Thumbnail(url: json["url"].url!, quality: .init(rawValue: json["quality"].string!)!)
+        details["videoThumbnails"].arrayValue.compactMap { json in
+            guard let url = json["url"].url,
+                  var components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                  let quality = json["quality"].string
+            else {
+                return nil
+            }
+
+            // some of instances are not configured properly and return http thumbnails links
+            // http connections are not allowed in the app so we can safely convert it to https
+            components.scheme = "https"
+
+            guard let thumbnailUrl = components.url else {
+                return nil
+            }
+
+            return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
         }
     }
 
