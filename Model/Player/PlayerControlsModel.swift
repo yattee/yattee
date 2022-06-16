@@ -11,8 +11,6 @@ final class PlayerControlsModel: ObservableObject {
     @Published var timer: Timer?
     @Published var playingFullscreen = false
 
-    private var throttle = Throttle(interval: 1)
-
     var player: PlayerModel!
 
     var playbackTime: String {
@@ -62,6 +60,7 @@ final class PlayerControlsModel: ObservableObject {
             return
         }
 
+        player.backend.updateControls()
         withAnimation(PlayerControls.animation) {
             presentingControls = true
         }
@@ -147,8 +146,6 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func update() {
-        throttle.execute { [weak self] in
-            self?.player?.backend.updateControls()
-        }
+        player?.backend.updateControls()
     }
 }

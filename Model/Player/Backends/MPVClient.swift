@@ -141,6 +141,10 @@ final class MPVClient: ObservableObject {
         CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("time-pos"))
     }
 
+    var frameDropCount: Int {
+        mpv.isNil ? 0 : getInt("frame-drop-count")
+    }
+
     var duration: CMTime {
         CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("duration"))
     }
@@ -320,11 +324,11 @@ final class MPVClient: ObservableObject {
     private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
         let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
 
-        guard glView.needsDrawing else {
-            return
-        }
-
         glView.queue.async {
+            guard glView.needsDrawing else {
+                return
+            }
+
             glView.display()
         }
     }

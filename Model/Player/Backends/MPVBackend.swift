@@ -6,6 +6,8 @@ import Logging
 import SwiftUI
 
 final class MPVBackend: PlayerBackend {
+    static var clientUpdatesInterval = 1.0
+
     private var logger = Logger(label: "mpv-backend")
 
     var model: PlayerModel!
@@ -66,11 +68,15 @@ final class MPVBackend: PlayerBackend {
         client?.tracksCount ?? -1
     }
 
+    var frameDropCount: Int {
+        client?.frameDropCount ?? 0
+    }
+
     init(model: PlayerModel, controls: PlayerControlsModel? = nil) {
         self.model = model
         self.controls = controls
 
-        clientTimer = .init(timeInterval: 1)
+        clientTimer = .init(timeInterval: Self.clientUpdatesInterval)
         clientTimer.eventHandler = getClientUpdates
     }
 
@@ -272,12 +278,12 @@ final class MPVBackend: PlayerBackend {
     func closePiP(wasPlaying _: Bool) {}
 
     func updateControls() {
+        guard model.presentingPlayer else {
+            return
+        }
+
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
-                return
-            }
-
-            guard self.controls.player.presentingPlayer else {
                 return
             }
 
