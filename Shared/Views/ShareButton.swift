@@ -81,6 +81,7 @@ struct ShareButton: View {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(url.absoluteString, forType: .string)
         #else
+            player.pause()
             shareURL = url
             presentingShareSheet = true
         #endif
