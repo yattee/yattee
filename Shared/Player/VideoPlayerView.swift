@@ -156,7 +156,6 @@ struct VideoPlayerView: View {
                                         return // swiftlint:disable:this implicit_return
                                     }
 
-                                    player.backend.setNeedsDrawing(false)
                                     let drag = value.translation.height
 
                                     guard drag > 0 else {
