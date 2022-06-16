@@ -256,8 +256,9 @@ struct PlayerControls: View {
         #endif
     }
 
-    @ViewBuilder private var backendButton: some View {
-        button(player.activeBackend.label, width: 100) {
+    private var backendButton: some View {
+        let label = "\(player.activeBackend.label)\(player.activeBackend == .mpv ? " - \(player.mpvBackend.frameDropCount)" : "")"
+        return button(label, width: 120) {
             player.saveTime {
                 player.changeActiveBackend(from: player.activeBackend, to: player.activeBackend.next())
                 model.resetTimer()
