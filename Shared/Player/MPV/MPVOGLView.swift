@@ -7,6 +7,7 @@ final class MPVOGLView: GLKView {
     private var defaultFBO: GLint?
 
     var mpvGL: UnsafeMutableRawPointer?
+    var queue = DispatchQueue(label: "stream.yattee.opengl", qos: .userInteractive)
     var needsDrawing = true
 
     override init(frame: CGRect) {
@@ -18,13 +19,8 @@ final class MPVOGLView: GLKView {
         logger.info("frame size: \(frame.width) x \(frame.height)")
 
         super.init(frame: frame, context: context)
-        contentMode = .redraw
 
         EAGLContext.setCurrent(context)
-
-        drawableColorFormat = .RGBA8888
-        drawableDepthFormat = .formatNone
-        drawableStencilFormat = .formatNone
 
         defaultFBO = -1
         isOpaque = false
@@ -38,28 +34,30 @@ final class MPVOGLView: GLKView {
     }
 
     override func draw(_: CGRect) {
+        guard needsDrawing, let mpvGL = mpvGL else {
+            return
+        }
+
         glGetIntegerv(UInt32(GL_FRAMEBUFFER_BINDING), &defaultFBO!)
 
         var dims: [GLint] = [0, 0, 0, 0]
         glGetIntegerv(GLenum(GL_VIEWPORT), &dims)
 
-        if mpvGL != nil {
-            var data = mpv_opengl_fbo(
-                fbo: Int32(defaultFBO!),
-                w: Int32(dims[2]),
-                h: Int32(dims[3]),
-                internal_format: 0
-            )
-            var flip: CInt = 1
-            withUnsafeMutablePointer(to: &flip) { flip in
-                withUnsafeMutablePointer(to: &data) { data in
-                    var params = [
-                        mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: data),
-                        mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flip),
-                        mpv_render_param()
-                    ]
-                    mpv_render_context_render(OpaquePointer(mpvGL), &params)
-                }
+        var data = mpv_opengl_fbo(
+            fbo: Int32(defaultFBO!),
+            w: Int32(dims[2]),
+            h: Int32(dims[3]),
+            internal_format: 0
+        )
+        var flip: CInt = 1
+        withUnsafeMutablePointer(to: &flip) { flip in
+            withUnsafeMutablePointer(to: &data) { data in
+                var params = [
+                    mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: data),
+                    mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flip),
+                    mpv_render_param()
+                ]
+                mpv_render_context_render(OpaquePointer(mpvGL), &params)
             }
         }
     }
