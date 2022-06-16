@@ -324,8 +324,8 @@ final class MPVClient: ObservableObject {
             return
         }
 
-        DispatchQueue.main.async {
-            glView.setNeedsDisplay()
+        glView.queue.async {
+            glView.display()
         }
     }
 

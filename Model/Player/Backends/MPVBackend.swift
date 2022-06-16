@@ -273,9 +273,17 @@ final class MPVBackend: PlayerBackend {
 
     func updateControls() {
         DispatchQueue.main.async { [weak self] in
-            self?.logger.info("updating controls")
-            self?.controls.currentTime = self?.currentTime ?? .zero
-            self?.controls.duration = self?.playerItemDuration ?? .zero
+            guard let self = self else {
+                return
+            }
+
+            guard self.controls.player.presentingPlayer else {
+                return
+            }
+
+            self.logger.info("updating controls")
+            self.controls.currentTime = self.currentTime ?? .zero
+            self.controls.duration = self.playerItemDuration ?? .zero
         }
     }
 
@@ -296,8 +304,6 @@ final class MPVBackend: PlayerBackend {
     private var handleSegmentsThrottle = Throttle(interval: 1)
 
     private func getClientUpdates() {
-        self.logger.info("getting client updates")
-
         currentTime = client?.currentTime
         playerItemDuration = client?.duration
 
