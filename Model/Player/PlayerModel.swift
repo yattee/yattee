@@ -554,6 +554,10 @@ final class PlayerModel: ObservableObject {
             Windows.player.toggleFullScreen()
         #endif
 
+        #if os(iOS)
+            setNeedsDrawing(false)
+        #endif
+
         controls.playingFullscreen = !isFullScreen
 
         #if os(iOS)
@@ -564,6 +568,10 @@ final class PlayerModel: ObservableObject {
                 Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
             } else {
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.setNeedsDrawing(true)
             }
         #endif
     }
