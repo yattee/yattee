@@ -6,7 +6,7 @@ import Logging
 import SwiftUI
 
 final class MPVBackend: PlayerBackend {
-    static var clientUpdatesInterval = 1.0
+    static var controlsUpdateInterval = 0.5
 
     private var logger = Logger(label: "mpv-backend")
 
@@ -72,11 +72,19 @@ final class MPVBackend: PlayerBackend {
         client?.frameDropCount ?? 0
     }
 
+    var outputFps: Double {
+        client?.outputFps ?? 0
+    }
+
+    var hwDecoder: String {
+        client?.hwDecoder ?? "unknown"
+    }
+
     init(model: PlayerModel, controls: PlayerControlsModel? = nil) {
         self.model = model
         self.controls = controls
 
-        clientTimer = .init(timeInterval: Self.clientUpdatesInterval)
+        clientTimer = .init(timeInterval: Self.controlsUpdateInterval)
         clientTimer.eventHandler = getClientUpdates
     }
 
@@ -341,8 +349,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func handle(_ event: UnsafePointer<mpv_event>!) {
-        logger.info("\(String(cString: mpv_event_name(event.pointee.event_id)))")
-
         switch event.pointee.event_id {
         case MPV_EVENT_SHUTDOWN:
             mpv_destroy(client.mpv)
@@ -350,7 +356,7 @@ final class MPVBackend: PlayerBackend {
 
         case MPV_EVENT_LOG_MESSAGE:
             let logmsg = UnsafeMutablePointer<mpv_event_log_message>(OpaquePointer(event.pointee.data))
-            logger.info(.init(stringLiteral: "log: \(String(cString: (logmsg!.pointee.prefix)!)), "
+            logger.info(.init(stringLiteral: "\(String(cString: (logmsg!.pointee.prefix)!)), "
                     + "\(String(cString: (logmsg!.pointee.level)!)), "
                     + "\(String(cString: (logmsg!.pointee.text)!))"))
 
@@ -375,7 +381,7 @@ final class MPVBackend: PlayerBackend {
             }
 
         default:
-            logger.info(.init(stringLiteral: "event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))
+            logger.info(.init(stringLiteral: "UNHANDLED event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))
         }
     }
 
