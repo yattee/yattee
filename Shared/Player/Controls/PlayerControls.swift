@@ -115,7 +115,9 @@ struct PlayerControls: View {
             Group {
                 Text("hw decoder: \(player.mpvBackend.hwDecoder)")
                 Text("dropped: \(player.mpvBackend.frameDropCount)")
-                Text("output fps: \(player.mpvBackend.outputFps)")
+                Text("video: \(String(format: "%.2ffps", player.mpvBackend.outputFps))")
+                Text("buffering: \(String(format: "%.0f%%", player.mpvBackend.bufferingState))")
+                Text("cache: \(String(format: "%.2fs", player.mpvBackend.cacheDuration))")
             }
             .padding(4)
             #if os(macOS)
