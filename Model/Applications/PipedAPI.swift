@@ -4,6 +4,7 @@ import Siesta
 import SwiftyJSON
 
 final class PipedAPI: Service, ObservableObject, VideosAPI {
+    static var disallowedVideoCodecs = ["av01"]
     static var authorizedEndpoints = ["subscriptions", "subscribe", "unsubscribe", "user/playlists"]
 
     @Published var account: Account!
@@ -500,11 +501,19 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let videoStreams = content.dictionaryValue["videoStreams"]?.arrayValue ?? []
 
         videoStreams.forEach { videoStream in
+            let videoCodec = videoStream.dictionaryValue["codec"]?.string ?? ""
+            if Self.disallowedVideoCodecs.contains(where: videoCodec.contains) {
+                return
+            }
+
             let audioAsset = AVURLAsset(url: audioStream.dictionaryValue["url"]!.url!)
             let videoAsset = AVURLAsset(url: videoStream.dictionaryValue["url"]!.url!)
 
             let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
-            let resolution = Stream.Resolution.from(resolution: videoStream.dictionaryValue["quality"]!.stringValue)
+            let quality = videoStream.dictionaryValue["quality"]?.string ?? "unknown"
+            let qualityComponents = quality.components(separatedBy: "p")
+            let fps = Int(qualityComponents[1].isEmpty ? "30" : qualityComponents[1])
+            let resolution = Stream.Resolution.from(resolution: quality, fps: fps)
             let videoFormat = videoStream.dictionaryValue["format"]?.stringValue
 
             if videoOnly {
