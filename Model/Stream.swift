@@ -5,32 +5,30 @@ import Foundation
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
-        case hd4320p60
-        case hd4320p
         case hd2160p60
         case hd2160p50
         case hd2160p48
-        case hd2160p
+        case hd2160p30
         case hd1440p60
         case hd1440p50
         case hd1440p48
-        case hd1440p
+        case hd1440p30
         case hd1080p60
         case hd1080p50
         case hd1080p48
-        case hd1080p
+        case hd1080p30
         case hd720p60
         case hd720p50
         case hd720p48
-        case hd720p
-        case sd480p
-        case sd360p
-        case sd240p
-        case sd144p
+        case hd720p30
+        case sd480p30
+        case sd360p30
+        case sd240p30
+        case sd144p30
         case unknown
 
         var name: String {
-            "\(height)p\(refreshRate != -1 ? ", \(refreshRate) fps" : "")"
+            "\(height)p\(refreshRate != -1 && refreshRate != 30 ? ", \(refreshRate) fps" : "")"
         }
 
         var height: Int {
@@ -48,11 +46,16 @@ class Stream: Equatable, Hashable, Identifiable {
             }
 
             let refreshRatePart = rawValue.components(separatedBy: "p")[1]
+
+            if refreshRatePart.isEmpty {
+                return 30
+            }
+
             return Int(refreshRatePart.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) ?? -1
         }
 
-        static func from(resolution: String) -> Resolution {
-            allCases.first { "\($0)".contains(resolution) } ?? .unknown
+        static func from(resolution: String, fps: Int? = nil) -> Resolution {
+            allCases.first { $0.rawValue.contains(resolution) && $0.refreshRate == (fps ?? 30) } ?? .unknown
         }
 
         static func < (lhs: Resolution, rhs: Resolution) -> Bool {
@@ -157,7 +160,7 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var quality: String {
-        if resolution == .hd2160p {
+        if resolution == .hd2160p30 {
             return "4K (2160p)"
         }
 
@@ -165,13 +168,7 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var shortQuality: String {
-        if resolution == .hd4320p60 || resolution == .hd4320p {
-            return "8K"
-        } else if resolution == .hd2160p60 ||
-            resolution == .hd2160p50 ||
-            resolution == .hd2160p48 ||
-            resolution == .hd2160p
-        {
+        if resolution.height == 2160 {
             return "4K"
         } else if kind == .hls {
             return "HLS"
