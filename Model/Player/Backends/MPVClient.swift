@@ -155,6 +155,14 @@ final class MPVClient: ObservableObject {
         mpv.isNil ? "unknown" : (getString("hwdec-current") ?? "unknown")
     }
 
+    var bufferingState: Double {
+        mpv.isNil ? 0.0 : getDouble("cache-buffering-state")
+    }
+
+    var cacheDuration: Double {
+        mpv.isNil ? 0.0 : getDouble("demuxer-cache-duration")
+    }
+
     var duration: CMTime {
         CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("duration"))
     }
