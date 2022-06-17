@@ -512,7 +512,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
             let quality = videoStream.dictionaryValue["quality"]?.string ?? "unknown"
             let qualityComponents = quality.components(separatedBy: "p")
-            let fps = Int(qualityComponents[1].isEmpty ? "30" : qualityComponents[1])
+            let fps = qualityComponents.count > 1 ? Int(qualityComponents[1]) : 30
             let resolution = Stream.Resolution.from(resolution: quality, fps: fps)
             let videoFormat = videoStream.dictionaryValue["format"]?.stringValue
 
