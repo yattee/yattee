@@ -280,9 +280,6 @@
 		3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
 		3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
 		3751B4B427836902000B7DF4 /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751B4B127836902000B7DF4 /* SearchPage.swift */; };
-		3751BA7927E63A54007B1A60 /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */; };
-		3751BA7A27E63A54007B1A60 /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */; };
-		3751BA7B27E63A54007B1A60 /* Defaults+Workaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */; };
 		3751BA7E27E63F1D007B1A60 /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */; };
 		3751BA8027E64244007B1A60 /* VideoLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA7F27E64244007B1A60 /* VideoLayer.swift */; };
 		3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */; };
@@ -913,7 +910,6 @@
 		374C0544272496FD009BDDBE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		375168D52700FAFF008F96A6 /* Debounce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
 		3751B4B127836902000B7DF4 /* SearchPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPage.swift; sourceTree = "<group>"; };
-		3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Defaults+Workaround.swift"; sourceTree = "<group>"; };
 		3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		3751BA7F27E64244007B1A60 /* VideoLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLayer.swift; sourceTree = "<group>"; };
 		3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnYouTubeDislikeAPI.swift; sourceTree = "<group>"; };
@@ -1763,7 +1759,6 @@
 				371AAE2826CEC7D900901972 /* Views */,
 				375168D52700FAFF008F96A6 /* Debounce.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
-				3751BA7827E63A54007B1A60 /* Defaults+Workaround.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
@@ -2590,7 +2585,6 @@
 				37484C2526FC83E000287258 /* InstanceForm.swift in Sources */,
 				37DD9DBD2785D60300539416 /* ScrollViewMatcher.swift in Sources */,
 				37B767DB2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
-				3751BA7927E63A54007B1A60 /* Defaults+Workaround.swift in Sources */,
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
@@ -2800,7 +2794,6 @@
 				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
-				3751BA7A27E63A54007B1A60 /* Defaults+Workaround.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
 				37FB28422721B22200A57617 /* ContentItem.swift in Sources */,
 				376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,
@@ -2933,7 +2926,6 @@
 				375168D82700FDB9008F96A6 /* Debounce.swift in Sources */,
 				37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C0697C2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
-				3751BA7B27E63A54007B1A60 /* Defaults+Workaround.swift in Sources */,
 				378AE93D274EDFB3006A4EE1 /* Backport.swift in Sources */,
 				37130A5D277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37C3A243272359900087A57A /* Double+Format.swift in Sources */,
