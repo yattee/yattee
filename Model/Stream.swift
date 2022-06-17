@@ -168,12 +168,12 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var shortQuality: String {
-        if resolution.height == 2160 {
+        if resolution?.height == 2160 {
             return "4K"
         } else if kind == .hls {
             return "HLS"
         } else {
-            return resolution.name
+            return resolution?.name ?? "?"
         }
     }
 
