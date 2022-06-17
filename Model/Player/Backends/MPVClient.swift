@@ -35,15 +35,17 @@ final class MPVClient: ObservableObject {
             exit(1)
         }
 
-        checkError(mpv_request_log_messages(mpv, "warn"))
+        #if DEBUG
+            checkError(mpv_request_log_messages(mpv, "debug"))
+        #else
+            checkError(mpv_request_log_messages(mpv, "warn"))
+        #endif
 
         #if os(macOS)
             checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))
-        #else
-            checkError(mpv_set_option_string(mpv, "hwdec", "yes"))
-            checkError(mpv_set_option_string(mpv, "override-display-fps", "\(UIScreen.main.maximumFramesPerSecond)"))
-            checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
         #endif
+
+        checkError(mpv_set_option_string(mpv, "hwdec", "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
 
         checkError(mpv_initialize(mpv))
@@ -55,7 +57,7 @@ final class MPVClient: ObservableObject {
             extra_exts: nil
         )
 
-        queue = DispatchQueue(label: "mpv", qos: .background)
+        queue = DispatchQueue(label: "mpv", qos: .userInteractive)
 
         withUnsafeMutablePointer(to: &initParams) { initParams in
             var params = [
@@ -143,6 +145,14 @@ final class MPVClient: ObservableObject {
 
     var frameDropCount: Int {
         mpv.isNil ? 0 : getInt("frame-drop-count")
+    }
+
+    var outputFps: Double {
+        mpv.isNil ? 0.0 : getDouble("estimated-vf-fps")
+    }
+
+    var hwDecoder: String {
+        mpv.isNil ? "unknown" : (getString("hwdec-current") ?? "unknown")
     }
 
     var duration: CMTime {
@@ -324,11 +334,11 @@ final class MPVClient: ObservableObject {
     private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
         let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
 
-        glView.queue.async {
-            guard glView.needsDrawing else {
-                return
-            }
+        guard glView.needsDrawing else {
+            return
+        }
 
+        glView.queue.async {
             glView.display()
         }
     }

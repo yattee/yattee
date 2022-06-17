@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
@@ -21,6 +22,8 @@ struct PlayerControls: View {
 
         @FocusState private var focusedField: Field?
     #endif
+
+    @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
 
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
@@ -49,6 +52,10 @@ struct PlayerControls: View {
                     Spacer()
 
                     Group {
+                        if player.activeBackend == .mpv, showMPVPlaybackStats {
+                            mpvPlaybackStats
+                        }
+
                         timeline
                             .offset(y: 10)
                             .zIndex(1)
@@ -101,6 +108,30 @@ struct PlayerControls: View {
                 .retryOnAppear(true)
                 .indicator(.activity)
         }
+    }
+
+    var mpvPlaybackStats: some View {
+        HStack {
+            Group {
+                Text("hw decoder: \(player.mpvBackend.hwDecoder)")
+                Text("dropped: \(player.mpvBackend.frameDropCount)")
+                Text("output fps: \(player.mpvBackend.outputFps)")
+            }
+            .padding(4)
+            #if os(macOS)
+                .background(VisualEffectBlur(material: .hudWindow))
+            #elseif os(iOS)
+                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+            #else
+                .background(.thinMaterial)
+            #endif
+                .mask(RoundedRectangle(cornerRadius: 3))
+
+            Spacer()
+        }
+        #if !os(tvOS)
+        .font(.system(size: 9))
+        #endif
     }
 
     var timeline: some View {
@@ -164,14 +195,11 @@ struct PlayerControls: View {
     var buttonsBar: some View {
         HStack {
             #if !os(tvOS)
-                #if os(iOS)
-                    hidePlayerButton
-                #endif
-
                 fullscreenButton
 
                 #if os(iOS)
                     pipButton
+                        .padding(.leading, 5)
                 #endif
 
                 Spacer()
@@ -257,8 +285,7 @@ struct PlayerControls: View {
     }
 
     private var backendButton: some View {
-        let label = "\(player.activeBackend.label)\(player.activeBackend == .mpv ? " - \(player.mpvBackend.frameDropCount)" : "")"
-        return button(label, width: 120) {
+        button(player.activeBackend.label, width: 100) {
             player.saveTime {
                 player.changeActiveBackend(from: player.activeBackend, to: player.activeBackend.next())
                 model.resetTimer()

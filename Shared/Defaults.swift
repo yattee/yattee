@@ -82,15 +82,13 @@ extension Defaults.Keys {
 
     static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
 
-    #if os(macOS)
-        static let enableBetaChannel = Key<Bool>("enableBetaChannel", default: false)
-    #endif
-
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
         static let lockOrientationInFullScreen = Key<Bool>("lockOrientationInFullScreen", default: false)
     #endif
+
+    static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
