@@ -561,6 +561,10 @@ final class PlayerModel: ObservableObject {
         controls.playingFullscreen = !isFullScreen
 
         #if os(iOS)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.setNeedsDrawing(true)
+            }
+
             if controls.playingFullscreen {
                 guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
                     return
@@ -568,10 +572,6 @@ final class PlayerModel: ObservableObject {
                 Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
             } else {
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-                self?.setNeedsDrawing(true)
             }
         #endif
     }
