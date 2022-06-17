@@ -80,6 +80,14 @@ final class MPVBackend: PlayerBackend {
         client?.hwDecoder ?? "unknown"
     }
 
+    var bufferingState: Double {
+        client?.bufferingState ?? 0
+    }
+
+    var cacheDuration: Double {
+        client?.cacheDuration ?? 0
+    }
+
     init(model: PlayerModel, controls: PlayerControlsModel? = nil) {
         self.model = model
         self.controls = controls
