@@ -2348,6 +2348,7 @@
 		};
 		37CC3F48270CE89B00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 12;
 			files = (
 			);
@@ -2365,6 +2366,7 @@
 		};
 		37CC3F49270CE8CA00608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -2382,6 +2384,7 @@
 		};
 		37CC3F4A270CE8D000608308 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -3366,7 +3369,10 @@
 					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
 				);
 				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-Wl,-no_compact_unwind",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = iphoneos;
@@ -3404,7 +3410,10 @@
 					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
 				);
 				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-Wl,-no_compact_unwind",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = iphoneos;
@@ -3446,6 +3455,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.4;
+				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
@@ -3485,6 +3495,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.4;
+				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = macosx;
@@ -3624,6 +3635,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
 				);
 				MARKETING_VERSION = 1.4;
+				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
@@ -3662,6 +3674,7 @@
 					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
 				);
 				MARKETING_VERSION = 1.4;
+				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
