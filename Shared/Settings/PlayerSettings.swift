@@ -28,6 +28,8 @@ struct PlayerSettings: View {
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
 
+    @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
+
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
             UIDevice.current.userInterfaceIdiom
@@ -103,6 +105,10 @@ struct PlayerSettings: View {
                     lockOrientationInFullScreenToggle
                 }
             #endif
+
+            Section(header: SettingsHeader(text: "Debugging")) {
+                showMPVPlaybackStatsToggle
+            }
         }
     }
 
@@ -232,11 +238,17 @@ struct PlayerSettings: View {
             Toggle("Close PiP and open player when application enters foreground", isOn: $closePiPAndOpenPlayerOnEnteringForeground)
         }
     #endif
+
+    private var showMPVPlaybackStatsToggle: some View {
+        Toggle("Show MPV playback statistics", isOn: $showMPVPlaybackStats)
+    }
 }
 
 struct PlaybackSettings_Previews: PreviewProvider {
     static var previews: some View {
-        PlayerSettings()
-            .injectFixtureEnvironmentObjects()
+        VStack(alignment: .leading) {
+            PlayerSettings()
+        }
+        .injectFixtureEnvironmentObjects()
     }
 }
