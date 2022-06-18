@@ -383,6 +383,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             id = videoID
         }
 
+        let description = json["description"].stringValue
+
         return Video(
             id: id,
             videoID: videoID,
@@ -391,7 +393,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             length: json["lengthSeconds"].doubleValue,
             published: json["publishedText"].stringValue,
             views: json["viewCount"].intValue,
-            description: json["description"].stringValue,
+            description: description,
             genre: json["genre"].stringValue,
             channel: extractChannel(from: json),
             thumbnails: extractThumbnails(from: json),
@@ -403,7 +405,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             dislikes: json["dislikeCount"].int,
             keywords: json["keywords"].arrayValue.compactMap { $0.string },
             streams: extractStreams(from: json),
-            related: extractRelated(from: json)
+            related: extractRelated(from: json),
+            chapters: extractChapters(from: description)
         )
     }
 

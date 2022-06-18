@@ -17,20 +17,14 @@ extension PlayerModel {
 
     func loadAvailableStreams(_ video: Video) {
         availableStreams = []
-        let playerInstance = InstancesModel.forPlayer ?? InstancesModel.all.first
 
-        guard !playerInstance.isNil else {
+        guard let playerInstance = InstancesModel.forPlayer ?? InstancesModel.all.first else {
             return
         }
 
-        logger.info("loading streams from \(playerInstance!.description)")
+        logger.info("loading streams from \(playerInstance.description)")
 
-        fetchStreams(playerInstance!.anonymous.video(video.videoID), instance: playerInstance!, video: video) { _ in
-            InstancesModel.all.filter { $0 != playerInstance }.forEach { instance in
-                self.logger.info("loading streams from \(instance.description)")
-                self.fetchStreams(instance.anonymous.video(video.videoID), instance: instance, video: video)
-            }
-        }
+        fetchStreams(playerInstance.anonymous.video(video.videoID), instance: playerInstance, video: video)
     }
 
     private func fetchStreams(
@@ -60,8 +54,12 @@ extension PlayerModel {
             stream.instance = instance
 
             if instance.app == .invidious {
-                stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: stream.audioAsset)
-                stream.videoAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: stream.videoAsset)
+                if let audio = stream.audioAsset {
+                    stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: audio)
+                }
+                if let video = stream.videoAsset {
+                    stream.videoAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: video)
+                }
             }
 
             return stream

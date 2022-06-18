@@ -11,6 +11,8 @@ final class AVPlayerBackend: PlayerBackend {
 
     var model: PlayerModel!
     var controls: PlayerControlsModel!
+    var playerTime: PlayerTimeModel!
+    var networkState: NetworkStateModel!
 
     var stream: Stream?
     var video: Video?
@@ -29,6 +31,11 @@ final class AVPlayerBackend: PlayerBackend {
 
     var isPlaying: Bool {
         avPlayer.timeControlStatus == .playing
+    }
+
+    var isSeeking: Bool {
+        // TODO: implement this maybe?
+        false
     }
 
     var playerItemDuration: CMTime? {
@@ -52,9 +59,10 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var timeObserverThrottle = Throttle(interval: 2)
 
-    init(model: PlayerModel, controls: PlayerControlsModel?) {
+    init(model: PlayerModel, controls: PlayerControlsModel?, playerTime: PlayerTimeModel?) {
         self.model = model
         self.controls = controls
+        self.playerTime = playerTime
 
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
@@ -493,8 +501,8 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            self.controls.duration = self.playerItemDuration ?? .zero
-            self.controls.currentTime = self.currentTime ?? .zero
+            self.playerTime.duration = self.playerItemDuration ?? .zero
+            self.playerTime.currentTime = self.currentTime ?? .zero
 
             #if !os(tvOS)
                 self.model.updateNowPlayingInfo()
@@ -581,4 +589,5 @@ final class AVPlayerBackend: PlayerBackend {
     func stopControlsUpdates() {}
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
+    func updateNetworkState() {}
 }

@@ -11,7 +11,7 @@ final class MPVOGLView: GLKView {
     var needsDrawing = true
 
     override init(frame: CGRect) {
-        guard let context = EAGLContext(api: .openGLES3) else {
+        guard let context = EAGLContext(api: .openGLES2) else {
             print("Failed to initialize OpenGLES 2.0 context")
             exit(1)
         }
@@ -20,10 +20,12 @@ final class MPVOGLView: GLKView {
 
         super.init(frame: frame, context: context)
 
-        EAGLContext.setCurrent(context)
+        self.context = context
+        bindDrawable()
 
         defaultFBO = -1
-        isOpaque = false
+        isOpaque = true
+        enableSetNeedsDisplay = false
 
         fillBlack()
     }

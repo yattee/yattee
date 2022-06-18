@@ -2,7 +2,6 @@ import UIKit
 
 final class MPVViewController: UIViewController {
     var client: MPVClient!
-    var glView: MPVOGLView!
 
     init() {
         client = MPVClient()
@@ -17,9 +16,8 @@ final class MPVViewController: UIViewController {
         super.loadView()
 
         client.create(frame: view.frame)
-        glView = client.glView
 
-        view.addSubview(glView)
+        view.addSubview(client.glView)
 
         super.viewDidLoad()
     }

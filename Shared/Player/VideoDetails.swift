@@ -2,14 +2,30 @@ import Defaults
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
+import SwiftUIPager
 
 struct VideoDetails: View {
-    enum Page {
-        case info, comments, related, queue
+    enum DetailsPage: CaseIterable {
+        case info, chapters, comments, related, queue
+
+        var index: Int {
+            switch self {
+            case .info:
+                return 0
+            case .chapters:
+                return 1
+            case .comments:
+                return 2
+            case .related:
+                return 3
+            case .queue:
+                return 4
+            }
+        }
     }
 
-    @Binding var sidebarQueue: Bool
-    @Binding var fullScreen: Bool
+    var sidebarQueue: Bool
+    var fullScreen: Bool
 
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
@@ -18,89 +34,82 @@ struct VideoDetails: View {
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
-    @State private var currentPage = Page.info
+    @StateObject private var page: Page = .first()
 
-    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Default(.showKeywords) private var showKeywords
+    @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
+    @Default(.controlsBarInPlayer) private var controlsBarInPlayer
 
-    init(
-        sidebarQueue: Binding<Bool>? = nil,
-        fullScreen: Binding<Bool>? = nil
-    ) {
-        _sidebarQueue = sidebarQueue ?? .constant(true)
-        _fullScreen = fullScreen ?? .constant(false)
+    var currentPage: DetailsPage {
+        DetailsPage.allCases.first { $0.index == page.index } ?? .info
     }
 
     var video: Video? {
         player.currentVideo
     }
 
-    var body: some View {
-        VStack(alignment: .leading) {
-            Group {
-                Group {
-                    HStack(spacing: 0) {
-                        title
+    func pageButton(
+        _ label: String,
+        _ symbolName: String,
+        _ destination: DetailsPage,
+        pageChangeAction: (() -> Void)? = nil
+    ) -> some View {
+        Button(action: {
+            page.update(.new(index: destination.index))
+            pageChangeAction?()
+        }) {
+            HStack {
+                Spacer()
 
-                        toggleFullScreenDetailsButton
+                HStack(spacing: 4) {
+                    Image(systemName: symbolName)
+
+                    if playerDetailsPageButtonLabelStyle.text {
+                        Text(label)
                     }
-                    #if os(macOS)
-                    .padding(.top, 10)
-                    #endif
-
-                    if !video.isNil {
-                        Divider()
-                    }
-
-                    subscriptionsSection
-                        .onChange(of: video) { video in
-                            if let video = video {
-                                subscribed = subscriptions.isSubscribing(video.channel.id)
-                            }
-                        }
                 }
-                .padding(.horizontal)
+                .frame(minHeight: 15)
+                .lineLimit(1)
+                .padding(.vertical, 4)
+                .foregroundColor(currentPage == destination ? .white : .accentColor)
 
-                if !sidebarQueue ||
-                    (CommentsModel.enabled && CommentsModel.placement == .separate)
-                {
-                    pagePicker
-                        .padding(.horizontal)
-                }
+                Spacer()
             }
             .contentShape(Rectangle())
-            .onSwipeGesture(
-                up: {
-                    withAnimation {
-                        fullScreen = true
-                    }
-                },
-                down: {
-                    withAnimation {
-                        if fullScreen {
-                            fullScreen = false
-                        } else {
-                            self.player.hide()
-                        }
-                    }
-                }
-            )
+        }
+        .background(currentPage == destination ? Color.accentColor : .clear)
+        .buttonStyle(.plain)
+        .font(.system(size: 10).bold())
+        .overlay(
+            RoundedRectangle(cornerRadius: 2)
+                .stroke(Color.accentColor, lineWidth: 2)
+                .foregroundColor(.clear)
+        )
+        .frame(maxWidth: .infinity)
+    }
 
-            switch currentPage {
+    @ViewBuilder func detailsByPage(_ page: DetailsPage) -> some View {
+        Group {
+            switch page {
             case .info:
                 ScrollView(.vertical, showsIndicators: false) {
                     detailsPage
                 }
+            case .chapters:
+                ChaptersView()
+                    .edgesIgnoringSafeArea(.horizontal)
+
             case .queue:
-                PlayerQueueView(sidebarQueue: $sidebarQueue, fullScreen: $fullScreen)
+                PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: fullScreen)
                     .edgesIgnoringSafeArea(.horizontal)
 
             case .related:
@@ -111,9 +120,54 @@ struct VideoDetails: View {
                     .edgesIgnoringSafeArea(.horizontal)
             }
         }
+        .contentShape(Rectangle())
+    }
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Group {
+//                Group {
+//                    subscriptionsSection
+//                        .border(.red, width: 4)
+//
+//                        .onChange(of: video) { video in
+//                            if let video = video {
+//                                subscribed = subscriptions.isSubscribing(video.channel.id)
+//                            }
+//                        }
+//                }
+//                .padding(.top, 4)
+//                .padding(.horizontal)
+
+                HStack(spacing: 4) {
+                    pageButton("Info", "info.circle", .info)
+                    pageButton("Chapters", "bookmark", .chapters)
+                    pageButton("Comments", "text.bubble", .comments) { comments.load() }
+                    pageButton("Related", "rectangle.stack.fill", .related)
+                    pageButton("Queue", "list.number", .queue)
+                }
+                .onChange(of: player.currentItem) { _ in
+                    page.update(.moveToFirst)
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+            }
+            .contentShape(Rectangle())
+
+            Pager(page: page, data: DetailsPage.allCases, id: \.self) {
+                detailsByPage($0)
+            }
+            .onPageWillChange { pageIndex in
+                if pageIndex == DetailsPage.comments.index {
+                    comments.load()
+                } else {
+                    print("comments not loading")
+                }
+            }
+        }
         .onAppear {
             if video.isNil && !sidebarQueue {
-                currentPage = .queue
+                page.update(.new(index: DetailsPage.queue.index))
             }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
@@ -124,91 +178,56 @@ struct VideoDetails: View {
         .onChange(of: sidebarQueue) { queue in
             if queue {
                 if currentPage == .related || currentPage == .queue {
-                    currentPage = .info
+                    page.update(.moveToFirst)
                 }
             } else if video.isNil {
-                currentPage = .queue
+                page.update(.moveToLast)
             }
         }
         .edgesIgnoringSafeArea(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    var title: some View {
-        Group {
-            if video != nil {
-                Text(video!.title)
-                    .onAppear {
-                        currentPage = .info
-                    }
-                    .contextMenu {
-                        Button {
-                            player.closeCurrentItem()
-                            if !sidebarQueue {
-                                currentPage = .queue
-                            } else {
-                                currentPage = .info
-                            }
-                        } label: {
-                            Label("Close Video", systemImage: "xmark.circle")
-                        }
-                        .disabled(player.currentItem.isNil)
-                    }
-
-                    .font(.title2.bold())
-            } else {
-                Text("Not playing")
-                    .foregroundColor(.secondary)
-            }
-
-            Spacer()
-        }
-    }
-
-    var toggleFullScreenDetailsButton: some View {
-        Button {
-            withAnimation {
-                fullScreen.toggle()
-            }
-        } label: {
-            Label("Resize", systemImage: fullScreen ? "chevron.down" : "chevron.up")
-                .labelStyle(.iconOnly)
-        }
-        .help("Toggle fullscreen details")
-        .buttonStyle(.plain)
-        .keyboardShortcut("t")
+    var showAddToPlaylistButton: Bool {
+        accounts.app.supportsUserPlaylists && accounts.signedIn
     }
 
     var subscriptionsSection: some View {
         Group {
-            if video != nil {
+            if let video = video {
                 HStack(alignment: .center) {
                     HStack(spacing: 10) {
                         Group {
-                            ZStack(alignment: .bottomTrailing) {
-                                authorAvatar
+//                            ZStack(alignment: .bottomTrailing) {
+//                                authorAvatar
+//
+//                                if subscribed {
+//                                    Image(systemName: "star.circle.fill")
+//                                        .background(Color.background)
+//                                        .clipShape(Circle())
+//                                        .foregroundColor(.secondary)
+//                                }
+//                            }
 
-                                if subscribed {
-                                    Image(systemName: "star.circle.fill")
-                                        .background(Color.background)
-                                        .clipShape(Circle())
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-
-                            VStack(alignment: .leading) {
-                                Text(video!.channel.name)
-                                    .font(.system(size: 14))
-                                    .bold()
-
-                                Group {
-                                    if let subscribers = video!.channel.subscriptionsString {
-                                        Text("\(subscribers) subscribers")
-                                    }
-                                }
-                                .foregroundColor(.secondary)
-                                .font(.caption2)
-                            }
+//                            VStack(alignment: .leading, spacing: 4) {
+//                                Text(video.title)
+//                                    .font(.system(size: 11))
+//                                    .fontWeight(.bold)
+//
+//                                HStack(spacing: 4) {
+//                                    Text(video.channel.name)
+//
+//                                    if let subscribers = video.channel.subscriptionsString {
+//                                        Text("•")
+//                                            .foregroundColor(.secondary)
+//                                            .opacity(0.3)
+//
+//                                        Text("\(subscribers) subscribers")
+//                                    }
+//                                }
+//                                .foregroundColor(.secondary)
+//                                .font(.caption2)
+//                            }
                         }
                     }
                     .contentShape(RoundedRectangle(cornerRadius: 12))
@@ -227,80 +246,8 @@ struct VideoDetails: View {
                             }
                         }
                     }
-
-                    if accounts.app.supportsSubscriptions, accounts.signedIn {
-                        Spacer()
-
-                        Section {
-                            if subscribed {
-                                Button("Unsubscribe") {
-                                    presentingUnsubscribeAlert = true
-                                }
-                                #if os(iOS)
-                                .backport
-                                .tint(.gray)
-                                #endif
-                                .alert(isPresented: $presentingUnsubscribeAlert) {
-                                    Alert(
-                                        title: Text(
-                                            "Are you sure you want to unsubscribe from \(video!.channel.name)?"
-                                        ),
-                                        primaryButton: .destructive(Text("Unsubscribe")) {
-                                            subscriptionToggleButtonDisabled = true
-
-                                            subscriptions.unsubscribe(video!.channel.id) {
-                                                withAnimation {
-                                                    subscriptionToggleButtonDisabled = false
-                                                    subscribed.toggle()
-                                                }
-                                            }
-                                        },
-                                        secondaryButton: .cancel()
-                                    )
-                                }
-                            } else {
-                                Button("Subscribe") {
-                                    subscriptionToggleButtonDisabled = true
-
-                                    subscriptions.subscribe(video!.channel.id) {
-                                        withAnimation {
-                                            subscriptionToggleButtonDisabled = false
-                                            subscribed.toggle()
-                                        }
-                                    }
-                                }
-                                .backport
-                                .tint(subscriptionToggleButtonDisabled ? .gray : .blue)
-                            }
-                        }
-                        .disabled(subscriptionToggleButtonDisabled)
-                        .font(.system(size: 13))
-                        .buttonStyle(.borderless)
-                    }
                 }
             }
-        }
-    }
-
-    var pagePicker: some View {
-        Picker("Page", selection: $currentPage) {
-            if !video.isNil {
-                Text("Info").tag(Page.info)
-                if CommentsModel.enabled, CommentsModel.placement == .separate {
-                    Text("Comments").tag(Page.comments)
-                }
-                if !sidebarQueue {
-                    Text("Related").tag(Page.related)
-                }
-            }
-            if !sidebarQueue {
-                Text("Queue").tag(Page.queue)
-            }
-        }
-        .labelsHidden()
-        .pickerStyle(.segmented)
-        .onDisappear {
-            currentPage = .info
         }
     }
 
@@ -311,30 +258,9 @@ struct VideoDetails: View {
                     if let published = video.publishedDate {
                         Text(published)
                     }
-
-                    if let date = video.publishedAt {
-                        if video.publishedDate != nil {
-                            Text("•")
-                                .foregroundColor(.secondary)
-                                .opacity(0.3)
-                        }
-                        Text(formattedPublishedAt(date))
-                    }
                 }
-                .font(.system(size: 12))
-                .padding(.bottom, -1)
-                .foregroundColor(.secondary)
             }
         }
-    }
-
-    func formattedPublishedAt(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .none
-
-        return dateFormatter.string(from: date)
     }
 
     var countsSection: some View {
@@ -386,13 +312,6 @@ struct VideoDetails: View {
                 .foregroundColor(.secondary)
             }
         }
-        .background(
-            EmptyView().sheet(isPresented: $presentingAddToPlaylist) {
-                if let video = video {
-                    AddToPlaylistView(video: video)
-                }
-            }
-        )
         #if os(iOS)
         .background(
             EmptyView().sheet(isPresented: $presentingShareSheet) {
@@ -419,9 +338,38 @@ struct VideoDetails: View {
                     .retryOnAppear(true)
                     .indicator(.activity)
                     .clipShape(Circle())
-                    .frame(width: 45, height: 45, alignment: .leading)
+                    .frame(width: 35, height: 35, alignment: .leading)
             }
         }
+    }
+
+    var videoProperties: some View {
+        HStack(spacing: 2) {
+            publishedDateSection
+            Spacer()
+
+            HStack(spacing: 4) {
+                if let views = video?.viewsCount {
+                    Image(systemName: "eye")
+
+                    Text(views)
+                }
+
+                if let likes = video?.likesCount {
+                    Image(systemName: "hand.thumbsup")
+
+                    Text(likes)
+                }
+
+                if let likes = video?.dislikesCount {
+                    Image(systemName: "hand.thumbsdown")
+
+                    Text(likes)
+                }
+            }
+        }
+        .font(.system(size: 12))
+        .foregroundColor(.secondary)
     }
 
     var detailsPage: some View {
@@ -429,21 +377,21 @@ struct VideoDetails: View {
             VStack(alignment: .leading, spacing: 0) {
                 if let video = player.currentVideo {
                     VStack(spacing: 6) {
-                        HStack {
-                            publishedDateSection
-                            Spacer()
-                        }
-
-                        Divider()
-
-                        countsSection
+                        videoProperties
 
                         Divider()
                     }
                     .padding(.bottom, 6)
 
                     VStack(alignment: .leading, spacing: 10) {
-                        if let description = video.description {
+                        if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
+                            VStack(alignment: .leading, spacing: 0) {
+                                ForEach(1 ... Int.random(in: 3 ... 5), id: \.self) { _ in
+                                    Text(String(repeating: Video.fixture.description!, count: Int.random(in: 1 ... 4)))
+                                        .redacted(reason: .placeholder)
+                                }
+                            }
+                        } else if let description = video.description {
                             Group {
                                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
                                     Text(description)
@@ -531,7 +479,7 @@ struct VideoDetails: View {
 
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDetails(sidebarQueue: .constant(true))
+        VideoDetails(sidebarQueue: true, fullScreen: false)
             .injectFixtureEnvironmentObjects()
     }
 }

@@ -1,8 +1,8 @@
 import Foundation
 
 extension Double {
-    func formattedAsPlaybackTime() -> String? {
-        guard !isZero, isFinite else {
+    func formattedAsPlaybackTime(allowZero: Bool = false) -> String? {
+        guard allowZero || !isZero, isFinite else {
             return nil
         }
 
