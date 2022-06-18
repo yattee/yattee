@@ -14,7 +14,7 @@ struct NoCommentsView: View {
                 .font(.system(size: 12))
             #endif
         }
-        .frame(minWidth: 0, maxWidth: .infinity)
+        .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
         #if !os(tvOS)
             .foregroundColor(.secondary)
         #endif

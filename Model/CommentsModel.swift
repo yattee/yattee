@@ -40,12 +40,12 @@ final class CommentsModel: ObservableObject {
     }
 
     func load(page: String? = nil) {
-        guard Self.enabled else {
+        guard Self.enabled, !loaded else {
             return
         }
 
         guard !Self.instance.isNil,
-              !(player?.currentVideo.isNil ?? true)
+              let video = player.currentVideo
         else {
             return
         }
@@ -56,7 +56,7 @@ final class CommentsModel: ObservableObject {
 
         firstPage = page.isNil || page!.isEmpty
 
-        api?.comments(player.currentVideo!.videoID, page: page)?
+        api?.comments(video.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {

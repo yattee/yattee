@@ -66,6 +66,10 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
+    @Published var presentingAlert = false
+    @Published var alertTitle = ""
+    @Published var alertMessage = ""
+
     static func openChannel(
         _ channel: Channel,
         player: PlayerModel,
@@ -180,6 +184,12 @@ final class NavigationModel: ObservableObject {
         #if os(iOS)
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         #endif
+    }
+
+    func presentAlert(title: String, message: String) {
+        alertTitle = title
+        alertMessage = message
+        presentingAlert = true
     }
 }
 

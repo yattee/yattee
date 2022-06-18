@@ -5,37 +5,26 @@ import SwiftUI
 final class PlayerControlsModel: ObservableObject {
     @Published var isLoadingVideo = false
     @Published var isPlaying = true
-    @Published var currentTime = CMTime.zero
-    @Published var duration = CMTime.zero
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
+    @Published var presentingControlsOverlay = false
     @Published var timer: Timer?
-    @Published var playingFullscreen = false
 
     var player: PlayerModel!
 
-    var playbackTime: String {
-        guard let current = currentTime.seconds.formattedAsPlaybackTime(),
-              let duration = duration.seconds.formattedAsPlaybackTime()
-        else {
-            return "--:-- / --:--"
-        }
-
-        var withoutSegments = ""
-        if let withoutSegmentsDuration = playerItemDurationWithoutSponsorSegments,
-           self.duration.seconds != withoutSegmentsDuration
-        {
-            withoutSegments = " (\(withoutSegmentsDuration.formattedAsPlaybackTime() ?? "--:--"))"
-        }
-
-        return "\(current) / \(duration)\(withoutSegments)"
-    }
-
-    var playerItemDurationWithoutSponsorSegments: Double? {
-        guard let duration = player.playerItemDurationWithoutSponsorSegments else {
-            return nil
-        }
-
-        return duration.seconds
+    init(
+        isLoadingVideo: Bool = false,
+        isPlaying: Bool = true,
+        presentingControls: Bool = false,
+        presentingControlsOverlay: Bool = false,
+        timer: Timer? = nil,
+        player: PlayerModel? = nil
+    ) {
+        self.isLoadingVideo = isLoadingVideo
+        self.isPlaying = isPlaying
+        self.presentingControls = presentingControls
+        self.presentingControlsOverlay = presentingControlsOverlay
+        self.timer = timer
+        self.player = player
     }
 
     func handlePresentationChange() {
@@ -45,7 +34,7 @@ final class PlayerControlsModel: ObservableObject {
                 self?.resetTimer()
             }
         } else {
-            player.backend.stopControlsUpdates()
+            player?.backend.stopControlsUpdates()
             timer?.invalidate()
             timer = nil
         }
@@ -89,11 +78,6 @@ final class PlayerControlsModel: ObservableObject {
 
     func toggle() {
         presentingControls ? hide() : show()
-    }
-
-    func reset() {
-        currentTime = .zero
-        duration = .zero
     }
 
     func resetTimer() {

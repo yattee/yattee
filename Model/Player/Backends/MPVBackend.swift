@@ -12,6 +12,8 @@ final class MPVBackend: PlayerBackend {
 
     var model: PlayerModel!
     var controls: PlayerControlsModel!
+    var playerTime: PlayerTimeModel!
+    var networkState: NetworkStateModel!
 
     var stream: Stream?
     var video: Video?
@@ -24,17 +26,22 @@ final class MPVBackend: PlayerBackend {
                 return
             }
 
-            self.controls.isLoadingVideo = self.isLoadingVideo
+            self.controls?.isLoadingVideo = self.isLoadingVideo
+            self.updateNetworkState()
 
             if !self.isLoadingVideo {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                     self?.handleEOF = true
                 }
             }
+
+            self.model?.objectWillChange.send()
         }
     }}
 
     var isPlaying = true { didSet {
+        updateNetworkState()
+
         if isPlaying {
             startClientUpdates()
         } else {
@@ -49,6 +56,15 @@ final class MPVBackend: PlayerBackend {
             }
         #endif
     }}
+    var isSeeking = false {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.model.isSeeking = self.isSeeking
+            }
+        }
+    }
+
     var playerItemDuration: CMTime?
 
     #if !os(macOS)
@@ -88,9 +104,16 @@ final class MPVBackend: PlayerBackend {
         client?.cacheDuration ?? 0
     }
 
-    init(model: PlayerModel, controls: PlayerControlsModel? = nil) {
+    init(
+        model: PlayerModel,
+        controls: PlayerControlsModel? = nil,
+        playerTime: PlayerTimeModel? = nil,
+        networkState: NetworkStateModel? = nil
+    ) {
         self.model = model
         self.controls = controls
+        self.playerTime = playerTime
+        self.networkState = networkState
 
         clientTimer = .init(timeInterval: Self.controlsUpdateInterval)
         clientTimer.eventHandler = getClientUpdates
@@ -155,7 +178,6 @@ final class MPVBackend: PlayerBackend {
 
                 if !preservingTime,
                    let segment = self.model.sponsorBlock.segments.first,
-                   segment.end > 4,
                    self.model.lastSkipped.isNil
                 {
                     self.seek(to: segment.endTime) { finished in
@@ -202,7 +224,7 @@ final class MPVBackend: PlayerBackend {
                     let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                     let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 
-                    self.client.loadFile(fileToLoad, audio: audioTrack, time: time) { [weak self] _ in
+                    self.client?.loadFile(fileToLoad, audio: audioTrack, time: time) { [weak self] _ in
                         self?.isLoadingVideo = true
                         self?.pause()
                     }
@@ -229,7 +251,7 @@ final class MPVBackend: PlayerBackend {
         isPlaying = true
         startClientUpdates()
 
-        if controls.presentingControls {
+        if controls?.presentingControls ?? false {
             startControlsUpdates()
         }
 
@@ -254,7 +276,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func seek(to time: CMTime, completionHandler: ((Bool) -> Void)?) {
-        client.seek(to: time) { [weak self] _ in
+        client?.seek(to: time) { [weak self] _ in
             self?.getClientUpdates()
             self?.updateControls()
             completionHandler?(true)
@@ -262,7 +284,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        client.seek(relative: time) { [weak self] _ in
+        client?.seek(relative: time) { [weak self] _ in
             self?.getClientUpdates()
             self?.updateControls()
             completionHandler?(true)
@@ -280,13 +302,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func enterFullScreen() {
-        model.toggleFullscreen(controls?.playingFullscreen ?? false)
-
-        #if os(iOS)
-            if Defaults[.lockOrientationInFullScreen] {
-                Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
-            }
-        #endif
+        model.toggleFullscreen(model?.playingFullScreen ?? false)
     }
 
     func exitFullScreen() {}
@@ -297,15 +313,13 @@ final class MPVBackend: PlayerBackend {
         guard model.presentingPlayer else {
             return
         }
-
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
                 return
             }
 
-            self.logger.info("updating controls")
-            self.controls.currentTime = self.currentTime ?? .zero
-            self.controls.duration = self.playerItemDuration ?? .zero
+            self.playerTime.currentTime = self.currentTime ?? .zero
+            self.playerTime.duration = self.playerItemDuration ?? .zero
         }
     }
 
@@ -375,13 +389,22 @@ final class MPVBackend: PlayerBackend {
 
         case MPV_EVENT_PLAYBACK_RESTART:
             isLoadingVideo = false
+            isSeeking = false
 
             onFileLoaded?()
             startClientUpdates()
             onFileLoaded = nil
 
+        case MPV_EVENT_PAUSE:
+            updateNetworkState()
+
         case MPV_EVENT_UNPAUSE:
             isLoadingVideo = false
+            isSeeking = false
+            updateNetworkState()
+
+        case MPV_EVENT_SEEK:
+            isSeeking = true
 
         case MPV_EVENT_END_FILE:
             DispatchQueue.main.async { [weak self] in
@@ -417,18 +440,41 @@ final class MPVBackend: PlayerBackend {
     }
 
     func setSize(_ width: Double, _ height: Double) {
-        self.client?.setSize(width, height)
+        client?.setSize(width, height)
     }
 
     func addVideoTrack(_ url: URL) {
-        self.client?.addVideoTrack(url)
+        client?.addVideoTrack(url)
     }
 
     func setVideoToAuto() {
-        self.client?.setVideoToAuto()
+        client?.setVideoToAuto()
     }
 
     func setVideoToNo() {
-        self.client?.setVideoToNo()
+        client?.setVideoToNo()
+    }
+
+    func updateNetworkState() {
+        guard let client = client, let networkState = networkState else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            networkState.pausedForCache = client.pausedForCache
+            networkState.cacheDuration = client.cacheDuration
+            networkState.bufferingState = client.bufferingState
+        }
+
+        if networkState.needsUpdates {
+            dispatchNetworkUpdate()
+        }
+    }
+
+    func dispatchNetworkUpdate() {
+        print("dispatching network update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            self?.updateNetworkState()
+        }
     }
 }

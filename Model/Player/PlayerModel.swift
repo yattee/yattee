@@ -53,6 +53,7 @@ final class PlayerModel: ObservableObject {
 
     @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
+    @Published var videoBeingOpened: Video?
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
@@ -64,6 +65,10 @@ final class PlayerModel: ObservableObject {
 
     @Published var musicMode = false
     @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
+
+    @Published var isSeeking = false { didSet {
+        backend.updateNetworkState()
+    }}
 
     #if os(iOS)
         @Published var motionManager: CMMotionManager!
@@ -79,9 +84,24 @@ final class PlayerModel: ObservableObject {
             backend.controls = controls
         }
     }}
+    var playerTime: PlayerTimeModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.playerTime = playerTime
+            backend.playerTime.player = self
+        }
+    }}
+    var networkState: NetworkStateModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.networkState = networkState
+            backend.networkState.player = self
+        }
+    }}
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
+    @Published var playingFullScreen = false
     @Published var playingInPictureInPicture = false
     var pipController: AVPictureInPictureController?
     var pipDelegate = PiPDelegate()
@@ -108,13 +128,31 @@ final class PlayerModel: ObservableObject {
         var playerLayerView: PlayerLayerView!
     #endif
 
-    init(accounts: AccountsModel? = nil, comments: CommentsModel? = nil, controls: PlayerControlsModel? = nil) {
-        self.accounts = accounts ?? AccountsModel()
-        self.comments = comments ?? CommentsModel()
-        self.controls = controls ?? PlayerControlsModel()
+    var onPresentPlayer: (() -> Void)?
 
-        self.avPlayerBackend = AVPlayerBackend(model: self, controls: controls)
-        self.mpvBackend = MPVBackend(model: self)
+    init(
+        accounts: AccountsModel = AccountsModel(),
+        comments: CommentsModel = CommentsModel(),
+        controls: PlayerControlsModel = PlayerControlsModel(),
+        playerTime: PlayerTimeModel = PlayerTimeModel(),
+        networkState: NetworkStateModel = NetworkStateModel()
+    ) {
+        self.accounts = accounts
+        self.comments = comments
+        self.controls = controls
+        self.playerTime = playerTime
+        self.networkState = networkState
+
+        self.avPlayerBackend = AVPlayerBackend(
+            model: self,
+            controls: controls,
+            playerTime: playerTime
+        )
+        self.mpvBackend = MPVBackend(
+            model: self,
+            playerTime: playerTime,
+            networkState: networkState
+        )
 
         Defaults[.activeBackend] = .mpv
     }
@@ -136,7 +174,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func hide() {
-        controls.playingFullscreen = false
+        playingFullScreen = false
         presentingPlayer = false
 
         #if os(iOS)
@@ -176,11 +214,19 @@ final class PlayerModel: ObservableObject {
     }
 
     var playerItemDuration: CMTime? {
-        backend.playerItemDuration
+        guard !currentItem.isNil else {
+            return nil
+        }
+
+        return backend.playerItemDuration
     }
 
     var playerItemDurationWithoutSponsorSegments: CMTime? {
-        (backend.playerItemDuration ?? .zero) - .secondsInDefaultTimescale(
+        guard let playerItemDuration = playerItemDuration, !playerItemDuration.seconds.isZero else {
+            return nil
+        }
+
+        return playerItemDuration - .secondsInDefaultTimescale(
             sponsorBlock.segments.reduce(0) { $0 + $1.duration }
         )
     }
@@ -212,18 +258,15 @@ final class PlayerModel: ObservableObject {
     func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
         pause()
 
-        var delay = 0.0
         #if os(iOS)
-            delay = 0.5
-        #endif
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-            guard let self = self else {
+            if !playingInPictureInPicture, showingPlayer {
+                onPresentPlayer = { [weak self] in self?.playNow(video, at: time) }
+                show()
                 return
             }
+        #endif
 
-            self.playNow(video, at: time)
-        }
+        playNow(video, at: time)
 
         guard !playingInPictureInPicture else {
             return
@@ -260,7 +303,7 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        controls.reset()
+        playerTime.reset()
 
         backend.playStream(
             stream,
@@ -468,10 +511,13 @@ final class PlayerModel: ObservableObject {
 
         func handleEnterBackground() {
             setNeedsDrawing(false)
+            if !playingInPictureInPicture, !musicMode {
+                pause()
+            }
         }
 
         func enterFullScreen() {
-            guard !controls.playingFullscreen else {
+            guard !playingFullScreen else {
                 return
             }
 
@@ -481,13 +527,13 @@ final class PlayerModel: ObservableObject {
         }
 
         func exitFullScreen() {
-            guard controls.playingFullscreen else {
+            guard playingFullScreen else {
                 return
             }
 
             logger.info("exiting fullscreen")
 
-            if controls.playingFullscreen {
+            if playingFullScreen {
                 toggleFullscreen(true)
             }
 
@@ -559,14 +605,14 @@ final class PlayerModel: ObservableObject {
             setNeedsDrawing(false)
         #endif
 
-        controls.playingFullscreen = !isFullScreen
+        playingFullScreen = !isFullScreen
 
         #if os(iOS)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
                 self?.setNeedsDrawing(true)
             }
 
-            if controls.playingFullscreen {
+            if playingFullScreen {
                 guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
                     return
                 }
@@ -590,12 +636,6 @@ final class PlayerModel: ObservableObject {
                 avPlayerBackend.switchToMPVOnPipClose = false
                 closePiP()
             }
-            #if os(macOS)
-                // TODO: initialize mpv on startup on mac
-                if mpvBackend.client.isNil {
-                    Windows.player.open()
-                }
-            #endif
             changeActiveBackend(from: .appleAVPlayer, to: .mpv)
             controls.presentingControls = true
             controls.removeTimer()

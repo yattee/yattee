@@ -297,6 +297,7 @@ struct SearchView: View {
                 }
                 .redrawOn(change: recentsChanged)
             }
+            .id(UUID())
         }
         #if os(iOS)
         .listStyle(.insetGrouped)

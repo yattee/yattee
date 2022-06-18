@@ -20,22 +20,14 @@ extension PlayerModel {
         }
 
         videosToPlay.dropFirst().reversed().forEach { video in
-            enqueueVideo(video, prepending: true) { _, item in
-                if item.video == first {
-                    self.advanceToItem(item)
-                }
-            }
+            enqueueVideo(video, prepending: true, loadDetails: false)
         }
 
         show()
     }
 
     func playNext(_ video: Video) {
-        enqueueVideo(video, prepending: true) { _, item in
-            if self.currentItem.isNil {
-                self.advanceToItem(item)
-            }
-        }
+        enqueueVideo(video, play: currentItem.isNil, prepending: true)
     }
 
     func playNow(_ video: Video, at time: CMTime? = nil) {
@@ -45,12 +37,12 @@ extension PlayerModel {
 
         prepareCurrentItemForHistory()
 
-        enqueueVideo(video, prepending: true) { _, item in
+        enqueueVideo(video, play: true, atTime: time, prepending: true) { _, item in
             self.advanceToItem(item, at: time)
         }
     }
 
-    func playItem(_ item: PlayerQueueItem, video: Video? = nil, at time: CMTime? = nil) {
+    func playItem(_ item: PlayerQueueItem, at time: CMTime? = nil) {
         if !playingInPictureInPicture {
             backend.closeItem()
         }
@@ -65,32 +57,25 @@ extension PlayerModel {
             currentItem.playbackTime = .zero
         }
 
-        if video != nil {
-            currentItem.video = video!
-        }
-
         preservedTime = currentItem.playbackTime
 
         DispatchQueue.main.async { [weak self] in
             guard let video = self?.currentVideo else {
                 return
             }
+            self?.videoBeingOpened = nil
 
-            self?.loadAvailableStreams(video)
+            if video.streams.isEmpty {
+                self?.loadAvailableStreams(video)
+            } else {
+                guard let instance = self?.accounts.current?.instance ?? InstancesModel.forPlayer ?? InstancesModel.all.first else { return }
+                self?.availableStreams = self?.streamsWithInstance(instance: instance, streams: video.streams) ?? video.streams
+            }
         }
     }
 
     func preferredStream(_ streams: [Stream]) -> Stream? {
-        let quality = Defaults[.quality]
-        var streams = streams
-
-        if let id = Defaults[.playerInstanceID] {
-            streams = streams.filter { $0.instance.id == id }
-        }
-
-        streams = streams.filter { backend.canPlay($0) }
-
-        return backend.bestPlayable(streams, maxResolution: quality)
+        backend.bestPlayable(streams.filter { backend.canPlay($0) }, maxResolution: Defaults[.quality])
     }
 
     func advanceToNextItem() {
@@ -109,7 +94,7 @@ extension PlayerModel {
         currentItem = newItem
 
         accounts.api.loadDetails(newItem) { newItem in
-            self.playItem(newItem, video: newItem.video, at: time)
+            self.playItem(newItem, at: time)
         }
     }
 
@@ -140,23 +125,29 @@ extension PlayerModel {
         play: Bool = false,
         atTime: CMTime? = nil,
         prepending: Bool = false,
+        loadDetails: Bool = true,
         videoDetailsLoadHandler: @escaping (Video, PlayerQueueItem) -> Void = { _, _ in }
     ) -> PlayerQueueItem? {
         let item = PlayerQueueItem(video, playbackTime: atTime)
 
         if play {
             currentItem = item
-            // pause playing current video as it's going to be replaced with next one
+            videoBeingOpened = video
         }
 
-        queue.insert(item, at: prepending ? 0 : queue.endIndex)
+        if loadDetails {
+            accounts.api.loadDetails(item) { [weak self] newItem in
+                guard let self = self else { return }
+                videoDetailsLoadHandler(newItem.video, newItem)
 
-        accounts.api.loadDetails(item) { newItem in
-            videoDetailsLoadHandler(newItem.video, newItem)
-
-            if play {
-                self.playItem(newItem, video: video)
+                if play {
+                    self.playItem(newItem)
+                } else {
+                    self.queue.insert(newItem, at: prepending ? 0 : self.queue.endIndex)
+                }
             }
+        } else {
+            queue.insert(item, at: prepending ? 0 : queue.endIndex)
         }
 
         return item

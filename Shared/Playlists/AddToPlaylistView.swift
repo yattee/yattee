@@ -9,11 +9,11 @@ struct AddToPlaylistView: View {
 
     @State private var error = ""
     @State private var presentingErrorAlert = false
-    @State private var submitButtonDisabled = false
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlaylistsModel> private var model
 
     var body: some View {
@@ -123,14 +123,8 @@ struct AddToPlaylistView: View {
         HStack {
             Spacer()
             Button("Add to Playlist", action: addToPlaylist)
-                .disabled(submitButtonDisabled || selectedPlaylist.isNil)
+                .disabled(selectedPlaylist.isNil)
                 .padding(.top, 30)
-                .alert(isPresented: $presentingErrorAlert) {
-                    Alert(
-                        title: Text("Error when accessing playlist"),
-                        message: Text(error)
-                    )
-                }
             #if !os(tvOS)
                 .keyboardShortcut(.defaultAction)
             #endif
@@ -166,20 +160,9 @@ struct AddToPlaylistView: View {
 
         Defaults[.lastUsedPlaylistID] = id
 
-        submitButtonDisabled = true
+        model.addVideo(playlistID: id, videoID: video.videoID, navigation: navigation)
 
-        model.addVideo(
-            playlistID: id,
-            videoID: video.videoID,
-            onSuccess: {
-                presentationMode.wrappedValue.dismiss()
-            },
-            onFailure: { requestError in
-                error = "(\(requestError.httpStatusCode ?? -1)) \(requestError.userMessage)"
-                presentingErrorAlert = true
-                submitButtonDisabled = false
-            }
-        )
+        presentationMode.wrappedValue.dismiss()
     }
 
     private var selectedPlaylist: Playlist? {
