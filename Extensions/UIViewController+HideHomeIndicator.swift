@@ -2,7 +2,7 @@ import UIKit
 
 extension UIViewController {
     @objc var swizzle_prefersHomeIndicatorAutoHidden: Bool {
-        return true
+        true
     }
 
     public class func swizzleHomeIndicatorProperty() {

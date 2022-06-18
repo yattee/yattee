@@ -5,9 +5,19 @@ disabled_rules:
   - opening_brace
   - number_separator
   - multiline_arguments
-
+opt_in_rules:
+  - conditional_returns_on_newline
+  - implicit_return
 excluded:
   - Vendor
   - Tests Apple TV
   - Tests iOS
   - Tests macOS
+
+conditional_returns_on_newline:
+  if_only: true
+
+implicit_return:
+  included:
+    - function
+    - getter

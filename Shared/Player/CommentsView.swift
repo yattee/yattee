@@ -14,9 +14,6 @@ struct CommentsView: View {
                 NoCommentsView(text: "No comments", systemImage: "0.circle.fill")
             } else if !comments.loaded {
                 PlaceholderProgressView()
-                    .onAppear {
-                        comments.load()
-                    }
             } else {
                 let last = comments.all.last
                 let commentsStack = LazyVStack {

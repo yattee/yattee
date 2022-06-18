@@ -77,9 +77,10 @@ struct VideoContextMenuView: View {
             }
         }
 
-        if accounts.app.supportsUserPlaylists {
+        if accounts.app.supportsUserPlaylists, accounts.signedIn {
             Section {
                 addToPlaylistButton
+                addToLastPlaylistButton
 
                 if let id = navigation.tabSelection?.playlistID ?? playlistID {
                     removeFromPlaylistButton(playlistID: id)
@@ -116,7 +117,7 @@ struct VideoContextMenuView: View {
         Button {
             player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt))
         } label: {
-            Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime() ?? "where I left off")", systemImage: "playpause")
+            Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime(allowZero: true) ?? "where I left off")", systemImage: "playpause")
         }
     }
 
@@ -227,6 +228,16 @@ struct VideoContextMenuView: View {
             navigation.presentAddToPlaylist(video)
         } label: {
             Label("Add to Playlist...", systemImage: "text.badge.plus")
+        }
+    }
+
+    @ViewBuilder private var addToLastPlaylistButton: some View {
+        if let playlist = playlists.lastUsed {
+            Button {
+                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+            } label: {
+                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+            }
         }
     }
 

@@ -12,8 +12,10 @@ struct ContentView: View {
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<NetworkStateModel> private var networkState
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var playerControls
+    @EnvironmentObject<PlayerTimeModel> private var playerTime
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
@@ -42,7 +44,6 @@ struct ContentView: View {
                 TVNavigationView()
             #endif
         }
-        .onAppear(perform: configure)
         .onChange(of: accounts.signedIn) { _ in
             subscriptions.load(force: true)
             playlists.load(force: true)
@@ -52,7 +53,9 @@ struct ContentView: View {
         .environmentObject(comments)
         .environmentObject(instances)
         .environmentObject(navigation)
+        .environmentObject(networkState)
         .environmentObject(player)
+        .environmentObject(playerTime)
         .environmentObject(playlists)
         .environmentObject(recents)
         .environmentObject(search)
@@ -107,118 +110,9 @@ struct ContentView: View {
                     secondaryButton: .cancel()
                 )
             }
-    }
-
-    func configure() {
-        SiestaLog.Category.enabled = .common
-        SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
-        SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
-        #if !os(macOS)
-            setupNowPlayingInfoCenter()
-        #endif
-
-        #if os(iOS)
-            if Defaults[.lockPortraitWhenBrowsing] {
-                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            .alert(isPresented: $navigation.presentingAlert) {
+                Alert(title: Text(navigation.alertTitle), message: Text(navigation.alertMessage))
             }
-        #endif
-
-        if let account = accounts.lastUsed ??
-            instances.lastUsed?.anonymousAccount ??
-            InstancesModel.all.first?.anonymousAccount
-        {
-            accounts.setCurrent(account)
-        }
-
-        if accounts.current.isNil {
-            navigation.presentingWelcomeScreen = true
-        }
-
-        playlists.accounts = accounts
-        search.accounts = accounts
-        subscriptions.accounts = accounts
-
-        comments.player = player
-
-        menu.accounts = accounts
-        menu.navigation = navigation
-        menu.player = player
-        playerControls.player = player
-
-        player.accounts = accounts
-        player.comments = comments
-        player.controls = playerControls
-
-        if !accounts.current.isNil {
-            player.restoreQueue()
-        }
-
-        if !Defaults[.saveRecents] {
-            recents.clear()
-        }
-
-        var section = Defaults[.visibleSections].min()?.tabSelection
-
-        #if os(macOS)
-            if section == .playlists {
-                section = .search
-            }
-        #endif
-
-        navigation.tabSelection = section ?? .search
-
-        subscriptions.load()
-        playlists.load()
-    }
-
-    func setupNowPlayingInfoCenter() {
-        #if !os(macOS)
-            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-
-            UIApplication.shared.beginReceivingRemoteControlEvents()
-        #endif
-
-        MPRemoteCommandCenter.shared().playCommand.addTarget { _ in
-            player.play()
-            return .success
-        }
-
-        MPRemoteCommandCenter.shared().pauseCommand.addTarget { _ in
-            player.pause()
-            return .success
-        }
-
-        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = false
-        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = false
-
-        MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { remoteEvent in
-            guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent
-            else {
-                return .commandFailed
-            }
-
-            player.backend.seek(to: event.positionTime)
-
-            return .success
-        }
-
-        let skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand
-        skipForwardCommand.isEnabled = true
-        skipForwardCommand.preferredIntervals = [10]
-
-        skipForwardCommand.addTarget { _ in
-            player.backend.seek(relative: .secondsInDefaultTimescale(10))
-            return .success
-        }
-
-        let skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand
-        skipBackwardCommand.isEnabled = true
-        skipBackwardCommand.preferredIntervals = [10]
-
-        skipBackwardCommand.addTarget { _ in
-            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-            return .success
-        }
     }
 
     func openWelcomeScreenIfAccountEmpty() {
