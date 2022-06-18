@@ -529,7 +529,8 @@ final class PlayerModel: ObservableObject {
 
     func updateCurrentArtwork() {
         guard let video = currentVideo,
-              let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .medium)!)
+              let thumbnailURL = video.thumbnailURL(quality: .medium),
+              let thumbnailData = try? Data(contentsOf: thumbnailURL)
         else {
             return
         }

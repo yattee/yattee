@@ -93,7 +93,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
             let results = content.json.arrayValue.compactMap { json -> ContentItem? in
-                let type = json.dictionaryValue["type"]?.stringValue
+                let type = json.dictionaryValue["type"]?.string
 
                 if type == "channel" {
                     return ContentItem(channel: self.extractChannel(from: json))
@@ -401,14 +401,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             publishedAt: publishedAt,
             likes: json["likeCount"].int,
             dislikes: json["dislikeCount"].int,
-            keywords: json["keywords"].arrayValue.map { $0.stringValue },
+            keywords: json["keywords"].arrayValue.compactMap { $0.string },
             streams: extractStreams(from: json),
             related: extractRelated(from: json)
         )
     }
 
     func extractChannel(from json: JSON) -> Channel {
-        var thumbnailURL = json["authorThumbnails"].arrayValue.last?.dictionaryValue["url"]?.stringValue ?? ""
+        var thumbnailURL = json["authorThumbnails"].arrayValue.last?.dictionaryValue["url"]?.string ?? ""
 
         // append protocol to unproxied thumbnail URL if it's missing
         if thumbnailURL.count > 2,
@@ -467,32 +467,41 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
-        streams.map {
-            SingleAssetStream(
-                avAsset: AVURLAsset(url: $0["url"].url!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
+        streams.compactMap { stream in
+            guard let streamURL = stream["url"].url else {
+                return nil
+            }
+
+            return SingleAssetStream(
+                avAsset: AVURLAsset(url: streamURL),
+                resolution: Stream.Resolution.from(resolution: stream["resolution"].string ?? ""),
                 kind: .stream,
-                encoding: $0["encoding"].stringValue
+                encoding: stream["encoding"].string ?? ""
             )
         }
     }
 
     private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
-        let audioAssetURL = streams.first { $0["type"].stringValue.starts(with: "audio/mp4") }
-        guard audioAssetURL != nil else {
-            return []
+        guard let audioStream = streams.first(where: { $0["type"].stringValue.starts(with: "audio/mp4") }) else {
+            return .init()
         }
 
-        let videoAssetsURLs = streams.filter { $0["type"].stringValue.starts(with: "video/") }
+        let videoStreams = streams.filter { $0["type"].stringValue.starts(with: "video/") }
 
-        return videoAssetsURLs.map {
-            Stream(
-                audioAsset: AVURLAsset(url: audioAssetURL!["url"].url!),
-                videoAsset: AVURLAsset(url: $0["url"].url!),
-                resolution: Stream.Resolution.from(resolution: $0["resolution"].stringValue),
+        return videoStreams.compactMap { videoStream in
+            guard let audioAssetURL = audioStream["url"].url,
+                  let videoAssetURL = videoStream["url"].url
+            else {
+                return nil
+            }
+
+            return Stream(
+                audioAsset: AVURLAsset(url: audioAssetURL),
+                videoAsset: AVURLAsset(url: videoAssetURL),
+                resolution: Stream.Resolution.from(resolution: videoStream["resolution"].stringValue),
                 kind: .adaptive,
-                encoding: $0["encoding"].stringValue,
-                videoFormat: $0["type"].stringValue
+                encoding: videoStream["encoding"].string,
+                videoFormat: videoStream["type"].string
             )
         }
     }
