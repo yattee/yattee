@@ -14,7 +14,6 @@ struct AppSidebarNavigation: View {
         @EnvironmentObject<InstancesModel> private var instances
         @EnvironmentObject<NavigationModel> private var navigation
         @EnvironmentObject<PlayerModel> private var player
-        @EnvironmentObject<PlayerControlsModel> private var playerControls
         @EnvironmentObject<PlaylistsModel> private var playlists
         @EnvironmentObject<RecentsModel> private var recents
         @EnvironmentObject<SearchModel> private var search
@@ -50,15 +49,13 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: sidebarMinWidth)
 
             VStack {
-                BrowserPlayerControls {
-                    HStack(alignment: .center) {
-                        Spacer()
-                        Image(systemName: "4k.tv")
-                            .renderingMode(.original)
-                            .font(.system(size: 60))
-                            .foregroundColor(.accentColor)
-                        Spacer()
-                    }
+                HStack(alignment: .center) {
+                    Spacer()
+                    Image(systemName: "4k.tv")
+                        .renderingMode(.original)
+                        .font(.system(size: 60))
+                        .foregroundColor(.accentColor)
+                    Spacer()
                 }
             }
         }

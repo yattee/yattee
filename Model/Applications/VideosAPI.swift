@@ -116,4 +116,54 @@ extension VideosAPI {
 
         return urlComponents.url
     }
+
+    func extractChapters(from description: String) -> [Chapter] {
+        guard let chaptersRegularExpression = try? NSRegularExpression(
+            pattern: "(?<start>(?:[0-9]+:){1,}(?:[0-9]+))(?:\\s)+(?:- ?)?(?<title>.*)",
+            options: .caseInsensitive
+        ) else { return [] }
+
+        let chapterLines = chaptersRegularExpression.matches(
+            in: description,
+            range: NSRange(description.startIndex..., in: description)
+        )
+
+        return chapterLines.compactMap { line in
+            let titleRange = line.range(withName: "title")
+            let startRange = line.range(withName: "start")
+
+            guard let titleSubstringRange = Range(titleRange, in: description),
+                  let startSubstringRange = Range(startRange, in: description),
+                  let titleCapture = String(description[titleSubstringRange]),
+                  let startCapture = String(description[startSubstringRange]) else { return nil }
+
+            let startComponents = startCapture.components(separatedBy: ":")
+            guard startComponents.count <= 3 else { return nil }
+
+            var hours: Double?
+            var minutes: Double?
+            var seconds: Double?
+
+            if startComponents.count == 3 {
+                hours = Double(startComponents[0])
+                minutes = Double(startComponents[1])
+                seconds = Double(startComponents[2])
+            } else if startComponents.count == 2 {
+                minutes = Double(startComponents[0])
+                seconds = Double(startComponents[1])
+            }
+
+            guard var startSeconds = seconds else { return nil }
+
+            if let minutes = minutes {
+                startSeconds += 60 * minutes
+            }
+
+            if let hours = hours {
+                startSeconds += 60 * 60 * hours
+            }
+
+            return .init(title: titleCapture, start: startSeconds)
+        }
+    }
 }

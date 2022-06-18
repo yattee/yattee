@@ -6,7 +6,7 @@ import SwiftUI
 struct PlayerQueueRow: View {
     let item: PlayerQueueItem
     var history = false
-    @Binding var fullScreen: Bool
+    var fullScreen: Bool
 
     @EnvironmentObject<PlayerModel> private var player
 
@@ -14,10 +14,10 @@ struct PlayerQueueRow: View {
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
-    init(item: PlayerQueueItem, history: Bool = false, fullScreen: Binding<Bool> = .constant(false)) {
+    init(item: PlayerQueueItem, history: Bool = false, fullScreen: Bool = false) {
         self.item = item
         self.history = history
-        _fullScreen = fullScreen
+        self.fullScreen = fullScreen
         _watchRequest = FetchRequest<Watch>(
             entity: Watch.entity(),
             sortDescriptors: [],
@@ -32,6 +32,8 @@ struct PlayerQueueRow: View {
 
                 player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
+                player.videoBeingOpened = item.video
+
                 if history {
                     player.playHistory(item, at: watchStoppedAt)
                 } else {
@@ -39,9 +41,9 @@ struct PlayerQueueRow: View {
                 }
 
                 if fullScreen {
-                    withAnimation {
-                        fullScreen = false
-                    }
+//                    withAnimation {
+//                        fullScreen = false
+//                    }
                 }
 
                 if closePiPOnNavigation, player.playingInPictureInPicture {

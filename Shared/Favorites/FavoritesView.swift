@@ -70,7 +70,13 @@ struct FavoritesView: View {
 
 struct Favorites_Previews: PreviewProvider {
     static var previews: some View {
-        FavoritesView()
-            .injectFixtureEnvironmentObjects()
+        TabView {
+            FavoritesView()
+                .overlay(VideoPlayerView().injectFixtureEnvironmentObjects())
+                .injectFixtureEnvironmentObjects()
+                .tabItem {
+                    Label("a", systemImage: "")
+                }
+        }
     }
 }

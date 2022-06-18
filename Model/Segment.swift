@@ -21,6 +21,14 @@ class Segment: ObservableObject, Hashable {
         end - start
     }
 
+    var durationText: String {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 1
+
+        return formatter.string(from: NSNumber(value: duration)) ?? ""
+    }
+
     var endTime: CMTime {
         .secondsInDefaultTimescale(end)
     }

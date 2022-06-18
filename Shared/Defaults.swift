@@ -1,5 +1,6 @@
 import Defaults
 import Foundation
+import SwiftUI
 #if os(iOS)
     import UIKit
 #endif
@@ -9,6 +10,12 @@ extension Defaults.Keys {
         static let defaultForPauseOnHidingPlayer = true
     #else
         static let defaultForPauseOnHidingPlayer = false
+    #endif
+
+    #if os(macOS)
+        static let defaultForPlayerDetailsPageButtonLabelStyle = PlayerDetailsPageButtonLabelStyle.iconAndText
+    #else
+        static let defaultForPlayerDetailsPageButtonLabelStyle = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
     #endif
 
     static let kavinPipedInstanceID = "kavin-piped"
@@ -89,6 +96,10 @@ extension Defaults.Keys {
     #endif
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
+
+    static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
+
+    static let controlsBarInPlayer = Key<Bool>("controlsBarInPlayer", default: true)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
@@ -200,3 +211,11 @@ enum WatchedVideoPlayNowBehavior: String, Defaults.Serializable {
         case info, separate
     }
 #endif
+
+enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
+    case iconOnly, iconAndText
+
+    var text: Bool {
+        self == .iconAndText
+    }
+}

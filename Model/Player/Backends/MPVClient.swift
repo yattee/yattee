@@ -45,6 +45,9 @@ final class MPVClient: ObservableObject {
             checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))
         #endif
 
+        checkError(mpv_set_option_string(mpv, "cache-pause-initial", "yes"))
+        checkError(mpv_set_option_string(mpv, "cache-secs", "20"))
+        checkError(mpv_set_option_string(mpv, "cache-pause-wait", "2"))
         checkError(mpv_set_option_string(mpv, "hwdec", "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
 
@@ -167,6 +170,10 @@ final class MPVClient: ObservableObject {
         CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("duration"))
     }
 
+    var pausedForCache: Bool {
+        mpv.isNil ? false : getFlag("paused-for-cache")
+    }
+
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
         guard !seeking else {
             logger.warning("ignoring seek, another in progress")
@@ -260,6 +267,12 @@ final class MPVClient: ObservableObject {
 
     var tracksCount: Int {
         Int(getString("track-list/count") ?? "-1") ?? -1
+    }
+
+    private func getFlag(_ name: String) -> Bool {
+        var data = Int64()
+        mpv_get_property(mpv, name, MPV_FORMAT_FLAG, &data)
+        return data > 0
     }
 
     private func setFlagAsync(_ name: String, _ flag: Bool) {

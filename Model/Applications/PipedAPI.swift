@@ -409,6 +409,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let live = details["livestream"]?.bool ?? (details["duration"]?.int == -1)
 
+        let description = extractDescription(from: content) ?? ""
+
+        var chapters = extractChapters(from: content)
+        if chapters.isEmpty, !description.isEmpty {
+            chapters = extractChapters(from: description)
+        }
+
         return Video(
             videoID: extractID(from: content),
             title: details["title"]?.string ?? "",
@@ -416,14 +423,15 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             length: details["duration"]?.double ?? 0,
             published: published ?? "",
             views: details["views"]?.int ?? 0,
-            description: extractDescription(from: content),
+            description: description,
             channel: Channel(id: channelId, name: author, thumbnailURL: authorThumbnailURL, subscriptionsCount: subscriptionsCount),
             thumbnails: thumbnails,
             live: live,
             likes: details["likes"]?.int,
             dislikes: details["dislikes"]?.int,
             streams: extractStreams(from: content),
-            related: extractRelated(from: content)
+            related: extractRelated(from: content),
+            chapters: extractChapters(from: content)
         )
     }
 
@@ -570,5 +578,22 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             repliesPage: details["repliesPage"]?.string,
             channel: Channel(id: channelId, name: author)
         )
+    }
+
+    private func extractChapters(from content: JSON) -> [Chapter] {
+        guard let chapters = content.dictionaryValue["chapters"]?.array else {
+            return .init()
+        }
+
+        return chapters.compactMap { chapter in
+            guard let title = chapter["title"].string,
+                  let image = chapter["image"].url,
+                  let start = chapter["start"].double
+            else {
+                return nil
+            }
+
+            return Chapter(title: title, image: image, start: start)
+        }
     }
 }

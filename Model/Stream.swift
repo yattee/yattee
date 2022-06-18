@@ -91,13 +91,13 @@ class Stream: Equatable, Hashable, Identifiable {
 
         private var sortOrder: Int {
             switch self {
-            case .webm:
-                return 0
             case .mp4:
-                return 1
+                return 0
             case .avc1:
-                return 2
+                return 1
             case .av1:
+                return 2
+            case .webm:
                 return 3
             case .unknown:
                 return 4
@@ -160,17 +160,11 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var quality: String {
-        if resolution == .hd2160p30 {
-            return "4K (2160p)"
-        }
-
-        return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
+        kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
     }
 
     var shortQuality: String {
-        if resolution?.height == 2160 {
-            return "4K"
-        } else if kind == .hls {
+        if kind == .hls {
             return "HLS"
         } else {
             return resolution?.name ?? "?"

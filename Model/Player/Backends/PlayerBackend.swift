@@ -5,6 +5,8 @@ import Foundation
 protocol PlayerBackend {
     var model: PlayerModel! { get set }
     var controls: PlayerControlsModel! { get set }
+    var playerTime: PlayerTimeModel! { get set }
+    var networkState: NetworkStateModel! { get set }
 
     var stream: Stream? { get set }
     var video: Video? { get set }
@@ -14,6 +16,7 @@ protocol PlayerBackend {
     var isLoadingVideo: Bool { get }
 
     var isPlaying: Bool { get }
+    var isSeeking: Bool { get }
     var playerItemDuration: CMTime? { get }
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
@@ -48,6 +51,8 @@ protocol PlayerBackend {
     func updateControls()
     func startControlsUpdates()
     func stopControlsUpdates()
+
+    func updateNetworkState()
 
     func setNeedsDrawing(_ needsDrawing: Bool)
     func setSize(_ width: Double, _ height: Double)

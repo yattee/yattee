@@ -23,7 +23,7 @@ struct PlayerControls: View {
         @FocusState private var focusedField: Field?
     #endif
 
-    @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
+    @Default(.controlsBarInPlayer) private var controlsBarInPlayer
 
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
@@ -31,74 +31,107 @@ struct PlayerControls: View {
     }
 
     var body: some View {
-        VStack {
-            ZStack(alignment: .bottom) {
-                VStack(alignment: .trailing, spacing: 4) {
-                    #if !os(tvOS)
-                        buttonsBar
-
-                        HStack(spacing: 4) {
-                            qualityButton
-                            backendButton
-                        }
-                    #else
-                        Text(player.stream?.description ?? "")
-                    #endif
-
-                    Spacer()
-
-                    mediumButtonsBar
-
-                    Spacer()
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                ZStack(alignment: .center) {
+                    OpeningStream()
+                    NetworkState()
 
                     Group {
-                        if player.activeBackend == .mpv, showMPVPlaybackStats {
-                            mpvPlaybackStats
-                        }
+                        VStack(spacing: 4) {
+                            buttonsBar
 
-                        timeline
-                            .offset(y: 10)
-                            .zIndex(1)
+                            if let video = player.currentVideo, player.playingFullScreen {
+//                            if let video = Video.fixture {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(video.title)
+                                        .font(.title2.bold())
 
-                        HStack {
+                                    Text(video.author)
+                                        .font(.title3)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(12)
+                                .modifier(ControlBackgroundModifier())
+                                .clipShape(RoundedRectangle(cornerRadius: 3))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+
                             Spacer()
 
-                            bottomBar
-                            #if os(macOS)
-                            .background(VisualEffectBlur(material: .hudWindow))
-                            #elseif os(iOS)
-                            .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                            #endif
-                            .mask(RoundedRectangle(cornerRadius: 3))
+                            Group {
+                                ZStack(alignment: .bottom) {
+                                    floatingControls
+                                        .padding(.top, 20)
+                                        .padding(4)
+                                        .modifier(ControlBackgroundModifier())
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                                    timeline
+                                        .padding(4)
+                                        .offset(y: -25)
+                                        .zIndex(1)
+                                }
+                                .frame(maxWidth: 500)
+                                .padding(.bottom, 2)
+                            }
                         }
+                        .padding(.top, 2)
+                        .padding(.horizontal, 2)
                     }
-                    .padding(.horizontal, 16)
+                    .opacity(model.presentingControlsOverlay ? 1 : model.presentingControls ? 1 : 0)
                 }
             }
-            .padding(.top, 4)
-            .padding(.horizontal, 4)
-            .opacity(model.presentingControls ? 1 : 0)
-        }
-        #if os(tvOS)
-        .onChange(of: model.presentingControls) { _ in
-            if model.presentingControls {
-                focusedField = .play
+            #if os(tvOS)
+            .onChange(of: model.presentingControls) { _ in
+                if model.presentingControls {
+                    focusedField = .play
+                }
             }
+            .onChange(of: focusedField) { _ in
+                model.resetTimer()
+            }
+            #else
+                    .background(PlayerGestures())
+                    .background(controlsBackground)
+            #endif
+
+            ControlsOverlay()
+                .padding()
+                .modifier(ControlBackgroundModifier(enabled: true))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .offset(x: -2, y: 40)
+                .opacity(model.presentingControlsOverlay ? 1 : 0)
+
+            Button {
+                player.restoreLastSkippedSegment()
+            } label: {
+                HStack(spacing: 10) {
+                    if let segment = player.lastSkipped {
+                        Image(systemName: "arrow.counterclockwise")
+
+                        Text("Skipped \(segment.durationText) seconds of \(SponsorBlockAPI.categoryDescription(segment.category)?.lowercased() ?? "segment")")
+                            .frame(alignment: .bottomLeading)
+                    }
+                }
+                .padding(.vertical, 4)
+                .padding(.horizontal, 5)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+                .modifier(ControlBackgroundModifier())
+                .clipShape(RoundedRectangle(cornerRadius: 2))
+                .offset(x: -2, y: -2)
+            }
+            .buttonStyle(.plain)
+            .opacity(model.presentingControls ? 0 : player.lastSkipped.isNil ? 0 : 1)
         }
-        .onChange(of: focusedField) { _ in
-            model.resetTimer()
-        }
-        #else
-                .background(PlayerGestures())
-                .background(controlsBackground)
-        #endif
-                .environment(\.colorScheme, .dark)
     }
 
     @ViewBuilder var controlsBackground: some View {
         if player.musicMode,
            let item = self.player.currentItem,
-           let url = thumbnails.best(item.video)
+           let video = item.video,
+           let url = thumbnails.best(video)
         {
             WebImage(url: url)
                 .resizable()
@@ -110,48 +143,8 @@ struct PlayerControls: View {
         }
     }
 
-    var mpvPlaybackStats: some View {
-        HStack {
-            Group {
-                Text("hw decoder: \(player.mpvBackend.hwDecoder)")
-                Text("dropped: \(player.mpvBackend.frameDropCount)")
-                Text("video: \(String(format: "%.2ffps", player.mpvBackend.outputFps))")
-                Text("buffering: \(String(format: "%.0f%%", player.mpvBackend.bufferingState))")
-                Text("cache: \(String(format: "%.2fs", player.mpvBackend.cacheDuration))")
-            }
-            .padding(4)
-            #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-            #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-            #else
-                .background(.thinMaterial)
-            #endif
-                .mask(RoundedRectangle(cornerRadius: 3))
-
-            Spacer()
-        }
-        #if !os(tvOS)
-        .font(.system(size: 9))
-        #endif
-    }
-
     var timeline: some View {
-        TimelineView(duration: durationBinding, current: currentTimeBinding, cornerRadius: 0)
-    }
-
-    var durationBinding: Binding<Double> {
-        Binding<Double>(
-            get: { model.duration.seconds },
-            set: { value in model.duration = .secondsInDefaultTimescale(value) }
-        )
-    }
-
-    var currentTimeBinding: Binding<Double> {
-        Binding<Double>(
-            get: { model.currentTime.seconds },
-            set: { value in model.currentTime = .secondsInDefaultTimescale(value) }
-        )
+        TimelineView(context: .player).foregroundColor(.primary)
     }
 
     private var hidePlayerButton: some View {
@@ -195,20 +188,20 @@ struct PlayerControls: View {
     }
 
     var buttonsBar: some View {
-        HStack {
+        HStack(spacing: 20) {
             #if !os(tvOS)
                 fullscreenButton
-
-                #if os(iOS)
-                    pipButton
-                        .padding(.leading, 5)
-                #endif
+                pipButton
 
                 Spacer()
 
-                rateButton
+                button("overlay", systemImage: "info.circle") {}
 
-                musicModeButton
+                button("settings", systemImage: "gearshape", active: model.presentingControlsOverlay) {
+                    withAnimation(Self.animation) {
+                        model.presentingControlsOverlay.toggle()
+                    }
+                }
 
                 closeVideoButton
             #endif
@@ -225,74 +218,6 @@ struct PlayerControls: View {
         #if !os(tvOS)
         .keyboardShortcut(fullScreenLayout ? .cancelAction : .defaultAction)
         #endif
-    }
-
-    @ViewBuilder private var rateButton: some View {
-        #if os(macOS)
-            ratePicker
-                .labelsHidden()
-                .frame(maxWidth: 70)
-        #elseif os(iOS)
-            Menu {
-                ratePicker
-                    .frame(width: 45, height: 30)
-                #if os(iOS)
-                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                #endif
-                    .mask(RoundedRectangle(cornerRadius: 3))
-            } label: {
-                Text(player.rateLabel(player.currentRate))
-                    .foregroundColor(.primary)
-            }
-            .buttonStyle(.plain)
-            .foregroundColor(.primary)
-            .frame(width: 50, height: 30)
-            #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-            #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-            #endif
-                .mask(RoundedRectangle(cornerRadius: 3))
-        #endif
-    }
-
-    @ViewBuilder private var qualityButton: some View {
-        #if os(macOS)
-            StreamControl()
-                .labelsHidden()
-                .frame(maxWidth: 300)
-        #elseif os(iOS)
-            Menu {
-                StreamControl()
-                    .frame(width: 45, height: 30)
-                #if os(iOS)
-                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                #endif
-                    .mask(RoundedRectangle(cornerRadius: 3))
-            } label: {
-                Text(player.streamSelection?.shortQuality ?? "loading")
-                    .frame(width: 140, height: 30)
-                    .foregroundColor(.primary)
-            }
-            .buttonStyle(.plain)
-            .foregroundColor(.primary)
-            .frame(width: 140, height: 30)
-            #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-            #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-            #endif
-                .mask(RoundedRectangle(cornerRadius: 3))
-        #endif
-    }
-
-    private var backendButton: some View {
-        button(player.activeBackend.label, width: 100) {
-            player.saveTime {
-                player.changeActiveBackend(from: player.activeBackend, to: player.activeBackend.next())
-                model.resetTimer()
-            }
-        }
     }
 
     private var closeVideoButton: some View {
@@ -313,21 +238,8 @@ struct PlayerControls: View {
     }
 
     private var musicModeButton: some View {
-        button("Music Mode", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
+        button("Music Mode", systemImage: "music.note", background: false, active: player.musicMode, action: player.toggleMusicMode)
             .disabled(player.activeBackend == .appleAVPlayer)
-    }
-
-    var ratePicker: some View {
-        Picker("Rate", selection: rateBinding) {
-            ForEach(PlayerModel.availableRates, id: \.self) { rate in
-                Text(player.rateLabel(rate)).tag(rate)
-            }
-        }
-        .transaction { t in t.animation = .none }
-    }
-
-    private var rateBinding: Binding<Float> {
-        .init(get: { player.currentRate }, set: { rate in player.currentRate = rate })
     }
 
     private var pipButton: some View {
@@ -336,93 +248,89 @@ struct PlayerControls: View {
         }
     }
 
-    var mediumButtonsBar: some View {
+    var floatingControls: some View {
         HStack {
-            #if !os(tvOS)
-                restartVideoButton
-                    .padding(.trailing, 15)
-
-                button("Seek Backward", systemImage: "gobackward.10", size: 30, cornerRadius: 5) {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-                }
-
-                #if os(tvOS)
-                .focused($focusedField, equals: .backward)
-                #else
-                .keyboardShortcut("k", modifiers: [])
-                .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [])
-                #endif
-
-            #endif
-
-            Spacer()
-
-            button(
-                model.isPlaying ? "Pause" : "Play",
-                systemImage: model.isPlaying ? "pause.fill" : "play.fill",
-                size: 30, cornerRadius: 5
-            ) {
-                player.backend.togglePlay()
+            HStack(spacing: 20) {
+                togglePlayButton
+                seekBackwardButton
+                seekForwardButton
             }
-            #if os(tvOS)
-            .focused($focusedField, equals: .play)
-            #else
-            .keyboardShortcut("p")
-            .keyboardShortcut(.space)
-            #endif
-            .disabled(model.isLoadingVideo)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
-            #if !os(tvOS)
-                button("Seek Forward", systemImage: "goforward.10", size: 30, cornerRadius: 5) {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(10))
-                }
-                #if os(tvOS)
-                .focused($focusedField, equals: .forward)
-                #else
-                .keyboardShortcut("l", modifiers: [])
-                .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
-                #endif
-
+            HStack(spacing: 20) {
+                restartVideoButton
                 advanceToNextItemButton
-                    .padding(.leading, 15)
-            #endif
+                musicModeButton
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.system(size: 20))
     }
 
+    var seekBackwardButton: some View {
+        button("Seek Backward", systemImage: "gobackward.10", size: 25, cornerRadius: 5, background: false) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+        }
+        #if os(tvOS)
+        .focused($focusedField, equals: .backward)
+        #else
+        .keyboardShortcut("k", modifiers: [])
+        .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [])
+        #endif
+    }
+
+    var seekForwardButton: some View {
+        button("Seek Forward", systemImage: "goforward.10", size: 25, cornerRadius: 5, background: false) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(10))
+        }
+        #if os(tvOS)
+        .focused($focusedField, equals: .forward)
+        #else
+        .keyboardShortcut("l", modifiers: [])
+        .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
+        #endif
+    }
+
     private var restartVideoButton: some View {
-        button("Restart video", systemImage: "backward.end.fill", size: 30, cornerRadius: 5) {
+        button("Restart video", systemImage: "backward.end.fill", size: 25, cornerRadius: 5, background: false) {
             player.backend.seek(to: 0.0)
         }
     }
 
+    private var togglePlayButton: some View {
+        button(
+            model.isPlaying ? "Pause" : "Play",
+            systemImage: model.isPlaying ? "pause.fill" : "play.fill",
+            size: 25, cornerRadius: 5, background: false
+        ) {
+            player.backend.togglePlay()
+        }
+        #if os(tvOS)
+        .focused($focusedField, equals: .play)
+        #else
+        .keyboardShortcut("p")
+        .keyboardShortcut(.space)
+        #endif
+        .disabled(model.isLoadingVideo)
+    }
+
     private var advanceToNextItemButton: some View {
-        button("Next", systemImage: "forward.fill", size: 30, cornerRadius: 5) {
+        button("Next", systemImage: "forward.fill", size: 25, cornerRadius: 5, background: false) {
             player.advanceToNextItem()
         }
         .disabled(player.queue.isEmpty)
     }
 
-    var bottomBar: some View {
-        HStack {
-            Text(model.playbackTime)
-        }
-        .font(.system(size: 15))
-        .padding(.horizontal, 5)
-        .padding(.vertical, 3)
-        .labelStyle(.iconOnly)
-        .foregroundColor(.primary)
-    }
-
     func button(
         _ label: String,
         systemImage: String? = nil,
-        size: Double = 30,
+        size: Double = 25,
         width: Double? = nil,
         height: Double? = nil,
         cornerRadius: Double = 3,
+        background: Bool = true,
         active: Bool = false,
         action: @escaping () -> Void = {}
     ) -> some View {
@@ -442,39 +350,30 @@ struct PlayerControls: View {
             .padding()
             .contentShape(Rectangle())
         }
+        .font(.system(size: 13))
         .buttonStyle(.plain)
-        .foregroundColor(active ? .accentColor : .primary)
+        .foregroundColor(active ? Color("AppRedColor") : .primary)
         .frame(width: width ?? size, height: height ?? size)
-        #if os(macOS)
-            .background(VisualEffectBlur(material: .hudWindow))
-        #elseif os(iOS)
-            .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-        #endif
-            .mask(RoundedRectangle(cornerRadius: cornerRadius))
+        .modifier(ControlBackgroundModifier(enabled: background))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 
     var fullScreenLayout: Bool {
         #if os(iOS)
-            model.playingFullscreen || verticalSizeClass == .compact
+            player.playingFullScreen || verticalSizeClass == .compact
         #else
-            model.playingFullscreen
+            player.playingFullScreen
         #endif
     }
 }
 
 struct PlayerControls_Previews: PreviewProvider {
     static var previews: some View {
-        let model = PlayerControlsModel()
-        model.presentingControls = true
-        model.currentTime = .secondsInDefaultTimescale(0)
-        model.duration = .secondsInDefaultTimescale(120)
-
-        return ZStack {
+        ZStack {
             Color.gray
 
             PlayerControls(player: PlayerModel(), thumbnails: ThumbnailsModel())
                 .injectFixtureEnvironmentObjects()
-                .environmentObject(model)
         }
     }
 }

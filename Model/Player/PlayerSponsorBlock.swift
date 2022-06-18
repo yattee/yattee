@@ -2,14 +2,16 @@ import AVFAudio
 import CoreMedia
 import Defaults
 import Foundation
+import SwiftUI
 
 extension PlayerModel {
     func handleSegments(at time: CMTime) {
         if let segment = lastSkipped {
-            if time > .secondsInDefaultTimescale(segment.end + 10) {
+            if time > .secondsInDefaultTimescale(segment.end + 5) {
                 resetLastSegment()
             }
         }
+
         guard let firstSegment = sponsorBlock.segments.first(where: { $0.timeInSegment(time) }) else {
             return
         }
@@ -60,7 +62,9 @@ extension PlayerModel {
         backend.seek(to: segment.endTime)
 
         DispatchQueue.main.async { [weak self] in
-            self?.lastSkipped = segment
+            withAnimation {
+                self?.lastSkipped = segment
+            }
             self?.segmentRestorationTime = time
         }
         logger.info("SponsorBlock skipping to: \(segment.end)")
@@ -69,8 +73,7 @@ extension PlayerModel {
     private func shouldSkip(_ segment: Segment, at time: CMTime) -> Bool {
         guard isPlaying,
               !restoredSegments.contains(segment),
-              Defaults[.sponsorBlockCategories].contains(segment.category),
-              segment.end > 4
+              Defaults[.sponsorBlockCategories].contains(segment.category)
         else {
             return false
         }
@@ -92,7 +95,9 @@ extension PlayerModel {
 
     private func resetLastSegment() {
         DispatchQueue.main.async { [weak self] in
-            self?.lastSkipped = nil
+            withAnimation {
+                self?.lastSkipped = nil
+            }
             self?.segmentRestorationTime = nil
         }
     }

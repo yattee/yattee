@@ -9,9 +9,11 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(InstancesModel())
             .environmentObject(invidious)
             .environmentObject(NavigationModel())
+            .environmentObject(NetworkStateModel())
             .environmentObject(PipedAPI())
             .environmentObject(player)
-            .environmentObject(PlayerControlsModel())
+            .environmentObject(playerControls)
+            .environmentObject(PlayerTimeModel())
             .environmentObject(PlaylistsModel())
             .environmentObject(RecentsModel())
             .environmentObject(SearchModel())
@@ -35,6 +37,10 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
         player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
 
         return player
+    }
+
+    private var playerControls: PlayerControlsModel {
+        PlayerControlsModel(presentingControls: true, player: player)
     }
 
     private var subscriptions: SubscriptionsModel {

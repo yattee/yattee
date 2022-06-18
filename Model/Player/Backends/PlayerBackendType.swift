@@ -13,4 +13,8 @@ enum PlayerBackendType: String, CaseIterable, Defaults.Serializable {
             return "AVPlayer"
         }
     }
+
+    var supportsNetworkStateBufferingDetails: Bool {
+        self == .mpv
+    }
 }

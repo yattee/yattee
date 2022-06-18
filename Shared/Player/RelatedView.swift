@@ -1,24 +1,48 @@
+import Defaults
 import SwiftUI
 
 struct RelatedView: View {
+    @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlaylistsModel> private var playlists
 
     var body: some View {
         List {
-            if !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
+            if let related = player.currentVideo?.related {
                 Section(header: Text("Related")) {
-                    ForEach(player.currentVideo!.related) { video in
-                        PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: .constant(false))
+                    ForEach(related) { video in
+                        PlayerQueueRow(item: PlayerQueueItem(video))
                             .contextMenu {
-                                Button {
-                                    player.playNext(video)
-                                } label: {
-                                    Label("Play Next", systemImage: "text.insert")
+                                Section {
+                                    Button {
+                                        player.playNext(video)
+                                    } label: {
+                                        Label("Play Next", systemImage: "text.insert")
+                                    }
+                                    Button {
+                                        player.enqueueVideo(video)
+                                    } label: {
+                                        Label("Play Last", systemImage: "text.append")
+                                    }
                                 }
-                                Button {
-                                    player.enqueueVideo(video)
-                                } label: {
-                                    Label("Play Last", systemImage: "text.append")
+
+                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
+                                    Section {
+                                        Button {
+                                            navigation.presentAddToPlaylist(video)
+                                        } label: {
+                                            Label("Add to playlist...", systemImage: "text.badge.plus")
+                                        }
+
+                                        if let playlist = playlists.lastUsed {
+                                            Button {
+                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+                                            } label: {
+                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+                                            }
+                                        }
+                                    }
                                 }
                             }
                     }
