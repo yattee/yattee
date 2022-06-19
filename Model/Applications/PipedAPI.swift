@@ -372,7 +372,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             id: id,
             title: details["name"]?.string ?? "",
             thumbnailURL: thumbnailURL,
-            channel: extractChannel(from: json)!,
+            channel: extractChannel(from: json),
             videos: videos,
             videosCount: details["videos"]?.int
         )
