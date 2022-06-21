@@ -12,6 +12,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool { // swiftlint:disable:this discouraged_optional_collection
         Self.instance = self
+        #if os(iOS)
+            UIViewController.swizzleHomeIndicatorProperty()
+        #endif
         return true
     }
 }
