@@ -96,6 +96,8 @@ struct VideoPlayerView: View {
             #if os(iOS)
             .offset(y: viewVerticalOffset)
             .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
+            .backport
+            .persistentSystemOverlays(!fullScreenLayout)
             #endif
         #endif
     }
