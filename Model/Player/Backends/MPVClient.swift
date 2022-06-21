@@ -340,6 +340,11 @@ final class MPVClient: ObservableObject {
     }
 
     private func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
+        #if targetEnvironment(simulator)
+            // performance of drawing in simulator is poor and buggy, disable it
+            return
+        #endif
+
         let glView = unsafeBitCast(ctx, to: MPVOGLView.self)
 
         guard glView.needsDrawing else {
