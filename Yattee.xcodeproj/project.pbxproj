@@ -75,6 +75,8 @@
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
+		370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79C8286279810045DB77 /* NSObject+Swizzle.swift */; };
+		370B79CC286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */; };
 		370F4FA927CC163A001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
 		370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
 		370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
@@ -145,6 +147,7 @@
 		37130A5F277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
 		37130A60277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
 		37130A61277657300033018A /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37130A5E277657300033018A /* PersistenceController.swift */; };
+		37136CAC286273060095C0CF /* PersistentSystemOverlays+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37136CAB286273060095C0CF /* PersistentSystemOverlays+Backport.swift */; };
 		3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
 		37141670267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
 		37141671267A8ACC006CA35D /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714166E267A8ACC006CA35D /* TrendingView.swift */; };
@@ -812,6 +815,8 @@
 		3703100127B0713600ECDDAA /* PlayerGestures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerGestures.swift; sourceTree = "<group>"; };
 		3705B17F267B4DFB00704544 /* TrendingCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountry.swift; sourceTree = "<group>"; };
 		3705B181267B4E4900704544 /* TrendingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCategory.swift; sourceTree = "<group>"; };
+		370B79C8286279810045DB77 /* NSObject+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+Swizzle.swift"; sourceTree = "<group>"; };
+		370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+HideHomeIndicator.swift"; sourceTree = "<group>"; };
 		370F4FAE27CC16CA001B35DC /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libssl.3.dylib; sourceTree = "<group>"; };
 		370F4FAF27CC16CA001B35DC /* libXau.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libXau.6.dylib; sourceTree = "<group>"; };
 		370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libxcb.1.1.0.dylib; sourceTree = "<group>"; };
@@ -844,6 +849,7 @@
 		3711403E26B206A6005B3555 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		37130A5A277657090033018A /* Yattee.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Yattee.xcdatamodel; sourceTree = "<group>"; };
 		37130A5E277657300033018A /* PersistenceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		37136CAB286273060095C0CF /* PersistentSystemOverlays+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistentSystemOverlays+Backport.swift"; sourceTree = "<group>"; };
 		3714166E267A8ACC006CA35D /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
 		37141672267A8E10006CA35D /* Country.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
 		37152EE926EFEB95004FB96D /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
@@ -1417,6 +1423,7 @@
 				3722AEBF274DAEB8005EA4D6 /* Tint+Backport.swift */,
 				3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */,
 				3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */,
+				37136CAB286273060095C0CF /* PersistentSystemOverlays+Backport.swift */,
 			);
 			path = Backports;
 			sourceTree = "<group>";
@@ -1713,9 +1720,11 @@
 				37E8B0EF27B326F30024006F /* Comparable+Clamped.swift */,
 				37C3A240272359900087A57A /* Double+Format.swift */,
 				37BA794E26DC3E0E002A0235 /* Int+Format.swift */,
+				370B79C8286279810045DB77 /* NSObject+Swizzle.swift */,
 				3782B95C2755858100990149 /* NSTextField+FocusRingType.swift */,
 				3782B9512755667600990149 /* String+Format.swift */,
 				377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */,
+				370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */,
 				3743CA51270F284F00E4D32B /* View+Borders.swift */,
 			);
 			path = Extensions;
@@ -2544,7 +2553,9 @@
 				377FC7E3267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37C3A251272366440087A57A /* ChannelPlaylistView.swift in Sources */,
 				37E2EEAB270656EC00170416 /* BrowserPlayerControls.swift in Sources */,
+				370B79CC286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift in Sources */,
 				37E8B0EC27B326C00024006F /* TimelineView.swift in Sources */,
+				37136CAC286273060095C0CF /* PersistentSystemOverlays+Backport.swift in Sources */,
 				374C053527242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
 				37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */,
 				371114EB27B94C8800C2EF7B /* RepeatingTimer.swift in Sources */,
@@ -2628,6 +2639,7 @@
 				37E70923271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				37BD07BB2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */,
 				37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
+				370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */,
 				37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */,
 				37C3A241272359900087A57A /* Double+Format.swift in Sources */,
 				3784CDE227772EE40055BBF2 /* Watch.swift in Sources */,
