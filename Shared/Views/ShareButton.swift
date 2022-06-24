@@ -25,7 +25,6 @@ struct ShareButton: View {
             youtubeActions
         } label: {
             Label("Share", systemImage: "square.and.arrow.up")
-                .labelStyle(.iconOnly)
         }
         .menuStyle(.borderlessButton)
         #if os(macOS)

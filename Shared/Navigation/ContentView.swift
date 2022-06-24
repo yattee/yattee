@@ -107,17 +107,6 @@ struct ContentView: View {
                 }
             )
         #endif
-            .alert(isPresented: $navigation.presentingUnsubscribeAlert) {
-                Alert(
-                    title: Text(
-                        "Are you sure you want to unsubscribe from \(navigation.channelToUnsubscribe.name)?"
-                    ),
-                    primaryButton: .destructive(Text("Unsubscribe")) {
-                        subscriptions.unsubscribe(navigation.channelToUnsubscribe.id)
-                    },
-                    secondaryButton: .cancel()
-                )
-            }
             .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }
 

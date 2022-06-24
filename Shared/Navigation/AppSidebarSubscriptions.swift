@@ -15,7 +15,7 @@ struct AppSidebarSubscriptions: View {
                 }
                 .contextMenu {
                     Button("Unsubscribe") {
-                        navigation.presentUnsubscribeAlert(channel)
+                        navigation.presentUnsubscribeAlert(channel, subscriptions: subscriptions)
                     }
                 }
                 .id("channel\(channel.id)")
