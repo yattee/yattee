@@ -322,9 +322,7 @@ struct SearchView: View {
                     channel,
                     player: player,
                     recents: recents,
-                    navigation: navigation,
-                    navigationStyle: navigationStyle,
-                    delay: false
+                    navigation: navigation
                 )
             case .playlist:
                 guard let playlist = item.playlist else {
@@ -335,9 +333,7 @@ struct SearchView: View {
                     playlist,
                     player: player,
                     recents: recents,
-                    navigation: navigation,
-                    navigationStyle: navigationStyle,
-                    delay: false
+                    navigation: navigation
                 )
             }
         } label: {
