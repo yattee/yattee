@@ -122,19 +122,6 @@ struct VideoDetails: View {
     var body: some View {
         VStack(alignment: .leading) {
             Group {
-//                Group {
-//                    subscriptionsSection
-//                        .border(.red, width: 4)
-//
-//                        .onChange(of: video) { video in
-//                            if let video = video {
-//                                subscribed = subscriptions.isSubscribing(video.channel.id)
-//                            }
-//                        }
-//                }
-//                .padding(.top, 4)
-//                .padding(.horizontal)
-
                 HStack(spacing: 4) {
                     pageButton("Info", "info.circle", .info)
                     pageButton("Chapters", "bookmark", .chapters)
@@ -186,64 +173,6 @@ struct VideoDetails: View {
 
     var showAddToPlaylistButton: Bool {
         accounts.app.supportsUserPlaylists && accounts.signedIn
-    }
-
-    var subscriptionsSection: some View {
-        Group {
-            if let video = video {
-                HStack(alignment: .center) {
-                    HStack(spacing: 10) {
-                        Group {
-//                            ZStack(alignment: .bottomTrailing) {
-//                                authorAvatar
-//
-//                                if subscribed {
-//                                    Image(systemName: "star.circle.fill")
-//                                        .background(Color.background)
-//                                        .clipShape(Circle())
-//                                        .foregroundColor(.secondary)
-//                                }
-//                            }
-
-//                            VStack(alignment: .leading, spacing: 4) {
-//                                Text(video.title)
-//                                    .font(.system(size: 11))
-//                                    .fontWeight(.bold)
-//
-//                                HStack(spacing: 4) {
-//                                    Text(video.channel.name)
-//
-//                                    if let subscribers = video.channel.subscriptionsString {
-//                                        Text("•")
-//                                            .foregroundColor(.secondary)
-//                                            .opacity(0.3)
-//
-//                                        Text("\(subscribers) subscribers")
-//                                    }
-//                                }
-//                                .foregroundColor(.secondary)
-//                                .font(.caption2)
-//                            }
-                        }
-                    }
-                    .contentShape(RoundedRectangle(cornerRadius: 12))
-                    .contextMenu {
-                        if let video = video {
-                            Button(action: {
-                                NavigationModel.openChannel(
-                                    video.channel,
-                                    player: player,
-                                    recents: recents,
-                                    navigation: navigation
-                                )
-                            }) {
-                                Label("\(video.channel.name) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     var publishedDateSection: some View {

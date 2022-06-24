@@ -589,5 +589,5 @@ final class AVPlayerBackend: PlayerBackend {
     func stopControlsUpdates() {}
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
-    func updateNetworkState() {}
+    func setNeedsNetworkStateUpdates() {}
 }
