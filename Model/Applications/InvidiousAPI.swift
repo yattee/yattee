@@ -211,6 +211,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
     }
 
+    func channelByName(_: String) -> Resource? {
+        nil
+    }
+
     func channelVideos(_ id: String) -> Resource {
         resource(baseURL: account.url, path: basePathAppending("channels/\(id)/latest"))
     }

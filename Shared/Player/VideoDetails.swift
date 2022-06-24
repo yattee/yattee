@@ -238,8 +238,7 @@ struct VideoDetails: View {
                                     video.channel,
                                     player: player,
                                     recents: recents,
-                                    navigation: navigation,
-                                    navigationStyle: navigationStyle
+                                    navigation: navigation
                                 )
                             }) {
                                 Label("\(video.channel.name) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
