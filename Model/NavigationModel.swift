@@ -179,9 +179,20 @@ final class NavigationModel: ObservableObject {
         presentingPlaylistForm = true
     }
 
-    func presentUnsubscribeAlert(_ channel: Channel?) {
+    func presentUnsubscribeAlert(_ channel: Channel, subscriptions: SubscriptionsModel) {
         channelToUnsubscribe = channel
-        presentingUnsubscribeAlert = channelToUnsubscribe != nil
+        alert = Alert(
+            title: Text(
+                "Are you sure you want to unsubscribe from \(channelToUnsubscribe.name)?"
+            ),
+            primaryButton: .destructive(Text("Unsubscribe")) { [weak self] in
+                if let id = self?.channelToUnsubscribe.id {
+                    subscriptions.unsubscribe(id)
+                }
+            },
+            secondaryButton: .cancel()
+        )
+        presentingAlert = true
     }
 
     func hideKeyboard() {

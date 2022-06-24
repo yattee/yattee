@@ -67,16 +67,6 @@ struct VideoContextMenuView: View {
             addToQueueButton
         }
 
-        if !inChannelView, !inChannelPlaylistView {
-            Section {
-                openChannelButton
-
-                if accounts.app.supportsSubscriptions, accounts.api.signedIn {
-                    subscriptionButton
-                }
-            }
-        }
-
         if accounts.app.supportsUserPlaylists, accounts.signedIn {
             Section {
                 addToPlaylistButton
@@ -84,6 +74,16 @@ struct VideoContextMenuView: View {
 
                 if let id = navigation.tabSelection?.playlistID ?? playlistID {
                     removeFromPlaylistButton(playlistID: id)
+                }
+            }
+        }
+
+        if !inChannelView, !inChannelPlaylistView {
+            Section {
+                openChannelButton
+
+                if accounts.app.supportsSubscriptions, accounts.api.signedIn {
+                    subscriptionButton
                 }
             }
         }
@@ -205,7 +205,7 @@ struct VideoContextMenuView: View {
                     #if os(tvOS)
                         subscriptions.unsubscribe(video.channel.id)
                     #else
-                        navigation.presentUnsubscribeAlert(video.channel)
+                        navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
                     #endif
                 } label: {
                     Label("Unsubscribe", systemImage: "xmark.circle")
