@@ -6,7 +6,7 @@ final class PlayerControlsModel: ObservableObject {
     @Published var isLoadingVideo = false
     @Published var isPlaying = true
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
-    @Published var presentingControlsOverlay = false
+    @Published var presentingControlsOverlay = false { didSet { handleOverlayPresentationChange() } }
     @Published var timer: Timer?
 
     var player: PlayerModel!
@@ -38,6 +38,10 @@ final class PlayerControlsModel: ObservableObject {
             timer?.invalidate()
             timer = nil
         }
+    }
+
+    func handleOverlayPresentationChange() {
+        player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay)
     }
 
     func show() {

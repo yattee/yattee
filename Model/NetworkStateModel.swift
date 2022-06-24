@@ -34,7 +34,7 @@ final class NetworkStateModel: ObservableObject {
 
     var needsUpdates: Bool {
         if let player = player {
-            return pausedForCache || player.isSeeking || player.isLoadingVideo
+            return pausedForCache || player.isSeeking || player.isLoadingVideo || player.controls.presentingControlsOverlay
         }
 
         return pausedForCache

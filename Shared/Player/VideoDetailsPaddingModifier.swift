@@ -2,13 +2,7 @@ import Foundation
 import SwiftUI
 
 struct VideoDetailsPaddingModifier: ViewModifier {
-    static var defaultAdditionalDetailsPadding: Double {
-        #if os(macOS)
-            5
-        #else
-            10
-        #endif
-    }
+    static var defaultAdditionalDetailsPadding = 0.0
 
     let geometry: GeometryProxy
     let aspectRatio: Double?

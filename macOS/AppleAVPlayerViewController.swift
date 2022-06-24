@@ -24,8 +24,8 @@ final class AppleAVPlayerViewController: NSViewController {
         playerView.player = playerModel.avPlayerBackend.avPlayer
         pictureInPictureDelegate.playerModel = playerModel
 
+        playerView.controlsStyle = .none
         playerView.allowsPictureInPicturePlayback = true
-        playerView.showsFullScreenToggleButton = true
 
         playerView.pictureInPictureDelegate = pictureInPictureDelegate
 

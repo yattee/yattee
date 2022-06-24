@@ -22,12 +22,7 @@ struct CommentsView: View {
                             .onAppear {
                                 comments.loadNextPageIfNeeded(current: comment)
                             }
-                            .padding(.bottom, comment == last ? 5 : 0)
-
-                        if comment != last {
-                            Divider()
-                                .padding(.vertical, 5)
-                        }
+                            .borderBottom(height: comment != last ? 0.5 : 0, color: Color("ControlsBorderColor"))
                     }
                 }
 

@@ -114,12 +114,13 @@ struct TimelineView: View {
                     ZStack(alignment: .leading) {
                         ZStack(alignment: .leading) {
                             Rectangle()
-                                .fill(Color.gray.opacity(0.1))
+                                .fill(Color.white.opacity(0.2))
                                 .frame(maxHeight: height)
+                                .offset(x: current * oneUnitWidth)
                                 .zIndex(1)
 
                             Rectangle()
-                                .fill(Color.gray.opacity(0.5))
+                                .fill(Color.white.opacity(0.6))
                                 .frame(maxHeight: height)
                                 .frame(width: current * oneUnitWidth)
                                 .zIndex(1)
@@ -187,7 +188,7 @@ struct TimelineView: View {
                     #endif
                 }
 
-                .background(GeometryReader { proxy in
+                .overlay(GeometryReader { proxy in
                     Color.clear
                         .onAppear {
                             self.size = proxy.size
@@ -265,7 +266,6 @@ struct TimelineView: View {
     }
 
     var segments: [Segment] {
-        // [.init(category: "outro", segment: [25,30], uuid: UUID().uuidString, videoDuration: 100)] ??
         player.sponsorBlock.segments
     }
 
@@ -290,7 +290,7 @@ struct TimelineView: View {
     var chaptersLayers: some View {
         ForEach(chapters) { chapter in
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("AppBlueColor"))
+                .fill(Color.orange)
                 .frame(maxWidth: 2, maxHeight: 12)
                 .offset(x: (chapter.start * oneUnitWidth) - 1)
         }

@@ -1,13 +1,8 @@
 import Defaults
 import SDWebImageSwiftUI
 import SwiftUI
-import SwiftUIPager
 
 struct ControlsBar: View {
-    enum Pages: CaseIterable {
-        case details, controls
-    }
-
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerControlsModel> private var playerControls
@@ -19,27 +14,28 @@ struct ControlsBar: View {
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
-    @StateObject private var controlsPage = Page.first()
+    var presentingControls = true
+    var backgroundEnabled = true
+    var borderTop = true
+    var borderBottom = true
+    var detailsTogglePlayer = true
 
     var body: some View {
-        VStack(spacing: 0) {
-            Pager(page: controlsPage, data: Pages.allCases, id: \.self) { index in
-                switch index {
-                case .details:
-                    details
-                default:
-                    controls
-                }
+        HStack(spacing: 0) {
+            detailsButton
+
+            if presentingControls {
+                controls
+                    .frame(maxWidth: 120)
             }
-            .pagingPriority(.simultaneous)
         }
         .buttonStyle(.plain)
         .labelStyle(.iconOnly)
         .padding(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: barHeight)
-        .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
-        .borderBottom(height: 0.4, color: Color("ControlsBorderColor"))
-        .modifier(ControlBackgroundModifier(edgesIgnoringSafeArea: .bottom))
+        .borderTop(height: borderTop ? 0.4 : 0, color: Color("ControlsBorderColor"))
+        .borderBottom(height: borderBottom ? 0.4 : 0, color: Color("ControlsBorderColor"))
+        .modifier(ControlBackgroundModifier(enabled: backgroundEnabled, edgesIgnoringSafeArea: .bottom))
         #if os(iOS)
             .background(
                 EmptyView().sheet(isPresented: $presentingShareSheet) {
@@ -51,6 +47,19 @@ struct ControlsBar: View {
         #endif
     }
 
+    @ViewBuilder var detailsButton: some View {
+        if detailsTogglePlayer {
+            Button {
+                model.togglePlayer()
+            } label: {
+                details
+                    .contentShape(Rectangle())
+            }
+        } else {
+            details
+        }
+    }
+
     var controls: some View {
         HStack(spacing: 4) {
             Group {
@@ -59,32 +68,18 @@ struct ControlsBar: View {
                     model.closePiP()
                 } label: {
                     Label("Close Video", systemImage: "xmark")
-                        .padding(.horizontal, 4)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity)
                         .contentShape(Rectangle())
                 }
-
-                Spacer()
-
-                Button(action: { model.backend.seek(to: 0) }) {
-                    Label("Restart", systemImage: "backward.end.fill")
-                        .contentShape(Rectangle())
-                }
-
-                Spacer()
-
-                Button {
-                    model.backend.seek(relative: .secondsInDefaultTimescale(-10))
-                } label: {
-                    Label("Backward", systemImage: "gobackward.10")
-                }
-                Spacer()
 
                 if playerControls.isPlaying {
                     Button(action: {
                         model.pause()
                     }) {
                         Label("Pause", systemImage: "pause.fill")
-                            .padding(.horizontal, 4)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
                             .contentShape(Rectangle())
                     }
                 } else {
@@ -92,38 +87,27 @@ struct ControlsBar: View {
                         model.play()
                     }) {
                         Label("Play", systemImage: "play.fill")
-                            .padding(.horizontal, 4)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
                             .contentShape(Rectangle())
                     }
                 }
-                Spacer()
-
-                Button {
-                    model.backend.seek(relative: .secondsInDefaultTimescale(10))
-                } label: {
-                    Label("Forward", systemImage: "goforward.10")
-                }
-
-                Spacer()
             }
             .disabled(playerControls.isLoadingVideo || model.currentItem.isNil)
 
             Button(action: { model.advanceToNextItem() }) {
                 Label("Next", systemImage: "forward.fill")
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
             }
             .disabled(model.queue.isEmpty)
-
-            Spacer()
         }
-        .padding(.vertical)
-
         .font(.system(size: 24))
-        .frame(maxWidth: .infinity)
     }
 
     var barHeight: Double {
-        75
+        55
     }
 
     var details: some View {
@@ -147,8 +131,6 @@ struct ControlsBar: View {
                     if let video = model.currentVideo {
                         Group {
                             Section {
-                                Text(video.title)
-
                                 if accounts.app.supportsUserPlaylists && accounts.signedIn {
                                     Section {
                                         Button {
@@ -165,13 +147,13 @@ struct ControlsBar: View {
                                             }
                                         }
                                     }
-
-                                    ShareButton(
-                                        contentItem: .init(video: model.currentVideo),
-                                        presentingShareSheet: $presentingShareSheet,
-                                        shareURL: $shareURL
-                                    )
                                 }
+
+                                ShareButton(
+                                    contentItem: .init(video: model.currentVideo),
+                                    presentingShareSheet: $presentingShareSheet,
+                                    shareURL: $shareURL
+                                )
 
                                 Section {
                                     Button {
@@ -208,6 +190,12 @@ struct ControlsBar: View {
                                     }
                                 }
                             }
+
+                            Button {
+                                model.closeCurrentItem()
+                            } label: {
+                                Label("Close Video", systemImage: "xmark")
+                            }
                         }
                         .labelStyle(.automatic)
                     }
@@ -234,9 +222,7 @@ struct ControlsBar: View {
     }
 
     private var authorAvatar: some View {
-        Button {
-            model.togglePlayer()
-        } label: {
+        Group {
             if let video = model.currentItem?.video, let url = video.channel.thumbnailURL {
                 WebImage(url: url)
                     .resizable()
@@ -246,9 +232,15 @@ struct ControlsBar: View {
                     .retryOnAppear(true)
                     .indicator(.activity)
             } else {
-                Image(systemName: "play.rectangle")
-                    .foregroundColor(.accentColor)
-                    .font(.system(size: 30))
+                ZStack {
+                    Color(white: 0.8)
+                        .opacity(0.5)
+
+                    Image(systemName: "play.rectangle")
+                        .foregroundColor(.accentColor)
+                        .font(.system(size: 20))
+                        .contentShape(Rectangle())
+                }
             }
         }
         .frame(width: 44, height: 44, alignment: .leading)

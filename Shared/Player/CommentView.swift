@@ -99,6 +99,7 @@ struct CommentView: View {
         #if os(tvOS)
         .padding(.horizontal, 20)
         #endif
+        .padding(.bottom, 10)
     }
 
     private var authorAvatar: some View {
