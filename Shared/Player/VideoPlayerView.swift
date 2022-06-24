@@ -61,10 +61,12 @@ struct VideoPlayerView: View {
     }
 
     var body: some View {
-        // TODO: remove
-        if #available(iOS 15.0, macOS 12.0, *) {
-            _ = Self._printChanges()
-        }
+        #if DEBUG
+            // TODO: remove
+            if #available(iOS 15.0, macOS 12.0, *) {
+                _ = Self._printChanges()
+            }
+        #endif
 
         #if os(macOS)
             return HSplitView {
@@ -159,7 +161,7 @@ struct VideoPlayerView: View {
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
                             if player.playingInPictureInPicture {
-                                pictureInPicturePlaceholder(geometry: geometry)
+                                pictureInPicturePlaceholder
                             } else {
                                 playerView
                                 #if !os(tvOS)
@@ -170,7 +172,7 @@ struct VideoPlayerView: View {
                                         fullScreen: player.playingFullScreen
                                     )
                                 )
-//                                .overlay(playerPlaceholder(geometry: geometry))
+                                .overlay(playerPlaceholder)
                                 #endif
                             }
                         }
@@ -183,15 +185,11 @@ struct VideoPlayerView: View {
                         .gesture(
                             DragGesture(coordinateSpace: .global)
                                 .onChanged { value in
-                                    guard player.presentingPlayer else {
-                                        return // swiftlint:disable:this implicit_return
-                                    }
+                                    guard player.presentingPlayer else { return }
 
                                     let drag = value.translation.height
 
-                                    guard drag > 0 else {
-                                        return // swiftlint:disable:this implicit_return
-                                    }
+                                    guard drag > 0 else { return }
 
                                     guard drag < 100 else {
                                         player.hide()
@@ -231,6 +229,7 @@ struct VideoPlayerView: View {
                                     #if os(iOS)
                                         if verticalSizeClass == .regular {
                                             VideoDetails(sidebarQueue: sidebarQueue, fullScreen: fullScreenDetails)
+                                                .edgesIgnoringSafeArea(.bottom)
                                         }
 
                                     #else
@@ -246,12 +245,6 @@ struct VideoPlayerView: View {
                                 ))
                             }
                         #endif
-                    }
-                #endif
-
-                #if !os(tvOS)
-                    if !fullScreenLayout {
-                        ControlsBar()
                     }
                 #endif
             }
@@ -273,7 +266,6 @@ struct VideoPlayerView: View {
                 #endif
             }
         }
-        .transition(.asymmetric(insertion: .slide, removal: .identity))
         .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
         #if os(iOS)
             .statusBar(hidden: player.playingFullScreen)
@@ -326,7 +318,7 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @ViewBuilder func playerPlaceholder(geometry: GeometryProxy) -> some View {
+    @ViewBuilder var playerPlaceholder: some View {
         if player.currentItem.isNil {
             ZStack(alignment: .topLeading) {
                 HStack {
@@ -359,11 +351,11 @@ struct VideoPlayerView: View {
             }
             .background(Color.black)
             .contentShape(Rectangle())
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
+            .frame(width: player.playerSize.width, height: player.playerSize.height)
         }
     }
 
-    func pictureInPicturePlaceholder(geometry: GeometryProxy) -> some View {
+    var pictureInPicturePlaceholder: some View {
         HStack {
             Spacer()
             VStack {
@@ -389,7 +381,7 @@ struct VideoPlayerView: View {
             }
         }
         .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / Self.defaultAspectRatio)
+        .frame(width: player.playerSize.width, height: player.playerSize.height)
     }
 
     #if os(iOS)

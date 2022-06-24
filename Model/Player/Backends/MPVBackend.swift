@@ -28,7 +28,7 @@ final class MPVBackend: PlayerBackend {
             }
 
             self.controls?.isLoadingVideo = self.isLoadingVideo
-            self.setNeedsNetworkStateUpdates()
+            self.setNeedsNetworkStateUpdates(true)
 
             if !self.isLoadingVideo {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
@@ -476,7 +476,11 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    func setNeedsNetworkStateUpdates() {
-        networkStateTimer.resume()
+    func setNeedsNetworkStateUpdates(_ needsUpdates: Bool) {
+        if needsUpdates {
+            networkStateTimer.resume()
+        } else {
+            networkStateTimer.suspend()
+        }
     }
 }
