@@ -2,6 +2,7 @@ import Defaults
 import SwiftUI
 
 struct ControlsOverlay: View {
+    @EnvironmentObject<NetworkStateModel> private var networkState
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var model
 
@@ -165,7 +166,7 @@ struct ControlsOverlay: View {
                 Text("hw decoder: \(player.mpvBackend.hwDecoder)")
                 Text("dropped: \(player.mpvBackend.frameDropCount)")
                 Text("video: \(String(format: "%.2ffps", player.mpvBackend.outputFps))")
-                Text("buffering: \(String(format: "%.0f%%", player.mpvBackend.bufferingState))")
+                Text("buffering: \(String(format: "%.0f%%", networkState.bufferingState))")
                 Text("cache: \(String(format: "%.2fs", player.mpvBackend.cacheDuration))")
             }
             .mask(RoundedRectangle(cornerRadius: 3))

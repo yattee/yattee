@@ -6,8 +6,8 @@ struct ChaptersView: View {
     @EnvironmentObject<PlayerModel> private var player
 
     var body: some View {
-        List {
-            if let chapters = player.currentVideo?.chapters, !chapters.isEmpty {
+        if let chapters = player.currentVideo?.chapters, !chapters.isEmpty {
+            List {
                 Section(header: Text("Chapters")) {
                     ForEach(chapters) { chapter in
                         Button {
@@ -18,18 +18,17 @@ struct ChaptersView: View {
                         .buttonStyle(.plain)
                     }
                 }
-            } else {
-                Text(player.currentVideo?.title ?? "")
             }
-        }
-        .id(UUID())
-        #if os(macOS)
+            #if os(macOS)
             .listStyle(.inset)
-        #elseif os(iOS)
+            #elseif os(iOS)
             .listStyle(.grouped)
-        #else
+            #else
             .listStyle(.plain)
-        #endif
+            #endif
+        } else {
+            NoCommentsView(text: "No chapters information available", systemImage: "xmark.circle.fill")
+        }
     }
 
     @ViewBuilder func chapterButtonLabel(_ chapter: Chapter) -> some View {
