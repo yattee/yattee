@@ -5,7 +5,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environmentObject(AccountsModel())
-            .environmentObject(CommentsModel())
+            .environmentObject(comments)
             .environmentObject(InstancesModel())
             .environmentObject(invidious)
             .environmentObject(NavigationModel())
@@ -19,6 +19,14 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(SearchModel())
             .environmentObject(subscriptions)
             .environmentObject(ThumbnailsModel())
+    }
+
+    private var comments: CommentsModel {
+        let comments = CommentsModel()
+        comments.loaded = true
+        comments.all = [.fixture]
+
+        return comments
     }
 
     private var invidious: InvidiousAPI {

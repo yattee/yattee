@@ -6,7 +6,11 @@ struct NetworkState: View {
 
     var body: some View {
         Buffering(state: model.fullStateText)
-            .opacity(model.pausedForCache || player.isSeeking ? 1 : 0)
+            .opacity(visible ? 1 : 0)
+    }
+
+    var visible: Bool {
+        player.isPlaying && (model.pausedForCache || player.isSeeking)
     }
 }
 

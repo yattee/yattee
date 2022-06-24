@@ -53,10 +53,81 @@ struct VideoDetails: View {
         player.currentVideo
     }
 
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ControlsBar(
+                presentingControls: false,
+                backgroundEnabled: false,
+                borderTop: false,
+                detailsTogglePlayer: false
+            )
+
+            HStack(spacing: 4) {
+                pageButton("Info", "info.circle", .info, !video.isNil)
+                pageButton("Chapters", "bookmark", .chapters, !(video?.chapters.isEmpty ?? true))
+                pageButton("Comments", "text.bubble", .comments, !video.isNil) { comments.load() }
+                pageButton("Related", "rectangle.stack.fill", .related, !video.isNil)
+                pageButton("Queue", "list.number", .queue, !video.isNil)
+            }
+            .onChange(of: player.currentItem) { _ in
+                page.update(.moveToFirst)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 6)
+
+            Pager(page: page, data: DetailsPage.allCases, id: \.self) {
+                detailsByPage($0)
+            }
+            .onPageWillChange { pageIndex in
+                if pageIndex == DetailsPage.comments.index {
+                    comments.load()
+                }
+            }
+        }
+        .onAppear {
+            if video.isNil && !sidebarQueue {
+                page.update(.new(index: DetailsPage.queue.index))
+            }
+
+            guard video != nil, accounts.app.supportsSubscriptions else {
+                subscribed = false
+                return
+            }
+        }
+        .onChange(of: sidebarQueue) { queue in
+            if queue {
+                if currentPage == .related || currentPage == .queue {
+                    page.update(.moveToFirst)
+                }
+            } else if video.isNil {
+                page.update(.moveToLast)
+            }
+        }
+        .edgesIgnoringSafeArea(.horizontal)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    var publishedDateSection: some View {
+        Group {
+            if let video = player.currentVideo {
+                HStack(spacing: 4) {
+                    if let published = video.publishedDate {
+                        Text(published)
+                    }
+                }
+            }
+        }
+    }
+
+    private var contentItem: ContentItem {
+        ContentItem(video: player.currentVideo!)
+    }
+
     func pageButton(
         _ label: String,
         _ symbolName: String,
         _ destination: DetailsPage,
+        _ active: Bool = true,
         pageChangeAction: (() -> Void)? = nil
     ) -> some View {
         Button(action: {
@@ -69,25 +140,25 @@ struct VideoDetails: View {
                 HStack(spacing: 4) {
                     Image(systemName: symbolName)
 
-                    if playerDetailsPageButtonLabelStyle.text {
+                    if playerDetailsPageButtonLabelStyle.text && player.playerSize.width > 450 {
                         Text(label)
                     }
                 }
                 .frame(minHeight: 15)
                 .lineLimit(1)
                 .padding(.vertical, 4)
-                .foregroundColor(currentPage == destination ? .white : .accentColor)
+                .foregroundColor(currentPage == destination ? .white : (active ? Color.accentColor : .gray))
 
                 Spacer()
             }
             .contentShape(Rectangle())
         }
-        .background(currentPage == destination ? Color.accentColor : .clear)
+        .background(currentPage == destination ? (active ? Color.accentColor : .gray) : .clear)
         .buttonStyle(.plain)
         .font(.system(size: 10).bold())
         .overlay(
             RoundedRectangle(cornerRadius: 2)
-                .stroke(Color.accentColor, lineWidth: 2)
+                .stroke(active ? Color.accentColor : .gray, lineWidth: 2)
                 .foregroundColor(.clear)
         )
         .frame(maxWidth: .infinity)
@@ -117,123 +188,6 @@ struct VideoDetails: View {
             }
         }
         .contentShape(Rectangle())
-    }
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            Group {
-                HStack(spacing: 4) {
-                    pageButton("Info", "info.circle", .info)
-                    pageButton("Chapters", "bookmark", .chapters)
-                    pageButton("Comments", "text.bubble", .comments) { comments.load() }
-                    pageButton("Related", "rectangle.stack.fill", .related)
-                    pageButton("Queue", "list.number", .queue)
-                }
-                .onChange(of: player.currentItem) { _ in
-                    page.update(.moveToFirst)
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-            }
-            .contentShape(Rectangle())
-
-            Pager(page: page, data: DetailsPage.allCases, id: \.self) {
-                detailsByPage($0)
-            }
-            .onPageWillChange { pageIndex in
-                if pageIndex == DetailsPage.comments.index {
-                    comments.load()
-                } else {
-                    print("comments not loading")
-                }
-            }
-        }
-        .onAppear {
-            if video.isNil && !sidebarQueue {
-                page.update(.new(index: DetailsPage.queue.index))
-            }
-
-            guard video != nil, accounts.app.supportsSubscriptions else {
-                subscribed = false
-                return
-            }
-        }
-        .onChange(of: sidebarQueue) { queue in
-            if queue {
-                if currentPage == .related || currentPage == .queue {
-                    page.update(.moveToFirst)
-                }
-            } else if video.isNil {
-                page.update(.moveToLast)
-            }
-        }
-        .edgesIgnoringSafeArea(.horizontal)
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    var showAddToPlaylistButton: Bool {
-        accounts.app.supportsUserPlaylists && accounts.signedIn
-    }
-
-    var publishedDateSection: some View {
-        Group {
-            if let video = player.currentVideo {
-                HStack(spacing: 4) {
-                    if let published = video.publishedDate {
-                        Text(published)
-                    }
-                }
-            }
-        }
-    }
-
-    private var contentItem: ContentItem {
-        ContentItem(video: player.currentVideo!)
-    }
-
-    private var authorAvatar: some View {
-        Group {
-            if let video = video, let url = video.channel.thumbnailURL {
-                WebImage(url: url)
-                    .resizable()
-                    .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
-                    }
-                    .retryOnAppear(true)
-                    .indicator(.activity)
-                    .clipShape(Circle())
-                    .frame(width: 35, height: 35, alignment: .leading)
-            }
-        }
-    }
-
-    var videoProperties: some View {
-        HStack(spacing: 2) {
-            publishedDateSection
-            Spacer()
-
-            HStack(spacing: 4) {
-                if let views = video?.viewsCount {
-                    Image(systemName: "eye")
-
-                    Text(views)
-                }
-
-                if let likes = video?.likesCount {
-                    Image(systemName: "hand.thumbsup")
-
-                    Text(likes)
-                }
-
-                if let likes = video?.dislikesCount {
-                    Image(systemName: "hand.thumbsdown")
-
-                    Text(likes)
-                }
-            }
-        }
-        .font(.system(size: 12))
-        .foregroundColor(.secondary)
     }
 
     var detailsPage: some View {
@@ -314,6 +268,35 @@ struct VideoDetails: View {
                 }
             }
         }
+    }
+
+    var videoProperties: some View {
+        HStack(spacing: 2) {
+            publishedDateSection
+            Spacer()
+
+            HStack(spacing: 4) {
+                if let views = video?.viewsCount {
+                    Image(systemName: "eye")
+
+                    Text(views)
+                }
+
+                if let likes = video?.likesCount {
+                    Image(systemName: "hand.thumbsup")
+
+                    Text(likes)
+                }
+
+                if let likes = video?.dislikesCount {
+                    Image(systemName: "hand.thumbsdown")
+
+                    Text(likes)
+                }
+            }
+        }
+        .font(.system(size: 12))
+        .foregroundColor(.secondary)
     }
 
     func videoDetail(label: String, value: String, symbol: String) -> some View {

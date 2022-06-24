@@ -23,8 +23,6 @@ struct PlayerControls: View {
         @FocusState private var focusedField: Field?
     #endif
 
-    @Default(.controlsBarInPlayer) private var controlsBarInPlayer
-
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
         self.thumbnails = thumbnails
@@ -191,11 +189,12 @@ struct PlayerControls: View {
         HStack(spacing: 20) {
             #if !os(tvOS)
                 fullscreenButton
-                pipButton
+
+                #if os(iOS)
+                    pipButton
+                #endif
 
                 Spacer()
-
-                button("overlay", systemImage: "info.circle") {}
 
                 button("settings", systemImage: "gearshape", active: model.presentingControlsOverlay) {
                     withAnimation(Self.animation) {
