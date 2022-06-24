@@ -191,8 +191,7 @@ struct VideoContextMenuView: View {
                 video.channel,
                 player: player,
                 recents: recents,
-                navigation: navigation,
-                navigationStyle: navigationStyle
+                navigation: navigation
             )
         } label: {
             Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")

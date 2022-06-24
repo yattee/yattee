@@ -17,6 +17,10 @@ enum Windows: String, CaseIterable {
         }
     }
 
+    var isOpen: Bool {
+        !window.isNil
+    }
+
     func focus() {
         window?.makeKeyAndOrderFront(self)
     }

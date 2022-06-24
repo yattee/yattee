@@ -40,6 +40,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             self.extractChannel(from: content.json)
         }
 
+        configureTransformer(pathPattern("c/*")) { (content: Entity<JSON>) -> Channel? in
+            self.extractChannel(from: content.json)
+        }
+
         configureTransformer(pathPattern("playlists/*")) { (content: Entity<JSON>) -> ChannelPlaylist? in
             self.extractChannelPlaylist(from: content.json)
         }
@@ -123,6 +127,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func channel(_ id: String) -> Resource {
         resource(baseURL: account.url, path: "channel/\(id)")
+    }
+
+    func channelByName(_ name: String) -> Resource? {
+        resource(baseURL: account.url, path: "c/\(name)")
     }
 
     func channelVideos(_ id: String) -> Resource {
@@ -362,14 +370,12 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func extractChannelPlaylist(from json: JSON) -> ChannelPlaylist? {
         let details = json.dictionaryValue
-        let id = details["url"]?.string?.components(separatedBy: "?list=").last ?? UUID().uuidString
         let thumbnailURL = details["thumbnail"]?.url ?? details["thumbnailUrl"]?.url
         var videos = [Video]()
         if let relatedStreams = details["relatedStreams"] {
             videos = extractVideos(from: relatedStreams)
         }
         return ChannelPlaylist(
-            id: id,
             title: details["name"]?.string ?? "",
             thumbnailURL: thumbnailURL,
             channel: extractChannel(from: json),

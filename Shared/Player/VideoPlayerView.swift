@@ -48,7 +48,10 @@ struct VideoPlayerView: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var search
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
     init() {
@@ -67,7 +70,16 @@ struct VideoPlayerView: View {
             return HSplitView {
                 content
             }
-            .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
+            .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
+            .onOpenURL {
+                OpenURLHandler(
+                    accounts: accounts,
+                    navigation: navigation,
+                    recents: recents,
+                    player: player,
+                    search: search
+                ).handle($0)
+            }
             .frame(minWidth: 950, minHeight: 700)
         #else
             return GeometryReader { geometry in

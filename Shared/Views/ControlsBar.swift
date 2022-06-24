@@ -8,8 +8,6 @@ struct ControlsBar: View {
         case details, controls
     }
 
-    @Environment(\.navigationStyle) private var navigationStyle
-
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerControlsModel> private var playerControls
@@ -36,7 +34,7 @@ struct ControlsBar: View {
         .padding(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: barHeight)
         .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
-        .borderBottom(height: navigationStyle == .sidebar ? 0 : 0.4, color: Color("ControlsBorderColor"))
+        .borderBottom(height: 0.4, color: Color("ControlsBorderColor"))
         .modifier(ControlBackgroundModifier(edgesIgnoringSafeArea: .bottom))
     }
 
@@ -153,8 +151,7 @@ struct ControlsBar: View {
                                                 video.channel,
                                                 player: model,
                                                 recents: recents,
-                                                navigation: navigation,
-                                                navigationStyle: navigationStyle
+                                                navigation: navigation
                                             )
                                         } label: {
                                             Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")

@@ -16,7 +16,7 @@ final class ThumbnailsModel: ObservableObject {
     }
 
     func best(_ video: Video) -> URL? {
-        let qualities = [Thumbnail.Quality.default]
+        let qualities = [Thumbnail.Quality.maxresdefault, .medium, .default]
 
         for quality in qualities {
             let url = video.thumbnailURL(quality: quality)

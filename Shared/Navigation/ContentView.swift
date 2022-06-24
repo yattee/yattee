@@ -76,7 +76,15 @@ struct ContentView: View {
                 }
             )
         #if !os(tvOS)
-            .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
+            .onOpenURL {
+                OpenURLHandler(
+                    accounts: accounts,
+                    navigation: navigation,
+                    recents: recents,
+                    player: player,
+                    search: search
+                ).handle($0)
+            }
             .background(
                 EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
                     AddToPlaylistView(video: navigation.videoToAddToPlaylist)
@@ -110,9 +118,7 @@ struct ContentView: View {
                     secondaryButton: .cancel()
                 )
             }
-            .alert(isPresented: $navigation.presentingAlert) {
-                Alert(title: Text(navigation.alertTitle), message: Text(navigation.alertMessage))
-            }
+            .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }
 
     func openWelcomeScreenIfAccountEmpty() {

@@ -255,8 +255,7 @@ struct CommentView: View {
             comment.channel,
             player: player,
             recents: recents,
-            navigation: navigation,
-            navigationStyle: navigationStyle
+            navigation: navigation
         )
     }
 }

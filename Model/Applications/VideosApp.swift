@@ -58,4 +58,8 @@ enum VideosApp: String, CaseIterable {
     var searchUsesIndexedPages: Bool {
         self == .invidious
     }
+
+    var supportsOpeningChannelsByName: Bool {
+        self == .piped
+    }
 }
