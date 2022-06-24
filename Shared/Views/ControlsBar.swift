@@ -14,6 +14,10 @@ struct ControlsBar: View {
     @EnvironmentObject<PlayerModel> private var model
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+
+    @State private var presentingShareSheet = false
+    @State private var shareURL: URL?
 
     @StateObject private var controlsPage = Page.first()
 
@@ -36,6 +40,15 @@ struct ControlsBar: View {
         .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
         .borderBottom(height: 0.4, color: Color("ControlsBorderColor"))
         .modifier(ControlBackgroundModifier(edgesIgnoringSafeArea: .bottom))
+        #if os(iOS)
+            .background(
+                EmptyView().sheet(isPresented: $presentingShareSheet) {
+                    if let shareURL = shareURL {
+                        ShareSheet(activityItems: [shareURL])
+                    }
+                }
+            )
+        #endif
     }
 
     var controls: some View {
@@ -116,56 +129,89 @@ struct ControlsBar: View {
     var details: some View {
         HStack {
             HStack(spacing: 8) {
-                authorAvatar
-                    .contextMenu {
-                        if let video = model.currentVideo {
-                            Group {
-                                Section {
-                                    Text(video.title)
+                ZStack(alignment: .bottomTrailing) {
+                    authorAvatar
 
-                                    if accounts.app.supportsUserPlaylists && accounts.signedIn {
-                                        Section {
+                    if accounts.app.supportsSubscriptions,
+                       accounts.signedIn,
+                       let video = model.currentVideo,
+                       subscriptions.isSubscribing(video.channel.id)
+                    {
+                        Image(systemName: "star.circle.fill")
+                            .background(Color.background)
+                            .clipShape(Circle())
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .contextMenu {
+                    if let video = model.currentVideo {
+                        Group {
+                            Section {
+                                Text(video.title)
+
+                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
+                                    Section {
+                                        Button {
+                                            navigation.presentAddToPlaylist(video)
+                                        } label: {
+                                            Label("Add to Playlist...", systemImage: "text.badge.plus")
+                                        }
+
+                                        if let playlist = playlists.lastUsed, let video = model.currentVideo {
                                             Button {
-                                                navigation.presentAddToPlaylist(video)
+                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
                                             } label: {
-                                                Label("Add to Playlist...", systemImage: "text.badge.plus")
-                                            }
-
-                                            if let playlist = playlists.lastUsed, let video = model.currentVideo {
-                                                Button {
-                                                    playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
-                                                } label: {
-                                                    Label("Add to \(playlist.title)", systemImage: "text.badge.star")
-                                                }
-                                            }
-
-                                            Button {} label: {
-                                                Label("Share", systemImage: "square.and.arrow.up")
+                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
                                             }
                                         }
                                     }
 
-                                    Section {
-                                        Button {
-                                            NavigationModel.openChannel(
-                                                video.channel,
-                                                player: model,
-                                                recents: recents,
-                                                navigation: navigation
-                                            )
-                                        } label: {
-                                            Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
-                                        }
+                                    ShareButton(
+                                        contentItem: .init(video: model.currentVideo),
+                                        presentingShareSheet: $presentingShareSheet,
+                                        shareURL: $shareURL
+                                    )
+                                }
 
-                                        Button {} label: {
-                                            Label("Unsubscribe", systemImage: "xmark.circle")
+                                Section {
+                                    Button {
+                                        NavigationModel.openChannel(
+                                            video.channel,
+                                            player: model,
+                                            recents: recents,
+                                            navigation: navigation
+                                        )
+                                    } label: {
+                                        Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
+                                    }
+
+                                    if accounts.app.supportsSubscriptions, accounts.signedIn {
+                                        if subscriptions.isSubscribing(video.channel.id) {
+                                            Button {
+                                                #if os(tvOS)
+                                                    subscriptions.unsubscribe(video.channel.id)
+                                                #else
+                                                    navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
+                                                #endif
+                                            } label: {
+                                                Label("Unsubscribe", systemImage: "xmark.circle")
+                                            }
+                                        } else {
+                                            Button {
+                                                subscriptions.subscribe(video.channel.id) {
+                                                    navigation.sidebarSectionChanged.toggle()
+                                                }
+                                            } label: {
+                                                Label("Subscribe", systemImage: "star.circle")
+                                            }
                                         }
                                     }
                                 }
                             }
-                            .labelStyle(.automatic)
                         }
+                        .labelStyle(.automatic)
                     }
+                }
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(model.currentVideo?.title ?? "Not playing")

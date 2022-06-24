@@ -29,10 +29,6 @@ struct VideoDetails: View {
 
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
-    @State private var presentingUnsubscribeAlert = false
-    @State private var presentingAddToPlaylist = false
-    @State private var presentingShareSheet = false
-    @State private var shareURL: URL?
 
     @StateObject private var page: Page = .first()
 
@@ -260,66 +256,6 @@ struct VideoDetails: View {
                 }
             }
         }
-    }
-
-    var countsSection: some View {
-        Group {
-            if let video = player.currentVideo {
-                HStack {
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet,
-                        shareURL: $shareURL
-                    )
-
-                    Spacer()
-
-                    if let views = video.viewsCount {
-                        videoDetail(label: "Views", value: views, symbol: "eye")
-                    }
-
-                    if let likes = video.likesCount {
-                        Divider()
-                            .frame(minHeight: 35)
-
-                        videoDetail(label: "Likes", value: likes, symbol: "hand.thumbsup")
-                    }
-
-                    if let dislikes = video.dislikesCount {
-                        Divider()
-                            .frame(minHeight: 35)
-
-                        videoDetail(label: "Dislikes", value: dislikes, symbol: "hand.thumbsdown")
-                    }
-
-                    Spacer()
-
-                    Button {
-                        presentingAddToPlaylist = true
-                    } label: {
-                        Label("Add to Playlist", systemImage: "text.badge.plus")
-                            .labelStyle(.iconOnly)
-                            .help("Add to Playlist...")
-                    }
-                    .buttonStyle(.plain)
-                    .opacity(accounts.app.supportsUserPlaylists ? 1 : 0)
-                    #if os(macOS)
-                        .frame(minWidth: 35, alignment: .trailing)
-                    #endif
-                }
-                .frame(maxHeight: 35)
-                .foregroundColor(.secondary)
-            }
-        }
-        #if os(iOS)
-        .background(
-            EmptyView().sheet(isPresented: $presentingShareSheet) {
-                if let shareURL = shareURL {
-                    ShareSheet(activityItems: [shareURL])
-                }
-            }
-        )
-        #endif
     }
 
     private var contentItem: ContentItem {
