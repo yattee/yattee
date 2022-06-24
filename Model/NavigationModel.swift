@@ -66,23 +66,23 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
+    @Published var alert = Alert(title: Text("Error"))
     @Published var presentingAlert = false
-    @Published var alertTitle = ""
-    @Published var alertMessage = ""
+    #if os(macOS)
+        @Published var presentingAlertInVideoPlayer = false
+    #endif
 
     static func openChannel(
         _ channel: Channel,
         player: PlayerModel,
         recents: RecentsModel,
-        navigation: NavigationModel,
-        navigationStyle: NavigationStyle,
-        delay: Bool = true
+        navigation: NavigationModel
     ) {
         guard channel.id != Video.fixtureChannelID else {
             return
         }
 
-        player.presentingPlayer = false
+        player.hide()
         navigation.presentingChannel = false
 
         let recent = RecentItem(from: channel)
@@ -92,23 +92,11 @@ final class NavigationModel: ObservableObject {
             player.hide()
         #endif
 
-        let openRecent = {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
-            navigation.presentingChannel = true
-        }
-
-        if navigationStyle == .tab {
-            if delay {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    openRecent()
-                }
-            } else {
-                openRecent()
-            }
-        } else if navigationStyle == .sidebar {
-            openRecent()
             navigation.sidebarSectionChanged.toggle()
             navigation.tabSelection = .recentlyOpened(recent.tag)
+            navigation.presentingChannel = true
         }
     }
 
@@ -116,10 +104,9 @@ final class NavigationModel: ObservableObject {
         _ playlist: ChannelPlaylist,
         player: PlayerModel,
         recents: RecentsModel,
-        navigation: NavigationModel,
-        navigationStyle: NavigationStyle,
-        delay: Bool = false
+        navigation: NavigationModel
     ) {
+        navigation.presentingChannel = false
         navigation.presentingPlaylist = false
 
         let recent = RecentItem(from: playlist)
@@ -129,24 +116,41 @@ final class NavigationModel: ObservableObject {
             player.hide()
         #endif
 
-        let openRecent = {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
-            navigation.presentingPlaylist = true
-        }
-
-        if navigationStyle == .tab {
-            if delay {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    openRecent()
-                }
-            } else {
-                openRecent()
-            }
-        } else if navigationStyle == .sidebar {
-            openRecent()
             navigation.sidebarSectionChanged.toggle()
             navigation.tabSelection = .recentlyOpened(recent.tag)
+            navigation.presentingPlaylist = true
         }
+    }
+
+    static func openSearchQuery(
+        _ searchQuery: String?,
+        player: PlayerModel,
+        recents: RecentsModel,
+        navigation: NavigationModel,
+        search: SearchModel
+    ) {
+        player.hide()
+        navigation.presentingChannel = false
+        navigation.presentingPlaylist = false
+        navigation.tabSelection = .search
+
+        if let searchQuery = searchQuery {
+            let recent = RecentItem(from: searchQuery)
+            recents.add(recent)
+
+            DispatchQueue.main.async {
+                search.queryText = searchQuery
+                search.changeQuery { query in query.query = searchQuery }
+            }
+        }
+
+        #if os(macOS)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Windows.main.focus()
+            }
+        #endif
     }
 
     var tabSelectionBinding: Binding<TabSelection> {
@@ -187,8 +191,7 @@ final class NavigationModel: ObservableObject {
     }
 
     func presentAlert(title: String, message: String) {
-        alertTitle = title
-        alertMessage = message
+        alert = Alert(title: Text(title), message: Text(message))
         presentingAlert = true
     }
 }

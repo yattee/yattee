@@ -15,6 +15,7 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.content = content()
+        toolbar()
     }
 
     init(

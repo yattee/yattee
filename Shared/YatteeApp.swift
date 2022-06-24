@@ -132,6 +132,7 @@ struct YatteeApp: App {
                     .environmentObject(playerTime)
                     .environmentObject(playlists)
                     .environmentObject(recents)
+                    .environmentObject(search)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnails)
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))

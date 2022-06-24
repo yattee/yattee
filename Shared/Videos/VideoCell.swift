@@ -307,8 +307,7 @@ struct VideoCell: View {
                 video.channel,
                 player: player,
                 recents: recents,
-                navigation: navigation,
-                navigationStyle: navigationStyle
+                navigation: navigation
             )
         } label: {
             if badge {
