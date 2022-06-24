@@ -67,7 +67,7 @@ final class PlayerModel: ObservableObject {
     @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
 
     @Published var isSeeking = false { didSet {
-        backend.updateNetworkState()
+        backend.setNeedsNetworkStateUpdates()
     }}
 
     #if os(iOS)

@@ -52,7 +52,7 @@ protocol PlayerBackend {
     func startControlsUpdates()
     func stopControlsUpdates()
 
-    func updateNetworkState()
+    func setNeedsNetworkStateUpdates()
 
     func setNeedsDrawing(_ needsDrawing: Bool)
     func setSize(_ width: Double, _ height: Double)

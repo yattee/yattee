@@ -7,6 +7,7 @@ import SwiftUI
 
 final class MPVBackend: PlayerBackend {
     static var controlsUpdateInterval = 0.5
+    static var networkStateUpdateInterval = 0.1
 
     private var logger = Logger(label: "mpv-backend")
 
@@ -27,7 +28,7 @@ final class MPVBackend: PlayerBackend {
             }
 
             self.controls?.isLoadingVideo = self.isLoadingVideo
-            self.updateNetworkState()
+            self.setNeedsNetworkStateUpdates()
 
             if !self.isLoadingVideo {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
@@ -40,7 +41,7 @@ final class MPVBackend: PlayerBackend {
     }}
 
     var isPlaying = true { didSet {
-        updateNetworkState()
+        networkStateTimer.resume()
 
         if isPlaying {
             startClientUpdates()
@@ -73,6 +74,7 @@ final class MPVBackend: PlayerBackend {
     var client: MPVClient! { didSet { client.backend = self } }
 
     private var clientTimer: RepeatingTimer!
+    private var networkStateTimer: RepeatingTimer!
 
     private var handleEOF = false
     private var onFileLoaded: (() -> Void)?
@@ -117,6 +119,9 @@ final class MPVBackend: PlayerBackend {
 
         clientTimer = .init(timeInterval: Self.controlsUpdateInterval)
         clientTimer.eventHandler = getClientUpdates
+
+        networkStateTimer = .init(timeInterval: Self.networkStateUpdateInterval)
+        networkStateTimer.eventHandler = updateNetworkState
     }
 
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
@@ -396,12 +401,12 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
 
         case MPV_EVENT_PAUSE:
-            updateNetworkState()
+            networkStateTimer.resume()
 
         case MPV_EVENT_UNPAUSE:
             isLoadingVideo = false
             isSeeking = false
-            updateNetworkState()
+            networkStateTimer.resume()
 
         case MPV_EVENT_SEEK:
             isSeeking = true
@@ -466,15 +471,12 @@ final class MPVBackend: PlayerBackend {
             networkState.bufferingState = client.bufferingState
         }
 
-        if networkState.needsUpdates {
-            dispatchNetworkUpdate()
+        if !networkState.needsUpdates {
+            networkStateTimer.suspend()
         }
     }
 
-    func dispatchNetworkUpdate() {
-        print("dispatching network update")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.updateNetworkState()
-        }
+    func setNeedsNetworkStateUpdates() {
+        networkStateTimer.resume()
     }
 }
