@@ -19,7 +19,9 @@ struct ControlsOverlay: View {
                 rateButton
                 increaseRateButton
             }
+            #if os(iOS)
             .foregroundColor(.white)
+            #endif
 
             if player.activeBackend == .mpv,
                showMPVPlaybackStats
@@ -58,13 +60,13 @@ struct ControlsOverlay: View {
         } label: {
             Label("Increase rate", systemImage: "plus")
                 .labelStyle(.iconOnly)
-                .padding(.horizontal, 8)
+                .padding(8)
+                .frame(height: 30)
                 .contentShape(Rectangle())
         }
         #if os(macOS)
         .buttonStyle(.bordered)
         #else
-        .frame(height: 30)
         .modifier(ControlBackgroundModifier())
         .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
@@ -81,13 +83,13 @@ struct ControlsOverlay: View {
         } label: {
             Label("Decrease rate", systemImage: "minus")
                 .labelStyle(.iconOnly)
-                .padding(.horizontal, 8)
+                .padding(8)
+                .frame(height: 30)
                 .contentShape(Rectangle())
         }
         #if os(macOS)
         .buttonStyle(.bordered)
         #else
-        .frame(height: 30)
         .modifier(ControlBackgroundModifier())
         .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
@@ -112,6 +114,8 @@ struct ControlsOverlay: View {
                     .frame(width: 140, height: 30)
                     .foregroundColor(.primary)
             }
+            .transaction { t in t.animation = .none }
+
             .buttonStyle(.plain)
             .foregroundColor(.primary)
             .frame(width: 140, height: 30)
@@ -133,12 +137,13 @@ struct ControlsOverlay: View {
             Menu {
                 ratePicker
                     .frame(width: 100, height: 30)
-
                     .mask(RoundedRectangle(cornerRadius: 3))
             } label: {
                 Text(player.rateLabel(player.currentRate))
                     .foregroundColor(.primary)
+                    .frame(width: 80)
             }
+            .transaction { t in t.animation = .none }
             .buttonStyle(.plain)
             .foregroundColor(.primary)
             .frame(width: 100, height: 30)
