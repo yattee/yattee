@@ -40,7 +40,6 @@ struct PlayerControls: View {
                             buttonsBar
 
                             if let video = player.currentVideo, player.playingFullScreen {
-//                            if let video = Video.fixture {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(video.title)
                                         .font(.title2.bold())
