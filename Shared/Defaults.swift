@@ -63,6 +63,7 @@ extension Defaults.Keys {
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
     static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: defaultForPauseOnHidingPlayer)
+    static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
@@ -98,8 +99,6 @@ extension Defaults.Keys {
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
 
     static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
-
-    static let controlsBarInPlayer = Key<Bool>("controlsBarInPlayer", default: true)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

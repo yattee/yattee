@@ -376,6 +376,8 @@ final class MPVBackend: PlayerBackend {
     }
 
     func handle(_ event: UnsafePointer<mpv_event>!) {
+        logger.info(.init(stringLiteral: "RECEIVED  event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))
+
         switch event.pointee.event_id {
         case MPV_EVENT_SHUTDOWN:
             mpv_destroy(client.mpv)
@@ -401,9 +403,11 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
 
         case MPV_EVENT_PAUSE:
+            isPlaying = false
             networkStateTimer.resume()
 
         case MPV_EVENT_UNPAUSE:
+            isPlaying = true
             isLoadingVideo = false
             isSeeking = false
             networkStateTimer.resume()
@@ -413,7 +417,7 @@ final class MPVBackend: PlayerBackend {
 
         case MPV_EVENT_END_FILE:
             DispatchQueue.main.async { [weak self] in
-                self?.handleEndOfFile(event)
+                self?.handleEndOfFile()
             }
 
         default:
@@ -421,20 +425,26 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    func handleEndOfFile(_: UnsafePointer<mpv_event>!) {
+    func handleEndOfFile() {
         guard handleEOF, !isLoadingVideo else {
             return
         }
 
-        model.prepareCurrentItemForHistory(finished: true)
+        getClientUpdates()
+
+        if Defaults[.closeLastItemOnPlaybackEnd] {
+            model.prepareCurrentItemForHistory(finished: true)
+        }
 
         if model.queue.isEmpty {
             #if !os(macOS)
                 try? AVAudioSession.sharedInstance().setActive(false)
             #endif
-            model.resetQueue()
 
-            model.hide()
+            if Defaults[.closeLastItemOnPlaybackEnd] {
+                model.resetQueue()
+                model.hide()
+            }
         } else {
             model.advanceToNextItem()
         }
