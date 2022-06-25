@@ -464,20 +464,24 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     @objc func itemDidPlayToEndTime() {
-        model.prepareCurrentItemForHistory(finished: true)
+        if Defaults[.closeLastItemOnPlaybackEnd] {
+            model.prepareCurrentItemForHistory(finished: true)
+        }
 
         if model.queue.isEmpty {
             #if !os(macOS)
                 try? AVAudioSession.sharedInstance().setActive(false)
             #endif
-            model.resetQueue()
-            #if os(tvOS)
-                controller?.playerView.dismiss(animated: false) { [weak self] in
-                    self?.controller?.dismiss(animated: true)
-                }
-            #else
-                model.hide()
-            #endif
+            if Defaults[.closeLastItemOnPlaybackEnd] {
+                model.resetQueue()
+                #if os(tvOS)
+                    controller?.playerView.dismiss(animated: false) { [weak self] in
+                        self?.controller?.dismiss(animated: true)
+                    }
+                #else
+                    model.hide()
+                #endif
+            }
         } else {
             if model.playingInPictureInPicture {
                 startPictureInPictureOnPlay = true

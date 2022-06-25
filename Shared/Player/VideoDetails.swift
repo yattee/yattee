@@ -43,7 +43,6 @@ struct VideoDetails: View {
 
     @Default(.showKeywords) private var showKeywords
     @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
-    @Default(.controlsBarInPlayer) private var controlsBarInPlayer
 
     var currentPage: DetailsPage {
         DetailsPage.allCases.first { $0.index == page.index } ?? .info

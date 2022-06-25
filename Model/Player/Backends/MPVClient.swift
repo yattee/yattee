@@ -48,6 +48,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "cache-pause-initial", "yes"))
         checkError(mpv_set_option_string(mpv, "cache-secs", "20"))
         checkError(mpv_set_option_string(mpv, "cache-pause-wait", "2"))
+        checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
         checkError(mpv_set_option_string(mpv, "hwdec", "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
 
