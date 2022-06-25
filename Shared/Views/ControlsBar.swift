@@ -221,10 +221,24 @@ struct ControlsBar: View {
                         .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
                         .lineLimit(1)
 
-                    Text(model.currentVideo?.author ?? "")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
+                    HStack(spacing: 2) {
+                        Text(model.currentVideo?.author ?? "")
+                            .font(.system(size: 12))
+
+                        if let channel = model.currentVideo?.channel,
+                           let subsriptions = channel.subscriptionsString
+                        {
+                            HStack(spacing: 2) {
+                                Image(systemName: "person.2.fill")
+
+                                Text(subsriptions)
+                            }
+                            .padding(.leading, 4)
+                            .font(.system(size: 9))
+                        }
+                    }
+                    .lineLimit(1)
+                    .foregroundColor(.secondary)
                 }
             }
             .buttonStyle(.plain)
@@ -246,7 +260,7 @@ struct ControlsBar: View {
                     .indicator(.activity)
             } else {
                 ZStack {
-                    Color(white: 0.8)
+                    Color(white: 0.6)
                         .opacity(0.5)
 
                     Image(systemName: "play.rectangle")
