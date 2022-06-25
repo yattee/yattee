@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PlayerQueueView: View {
     var sidebarQueue: Bool
-    var fullScreen: Bool
+    @Binding var fullScreen: Bool
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -49,7 +49,10 @@ struct PlayerQueueView: View {
             }
 
             ForEach(player.queue) { item in
-                PlayerQueueRow(item: item, fullScreen: fullScreen)
+                PlayerQueueRow(item: item, fullScreen: $fullScreen)
+                    .onAppear {
+                        player.loadQueueVideoDetails(item)
+                    }
                     .contextMenu {
                         removeButton(item)
                         removeAllButton()
@@ -70,7 +73,7 @@ struct PlayerQueueView: View {
                         PlayerQueueRow(
                             item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
                             history: true,
-                            fullScreen: fullScreen
+                            fullScreen: $fullScreen
                         )
                         .onAppear {
                             player.loadHistoryVideoDetails(watch.videoID)
@@ -89,7 +92,7 @@ struct PlayerQueueView: View {
             if !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
                 Section(header: Text("Related")) {
                     ForEach(player.currentVideo!.related) { video in
-                        PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: fullScreen)
+                        PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
                             .contextMenu {
                                 Button {
                                     player.playNext(video)
@@ -137,7 +140,7 @@ struct PlayerQueueView: View {
 struct PlayerQueueView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            PlayerQueueView(sidebarQueue: true, fullScreen: true)
+            PlayerQueueView(sidebarQueue: true, fullScreen: .constant(true))
         }
         .injectFixtureEnvironmentObjects()
     }

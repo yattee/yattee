@@ -50,6 +50,7 @@ struct VideoPlayerView: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
@@ -179,7 +180,7 @@ struct VideoPlayerView: View {
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
                         .onHover { hovering in
                             hoveringPlayer = hovering
-//                            hovering ? playerControls.show() : playerControls.hide()
+                            hovering ? playerControls.show() : playerControls.hide()
                         }
                         #if !os(macOS)
                         .gesture(
@@ -210,30 +211,30 @@ struct VideoPlayerView: View {
                                 }
                         )
                         #else
-//                                .onAppear(perform: {
-//                                    NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-//                                        if hoveringPlayer {
-//                                            playerControls.resetTimer()
-//                                        }
-//
-//                                        return $0
-//                                    }
-//                                })
+                                .onAppear(perform: {
+                                    NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                        if hoveringPlayer {
+                                            playerControls.resetTimer()
+                                        }
+
+                                        return $0
+                                    }
+                                })
                         #endif
 
-.background(Color.black)
+                                .background(Color.black)
 
                         #if !os(tvOS)
                             if !player.playingFullScreen {
                                 VStack(spacing: 0) {
                                     #if os(iOS)
                                         if verticalSizeClass == .regular {
-                                            VideoDetails(sidebarQueue: sidebarQueue, fullScreen: fullScreenDetails)
+                                            VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                                 .edgesIgnoringSafeArea(.bottom)
                                         }
 
                                     #else
-                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: fullScreenDetails)
+                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
 
                                     #endif
                                 }
@@ -255,12 +256,12 @@ struct VideoPlayerView: View {
             if !player.playingFullScreen {
                 #if os(iOS)
                     if sidebarQueue {
-                        PlayerQueueView(sidebarQueue: true, fullScreen: fullScreenDetails)
+                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(maxWidth: 350)
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
-                        PlayerQueueView(sidebarQueue: true, fullScreen: fullScreenDetails)
+                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(minWidth: 300)
                     }
                 #endif

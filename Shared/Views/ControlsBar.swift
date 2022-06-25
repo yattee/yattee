@@ -19,6 +19,9 @@ struct ControlsBar: View {
     var borderTop = true
     var borderBottom = true
     var detailsTogglePlayer = true
+    var detailsToggleFullScreen = false
+
+    @Binding var fullScreen: Bool
 
     var body: some View {
         HStack(spacing: 0) {
@@ -55,6 +58,16 @@ struct ControlsBar: View {
                 details
                     .contentShape(Rectangle())
             }
+        } else if detailsToggleFullScreen {
+            Button {
+                withAnimation {
+                    fullScreen.toggle()
+                }
+            } label: {
+                details
+                    .contentShape(Rectangle())
+            }
+            .keyboardShortcut("t")
         } else {
             details
         }
@@ -250,7 +263,7 @@ struct ControlsBar: View {
 
 struct ControlsBar_Previews: PreviewProvider {
     static var previews: some View {
-        ControlsBar()
+        ControlsBar(fullScreen: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }
