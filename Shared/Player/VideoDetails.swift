@@ -25,7 +25,7 @@ struct VideoDetails: View {
     }
 
     var sidebarQueue: Bool
-    var fullScreen: Bool
+    @Binding var fullScreen: Bool
 
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
@@ -58,7 +58,9 @@ struct VideoDetails: View {
                 presentingControls: false,
                 backgroundEnabled: false,
                 borderTop: false,
-                detailsTogglePlayer: false
+                detailsTogglePlayer: false,
+                detailsToggleFullScreen: true,
+                fullScreen: $fullScreen
             )
 
             HStack(spacing: 4) {
@@ -175,7 +177,7 @@ struct VideoDetails: View {
                     .edgesIgnoringSafeArea(.horizontal)
 
             case .queue:
-                PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: fullScreen)
+                PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: $fullScreen)
                     .edgesIgnoringSafeArea(.horizontal)
 
             case .related:
@@ -325,7 +327,7 @@ struct VideoDetails: View {
 
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDetails(sidebarQueue: true, fullScreen: false)
+        VideoDetails(sidebarQueue: true, fullScreen: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }
