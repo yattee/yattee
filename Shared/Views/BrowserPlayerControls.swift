@@ -42,7 +42,7 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
                     toolbar
                         .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
                         .modifier(ControlBackgroundModifier())
-                    ControlsBar()
+                    ControlsBar(fullScreen: .constant(false))
                         .edgesIgnoringSafeArea(.bottom)
                 }
             #endif
