@@ -15,6 +15,7 @@ struct PlayerSettings: View {
     @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.lockOrientationInFullScreen) private var lockOrientationInFullScreen
@@ -62,6 +63,7 @@ struct PlayerSettings: View {
                 sourcePicker
                 qualityPicker
                 pauseOnHidingPlayerToggle
+                closeLastItemOnPlaybackEndToggle
             }
 
             Section(header: SettingsHeader(text: "Comments")) {
@@ -207,6 +209,10 @@ struct PlayerSettings: View {
 
     private var pauseOnHidingPlayerToggle: some View {
         Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
+    }
+
+    private var closeLastItemOnPlaybackEndToggle: some View {
+        Toggle("Close video after playing last in the queue", isOn: $closeLastItemOnPlaybackEnd)
     }
 
     #if os(iOS)
