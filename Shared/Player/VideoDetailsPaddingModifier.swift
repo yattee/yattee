@@ -4,20 +4,20 @@ import SwiftUI
 struct VideoDetailsPaddingModifier: ViewModifier {
     static var defaultAdditionalDetailsPadding = 0.0
 
-    let geometry: GeometryProxy
+    let playerSize: CGSize
     let aspectRatio: Double?
     let minimumHeightLeft: Double
     let additionalPadding: Double
     let fullScreen: Bool
 
     init(
-        geometry: GeometryProxy,
+        playerSize: CGSize,
         aspectRatio: Double? = nil,
         minimumHeightLeft: Double? = nil,
         additionalPadding: Double? = nil,
         fullScreen: Bool = false
     ) {
-        self.geometry = geometry
+        self.playerSize = playerSize
         self.aspectRatio = aspectRatio ?? VideoPlayerView.defaultAspectRatio
         self.minimumHeightLeft = minimumHeightLeft ?? VideoPlayerView.defaultMinimumHeightLeft
         self.additionalPadding = additionalPadding ?? Self.defaultAdditionalDetailsPadding
@@ -33,7 +33,7 @@ struct VideoDetailsPaddingModifier: ViewModifier {
     }
 
     var playerHeight: Double {
-        [geometry.size.width / usedAspectRatio, geometry.size.height - minimumHeightLeft].min()!
+        playerSize.height
     }
 
     var topPadding: Double {
