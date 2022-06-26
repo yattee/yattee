@@ -75,13 +75,12 @@ struct URLParser {
     }
 
     var channelName: String? {
-        guard destination == .channel else { return nil }
-
+        guard hasAnyOfPrefixes(path, ["c/", "/c/"]) else { return nil }
         return removePrefixes(path, Self.prefixes[.channel]!.map { [$0, "/"].joined() })
     }
 
     var channelID: String? {
-        guard destination == .channel else { return nil }
+        guard hasAnyOfPrefixes(path, ["channel/", "/channel/"]) else { return nil }
 
         return removePrefixes(path, Self.prefixes[.channel]!.map { [$0, "/"].joined() })
     }
@@ -95,7 +94,7 @@ struct URLParser {
     }
 
     private func hasAnyOfPrefixes(_ value: String, _ prefixes: [String]) -> Bool {
-        return prefixes.contains { value.hasPrefix($0) }
+        prefixes.contains { value.hasPrefix($0) }
     }
 
     private func removePrefixes(_ value: String, _ prefixes: [String]) -> String {
