@@ -51,7 +51,7 @@ final class PlayerModel: ObservableObject {
     @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
-    @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
+    @Published var queue = [PlayerQueueItem]() { didSet { handleQueueChange() } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
     @Published var videoBeingOpened: Video?
     @Published var historyVideos = [Video]()
@@ -483,6 +483,12 @@ final class PlayerModel: ObservableObject {
         #endif
 
         backend.closePiP(wasPlaying: wasPlaying)
+    }
+
+    func handleQueueChange() {
+        Defaults[.queue] = queue
+
+        controls.objectWillChange.send()
     }
 
     func handleCurrentItemChange() {
