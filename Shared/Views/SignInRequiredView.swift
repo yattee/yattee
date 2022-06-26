@@ -54,7 +54,7 @@ struct SignInRequiredView<Content: View>: View {
                 OpenSettingsButton()
             #endif
         }
-        .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
     }
 }
 
@@ -65,7 +65,6 @@ struct SignInRequiredView_Previews: PreviewProvider {
                 Text("Only when signed in")
             }
         }
-        .environmentObject(PlayerModel())
-        .environmentObject(InvidiousAPI())
+        .injectFixtureEnvironmentObjects()
     }
 }
