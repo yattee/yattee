@@ -68,7 +68,7 @@ struct VideoDetails: View {
                 pageButton("Chapters", "bookmark", .chapters, !(video?.chapters.isEmpty ?? true))
                 pageButton("Comments", "text.bubble", .comments, !video.isNil) { comments.load() }
                 pageButton("Related", "rectangle.stack.fill", .related, !video.isNil)
-                pageButton("Queue", "list.number", .queue, !video.isNil)
+                pageButton("Queue", "list.number", .queue, !player.queue.isEmpty)
             }
             .onChange(of: player.currentItem) { _ in
                 page.update(.moveToFirst)
@@ -77,7 +77,11 @@ struct VideoDetails: View {
             .padding(.vertical, 6)
 
             Pager(page: page, data: DetailsPage.allCases, id: \.self) {
-                detailsByPage($0)
+                if !player.currentItem.isNil || page.index == DetailsPage.queue.index {
+                    detailsByPage($0)
+                } else {
+                    VStack {}
+                }
             }
             .onPageWillChange { pageIndex in
                 if pageIndex == DetailsPage.comments.index {
