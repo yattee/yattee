@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 
 final class ThumbnailsModel: ObservableObject {
@@ -16,9 +17,7 @@ final class ThumbnailsModel: ObservableObject {
     }
 
     func best(_ video: Video) -> URL? {
-        let qualities = [Thumbnail.Quality.maxresdefault, .medium, .default]
-
-        for quality in qualities {
+        for quality in availableQualitites {
             let url = video.thumbnailURL(quality: quality)
             if !isUnloadable(url) {
                 return url
@@ -26,5 +25,16 @@ final class ThumbnailsModel: ObservableObject {
         }
 
         return nil
+    }
+
+    private var availableQualitites: [Thumbnail.Quality] {
+        switch Defaults[.thumbnailsQuality] {
+        case .highest:
+            return [.maxresdefault, .medium, .default]
+        case .medium:
+            return [.medium, .default]
+        case .low:
+            return [.default]
+        }
     }
 }
