@@ -85,12 +85,6 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func resetTimer() {
-        #if os(tvOS)
-            if !presentingControls {
-                show()
-            }
-        #endif
-
         removeTimer()
 
         guard let player = player, !player.musicMode else {
