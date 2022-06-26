@@ -66,6 +66,9 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
+    @Published var presentingShareSheet = false
+    @Published var shareURL: URL?
+
     @Published var alert = Alert(title: Text("Error"))
     @Published var presentingAlert = false
     #if os(macOS)
@@ -204,6 +207,11 @@ final class NavigationModel: ObservableObject {
     func presentAlert(title: String, message: String) {
         alert = Alert(title: Text(title), message: Text(message))
         presentingAlert = true
+    }
+
+    func presentShareSheet(_ url: URL) {
+        shareURL = url
+        presentingShareSheet = true
     }
 }
 
