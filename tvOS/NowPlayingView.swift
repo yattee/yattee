@@ -68,6 +68,9 @@ struct NowPlayingView: View {
                             } label: {
                                 VideoBanner(video: item.video)
                             }
+                            .onAppear {
+                                player.loadQueueVideoDetails(item)
+                            }
                             .contextMenu {
                                 Button("Remove", role: .destructive) {
                                     player.remove(item)
