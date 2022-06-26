@@ -78,9 +78,11 @@ struct VideoContextMenuView: View {
             }
         }
 
-        Section {
-            ShareButton(contentItem: .init(video: video))
-        }
+        #if !os(tvOS)
+            Section {
+                ShareButton(contentItem: .init(video: video))
+            }
+        #endif
 
         if !inChannelView, !inChannelPlaylistView {
             Section {
