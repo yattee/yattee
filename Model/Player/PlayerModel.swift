@@ -165,7 +165,9 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
-        presentingPlayer = true
+        DispatchQueue.main.async { [weak self] in
+            self?.presentingPlayer = true
+        }
 
         #if os(macOS)
             Windows.player.open()
@@ -174,8 +176,10 @@ final class PlayerModel: ObservableObject {
     }
 
     func hide() {
-        playingFullScreen = false
-        presentingPlayer = false
+        DispatchQueue.main.async { [weak self] in
+            self?.playingFullScreen = false
+            self?.presentingPlayer = false
+        }
 
         #if os(iOS)
             if Defaults[.lockPortraitWhenBrowsing] {
