@@ -7,10 +7,6 @@ struct PlayerSettings: View {
     @Default(.quality) private var quality
     @Default(.commentsInstanceID) private var commentsInstanceID
 
-    #if !os(tvOS)
-        @Default(.commentsPlacement) private var commentsPlacement
-    #endif
-
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
@@ -68,10 +64,6 @@ struct PlayerSettings: View {
 
             Section(header: SettingsHeader(text: "Comments")) {
                 commentsInstancePicker
-                #if !os(tvOS)
-                    commentsPlacementPicker
-                        .disabled(!CommentsModel.enabled)
-                #endif
             }
 
             Section(header: SettingsHeader(text: "Interface")) {
@@ -160,19 +152,6 @@ struct PlayerSettings: View {
             .pickerStyle(.inline)
         #endif
     }
-
-    #if !os(tvOS)
-        private var commentsPlacementPicker: some View {
-            Picker("Placement", selection: $commentsPlacement) {
-                Text("Below video description").tag(CommentsPlacement.info)
-                Text("Separate tab").tag(CommentsPlacement.separate)
-            }
-            .labelsHidden()
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #endif
-        }
-    #endif
 
     private var sidebarPicker: some View {
         Picker("Sidebar", selection: $playerSidebar) {
