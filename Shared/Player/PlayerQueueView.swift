@@ -10,6 +10,8 @@ struct PlayerQueueView: View {
     var watches: FetchedResults<Watch>
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveHistory) private var saveHistory
@@ -104,6 +106,24 @@ struct PlayerQueueView: View {
                                     player.enqueueVideo(video)
                                 } label: {
                                     Label("Play Last", systemImage: "text.append")
+                                }
+
+                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
+                                    Section {
+                                        Button {
+                                            navigation.presentAddToPlaylist(video)
+                                        } label: {
+                                            Label("Add to playlist...", systemImage: "text.badge.plus")
+                                        }
+
+                                        if let playlist = playlists.lastUsed {
+                                            Button {
+                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+                                            } label: {
+                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+                                            }
+                                        }
+                                    }
                                 }
                             }
                     }
