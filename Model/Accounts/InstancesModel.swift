@@ -61,7 +61,7 @@ final class InstancesModel: ObservableObject {
     }
 
     static func standardizedURL(_ url: String) -> String {
-        if url.last == "/" {
+        if url.count > 7, url.last == "/" {
             return String(url.dropLast())
         } else {
             return url
