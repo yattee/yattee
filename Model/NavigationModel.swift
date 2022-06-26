@@ -13,6 +13,9 @@ final class NavigationModel: ObservableObject {
         case recentlyOpened(String)
         case nowPlaying
         case search
+        #if os(tvOS)
+            case settings
+        #endif
 
         var stringValue: String {
             switch self {
@@ -34,6 +37,10 @@ final class NavigationModel: ObservableObject {
                 return "recentlyOpened"
             case .search:
                 return "search"
+            #if os(tvOS)
+                case .settings: // swiftlint:disable:this switch_case_alignment
+                    return "settings"
+            #endif
             default:
                 return ""
             }

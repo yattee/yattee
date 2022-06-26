@@ -79,89 +79,98 @@ struct SettingsView: View {
             .padding(20)
             .frame(width: 480, height: windowHeight)
         #else
-            NavigationView {
-                List {
-                    #if os(tvOS)
-                        AccountSelectionView()
-                    #endif
-
-                    Section(header: Text("Instances")) {
-                        ForEach(instances) { instance in
-                            AccountsNavigationLink(instance: instance)
-                        }
-                        addInstanceButton
+            Group {
+                #if os(tvOS)
+                    settingsList
+                #else
+                    NavigationView {
+                        settingsList
                     }
-
-                    #if os(tvOS)
-                        Divider()
-                    #endif
-
-                    Section {
-                        #if os(tvOS)
-                            NavigationLink {
-                                EditFavorites()
-                            } label: {
-                                Label("Favorites", systemImage: "heart.fill")
-                            }
-                        #endif
-
-                        NavigationLink {
-                            BrowsingSettings()
-                        } label: {
-                            Label("Browsing", systemImage: "list.and.film")
-                        }
-
-                        NavigationLink {
-                            PlayerSettings()
-                        } label: {
-                            Label("Player", systemImage: "play.rectangle")
-                        }
-
-                        NavigationLink {
-                            HistorySettings()
-                        } label: {
-                            Label("History", systemImage: "clock.arrow.circlepath")
-                        }
-
-                        NavigationLink {
-                            SponsorBlockSettings()
-                        } label: {
-                            Label("SponsorBlock", systemImage: "dollarsign.circle")
-                        }
-                    }
-
-                    Section(footer: versionString) {
-                        NavigationLink {
-                            Help()
-                        } label: {
-                            Label("Help", systemImage: "questionmark.circle")
-                        }
-                    }
-                }
-                .navigationTitle("Settings")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        #if !os(tvOS)
-                            Button("Done") {
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                            .keyboardShortcut(.cancelAction)
-                        #endif
-                    }
-                }
-                .frame(maxWidth: 1000)
-                #if os(iOS)
-                    .listStyle(.insetGrouped)
                 #endif
             }
             .sheet(isPresented: $presentingInstanceForm) {
                 InstanceForm(savedInstanceID: $savedFormInstanceID)
             }
-            #if os(tvOS)
-            .background(Color.background(scheme: colorScheme))
-            #endif
         #endif
     }
+
+    #if !os(macOS)
+        var settingsList: some View {
+            List {
+                #if os(tvOS)
+                    AccountSelectionView()
+                #endif
+
+                Section(header: Text("Instances")) {
+                    ForEach(instances) { instance in
+                        AccountsNavigationLink(instance: instance)
+                    }
+                    addInstanceButton
+                }
+
+                #if os(tvOS)
+                    Divider()
+                #endif
+
+                Section {
+                    #if os(tvOS)
+                        NavigationLink {
+                            EditFavorites()
+                        } label: {
+                            Label("Favorites", systemImage: "heart.fill")
+                        }
+                    #endif
+
+                    NavigationLink {
+                        BrowsingSettings()
+                    } label: {
+                        Label("Browsing", systemImage: "list.and.film")
+                    }
+
+                    NavigationLink {
+                        PlayerSettings()
+                    } label: {
+                        Label("Player", systemImage: "play.rectangle")
+                    }
+
+                    NavigationLink {
+                        HistorySettings()
+                    } label: {
+                        Label("History", systemImage: "clock.arrow.circlepath")
+                    }
+
+                    NavigationLink {
+                        SponsorBlockSettings()
+                    } label: {
+                        Label("SponsorBlock", systemImage: "dollarsign.circle")
+                    }
+                }
+
+                Section(footer: versionString) {
+                    NavigationLink {
+                        Help()
+                    } label: {
+                        Label("Help", systemImage: "questionmark.circle")
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    #if !os(tvOS)
+                        Button("Done") {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                        .keyboardShortcut(.cancelAction)
+                    #endif
+                }
+            }
+            .frame(maxWidth: 1000)
+            #if os(iOS)
+                .listStyle(.insetGrouped)
+            #endif
+        }
+    #endif
 
     #if os(macOS)
         private var windowHeight: Double {

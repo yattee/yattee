@@ -10,44 +10,51 @@ struct TVNavigationView: View {
     @Default(.visibleSections) private var visibleSections
 
     var body: some View {
-        TabView(selection: navigation.tabSelectionBinding) {
-            if visibleSections.contains(.favorites) {
-                FavoritesView()
-                    .tabItem { Text("Favorites") }
-                    .tag(TabSelection.favorites)
+        NavigationView {
+            TabView(selection: navigation.tabSelectionBinding) {
+                if visibleSections.contains(.favorites) {
+                    FavoritesView()
+                        .tabItem { Text("Favorites") }
+                        .tag(TabSelection.favorites)
+                }
+
+                if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
+                    SubscriptionsView()
+                        .tabItem { Text("Subscriptions") }
+                        .tag(TabSelection.subscriptions)
+                }
+
+                if visibleSections.contains(.popular), accounts.app.supportsPopular {
+                    PopularView()
+                        .tabItem { Text("Popular") }
+                        .tag(TabSelection.popular)
+                }
+
+                if visibleSections.contains(.trending) {
+                    TrendingView()
+                        .tabItem { Text("Trending") }
+                        .tag(TabSelection.trending)
+                }
+
+                if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
+                    PlaylistsView()
+                        .tabItem { Text("Playlists") }
+                        .tag(TabSelection.playlists)
+                }
+
+                NowPlayingView()
+                    .tabItem { Text("Now Playing") }
+                    .tag(TabSelection.nowPlaying)
+
+                SearchView()
+                    .tabItem { Image(systemName: "magnifyingglass") }
+                    .tag(TabSelection.search)
+
+                SettingsView()
+                    .navigationBarHidden(true)
+                    .tabItem { Image(systemName: "gear") }
+                    .tag(TabSelection.settings)
             }
-
-            if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
-                SubscriptionsView()
-                    .tabItem { Text("Subscriptions") }
-                    .tag(TabSelection.subscriptions)
-            }
-
-            if visibleSections.contains(.popular), accounts.app.supportsPopular {
-                PopularView()
-                    .tabItem { Text("Popular") }
-                    .tag(TabSelection.popular)
-            }
-
-            if visibleSections.contains(.trending) {
-                TrendingView()
-                    .tabItem { Text("Trending") }
-                    .tag(TabSelection.trending)
-            }
-
-            if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
-                PlaylistsView()
-                    .tabItem { Text("Playlists") }
-                    .tag(TabSelection.playlists)
-            }
-
-            NowPlayingView()
-                .tabItem { Text("Now Playing") }
-                .tag(TabSelection.nowPlaying)
-
-            SearchView()
-                .tabItem { Image(systemName: "magnifyingglass") }
-                .tag(TabSelection.search)
         }
         .fullScreenCover(isPresented: $navigation.presentingSettings) { SettingsView() }
         .fullScreenCover(isPresented: $navigation.presentingAddToPlaylist) {
@@ -68,7 +75,6 @@ struct TVNavigationView: View {
                 ChannelPlaylistView(playlist: playlist)
             }
         }
-        .onPlayPauseCommand { navigation.presentingSettings.toggle() }
     }
 }
 
