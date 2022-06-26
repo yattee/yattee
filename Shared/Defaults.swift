@@ -51,6 +51,7 @@ extension Defaults.Keys {
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
+    static let thumbnailsQuality = Key<ThumbnailsQuality>("thumbnailsQuality", default: .highest)
 
     static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
     static let quality = Key<ResolutionSetting>("quality", default: .best)
@@ -217,4 +218,8 @@ enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializa
     var text: Bool {
         self == .iconAndText
     }
+}
+
+enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
+    case highest, medium, low
 }
