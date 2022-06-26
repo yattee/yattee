@@ -58,7 +58,6 @@ struct AppSidebarNavigation: View {
                             .foregroundColor(.accentColor)
                         Spacer()
                     }
-                    .frame(maxHeight: .infinity)
                 }
             }
         }

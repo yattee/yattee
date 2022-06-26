@@ -36,6 +36,7 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
 
         return ZStack(alignment: .bottomLeading) {
             content
+                .frame(maxHeight: .infinity)
 
             #if !os(tvOS)
                 VStack(spacing: 0) {
