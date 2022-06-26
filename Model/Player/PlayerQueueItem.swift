@@ -39,6 +39,10 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
         return duration - seconds <= 10
     }
 
+    var hasDetailsLoaded: Bool {
+        !video.isNil
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
