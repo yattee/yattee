@@ -240,7 +240,7 @@ struct VideoPlayerView: View {
                                 }
                                 .background(colorScheme == .dark ? Color.black : Color.white)
                                 .modifier(VideoDetailsPaddingModifier(
-                                    geometry: geometry,
+                                    playerSize: player.playerSize,
                                     aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
                                     fullScreen: fullScreenDetails
                                 ))
