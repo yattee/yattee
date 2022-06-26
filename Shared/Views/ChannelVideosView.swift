@@ -120,11 +120,7 @@ struct ChannelVideosView: View {
                             .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
                     }
 
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet,
-                        shareURL: $shareURL
-                    )
+                    ShareButton(contentItem: contentItem)
 
                     subscriptionToggleButton
 
@@ -132,13 +128,6 @@ struct ChannelVideosView: View {
                         FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
                     }
                 }
-            }
-        }
-        #endif
-        #if os(iOS)
-        .sheet(isPresented: $presentingShareSheet) {
-            if let shareURL = shareURL {
-                ShareSheet(activityItems: [shareURL])
             }
         }
         #endif
