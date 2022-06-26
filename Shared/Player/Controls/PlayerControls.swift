@@ -69,6 +69,9 @@ struct PlayerControls: View {
                                         .offset(y: -25)
                                         .zIndex(1)
                                 }
+                                #if os(tvOS)
+                                .offset(y: -100)
+                                #endif
                                 .frame(maxWidth: 500)
                                 .padding(.bottom, 2)
                             }
@@ -260,7 +263,9 @@ struct PlayerControls: View {
             HStack(spacing: 20) {
                 restartVideoButton
                 advanceToNextItemButton
-                musicModeButton
+                #if !os(tvOS)
+                    musicModeButton
+                #endif
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }

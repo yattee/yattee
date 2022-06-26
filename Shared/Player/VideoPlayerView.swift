@@ -141,21 +141,21 @@ struct VideoPlayerView: View {
                     playerView
                         .ignoresSafeArea(.all, edges: .all)
                         .onMoveCommand { direction in
+                            if direction == .up || direction == .down {
+                                playerControls.show()
+                            }
+
+                            playerControls.resetTimer()
+
+                            guard !playerControls.presentingControls else {
+                                return
+                            }
+
                             if direction == .left {
-                                playerControls.resetTimer()
                                 player.backend.seek(relative: .secondsInDefaultTimescale(-10))
                             }
                             if direction == .right {
-                                playerControls.resetTimer()
                                 player.backend.seek(relative: .secondsInDefaultTimescale(10))
-                            }
-                            if direction == .up {
-                                playerControls.show()
-                                playerControls.resetTimer()
-                            }
-                            if direction == .down {
-                                playerControls.show()
-                                playerControls.resetTimer()
                             }
                         }
                 #else
