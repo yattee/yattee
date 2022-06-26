@@ -78,6 +78,10 @@ struct VideoContextMenuView: View {
             }
         }
 
+        Section {
+            ShareButton(contentItem: .init(video: video))
+        }
+
         if !inChannelView, !inChannelPlaylistView {
             Section {
                 openChannelButton

@@ -26,7 +26,7 @@ class Segment: ObservableObject, Hashable {
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 1
 
-        return formatter.string(from: NSNumber(value: duration)) ?? ""
+        return formatter.string(from: NSNumber(value: duration.rounded())) ?? ""
     }
 
     var endTime: CMTime {

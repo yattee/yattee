@@ -64,6 +64,11 @@ struct ContentView: View {
 
         #if os(iOS)
             .overlay(videoPlayer)
+            .sheet(isPresented: $navigation.presentingShareSheet) {
+                if let shareURL = navigation.shareURL {
+                    ShareSheet(activityItems: [shareURL])
+                }
+            }
         #endif
 
             // iOS 14 has problem with multiple sheets in one view

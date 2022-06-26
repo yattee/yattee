@@ -95,13 +95,6 @@ struct ChannelPlaylistView: View {
             VerticalCells(items: items)
                 .environment(\.inChannelPlaylistView, true)
         }
-        #if os(iOS)
-        .sheet(isPresented: $presentingShareSheet) {
-            if let shareURL = shareURL {
-                ShareSheet(activityItems: [shareURL])
-            }
-        }
-        #endif
         .onAppear {
             resource?.loadIfNeeded()
         }
@@ -119,11 +112,7 @@ struct ChannelPlaylistView: View {
 
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
-                    ShareButton(
-                        contentItem: contentItem,
-                        presentingShareSheet: $presentingShareSheet,
-                        shareURL: $shareURL
-                    )
+                    ShareButton(contentItem: contentItem)
 
                     if let playlist = presentedPlaylist {
                         FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
