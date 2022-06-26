@@ -162,11 +162,7 @@ struct ControlsBar: View {
                                     }
                                 }
 
-                                ShareButton(
-                                    contentItem: .init(video: model.currentVideo),
-                                    presentingShareSheet: $presentingShareSheet,
-                                    shareURL: $shareURL
-                                )
+                                ShareButton(contentItem: .init(video: model.currentVideo))
 
                                 Section {
                                     Button {
@@ -225,7 +221,8 @@ struct ControlsBar: View {
                         Text(model.currentVideo?.author ?? "")
                             .font(.system(size: 12))
 
-                        if let channel = model.currentVideo?.channel,
+                        if !presentingControls,
+                           let channel = model.currentVideo?.channel,
                            let subsriptions = channel.subscriptionsString
                         {
                             HStack(spacing: 2) {
