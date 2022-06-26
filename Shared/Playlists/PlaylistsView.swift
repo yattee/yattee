@@ -118,6 +118,7 @@ struct PlaylistsView: View {
         }
         .onAppear {
             model.load()
+            resource?.load()
         }
         .onChange(of: accounts.current) { _ in
             model.load(force: true)
