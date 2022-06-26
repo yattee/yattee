@@ -55,6 +55,7 @@ final class URLParserTests: XCTestCase {
             let parser = URLParser(url: URL(string: url)!)
             XCTAssertEqual(parser.destination, .channel)
             XCTAssertEqual(parser.channelName, name)
+            XCTAssertNil(parser.channelID)
         }
     }
 
@@ -63,6 +64,7 @@ final class URLParserTests: XCTestCase {
             let parser = URLParser(url: URL(string: url)!)
             XCTAssertEqual(parser.destination, .channel)
             XCTAssertEqual(parser.channelID, id)
+            XCTAssertNil(parser.channelName)
         }
     }
 
