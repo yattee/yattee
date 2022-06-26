@@ -109,6 +109,9 @@ struct TimelineView: View {
             HStack(spacing: 4) {
                 Text((dragging ? projectedValue : nil)?.formattedAsPlaybackTime(allowZero: true) ?? playerTime.currentPlaybackTime)
                     .frame(minWidth: 35)
+                #if os(tvOS)
+                    .font(.system(size: 20))
+                #endif
 
                 ZStack(alignment: .center) {
                     ZStack(alignment: .leading) {
@@ -209,6 +212,9 @@ struct TimelineView: View {
                 Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
                     .clipShape(RoundedRectangle(cornerRadius: 3))
                     .frame(minWidth: 35)
+                #if os(tvOS)
+                    .font(.system(size: 20))
+                #endif
             }
             .clipShape(RoundedRectangle(cornerRadius: 3))
             .font(.system(size: 9).monospacedDigit())
