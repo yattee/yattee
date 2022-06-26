@@ -49,7 +49,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "cache-secs", "20"))
         checkError(mpv_set_option_string(mpv, "cache-pause-wait", "2"))
         checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
-        checkError(mpv_set_option_string(mpv, "hwdec", "auto-safe"))
+        checkError(mpv_set_option_string(mpv, "hwdec", machine == "x86_64" ? "no" : "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
 
         checkError(mpv_initialize(mpv))
@@ -321,9 +321,22 @@ final class MPVClient: ObservableObject {
         return strArgs
     }
 
-    func checkError(_ status: CInt) {
+    private func checkError(_ status: CInt) {
         if status < 0 {
             logger.error(.init(stringLiteral: "MPV API error: \(String(cString: mpv_error_string(status)))\n"))
+        }
+    }
+
+    private var machine: String {
+        var systeminfo = utsname()
+        uname(&systeminfo)
+        return withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
+            let data = Data(bufPtr)
+            if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
+                return String(data: data[0 ... lastIndex], encoding: .isoLatin1)!
+            } else {
+                return String(data: data, encoding: .isoLatin1)!
+            }
         }
     }
 }
