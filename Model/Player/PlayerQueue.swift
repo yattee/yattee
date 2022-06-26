@@ -179,10 +179,6 @@ extension PlayerModel {
     }
 
     func restoreQueue() {
-        guard !accounts.current.isNil else {
-            return
-        }
-
         var restoredQueue = [PlayerQueueItem?]()
 
         if let lastPlayed = Defaults[.lastPlayed],
@@ -194,12 +190,14 @@ extension PlayerModel {
 
         restoredQueue.append(contentsOf: Defaults[.queue])
         queue = restoredQueue.compactMap { $0 }
+    }
 
-        queue.forEach { item in
-            accounts.api.loadDetails(item) { newItem in
-                if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
-                    self.queue[index] = newItem
-                }
+    func loadQueueVideoDetails(_ item: PlayerQueueItem) {
+        guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
+
+        accounts.api.loadDetails(item) { newItem in
+            if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
+                self.queue[index] = newItem
             }
         }
     }

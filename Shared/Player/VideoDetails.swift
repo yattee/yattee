@@ -159,7 +159,7 @@ struct VideoDetails: View {
         .font(.system(size: 10).bold())
         .overlay(
             RoundedRectangle(cornerRadius: 2)
-                .stroke(active ? Color.accentColor : .gray, lineWidth: 2)
+                .stroke(active ? Color.accentColor : .gray, lineWidth: 1.2)
                 .foregroundColor(.clear)
         )
         .frame(maxWidth: .infinity)
