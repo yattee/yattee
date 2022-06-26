@@ -297,7 +297,7 @@ struct VideoPlayerView: View {
                         pipDelegate.player = player
 
                         player.pipDelegate = pipDelegate
-                        player.pipController!.delegate = pipDelegate
+                        player.pipController?.delegate = pipDelegate
                         player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
                     }
                 #endif
