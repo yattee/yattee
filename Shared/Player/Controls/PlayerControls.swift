@@ -40,17 +40,17 @@ struct PlayerControls: View {
                             buttonsBar
 
                             if let video = player.currentVideo, player.playingFullScreen {
-                                VStack(alignment: .leading, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 2) {
                                     Text(video.title)
-                                        .font(.title2.bold())
+                                        .font(.caption.bold())
 
                                     Text(video.author)
-                                        .font(.title3)
+                                        .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
-                                .padding(12)
+                                .padding(4)
                                 .modifier(ControlBackgroundModifier())
-                                .clipShape(RoundedRectangle(cornerRadius: 3))
+                                .clipShape(RoundedRectangle(cornerRadius: 2))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
 
