@@ -102,6 +102,7 @@ extension PlayerModel {
         DispatchQueue.main.async { [weak self] in
             withAnimation {
                 self?.lastSkipped = nil
+                self?.controls.objectWillChange.send()
             }
             self?.segmentRestorationTime = nil
         }
