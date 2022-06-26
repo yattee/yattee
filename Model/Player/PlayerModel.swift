@@ -585,23 +585,26 @@ final class PlayerModel: ObservableObject {
 
     func updateCurrentArtwork() {
         guard let video = currentVideo,
-              let thumbnailURL = video.thumbnailURL(quality: .medium),
-              let thumbnailData = try? Data(contentsOf: thumbnailURL)
+              let thumbnailURL = video.thumbnailURL(quality: .medium)
         else {
             return
         }
 
-        #if os(macOS)
-            let image = NSImage(data: thumbnailData)
-        #else
-            let image = UIImage(data: thumbnailData)
-        #endif
+        let task = URLSession.shared.dataTask(with: thumbnailURL) { [weak self] thumbnailData, _, _ in
+            guard let thumbnailData = thumbnailData else {
+                return
+            }
 
-        if image.isNil {
-            return
+            #if os(macOS)
+                guard let image = NSImage(data: thumbnailData) else { return }
+            #else
+                guard let image = UIImage(data: thumbnailData) else { return }
+            #endif
+
+            self?.currentArtwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
         }
 
-        currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
+        task.resume()
     }
 
     func toggleFullscreen(_ isFullScreen: Bool) {
