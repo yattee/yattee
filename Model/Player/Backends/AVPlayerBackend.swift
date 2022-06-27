@@ -287,7 +287,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         addItemDidPlayToEndTimeObserver()
-        attachMetadata(to: model.playerItem!, video: video, for: stream)
+        attachMetadata()
 
         DispatchQueue.main.async {
             self.stream = stream
@@ -386,27 +386,42 @@ final class AVPlayerBackend: PlayerBackend {
         }
     }
 
-    private func attachMetadata(to item: AVPlayerItem, video: Video, for _: Stream? = nil) {
+    private func attachMetadata() {
+        guard let video = model.currentVideo else { return }
+
         #if !os(macOS)
             var externalMetadata = [
                 makeMetadataItem(.commonIdentifierTitle, value: video.title),
                 makeMetadataItem(.quickTimeMetadataGenre, value: video.genre ?? ""),
                 makeMetadataItem(.commonIdentifierDescription, value: video.description ?? "")
             ]
-            if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .medium)!),
-               let image = UIImage(data: thumbnailData),
-               let pngData = image.pngData()
-            {
-                let artworkItem = makeMetadataItem(.commonIdentifierArtwork, value: pngData)
-                externalMetadata.append(artworkItem)
+
+            if let thumbnailURL = video.thumbnailURL(quality: .medium) {
+                let task = URLSession.shared.dataTask(with: thumbnailURL) { [weak self] thumbnailData, _, _ in
+                    guard let thumbnailData = thumbnailData else { return }
+
+                    let image = UIImage(data: thumbnailData)
+                    if let pngData = image?.pngData() {
+                        if let artworkItem = self?.makeMetadataItem(.commonIdentifierArtwork, value: pngData) {
+                            externalMetadata.append(artworkItem)
+                        }
+                    }
+
+                    self?.avPlayer.currentItem?.externalMetadata = externalMetadata
+                }
+
+                task.resume()
             }
 
-            item.externalMetadata = externalMetadata
         #endif
 
-        item.preferredForwardBufferDuration = 5
-
-        observePlayerItemStatus(item)
+        if let item = model.playerItem {
+            #if !os(macOS)
+                item.externalMetadata = externalMetadata
+            #endif
+            item.preferredForwardBufferDuration = 5
+            observePlayerItemStatus(item)
+        }
     }
 
     #if !os(macOS)
