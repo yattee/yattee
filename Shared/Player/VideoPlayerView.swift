@@ -158,6 +158,9 @@ struct VideoPlayerView: View {
                                 player.backend.seek(relative: .secondsInDefaultTimescale(10))
                             }
                         }
+                        .onPlayPauseCommand {
+                            player.togglePlay()
+                        }
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
