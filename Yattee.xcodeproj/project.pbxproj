@@ -205,6 +205,36 @@
 		37319F0527103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
+		3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
+		3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
+		3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
+		3736A201286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
+		3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */; };
+		3736A203286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */; };
+		3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F2286BB72300C9E5EE /* libavformat.xcframework */; };
+		3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F2286BB72300C9E5EE /* libavformat.xcframework */; };
+		3736A206286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */; };
+		3736A207286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */; };
+		3736A208286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */; };
+		3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */; };
+		3736A20A286BB72300C9E5EE /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F5286BB72300C9E5EE /* libssl.xcframework */; };
+		3736A20B286BB72300C9E5EE /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F5286BB72300C9E5EE /* libssl.xcframework */; };
+		3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F6286BB72300C9E5EE /* libavutil.xcframework */; };
+		3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F6286BB72300C9E5EE /* libavutil.xcframework */; };
+		3736A20E286BB72300C9E5EE /* libass.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F7286BB72300C9E5EE /* libass.xcframework */; };
+		3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F7286BB72300C9E5EE /* libass.xcframework */; };
+		3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */; };
+		3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */; };
+		3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F9286BB72300C9E5EE /* libswresample.xcframework */; };
+		3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F9286BB72300C9E5EE /* libswresample.xcframework */; };
+		3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FA286BB72300C9E5EE /* libswscale.xcframework */; };
+		3736A215286BB72300C9E5EE /* libswscale.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FA286BB72300C9E5EE /* libswscale.xcframework */; };
+		3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */; };
+		3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */; };
+		3736A218286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
+		3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
+		3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
+		3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
 		373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE5275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE6275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
@@ -255,21 +285,6 @@
 		37484C3126FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
-		3749BF8327ADA135000480FF /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7427ADA135000480FF /* libcrypto.a */; };
-		3749BF8427ADA135000480FF /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7527ADA135000480FF /* libfreetype.a */; };
-		3749BF8527ADA135000480FF /* libmpv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7627ADA135000480FF /* libmpv.a */; };
-		3749BF8627ADA135000480FF /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7727ADA135000480FF /* libavutil.a */; };
-		3749BF8727ADA135000480FF /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7827ADA135000480FF /* libavfilter.a */; };
-		3749BF8827ADA135000480FF /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7927ADA135000480FF /* libavcodec.a */; };
-		3749BF8927ADA135000480FF /* libuchardet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7A27ADA135000480FF /* libuchardet.a */; };
-		3749BF8A27ADA135000480FF /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7B27ADA135000480FF /* libavformat.a */; };
-		3749BF8B27ADA135000480FF /* libfribidi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7C27ADA135000480FF /* libfribidi.a */; };
-		3749BF8C27ADA135000480FF /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7D27ADA135000480FF /* libavdevice.a */; };
-		3749BF8D27ADA135000480FF /* libharfbuzz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7E27ADA135000480FF /* libharfbuzz.a */; };
-		3749BF8E27ADA135000480FF /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF7F27ADA135000480FF /* libswresample.a */; };
-		3749BF8F27ADA135000480FF /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF8027ADA135000480FF /* libssl.a */; };
-		3749BF9027ADA135000480FF /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF8127ADA135000480FF /* libswscale.a */; };
-		3749BF9127ADA135000480FF /* libass.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3749BF8227ADA135000480FF /* libass.a */; };
 		374C053527242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
 		374C053627242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
 		374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
@@ -365,16 +380,6 @@
 		376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
-		3772002727E8EDF000CB2475 /* libmpv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001327E8ED1600CB2475 /* libmpv.a */; };
-		3772002827E8EDF000CB2475 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001A27E8ED1700CB2475 /* libswscale.a */; };
-		3772002927E8EDF000CB2475 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001627E8ED1700CB2475 /* libavutil.a */; };
-		3772002A27E8EDF000CB2475 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001727E8ED1700CB2475 /* libswresample.a */; };
-		3772002B27E8EDF000CB2475 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001427E8ED1700CB2475 /* libavcodec.a */; };
-		3772002C27E8EDF000CB2475 /* libpostproc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001927E8ED1700CB2475 /* libpostproc.a */; };
-		3772002D27E8EDF000CB2475 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001127E8ED1500CB2475 /* libavformat.a */; };
-		3772002E27E8EDF000CB2475 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001527E8ED1700CB2475 /* libavdevice.a */; };
-		3772002F27E8EDF000CB2475 /* libavresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001227E8ED1500CB2475 /* libavresample.a */; };
-		3772003027E8EDF000CB2475 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772001827E8ED1700CB2475 /* libavfilter.a */; };
 		3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003227E8EEA100CB2475 /* AudioToolbox.framework */; };
 		3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003427E8EEA100CB2475 /* AVFoundation.framework */; };
 		3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003527E8EEA100CB2475 /* CoreMedia.framework */; };
@@ -904,6 +909,21 @@
 		3730D89F2712E2B70020ED53 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
 		37319F0427103F94004ECCD0 /* PlayerQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueue.swift; sourceTree = "<group>"; };
+		3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavdevice.xcframework; sourceTree = "<group>"; };
+		3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libuchardet.xcframework; sourceTree = "<group>"; };
+		3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libfribidi.xcframework; sourceTree = "<group>"; };
+		3736A1F2286BB72300C9E5EE /* libavformat.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavformat.xcframework; sourceTree = "<group>"; };
+		3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libfreetype.xcframework; sourceTree = "<group>"; };
+		3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libcrypto.xcframework; sourceTree = "<group>"; };
+		3736A1F5286BB72300C9E5EE /* libssl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libssl.xcframework; sourceTree = "<group>"; };
+		3736A1F6286BB72300C9E5EE /* libavutil.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavutil.xcframework; sourceTree = "<group>"; };
+		3736A1F7286BB72300C9E5EE /* libass.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libass.xcframework; sourceTree = "<group>"; };
+		3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavcodec.xcframework; sourceTree = "<group>"; };
+		3736A1F9286BB72300C9E5EE /* libswresample.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libswresample.xcframework; sourceTree = "<group>"; };
+		3736A1FA286BB72300C9E5EE /* libswscale.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libswscale.xcframework; sourceTree = "<group>"; };
+		3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavfilter.xcframework; sourceTree = "<group>"; };
+		3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libharfbuzz.xcframework; sourceTree = "<group>"; };
+		3736A1FD286BB72300C9E5EE /* libmpv.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libmpv.xcframework; sourceTree = "<group>"; };
 		373C8FE3275B955100CB5936 /* CommentsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsPage.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
 		373CFADA269663F1003CB2C6 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
@@ -925,21 +945,6 @@
 		3749BF6F27ADA135000480FF /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
 		3749BF7027ADA135000480FF /* stream_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_cb.h; sourceTree = "<group>"; };
 		3749BF7127ADA135000480FF /* qthelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = qthelper.hpp; sourceTree = "<group>"; };
-		3749BF7427ADA135000480FF /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		3749BF7527ADA135000480FF /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreetype.a; sourceTree = "<group>"; };
-		3749BF7627ADA135000480FF /* libmpv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmpv.a; sourceTree = "<group>"; };
-		3749BF7727ADA135000480FF /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavutil.a; sourceTree = "<group>"; };
-		3749BF7827ADA135000480FF /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavfilter.a; sourceTree = "<group>"; };
-		3749BF7927ADA135000480FF /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavcodec.a; sourceTree = "<group>"; };
-		3749BF7A27ADA135000480FF /* libuchardet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libuchardet.a; sourceTree = "<group>"; };
-		3749BF7B27ADA135000480FF /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavformat.a; sourceTree = "<group>"; };
-		3749BF7C27ADA135000480FF /* libfribidi.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfribidi.a; sourceTree = "<group>"; };
-		3749BF7D27ADA135000480FF /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavdevice.a; sourceTree = "<group>"; };
-		3749BF7E27ADA135000480FF /* libharfbuzz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libharfbuzz.a; sourceTree = "<group>"; };
-		3749BF7F27ADA135000480FF /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswresample.a; sourceTree = "<group>"; };
-		3749BF8027ADA135000480FF /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
-		3749BF8127ADA135000480FF /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswscale.a; sourceTree = "<group>"; };
-		3749BF8227ADA135000480FF /* libass.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libass.a; sourceTree = "<group>"; };
 		3749BF9227ADA142000480FF /* BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSettings.swift; sourceTree = "<group>"; };
 		374C053A2724614F009BDDBE /* PlayerTVMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTVMenu.swift; sourceTree = "<group>"; };
@@ -976,16 +981,6 @@
 		376BE50627347B57009AD608 /* SettingsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHeader.swift; sourceTree = "<group>"; };
 		376BE50A27349108009AD608 /* BrowsingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingSettings.swift; sourceTree = "<group>"; };
 		376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Instance+Fixtures.swift"; sourceTree = "<group>"; };
-		3772001127E8ED1500CB2475 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavformat.a; sourceTree = "<group>"; };
-		3772001227E8ED1500CB2475 /* libavresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavresample.a; sourceTree = "<group>"; };
-		3772001327E8ED1600CB2475 /* libmpv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmpv.a; sourceTree = "<group>"; };
-		3772001427E8ED1700CB2475 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavcodec.a; sourceTree = "<group>"; };
-		3772001527E8ED1700CB2475 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavdevice.a; sourceTree = "<group>"; };
-		3772001627E8ED1700CB2475 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavutil.a; sourceTree = "<group>"; };
-		3772001727E8ED1700CB2475 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswresample.a; sourceTree = "<group>"; };
-		3772001827E8ED1700CB2475 /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavfilter.a; sourceTree = "<group>"; };
-		3772001927E8ED1700CB2475 /* libpostproc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libpostproc.a; sourceTree = "<group>"; };
-		3772001A27E8ED1700CB2475 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswscale.a; sourceTree = "<group>"; };
 		3772002527E8ED2600CB2475 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		3772003127E8EEA100CB2475 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		3772003227E8EEA100CB2475 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
@@ -1173,39 +1168,39 @@
 			buildActionMask = 2147483647;
 			files = (
 				37C2212B27ADA43700305B41 /* VideoToolbox.framework in Frameworks */,
+				3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
+				3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
+				3736A218286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
+				3736A206286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */,
 				37C2212927ADA41400305B41 /* CoreMedia.framework in Frameworks */,
+				3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */,
+				3736A20A286BB72300C9E5EE /* libssl.xcframework in Frameworks */,
 				37C2212727ADA41000305B41 /* CoreFoundation.framework in Frameworks */,
 				37C2212527ADA40A00305B41 /* AudioToolbox.framework in Frameworks */,
 				37C2212327ADA3F200305B41 /* libiconv.tbd in Frameworks */,
 				37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */,
 				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
 				37FB284B2722099E00A57617 /* SDWebImageSwiftUI in Frameworks */,
-				3749BF8527ADA135000480FF /* libmpv.a in Frameworks */,
-				3749BF8927ADA135000480FF /* libuchardet.a in Frameworks */,
+				3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
+				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
-				3749BF8627ADA135000480FF /* libavutil.a in Frameworks */,
-				3749BF9127ADA135000480FF /* libass.a in Frameworks */,
+				3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
-				3749BF8727ADA135000480FF /* libavfilter.a in Frameworks */,
-				3749BF8827ADA135000480FF /* libavcodec.a in Frameworks */,
-				3749BF8D27ADA135000480FF /* libharfbuzz.a in Frameworks */,
+				3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */,
-				3749BF8C27ADA135000480FF /* libavdevice.a in Frameworks */,
-				3749BF9027ADA135000480FF /* libswscale.a in Frameworks */,
-				3749BF8B27ADA135000480FF /* libfribidi.a in Frameworks */,
+				3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
+				3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
-				3749BF8327ADA135000480FF /* libcrypto.a in Frameworks */,
-				3749BF8F27ADA135000480FF /* libssl.a in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
+				3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37A5DBC4285DFF5400CA4DD1 /* SwiftUIPager in Frameworks */,
-				3749BF8A27ADA135000480FF /* libavformat.a in Frameworks */,
 				377FC7DB267A080300A6BBAF /* Logging in Frameworks */,
+				3736A208286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
-				3749BF8E27ADA135000480FF /* libswresample.a in Frameworks */,
-				3749BF8427ADA135000480FF /* libfreetype.a in Frameworks */,
+				3736A20E286BB72300C9E5EE /* libass.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1277,33 +1272,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3772003027E8EDF000CB2475 /* libavfilter.a in Frameworks */,
 				3772003C27E8EED000CB2475 /* libz.tbd in Frameworks */,
-				3772002A27E8EDF000CB2475 /* libswresample.a in Frameworks */,
-				3772002F27E8EDF000CB2475 /* libavresample.a in Frameworks */,
+				3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
+				3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
+				3736A20B286BB72300C9E5EE /* libssl.xcframework in Frameworks */,
+				3736A215286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
 				37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */,
+				3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
+				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
-				3772002D27E8EDF000CB2475 /* libavformat.a in Frameworks */,
-				3772002827E8EDF000CB2475 /* libswscale.a in Frameworks */,
+				3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */,
+				3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
+				3736A203286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
+				3736A207286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */,
 				3772003D27E8EEDB00CB2475 /* libiconv.tbd in Frameworks */,
 				3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */,
+				3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
 				37FB28462722054C00A57617 /* SDWebImageSwiftUI in Frameworks */,
-				3772002B27E8EDF000CB2475 /* libavcodec.a in Frameworks */,
+				3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
+				3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917E27237D2A009F956E /* PINCache in Frameworks */,
 				3772003E27E8EEEB00CB2475 /* VideoToolbox.framework in Frameworks */,
+				3736A201286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */,
 				37CF8B8828535E6300B71E37 /* SDWebImage in Frameworks */,
 				3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */,
-				3772002C27E8EDF000CB2475 /* libpostproc.a in Frameworks */,
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
-				3772002927E8EDF000CB2475 /* libavutil.a in Frameworks */,
 				3772003B27E8EEC800CB2475 /* libbz2.tbd in Frameworks */,
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
-				3772002727E8EDF000CB2475 /* libmpv.a in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
+				3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
 				37B767E02678C5BF0098BAA8 /* Logging in Frameworks */,
-				3772002E27E8EDF000CB2475 /* libavdevice.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1491,6 +1491,28 @@
 			path = Backports;
 			sourceTree = "<group>";
 		};
+		3736A1EE286BB72300C9E5EE /* framework */ = {
+			isa = PBXGroup;
+			children = (
+				3736A1F7286BB72300C9E5EE /* libass.xcframework */,
+				3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */,
+				3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */,
+				3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */,
+				3736A1F2286BB72300C9E5EE /* libavformat.xcframework */,
+				3736A1F6286BB72300C9E5EE /* libavutil.xcframework */,
+				3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */,
+				3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */,
+				3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */,
+				3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */,
+				3736A1FD286BB72300C9E5EE /* libmpv.xcframework */,
+				3736A1F5286BB72300C9E5EE /* libssl.xcframework */,
+				3736A1F9286BB72300C9E5EE /* libswresample.xcframework */,
+				3736A1FA286BB72300C9E5EE /* libswscale.xcframework */,
+				3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */,
+			);
+			path = framework;
+			sourceTree = "<group>";
+		};
 		3743B864272169E200261544 /* Applications */ = {
 			isa = PBXGroup;
 			children = (
@@ -1571,20 +1593,11 @@
 		3749BF6C27ADA135000480FF /* mpv */ = {
 			isa = PBXGroup;
 			children = (
+				3736A1EE286BB72300C9E5EE /* framework */,
 				3749BF6E27ADA135000480FF /* include */,
-				3749BF6D27ADA135000480FF /* iOS */,
 				370F4FAC27CC169D001B35DC /* macOS */,
-				3772001027E8ED0300CB2475 /* tvOS */,
 			);
 			path = mpv;
-			sourceTree = "<group>";
-		};
-		3749BF6D27ADA135000480FF /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				3749BF7327ADA135000480FF /* lib */,
-			);
-			path = iOS;
 			sourceTree = "<group>";
 		};
 		3749BF6E27ADA135000480FF /* include */ = {
@@ -1597,28 +1610,6 @@
 				3749BF7027ADA135000480FF /* stream_cb.h */,
 			);
 			path = include;
-			sourceTree = "<group>";
-		};
-		3749BF7327ADA135000480FF /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				3749BF7427ADA135000480FF /* libcrypto.a */,
-				3749BF7527ADA135000480FF /* libfreetype.a */,
-				3749BF7627ADA135000480FF /* libmpv.a */,
-				3749BF7727ADA135000480FF /* libavutil.a */,
-				3749BF7827ADA135000480FF /* libavfilter.a */,
-				3749BF7927ADA135000480FF /* libavcodec.a */,
-				3749BF7A27ADA135000480FF /* libuchardet.a */,
-				3749BF7B27ADA135000480FF /* libavformat.a */,
-				3749BF7C27ADA135000480FF /* libfribidi.a */,
-				3749BF7D27ADA135000480FF /* libavdevice.a */,
-				3749BF7E27ADA135000480FF /* libharfbuzz.a */,
-				3749BF7F27ADA135000480FF /* libswresample.a */,
-				3749BF8027ADA135000480FF /* libssl.a */,
-				3749BF8127ADA135000480FF /* libswscale.a */,
-				3749BF8227ADA135000480FF /* libass.a */,
-			);
-			path = lib;
 			sourceTree = "<group>";
 		};
 		374C0539272436DA009BDDBE /* SponsorBlock */ = {
@@ -1663,23 +1654,6 @@
 				37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */,
 			);
 			path = Modifiers;
-			sourceTree = "<group>";
-		};
-		3772001027E8ED0300CB2475 /* tvOS */ = {
-			isa = PBXGroup;
-			children = (
-				3772001427E8ED1700CB2475 /* libavcodec.a */,
-				3772001527E8ED1700CB2475 /* libavdevice.a */,
-				3772001827E8ED1700CB2475 /* libavfilter.a */,
-				3772001127E8ED1500CB2475 /* libavformat.a */,
-				3772001227E8ED1500CB2475 /* libavresample.a */,
-				3772001627E8ED1700CB2475 /* libavutil.a */,
-				3772001327E8ED1600CB2475 /* libmpv.a */,
-				3772001927E8ED1700CB2475 /* libpostproc.a */,
-				3772001727E8ED1700CB2475 /* libswresample.a */,
-				3772001A27E8ED1700CB2475 /* libswscale.a */,
-			);
-			path = tvOS;
 			sourceTree = "<group>";
 		};
 		377FC7D1267A080300A6BBAF /* Frameworks */ = {
@@ -3562,10 +3536,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.4;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
@@ -3604,10 +3575,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv/iOS/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.4;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
@@ -3830,13 +3798,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv",
-					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
+				OTHER_LDFLAGS = (
+					"-Wl,-no_compact_unwind",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
@@ -3869,13 +3836,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv",
-					"$(PROJECT_DIR)/Vendor/mpv/tvOS",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.4;
-				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
+				OTHER_LDFLAGS = (
+					"-Wl,-no_compact_unwind",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				SDKROOT = appletvos;
