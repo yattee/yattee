@@ -47,6 +47,10 @@ extension PlayerModel {
                 }
             }
             .onCompletion(onCompletion)
+            .onFailure { [weak self] responseError in
+                self?.navigation.presentAlert(title: "Could not load streams", message: responseError.userMessage)
+                self?.videoBeingOpened = nil
+            }
     }
 
     func streamsWithInstance(instance: Instance, streams: [Stream]) -> [Stream] {

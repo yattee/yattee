@@ -196,6 +196,7 @@ struct YatteeApp: App {
         player.accounts = accounts
         player.comments = comments
         player.controls = playerControls
+        player.navigation = navigation
         player.networkState = networkState
         player.playerTime = playerTime
 

@@ -58,14 +58,22 @@ protocol VideosAPI {
 
     func channelPlaylist(_ id: String) -> Resource?
 
-    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
+    func loadDetails(
+        _ item: PlayerQueueItem,
+        failureHandler: ((RequestError) -> Void)?,
+        completionHandler: @escaping (PlayerQueueItem) -> Void
+    )
     func shareURL(_ item: ContentItem, frontendHost: String?, time: CMTime?) -> URL?
 
     func comments(_ id: Video.ID, page: String?) -> Resource?
 }
 
 extension VideosAPI {
-    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void = { _ in }) {
+    func loadDetails(
+        _ item: PlayerQueueItem,
+        failureHandler: ((RequestError) -> Void)? = nil,
+        completionHandler: @escaping (PlayerQueueItem) -> Void = { _ in }
+    ) {
         guard (item.video?.streams ?? []).isEmpty else {
             completionHandler(item)
             return
@@ -80,7 +88,7 @@ extension VideosAPI {
             newItem.video = video
 
             completionHandler(newItem)
-        }
+        }.onFailure { failureHandler?($0) }
     }
 
     func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {
