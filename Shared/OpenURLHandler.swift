@@ -180,6 +180,10 @@ struct OpenURLHandler {
             return accounts.api.channel(id)
         }
 
+        if let resource = resourceForUsernameUrl(parser) {
+            return resource
+        }
+
         guard let name = parser.channelName else {
             return nil
         }
@@ -190,6 +194,20 @@ struct OpenURLHandler {
 
         if let instance = InstancesModel.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
             return instance.anonymous.channelByName(name)
+        }
+
+        return nil
+    }
+
+    private func resourceForUsernameUrl(_ parser: URLParser) -> Resource? {
+        guard let username = parser.username else { return nil }
+
+        if accounts.app.supportsOpeningChannelsByName {
+            return accounts.api.channelByUsername(username)
+        }
+
+        if let instance = InstancesModel.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
+            return instance.anonymous.channelByUsername(username)
         }
 
         return nil
