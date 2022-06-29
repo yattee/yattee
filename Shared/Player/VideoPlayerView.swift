@@ -226,7 +226,7 @@ struct VideoPlayerView: View {
                         #else
                                 .onAppear(perform: {
                                     NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                        if hoveringPlayer {
+                                        if !player.currentItem.isNil, hoveringPlayer {
                                             playerControls.resetTimer()
                                         }
 
