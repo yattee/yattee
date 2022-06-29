@@ -46,6 +46,15 @@
       }
     },
     {
+      "identity" : "repeat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/malcommac/Repeat.git",
+      "state" : {
+        "revision" : "9df757d0936c15dfd9d01067766fab87e927f838",
+        "version" : "0.6.0"
+      }
+    },
+    {
       "identity" : "sdwebimage",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
