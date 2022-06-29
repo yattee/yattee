@@ -507,7 +507,9 @@ final class PlayerModel: ObservableObject {
             Windows.player.window?.title = windowTitle
         #endif
 
-        Defaults[.lastPlayed] = currentItem
+        DispatchQueue.main.async(qos: .background) { [weak self] in
+            Defaults[.lastPlayed] = self?.currentItem
+        }
     }
 
     #if os(macOS)
