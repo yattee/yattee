@@ -1,3 +1,4 @@
+import Combine
 import CoreMedia
 import Foundation
 import SwiftUI
@@ -8,6 +9,10 @@ final class PlayerControlsModel: ObservableObject {
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
     @Published var presentingControlsOverlay = false { didSet { handleOverlayPresentationChange() } }
     @Published var timer: Timer?
+
+    #if os(tvOS)
+        var reporter = PassthroughSubject<String, Never>()
+    #endif
 
     var player: PlayerModel!
 
