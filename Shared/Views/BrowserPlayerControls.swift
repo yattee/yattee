@@ -38,7 +38,7 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
             content
                 .frame(maxHeight: .infinity)
 
-            #if !os(tvOS)
+            #if os(iOS)
                 VStack(spacing: 0) {
                     toolbar
                         .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
