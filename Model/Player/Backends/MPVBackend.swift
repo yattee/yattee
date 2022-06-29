@@ -3,6 +3,7 @@ import CoreMedia
 import Defaults
 import Foundation
 import Logging
+import Repeat
 import SwiftUI
 
 final class MPVBackend: PlayerBackend {
@@ -41,7 +42,7 @@ final class MPVBackend: PlayerBackend {
     }}
 
     var isPlaying = true { didSet {
-        networkStateTimer.resume()
+        networkStateTimer.start()
 
         if isPlaying {
             startClientUpdates()
@@ -73,8 +74,8 @@ final class MPVBackend: PlayerBackend {
     #endif
     var client: MPVClient! { didSet { client.backend = self } }
 
-    private var clientTimer: RepeatingTimer!
-    private var networkStateTimer: RepeatingTimer!
+    private var clientTimer: Repeater!
+    private var networkStateTimer: Repeater!
 
     private var handleEOF = false
     private var onFileLoaded: (() -> Void)?
@@ -117,11 +118,13 @@ final class MPVBackend: PlayerBackend {
         self.playerTime = playerTime
         self.networkState = networkState
 
-        clientTimer = .init(timeInterval: Self.controlsUpdateInterval)
-        clientTimer.eventHandler = getClientUpdates
+        clientTimer = .init(interval: .seconds(Self.controlsUpdateInterval), mode: .infinite) { [weak self] _ in
+            self?.getClientUpdates()
+        }
 
-        networkStateTimer = .init(timeInterval: Self.networkStateUpdateInterval)
-        networkStateTimer.eventHandler = updateNetworkState
+        networkStateTimer = .init(interval: .seconds(Self.networkStateUpdateInterval), mode: .infinite) { [weak self] _ in
+            self?.updateNetworkState()
+        }
     }
 
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
@@ -339,7 +342,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func startClientUpdates() {
-        clientTimer.resume()
+        clientTimer.start()
     }
 
     private var handleSegmentsThrottle = Throttle(interval: 1)
@@ -366,7 +369,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     private func stopClientUpdates() {
-        clientTimer.suspend()
+        clientTimer.pause()
     }
 
     private func updateControlsIsPlaying() {
@@ -404,13 +407,13 @@ final class MPVBackend: PlayerBackend {
 
         case MPV_EVENT_PAUSE:
             isPlaying = false
-            networkStateTimer.resume()
+            networkStateTimer.start()
 
         case MPV_EVENT_UNPAUSE:
             isPlaying = true
             isLoadingVideo = false
             isSeeking = false
-            networkStateTimer.resume()
+            networkStateTimer.start()
 
         case MPV_EVENT_SEEK:
             isSeeking = true
@@ -482,15 +485,15 @@ final class MPVBackend: PlayerBackend {
         }
 
         if !networkState.needsUpdates {
-            networkStateTimer.suspend()
+            networkStateTimer.pause()
         }
     }
 
     func setNeedsNetworkStateUpdates(_ needsUpdates: Bool) {
         if needsUpdates {
-            networkStateTimer.resume()
+            networkStateTimer.start()
         } else {
-            networkStateTimer.suspend()
+            networkStateTimer.pause()
         }
     }
 }
