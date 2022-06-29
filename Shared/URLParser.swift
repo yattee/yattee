@@ -4,13 +4,28 @@ import Foundation
 struct URLParser {
     static let prefixes: [Destination: [String]] = [
         .playlist: ["/playlist", "playlist"],
-        .channel: ["/c", "c", "/channel", "channel"],
+        .channel: ["/c", "c", "/channel", "channel", "/user", "user"],
         .search: ["/results", "search"]
     ]
 
     enum Destination {
         case video, playlist, channel, search
         case favorites, subscriptions, popular, trending
+    }
+
+    var url: URL
+
+    init(url: URL) {
+        self.url = url
+        let urlString = url.absoluteString
+        let scheme = urlComponents?.scheme
+        if scheme == nil,
+           urlString.contains("youtube.com"),
+           let url = URL(string: "https://\(urlString)"
+           )
+        {
+            self.url = url
+        }
     }
 
     var destination: Destination? {
@@ -33,8 +48,6 @@ struct URLParser {
 
         return .video
     }
-
-    var url: URL
 
     var videoID: String? {
         if host == "youtu.be", !path.isEmpty {
@@ -83,6 +96,12 @@ struct URLParser {
         guard hasAnyOfPrefixes(path, ["channel/", "/channel/"]) else { return nil }
 
         return removePrefixes(path, Self.prefixes[.channel]!.map { [$0, "/"].joined() })
+    }
+
+    var username: String? {
+        guard hasAnyOfPrefixes(path, ["user/", "/user/"]) else { return nil }
+
+        return removePrefixes(path, ["user/", "/user/"])
     }
 
     private var host: String {

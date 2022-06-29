@@ -8,6 +8,7 @@ protocol VideosAPI {
 
     func channel(_ id: String) -> Resource
     func channelByName(_ name: String) -> Resource?
+    func channelByUsername(_ username: String) -> Resource?
     func channelVideos(_ id: String) -> Resource
     func trending(country: Country, category: TrendingCategory?) -> Resource
     func search(_ query: SearchQuery, page: String?) -> Resource
