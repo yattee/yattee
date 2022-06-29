@@ -69,7 +69,7 @@ struct ShareButton: View {
     }
 
     private var contentItemIsPlayerCurrentVideo: Bool {
-        contentItem.contentType == .video && contentItem.video.videoID == player.currentVideo?.id
+        contentItem.contentType == .video && contentItem.video?.videoID == player.currentVideo?.videoID
     }
 
     private func shareAction(_ url: URL) {
