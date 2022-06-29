@@ -98,6 +98,8 @@ final class PlayerModel: ObservableObject {
             backend.networkState.player = self
         }
     }}
+    var navigation: NavigationModel
+
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
@@ -134,12 +136,14 @@ final class PlayerModel: ObservableObject {
         accounts: AccountsModel = AccountsModel(),
         comments: CommentsModel = CommentsModel(),
         controls: PlayerControlsModel = PlayerControlsModel(),
+        navigation: NavigationModel = NavigationModel(),
         playerTime: PlayerTimeModel = PlayerTimeModel(),
         networkState: NetworkStateModel = NetworkStateModel()
     ) {
         self.accounts = accounts
         self.comments = comments
         self.controls = controls
+        self.navigation = navigation
         self.playerTime = playerTime
         self.networkState = networkState
 

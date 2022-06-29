@@ -93,7 +93,7 @@ extension PlayerModel {
 
         currentItem = newItem
 
-        accounts.api.loadDetails(newItem) { newItem in
+        accounts.api.loadDetails(newItem, failureHandler: videoLoadFailureHandler) { newItem in
             self.playItem(newItem, at: time)
         }
     }
@@ -136,7 +136,7 @@ extension PlayerModel {
         }
 
         if loadDetails {
-            accounts.api.loadDetails(item) { [weak self] newItem in
+            accounts.api.loadDetails(item, failureHandler: videoLoadFailureHandler) { [weak self] newItem in
                 guard let self = self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
@@ -197,10 +197,16 @@ extension PlayerModel {
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
         guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
 
-        accounts.api.loadDetails(item) { newItem in
+        accounts.api.loadDetails(item, completionHandler: { newItem in
             if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
                 self.queue[index] = newItem
             }
-        }
+        })
+    }
+
+    private func videoLoadFailureHandler(_ error: RequestError) {
+        navigation.presentAlert(title: "Could not load video", message: error.userMessage)
+        videoBeingOpened = nil
+        currentItem = nil
     }
 }
