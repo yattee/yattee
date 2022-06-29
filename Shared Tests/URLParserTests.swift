@@ -16,6 +16,11 @@ final class URLParserTests: XCTestCase {
         "c/ABCDE": "ABCDE"
     ]
 
+    private static let users: [String: String] = [
+        "https://m.youtube.com/user/ARD": "ARD",
+        "m.youtube.com/user/ARD": "ARD"
+    ]
+
     private static let channelsByID: [String: String] = [
         "https://piped.kavin.rocks/channel/UCbcxFkd6B9xUU54InHv4Tig": "UCbcxFkd6B9xUU54InHv4Tig",
         "youtube.com/channel/UCbcxFkd6B9xUU54InHv4Tig": "UCbcxFkd6B9xUU54InHv4Tig",
@@ -65,6 +70,16 @@ final class URLParserTests: XCTestCase {
             XCTAssertEqual(parser.destination, .channel)
             XCTAssertEqual(parser.channelID, id)
             XCTAssertNil(parser.channelName)
+        }
+    }
+
+    func testUsersParsing() throws {
+        Self.users.forEach { url, user in
+            let parser = URLParser(url: URL(string: url)!)
+            XCTAssertEqual(parser.destination, .channel)
+            XCTAssertNil(parser.channelID)
+            XCTAssertNil(parser.channelName)
+            XCTAssertEqual(parser.username, user)
         }
     }
 
