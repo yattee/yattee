@@ -370,12 +370,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     func extractChannelPlaylist(from json: JSON) -> ChannelPlaylist? {
         let details = json.dictionaryValue
+        let id = details["url"]?.stringValue.components(separatedBy: "?list=").last
         let thumbnailURL = details["thumbnail"]?.url ?? details["thumbnailUrl"]?.url
         var videos = [Video]()
         if let relatedStreams = details["relatedStreams"] {
             videos = extractVideos(from: relatedStreams)
         }
         return ChannelPlaylist(
+            id: id ?? UUID().uuidString,
             title: details["name"]?.string ?? "",
             thumbnailURL: thumbnailURL,
             channel: extractChannel(from: json),
