@@ -23,6 +23,7 @@
         "matches": [
             "*://*.youtube-nocookie.com/*",
             "*://*.youtube.com/*",
+            "*://m.youtube.com/*",
             "*://*.youtu.be/*"
         ]
     }],
