@@ -70,7 +70,7 @@ struct PlayerControls: View {
                                         .zIndex(1)
                                 }
                                 #if os(tvOS)
-                                .offset(y: -100)
+                                .offset(y: -50)
                                 #endif
                                 .frame(maxWidth: 500)
                                 .padding(.bottom, 2)

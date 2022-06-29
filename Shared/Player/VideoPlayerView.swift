@@ -138,29 +138,39 @@ struct VideoPlayerView: View {
         Group {
             ZStack(alignment: .bottomLeading) {
                 #if os(tvOS)
-                    playerView
-                        .ignoresSafeArea(.all, edges: .all)
-                        .onMoveCommand { direction in
-                            if direction == .up || direction == .down {
-                                playerControls.show()
-                            }
+                    ZStack {
+                        playerView
 
-                            playerControls.resetTimer()
-
-                            guard !playerControls.presentingControls else {
-                                return
-                            }
-
-                            if direction == .left {
-                                player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-                            }
-                            if direction == .right {
-                                player.backend.seek(relative: .secondsInDefaultTimescale(10))
-                            }
+                        tvControls
+                    }
+                    .ignoresSafeArea(.all, edges: .all)
+                    .onMoveCommand { direction in
+                        if direction == .up || direction == .down {
+                            playerControls.show()
                         }
-                        .onPlayPauseCommand {
-                            player.togglePlay()
+
+                        playerControls.resetTimer()
+
+                        guard !playerControls.presentingControls else { return }
+
+                        if direction == .left {
+                            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
                         }
+                        if direction == .right {
+                            player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                        }
+                    }
+                    .onPlayPauseCommand {
+                        player.togglePlay()
+                    }
+
+                    .onExitCommand {
+                        if playerControls.presentingControls {
+                            playerControls.hide()
+                        } else {
+                            player.hide()
+                        }
+                    }
                 #else
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
@@ -308,9 +318,8 @@ struct VideoPlayerView: View {
 
             #if !os(tvOS)
                 PlayerGestures()
+                PlayerControls(player: player, thumbnails: thumbnails)
             #endif
-
-            PlayerControls(player: player, thumbnails: thumbnails)
         }
     }
 
@@ -500,6 +509,16 @@ struct VideoPlayerView: View {
                     player.exitFullScreen()
                 }
             }
+        }
+    #endif
+
+    #if os(tvOS)
+        var tvControls: some View {
+            TVControls(model: playerControls, player: player, thumbnails: thumbnails)
+                .onReceive(playerControls.reporter) { _ in
+                    playerControls.show()
+                    playerControls.resetTimer()
+                }
         }
     #endif
 }

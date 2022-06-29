@@ -372,7 +372,14 @@ final class PlayerModel: ObservableObject {
         #endif
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-            self?.backend.setNeedsDrawing(self?.presentingPlayer ?? false)
+            guard let self = self else { return }
+            self.backend.setNeedsDrawing(self.presentingPlayer)
+
+            #if os(tvOS)
+                if self.presentingPlayer {
+                    self.controls.show()
+                }
+            #endif
         }
 
         controls.hide()
