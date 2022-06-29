@@ -163,13 +163,15 @@ extension PlayerModel {
     }
 
     func playHistory(_ item: PlayerQueueItem, at time: CMTime? = nil) {
+        guard let video = item.video else { return }
+
         var time = time ?? item.playbackTime
 
         if item.shouldRestartPlaying {
             time = .zero
         }
 
-        let newItem = enqueueVideo(item.video, atTime: time, prepending: true)
+        let newItem = enqueueVideo(video, atTime: time, prepending: true)
 
         advanceToItem(newItem!)
     }
