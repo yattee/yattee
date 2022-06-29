@@ -104,7 +104,7 @@ final class MPVClient: ObservableObject {
                 if event!.pointee.event_id == MPV_EVENT_NONE {
                     break
                 }
-                backend.handle(event)
+                backend?.handle(event)
             }
         }
     }
