@@ -17,7 +17,8 @@ struct ChannelCell: View {
                 channel,
                 player: player,
                 recents: recents,
-                navigation: navigation
+                navigation: navigation,
+                navigationStyle: navigationStyle
             )
         } label: {
             content

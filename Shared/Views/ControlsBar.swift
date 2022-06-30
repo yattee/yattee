@@ -3,6 +3,13 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct ControlsBar: View {
+    @Binding var fullScreen: Bool
+
+    @State private var presentingShareSheet = false
+    @State private var shareURL: URL?
+
+    @Environment(\.navigationStyle) private var navigationStyle
+
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerControlsModel> private var playerControls
@@ -11,17 +18,12 @@ struct ControlsBar: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
-    @State private var presentingShareSheet = false
-    @State private var shareURL: URL?
-
     var presentingControls = true
     var backgroundEnabled = true
     var borderTop = true
     var borderBottom = true
     var detailsTogglePlayer = true
     var detailsToggleFullScreen = false
-
-    @Binding var fullScreen: Bool
 
     var body: some View {
         HStack(spacing: 0) {
@@ -170,7 +172,8 @@ struct ControlsBar: View {
                                             video.channel,
                                             player: model,
                                             recents: recents,
-                                            navigation: navigation
+                                            navigation: navigation,
+                                            navigationStyle: navigationStyle
                                         )
                                     } label: {
                                         Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")

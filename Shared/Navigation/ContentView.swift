@@ -87,7 +87,8 @@ struct ContentView: View {
                     navigation: navigation,
                     recents: recents,
                     player: player,
-                    search: search
+                    search: search,
+                    navigationStyle: navigationStyle
                 ).handle($0)
             }
             .background(
@@ -113,6 +114,16 @@ struct ContentView: View {
             )
         #endif
             .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
+    }
+
+    var navigationStyle: NavigationStyle {
+        #if os(iOS)
+            return horizontalSizeClass == .compact ? .tab : .sidebar
+        #elseif os(tvOS)
+            return .tab
+        #else
+            return .sidebar
+        #endif
     }
 
     func openWelcomeScreenIfAccountEmpty() {
