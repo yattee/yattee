@@ -3,7 +3,7 @@
     "default_locale": "en",
 
     "name": "Open in Yattee",
-    "description": "Open YouTube videos in Yattee app",
+    "description": "Open videos in Yattee app",
     "version": "1.0",
 
     "icons": {
