@@ -38,13 +38,16 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
             content
                 .frame(maxHeight: .infinity)
 
-            #if os(iOS)
+            #if !os(tvOS)
                 VStack(spacing: 0) {
-                    toolbar
-                        .frame(height: 35)
-                        .frame(maxWidth: .infinity)
-                        .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
-                        .modifier(ControlBackgroundModifier())
+                    #if os(iOS)
+                        toolbar
+                            .frame(height: 35)
+                            .frame(maxWidth: .infinity)
+                            .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
+                            .modifier(ControlBackgroundModifier())
+                    #endif
+
                     ControlsBar(fullScreen: .constant(false))
                         .edgesIgnoringSafeArea(.bottom)
                 }
