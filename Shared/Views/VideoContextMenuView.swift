@@ -22,6 +22,7 @@ struct VideoContextMenuView: View {
 
     @Default(.saveHistory) private var saveHistory
 
+    private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
     private var viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
     init(video: Video) {
@@ -44,6 +45,10 @@ struct VideoContextMenuView: View {
 
                 if !watch.isNil, !watch!.finished, !watchingNow {
                     continueButton
+                }
+
+                if !(watch?.finished ?? false) {
+                    markAsWatchedButton
                 }
 
                 if !watch.isNil, !watchingNow {
@@ -113,6 +118,9 @@ struct VideoContextMenuView: View {
         }
 
         if let watch = watch, let watchedAtString = watch.watchedAtString {
+            if watchedAtString == "in 0 seconds" {
+                return "Just watched"
+            }
             return "Watched \(watchedAtString)"
         }
 
@@ -124,6 +132,14 @@ struct VideoContextMenuView: View {
             player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt))
         } label: {
             Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime(allowZero: true) ?? "where I left off")", systemImage: "playpause")
+        }
+    }
+
+    var markAsWatchedButton: some View {
+        Button {
+            Watch.markAsWatched(videoID: video.videoID, duration: video.length, context: backgroundContext)
+        } label: {
+            Label("Mark as watched", systemImage: "checkmark.circle.fill")
         }
     }
 
