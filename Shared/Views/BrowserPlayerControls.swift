@@ -41,6 +41,8 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
             #if os(iOS)
                 VStack(spacing: 0) {
                     toolbar
+                        .frame(height: 35)
+                        .frame(maxWidth: .infinity)
                         .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
                         .modifier(ControlBackgroundModifier())
                     ControlsBar(fullScreen: .constant(false))
@@ -53,11 +55,13 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
 
 struct PlayerControlsView_Previews: PreviewProvider {
     static var previews: some View {
-        BrowserPlayerControls(context: .player) {
+        BrowserPlayerControls(context: .player, toolbar: {
+            Button("Button") {}
+        }) {
             BrowserPlayerControls {
                 VStack {
                     Spacer()
-                    Text("Hello")
+                    TextField("A", text: .constant("abc"))
                     Spacer()
                 }
             }
