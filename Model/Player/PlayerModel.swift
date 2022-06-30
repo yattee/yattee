@@ -522,7 +522,7 @@ final class PlayerModel: ObservableObject {
         }
     #else
         func handleEnterForeground() {
-            setNeedsDrawing(true)
+            setNeedsDrawing(presentingPlayer)
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
@@ -534,7 +534,8 @@ final class PlayerModel: ObservableObject {
 
         func handleEnterBackground() {
             setNeedsDrawing(false)
-            if !playingInPictureInPicture, !musicMode {
+
+            if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
                 pause()
             }
         }

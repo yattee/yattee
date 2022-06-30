@@ -64,6 +64,9 @@ extension Defaults.Keys {
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
     static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: defaultForPauseOnHidingPlayer)
+    #if !os(macOS)
+        static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
+    #endif
     static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)

@@ -20,6 +20,7 @@ struct PlayerSettings: View {
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
     #if !os(macOS)
+        @Default(.pauseOnEnteringBackground) private var pauseOnEnteringBackground
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
     #endif
 
@@ -59,6 +60,9 @@ struct PlayerSettings: View {
                 sourcePicker
                 qualityPicker
                 pauseOnHidingPlayerToggle
+                #if !os(macOS)
+                    pauseOnEnteringBackgroundToogle
+                #endif
                 closeLastItemOnPlaybackEndToggle
             }
 
@@ -189,6 +193,12 @@ struct PlayerSettings: View {
     private var pauseOnHidingPlayerToggle: some View {
         Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
     }
+
+    #if !os(macOS)
+        private var pauseOnEnteringBackgroundToogle: some View {
+            Toggle("Pause when entering background", isOn: $pauseOnEnteringBackground)
+        }
+    #endif
 
     private var closeLastItemOnPlaybackEndToggle: some View {
         Toggle("Close video after playing last in the queue", isOn: $closeLastItemOnPlaybackEnd)
