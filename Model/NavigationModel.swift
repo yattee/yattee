@@ -86,7 +86,8 @@ final class NavigationModel: ObservableObject {
         _ channel: Channel,
         player: PlayerModel,
         recents: RecentsModel,
-        navigation: NavigationModel
+        navigation: NavigationModel,
+        navigationStyle: NavigationStyle
     ) {
         guard channel.id != Video.fixtureChannelID else {
             return
@@ -104,9 +105,13 @@ final class NavigationModel: ObservableObject {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
-            navigation.sidebarSectionChanged.toggle()
-            navigation.tabSelection = .recentlyOpened(recent.tag)
-            navigation.presentingChannel = true
+
+            if navigationStyle == .sidebar {
+                navigation.sidebarSectionChanged.toggle()
+                navigation.tabSelection = .recentlyOpened(recent.tag)
+            } else {
+                navigation.presentingChannel = true
+            }
         }
     }
 
@@ -114,7 +119,8 @@ final class NavigationModel: ObservableObject {
         _ playlist: ChannelPlaylist,
         player: PlayerModel,
         recents: RecentsModel,
-        navigation: NavigationModel
+        navigation: NavigationModel,
+        navigationStyle: NavigationStyle
     ) {
         navigation.presentingChannel = false
         navigation.presentingPlaylist = false
@@ -128,9 +134,13 @@ final class NavigationModel: ObservableObject {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
-            navigation.sidebarSectionChanged.toggle()
-            navigation.tabSelection = .recentlyOpened(recent.tag)
-            navigation.presentingPlaylist = true
+
+            if navigationStyle == .sidebar {
+                navigation.sidebarSectionChanged.toggle()
+                navigation.tabSelection = .recentlyOpened(recent.tag)
+            } else {
+                navigation.presentingPlaylist = true
+            }
         }
     }
 
