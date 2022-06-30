@@ -10,6 +10,7 @@ struct OpenURLHandler {
     var recents: RecentsModel
     var player: PlayerModel
     var search: SearchModel
+    var navigationStyle = NavigationStyle.sidebar
 
     func handle(_ url: URL) {
         if accounts.current.isNil {
@@ -132,7 +133,8 @@ struct OpenURLHandler {
                             playlist,
                             player: player,
                             recents: recents,
-                            navigation: navigation
+                            navigation: navigation,
+                            navigationStyle: navigationStyle
                         )
                     }
                 } else {
@@ -163,7 +165,8 @@ struct OpenURLHandler {
                             channel,
                             player: player,
                             recents: recents,
-                            navigation: navigation
+                            navigation: navigation,
+                            navigationStyle: navigationStyle
                         )
                     }
                 } else {

@@ -55,12 +55,12 @@ struct VideoDetails: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ControlsBar(
+                fullScreen: $fullScreen,
                 presentingControls: false,
                 backgroundEnabled: false,
                 borderTop: false,
                 detailsTogglePlayer: false,
-                detailsToggleFullScreen: true,
-                fullScreen: $fullScreen
+                detailsToggleFullScreen: true
             )
 
             HStack(spacing: 4) {
