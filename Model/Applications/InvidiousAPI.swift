@@ -442,8 +442,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func extractChannelPlaylist(from json: JSON) -> ChannelPlaylist {
         let details = json.dictionaryValue
         return ChannelPlaylist(
-            id: details["playlistId"]!.stringValue,
-            title: details["title"]!.stringValue,
+            id: details["playlistId"]?.string ?? details["mixId"]?.string ?? UUID().uuidString,
+            title: details["title"]?.stringValue ?? "",
             thumbnailURL: details["playlistThumbnail"]?.url,
             channel: extractChannel(from: json),
             videos: details["videos"]?.arrayValue.compactMap(extractVideo) ?? []
