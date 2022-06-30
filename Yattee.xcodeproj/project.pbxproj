@@ -191,6 +191,8 @@
 		372AA410286D067B0000B1DC /* Repeat in Frameworks */ = {isa = PBXBuildFile; productRef = 372AA40F286D067B0000B1DC /* Repeat */; };
 		372AA412286D06950000B1DC /* Repeat in Frameworks */ = {isa = PBXBuildFile; productRef = 372AA411286D06950000B1DC /* Repeat */; };
 		372AA414286D06A10000B1DC /* Repeat in Frameworks */ = {isa = PBXBuildFile; productRef = 372AA413286D06A10000B1DC /* Repeat */; };
+		372B3686286E022A00BB84D7 /* Open in Yattee - iOS.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37A3B1792725735F000FB5EE /* Open in Yattee - iOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		372B368A286E03CD00BB84D7 /* Open in Yattee - macOS.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37A3B15727255E7F000FB5EE /* Open in Yattee - macOS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		372CFD15285F2E2A00B0B54B /* ControlsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372CFD14285F2E2A00B0B54B /* ControlsBar.swift */; };
 		372CFD16285F2E2A00B0B54B /* ControlsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372CFD14285F2E2A00B0B54B /* ControlsBar.swift */; };
 		372D85DE283841B800FF3C7D /* PiPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F428383A89000CFD59 /* PiPDelegate.swift */; };
@@ -778,6 +780,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		372B3687286E022A00BB84D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37A3B1782725735F000FB5EE;
+			remoteInfo = "Open in Yattee (iOS)";
+		};
+		372B368B286E03CD00BB84D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37A3B15627255E7F000FB5EE;
+			remoteInfo = "Open in Yattee (macOS)";
+		};
 		37D4B0D52671614900C925CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
@@ -837,6 +853,28 @@
 				370F4FFD27CC1756001B35DC /* libxcb-shm.0.0.0.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		372B3689286E022A00BB84D7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				372B3686286E022A00BB84D7 /* Open in Yattee - iOS.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		372B368D286E03CD00BB84D7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				372B368A286E03CD00BB84D7 /* Open in Yattee - macOS.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1011,14 +1049,14 @@
 		3797758A2689345500DD52A8 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		379775922689365600DD52A8 /* Array+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Next.swift"; sourceTree = "<group>"; };
 		37992DC726CC50BC003D4C27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee (macOS).appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37A3B15727255E7F000FB5EE /* Open in Yattee - macOS.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee - macOS.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		37A3B15E27255E7F000FB5EE /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
 		37A3B16027255E7F000FB5EE /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
 		37A3B16427255E7F000FB5EE /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
 		37A3B16C27255E7F000FB5EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37A3B16D27255E7F000FB5EE /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
-		37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee (iOS).appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37A3B1792725735F000FB5EE /* Open in Yattee - iOS.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee - iOS.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBackgroundModifier.swift; sourceTree = "<group>"; };
 		37A9965926D6F8CA006E3224 /* HorizontalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCells.swift; sourceTree = "<group>"; };
 		37A9965D26D6F9B9006E3224 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
@@ -1845,8 +1883,8 @@
 				37D4B0DE2671614900C925CA /* Tests (macOS).xctest */,
 				37D4B158267164AE00C925CA /* Yattee.app */,
 				37D4B171267164B000C925CA /* Tests (tvOS).xctest */,
-				37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */,
-				37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */,
+				37A3B15727255E7F000FB5EE /* Open in Yattee - macOS.appex */,
+				37A3B1792725735F000FB5EE /* Open in Yattee - iOS.appex */,
 				3712643B2865FF4500D77974 /* Shared Tests.xctest */,
 			);
 			name = Products;
@@ -2059,9 +2097,9 @@
 			productReference = 3712643B2865FF4500D77974 /* Shared Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */ = {
+		37A3B15627255E7F000FB5EE /* Open in Yattee - macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (macOS)" */;
+			buildConfigurationList = 37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee - macOS" */;
 			buildPhases = (
 				37FF8BFF27F9A7BC0038199F /* Headers */,
 				37A3B15327255E7F000FB5EE /* Sources */,
@@ -2072,14 +2110,14 @@
 			);
 			dependencies = (
 			);
-			name = "Open in Yattee (macOS)";
+			name = "Open in Yattee - macOS";
 			productName = "Open in Yattee";
-			productReference = 37A3B15727255E7F000FB5EE /* Open in Yattee (macOS).appex */;
+			productReference = 37A3B15727255E7F000FB5EE /* Open in Yattee - macOS.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */ = {
+		37A3B1782725735F000FB5EE /* Open in Yattee - iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (iOS)" */;
+			buildConfigurationList = 37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee - iOS" */;
 			buildPhases = (
 				37FF8BFE27F9A7BA0038199F /* Headers */,
 				37A3B1752725735F000FB5EE /* Sources */,
@@ -2090,9 +2128,9 @@
 			);
 			dependencies = (
 			);
-			name = "Open in Yattee (iOS)";
+			name = "Open in Yattee - iOS";
 			productName = "Open in Yattee";
-			productReference = 37A3B1792725735F000FB5EE /* Open in Yattee (iOS).appex */;
+			productReference = 37A3B1792725735F000FB5EE /* Open in Yattee - iOS.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		37D4B0C82671614900C925CA /* Yattee (iOS) */ = {
@@ -2104,10 +2142,12 @@
 				37D4B0C52671614900C925CA /* Sources */,
 				37D4B0C62671614900C925CA /* Frameworks */,
 				37D4B0C72671614900C925CA /* Resources */,
+				372B3689286E022A00BB84D7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				372B3688286E022A00BB84D7 /* PBXTargetDependency */,
 			);
 			name = "Yattee (iOS)";
 			packageProductDependencies = (
@@ -2139,10 +2179,12 @@
 				37D4B0CC2671614900C925CA /* Frameworks */,
 				37D4B0CD2671614900C925CA /* Resources */,
 				370F500927CC1757001B35DC /* Embed Frameworks */,
+				372B368D286E03CD00BB84D7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				372B368C286E03CD00BB84D7 /* PBXTargetDependency */,
 			);
 			name = "Yattee (macOS)";
 			packageProductDependencies = (
@@ -2338,8 +2380,8 @@
 				37D4B0C82671614900C925CA /* Yattee (iOS) */,
 				37D4B0CE2671614900C925CA /* Yattee (macOS) */,
 				37D4B157267164AE00C925CA /* Yattee (tvOS) */,
-				37A3B1782725735F000FB5EE /* Open in Yattee (iOS) */,
-				37A3B15627255E7F000FB5EE /* Open in Yattee (macOS) */,
+				37A3B1782725735F000FB5EE /* Open in Yattee - iOS */,
+				37A3B15627255E7F000FB5EE /* Open in Yattee - macOS */,
 				37A3B19C27258492000FB5EE /* Periphery (iOS) */,
 				37FD43E62704A2240073EE42 /* Periphery (macOS) */,
 				37FD43EB2704A7710073EE42 /* Periphery (tvOS) */,
@@ -3186,6 +3228,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		372B3688286E022A00BB84D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37A3B1782725735F000FB5EE /* Open in Yattee - iOS */;
+			targetProxy = 372B3687286E022A00BB84D7 /* PBXContainerItemProxy */;
+		};
+		372B368C286E03CD00BB84D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37A3B15627255E7F000FB5EE /* Open in Yattee - macOS */;
+			targetProxy = 372B368B286E03CD00BB84D7 /* PBXContainerItemProxy */;
+		};
 		37D4B0D62671614900C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 37D4B0C82671614900C925CA /* Yattee (iOS) */;
@@ -3963,7 +4015,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (macOS)" */ = {
+		37A3B17427255E7F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee - macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37A3B17227255E7F000FB5EE /* Debug */,
@@ -3972,7 +4024,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee (iOS)" */ = {
+		37A3B1902725735F000FB5EE /* Build configuration list for PBXNativeTarget "Open in Yattee - iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				37A3B1912725735F000FB5EE /* Debug */,
