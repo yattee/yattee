@@ -255,23 +255,8 @@ struct VideoDetails: View {
                         }
                     }
                 }
-
-                if !video.isNil, CommentsModel.placement == .info {
-                    Divider()
-                    #if os(macOS)
-                        .padding(.bottom, 20)
-                    #else
-                        .padding(.vertical, 10)
-                    #endif
-                }
             }
             .padding(.horizontal)
-
-            LazyVStack {
-                if !video.isNil, CommentsModel.placement == .info {
-                    CommentsView()
-                }
-            }
         }
     }
 

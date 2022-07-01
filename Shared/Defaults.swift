@@ -53,7 +53,6 @@ extension Defaults.Keys {
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
-    static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: nil)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
