@@ -8,45 +8,50 @@ struct AccountsMenuView: View {
     @Default(.instances) private var instances
     @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
 
-    var body: some View {
-        Menu {
-            ForEach(allAccounts, id: \.id) { account in
-                Button {
-                    model.setCurrent(account)
-                } label: {
-                    HStack {
-                        Text(accountButtonTitle(account: account))
+    @ViewBuilder var body: some View {
+        if !instances.isEmpty {
+            Menu {
+                ForEach(allAccounts, id: \.id) { account in
+                    Button {
+                        model.setCurrent(account)
+                    } label: {
+                        HStack {
+                            Text(accountButtonTitle(account: account))
 
-                        Spacer()
+                            Spacer()
 
-                        if model.current == account {
-                            Image(systemName: "checkmark")
+                            if model.current == account {
+                                Image(systemName: "checkmark")
+                            }
                         }
                     }
                 }
-            }
-        } label: {
-            HStack {
-                Image(systemName: "person.crop.circle")
-                if accountPickerDisplaysUsername {
-                    label
-                        .labelStyle(.titleOnly)
+            } label: {
+                HStack {
+                    if !accountPickerDisplaysUsername || !(model.current?.isPublic ?? true) {
+                        Image(systemName: "globe")
+                    }
+
+                    if accountPickerDisplaysUsername {
+                        label
+                            .labelStyle(.titleOnly)
+                    }
                 }
             }
+            .disabled(allAccounts.isEmpty)
+            .transaction { t in t.animation = .none }
         }
-        .disabled(instances.isEmpty)
-        .transaction { t in t.animation = .none }
     }
 
     private var label: some View {
-        Label(model.current?.description ?? "Select Account", systemImage: "person.crop.circle")
+        Label(model.current?.description ?? "Select Account", systemImage: "globe")
     }
 
     private var allAccounts: [Account] {
-        accounts + instances.map(\.anonymousAccount)
+        accounts + instances.map(\.anonymousAccount) + [model.publicAccount].compactMap { $0 }
     }
 
     private func accountButtonTitle(account: Account) -> String {
-        instances.count > 1 ? "\(account.description) — \(account.instance.description)" : account.description
+        account.isPublic ? account.description : "\(account.description) — \(account.instance.shortDescription)"
     }
 }

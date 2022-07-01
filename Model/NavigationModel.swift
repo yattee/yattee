@@ -221,8 +221,9 @@ final class NavigationModel: ObservableObject {
         #endif
     }
 
-    func presentAlert(title: String, message: String) {
-        alert = Alert(title: Text(title), message: Text(message))
+    func presentAlert(title: String, message: String? = nil) {
+        let message = message.isNil ? nil : Text(message!)
+        alert = Alert(title: Text(title), message: message)
         presentingAlert = true
     }
 

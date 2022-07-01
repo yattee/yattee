@@ -8,6 +8,8 @@ final class AccountsModel: ObservableObject {
     @Published private var invidious = InvidiousAPI()
     @Published private var piped = PipedAPI()
 
+    @Published var publicAccount: Account?
+
     private var cancellables = [AnyCancellable]()
 
     var all: [Account] {
@@ -70,7 +72,7 @@ final class AccountsModel: ObservableObject {
             piped.setAccount(account)
         }
 
-        Defaults[.lastAccountID] = account.anonymous ? nil : account.id
+        Defaults[.lastAccountID] = account.anonymous ? (account.isPublic ? "public" : nil) : account.id
         Defaults[.lastInstanceID] = account.instanceID
     }
 

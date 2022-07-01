@@ -1,65 +1,93 @@
 import Defaults
+import Siesta
 import SwiftUI
 
 struct WelcomeScreen: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @EnvironmentObject<AccountsModel> private var accounts
-
-    @Default(.accounts) private var allAccounts
+    @State private var store = [ManifestedInstance]()
 
     var body: some View {
-        let welcomeScreen = VStack {
+        VStack(alignment: .leading) {
             Spacer()
 
-            Text("Welcome")
+            Text("Welcome to Yattee")
+                .frame(maxWidth: .infinity)
                 .font(.largeTitle)
                 .padding(.bottom, 10)
 
-            if allAccounts.isEmpty {
-                Text("To start, configure your Instances in Settings")
-                    .foregroundColor(.secondary)
-            } else {
-                Text("To start, pick one of your accounts:")
-                    .foregroundColor(.secondary)
-                #if os(tvOS)
-                    AccountSelectionView(showHeader: false)
+            Text("Select location closest to you to get the best performance")
+                .font(.subheadline)
 
+            ScrollView {
+                ForEach(store.map(\.country).sorted(), id: \.self) { country in
                     Button {
+                        Defaults[.countryOfPublicInstances] = country
+                        InstancesManifest.shared.setPublicAccount(country, accounts: accounts)
+
                         presentationMode.wrappedValue.dismiss()
                     } label: {
-                        Text("Start")
-                    }
-                    .opacity(accounts.current.isNil ? 0 : 1)
-                    .disabled(accounts.current.isNil)
-
-                #else
-                    AccountsMenuView()
-                        .onChange(of: accounts.current) { _ in
-                            presentationMode.wrappedValue.dismiss()
+                        HStack(spacing: 10) {
+                            if let flag = flag(country) {
+                                Text(flag)
+                            }
+                            Text(country)
+                            #if !os(tvOS)
+                                .foregroundColor(.white)
+                            #endif
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                    #if os(macOS)
-                        .frame(maxWidth: 280)
+                        #if os(tvOS)
+                        .padding(8)
+                        #else
+                        .padding(4)
+                        .background(RoundedRectangle(cornerRadius: 4).foregroundColor(Color.accentColor))
+                        .padding(.bottom, 2)
+                        #endif
+                    }
+                    .buttonStyle(.plain)
+                    #if os(tvOS)
+                        .padding(.horizontal, 10)
                     #endif
-                #endif
+                }
+                .padding(.horizontal, 30)
             }
 
-            Spacer()
+            Text("This information will not be collected and it will be saved only on your device. You can change it later in settings.")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
-            OpenSettingsButton()
+            #if !os(tvOS)
+                Spacer()
 
-            Spacer()
+                OpenSettingsButton()
+                    .frame(maxWidth: .infinity)
+
+                Spacer()
+            #endif
         }
+        .onAppear {
+            resource.load().onSuccess { response in
+                if let instances: [ManifestedInstance] = response.typedContent() {
+                    store = instances
+                }
+            }
+        }
+        .padding()
         #if os(macOS)
-        .frame(minWidth: 400, minHeight: 400)
+            .frame(minWidth: 400, minHeight: 400)
+        #elseif os(tvOS)
+            .frame(maxWidth: 1000)
         #endif
+    }
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-            welcomeScreen
-                .interactiveDismissDisabled()
-        } else {
-            welcomeScreen
-        }
+    func flag(_ country: String) -> String? {
+        store.first { $0.country == country }?.flag
+    }
+
+    var resource: Resource {
+        InstancesManifest.shared.instancesList
     }
 }
 

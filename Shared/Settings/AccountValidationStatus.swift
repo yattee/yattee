@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 struct AccountValidationStatus: View {
+    @Binding var app: VideosApp?
     @Binding var isValid: Bool
     @Binding var isValidated: Bool
     @Binding var isValidating: Bool
@@ -16,7 +17,7 @@ struct AccountValidationStatus: View {
                 .opacity(isValidating ? 1 : (isValidated ? 1 : 0))
 
             VStack(alignment: .leading) {
-                Text(isValid ? "Connected successfully" : "Connection failed")
+                Text(isValid ? "Connected successfully (\(app?.name ?? "Unknown"))" : "Connection failed")
                 if let error = error, !isValid {
                     Text(error)
                         .font(.caption2)

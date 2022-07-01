@@ -5,10 +5,10 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case instances, browsing, player, history, sponsorBlock, help
+            case browsing, player, history, sponsorBlock, locations, advanced, help
         }
 
-        @State private var selection = Tabs.instances
+        @State private var selection = Tabs.browsing
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -18,24 +18,20 @@ struct SettingsView: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
-
-    @State private var presentingInstanceForm = false
-    @State private var savedFormInstanceID: Instance.ID?
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<SettingsModel> private var model
 
     @Default(.instances) private var instances
 
     var body: some View {
+        settings
+            .environmentObject(model)
+            .alert(isPresented: $model.presentingAlert) { model.alert }
+    }
+
+    var settings: some View {
         #if os(macOS)
             TabView(selection: $selection) {
-                Form {
-                    InstancesSettings()
-                        .environmentObject(accounts)
-                }
-                .tabItem {
-                    Label("Instances", systemImage: "server.rack")
-                }
-                .tag(Tabs.instances)
-
                 Form {
                     BrowsingSettings()
                 }
@@ -69,6 +65,22 @@ struct SettingsView: View {
                 .tag(Tabs.sponsorBlock)
 
                 Form {
+                    LocationsSettings()
+                }
+                .tabItem {
+                    Label("Locations", systemImage: "globe")
+                }
+                .tag(Tabs.locations)
+
+                Group {
+                    AdvancedSettings()
+                }
+                .tabItem {
+                    Label("Advanced", systemImage: "wrench.and.screwdriver")
+                }
+                .tag(Tabs.advanced)
+
+                Form {
                     Help()
                 }
                 .tabItem {
@@ -88,9 +100,7 @@ struct SettingsView: View {
                     }
                 #endif
             }
-            .sheet(isPresented: $presentingInstanceForm) {
-                InstanceForm(savedInstanceID: $savedFormInstanceID)
-            }
+
         #endif
     }
 
@@ -99,16 +109,6 @@ struct SettingsView: View {
             List {
                 #if os(tvOS)
                     AccountSelectionView()
-                #endif
-
-                Section(header: Text("Instances")) {
-                    ForEach(instances) { instance in
-                        AccountsNavigationLink(instance: instance)
-                    }
-                    addInstanceButton
-                }
-
-                #if os(tvOS)
                     Divider()
                 #endif
 
@@ -144,6 +144,18 @@ struct SettingsView: View {
                     } label: {
                         Label("SponsorBlock", systemImage: "dollarsign.circle")
                     }
+
+                    NavigationLink {
+                        LocationsSettings()
+                    } label: {
+                        Label("Locations", systemImage: "globe")
+                    }
+
+                    NavigationLink {
+                        AdvancedSettings()
+                    } label: {
+                        Label("Advanced", systemImage: "wrench.and.screwdriver")
+                    }
                 }
 
                 Section(footer: versionString) {
@@ -175,8 +187,6 @@ struct SettingsView: View {
     #if os(macOS)
         private var windowHeight: Double {
             switch selection {
-            case .instances:
-                return 390
             case .browsing:
                 return 390
             case .player:
@@ -185,6 +195,10 @@ struct SettingsView: View {
                 return 480
             case .sponsorBlock:
                 return 660
+            case .locations:
+                return 480
+            case .advanced:
+                return 300
             case .help:
                 return 570
             }
@@ -196,14 +210,6 @@ struct SettingsView: View {
         #if os(tvOS)
             .foregroundColor(.secondary)
         #endif
-    }
-
-    private var addInstanceButton: some View {
-        Button {
-            presentingInstanceForm = true
-        } label: {
-            Label("Add Instance...", systemImage: "plus")
-        }
     }
 }
 
