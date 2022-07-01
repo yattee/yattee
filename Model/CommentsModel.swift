@@ -17,38 +17,16 @@ final class CommentsModel: ObservableObject {
 
     var player: PlayerModel!
 
-    static var instance: Instance? {
-        InstancesModel.find(Defaults[.commentsInstanceID])
+    var instance: Instance? {
+        player.accounts.current?.instance
     }
-
-    var api: VideosAPI? {
-        Self.instance.isNil ? nil : PipedAPI(account: Self.instance!.anonymousAccount)
-    }
-
-    static var enabled: Bool {
-        !instance.isNil
-    }
-
-    #if !os(tvOS)
-        static var placement: CommentsPlacement {
-            Defaults[.commentsPlacement]
-        }
-    #endif
 
     var nextPageAvailable: Bool {
         !(nextPage?.isEmpty ?? true)
     }
 
     func load(page: String? = nil) {
-        guard Self.enabled, !loaded else {
-            return
-        }
-
-        guard !Self.instance.isNil,
-              let video = player.currentVideo
-        else {
-            return
-        }
+        guard let video = player.currentVideo else { return }
 
         if !firstPage && !nextPageAvailable {
             return
@@ -56,7 +34,7 @@ final class CommentsModel: ObservableObject {
 
         firstPage = page.isNil || page!.isEmpty
 
-        api?.comments(video.videoID, page: page)?
+        player.accounts.api.comments(video.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {
@@ -64,6 +42,9 @@ final class CommentsModel: ObservableObject {
                     self?.nextPage = page.nextPage
                     self?.disabled = page.disabled
                 }
+            }
+            .onFailure { [weak self] requestError in
+                self?.disabled = !requestError.json.dictionaryValue["error"].isNil
             }
             .onCompletion { [weak self] _ in
                 self?.loaded = true
@@ -94,7 +75,7 @@ final class CommentsModel: ObservableObject {
         repliesPageID = page
         repliesLoaded = false
 
-        api?.comments(player.currentVideo!.videoID, page: page)?
+        player.accounts.api.comments(player.currentVideo!.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {

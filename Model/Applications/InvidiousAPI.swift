@@ -157,6 +157,15 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         configureTransformer(pathPattern("videos/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Video in
             self.extractVideo(from: content.json)
         }
+
+        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>) -> CommentsPage in
+            let details = content.json.dictionaryValue
+            let comments = details["comments"]?.arrayValue.compactMap { self.extractComment(from: $0) } ?? []
+            let nextPage = details["continuation"]?.string
+            let disabled = !details["error"].isNil
+
+            return CommentsPage(comments: comments, nextPage: nextPage, disabled: disabled)
+        }
     }
 
     private func pathPattern(_ path: String) -> String {
@@ -337,7 +346,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             .withParam("q", query.lowercased())
     }
 
-    func comments(_: Video.ID, page _: String?) -> Resource? { nil }
+    func comments(_ id: Video.ID, page: String?) -> Resource? {
+        let resource = resource(baseURL: account.url, path: basePathAppending("comments/\(id)"))
+        guard let page = page else { return resource }
+
+        return resource.withParam("continuation", page)
+    }
 
     private func searchQuery(_ query: String) -> String {
         var searchQuery = query
@@ -531,6 +545,25 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             visibility: content["isListed"].boolValue ? .public : .private,
             updated: content["updated"].doubleValue,
             videos: content["videos"].arrayValue.map { extractVideo(from: $0) }
+        )
+    }
+
+    private func extractComment(from content: JSON) -> Comment? {
+        let details = content.dictionaryValue
+        let author = details["author"]?.string ?? ""
+        let channelId = details["authorId"]?.string ?? UUID().uuidString
+        let authorAvatarURL = details["authorThumbnails"]?.arrayValue.last?.dictionaryValue["url"]?.string ?? ""
+        return Comment(
+            id: UUID().uuidString,
+            author: author,
+            authorAvatarURL: authorAvatarURL,
+            time: details["publishedText"]?.string ?? "",
+            pinned: false,
+            hearted: false,
+            likeCount: details["likeCount"]?.int ?? 0,
+            text: details["content"]?.string ?? "",
+            repliesPage: details["replies"]?.dictionaryValue["continuation"]?.string,
+            channel: Channel(id: channelId, name: author)
         )
     }
 }
