@@ -190,7 +190,7 @@ struct SettingsView: View {
             case .browsing:
                 return 390
             case .player:
-                return 500
+                return 390
             case .history:
                 return 480
             case .sponsorBlock:

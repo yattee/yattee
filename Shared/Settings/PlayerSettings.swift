@@ -5,7 +5,6 @@ struct PlayerSettings: View {
     @Default(.instances) private var instances
     @Default(.playerInstanceID) private var playerInstanceID
     @Default(.quality) private var quality
-    @Default(.commentsInstanceID) private var commentsInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
@@ -62,10 +61,6 @@ struct PlayerSettings: View {
                     pauseOnEnteringBackgroundToogle
                 #endif
                 closeLastItemOnPlaybackEndToggle
-            }
-
-            Section(header: SettingsHeader(text: "Comments")) {
-                commentsInstancePicker
             }
 
             Section(header: SettingsHeader(text: "Interface")) {
@@ -128,22 +123,6 @@ struct PlayerSettings: View {
         }
         .labelsHidden()
 
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
-    }
-
-    private var commentsInstancePicker: some View {
-        Picker("Source", selection: $commentsInstanceID) {
-            Text("Disabled").tag(Optional(""))
-
-            ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
-                Text(instance.description).tag(Optional(instance.id))
-            }
-        }
-        .labelsHidden()
         #if os(iOS)
             .pickerStyle(.automatic)
         #elseif os(tvOS)
