@@ -66,9 +66,7 @@ final class AppleAVPlayerViewController: UIViewController {
 
         #if os(tvOS)
             var infoViewControllers = [UIHostingController<AnyView>]()
-            if CommentsModel.enabled {
-                infoViewControllers.append(infoViewController([.comments], title: "Comments"))
-            }
+            infoViewControllers.append(infoViewController([.comments], title: "Comments"))
 
             var queueSections = [NowPlayingView.ViewSection.playingNext]
             if Defaults[.showHistoryInPlayer] {

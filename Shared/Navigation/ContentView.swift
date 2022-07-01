@@ -19,6 +19,7 @@ struct ContentView: View {
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<SettingsModel> private var settings
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
     @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
 
@@ -42,6 +43,7 @@ struct ContentView: View {
                 AppSidebarNavigation()
             #elseif os(tvOS)
                 TVNavigationView()
+                    .environmentObject(settings)
             #endif
         }
         .onChange(of: accounts.signedIn) { _ in
@@ -105,10 +107,12 @@ struct ContentView: View {
                 }
             )
             .background(
-                EmptyView().sheet(isPresented: $navigation.presentingSettings, onDismiss: openWelcomeScreenIfAccountEmpty) {
+                EmptyView().sheet(isPresented: $navigation.presentingSettings) {
                     SettingsView()
                         .environmentObject(accounts)
                         .environmentObject(instances)
+                        .environmentObject(settings)
+                        .environmentObject(navigation)
                         .environmentObject(player)
                 }
             )
@@ -124,14 +128,6 @@ struct ContentView: View {
         #else
             return .sidebar
         #endif
-    }
-
-    func openWelcomeScreenIfAccountEmpty() {
-        guard Defaults[.instances].isEmpty else {
-            return
-        }
-
-        navigation.presentingWelcomeScreen = true
     }
 
     var videoPlayer: some View {

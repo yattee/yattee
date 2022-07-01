@@ -7,6 +7,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(AccountsModel())
             .environmentObject(comments)
             .environmentObject(InstancesModel())
+            .environmentObject(InstancesManifest())
             .environmentObject(invidious)
             .environmentObject(NavigationModel())
             .environmentObject(NetworkStateModel())

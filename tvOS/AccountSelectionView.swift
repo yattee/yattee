@@ -11,13 +11,13 @@ struct AccountSelectionView: View {
     @Default(.instances) private var instances
 
     var body: some View {
-        Section(header: Text(showHeader ? "Current Account" : "")) {
-            Button(accountButtonTitle(account: accountsModel.current, long: true)) {
+        Section(header: Text(showHeader ? "Current Location" : "")) {
+            Button(accountButtonTitle(account: accountsModel.current)) {
                 if let account = nextAccount {
                     accountsModel.setCurrent(account)
                 }
             }
-            .disabled(instances.isEmpty)
+            .disabled(instances.isEmpty && Defaults[.countryOfPublicInstances].isNil)
             .contextMenu {
                 ForEach(allAccounts) { account in
                     Button(accountButtonTitle(account: account)) {
@@ -32,20 +32,18 @@ struct AccountSelectionView: View {
     }
 
     var allAccounts: [Account] {
-        accounts + instances.map(\.anonymousAccount)
+        accounts + instances.map(\.anonymousAccount) + [accountsModel.publicAccount].compactMap { $0 }
     }
 
     private var nextAccount: Account? {
         allAccounts.next(after: accountsModel.current)
     }
 
-    func accountButtonTitle(account: Account! = nil, long: Bool = false) -> String {
+    func accountButtonTitle(account: Account! = nil) -> String {
         guard account != nil else {
             return "Not selected"
         }
 
-        let instanceDescription = long ? account.instance.longDescription : account.instance.description
-
-        return instances.count > 1 ? "\(account.description) — \(instanceDescription)" : account.description
+        return account.isPublic ? account.description : "\(account.description) — \(account.instance.shortDescription)"
     }
 }

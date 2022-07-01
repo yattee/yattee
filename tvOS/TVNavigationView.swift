@@ -6,6 +6,7 @@ struct TVNavigationView: View {
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SettingsModel> private var settings
 
     @Default(.visibleSections) private var visibleSections
 
@@ -36,7 +37,7 @@ struct TVNavigationView: View {
                         .tag(TabSelection.trending)
                 }
 
-                if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists {
+                if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists, accounts.signedIn {
                     PlaylistsView()
                         .tabItem { Text("Playlists") }
                         .tag(TabSelection.playlists)
@@ -56,7 +57,6 @@ struct TVNavigationView: View {
                     .tag(TabSelection.settings)
             }
         }
-        .fullScreenCover(isPresented: $navigation.presentingSettings) { SettingsView() }
         .fullScreenCover(isPresented: $navigation.presentingAddToPlaylist) {
             if let video = navigation.videoToAddToPlaylist {
                 AddToPlaylistView(video: video)

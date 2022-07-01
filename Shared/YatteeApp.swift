@@ -40,6 +40,7 @@ struct YatteeApp: App {
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
+    @StateObject private var settings = SettingsModel()
     @StateObject private var subscriptions = SubscriptionsModel()
     @StateObject private var thumbnails = ThumbnailsModel()
 
@@ -60,6 +61,7 @@ struct YatteeApp: App {
                 .environmentObject(playerTime)
                 .environmentObject(playlists)
                 .environmentObject(recents)
+                .environmentObject(settings)
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnails)
                 .environmentObject(menu)
@@ -144,8 +146,10 @@ struct YatteeApp: App {
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environmentObject(accounts)
                     .environmentObject(instances)
+                    .environmentObject(navigation)
                     .environmentObject(player)
                     .environmentObject(playerControls)
+                    .environmentObject(settings)
             }
         #endif
     }
@@ -170,15 +174,21 @@ struct YatteeApp: App {
             }
         #endif
 
-        if let account = accounts.lastUsed ??
-            instances.lastUsed?.anonymousAccount ??
-            InstancesModel.all.first?.anonymousAccount
+        if Defaults[.lastAccountID] != "public",
+           let account = accounts.lastUsed ??
+           instances.lastUsed?.anonymousAccount ??
+           InstancesModel.all.first?.anonymousAccount
         {
             accounts.setCurrent(account)
         }
 
-        if accounts.current.isNil {
+        let countryOfPublicInstances = Defaults[.countryOfPublicInstances]
+        if accounts.current.isNil, countryOfPublicInstances.isNil {
             navigation.presentingWelcomeScreen = true
+        }
+
+        if !countryOfPublicInstances.isNil {
+            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances!, accounts: accounts, asCurrent: accounts.current.isNil)
         }
 
         playlists.accounts = accounts

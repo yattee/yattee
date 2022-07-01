@@ -18,16 +18,10 @@ extension Defaults.Keys {
         static let defaultForPlayerDetailsPageButtonLabelStyle = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
     #endif
 
-    static let kavinPipedInstanceID = "kavin-piped"
-    static let instances = Key<[Instance]>("instances", default: [
-        .init(
-            app: .piped,
-            id: kavinPipedInstanceID,
-            name: "Kavin",
-            apiURL: "https://pipedapi.kavin.rocks",
-            frontendURL: "https://piped.kavin.rocks"
-        )
-    ])
+    static let instancesManifest = Key<String>("instancesManifest", default: "")
+    static let countryOfPublicInstances = Key<String?>("countryOfPublicInstances")
+
+    static let instances = Key<[Instance]>("instances", default: [])
     static let accounts = Key<[Account]>("accounts", default: [])
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
@@ -59,7 +53,7 @@ extension Defaults.Keys {
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
-    static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
+    static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: nil)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
