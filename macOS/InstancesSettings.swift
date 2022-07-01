@@ -16,13 +16,12 @@ struct InstancesSettings: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<SettingsModel> private var settings
 
     @Default(.instances) private var instances
 
     var body: some View {
-        Group {
-            SettingsHeader(text: "Instance")
-
+        VStack(alignment: .leading, spacing: 10) {
             if !instances.isEmpty {
                 Picker("Instance", selection: $selectedInstanceID) {
                     ForEach(instances) { instance in
@@ -31,7 +30,7 @@ struct InstancesSettings: View {
                 }
                 .labelsHidden()
             } else {
-                Text("You have no instances configured")
+                Text("You have no custom locations configured")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -43,7 +42,7 @@ struct InstancesSettings: View {
 
                 let list = List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
-                        Text("You have no accounts for this instance")
+                        Text("You have no accounts for this location")
                             .foregroundColor(.secondary)
                     }
                     ForEach(selectedInstanceAccounts) { account in
@@ -116,13 +115,11 @@ struct InstancesSettings: View {
 
                     Spacer()
 
-                    Button("Remove Instance") {
+                    Button("Remove Location") {
                         presentingInstanceRemovalConfirmation = true
-                    }
-                    .alert(isPresented: $presentingInstanceRemovalConfirmation) {
-                        Alert(
+                        settings.presentAlert(Alert(
                             title: Text(
-                                "Are you sure you want to remove \(selectedInstance!.longDescription) instance?"
+                                "Are you sure you want to remove \(selectedInstance!.longDescription) location?"
                             ),
                             message: Text("This cannot be undone"),
                             primaryButton: .destructive(Text("Remove")) {
@@ -134,13 +131,13 @@ struct InstancesSettings: View {
                                 selectedInstanceID = instances.last?.id
                             },
                             secondaryButton: .cancel()
-                        )
+                        ))
                     }
                     .foregroundColor(.red)
                 }
             }
 
-            Button("Add Instance...") {
+            Button("Add Location...") {
                 presentingInstanceForm = true
             }
         }
