@@ -78,16 +78,6 @@ struct ControlsBar: View {
     var controls: some View {
         HStack(spacing: 4) {
             Group {
-                Button {
-                    model.closeCurrentItem()
-                    model.closePiP()
-                } label: {
-                    Label("Close Video", systemImage: "xmark")
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity)
-                        .contentShape(Rectangle())
-                }
-
                 if playerControls.isPlaying {
                     Button(action: {
                         model.pause()
@@ -117,7 +107,19 @@ struct ControlsBar: View {
                     .contentShape(Rectangle())
             }
             .disabled(model.queue.isEmpty)
+
+            Button {
+                model.closeCurrentItem()
+                model.closePiP()
+            } label: {
+                Label("Close Video", systemImage: "xmark")
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+            }
+            .disabled(model.currentItem.isNil)
         }
+        .imageScale(.small)
         .font(.system(size: 24))
     }
 
@@ -220,25 +222,27 @@ struct ControlsBar: View {
                         .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
                         .lineLimit(1)
 
-                    HStack(spacing: 2) {
-                        Text(model.currentVideo?.author ?? "")
-                            .font(.system(size: 12))
+                    if let video = model.currentVideo {
+                        HStack(spacing: 2) {
+                            Text(video.author)
+                                .font(.system(size: 12))
 
-                        if !presentingControls,
-                           let channel = model.currentVideo?.channel,
-                           let subsriptions = channel.subscriptionsString
-                        {
-                            HStack(spacing: 2) {
-                                Image(systemName: "person.2.fill")
+                            if !presentingControls,
+                               let channel = model.currentVideo?.channel,
+                               let subsriptions = channel.subscriptionsString
+                            {
+                                HStack(spacing: 2) {
+                                    Image(systemName: "person.2.fill")
 
-                                Text(subsriptions)
+                                    Text(subsriptions)
+                                }
+                                .padding(.leading, 4)
+                                .font(.system(size: 9))
                             }
-                            .padding(.leading, 4)
-                            .font(.system(size: 9))
                         }
+                        .lineLimit(1)
+                        .foregroundColor(.secondary)
                     }
-                    .lineLimit(1)
-                    .foregroundColor(.secondary)
                 }
             }
             .buttonStyle(.plain)
