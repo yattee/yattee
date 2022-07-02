@@ -96,6 +96,9 @@ extension Defaults.Keys {
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
 
     static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
+
+    static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")
+    static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "2")
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

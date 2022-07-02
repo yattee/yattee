@@ -4,6 +4,8 @@ import SwiftUI
 struct AdvancedSettings: View {
     @Default(.instancesManifest) private var instancesManifest
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
+    @Default(.mpvCacheSecs) private var mpvCacheSecs
+    @Default(.mpvCachePauseWait) private var mpvCachePauseWait
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -26,27 +28,54 @@ struct AdvancedSettings: View {
     }
 
     @ViewBuilder var advancedSettings: some View {
-        Section(header: manifestHeader, footer: manifestFooter) {
+        Section(header: SettingsHeader(text: "MPV"), footer: mpvFooter) {
+            showMPVPlaybackStatsToggle
+
+            HStack {
+                Text("cache-secs")
+                #if os(macOS)
+                    .frame(minWidth: 120, alignment: .leading)
+                #endif
+                TextField("cache-secs", text: $mpvCacheSecs)
+            }
+
+            HStack {
+                Text("cache-pause-wait")
+                #if os(macOS)
+                    .frame(minWidth: 120, alignment: .leading)
+                #endif
+                TextField("cache-pause-wait", text: $mpvCachePauseWait)
+            }
+        }
+        .multilineTextAlignment(.trailing)
+
+        Section(header: manifestHeader) {
             TextField("URL", text: $instancesManifest)
+            #if !os(macOS)
+                .keyboardType(.webSearch)
+            #endif
+                .disableAutocorrection(true)
         }
         .padding(.bottom, 4)
+    }
 
-        Section(header: SettingsHeader(text: "Debugging")) {
-            showMPVPlaybackStatsToggle
+    @ViewBuilder var mpvFooter: some View {
+        VStack(alignment: .leading) {
+            Text("Restart the app to apply the settings above.")
+            HStack(spacing: 2) {
+                Text("More info can be found in")
+                Link("MPV Documentation", destination: URL(string: "https://mpv.io/manual/master")!)
+            }
         }
+        .foregroundColor(.secondary)
     }
 
     var manifestHeader: some View {
         SettingsHeader(text: "Public Manifest")
     }
 
-    var manifestFooter: some View {
-        Text("You can create your own locations manifest and set its URL here to replace the built-in one")
-            .foregroundColor(.secondary)
-    }
-
     var showMPVPlaybackStatsToggle: some View {
-        Toggle("Show MPV playback statistics", isOn: $showMPVPlaybackStats)
+        Toggle("Show playback statistics", isOn: $showMPVPlaybackStats)
     }
 }
 
