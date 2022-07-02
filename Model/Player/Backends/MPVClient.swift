@@ -1,4 +1,5 @@
 import CoreMedia
+import Defaults
 import Foundation
 import Logging
 #if !os(macOS)
@@ -46,8 +47,8 @@ final class MPVClient: ObservableObject {
         #endif
 
         checkError(mpv_set_option_string(mpv, "cache-pause-initial", "yes"))
-        checkError(mpv_set_option_string(mpv, "cache-secs", "20"))
-        checkError(mpv_set_option_string(mpv, "cache-pause-wait", "2"))
+        checkError(mpv_set_option_string(mpv, "cache-secs", Defaults[.mpvCacheSecs]))
+        checkError(mpv_set_option_string(mpv, "cache-pause-wait", Defaults[.mpvCachePauseWait]))
         checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
         checkError(mpv_set_option_string(mpv, "hwdec", machine == "x86_64" ? "no" : "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
