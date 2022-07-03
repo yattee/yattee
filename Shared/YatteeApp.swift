@@ -174,12 +174,8 @@ struct YatteeApp: App {
             }
         #endif
 
-        if Defaults[.lastAccountID] != "public",
-           let account = accounts.lastUsed ??
-           instances.lastUsed?.anonymousAccount ??
-           InstancesModel.all.first?.anonymousAccount
-        {
-            accounts.setCurrent(account)
+        if Defaults[.lastAccountID] != "public" {
+            accounts.configureAccount()
         }
 
         let countryOfPublicInstances = Defaults[.countryOfPublicInstances]
