@@ -3,7 +3,8 @@ import SwiftUI
 
 struct Help: View {
     static let wikiURL = URL(string: "https://github.com/yattee/yattee/wiki")!
-    static let matrixURL = URL(string: "https://tinyurl.com/yattee-matrix")!
+    static let matrixURL = URL(string: "https://tinyurl.com/matrix-yattee")!
+    static let discordURL = URL(string: "https://yattee.stream/discord")!
     static let issuesURL = URL(string: "https://github.com/yattee/yattee/issues")!
     static let milestonesURL = URL(string: "https://github.com/yattee/yattee/milestones")!
     static let donationsURL = URL(string: "https://github.com/yattee/yattee/wiki/Donations")!
@@ -30,9 +31,11 @@ struct Help: View {
                     Section {
                         header("I want to ask a question")
 
-                        Text("Discussions take place in Matrix chat channel. It's a good spot for general questions.")
+                        Text("Discussions take place in Discord and Matrix. It's a good spot for general questions.")
                             .padding(.bottom, 8)
 
+                        helpItemLink("Discord Server", url: Self.discordURL, systemImage: "message")
+                            .padding(.bottom, 8)
                         helpItemLink("Matrix Channel", url: Self.matrixURL, systemImage: "message")
                             .padding(.bottom, 8)
                     }
