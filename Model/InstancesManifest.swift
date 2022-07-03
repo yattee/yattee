@@ -31,7 +31,7 @@ final class InstancesManifest: Service, ObservableObject {
         guard let country = country else {
             accounts.publicAccount = nil
             if asCurrent {
-                accounts.setCurrent(nil)
+                accounts.configureAccount()
             }
             return
         }

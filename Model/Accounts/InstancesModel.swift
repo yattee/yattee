@@ -14,7 +14,7 @@ final class InstancesModel: ObservableObject {
         return InstancesModel.find(id)
     }
 
-    var lastUsed: Instance? {
+    static var lastUsed: Instance? {
         guard let id = Defaults[.lastInstanceID] else {
             return nil
         }

@@ -54,6 +54,15 @@ final class AccountsModel: ObservableObject {
         )
     }
 
+    func configureAccount() {
+        if let account = lastUsed ??
+            InstancesModel.lastUsed?.anonymousAccount ??
+            InstancesModel.all.first?.anonymousAccount
+        {
+            setCurrent(account)
+        }
+    }
+
     func setCurrent(_ account: Account! = nil) {
         guard account != current else {
             return
