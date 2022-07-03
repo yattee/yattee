@@ -176,6 +176,10 @@ final class MPVClient: ObservableObject {
         mpv.isNil ? false : getFlag("paused-for-cache")
     }
 
+    var eofReached: Bool {
+        mpv.isNil ? false : getFlag("eof-reached")
+    }
+
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
         guard !seeking else {
             logger.warning("ignoring seek, another in progress")

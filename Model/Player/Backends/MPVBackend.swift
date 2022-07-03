@@ -30,13 +30,6 @@ final class MPVBackend: PlayerBackend {
 
             self.controls?.isLoadingVideo = self.isLoadingVideo
             self.setNeedsNetworkStateUpdates(true)
-
-            if !self.isLoadingVideo {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                    self?.handleEOF = true
-                }
-            }
-
             self.model?.objectWillChange.send()
         }
     }}
@@ -77,7 +70,6 @@ final class MPVBackend: PlayerBackend {
     private var clientTimer: Repeater!
     private var networkStateTimer: Repeater!
 
-    private var handleEOF = false
     private var onFileLoaded: (() -> Void)?
 
     private var controlsUpdates = false
@@ -157,7 +149,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading _: Bool) {
-        handleEOF = false
         #if !os(macOS)
             if model.presentingPlayer {
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -304,7 +295,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func closeItem() {
-        handleEOF = false
         client?.pause()
         client?.stop()
     }
@@ -406,6 +396,7 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
 
         case MPV_EVENT_PAUSE:
+            DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
             isPlaying = false
             networkStateTimer.start()
 
@@ -419,9 +410,7 @@ final class MPVBackend: PlayerBackend {
             isSeeking = true
 
         case MPV_EVENT_END_FILE:
-            DispatchQueue.main.async { [weak self] in
-                self?.handleEndOfFile()
-            }
+            DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
 
         default:
             logger.info(.init(stringLiteral: "UNHANDLED event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))
@@ -429,7 +418,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func handleEndOfFile() {
-        guard handleEOF, !isLoadingVideo else {
+        guard client.eofReached else {
             return
         }
 
