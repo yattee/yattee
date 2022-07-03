@@ -161,7 +161,7 @@ struct SettingsView: View {
                     }
                 }
 
-                Section {
+                Section(footer: helpFooter) {
                     NavigationLink {
                         Help()
                     } label: {
@@ -232,6 +232,14 @@ struct SettingsView: View {
             }
         }
     #endif
+
+    var helpFooter: some View {
+        #if os(tvOS)
+            versionString
+        #else
+            EmptyView()
+        #endif
+    }
 
     private var versionString: some View {
         Text("Yattee \(YatteeApp.version) (build \(YatteeApp.build))")
