@@ -12,16 +12,17 @@ struct WelcomeScreen: View {
         VStack(alignment: .leading) {
             Spacer()
 
-            Text("Welcome to Yattee")
+            Text("Welcome")
                 .frame(maxWidth: .infinity)
                 .font(.largeTitle)
                 .padding(.bottom, 10)
 
-            Text("Select location closest to you to get the best performance")
+            Text("Select location closest to you:")
                 .font(.subheadline)
 
             ScrollView {
-                ForEach(store.map(\.country).sorted(), id: \.self) { country in
+                let countries = store.map(\.country).sorted().unique()
+                ForEach(countries, id: \.self) { country in
                     Button {
                         Defaults[.countryOfPublicInstances] = country
                         InstancesManifest.shared.setPublicAccount(country, accounts: accounts)
@@ -53,19 +54,17 @@ struct WelcomeScreen: View {
                 }
                 .padding(.horizontal, 30)
             }
-
-            Text("This information will not be collected and it will be saved only on your device. You can change it later in settings.")
+            #if !os(tvOS)
+                OpenSettingsButton()
+                    .foregroundColor(.white)
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 4).foregroundColor(Color.accentColor))
+                    .frame(maxWidth: .infinity)
+            #endif
+            Text("This information will be processed only on your device and used to connect you to the server in the specified country.\n" +
+                "It can be changed later in settings. You can use your own locations too.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-
-            #if !os(tvOS)
-                Spacer()
-
-                OpenSettingsButton()
-                    .frame(maxWidth: .infinity)
-
-                Spacer()
-            #endif
         }
         .onAppear {
             resource.load().onSuccess { response in
