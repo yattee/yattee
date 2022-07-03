@@ -3,6 +3,9 @@ import Foundation
 import SwiftUI
 
 struct SettingsView: View {
+    static let matrixURL = URL(string: "https://tinyurl.com/matrix-yattee")!
+    static let discordURL = URL(string: "https://yattee.stream/discord")!
+
     #if os(macOS)
         private enum Tabs: Hashable {
             case locations, browsing, player, history, sponsorBlock, advanced, help
@@ -158,13 +161,38 @@ struct SettingsView: View {
                     }
                 }
 
-                Section(footer: versionString) {
+                Section {
                     NavigationLink {
                         Help()
                     } label: {
                         Label("Help", systemImage: "questionmark.circle")
                     }
                 }
+
+                #if !os(tvOS)
+                    Section(header: Text("Contact"), footer: versionString) {
+                        Link(destination: Self.discordURL) {
+                            HStack {
+                                Image("Discord")
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .frame(maxWidth: 30, maxHeight: 30)
+
+                                Text("Discord Server")
+                            }
+                        }
+
+                        Link(destination: Self.matrixURL) {
+                            HStack {
+                                Image("Matrix")
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .frame(maxWidth: 30, maxHeight: 30)
+                                Text("Matrix Chat")
+                            }
+                        }
+                    }
+                #endif
             }
             .navigationTitle("Settings")
             .toolbar {
@@ -200,7 +228,7 @@ struct SettingsView: View {
             case .advanced:
                 return 300
             case .help:
-                return 570
+                return 600
             }
         }
     #endif
