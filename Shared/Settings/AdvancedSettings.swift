@@ -33,21 +33,18 @@ struct AdvancedSettings: View {
 
             HStack {
                 Text("cache-secs")
-                #if os(macOS)
-                    .frame(minWidth: 120, alignment: .leading)
-                #endif
+                    .frame(minWidth: 140, alignment: .leading)
                 TextField("cache-secs", text: $mpvCacheSecs)
             }
+            .multilineTextAlignment(.trailing)
 
             HStack {
                 Text("cache-pause-wait")
-                #if os(macOS)
-                    .frame(minWidth: 120, alignment: .leading)
-                #endif
+                    .frame(minWidth: 140, alignment: .leading)
                 TextField("cache-pause-wait", text: $mpvCachePauseWait)
             }
+            .multilineTextAlignment(.trailing)
         }
-        .multilineTextAlignment(.trailing)
 
         Section(header: manifestHeader) {
             TextField("URL", text: $instancesManifest)
@@ -60,11 +57,21 @@ struct AdvancedSettings: View {
     }
 
     @ViewBuilder var mpvFooter: some View {
+        let url = "https://mpv.io/manual/master"
+
         VStack(alignment: .leading) {
             Text("Restart the app to apply the settings above.")
-            HStack(spacing: 2) {
-                Text("More info can be found in")
-                Link("MPV Documentation", destination: URL(string: "https://mpv.io/manual/master")!)
+            VStack(alignment: .leading, spacing: 2) {
+                #if os(tvOS)
+                    Text("More info can be found in MPV Documentation:")
+                    Text(url)
+                #else
+                    Text("More info can be found in:")
+                    Link("MPV Documentation", destination: URL(string: url)!)
+                    #if os(macOS)
+                        .onHover(perform: onHover(_:))
+                    #endif
+                #endif
             }
         }
         .foregroundColor(.secondary)
@@ -77,6 +84,16 @@ struct AdvancedSettings: View {
     var showMPVPlaybackStatsToggle: some View {
         Toggle("Show playback statistics", isOn: $showMPVPlaybackStats)
     }
+
+    #if os(macOS)
+        private func onHover(_ inside: Bool) {
+            if inside {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+    #endif
 }
 
 struct AdvancedSettings_Previews: PreviewProvider {
