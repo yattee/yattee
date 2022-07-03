@@ -5,10 +5,10 @@ import SwiftUI
 struct SettingsView: View {
     #if os(macOS)
         private enum Tabs: Hashable {
-            case browsing, player, history, sponsorBlock, locations, advanced, help
+            case locations, browsing, player, history, sponsorBlock, advanced, help
         }
 
-        @State private var selection = Tabs.browsing
+        @State private var selection = Tabs.locations
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -32,6 +32,14 @@ struct SettingsView: View {
     var settings: some View {
         #if os(macOS)
             TabView(selection: $selection) {
+                Form {
+                    LocationsSettings()
+                }
+                .tabItem {
+                    Label("Locations", systemImage: "globe")
+                }
+                .tag(Tabs.locations)
+
                 Form {
                     BrowsingSettings()
                 }
@@ -63,14 +71,6 @@ struct SettingsView: View {
                     Label("SponsorBlock", systemImage: "dollarsign.circle")
                 }
                 .tag(Tabs.sponsorBlock)
-
-                Form {
-                    LocationsSettings()
-                }
-                .tabItem {
-                    Label("Locations", systemImage: "globe")
-                }
-                .tag(Tabs.locations)
 
                 Group {
                     AdvancedSettings()
@@ -122,6 +122,12 @@ struct SettingsView: View {
                     #endif
 
                     NavigationLink {
+                        LocationsSettings()
+                    } label: {
+                        Label("Locations", systemImage: "globe")
+                    }
+
+                    NavigationLink {
                         BrowsingSettings()
                     } label: {
                         Label("Browsing", systemImage: "list.and.film")
@@ -143,12 +149,6 @@ struct SettingsView: View {
                         SponsorBlockSettings()
                     } label: {
                         Label("SponsorBlock", systemImage: "dollarsign.circle")
-                    }
-
-                    NavigationLink {
-                        LocationsSettings()
-                    } label: {
-                        Label("Locations", systemImage: "globe")
                     }
 
                     NavigationLink {

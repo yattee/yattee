@@ -18,6 +18,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
             .environmentObject(PlaylistsModel())
             .environmentObject(RecentsModel())
             .environmentObject(SearchModel())
+            .environmentObject(SettingsModel())
             .environmentObject(subscriptions)
             .environmentObject(ThumbnailsModel())
     }
