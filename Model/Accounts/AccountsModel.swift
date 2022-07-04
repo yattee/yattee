@@ -81,8 +81,12 @@ final class AccountsModel: ObservableObject {
             piped.setAccount(account)
         }
 
-        Defaults[.lastAccountID] = account.anonymous ? (account.isPublic ? "public" : nil) : account.id
-        Defaults[.lastInstanceID] = account.instanceID
+        Defaults[.lastAccountIsPublic] = account.isPublic
+
+        if !account.isPublic {
+            Defaults[.lastAccountID] = account.anonymous ? nil : account.id
+            Defaults[.lastInstanceID] = account.instanceID
+        }
     }
 
     static func find(_ id: Account.ID) -> Account? {

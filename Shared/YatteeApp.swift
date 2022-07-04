@@ -174,7 +174,7 @@ struct YatteeApp: App {
             }
         #endif
 
-        if Defaults[.lastAccountID] != "public" {
+        if !Defaults[.lastAccountIsPublic] {
             accounts.configureAccount()
         }
 

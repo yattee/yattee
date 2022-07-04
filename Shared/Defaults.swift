@@ -26,6 +26,7 @@ extension Defaults.Keys {
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
     static let lastUsedPlaylistID = Key<Playlist.ID?>("lastPlaylistID")
+    static let lastAccountIsPublic = Key<Bool>("lastAccountIsPublic", default: false)
 
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
