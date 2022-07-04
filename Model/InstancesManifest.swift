@@ -51,15 +51,24 @@ final class InstancesManifest: Service, ObservableObject {
     func changePublicAccount(_ accounts: AccountsModel, settings: SettingsModel) {
         instancesList.load().onSuccess { response in
             if let instances: [ManifestedInstance] = response.typedContent() {
-                let countryInstances = instances.filter { $0.country == Defaults[.countryOfPublicInstances] }
+                var countryInstances = instances.filter { $0.country == Defaults[.countryOfPublicInstances] }
                 let region = countryInstances.first?.region ?? "Europe"
                 var regionInstances = instances.filter { $0.region == region }
 
                 if let publicAccountUrl = accounts.publicAccount?.url {
+                    countryInstances = countryInstances.filter { $0.url.absoluteString != publicAccountUrl }
                     regionInstances = regionInstances.filter { $0.url.absoluteString != publicAccountUrl }
                 }
 
-                guard let instance = regionInstances.randomElement() else {
+                var instance: ManifestedInstance?
+
+                if accounts.current?.isPublic ?? false {
+                    instance = regionInstances.randomElement()
+                } else {
+                    instance = countryInstances.randomElement() ?? regionInstances.randomElement()
+                }
+
+                guard let instance = instance else {
                     settings.presentAlert(title: "Could not change location", message: "No locations available at the moment")
                     return
                 }
