@@ -80,16 +80,18 @@ extension VideosAPI {
             return
         }
 
-        video(item.videoID).load().onSuccess { response in
-            guard let video: Video = response.typedContent() else {
-                return
+        video(item.videoID).load()
+            .onSuccess { response in
+                guard let video: Video = response.typedContent() else {
+                    return
+                }
+
+                var newItem = item
+                newItem.video = video
+
+                completionHandler(newItem)
             }
-
-            var newItem = item
-            newItem.video = video
-
-            completionHandler(newItem)
-        }.onFailure { failureHandler?($0) }
+            .onFailure { failureHandler?($0) }
     }
 
     func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {

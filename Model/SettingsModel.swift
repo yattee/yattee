@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-class SettingsModel: ObservableObject {
+final class SettingsModel: ObservableObject {
     @Published var presentingAlert = false
     @Published var alert = Alert(title: Text("Error"))
 

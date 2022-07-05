@@ -96,7 +96,8 @@ struct LocationsSettings: View {
                 if let instances: [ManifestedInstance] = response.typedContent() {
                     self.countries = instances.map(\.country).unique().sorted()
                 }
-            }.onFailure { _ in
+            }
+            .onFailure { _ in
                 model.presentAlert(title: "Could not load locations manifest")
             }
     }
