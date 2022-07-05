@@ -10,7 +10,15 @@ struct PlayerGestures: View {
                 .tapRecognizer(
                     tapSensitivity: 0.2,
                     singleTapAction: {
-                        model.toggle()
+                        if model.presentingControlsOverlay {
+                            model.presentingControls = true
+                            model.resetTimer()
+                            withAnimation {
+                                model.presentingControlsOverlay = false
+                            }
+                        } else {
+                            model.toggle()
+                        }
                     },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(-10))
@@ -24,7 +32,15 @@ struct PlayerGestures: View {
                 .tapRecognizer(
                     tapSensitivity: 0.2,
                     singleTapAction: {
-                        model.toggle()
+                        if model.presentingControlsOverlay {
+                            model.presentingControls = true
+                            model.resetTimer()
+                            withAnimation {
+                                model.presentingControlsOverlay = false
+                            }
+                        } else {
+                            model.toggle()
+                        }
                     },
                     doubleTapAction: {
                         player.backend.togglePlay()
@@ -38,7 +54,15 @@ struct PlayerGestures: View {
                 .tapRecognizer(
                     tapSensitivity: 0.2,
                     singleTapAction: {
-                        model.toggle()
+                        if model.presentingControlsOverlay {
+                            model.presentingControls = true
+                            model.resetTimer()
+                            withAnimation {
+                                model.presentingControlsOverlay = false
+                            }
+                        } else {
+                            model.toggle()
+                        }
                     },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(10))
