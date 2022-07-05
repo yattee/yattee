@@ -136,7 +136,7 @@ struct ControlsOverlay: View {
             captionsPicker
                 .labelsHidden()
                 .frame(maxWidth: 300)
-        #else
+        #elseif os(iOS)
             Menu {
                 captionsPicker
                     .frame(width: 140, height: 30)
