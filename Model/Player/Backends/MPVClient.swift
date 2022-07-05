@@ -110,7 +110,7 @@ final class MPVClient: ObservableObject {
         }
     }
 
-    func loadFile(_ url: URL, audio: URL? = nil, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
+    func loadFile(_ url: URL, audio: URL? = nil, sub: URL? = nil, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
         var args = [url.absoluteString]
         var options = [String]()
 
@@ -121,6 +121,10 @@ final class MPVClient: ObservableObject {
 
         if let audioURL = audio?.absoluteString {
             options.append("audio-files-append=\"\(audioURL)\"")
+        }
+
+        if let subURL = sub?.absoluteString {
+            options.append("sub-files-append=\"\(subURL)\"")
         }
 
         args.append(options.joined(separator: ","))
@@ -261,6 +265,14 @@ final class MPVClient: ObservableObject {
 
     func addVideoTrack(_ url: URL) {
         command("video-add", args: [url.absoluteString])
+    }
+
+    func addSubTrack(_ url: URL) {
+        command("sub-add", args: [url.absoluteString])
+    }
+
+    func removeSubs() {
+        command("sub-remove")
     }
 
     func setVideoToAuto() {

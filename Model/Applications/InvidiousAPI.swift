@@ -428,7 +428,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             keywords: json["keywords"].arrayValue.compactMap { $0.string },
             streams: extractStreams(from: json),
             related: extractRelated(from: json),
-            chapters: extractChapters(from: description)
+            chapters: extractChapters(from: description),
+            captions: extractCaptions(from: json)
         )
     }
 
@@ -565,5 +566,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             repliesPage: details["replies"]?.dictionaryValue["continuation"]?.string,
             channel: Channel(id: channelId, name: author)
         )
+    }
+
+    private func extractCaptions(from content: JSON) -> [Captions] {
+        content["captions"].arrayValue.compactMap { details in
+            guard let baseURL = account.url,
+                  let url = URL(string: baseURL + details["url"].stringValue) else { return nil }
+
+            return Captions(
+                label: details["label"].stringValue,
+                code: details["language_code"].stringValue,
+                url: url
+            )
+        }
     }
 }

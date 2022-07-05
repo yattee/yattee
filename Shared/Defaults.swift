@@ -48,6 +48,7 @@ extension Defaults.Keys {
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
     static let thumbnailsQuality = Key<ThumbnailsQuality>("thumbnailsQuality", default: .highest)
 
+    static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
     static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
     static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
