@@ -43,14 +43,15 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
     private var player: PlayerModel {
         let player = PlayerModel()
 
-        player.currentItem = PlayerQueueItem(Video.fixture)
+        player.currentItem = PlayerQueueItem(Video(videoID: "", title: "", author: "", length: 0, published: "2 days ago", views: 43434, channel: .init(id: "", name: ""), likes: 2332, dislikes: 30))
         player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
+        player.videoBeingOpened = Video.fixture
 
         return player
     }
 
     private var playerControls: PlayerControlsModel {
-        PlayerControlsModel(presentingControls: true, player: player)
+        PlayerControlsModel(presentingControls: true, presentingControlsOverlay: true, player: player)
     }
 
     private var subscriptions: SubscriptionsModel {
