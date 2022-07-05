@@ -47,6 +47,11 @@ final class PlayerControlsModel: ObservableObject {
 
     func handleOverlayPresentationChange() {
         player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay)
+        if presentingControlsOverlay {
+            removeTimer()
+        } else {
+            resetTimer()
+        }
     }
 
     func show() {

@@ -97,6 +97,7 @@ struct PlayerControls: View {
             #endif
 
             ControlsOverlay()
+                .frame(height: overlayHeight)
                 .padding()
                 .modifier(ControlBackgroundModifier(enabled: true))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -125,6 +126,11 @@ struct PlayerControls: View {
             .buttonStyle(.plain)
             .opacity(model.presentingControls ? 0 : player.lastSkipped.isNil ? 0 : 1)
         }
+    }
+
+    var overlayHeight: Double {
+        guard let player = player, player.playerSize.height.isFinite else { return 0 }
+        return [0, [player.playerSize.height - 80, 140].min()!].max()!
     }
 
     @ViewBuilder var controlsBackground: some View {
