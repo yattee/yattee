@@ -260,29 +260,51 @@ struct VideoDetails: View {
         }
     }
 
-    var videoProperties: some View {
-        HStack(spacing: 2) {
-            publishedDateSection
-            Spacer()
+    @ViewBuilder var videoProperties: some View {
+        Group {
+            if player.videoBeingOpened.isNil {
+                HStack(spacing: 2) {
+                    publishedDateSection
+                    Spacer()
 
-            HStack(spacing: 4) {
-                if let views = video?.viewsCount {
-                    Image(systemName: "eye")
+                    HStack(spacing: 4) {
+                        if let views = video?.viewsCount {
+                            Image(systemName: "eye")
 
-                    Text(views)
+                            Text(views)
+                        }
+
+                        if let likes = video?.likesCount {
+                            Image(systemName: "hand.thumbsup")
+
+                            Text(likes)
+                        }
+
+                        if let likes = video?.dislikesCount {
+                            Image(systemName: "hand.thumbsdown")
+
+                            Text(likes)
+                        }
+                    }
                 }
+            } else {
+                HStack(spacing: 2) {
+                    Text("Date placeholder")
 
-                if let likes = video?.likesCount {
-                    Image(systemName: "hand.thumbsup")
+                    Spacer()
 
-                    Text(likes)
+                    HStack(spacing: 4) {
+                        Image(systemName: "eye")
+                        Text("1000")
+
+                        Image(systemName: "eye")
+                        Text("100")
+
+                        Image(systemName: "eye")
+                        Text("10")
+                    }
                 }
-
-                if let likes = video?.dislikesCount {
-                    Image(systemName: "hand.thumbsdown")
-
-                    Text(likes)
-                }
+                .redacted(reason: .placeholder)
             }
         }
         .font(.system(size: 12))
