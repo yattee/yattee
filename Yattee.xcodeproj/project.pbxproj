@@ -397,7 +397,6 @@
 		37732FF52703D32400F04329 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37732FF32703D32400F04329 /* Sidebar.swift */; };
 		37737786276F9858000521C1 /* Windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37737785276F9858000521C1 /* Windows.swift */; };
 		3774123327387CB000423605 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372915E52687E3B900F5A35B /* Defaults.swift */; };
-		3774123427387CC100423605 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
 		3774124927387D2300423605 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF28F26740715007FC770 /* Channel.swift */; };
 		3774124A27387D2300423605 /* ContentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB28402721B22200A57617 /* ContentItem.swift */; };
 		3774124B27387D2300423605 /* ThumbnailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */; };
@@ -438,6 +437,9 @@
 		3774127827387EB000423605 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127727387EB000423605 /* Logging */; };
 		3774127A27387EBC00423605 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127927387EBC00423605 /* Defaults */; };
 		3774127C27387EC800423605 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127B27387EC800423605 /* Alamofire */; };
+		3776ADD6287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
+		3776ADD7287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
+		3776ADD8287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
 		377A20A92693C9A2002842B8 /* TypedContentAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */; };
 		377A20AA2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */; };
 		377A20AB2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */; };
@@ -1048,6 +1050,7 @@
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		37737785276F9858000521C1 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
+		3776ADD5287381240078EBC4 /* Captions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Captions.swift; path = Model/Captions.swift; sourceTree = SOURCE_ROOT; };
 		377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedContentAccessors.swift; sourceTree = "<group>"; };
 		377ABC3F286E4AD5009C986F /* InstancesManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstancesManifest.swift; sourceTree = "<group>"; };
 		377ABC43286E4B74009C986F /* ManifestedInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestedInstance.swift; sourceTree = "<group>"; };
@@ -1964,6 +1967,7 @@
 				3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */,
 				37FB283F2721B20800A57617 /* Search */,
 				374C0539272436DA009BDDBE /* SponsorBlock */,
+				3776ADD5287381240078EBC4 /* Captions.swift */,
 				37AAF28F26740715007FC770 /* Channel.swift */,
 				37C3A24427235DA70087A57A /* ChannelPlaylist.swift */,
 				37520698285E8DD300CA655F /* Chapter.swift */,
@@ -2672,6 +2676,7 @@
 				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
 				37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37BE0BD626A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */,
+				3776ADD6287381240078EBC4 /* Captions.swift in Sources */,
 				37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
 				37484C1926FC837400287258 /* PlayerSettings.swift in Sources */,
@@ -2928,6 +2933,7 @@
 				3782B9532755667600990149 /* String+Format.swift in Sources */,
 				37E2EEAC270656EC00170416 /* BrowserPlayerControls.swift in Sources */,
 				37BF662027308884008CCFB0 /* DropFavoriteOutside.swift in Sources */,
+				3776ADD7287381240078EBC4 /* Captions.swift in Sources */,
 				37E70924271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				374C0543272496E4009BDDBE /* AppDelegate.swift in Sources */,
 				373CFACC26966264003CB2C6 /* SearchQuery.swift in Sources */,
@@ -3057,7 +3063,6 @@
 				3774125627387D2300423605 /* Segment.swift in Sources */,
 				373C8FE7275B955100CB5936 /* CommentsPage.swift in Sources */,
 				3774124D27387D2300423605 /* PlaylistsModel.swift in Sources */,
-				3774123427387CC100423605 /* InvidiousAPI.swift in Sources */,
 				3774124B27387D2300423605 /* ThumbnailsModel.swift in Sources */,
 				3774125427387D2300423605 /* Store.swift in Sources */,
 				3774125027387D2300423605 /* Video.swift in Sources */,
@@ -3119,6 +3124,7 @@
 				371B7E632759706A00D21217 /* CommentsView.swift in Sources */,
 				37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				3782B95727557E6E00990149 /* SearchSuggestions.swift in Sources */,
+				3776ADD8287381240078EBC4 /* Captions.swift in Sources */,
 				37F0F4EC286F397E00C06C2E /* SettingsModel.swift in Sources */,
 				37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */,
 				37BC50AA2778A84700510953 /* HistorySettings.swift in Sources */,

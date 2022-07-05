@@ -9,24 +9,27 @@ struct ControlsOverlay: View {
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
 
     var body: some View {
-        VStack(spacing: 6) {
-            HStack {
-                backendButtons
-            }
-            qualityButton
-            HStack {
-                decreaseRateButton
-                rateButton
-                increaseRateButton
-            }
-            #if os(iOS)
-            .foregroundColor(.white)
-            #endif
+        ScrollView {
+            VStack(spacing: 6) {
+                HStack {
+                    backendButtons
+                }
+                qualityButton
+                captionsButton
+                HStack {
+                    decreaseRateButton
+                    rateButton
+                    increaseRateButton
+                }
+                #if os(iOS)
+                .foregroundColor(.white)
+                #endif
 
-            if player.activeBackend == .mpv,
-               showMPVPlaybackStats
-            {
-                mpvPlaybackStats
+                if player.activeBackend == .mpv,
+                   showMPVPlaybackStats
+                {
+                    mpvPlaybackStats
+                }
             }
         }
     }
@@ -128,6 +131,60 @@ struct ControlsOverlay: View {
         #endif
     }
 
+    @ViewBuilder private var captionsButton: some View {
+        #if os(macOS)
+            captionsPicker
+                .labelsHidden()
+                .frame(maxWidth: 300)
+        #else
+            Menu {
+                captionsPicker
+                    .frame(width: 140, height: 30)
+                    .mask(RoundedRectangle(cornerRadius: 3))
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "text.bubble")
+                    if let captions = captionsBinding.wrappedValue {
+                        Text(captions.code)
+                            .foregroundColor(.primary)
+                    }
+                }
+                .frame(width: 140, height: 30)
+            }
+            .transaction { t in t.animation = .none }
+            .buttonStyle(.plain)
+            .foregroundColor(.primary)
+            .frame(width: 140, height: 30)
+            .modifier(ControlBackgroundModifier())
+            .mask(RoundedRectangle(cornerRadius: 3))
+        #endif
+    }
+
+    @ViewBuilder private var captionsPicker: some View {
+        let captions = player.currentVideo?.captions ?? []
+        Picker("Captions", selection: captionsBinding) {
+            if captions.isEmpty {
+                Text("Not available")
+            } else {
+                Text("Disabled").tag(Captions?.none)
+            }
+            ForEach(captions) { caption in
+                Text(caption.description).tag(Optional(caption))
+            }
+        }
+        .disabled(captions.isEmpty)
+    }
+
+    private var captionsBinding: Binding<Captions?> {
+        .init(
+            get: { player.mpvBackend.captions },
+            set: {
+                player.mpvBackend.captions = $0
+                Defaults[.captionsLanguageCode] = $0?.code
+            }
+        )
+    }
+
     @ViewBuilder private var rateButton: some View {
         #if os(macOS)
             ratePicker
@@ -185,6 +242,7 @@ struct ControlsOverlay: View {
 struct ControlsOverlay_Previews: PreviewProvider {
     static var previews: some View {
         ControlsOverlay()
+            .environmentObject(NetworkStateModel())
             .environmentObject(PlayerModel())
             .environmentObject(PlayerControlsModel())
     }

@@ -19,6 +19,13 @@ final class MPVBackend: PlayerBackend {
 
     var stream: Stream?
     var video: Video?
+    var captions: Captions? { didSet {
+        guard let captions = captions else {
+            client.removeSubs()
+            return
+        }
+        addSubTrack(captions.url)
+    }}
     var currentTime: CMTime?
 
     var loadedVideo = false
@@ -155,11 +162,18 @@ final class MPVBackend: PlayerBackend {
             }
         #endif
 
+        var captions: Captions?
+        if let captionsLanguageCode = Defaults[.captionsLanguageCode] {
+            captions = video.captions.first { $0.code == captionsLanguageCode } ??
+                video.captions.first { $0.code.contains(captionsLanguageCode) }
+        }
+
         let updateCurrentStream = {
             DispatchQueue.main.async { [weak self] in
                 self?.stream = stream
                 self?.video = video
                 self?.model.stream = stream
+                self?.captions = captions
             }
         }
 
@@ -211,7 +225,7 @@ final class MPVBackend: PlayerBackend {
                         startPlaying()
                     }
 
-                    self.client.loadFile(url, time: time) { [weak self] _ in
+                    self.client.loadFile(url, sub: captions?.url, time: time) { [weak self] _ in
                         self?.isLoadingVideo = true
                     }
                 } else {
@@ -223,7 +237,7 @@ final class MPVBackend: PlayerBackend {
                     let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                     let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 
-                    self.client?.loadFile(fileToLoad, audio: audioTrack, time: time) { [weak self] _ in
+                    self.client?.loadFile(fileToLoad, audio: audioTrack, sub: captions?.url, time: time) { [weak self] _ in
                         self?.isLoadingVideo = true
                         self?.pause()
                     }
@@ -452,6 +466,11 @@ final class MPVBackend: PlayerBackend {
 
     func addVideoTrack(_ url: URL) {
         client?.addVideoTrack(url)
+    }
+
+    func addSubTrack(_ url: URL) {
+        client?.removeSubs()
+        client?.addSubTrack(url)
     }
 
     func setVideoToAuto() {

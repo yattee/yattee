@@ -199,7 +199,8 @@ struct VideoPlayerView: View {
                         .gesture(
                             DragGesture(coordinateSpace: .global)
                                 .onChanged { value in
-                                    guard player.presentingPlayer else { return }
+                                    guard player.presentingPlayer,
+                                          !playerControls.presentingControlsOverlay else { return }
 
                                     let drag = value.translation.height
 
