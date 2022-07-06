@@ -8,6 +8,10 @@ import Logging
 #endif
 
 final class MPVClient: ObservableObject {
+    static var logFile: URL {
+        YatteeApp.logsDirectory.appendingPathComponent("yattee-\(YatteeApp.build)-mpv-log.txt")
+    }
+
     private var logger = Logger(label: "mpv-client")
 
     var mpv: OpaquePointer!
@@ -36,11 +40,20 @@ final class MPVClient: ObservableObject {
             exit(1)
         }
 
-        #if DEBUG
+        if Defaults[.mpvEnableLogging] {
+            checkError(mpv_set_option_string(
+                mpv,
+                "log-file",
+                Self.logFile.absoluteString.replacingOccurrences(of: "file://", with: "")
+            ))
             checkError(mpv_request_log_messages(mpv, "debug"))
-        #else
-            checkError(mpv_request_log_messages(mpv, "warn"))
-        #endif
+        } else {
+            #if DEBUG
+                checkError(mpv_request_log_messages(mpv, "debug"))
+            #else
+                checkError(mpv_request_log_messages(mpv, "no"))
+            #endif
+        }
 
         #if os(macOS)
             checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))

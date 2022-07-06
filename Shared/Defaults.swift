@@ -101,6 +101,7 @@ extension Defaults.Keys {
 
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "2")
+    static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

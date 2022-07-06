@@ -20,6 +20,10 @@ struct YatteeApp: App {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
     }
 
+    static var logsDirectory: URL {
+        URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    }
+
     #if os(macOS)
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #elseif os(iOS)
