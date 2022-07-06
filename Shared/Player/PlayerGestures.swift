@@ -13,7 +13,7 @@ struct PlayerGestures: View {
                         if model.presentingControlsOverlay {
                             model.presentingControls = true
                             model.resetTimer()
-                            withAnimation {
+                            withAnimation(PlayerControls.animation) {
                                 model.presentingControlsOverlay = false
                             }
                         } else {
@@ -35,7 +35,7 @@ struct PlayerGestures: View {
                         if model.presentingControlsOverlay {
                             model.presentingControls = true
                             model.resetTimer()
-                            withAnimation {
+                            withAnimation(PlayerControls.animation) {
                                 model.presentingControlsOverlay = false
                             }
                         } else {
@@ -57,7 +57,7 @@ struct PlayerGestures: View {
                         if model.presentingControlsOverlay {
                             model.presentingControls = true
                             model.resetTimer()
-                            withAnimation {
+                            withAnimation(PlayerControls.animation) {
                                 model.presentingControlsOverlay = false
                             }
                         } else {
