@@ -13,7 +13,6 @@ struct PlayerSettings: View {
     @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockOrientationInFullScreen) private var lockOrientationInFullScreen
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
@@ -93,7 +92,6 @@ struct PlayerSettings: View {
                         enterFullscreenInLandscapeToggle
                     }
                     honorSystemOrientationLockToggle
-                    lockOrientationInFullScreenToggle
                 }
             #endif
         }
@@ -185,11 +183,6 @@ struct PlayerSettings: View {
 
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
-        }
-
-        private var lockOrientationInFullScreenToggle: some View {
-            Toggle("Lock orientation in fullscreen", isOn: $lockOrientationInFullScreen)
-                .disabled(!enterFullscreenInLandscape)
         }
     #endif
 

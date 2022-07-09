@@ -19,6 +19,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             UITabBar.appearance().backgroundImage = UIImage()
             UITabBar.appearance().isTranslucent = true
             UITabBar.appearance().backgroundColor = .clear
+
+            OrientationTracker.shared.startDeviceOrientationTracking()
         #endif
         return true
     }

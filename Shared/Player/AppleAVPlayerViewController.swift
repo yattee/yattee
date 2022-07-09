@@ -136,40 +136,13 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewController(
         _: AVPlayerViewController,
-        willBeginFullScreenPresentationWithAnimationCoordinator context: UIViewControllerTransitionCoordinator
-    ) {
-        #if os(iOS)
-            if !context.isCancelled, Defaults[.lockOrientationInFullScreen] {
-                Orientation.lockOrientation(.landscape, andRotateTo: UIDevice.current.orientation.isLandscape ? nil : .landscapeRight)
-            }
-        #endif
-    }
+        willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
+    ) {}
 
     func playerViewController(
         _: AVPlayerViewController,
-        willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator
-    ) {
-        let wasPlaying = playerModel.isPlaying
-        coordinator.animate(alongsideTransition: nil) { context in
-            #if os(iOS)
-                if wasPlaying {
-                    self.playerModel.play()
-                }
-            #endif
-            if !context.isCancelled {
-                #if os(iOS)
-                    self.playerModel.lockedOrientation = nil
-                    if Defaults[.enterFullscreenInLandscape] {
-                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                    }
-
-                    if wasPlaying {
-                        self.playerModel.play()
-                    }
-                #endif
-            }
-        }
-    }
+        willEndFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
+    ) {}
 
     func playerViewController(
         _: AVPlayerViewController,

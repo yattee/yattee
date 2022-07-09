@@ -38,7 +38,6 @@ struct VideoPlayerView: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
 
-        @State private var motionManager: CMMotionManager!
         @State private var orientation = UIInterfaceOrientation.portrait
         @State private var lastOrientation: UIInterfaceOrientation?
     #elseif os(macOS)
@@ -94,7 +93,7 @@ struct VideoPlayerView: View {
                             playerSize = geometry.size
                         }
                 }
-//                .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
+                .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
@@ -102,9 +101,6 @@ struct VideoPlayerView: View {
                     player.backend.setNeedsDrawing(!value)
                 }
                 #if os(iOS)
-                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                    handleOrientationDidChangeNotification()
-                }
                 .onChange(of: player.presentingPlayer) { newValue in
                     if newValue {
                         viewVerticalOffset = 0
@@ -120,9 +116,6 @@ struct VideoPlayerView: View {
                         } else {
                             Orientation.lockOrientation(.allButUpsideDown)
                         }
-
-                        motionManager?.stopAccelerometerUpdates()
-                        motionManager = nil
                         viewVerticalOffset = Self.hiddenOffset
                     }
                 }
@@ -203,7 +196,6 @@ struct VideoPlayerView: View {
                                 #endif
                             }
                         }
-//                        .ignoresSafeArea(.all, edges: fullScreenLayout ? .bottom : Edge.Set())
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
                         .onHover { hovering in
                             hoveringPlayer = hovering
@@ -253,7 +245,7 @@ struct VideoPlayerView: View {
                                 .background(Color.black)
 
                         #if !os(tvOS)
-                            if !player.playingFullScreen {
+                            if !fullScreenLayout {
                                 VStack(spacing: 0) {
                                     #if os(iOS)
                                         VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
@@ -281,7 +273,7 @@ struct VideoPlayerView: View {
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
-            if !player.playingFullScreen {
+            if !fullScreenLayout {
                 #if os(iOS)
                     if sidebarQueue {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
@@ -297,7 +289,7 @@ struct VideoPlayerView: View {
             }
         }
         #if os(iOS)
-        .statusBar(hidden: player.playingFullScreen)
+        .statusBar(hidden: fullScreenLayout)
         #endif
     }
 
@@ -339,18 +331,26 @@ struct VideoPlayerView: View {
                 PlayerGestures()
                 PlayerControls(player: player, thumbnails: thumbnails)
                 #if os(iOS)
-                    .padding(.top, fullScreenLayout ? (safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top) : 0)
+                    .padding(.top, controlsTopPadding)
                     .padding(.bottom, fullScreenLayout ? safeAreaInsets.bottom : 0)
                 #endif
             #endif
         }
-        .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
         #if os(iOS)
-            .statusBarHidden(fullScreenLayout)
+        .statusBarHidden(fullScreenLayout)
         #endif
     }
 
     #if os(iOS)
+        var controlsTopPadding: Double {
+            guard fullScreenLayout else { return 0 }
+
+            let idiom = UIDevice.current.userInterfaceIdiom
+            guard idiom == .pad else { return safeAreaInsets.top }
+
+            return safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top
+        }
+
         var safeAreaInsets: UIEdgeInsets {
             UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
         }
@@ -432,7 +432,7 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         private func configureOrientationUpdatesBasedOnAccelerometer() {
-            if UIDevice.current.orientation.isLandscape,
+            if OrientationTracker.shared.currentInterfaceOrientation.isLandscape,
                Defaults[.enterFullscreenInLandscape],
                !player.playingFullScreen,
                !player.playingInPictureInPicture
@@ -442,32 +442,16 @@ struct VideoPlayerView: View {
                 }
             }
 
-            guard !Defaults[.honorSystemOrientationLock], motionManager.isNil else {
-                return
-            }
-
-            motionManager = CMMotionManager()
-            motionManager.accelerometerUpdateInterval = 0.2
-            motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, _ in
-                guard player.presentingPlayer, !player.playingInPictureInPicture, !data.isNil else {
+            NotificationCenter.default.addObserver(
+                forName: OrientationTracker.deviceOrientationChangedNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                guard !Defaults[.honorSystemOrientationLock], player.presentingPlayer, !player.playingInPictureInPicture else {
                     return
                 }
 
-                guard let acceleration = data?.acceleration else {
-                    return
-                }
-
-                var orientation = UIInterfaceOrientation.unknown
-
-                if acceleration.x >= 0.65 {
-                    orientation = .landscapeLeft
-                } else if acceleration.x <= -0.65 {
-                    orientation = .landscapeRight
-                } else if acceleration.y <= -0.65 {
-                    orientation = .portrait
-                } else if acceleration.y >= 0.65 {
-                    orientation = .portraitUpsideDown
-                }
+                let orientation = OrientationTracker.shared.currentInterfaceOrientation
 
                 guard lastOrientation != orientation else {
                     return
@@ -475,67 +459,21 @@ struct VideoPlayerView: View {
 
                 lastOrientation = orientation
 
-                if orientation.isLandscape {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        guard Defaults[.enterFullscreenInLandscape] else {
-                            return
-                        }
-
-                        player.enterFullScreen()
-
-                        let orientationLockMask = orientation == .landscapeLeft ?
-                            UIInterfaceOrientationMask.landscapeLeft : .landscapeRight
-
-                        Orientation.lockOrientation(orientationLockMask, andRotateTo: orientation)
-
-                        guard Defaults[.lockOrientationInFullScreen] else {
-                            return
-                        }
-
-                        player.lockedOrientation = orientation
-                    }
-                } else {
-                    guard abs(acceleration.z) <= 0.74,
-                          player.lockedOrientation.isNil,
-                          Defaults[.enterFullscreenInLandscape],
-                          !Defaults[.lockOrientationInFullScreen]
-                    else {
+                DispatchQueue.main.async {
+                    guard Defaults[.enterFullscreenInLandscape] else {
                         return
                     }
 
-                    Orientation.lockOrientation(.portrait)
-                }
-            }
-        }
-
-        private func handleOrientationDidChangeNotification() {
-            viewVerticalOffset = viewVerticalOffset == 0 ? 0 : Self.hiddenOffset
-            let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
-            if newOrientation?.isLandscape ?? false,
-               player.presentingPlayer,
-               Defaults[.lockOrientationInFullScreen],
-               !player.lockedOrientation.isNil
-            {
-                Orientation.lockOrientation(.landscape, andRotateTo: newOrientation)
-                return
-            }
-
-            guard player.presentingPlayer, Defaults[.enterFullscreenInLandscape], Defaults[.honorSystemOrientationLock] else {
-                return
-            }
-
-            if UIDevice.current.orientation.isLandscape {
-                DispatchQueue.main.async {
-                    player.lockedOrientation = newOrientation
-                    player.enterFullScreen()
-                }
-            } else {
-                DispatchQueue.main.async {
-                    player.exitFullScreen()
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    player.exitFullScreen()
+                    if orientation.isLandscape {
+                        player.enterFullScreen()
+                        Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
+                    } else {
+                        if !player.playingFullScreen {
+                            player.exitFullScreen()
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                        }
+                    }
                 }
             }
         }
