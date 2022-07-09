@@ -33,6 +33,14 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.timeControlStatus == .playing
     }
 
+    var aspectRatio: Double {
+        #if os(tvOS)
+            VideoPlayerView.defaultAspectRatio
+        #else
+            controller?.aspectRatio ?? VideoPlayerView.defaultAspectRatio
+        #endif
+    }
+
     var isSeeking: Bool {
         // TODO: implement this maybe?
         false
@@ -144,14 +152,10 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func enterFullScreen() {
-        controller?.playerView
-            .perform(NSSelectorFromString("enterFullScreenAnimated:completionHandler:"), with: false, with: nil)
+        model.toggleFullscreen(model?.playingFullScreen ?? false)
     }
 
-    func exitFullScreen() {
-        controller?.playerView
-            .perform(NSSelectorFromString("exitFullScreenAnimated:completionHandler:"), with: false, with: nil)
-    }
+    func exitFullScreen() {}
 
     #if os(tvOS)
         func closePiP(wasPlaying: Bool) {

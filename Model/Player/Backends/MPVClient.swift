@@ -185,6 +185,20 @@ final class MPVClient: ObservableObject {
         mpv.isNil ? 0.0 : getDouble("demuxer-cache-duration")
     }
 
+    var aspectRatio: Double {
+        guard !mpv.isNil else { return VideoPlayerView.defaultAspectRatio }
+        let aspect = getDouble("video-params/aspect")
+        return aspect.isZero ? VideoPlayerView.defaultAspectRatio : aspect
+    }
+
+    var dh: Double {
+        let defaultDh = 500.0
+        guard !mpv.isNil else { return defaultDh }
+
+        let dh = getDouble("video-params/dh")
+        return dh.isZero ? defaultDh : dh
+    }
+
     var duration: CMTime {
         CMTime.secondsInDefaultTimescale(mpv.isNil ? -1 : getDouble("duration"))
     }
@@ -240,7 +254,24 @@ final class MPVClient: ObservableObject {
                 return
             }
 
-            glView?.frame = CGRect(x: 0, y: 0, width: roundedWidth, height: roundedHeight)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                UIView.animate(withDuration: 0.2, animations: {
+                    let height = [self.backend.model.playerSize.height, self.backend.model.playerSize.width / self.aspectRatio].min()!
+                    let offsetY = self.backend.model.playingFullScreen ? ((self.backend.model.playerSize.height / 2.0) - (height / 2)) : 0
+                    self.glView?.frame = CGRect(x: 0, y: offsetY, width: roundedWidth, height: height)
+                }) { completion in
+                    if completion {
+                        self.logger.info("setting player size to \(roundedWidth),\(roundedHeight) FINISHED")
+
+                        self.glView?.queue.async {
+                            self.glView.display()
+                        }
+                        self.backend?.controls?.objectWillChange.send()
+                    }
+                }
+            }
+
         #endif
     }
 

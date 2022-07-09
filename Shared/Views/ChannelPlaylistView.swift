@@ -61,8 +61,6 @@ struct ChannelPlaylistView: View {
                     viewVerticalOffset = Self.hiddenOffset
                 }
             }
-            .offset(y: viewVerticalOffset)
-            .animation(.easeIn(duration: 0.2), value: viewVerticalOffset)
             #endif
         } else {
             BrowserPlayerControls {
@@ -105,7 +103,9 @@ struct ChannelPlaylistView: View {
             ToolbarItem(placement: .navigation) {
                 if navigationStyle == .tab {
                     Button("Done") {
-                        navigation.presentingPlaylist = false
+                        withAnimation {
+                            navigation.presentingPlaylist = false
+                        }
                     }
                 }
             }
