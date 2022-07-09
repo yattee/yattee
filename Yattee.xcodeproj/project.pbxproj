@@ -511,6 +511,7 @@
 		379775932689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775942689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775952689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
+		379B0253287A1CDF001015B5 /* OrientationTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B0252287A1CDF001015B5 /* OrientationTracker.swift */; };
 		37A3B15A27255E7F000FB5EE /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */; };
 		37A3B15F27255E7F000FB5EE /* images in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B15E27255E7F000FB5EE /* images */; };
 		37A3B16127255E7F000FB5EE /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 37A3B16027255E7F000FB5EE /* manifest.json */; };
@@ -1073,6 +1074,7 @@
 		3797758A2689345500DD52A8 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		379775922689365600DD52A8 /* Array+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Next.swift"; sourceTree = "<group>"; };
 		37992DC726CC50BC003D4C27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		379B0252287A1CDF001015B5 /* OrientationTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrientationTracker.swift; sourceTree = "<group>"; };
 		37A3B15727255E7F000FB5EE /* Open in Yattee - macOS.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee - macOS.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37A3B15927255E7F000FB5EE /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		37A3B15E27255E7F000FB5EE /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
@@ -1775,6 +1777,7 @@
 			children = (
 				37B4E802277D0A72004BF56A /* AppDelegate.swift */,
 				37B4E804277D0AB4004BF56A /* Orientation.swift */,
+				379B0252287A1CDF001015B5 /* OrientationTracker.swift */,
 				3784B23A272894DA00B09468 /* ShareSheet.swift */,
 				3749BF9227ADA142000480FF /* BridgingHeader.h */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
@@ -2832,6 +2835,7 @@
 				37E70923271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				37BD07BB2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */,
 				37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
+				379B0253287A1CDF001015B5 /* OrientationTracker.swift in Sources */,
 				370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */,
 				37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */,
 				37C3A241272359900087A57A /* Double+Format.swift in Sources */,
