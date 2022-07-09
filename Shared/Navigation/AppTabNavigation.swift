@@ -145,25 +145,35 @@ struct AppTabNavigation: View {
         #endif
     }
 
-    private var channelView: some View {
-        ChannelVideosView()
-            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-            .environment(\.inChannelView, true)
-            .environment(\.navigationStyle, .tab)
-            .environmentObject(accounts)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
+    @ViewBuilder private var channelView: some View {
+        if navigation.presentingChannel {
+            ChannelVideosView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.inChannelView, true)
+                .environment(\.navigationStyle, .tab)
+                .environmentObject(accounts)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
+        } else {
+            EmptyView()
+        }
     }
 
-    private var playlistView: some View {
-        ChannelPlaylistView()
-            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-            .environmentObject(accounts)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
+    @ViewBuilder private var playlistView: some View {
+        if navigation.presentingPlaylist {
+            ChannelPlaylistView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(accounts)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
+        } else {
+            EmptyView()
+        }
     }
 }

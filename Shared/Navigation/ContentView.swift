@@ -130,7 +130,7 @@ struct ContentView: View {
         #endif
     }
 
-    var videoPlayer: some View {
+    @ViewBuilder var videoPlayer: some View {
         VideoPlayerView()
             .environmentObject(accounts)
             .environmentObject(comments)
