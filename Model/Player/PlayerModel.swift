@@ -170,7 +170,9 @@ final class PlayerModel: ObservableObject {
         #endif
 
         DispatchQueue.main.async { [weak self] in
-            self?.presentingPlayer = true
+            withAnimation {
+                self?.presentingPlayer = true
+            }
         }
 
         #if os(macOS)
@@ -182,7 +184,9 @@ final class PlayerModel: ObservableObject {
     func hide() {
         DispatchQueue.main.async { [weak self] in
             self?.playingFullScreen = false
-            self?.presentingPlayer = false
+            withAnimation {
+                self?.presentingPlayer = false
+            }
         }
 
         #if os(iOS)
@@ -625,26 +629,28 @@ final class PlayerModel: ObservableObject {
         controls.resetTimer()
 
         #if os(macOS)
-            Windows.player.toggleFullScreen()
-        #endif
-
-        #if os(iOS)
-            setNeedsDrawing(false)
-        #endif
-
-        playingFullScreen = !isFullScreen
-
-        #if os(iOS)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-                self?.setNeedsDrawing(true)
+            if isFullScreen {
+                Windows.player.toggleFullScreen()
             }
+        #endif
+        #if os(iOS)
+            withAnimation(.linear(duration: 0.2)) {
+                playingFullScreen = !isFullScreen
+            }
+        #else
+            playingFullScreen = !isFullScreen
+        #endif
 
-            if playingFullScreen {
-                guard !(UIApplication.shared.windows.first?.windowScene?.interfaceOrientation.isLandscape ?? true) else {
-                    return
+        #if os(macOS)
+            if !isFullScreen {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    Windows.player.toggleFullScreen()
                 }
-                Orientation.lockOrientation(.landscape, andRotateTo: .landscapeRight)
-            } else {
+            }
+        #endif
+
+        #if os(iOS)
+            if !playingFullScreen {
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
             }
         #endif

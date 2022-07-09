@@ -25,12 +25,15 @@ struct VideoPlayerSizeModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .frame(maxHeight: fullScreen ? .infinity : maxHeight)
-            .aspectRatio(usedAspectRatio, contentMode: .fit)
+            .frame(width: geometry.size.width)
+            .frame(maxHeight: maxHeight)
+        #if !os(macOS)
+            .aspectRatio(fullScreen ? nil : usedAspectRatio, contentMode: usedAspectRatioContentMode)
+        #endif
     }
 
     var usedAspectRatio: Double {
-        guard aspectRatio != nil else {
+        guard aspectRatio != nil, aspectRatio != 0 else {
             return VideoPlayerView.defaultAspectRatio
         }
 
@@ -53,6 +56,10 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     var maxHeight: Double {
+        guard !fullScreen else {
+            return .infinity
+        }
+
         #if os(iOS)
             let height = verticalSizeClass == .regular ? geometry.size.height - minimumHeightLeft : .infinity
         #else

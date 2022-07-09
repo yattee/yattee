@@ -21,10 +21,12 @@ struct VideoPlayerView: View {
     }
 
     @State private var playerSize: CGSize = .zero { didSet {
-        if playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits {
-            sidebarQueue = true
-        } else {
-            sidebarQueue = false
+        withAnimation {
+            if playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits {
+                sidebarQueue = true
+            } else {
+                sidebarQueue = false
+            }
         }
     }}
     @State private var hoveringPlayer = false
@@ -92,6 +94,7 @@ struct VideoPlayerView: View {
                             playerSize = geometry.size
                         }
                 }
+//                .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
@@ -134,6 +137,15 @@ struct VideoPlayerView: View {
         #endif
     }
 
+    var playerEdgesIgnoringSafeArea: Edge.Set {
+        #if os(iOS)
+            if fullScreenLayout, UIDevice.current.orientation.isLandscape {
+                return [.vertical]
+            }
+        #endif
+        return []
+    }
+
     var content: some View {
         Group {
             ZStack(alignment: .bottomLeading) {
@@ -173,23 +185,25 @@ struct VideoPlayerView: View {
                     }
                 #else
                     GeometryReader { geometry in
-                        VStack(spacing: 0) {
+                        Group {
                             if player.playingInPictureInPicture {
                                 pictureInPicturePlaceholder
                             } else {
                                 playerView
+
                                 #if !os(tvOS)
                                 .modifier(
                                     VideoPlayerSizeModifier(
                                         geometry: geometry,
-                                        aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
-                                        fullScreen: player.playingFullScreen
+                                        aspectRatio: player.backend.aspectRatio,
+                                        fullScreen: fullScreenLayout
                                     )
                                 )
                                 .overlay(playerPlaceholder)
                                 #endif
                             }
                         }
+//                        .ignoresSafeArea(.all, edges: fullScreenLayout ? .bottom : Edge.Set())
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
                         .onHover { hovering in
                             hoveringPlayer = hovering
@@ -197,7 +211,7 @@ struct VideoPlayerView: View {
                         }
                         #if !os(macOS)
                         .gesture(
-                            DragGesture(coordinateSpace: .global)
+                            DragGesture(minimumDistance: 0, coordinateSpace: .global)
                                 .onChanged { value in
                                     guard player.presentingPlayer,
                                           !playerControls.presentingControlsOverlay else { return }
@@ -242,20 +256,19 @@ struct VideoPlayerView: View {
                             if !player.playingFullScreen {
                                 VStack(spacing: 0) {
                                     #if os(iOS)
-                                        if verticalSizeClass == .regular {
-                                            VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
-                                                .edgesIgnoringSafeArea(.bottom)
-                                        }
-
+                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
+                                            .edgesIgnoringSafeArea(.bottom)
                                     #else
                                         VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
-
                                     #endif
                                 }
+                                #if !os(macOS)
+                                .transition(.move(edge: .bottom))
+                                #endif
                                 .background(colorScheme == .dark ? Color.black : Color.white)
                                 .modifier(VideoDetailsPaddingModifier(
                                     playerSize: player.playerSize,
-                                    aspectRatio: player.avPlayerBackend.controller?.aspectRatio,
+                                    aspectRatio: player.backend.aspectRatio,
                                     fullScreen: fullScreenDetails
                                 ))
                             }
@@ -263,6 +276,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
+
             .background(((colorScheme == .dark || fullScreenLayout) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
@@ -272,6 +286,7 @@ struct VideoPlayerView: View {
                     if sidebarQueue {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(maxWidth: 350)
+                            .transition(.move(edge: .trailing))
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
@@ -281,48 +296,65 @@ struct VideoPlayerView: View {
                 #endif
             }
         }
-        .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
         #if os(iOS)
-            .statusBar(hidden: player.playingFullScreen)
-            .navigationBarHidden(true)
+        .statusBar(hidden: player.playingFullScreen)
         #endif
     }
 
     var playerView: some View {
         ZStack(alignment: .top) {
-            switch player.activeBackend {
-            case .mpv:
-                player.mpvPlayerView
-                    .overlay(GeometryReader { proxy in
-                        Color.clear
-                            .onAppear {
-                                player.playerSize = proxy.size
-                            }
-                            .onChange(of: proxy.size) { _ in
-                                player.playerSize = proxy.size
-                            }
-                    })
-            case .appleAVPlayer:
-                player.avPlayerView
-                #if os(iOS)
-                    .onAppear {
-                        player.pipController = .init(playerLayer: player.playerLayerView.playerLayer)
-                        let pipDelegate = PiPDelegate()
-                        pipDelegate.player = player
+            Group {
+                switch player.activeBackend {
+                case .mpv:
+                    player.mpvPlayerView
+                        .overlay(GeometryReader { proxy in
+                            Color.clear
+                                .onAppear {
+                                    player.playerSize = proxy.size
+                                }
+                                .onChange(of: proxy.size) { _ in
+                                    player.playerSize = proxy.size
+                                }
+                        })
+                case .appleAVPlayer:
+                    player.avPlayerView
+                    #if os(iOS)
+                        .onAppear {
+                            player.pipController = .init(playerLayer: player.playerLayerView.playerLayer)
+                            let pipDelegate = PiPDelegate()
+                            pipDelegate.player = player
 
-                        player.pipDelegate = pipDelegate
-                        player.pipController?.delegate = pipDelegate
-                        player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
-                    }
-                #endif
+                            player.pipDelegate = pipDelegate
+                            player.pipController?.delegate = pipDelegate
+                            player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
+                        }
+                    #endif
+                }
             }
+            #if os(iOS)
+            .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
+            #endif
 
             #if !os(tvOS)
                 PlayerGestures()
                 PlayerControls(player: player, thumbnails: thumbnails)
+                #if os(iOS)
+                    .padding(.top, fullScreenLayout ? (safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top) : 0)
+                    .padding(.bottom, fullScreenLayout ? safeAreaInsets.bottom : 0)
+                #endif
             #endif
         }
+        .ignoresSafeArea(.all, edges: fullScreenLayout ? .vertical : Edge.Set())
+        #if os(iOS)
+            .statusBarHidden(fullScreenLayout)
+        #endif
     }
+
+    #if os(iOS)
+        var safeAreaInsets: UIEdgeInsets {
+            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
+        }
+    #endif
 
     var fullScreenLayout: Bool {
         #if os(iOS)
@@ -469,10 +501,6 @@ struct VideoPlayerView: View {
                           !Defaults[.lockOrientationInFullScreen]
                     else {
                         return
-                    }
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        player.exitFullScreen()
                     }
 
                     Orientation.lockOrientation(.portrait)

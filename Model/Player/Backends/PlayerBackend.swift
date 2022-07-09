@@ -19,6 +19,8 @@ protocol PlayerBackend {
     var isSeeking: Bool { get }
     var playerItemDuration: CMTime? { get }
 
+    var aspectRatio: Double { get }
+
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
     func canPlay(_ stream: Stream) -> Bool
 

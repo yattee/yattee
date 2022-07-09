@@ -86,6 +86,10 @@ final class MPVBackend: PlayerBackend {
         client?.tracksCount ?? -1
     }
 
+    var aspectRatio: Double {
+        client?.aspectRatio ?? VideoPlayerView.defaultAspectRatio
+    }
+
     var frameDropCount: Int {
         client?.frameDropCount ?? 0
     }
