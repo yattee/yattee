@@ -142,7 +142,7 @@ struct ContentView: View {
             .environmentObject(recents)
             .environmentObject(subscriptions)
             .environmentObject(thumbnailsModel)
-            .environment(\.navigationStyle, .sidebar)
+            .environment(\.navigationStyle, navigationStyle)
     }
 }
 

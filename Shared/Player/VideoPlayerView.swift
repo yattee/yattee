@@ -119,6 +119,7 @@ struct VideoPlayerView: View {
                         }
                         viewVerticalOffset = Self.hiddenOffset
                         stopOrientationUpdates()
+                        player.controls.hideOverlays()
                     }
                 }
                 #endif
@@ -203,9 +204,9 @@ struct VideoPlayerView: View {
                             hoveringPlayer = hovering
                             hovering ? playerControls.show() : playerControls.hide()
                         }
-                        #if !os(macOS)
-                        .gesture(playerDragGesture)
-                        #else
+                        #if os(iOS)
+                        .gesture(isPlayerDragGestureEnabled ? playerDragGesture : nil)
+                        #elseif os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
                                 if !player.currentItem.isNil, hoveringPlayer {
@@ -296,6 +297,9 @@ struct VideoPlayerView: View {
                     .onChange(of: proxy.size) { _ in
                         player.playerSize = proxy.size
                     }
+                    .onChange(of: player.controls.presentingOverlays) { _ in
+                        player.playerSize = proxy.size
+                    }
             })
             #if os(iOS)
             .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
@@ -349,6 +353,10 @@ struct VideoPlayerView: View {
                         player.show()
                     }
                 }
+        }
+
+        var isPlayerDragGestureEnabled: Bool {
+            !player.controls.presentingDetailsOverlay && !player.controls.presentingDetailsOverlay
         }
 
         var controlsTopPadding: Double {

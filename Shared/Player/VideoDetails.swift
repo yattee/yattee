@@ -108,7 +108,6 @@ struct VideoDetails: View {
                 page.update(.moveToLast)
             }
         }
-        .edgesIgnoringSafeArea(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
     }
 
@@ -178,18 +177,14 @@ struct VideoDetails: View {
                 }
             case .chapters:
                 ChaptersView()
-                    .edgesIgnoringSafeArea(.horizontal)
 
             case .queue:
                 PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: $fullScreen)
-                    .edgesIgnoringSafeArea(.horizontal)
 
             case .related:
                 RelatedView()
-                    .edgesIgnoringSafeArea(.horizontal)
             case .comments:
                 CommentsView(embedInScrollView: true)
-                    .edgesIgnoringSafeArea(.horizontal)
             }
         }
         .contentShape(Rectangle())
@@ -209,16 +204,16 @@ struct VideoDetails: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
                             VStack(alignment: .leading, spacing: 0) {
-                                ForEach(1 ... Int.random(in: 3 ... 5), id: \.self) { _ in
-                                    Text(String(repeating: Video.fixture.description!, count: Int.random(in: 1 ... 4)))
-                                        .redacted(reason: .placeholder)
-                                }
+                                Text(String(repeating: Video.fixture.description ?? "", count: Int.random(in: 1 ... 30)))
+                                    .redacted(reason: .placeholder)
                             }
                         } else if let description = video.description {
                             Group {
                                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
                                     Text(description)
+                                    #if !os(tvOS)
                                         .textSelection(.enabled)
+                                    #endif
                                 } else {
                                     Text(description)
                                 }
