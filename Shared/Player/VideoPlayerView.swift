@@ -112,6 +112,13 @@ struct VideoPlayerView: View {
                             player?.onPresentPlayer?()
                             player?.onPresentPlayer = nil
                         }
+
+                        if let orientationMask = player.lockedOrientation {
+                            Orientation.lockOrientation(
+                                orientationMask,
+                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
+                            )
+                        }
                     } else {
                         if Defaults[.lockPortraitWhenBrowsing] {
                             Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
@@ -333,8 +340,12 @@ struct VideoPlayerView: View {
 
                     guard drag > 0 else { return }
 
-                    if drag > 60, player.playingFullScreen {
+                    if drag > 60,
+                       player.playingFullScreen,
+                       !OrientationTracker.shared.currentInterfaceOrientation.isLandscape
+                    {
                         player.exitFullScreen()
+                        player.lockedOrientation = nil
                     }
 
                     viewVerticalOffset = drag
@@ -343,13 +354,9 @@ struct VideoPlayerView: View {
                     guard player.presentingPlayer,
                           !playerControls.presentingControlsOverlay else { return }
                     if viewVerticalOffset > 100 {
-                        if player.playingFullScreen {
-                            viewVerticalOffset = 0
-                            player.exitFullScreen()
-                        } else {
-                            player.backend.setNeedsDrawing(false)
-                            player.hide()
-                        }
+                        player.backend.setNeedsDrawing(false)
+                        player.hide()
+                        player.exitFullScreen()
                     } else {
                         viewVerticalOffset = 0
                         player.backend.setNeedsDrawing(true)
@@ -467,7 +474,11 @@ struct VideoPlayerView: View {
                 object: nil,
                 queue: .main
             ) { _ in
-                guard !Defaults[.honorSystemOrientationLock], player.presentingPlayer, !player.playingInPictureInPicture else {
+                guard !Defaults[.honorSystemOrientationLock],
+                      player.presentingPlayer,
+                      !player.playingInPictureInPicture,
+                      player.lockedOrientation.isNil
+                else {
                     return
                 }
 
