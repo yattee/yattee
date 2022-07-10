@@ -188,7 +188,7 @@ struct VideoPlayerView: View {
                                 .modifier(
                                     VideoPlayerSizeModifier(
                                         geometry: geometry,
-                                        aspectRatio: player.backend.aspectRatio,
+                                        aspectRatio: player.aspectRatio,
                                         fullScreen: fullScreenLayout
                                     )
                                 )
@@ -212,17 +212,17 @@ struct VideoPlayerView: View {
 
                                     guard drag > 0 else { return }
 
-                                    guard drag < 100 else {
-                                        player.hide()
-                                        return
-                                    }
-
                                     viewVerticalOffset = drag
                                 }
                                 .onEnded { _ in
                                     if viewVerticalOffset > 100 {
-                                        player.backend.setNeedsDrawing(false)
-                                        player.hide()
+                                        if player.playingFullScreen {
+                                            viewVerticalOffset = 0
+                                            player.exitFullScreen()
+                                        } else {
+                                            player.backend.setNeedsDrawing(false)
+                                            player.hide()
+                                        }
                                     } else {
                                         viewVerticalOffset = 0
                                         player.backend.setNeedsDrawing(true)
@@ -260,7 +260,6 @@ struct VideoPlayerView: View {
                                 .background(colorScheme == .dark ? Color.black : Color.white)
                                 .modifier(VideoDetailsPaddingModifier(
                                     playerSize: player.playerSize,
-                                    aspectRatio: player.backend.aspectRatio,
                                     fullScreen: fullScreenDetails
                                 ))
                             }
@@ -299,15 +298,6 @@ struct VideoPlayerView: View {
                 switch player.activeBackend {
                 case .mpv:
                     player.mpvPlayerView
-                        .overlay(GeometryReader { proxy in
-                            Color.clear
-                                .onAppear {
-                                    player.playerSize = proxy.size
-                                }
-                                .onChange(of: proxy.size) { _ in
-                                    player.playerSize = proxy.size
-                                }
-                        })
                 case .appleAVPlayer:
                     player.avPlayerView
                     #if os(iOS)
@@ -323,6 +313,15 @@ struct VideoPlayerView: View {
                     #endif
                 }
             }
+            .overlay(GeometryReader { proxy in
+                Color.clear
+                    .onAppear {
+                        player.playerSize = proxy.size
+                    }
+                    .onChange(of: proxy.size) { _ in
+                        player.playerSize = proxy.size
+                    }
+            })
             #if os(iOS)
             .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
             #endif
@@ -346,7 +345,7 @@ struct VideoPlayerView: View {
             guard fullScreenLayout else { return 0 }
 
             let idiom = UIDevice.current.userInterfaceIdiom
-            guard idiom == .pad else { return safeAreaInsets.top }
+            guard idiom == .pad else { return 0 }
 
             return safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top
         }
