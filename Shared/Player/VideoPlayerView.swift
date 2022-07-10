@@ -46,6 +46,7 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         @State private var viewVerticalOffset = Self.hiddenOffset
+        @State private var orientationObserver: Any?
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -117,6 +118,7 @@ struct VideoPlayerView: View {
                             Orientation.lockOrientation(.allButUpsideDown)
                         }
                         viewVerticalOffset = Self.hiddenOffset
+                        stopOrientationUpdates()
                     }
                 }
                 #endif
@@ -441,7 +443,7 @@ struct VideoPlayerView: View {
                 }
             }
 
-            NotificationCenter.default.addObserver(
+            orientationObserver = NotificationCenter.default.addObserver(
                 forName: OrientationTracker.deviceOrientationChangedNotification,
                 object: nil,
                 queue: .main
@@ -475,6 +477,11 @@ struct VideoPlayerView: View {
                     }
                 }
             }
+        }
+
+        private func stopOrientationUpdates() {
+            guard let observer = orientationObserver else { return }
+            NotificationCenter.default.removeObserver(observer)
         }
     #endif
 
