@@ -8,20 +8,16 @@ extension PlayerModel {
         currentItem?.video
     }
 
-    func play(_ videos: [Video], shuffling: Bool = false) {
-        let videosToPlay = shuffling ? videos.shuffled() : videos
-
-        guard let first = videosToPlay.first else {
-            return
+    func play(_ videos: [Video]) {
+        videos.forEach { video in
+            enqueueVideo(video, loadDetails: false)
         }
 
-        enqueueVideo(first, prepending: true) { _, item in
-            self.advanceToItem(item)
-        }
-
-        videosToPlay.dropFirst().reversed().forEach { video in
-            enqueueVideo(video, prepending: true, loadDetails: false)
-        }
+        #if os(iOS)
+            onPresentPlayer = { [weak self] in self?.advanceToNextItem() }
+        #else
+            advanceToNextItem()
+        #endif
 
         show()
     }
@@ -43,6 +39,8 @@ extension PlayerModel {
     }
 
     func playItem(_ item: PlayerQueueItem, at time: CMTime? = nil) {
+        advancing = false
+
         if !playingInPictureInPicture {
             backend.closeItem()
         }
@@ -79,10 +77,39 @@ extension PlayerModel {
     }
 
     func advanceToNextItem() {
+        guard !advancing else {
+            return
+        }
+        advancing = true
         prepareCurrentItemForHistory()
 
-        if let nextItem = queue.first {
+        var nextItem: PlayerQueueItem?
+        switch playbackMode {
+        case .queue:
+            nextItem = queue.first
+        case .shuffle:
+            nextItem = queue.randomElement()
+        case .related:
+            nextItem = autoplayItem
+        case .loopOne:
+            nextItem = nil
+        }
+
+        resetAutoplay()
+
+        if let nextItem = nextItem {
             advanceToItem(nextItem)
+        }
+    }
+
+    var isAdvanceToNextItemAvailable: Bool {
+        switch playbackMode {
+        case .loopOne:
+            return false
+        case .queue, .shuffle:
+            return !queue.isEmpty
+        case .related:
+            return !autoplayItem.isNil
         }
     }
 
@@ -206,6 +233,7 @@ extension PlayerModel {
 
     private func videoLoadFailureHandler(_ error: RequestError) {
         navigation.presentAlert(title: "Could not load video", message: error.userMessage)
+        advancing = false
         videoBeingOpened = nil
         currentItem = nil
     }
