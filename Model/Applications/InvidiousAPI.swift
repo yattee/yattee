@@ -508,7 +508,13 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
-        guard let audioStream = streams.first(where: { $0["type"].stringValue.starts(with: "audio/mp4") }) else {
+        let audioStreams = streams
+            .filter { $0["type"].stringValue.starts(with: "audio/mp4") }
+            .sorted {
+                $0.dictionaryValue["bitrate"]?.int ?? 0 >
+                    $1.dictionaryValue["bitrate"]?.int ?? 0
+            }
+        guard let audioStream = audioStreams.first else {
             return .init()
         }
 

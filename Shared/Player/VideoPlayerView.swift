@@ -41,6 +41,7 @@ struct VideoPlayerView: View {
         @State private var orientation = UIInterfaceOrientation.portrait
         @State private var lastOrientation: UIInterfaceOrientation?
     #elseif os(macOS)
+        var hoverThrottle = Throttle(interval: 0.5)
         var mouseLocation: CGPoint { NSEvent.mouseLocation }
     #endif
 
@@ -209,8 +210,10 @@ struct VideoPlayerView: View {
                         #elseif os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                if !player.currentItem.isNil, hoveringPlayer {
-                                    playerControls.resetTimer()
+                                hoverThrottle.execute {
+                                    if !player.currentItem.isNil, hoveringPlayer {
+                                        playerControls.resetTimer()
+                                    }
                                 }
 
                                 return $0

@@ -124,7 +124,6 @@ struct PlayerControls: View {
                 .foregroundColor(.secondary)
                 .modifier(ControlBackgroundModifier())
                 .clipShape(RoundedRectangle(cornerRadius: 2))
-                .offset(x: -2, y: -2)
             }
             .buttonStyle(.plain)
             .opacity(model.presentingControls || model.presentingOverlays ? 0 : player.lastSkipped.isNil ? 0 : 1)
