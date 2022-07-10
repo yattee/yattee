@@ -8,6 +8,7 @@ final class PlayerControlsModel: ObservableObject {
     @Published var isPlaying = true
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
     @Published var presentingControlsOverlay = false { didSet { handleOverlayPresentationChange() } }
+    @Published var presentingDetailsOverlay = false
     @Published var timer: Timer?
 
     #if os(tvOS)
@@ -21,6 +22,7 @@ final class PlayerControlsModel: ObservableObject {
         isPlaying: Bool = true,
         presentingControls: Bool = false,
         presentingControlsOverlay: Bool = false,
+        presentingDetailsOverlay: Bool = false,
         timer: Timer? = nil,
         player: PlayerModel? = nil
     ) {
@@ -28,20 +30,22 @@ final class PlayerControlsModel: ObservableObject {
         self.isPlaying = isPlaying
         self.presentingControls = presentingControls
         self.presentingControlsOverlay = presentingControlsOverlay
+        self.presentingDetailsOverlay = presentingDetailsOverlay
         self.timer = timer
         self.player = player
     }
 
     func handlePresentationChange() {
-        if presentingControls {
-            DispatchQueue.main.async { [weak self] in
-                self?.player?.backend.startControlsUpdates()
-                self?.resetTimer()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if self.presentingControls {
+                self.player?.backend.startControlsUpdates()
+                self.resetTimer()
+            } else {
+                self.player?.backend.stopControlsUpdates()
+                self.timer?.invalidate()
+                self.timer = nil
             }
-        } else {
-            player?.backend.stopControlsUpdates()
-            timer?.invalidate()
-            timer = nil
         }
     }
 
@@ -52,6 +56,15 @@ final class PlayerControlsModel: ObservableObject {
         } else {
             resetTimer()
         }
+    }
+
+    var presentingOverlays: Bool {
+        presentingDetailsOverlay || presentingControlsOverlay
+    }
+
+    func hideOverlays() {
+        presentingDetailsOverlay = false
+        presentingControlsOverlay = false
     }
 
     func show() {

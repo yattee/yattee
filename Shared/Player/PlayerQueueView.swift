@@ -28,9 +28,10 @@ struct PlayerQueueView: View {
                     playedPreviously
                 }
             }
+            .listRowBackground(Color.clear)
             #if !os(iOS)
-            .padding(.vertical, 5)
-            .listRowInsets(EdgeInsets())
+                .padding(.vertical, 5)
+                .listRowInsets(EdgeInsets())
             #endif
         }
 
@@ -38,6 +39,8 @@ struct PlayerQueueView: View {
         .listStyle(.inset)
         #elseif os(iOS)
         .listStyle(.grouped)
+        .backport
+        .scrollContentBackground(false)
         #else
         .listStyle(.plain)
         #endif

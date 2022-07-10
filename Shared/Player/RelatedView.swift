@@ -13,6 +13,7 @@ struct RelatedView: View {
                 Section(header: Text("Related")) {
                     ForEach(related) { video in
                         PlayerQueueRow(item: PlayerQueueItem(video))
+                            .listRowBackground(Color.clear)
                             .contextMenu {
                                 Section {
                                     Button {
@@ -53,6 +54,8 @@ struct RelatedView: View {
         .listStyle(.inset)
         #elseif os(iOS)
         .listStyle(.grouped)
+        .backport
+        .scrollContentBackground(false)
         #else
         .listStyle(.plain)
         #endif
