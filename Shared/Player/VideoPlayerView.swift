@@ -204,47 +204,20 @@ struct VideoPlayerView: View {
                             hovering ? playerControls.show() : playerControls.hide()
                         }
                         #if !os(macOS)
-                        .gesture(
-                            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                                .onChanged { value in
-                                    guard player.presentingPlayer,
-                                          !playerControls.presentingControlsOverlay else { return }
-
-                                    let drag = value.translation.height
-
-                                    guard drag > 0 else { return }
-
-                                    viewVerticalOffset = drag
-                                }
-                                .onEnded { _ in
-                                    if viewVerticalOffset > 100 {
-                                        if player.playingFullScreen {
-                                            viewVerticalOffset = 0
-                                            player.exitFullScreen()
-                                        } else {
-                                            player.backend.setNeedsDrawing(false)
-                                            player.hide()
-                                        }
-                                    } else {
-                                        viewVerticalOffset = 0
-                                        player.backend.setNeedsDrawing(true)
-                                        player.show()
-                                    }
-                                }
-                        )
+                        .gesture(playerDragGesture)
                         #else
-                                .onAppear(perform: {
-                                    NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                        if !player.currentItem.isNil, hoveringPlayer {
-                                            playerControls.resetTimer()
-                                        }
+                        .onAppear(perform: {
+                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                if !player.currentItem.isNil, hoveringPlayer {
+                                    playerControls.resetTimer()
+                                }
 
-                                        return $0
-                                    }
-                                })
+                                return $0
+                            }
+                        })
                         #endif
 
-                                .background(Color.black)
+                        .background(Color.black)
 
                         #if !os(tvOS)
                             if !fullScreenLayout {
@@ -343,6 +316,41 @@ struct VideoPlayerView: View {
     }
 
     #if os(iOS)
+        var playerDragGesture: some Gesture {
+            DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { value in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+
+                    let drag = value.translation.height
+
+                    guard drag > 0 else { return }
+
+                    if drag > 60, player.playingFullScreen {
+                        player.exitFullScreen()
+                    }
+
+                    viewVerticalOffset = drag
+                }
+                .onEnded { _ in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+                    if viewVerticalOffset > 100 {
+                        if player.playingFullScreen {
+                            viewVerticalOffset = 0
+                            player.exitFullScreen()
+                        } else {
+                            player.backend.setNeedsDrawing(false)
+                            player.hide()
+                        }
+                    } else {
+                        viewVerticalOffset = 0
+                        player.backend.setNeedsDrawing(true)
+                        player.show()
+                    }
+                }
+        }
+
         var controlsTopPadding: Double {
             guard fullScreenLayout else { return 0 }
 
