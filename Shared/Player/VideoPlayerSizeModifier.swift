@@ -33,18 +33,11 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     var usedAspectRatio: Double {
-        guard aspectRatio != nil, aspectRatio != 0 else {
+        guard let aspectRatio = aspectRatio, aspectRatio != 0 else {
             return VideoPlayerView.defaultAspectRatio
         }
 
-        let ratio = [aspectRatio!, VideoPlayerView.defaultAspectRatio].min()!
-        let viewRatio = geometry.size.width / geometry.size.height
-
-        #if os(iOS)
-            return verticalSizeClass == .regular ? ratio : viewRatio
-        #else
-            return ratio
-        #endif
+        return [aspectRatio, VideoPlayerView.defaultAspectRatio].min()!
     }
 
     var usedAspectRatioContentMode: ContentMode {

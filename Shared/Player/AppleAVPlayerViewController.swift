@@ -12,7 +12,7 @@ final class AppleAVPlayerViewController: UIViewController {
 
     let persistenceController = PersistenceController.shared
 
-    #if !os(tvOS)
+    #if os(iOS)
         var aspectRatio: Double? {
             let ratio = Double(playerView.videoBounds.width) / Double(playerView.videoBounds.height)
 

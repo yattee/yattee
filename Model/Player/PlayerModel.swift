@@ -45,6 +45,7 @@ final class PlayerModel: ObservableObject {
     @Published var playerSize: CGSize = .zero { didSet {
         backend.setSize(playerSize.width, playerSize.height)
     }}
+    @Published var aspectRatio = VideoPlayerView.defaultAspectRatio
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
 
@@ -69,12 +70,6 @@ final class PlayerModel: ObservableObject {
     @Published var isSeeking = false { didSet {
         backend.setNeedsNetworkStateUpdates(true)
     }}
-
-    #if os(iOS)
-        @Published var motionManager: CMMotionManager!
-        @Published var lockedOrientation: UIInterfaceOrientation?
-        @Published var lastOrientation: UIInterfaceOrientation?
-    #endif
 
     var accounts: AccountsModel
     var comments: CommentsModel
@@ -487,6 +482,7 @@ final class PlayerModel: ObservableObject {
         currentItem = nil
 
         backend.closeItem()
+        aspectRatio = VideoPlayerView.defaultAspectRatio
     }
 
     func closePiP() {

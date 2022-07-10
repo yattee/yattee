@@ -34,10 +34,13 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     var aspectRatio: Double {
-        #if os(tvOS)
-            VideoPlayerView.defaultAspectRatio
+        #if os(iOS)
+            guard let view = model?.playerLayerView else { return VideoPlayerView.defaultAspectRatio }
+
+            let videoRect = view.playerLayer.videoRect
+            return videoRect.width / videoRect.height
         #else
-            controller?.aspectRatio ?? VideoPlayerView.defaultAspectRatio
+            VideoPlayerView.defaultAspectRatio
         #endif
     }
 
@@ -306,36 +309,38 @@ final class AVPlayerBackend: PlayerBackend {
                 try? AVAudioSession.sharedInstance().setActive(true)
             #endif
 
-            if self.isAutoplaying(self.model.playerItem!) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                    guard let self = self else {
-                        return
-                    }
+            self.setRate(self.model.currentRate)
 
-                    if !preservingTime,
-                       let segment = self.model.sponsorBlock.segments.first,
-                       segment.start < 3,
-                       self.model.lastSkipped.isNil
-                    {
-                        self.avPlayer.seek(
-                            to: segment.endTime,
-                            toleranceBefore: .secondsInDefaultTimescale(1),
-                            toleranceAfter: .zero
-                        ) { finished in
-                            guard finished else {
-                                return
-                            }
+            guard let item = self.model.playerItem, self.isAutoplaying(item) else { return }
 
-                            self.model.lastSkipped = segment
-                            self.model.play()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                self.model.aspectRatio = self.aspectRatio
+
+                if !preservingTime,
+                   let segment = self.model.sponsorBlock.segments.first,
+                   segment.start < 3,
+                   self.model.lastSkipped.isNil
+                {
+                    self.avPlayer.seek(
+                        to: segment.endTime,
+                        toleranceBefore: .secondsInDefaultTimescale(1),
+                        toleranceAfter: .zero
+                    ) { finished in
+                        guard finished else {
+                            return
                         }
-                    } else {
+
+                        self.model.lastSkipped = segment
                         self.model.play()
                     }
+                } else {
+                    self.model.play()
                 }
             }
-
-            self.setRate(self.model.currentRate)
         }
 
         let replaceItemAndSeek = {
