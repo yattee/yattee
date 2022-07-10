@@ -204,9 +204,11 @@ final class MPVBackend: PlayerBackend {
 
                         self.model.lastSkipped = segment
                         self.play()
+                        self.model.aspectRatio = self.aspectRatio
                     }
                 } else {
                     self.play()
+                    self.model.aspectRatio = self.aspectRatio
                 }
             }
         }
