@@ -80,12 +80,8 @@ struct PlaylistsView: View {
                 Spacer()
 
                 if currentPlaylist != nil {
-                    HStack(spacing: 0) {
-                        playButton
-
-                        shuffleButton
-                    }
-                    .offset(x: 10)
+                    playButton
+                        .offset(x: 10)
                 }
             }
             .padding(.horizontal)
@@ -180,7 +176,6 @@ struct PlaylistsView: View {
                         .labelStyle(.iconOnly)
 
                     playButton
-                    shuffleButton
                 }
 
                 Spacer()
@@ -293,19 +288,10 @@ struct PlaylistsView: View {
 
     private var playButton: some View {
         Button {
+            player.playbackMode = .queue
             player.play(items.compactMap(\.video))
         } label: {
             Image(systemName: "play")
-                .padding(8)
-                .contentShape(Rectangle())
-        }
-    }
-
-    private var shuffleButton: some View {
-        Button {
-            player.play(items.compactMap(\.video), shuffling: true)
-        } label: {
-            Image(systemName: "shuffle")
                 .padding(8)
                 .contentShape(Rectangle())
         }

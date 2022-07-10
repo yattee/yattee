@@ -15,6 +15,23 @@ import SwiftyJSON
 #endif
 
 final class PlayerModel: ObservableObject {
+    enum PlaybackMode: String, CaseIterable, Defaults.Serializable {
+        case queue, shuffle, loopOne, related
+
+        var systemImage: String {
+            switch self {
+            case .queue:
+                return "list.number"
+            case .shuffle:
+                return "shuffle"
+            case .loopOne:
+                return "repeat.1"
+            case .related:
+                return "infinity"
+            }
+        }
+    }
+
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
     let logger = Logger(label: "stream.yattee.app")
 
@@ -65,6 +82,11 @@ final class PlayerModel: ObservableObject {
     @Published var restoredSegments = [Segment]()
 
     @Published var musicMode = false
+    @Published var playbackMode = PlaybackMode.queue { didSet { handlePlaybackModeChange() }}
+    @Published var autoplayItem: PlayerQueueItem?
+    @Published var autoplayItemSource: Video?
+    @Published var advancing = false
+
     @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
 
     @Published var isSeeking = false { didSet {
@@ -160,6 +182,7 @@ final class PlayerModel: ObservableObject {
         )
 
         Defaults[.activeBackend] = .mpv
+        playbackMode = Defaults[.playbackMode]
     }
 
     func show() {
@@ -489,6 +512,7 @@ final class PlayerModel: ObservableObject {
 
         backend.closeItem()
         aspectRatio = VideoPlayerView.defaultAspectRatio
+        resetAutoplay()
     }
 
     func closePiP() {
@@ -518,8 +542,48 @@ final class PlayerModel: ObservableObject {
         #endif
 
         DispatchQueue.main.async(qos: .background) { [weak self] in
-            Defaults[.lastPlayed] = self?.currentItem
+            guard let self = self else { return }
+            Defaults[.lastPlayed] = self.currentItem
+
+            if self.playbackMode == .related,
+               let video = self.currentVideo,
+               self.autoplayItemSource.isNil || self.autoplayItemSource?.videoID != video.videoID
+            {
+                self.setRelatedAutoplayItem()
+            }
         }
+    }
+
+    func handlePlaybackModeChange() {
+        Defaults[.playbackMode] = playbackMode
+
+        guard playbackMode == .related else {
+            autoplayItem = nil
+            return
+        }
+        setRelatedAutoplayItem()
+    }
+
+    func setRelatedAutoplayItem() {
+        guard let video = currentVideo?.related.randomElement() else { return }
+
+        let item = PlayerQueueItem(video)
+        autoplayItem = item
+        autoplayItemSource = video
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            guard let self = self else { return }
+            self.accounts.api.loadDetails(item, completionHandler: { newItem in
+                guard newItem.videoID == self.autoplayItem?.videoID else { return }
+                self.autoplayItem = newItem
+                self.controls.objectWillChange.send()
+            })
+        }
+    }
+
+    func resetAutoplay() {
+        autoplayItem = nil
+        autoplayItemSource = nil
     }
 
     #if os(macOS)

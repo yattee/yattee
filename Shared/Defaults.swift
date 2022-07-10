@@ -74,6 +74,7 @@ extension Defaults.Keys {
 
     static let queue = Key<[PlayerQueueItem]>("queue", default: [])
     static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
+    static let playbackMode = Key<PlayerModel.PlaybackMode>("playbackMode", default: .queue)
 
     static let saveHistory = Key<Bool>("saveHistory", default: true)
     static let showWatchingProgress = Key<Bool>("showWatchingProgress", default: true)

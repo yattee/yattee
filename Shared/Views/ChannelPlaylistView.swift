@@ -86,8 +86,6 @@ struct ChannelPlaylistView: View {
 
                     playButton
                         .labelStyle(.iconOnly)
-                    shuffleButton
-                        .labelStyle(.iconOnly)
                 }
             #endif
             VerticalCells(items: items)
@@ -119,7 +117,6 @@ struct ChannelPlaylistView: View {
                     }
 
                     playButton
-                    shuffleButton
                 }
             }
         }
@@ -137,17 +134,10 @@ struct ChannelPlaylistView: View {
 
     private var playButton: some View {
         Button {
+            player.playbackMode = .queue
             player.play(videos)
         } label: {
             Label("Play All", systemImage: "play")
-        }
-    }
-
-    private var shuffleButton: some View {
-        Button {
-            player.play(videos, shuffling: true)
-        } label: {
-            Label("Shuffle", systemImage: "shuffle")
         }
     }
 

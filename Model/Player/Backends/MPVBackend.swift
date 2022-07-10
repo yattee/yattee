@@ -444,22 +444,7 @@ final class MPVBackend: PlayerBackend {
 
         getClientUpdates()
 
-        if Defaults[.closeLastItemOnPlaybackEnd] {
-            model.prepareCurrentItemForHistory(finished: true)
-        }
-
-        if model.queue.isEmpty {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(false)
-            #endif
-
-            if Defaults[.closeLastItemOnPlaybackEnd] {
-                model.resetQueue()
-                model.hide()
-            }
-        } else {
-            model.advanceToNextItem()
-        }
+        eofPlaybackModeAction()
     }
 
     func setNeedsDrawing(_ needsDrawing: Bool) {

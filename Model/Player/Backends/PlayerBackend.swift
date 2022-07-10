@@ -72,4 +72,30 @@ extension PlayerBackend {
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
         seek(relative: time, completionHandler: completionHandler)
     }
+
+    func eofPlaybackModeAction() {
+        switch model.playbackMode {
+        case .queue, .shuffle:
+            if Defaults[.closeLastItemOnPlaybackEnd] {
+                model.prepareCurrentItemForHistory(finished: true)
+            }
+
+            if model.queue.isEmpty {
+                if Defaults[.closeLastItemOnPlaybackEnd] {
+                    model.resetQueue()
+                    model.hide()
+                }
+            } else {
+                model.advanceToNextItem()
+            }
+        case .loopOne:
+            model.backend.seek(to: .zero) { _ in
+                self.model.play()
+            }
+        case .related:
+            guard let item = model.autoplayItem else { return }
+            model.resetAutoplay()
+            model.advanceToItem(item)
+        }
+    }
 }
