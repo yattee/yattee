@@ -109,7 +109,7 @@ struct ControlsBar: View {
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
             }
-            .disabled(model.queue.isEmpty)
+            .disabled(!model.isAdvanceToNextItemAvailable)
 
             Button {
                 model.closeCurrentItem()

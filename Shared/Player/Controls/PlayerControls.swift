@@ -275,6 +275,7 @@ struct PlayerControls: View {
             Spacer()
 
             HStack(spacing: 20) {
+                playbackModeButton
                 restartVideoButton
                 advanceToNextItemButton
                 #if !os(tvOS)
@@ -284,6 +285,12 @@ struct PlayerControls: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.system(size: 20))
+    }
+
+    var playbackModeButton: some View {
+        button("Playback Mode", systemImage: player.playbackMode.systemImage, background: false) {
+            player.playbackMode = player.playbackMode.next()
+        }
     }
 
     var seekBackwardButton: some View {
@@ -337,7 +344,7 @@ struct PlayerControls: View {
         button("Next", systemImage: "forward.fill", size: 25, cornerRadius: 5, background: false) {
             player.advanceToNextItem()
         }
-        .disabled(player.queue.isEmpty)
+        .disabled(!player.isAdvanceToNextItemAvailable)
     }
 
     func button(

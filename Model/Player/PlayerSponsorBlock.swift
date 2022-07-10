@@ -43,22 +43,7 @@ extension PlayerModel {
 
                 self.pause()
 
-                if Defaults[.closeLastItemOnPlaybackEnd] {
-                    self.prepareCurrentItemForHistory(finished: true)
-                }
-
-                if self.queue.isEmpty {
-                    #if !os(macOS)
-                        try? AVAudioSession.sharedInstance().setActive(false)
-                    #endif
-
-                    if Defaults[.closeLastItemOnPlaybackEnd] {
-                        self.resetQueue()
-                        self.hide()
-                    }
-                } else {
-                    self.advanceToNextItem()
-                }
+                self.backend.eofPlaybackModeAction()
             }
 
             return
