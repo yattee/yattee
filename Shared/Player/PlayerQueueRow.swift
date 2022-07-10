@@ -26,34 +26,32 @@ struct PlayerQueueRow: View {
     }
 
     var body: some View {
-        Group {
-            Button {
-                player.prepareCurrentItemForHistory()
+        Button {
+            player.prepareCurrentItemForHistory()
 
-                player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
+            player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
-                player.videoBeingOpened = item.video
+            player.videoBeingOpened = item.video
 
-                if history {
-                    player.playHistory(item, at: watchStoppedAt)
-                } else {
-                    player.advanceToItem(item, at: watchStoppedAt)
-                }
-
-                if fullScreen {
-                    withAnimation {
-                        fullScreen = false
-                    }
-                }
-
-                if closePiPOnNavigation, player.playingInPictureInPicture {
-                    player.closePiP()
-                }
-            } label: {
-                VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
+            if history {
+                player.playHistory(item, at: watchStoppedAt)
+            } else {
+                player.advanceToItem(item, at: watchStoppedAt)
             }
-            .buttonStyle(.plain)
+
+            if fullScreen {
+                withAnimation {
+                    fullScreen = false
+                }
+            }
+
+            if closePiPOnNavigation, player.playingInPictureInPicture {
+                player.closePiP()
+            }
+        } label: {
+            VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
         }
+        .buttonStyle(.plain)
     }
 
     private var watch: Watch? {

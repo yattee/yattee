@@ -24,6 +24,7 @@ struct ControlsBar: View {
     var borderBottom = true
     var detailsTogglePlayer = true
     var detailsToggleFullScreen = false
+    var titleLineLimit = 2
 
     var body: some View {
         HStack(spacing: 0) {
@@ -69,7 +70,9 @@ struct ControlsBar: View {
                 details
                     .contentShape(Rectangle())
             }
+            #if !os(tvOS)
             .keyboardShortcut("t")
+            #endif
         } else {
             details
         }
@@ -139,7 +142,9 @@ struct ControlsBar: View {
                        subscriptions.isSubscribing(video.channel.id)
                     {
                         Image(systemName: "star.circle.fill")
+                        #if !os(tvOS)
                             .background(Color.background)
+                        #endif
                             .clipShape(Circle())
                             .foregroundColor(.secondary)
                     }
@@ -166,7 +171,9 @@ struct ControlsBar: View {
                                     }
                                 }
 
-                                ShareButton(contentItem: .init(video: model.currentVideo))
+                                #if !os(tvOS)
+                                    ShareButton(contentItem: .init(video: model.currentVideo))
+                                #endif
 
                                 Section {
                                     Button {
@@ -215,12 +222,14 @@ struct ControlsBar: View {
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(model.currentVideo?.title ?? "Not playing")
                         .font(.system(size: 14))
                         .fontWeight(.semibold)
                         .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
-                        .lineLimit(1)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(titleLineLimit)
+                        .multilineTextAlignment(.leading)
 
                     if let video = model.currentVideo {
                         HStack(spacing: 2) {

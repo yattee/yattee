@@ -96,23 +96,19 @@ final class NavigationModel: ObservableObject {
         player.hide()
         navigation.presentingChannel = false
 
-        let recent = RecentItem(from: channel)
         #if os(macOS)
             Windows.main.open()
-        #else
-            player.hide()
         #endif
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            recents.add(recent)
+        let recent = RecentItem(from: channel)
+        recents.add(RecentItem(from: channel))
 
-            if navigationStyle == .sidebar {
-                navigation.sidebarSectionChanged.toggle()
-                navigation.tabSelection = .recentlyOpened(recent.tag)
-            } else {
-                withAnimation {
-                    navigation.presentingChannel = true
-                }
+        if navigationStyle == .sidebar {
+            navigation.sidebarSectionChanged.toggle()
+            navigation.tabSelection = .recentlyOpened(recent.tag)
+        } else {
+            withAnimation {
+                navigation.presentingChannel = true
             }
         }
     }

@@ -98,7 +98,13 @@ final class PlayerModel: ObservableObject {
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
-    @Published var playingFullScreen = false
+    #if os(tvOS)
+        static let fullScreenIsDefault = true
+    #else
+        static let fullScreenIsDefault = false
+    #endif
+    @Published var playingFullScreen = PlayerModel.fullScreenIsDefault
+
     @Published var playingInPictureInPicture = false
     var pipController: AVPictureInPictureController?
     var pipDelegate = PiPDelegate()

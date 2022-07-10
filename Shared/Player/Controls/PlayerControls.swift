@@ -29,7 +29,7 @@ struct PlayerControls: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topLeading) {
             VStack {
                 ZStack(alignment: .center) {
                     OpeningStream()
@@ -39,19 +39,20 @@ struct PlayerControls: View {
                         VStack(spacing: 4) {
                             buttonsBar
 
-                            if let video = player.currentVideo, player.playingFullScreen {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(video.title)
-                                        .font(.caption.bold())
-
-                                    Text(video.author)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                            HStack {
+                                if !player.currentVideo.isNil, player.playingFullScreen {
+                                    Button {
+                                        withAnimation(Self.animation) {
+                                            model.presentingDetailsOverlay = true
+                                        }
+                                    } label: {
+                                        ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
+                                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            .frame(maxWidth: 300, alignment: .leading)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .padding(4)
-                                .modifier(ControlBackgroundModifier())
-                                .clipShape(RoundedRectangle(cornerRadius: 2))
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                Spacer()
                             }
 
                             Spacer()
@@ -69,9 +70,6 @@ struct PlayerControls: View {
                                         .offset(y: -25)
                                         .zIndex(1)
                                 }
-                                #if os(tvOS)
-                                .offset(y: -50)
-                                #endif
                                 .frame(maxWidth: 500)
                                 .padding(.bottom, 2)
                             }
@@ -79,7 +77,7 @@ struct PlayerControls: View {
                         .padding(.top, 2)
                         .padding(.horizontal, 2)
                     }
-                    .opacity(model.presentingControlsOverlay ? 1 : model.presentingControls ? 1 : 0)
+                    .opacity(model.presentingOverlays ? 0 : model.presentingControls ? 1 : 0)
                 }
             }
             #if os(tvOS)
@@ -99,10 +97,15 @@ struct PlayerControls: View {
             ControlsOverlay()
                 .frame(height: overlayHeight)
                 .padding()
-                .modifier(ControlBackgroundModifier(enabled: true))
+                .modifier(ControlBackgroundModifier())
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                .offset(x: -2, y: 40)
                 .opacity(model.presentingControlsOverlay ? 1 : 0)
+
+            VideoDetailsOverlay()
+                .frame(maxWidth: detailsWidth, maxHeight: 450)
+                .modifier(ControlBackgroundModifier())
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .opacity(model.presentingDetailsOverlay ? 1 : 0)
 
             Button {
                 player.restoreLastSkippedSegment()
@@ -124,13 +127,18 @@ struct PlayerControls: View {
                 .offset(x: -2, y: -2)
             }
             .buttonStyle(.plain)
-            .opacity(model.presentingControls ? 0 : player.lastSkipped.isNil ? 0 : 1)
+            .opacity(model.presentingControls || model.presentingOverlays ? 0 : player.lastSkipped.isNil ? 0 : 1)
         }
     }
 
     var overlayHeight: Double {
         guard let player = player, player.playerSize.height.isFinite else { return 0 }
-        return [0, [player.playerSize.height - 80, 140].min()!].max()!
+        return [0, [player.playerSize.height - 40, 140].min()!].max()!
+    }
+
+    var detailsWidth: Double {
+        guard let player = player, player.playerSize.width.isFinite else { return 200 }
+        return [player.playerSize.width, 600].min()!
     }
 
     @ViewBuilder var controlsBackground: some View {

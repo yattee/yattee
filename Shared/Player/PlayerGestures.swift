@@ -9,17 +9,7 @@ struct PlayerGestures: View {
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: {
-                        if model.presentingControlsOverlay {
-                            model.presentingControls = true
-                            model.resetTimer()
-                            withAnimation(PlayerControls.animation) {
-                                model.presentingControlsOverlay = false
-                            }
-                        } else {
-                            model.toggle()
-                        }
-                    },
+                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(-10))
                     },
@@ -31,17 +21,7 @@ struct PlayerGestures: View {
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: {
-                        if model.presentingControlsOverlay {
-                            model.presentingControls = true
-                            model.resetTimer()
-                            withAnimation(PlayerControls.animation) {
-                                model.presentingControlsOverlay = false
-                            }
-                        } else {
-                            model.toggle()
-                        }
-                    },
+                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.togglePlay()
                     },
@@ -53,17 +33,7 @@ struct PlayerGestures: View {
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: {
-                        if model.presentingControlsOverlay {
-                            model.presentingControls = true
-                            model.resetTimer()
-                            withAnimation(PlayerControls.animation) {
-                                model.presentingControlsOverlay = false
-                            }
-                        } else {
-                            model.toggle()
-                        }
-                    },
+                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(10))
                     },
@@ -71,6 +41,16 @@ struct PlayerGestures: View {
                         model.update()
                     }
                 )
+        }
+    }
+
+    func singleTapAction() {
+        if model.presentingOverlays {
+            withAnimation(PlayerControls.animation) {
+                model.hideOverlays()
+            }
+        } else {
+            model.toggle()
         }
     }
 
