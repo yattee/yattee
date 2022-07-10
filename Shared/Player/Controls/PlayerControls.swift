@@ -207,6 +207,7 @@ struct PlayerControls: View {
 
                 #if os(iOS)
                     pipButton
+                    lockOrientationButton
                 #endif
 
                 Spacer()
@@ -261,6 +262,21 @@ struct PlayerControls: View {
             model.startPiP()
         }
     }
+
+    #if os(iOS)
+        private var lockOrientationButton: some View {
+            button("Lock Rotation", systemImage: player.lockedOrientation.isNil ? "lock.rotation.open" : "lock.rotation", active: !player.lockedOrientation.isNil) {
+                if player.lockedOrientation.isNil {
+                    let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
+                    player.lockedOrientation = orientationMask
+                    Orientation.lockOrientation(orientationMask)
+                } else {
+                    player.lockedOrientation = nil
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                }
+            }
+        }
+    #endif
 
     var floatingControls: some View {
         HStack {

@@ -93,6 +93,10 @@ final class PlayerModel: ObservableObject {
         backend.setNeedsNetworkStateUpdates(true)
     }}
 
+    #if os(iOS)
+        @Published var lockedOrientation: UIInterfaceOrientationMask?
+    #endif
+
     var accounts: AccountsModel
     var comments: CommentsModel
     var controls: PlayerControlsModel { didSet {
@@ -717,7 +721,7 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if !playingFullScreen {
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                Orientation.lockOrientation(.allButUpsideDown)
             }
         #endif
     }
