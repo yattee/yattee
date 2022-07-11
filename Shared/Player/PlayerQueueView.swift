@@ -20,6 +20,9 @@ struct PlayerQueueView: View {
     var body: some View {
         List {
             Group {
+                if player.playbackMode == .related {
+                    autoplaying
+                }
                 playingNext
                 if sidebarQueue {
                     related
@@ -46,10 +49,42 @@ struct PlayerQueueView: View {
         #endif
     }
 
+    @ViewBuilder var autoplaying: some View {
+        Section(header: autoplayingHeader) {
+            if let item = player.autoplayItem {
+                PlayerQueueRow(item: item, autoplay: true)
+            } else {
+                Group {
+                    if player.currentItem.isNil {
+                        Text("Not Playing")
+                    } else {
+                        Text("Finding something to play...")
+                    }
+                }
+                .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    var autoplayingHeader: some View {
+        HStack {
+            Text("Autoplaying Next")
+            Spacer()
+            Button {
+                player.setRelatedAutoplayItem()
+            } label: {
+                Label("Find Other", systemImage: "arrow.triangle.2.circlepath.circle")
+                    .labelStyle(.iconOnly)
+            }
+            .disabled(player.currentItem.isNil)
+            .buttonStyle(.plain)
+        }
+    }
+
     var playingNext: some View {
-        Section(header: Text("Playing Next")) {
+        Section(header: Text("Queue")) {
             if player.queue.isEmpty {
-                Text("Playback queue is empty")
+                Text("Queue is empty")
                     .foregroundColor(.secondary)
             }
 
@@ -73,7 +108,7 @@ struct PlayerQueueView: View {
     var playedPreviously: some View {
         Group {
             if !visibleWatches.isEmpty {
-                Section(header: Text("Played Previously")) {
+                Section(header: Text("History")) {
                     ForEach(visibleWatches, id: \.videoID) { watch in
                         PlayerQueueRow(
                             item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
