@@ -263,11 +263,13 @@ struct VideoPlayerView: View {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(maxWidth: 350)
                             .transition(.move(edge: .trailing))
+                            .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(minWidth: 300)
+                            .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #endif
             }
