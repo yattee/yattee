@@ -213,7 +213,7 @@ struct VideoPlayerView: View {
                             hovering ? playerControls.show() : playerControls.hide()
                         }
                         #if os(iOS)
-                        .gesture(isPlayerDragGestureEnabled ? playerDragGesture : nil)
+                        .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
                         #elseif os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
@@ -359,10 +359,6 @@ struct VideoPlayerView: View {
                         player.show()
                     }
                 }
-        }
-
-        var isPlayerDragGestureEnabled: Bool {
-            !player.controls.presentingDetailsOverlay && !player.controls.presentingDetailsOverlay
         }
 
         var controlsTopPadding: Double {
