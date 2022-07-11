@@ -1,5 +1,6 @@
 import Combine
 import CoreMedia
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -7,8 +8,8 @@ final class PlayerControlsModel: ObservableObject {
     @Published var isLoadingVideo = false
     @Published var isPlaying = true
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
-    @Published var presentingControlsOverlay = false { didSet { handleOverlayPresentationChange() } }
-    @Published var presentingDetailsOverlay = false
+    @Published var presentingControlsOverlay = false { didSet { handleSettingsOverlayPresentationChange() } }
+    @Published var presentingDetailsOverlay = false { didSet { handleDetailsOverlayPresentationChange() } }
     @Published var timer: Timer?
 
     #if os(tvOS)
@@ -49,9 +50,17 @@ final class PlayerControlsModel: ObservableObject {
         }
     }
 
-    func handleOverlayPresentationChange() {
-        player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay)
+    func handleSettingsOverlayPresentationChange() {
+        player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay && Defaults[.showMPVPlaybackStats])
         if presentingControlsOverlay {
+            removeTimer()
+        } else {
+            resetTimer()
+        }
+    }
+
+    func handleDetailsOverlayPresentationChange() {
+        if presentingDetailsOverlay {
             removeTimer()
         } else {
             resetTimer()

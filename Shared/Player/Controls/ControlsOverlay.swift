@@ -15,7 +15,11 @@ struct ControlsOverlay: View {
                     backendButtons
                 }
                 qualityButton
-                captionsButton
+
+                if player.activeBackend == .mpv {
+                    captionsButton
+                }
+
                 HStack {
                     decreaseRateButton
                     rateButton
