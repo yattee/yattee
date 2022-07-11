@@ -82,7 +82,7 @@ final class PlayerModel: ObservableObject {
     @Published var restoredSegments = [Segment]()
 
     @Published var musicMode = false
-    @Published var playbackMode = PlaybackMode.queue { didSet { handlePlaybackModeChange() }}
+    @Published var playbackMode = PlaybackMode.queue { didSet { handlePlaybackModeChange() } }
     @Published var autoplayItem: PlayerQueueItem?
     @Published var autoplayItemSource: Video?
     @Published var advancing = false
@@ -158,6 +158,7 @@ final class PlayerModel: ObservableObject {
     #endif
 
     var onPresentPlayer: (() -> Void)?
+    private var remoteCommandCenterConfigured = false
 
     init(
         accounts: AccountsModel = AccountsModel(),
@@ -537,6 +538,7 @@ final class PlayerModel: ObservableObject {
     func handleQueueChange() {
         Defaults[.queue] = queue
 
+        updateRemoteCommandCenter()
         controls.objectWillChange.send()
     }
 
@@ -561,6 +563,8 @@ final class PlayerModel: ObservableObject {
     func handlePlaybackModeChange() {
         Defaults[.playbackMode] = playbackMode
 
+        updateRemoteCommandCenter()
+
         guard playbackMode == .related else {
             autoplayItem = nil
             return
@@ -580,8 +584,91 @@ final class PlayerModel: ObservableObject {
             self.accounts.api.loadDetails(item, completionHandler: { newItem in
                 guard newItem.videoID == self.autoplayItem?.videoID else { return }
                 self.autoplayItem = newItem
+                self.updateRemoteCommandCenter()
                 self.controls.objectWillChange.send()
             })
+        }
+    }
+
+    func updateRemoteCommandCenter() {
+        let skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand
+        let skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand
+        let previousTrackCommand = MPRemoteCommandCenter.shared().previousTrackCommand
+        let nextTrackCommand = MPRemoteCommandCenter.shared().nextTrackCommand
+
+        if !remoteCommandCenterConfigured {
+            remoteCommandCenterConfigured = true
+
+            #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .moviePlayback
+                )
+
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+            #endif
+
+            let preferredIntervals = [NSNumber(10)]
+
+            skipForwardCommand.preferredIntervals = preferredIntervals
+            skipBackwardCommand.preferredIntervals = preferredIntervals
+
+            skipForwardCommand.addTarget { [weak self] _ in
+                self?.backend.seek(relative: .secondsInDefaultTimescale(10))
+                return .success
+            }
+
+            skipBackwardCommand.addTarget { [weak self] _ in
+                self?.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                return .success
+            }
+
+            previousTrackCommand.addTarget { [weak self] _ in
+                self?.backend.seek(to: .zero)
+                return .success
+            }
+
+            nextTrackCommand.addTarget { [weak self] _ in
+                self?.advanceToNextItem()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
+                self?.play()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
+                self?.pause()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().togglePlayPauseCommand.addTarget { [weak self] _ in
+                self?.togglePlay()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
+                guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+
+                self?.backend.seek(to: event.positionTime)
+
+                return .success
+            }
+        }
+
+        switch Defaults[.systemControlsCommands] {
+        case .seek:
+            previousTrackCommand.isEnabled = false
+            nextTrackCommand.isEnabled = false
+            skipForwardCommand.isEnabled = true
+            skipBackwardCommand.isEnabled = true
+
+        case .restartAndAdvanceToNext:
+            skipForwardCommand.isEnabled = false
+            skipBackwardCommand.isEnabled = false
+            previousTrackCommand.isEnabled = true
+            nextTrackCommand.isEnabled = isAdvanceToNextItemAvailable
         }
     }
 
