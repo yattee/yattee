@@ -573,20 +573,36 @@ final class PlayerModel: ObservableObject {
     }
 
     func setRelatedAutoplayItem() {
-        guard let video = currentVideo?.related.randomElement() else { return }
+        guard let video = currentVideo else { return }
+        let related = video.related.filter { $0.videoID != autoplayItem?.video?.videoID }
 
-        let item = PlayerQueueItem(video)
-        autoplayItem = item
-        autoplayItemSource = video
+        let watchFetchRequest = Watch.fetchRequest()
+        watchFetchRequest.predicate = NSPredicate(format: "videoID IN %@", related.map(\.videoID) as [String])
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            guard let self = self else { return }
-            self.accounts.api.loadDetails(item, completionHandler: { newItem in
-                guard newItem.videoID == self.autoplayItem?.videoID else { return }
-                self.autoplayItem = newItem
-                self.updateRemoteCommandCenter()
-                self.controls.objectWillChange.send()
-            })
+        let results = try? context.fetch(watchFetchRequest)
+
+        context.perform { [weak self] in
+            guard let self = self,
+                  let results = results else { return }
+            let resultsIds = results.map(\.videoID)
+
+            guard let autoplayVideo = related.filter({ !resultsIds.contains($0.videoID) }).randomElement() else {
+                return
+            }
+
+            let item = PlayerQueueItem(autoplayVideo)
+            self.autoplayItem = item
+            self.autoplayItemSource = video
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                guard let self = self else { return }
+                self.accounts.api.loadDetails(item, completionHandler: { newItem in
+                    guard newItem.videoID == self.autoplayItem?.videoID else { return }
+                    self.autoplayItem = newItem
+                    self.updateRemoteCommandCenter()
+                    self.controls.objectWillChange.send()
+                })
+            }
         }
     }
 

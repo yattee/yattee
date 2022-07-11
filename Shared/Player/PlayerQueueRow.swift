@@ -6,6 +6,7 @@ import SwiftUI
 struct PlayerQueueRow: View {
     let item: PlayerQueueItem
     var history = false
+    var autoplay = false
     @Binding var fullScreen: Bool
 
     @EnvironmentObject<PlayerModel> private var player
@@ -14,9 +15,10 @@ struct PlayerQueueRow: View {
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
-    init(item: PlayerQueueItem, history: Bool = false, fullScreen: Binding<Bool> = .constant(false)) {
+    init(item: PlayerQueueItem, history: Bool = false, autoplay: Bool = false, fullScreen: Binding<Bool> = .constant(false)) {
         self.item = item
         self.history = history
+        self.autoplay = autoplay
         _fullScreen = fullScreen
         _watchRequest = FetchRequest<Watch>(
             entity: Watch.entity(),
@@ -47,6 +49,10 @@ struct PlayerQueueRow: View {
 
             if closePiPOnNavigation, player.playingInPictureInPicture {
                 player.closePiP()
+            }
+
+            if autoplay {
+                player.resetAutoplay()
             }
         } label: {
             VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
