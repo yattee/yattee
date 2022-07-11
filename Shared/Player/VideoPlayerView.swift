@@ -235,7 +235,6 @@ struct VideoPlayerView: View {
                                 VStack(spacing: 0) {
                                     #if os(iOS)
                                         VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
-                                            .edgesIgnoringSafeArea(.bottom)
                                     #else
                                         VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                     #endif
