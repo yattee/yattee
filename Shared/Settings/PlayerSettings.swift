@@ -118,9 +118,17 @@ struct PlayerSettings: View {
     }
 
     private var systemControlsCommandsPicker: some View {
-        Picker("System controls buttons", selection: $systemControlsCommands) {
-            Text("10 seconds forwards/backwards").tag(SystemControlsCommands.seek)
-            Text("Restart/Play next").tag(SystemControlsCommands.restartAndAdvanceToNext)
+        func labelText(_ label: String) -> String {
+            #if os(macOS)
+                "System controls show buttons for \(label)"
+            #else
+                label
+            #endif
+        }
+
+        return Picker("System controls buttons", selection: $systemControlsCommands) {
+            Text(labelText("10 seconds forwards/backwards")).tag(SystemControlsCommands.seek)
+            Text(labelText("Restart/Play next")).tag(SystemControlsCommands.restartAndAdvanceToNext)
         }
         .onChange(of: systemControlsCommands) { _ in
             player.updateRemoteCommandCenter()
