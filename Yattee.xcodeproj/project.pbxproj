@@ -1253,6 +1253,7 @@
 				37D9169A27388A81002B1BAA /* README.md */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		37D4B0C12671614700C925CA /* Shared */ = {
 			isa = PBXGroup;
