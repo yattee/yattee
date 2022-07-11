@@ -204,8 +204,10 @@ struct VideoDetails: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
                             VStack(alignment: .leading, spacing: 0) {
-                                Text(String(repeating: Video.fixture.description ?? "", count: Int.random(in: 1 ... 30)))
-                                    .redacted(reason: .placeholder)
+                                ForEach(1 ... Int.random(in: 3 ... 5), id: \.self) { _ in
+                                    Text(String(repeating: Video.fixture.description!, count: Int.random(in: 1 ... 4)))
+                                        .redacted(reason: .placeholder)
+                                }
                             }
                         } else if let description = video.description {
                             Group {
