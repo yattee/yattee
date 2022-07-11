@@ -236,14 +236,17 @@ struct ControlsBar: View {
                             Text(video.author)
                                 .font(.system(size: 12))
 
-                            if !presentingControls,
-                               let channel = model.currentVideo?.channel,
-                               let subsriptions = channel.subscriptionsString
-                            {
+                            if !presentingControls {
                                 HStack(spacing: 2) {
                                     Image(systemName: "person.2.fill")
 
-                                    Text(subsriptions)
+                                    if let channel = model.currentVideo?.channel {
+                                        if let subscriptions = channel.subscriptionsString {
+                                            Text(subscriptions)
+                                        } else {
+                                            Text("1234").redacted(reason: .placeholder)
+                                        }
+                                    }
                                 }
                                 .padding(.leading, 4)
                                 .font(.system(size: 9))
