@@ -23,6 +23,9 @@ struct PlayerSettings: View {
     #endif
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
+    @Default(.systemControlsCommands) private var systemControlsCommands
+
+    @EnvironmentObject<PlayerModel> private var player
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
@@ -60,6 +63,7 @@ struct PlayerSettings: View {
                     pauseOnEnteringBackgroundToogle
                 #endif
                 closeLastItemOnPlaybackEndToggle
+                systemControlsCommandsPicker
             }
 
             Section(header: SettingsHeader(text: "Interface")) {
@@ -104,6 +108,22 @@ struct PlayerSettings: View {
             ForEach(instances) { instance in
                 Text(instance.description).tag(Optional(instance.id))
             }
+        }
+        .labelsHidden()
+        #if os(iOS)
+            .pickerStyle(.automatic)
+        #elseif os(tvOS)
+            .pickerStyle(.inline)
+        #endif
+    }
+
+    private var systemControlsCommandsPicker: some View {
+        Picker("System controls buttons", selection: $systemControlsCommands) {
+            Text("10 seconds forwards/backwards").tag(SystemControlsCommands.seek)
+            Text("Restart/Play next").tag(SystemControlsCommands.restartAndAdvanceToNext)
+        }
+        .onChange(of: systemControlsCommands) { _ in
+            player.updateRemoteCommandCenter()
         }
         .labelsHidden()
         #if os(iOS)
