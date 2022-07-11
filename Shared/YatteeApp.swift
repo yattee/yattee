@@ -168,10 +168,6 @@ struct YatteeApp: App {
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
-        #if !os(macOS)
-            configureNowPlayingInfoCenter()
-        #endif
-
         #if os(iOS)
             if Defaults[.lockPortraitWhenBrowsing] {
                 Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
@@ -236,56 +232,8 @@ struct YatteeApp: App {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 Windows.main.focus()
             }
+        #else
+            player.updateRemoteCommandCenter()
         #endif
-    }
-
-    func configureNowPlayingInfoCenter() {
-        #if !os(macOS)
-            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-
-            UIApplication.shared.beginReceivingRemoteControlEvents()
-        #endif
-
-        MPRemoteCommandCenter.shared().playCommand.addTarget { _ in
-            player.play()
-            return .success
-        }
-
-        MPRemoteCommandCenter.shared().pauseCommand.addTarget { _ in
-            player.pause()
-            return .success
-        }
-
-        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = false
-        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = false
-
-        MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { remoteEvent in
-            guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent
-            else {
-                return .commandFailed
-            }
-
-            player.backend.seek(to: event.positionTime)
-
-            return .success
-        }
-
-        let skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand
-        skipForwardCommand.isEnabled = true
-        skipForwardCommand.preferredIntervals = [10]
-
-        skipForwardCommand.addTarget { _ in
-            player.backend.seek(relative: .secondsInDefaultTimescale(10))
-            return .success
-        }
-
-        let skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand
-        skipBackwardCommand.isEnabled = true
-        skipBackwardCommand.preferredIntervals = [10]
-
-        skipBackwardCommand.addTarget { _ in
-            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-            return .success
-        }
     }
 }

@@ -99,6 +99,7 @@ extension Defaults.Keys {
 
     static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
 
+    static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "2")
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
@@ -224,4 +225,8 @@ enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializa
 
 enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
     case highest, medium, low
+}
+
+enum SystemControlsCommands: String, CaseIterable, Defaults.Serializable {
+    case seek, restartAndAdvanceToNext
 }
