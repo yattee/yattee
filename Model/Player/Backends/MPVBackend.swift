@@ -45,6 +45,7 @@ final class MPVBackend: PlayerBackend {
         networkStateTimer.start()
 
         if isPlaying {
+            self.updatePlayerAspectRatio()
             startClientUpdates()
         } else {
             stopControlsUpdates()
@@ -204,11 +205,9 @@ final class MPVBackend: PlayerBackend {
 
                         self.model.lastSkipped = segment
                         self.play()
-                        self.model.aspectRatio = self.aspectRatio
                     }
                 } else {
                     self.play()
-                    self.model.aspectRatio = self.aspectRatio
                 }
             }
         }

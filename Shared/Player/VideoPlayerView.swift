@@ -300,15 +300,10 @@ struct VideoPlayerView: View {
             }
             .overlay(GeometryReader { proxy in
                 Color.clear
-                    .onAppear {
-                        player.playerSize = proxy.size
-                    }
-                    .onChange(of: proxy.size) { _ in
-                        player.playerSize = proxy.size
-                    }
-                    .onChange(of: player.controls.presentingOverlays) { _ in
-                        player.playerSize = proxy.size
-                    }
+                    .onAppear { player.playerSize = proxy.size }
+                    .onChange(of: proxy.size) { _ in player.playerSize = proxy.size }
+                    .onChange(of: player.controls.presentingOverlays) { _ in player.playerSize = proxy.size }
+                    .onChange(of: player.aspectRatio) { _ in player.playerSize = proxy.size }
             })
             #if os(iOS)
             .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)

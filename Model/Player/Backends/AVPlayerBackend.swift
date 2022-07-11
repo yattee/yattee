@@ -318,7 +318,7 @@ final class AVPlayerBackend: PlayerBackend {
                     return
                 }
 
-                self.model.aspectRatio = self.aspectRatio
+                self.updatePlayerAspectRatio()
 
                 if !preservingTime,
                    let segment = self.model.sponsorBlock.segments.first,
