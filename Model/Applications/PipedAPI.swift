@@ -488,8 +488,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let videoStreams = compatibleVideoStream(from: content)
 
         videoStreams.forEach { videoStream in
-            let audioAsset = AVURLAsset(url: audioStream.dictionaryValue["url"]!.url!)
-            let videoAsset = AVURLAsset(url: videoStream.dictionaryValue["url"]!.url!)
+            guard let audioAssetUrl = audioStream.dictionaryValue["url"]?.url,
+                  let videoAssetUrl = videoStream.dictionaryValue["url"]?.url
+            else {
+                return
+            }
+
+            let audioAsset = AVURLAsset(url: audioAssetUrl)
+            let videoAsset = AVURLAsset(url: videoAssetUrl)
 
             let videoOnly = videoStream.dictionaryValue["videoOnly"]?.boolValue ?? true
             let resolution = Stream.Resolution.from(resolution: videoStream.dictionaryValue["quality"]!.stringValue)
