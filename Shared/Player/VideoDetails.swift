@@ -117,6 +117,8 @@ struct VideoDetails: View {
                 HStack(spacing: 4) {
                     if let published = video.publishedDate {
                         Text(published)
+                    } else {
+                        Text("1 century ago").redacted(reason: .placeholder)
                     }
                 }
             }
@@ -204,11 +206,11 @@ struct VideoDetails: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
                             VStack(alignment: .leading, spacing: 0) {
-                                ForEach(1 ... Int.random(in: 3 ... 5), id: \.self) { _ in
-                                    Text(String(repeating: Video.fixture.description!, count: Int.random(in: 1 ... 4)))
-                                        .redacted(reason: .placeholder)
+                                ForEach(1 ... Int.random(in: 2 ... 5), id: \.self) { _ in
+                                    Text(String(repeating: Video.fixture.description ?? "", count: Int.random(in: 1 ... 4)))
                                 }
                             }
+                            .redacted(reason: .placeholder)
                         } else if let description = video.description {
                             Group {
                                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
@@ -258,50 +260,37 @@ struct VideoDetails: View {
     }
 
     @ViewBuilder var videoProperties: some View {
-        Group {
-            if player.videoBeingOpened.isNil {
-                HStack(spacing: 2) {
-                    publishedDateSection
-                    Spacer()
+        HStack(spacing: 2) {
+            publishedDateSection
 
-                    HStack(spacing: 4) {
-                        if let views = video?.viewsCount {
-                            Image(systemName: "eye")
+            Spacer()
 
-                            Text(views)
-                        }
+            HStack(spacing: 4) {
+                Image(systemName: "eye")
 
-                        if let likes = video?.likesCount {
-                            Image(systemName: "hand.thumbsup")
+                if let views = video?.viewsCount, player.videoBeingOpened.isNil {
+                    Text(views)
+                } else {
+                    Text("1,234M").redacted(reason: .placeholder)
+                }
 
-                            Text(likes)
-                        }
+                Image(systemName: "hand.thumbsup")
 
-                        if let likes = video?.dislikesCount {
-                            Image(systemName: "hand.thumbsdown")
+                if let likes = video?.likesCount, player.videoBeingOpened.isNil {
+                    Text(likes)
+                } else {
+                    Text("1,234M").redacted(reason: .placeholder)
+                }
 
-                            Text(likes)
-                        }
+                if Defaults[.enableReturnYouTubeDislike] {
+                    Image(systemName: "hand.thumbsdown")
+
+                    if let dislikes = video?.dislikesCount, player.videoBeingOpened.isNil {
+                        Text(dislikes)
+                    } else {
+                        Text("1,234M").redacted(reason: .placeholder)
                     }
                 }
-            } else {
-                HStack(spacing: 2) {
-                    Text("Date placeholder")
-
-                    Spacer()
-
-                    HStack(spacing: 4) {
-                        Image(systemName: "eye")
-                        Text("1000")
-
-                        Image(systemName: "eye")
-                        Text("100")
-
-                        Image(systemName: "eye")
-                        Text("10")
-                    }
-                }
-                .redacted(reason: .placeholder)
             }
         }
         .font(.system(size: 12))
