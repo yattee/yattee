@@ -102,7 +102,7 @@ struct PlayerControls: View {
                 .opacity(model.presentingControlsOverlay ? 1 : 0)
 
             VideoDetailsOverlay()
-                .frame(maxWidth: detailsWidth, maxHeight: 450)
+                .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
                 .modifier(ControlBackgroundModifier())
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .opacity(model.presentingDetailsOverlay ? 1 : 0)
@@ -138,6 +138,11 @@ struct PlayerControls: View {
     var detailsWidth: Double {
         guard let player = player, player.playerSize.width.isFinite else { return 200 }
         return [player.playerSize.width, 600].min()!
+    }
+
+    var detailsHeight: Double {
+        guard let player = player, player.playerSize.height.isFinite else { return 200 }
+        return [player.playerSize.height, 500].min()!
     }
 
     @ViewBuilder var controlsBackground: some View {
