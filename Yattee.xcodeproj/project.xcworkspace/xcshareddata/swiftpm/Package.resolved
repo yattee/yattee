@@ -46,12 +46,21 @@
       }
     },
     {
+      "identity" : "repeat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/malcommac/Repeat.git",
+      "state" : {
+        "revision" : "9df757d0936c15dfd9d01067766fab87e927f838",
+        "version" : "0.6.0"
+      }
+    },
+    {
       "identity" : "sdwebimage",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "c4b8660bb3ef543fe4bdcaac0db956b32dc5583f",
-        "version" : "5.13.0"
+        "branch" : "master",
+        "revision" : "16cf157658b48eab413a8783df0759861e54245b"
       }
     },
     {
@@ -77,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "8a0c5e1ae08ed763739262b9dcef64cfb241c14b",
-        "version" : "0.9.0"
+        "revision" : "18834cac007c8cc982c57d384b00e7a8a129e9db",
+        "version" : "0.8.5"
       }
     },
     {
@@ -88,15 +97,6 @@
       "state" : {
         "revision" : "43f34046ebb5beb6802200353c473af303bbc31e",
         "version" : "1.5.2"
-      }
-    },
-    {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle",
-      "state" : {
-        "branch" : "2.x",
-        "revision" : "fe69cab530bdfe9b49c544e0d6184967ef4c4055"
       }
     },
     {
@@ -115,6 +115,15 @@
       "state" : {
         "revision" : "f2616860a41f9d9932da412a8978fec79c06fe24",
         "version" : "0.1.4"
+      }
+    },
+    {
+      "identity" : "swiftuipager",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/fermoya/SwiftUIPager.git",
+      "state" : {
+        "revision" : "6e4170ef7cafd04b3d8ab8dc5b0469036b2bcd6a",
+        "version" : "2.4.0"
       }
     },
     {

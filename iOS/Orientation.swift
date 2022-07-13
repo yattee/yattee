@@ -21,11 +21,16 @@ struct Orientation {
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
         lockOrientation(orientation)
 
-        guard !rotateOrientation.isNil else {
+        guard let rotateOrientation = rotateOrientation else {
             return
         }
 
-        UIDevice.current.setValue(rotateOrientation!.rawValue, forKey: "orientation")
+        let orientationString = rotateOrientation == .portrait ? "portrait" : rotateOrientation == .landscapeLeft ? "landscapeLeft" :
+            rotateOrientation == .landscapeRight ? "landscapeRight" : rotateOrientation == .portraitUpsideDown ? "portraitUpsideDown" : "allButUpsideDown"
+
+        logger.info("rotating to \(orientationString)")
+
+        UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         UINavigationController.attemptRotationToDeviceOrientation()
     }
 }

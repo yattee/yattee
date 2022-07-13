@@ -53,7 +53,39 @@ struct PlaylistsView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls(toolbar: {
+            HStack {
+                HStack {
+                    newPlaylistButton
+                        .offset(x: -10)
+                    if currentPlaylist != nil {
+                        editPlaylistButton
+                    }
+                }
+
+                if !model.isEmpty {
+                    Spacer()
+                }
+
+                HStack {
+                    if model.isEmpty {
+                        Text("No Playlists")
+                            .foregroundColor(.secondary)
+                    } else {
+                        selectPlaylistButton
+                            .transaction { t in t.animation = .none }
+                    }
+                }
+
+                Spacer()
+
+                if currentPlaylist != nil {
+                    playButton
+                        .offset(x: 10)
+                }
+            }
+            .padding(.horizontal)
+        }) {
             SignInRequiredView(title: "Playlists") {
                 VStack {
                     #if os(tvOS)
@@ -72,12 +104,26 @@ struct PlaylistsView: View {
                                 Spacer()
                             #else
                                 VerticalCells(items: items)
+                                    .environment(\.scrollViewBottomPadding, 70)
                             #endif
                         }
                         .environment(\.currentPlaylistID, currentPlaylist?.id)
                     }
                 }
             }
+        }
+        .onAppear {
+            model.load()
+            resource?.load()
+        }
+        .onChange(of: accounts.current) { _ in
+            model.load(force: true)
+        }
+        .onChange(of: selectedPlaylistID) { _ in
+            resource?.load()
+        }
+        .onChange(of: model.reloadPlaylists) { _ in
+            resource?.load()
         }
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
@@ -88,74 +134,25 @@ struct PlaylistsView: View {
             PlaylistFormView(playlist: $editedPlaylist)
                 .environmentObject(accounts)
         }
+        .focusScope(focusNamespace)
         #else
-                .background(
-                    EmptyView()
-                        .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
-                            PlaylistFormView(playlist: $createdPlaylist)
-                                .environmentObject(accounts)
-                        }
-                )
-                .background(
-                    EmptyView()
-                        .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
-                            PlaylistFormView(playlist: $editedPlaylist)
-                                .environmentObject(accounts)
-                        }
-                )
+        .background(
+            EmptyView()
+                .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
+                    PlaylistFormView(playlist: $createdPlaylist)
+                        .environmentObject(accounts)
+                }
+        )
+        .background(
+            EmptyView()
+                .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
+                    PlaylistFormView(playlist: $editedPlaylist)
+                        .environmentObject(accounts)
+                }
+        )
         #endif
-                .toolbar {
-                    #if os(iOS)
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            Group {
-                                if model.isEmpty {
-                                    Text("No Playlists")
-                                        .foregroundColor(.secondary)
-                                } else {
-                                    selectPlaylistButton
-                                        .transaction { t in t.animation = .none }
-                                }
-
-                                Spacer()
-
-                                if currentPlaylist != nil {
-                                    HStack(spacing: 10) {
-                                        playButton
-                                        shuffleButton
-                                    }
-
-                                    Spacer()
-                                }
-
-                                HStack(spacing: 2) {
-                                    newPlaylistButton
-
-                                    if currentPlaylist != nil {
-                                        editPlaylistButton
-                                    }
-                                }
-                            }
-                        }
-                    #endif
-                }
-        #if os(tvOS)
-                .focusScope(focusNamespace)
-        #endif
-                .onAppear {
-                    model.load()
-                    resource?.load()
-                }
-                .onChange(of: accounts.current) { _ in
-                    model.load(force: true)
-                }
-                .onChange(of: selectedPlaylistID) { _ in
-                    resource?.load()
-                }
-                .onChange(of: model.reloadPlaylists) { _ in
-                    resource?.load()
-                }
         #if os(iOS)
-                .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
     }
 
@@ -179,7 +176,6 @@ struct PlaylistsView: View {
                         .labelStyle(.iconOnly)
 
                     playButton
-                    shuffleButton
                 }
 
                 Spacer()
@@ -261,7 +257,7 @@ struct PlaylistsView: View {
                 }
             } label: {
                 Text(currentPlaylist?.title ?? "Select playlist")
-                    .frame(maxWidth: 140, alignment: .leading)
+                    .frame(maxWidth: 140, alignment: .center)
             }
         #endif
     }
@@ -272,16 +268,17 @@ struct PlaylistsView: View {
             self.showingEditPlaylist = true
         }) {
             HStack(spacing: 8) {
-                Image(systemName: "slider.horizontal.3")
-                Text("Edit")
+                Image(systemName: "rectangle.and.pencil.and.ellipsis")
             }
         }
     }
 
     var newPlaylistButton: some View {
         Button(action: { self.showingNewPlaylist = true }) {
-            HStack(spacing: 8) {
+            HStack(spacing: 0) {
                 Image(systemName: "plus")
+                    .padding(8)
+                    .contentShape(Rectangle())
                 #if os(tvOS)
                     Text("New Playlist")
                 #endif
@@ -291,17 +288,12 @@ struct PlaylistsView: View {
 
     private var playButton: some View {
         Button {
+            player.playbackMode = .queue
             player.play(items.compactMap(\.video))
         } label: {
             Image(systemName: "play")
-        }
-    }
-
-    private var shuffleButton: some View {
-        Button {
-            player.play(items.compactMap(\.video), shuffling: true)
-        } label: {
-            Image(systemName: "shuffle")
+                .padding(8)
+                .contentShape(Rectangle())
         }
     }
 

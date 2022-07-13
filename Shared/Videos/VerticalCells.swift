@@ -6,6 +6,7 @@ struct VerticalCells: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @Environment(\.scrollViewBottomPadding) private var scrollViewBottomPadding
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
 
     var items = [ContentItem]()
@@ -20,6 +21,9 @@ struct VerticalCells: View {
                 }
             }
             .padding()
+            #if !os(tvOS)
+                Color.clear.padding(.bottom, scrollViewBottomPadding)
+            #endif
         }
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)

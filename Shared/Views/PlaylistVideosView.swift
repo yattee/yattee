@@ -4,7 +4,6 @@ import SwiftUI
 struct PlaylistVideosView: View {
     let playlist: Playlist
 
-    @Environment(\.inNavigationView) private var inNavigationView
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var model
 
@@ -46,7 +45,7 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             VerticalCells(items: contentItems)
                 .onAppear {
                     if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
@@ -66,15 +65,10 @@ struct PlaylistVideosView: View {
                     FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
 
                     Button {
-                        player.play(videos, inNavigationView: inNavigationView)
+                        player.playbackMode = .queue
+                        player.play(videos)
                     } label: {
                         Label("Play All", systemImage: "play")
-                    }
-
-                    Button {
-                        player.play(videos, shuffling: true, inNavigationView: inNavigationView)
-                    } label: {
-                        Label("Shuffle", systemImage: "shuffle")
                     }
                 }
             }

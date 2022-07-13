@@ -1,13 +1,20 @@
 parent_config: https://raw.githubusercontent.com/sindresorhus/swiftlint-config/main/.swiftlint.yml
 
 disabled_rules:
+  - conditional_returns_on_newline
   - identifier_name
   - opening_brace
   - number_separator
   - multiline_arguments
-
+opt_in_rules:
+  - implicit_return
 excluded:
   - Vendor
   - Tests Apple TV
   - Tests iOS
   - Tests macOS
+
+implicit_return:
+  included:
+    - function
+    - getter

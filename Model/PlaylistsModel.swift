@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import Siesta
 import SwiftUI
@@ -14,6 +15,10 @@ final class PlaylistsModel: ObservableObject {
 
     var all: [Playlist] {
         playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }
+    }
+
+    var lastUsed: Playlist? {
+        find(id: Defaults[.lastUsedPlaylistID])
     }
 
     func find(id: Playlist.ID?) -> Playlist? {
@@ -57,9 +62,19 @@ final class PlaylistsModel: ObservableObject {
         playlistID: Playlist.ID,
         videoID: Video.ID,
         onSuccess: @escaping () -> Void = {},
-        onFailure: @escaping (RequestError) -> Void = { _ in }
+        navigation: NavigationModel?,
+        onFailure: ((RequestError) -> Void)? = nil
     ) {
-        accounts.api.addVideoToPlaylist(videoID, playlistID, onFailure: onFailure) {
+        accounts.api.addVideoToPlaylist(
+            videoID,
+            playlistID,
+            onFailure: onFailure ?? { requestError in
+                navigation?.presentAlert(
+                    title: "Error when adding to playlist",
+                    message: "(\(requestError.httpStatusCode ?? -1)) \(requestError.userMessage)"
+                )
+            }
+        ) {
             self.load(force: true) {
                 self.reloadPlaylists.toggle()
                 onSuccess()

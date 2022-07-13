@@ -39,10 +39,10 @@ You can leave your feedback in [discussions](https://github.com/yattee/yattee/di
 | Channel Playlists | ✅ | ✅ |
 | Search | ✅ | ✅ |
 | Search Suggestions | ✅ | ✅ |
+| Comments | ✅ | ✅ |
+| Subtitles | ✅ |🔴 |
 | Search Filters | ✅ | 🔴 |
 | Popular | ✅ | 🔴 |
-| Subtitles | 🔴 | ✅ |
-| Comments | 🔴 | ✅ |
 
 You can browse and use accounts from one app and play videos with another (for example: use Invidious account for subscriptions and use Piped as playback source). Comments can be displayed from Piped even when Invidious is used for browsing/playing.
 

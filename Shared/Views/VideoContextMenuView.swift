@@ -1,13 +1,11 @@
 import CoreData
+import CoreMedia
 import Defaults
 import SwiftUI
 
 struct VideoContextMenuView: View {
     let video: Video
 
-    @Binding var playerNavigationLinkActive: Bool
-
-    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inChannelPlaylistView) private var inChannelPlaylistView
     @Environment(\.navigationStyle) private var navigationStyle
@@ -24,11 +22,11 @@ struct VideoContextMenuView: View {
 
     @Default(.saveHistory) private var saveHistory
 
+    private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
     private var viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
-    init(video: Video, playerNavigationLinkActive: Binding<Bool>) {
+    init(video: Video) {
         self.video = video
-        _playerNavigationLinkActive = playerNavigationLinkActive
         _watchRequest = video.watchFetchRequest
     }
 
@@ -49,6 +47,10 @@ struct VideoContextMenuView: View {
                     continueButton
                 }
 
+                if !(watch?.finished ?? false) {
+                    markAsWatchedButton
+                }
+
                 if !watch.isNil, !watchingNow {
                     removeFromHistoryButton
                 }
@@ -57,6 +59,12 @@ struct VideoContextMenuView: View {
 
         Section {
             playNowButton
+            #if os(iOS)
+                playNowInPictureInPictureButton
+            #endif
+            #if !os(tvOS)
+                playNowInMusicMode
+            #endif
         }
 
         Section {
@@ -64,22 +72,29 @@ struct VideoContextMenuView: View {
             addToQueueButton
         }
 
+        if accounts.app.supportsUserPlaylists, accounts.signedIn {
+            Section {
+                addToPlaylistButton
+                addToLastPlaylistButton
+
+                if let id = navigation.tabSelection?.playlistID ?? playlistID {
+                    removeFromPlaylistButton(playlistID: id)
+                }
+            }
+        }
+
+        #if !os(tvOS)
+            Section {
+                ShareButton(contentItem: .init(video: video))
+            }
+        #endif
+
         if !inChannelView, !inChannelPlaylistView {
             Section {
                 openChannelButton
 
                 if accounts.app.supportsSubscriptions, accounts.api.signedIn {
                     subscriptionButton
-                }
-            }
-        }
-
-        if accounts.app.supportsUserPlaylists {
-            Section {
-                addToPlaylistButton
-
-                if let id = navigation.tabSelection?.playlistID ?? playlistID {
-                    removeFromPlaylistButton(playlistID: id)
                 }
             }
         }
@@ -103,6 +118,9 @@ struct VideoContextMenuView: View {
         }
 
         if let watch = watch, let watchedAtString = watch.watchedAtString {
+            if watchedAtString == "in 0 seconds" {
+                return "Just watched"
+            }
             return "Watched \(watchedAtString)"
         }
 
@@ -111,9 +129,17 @@ struct VideoContextMenuView: View {
 
     private var continueButton: some View {
         Button {
-            player.play(video, at: watch!.stoppedAt, inNavigationView: inNavigationView)
+            player.play(video, at: .secondsInDefaultTimescale(watch!.stoppedAt))
         } label: {
-            Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime() ?? "where I left off")", systemImage: "playpause")
+            Label("Continue from \(watch!.stoppedAt.formattedAsPlaybackTime(allowZero: true) ?? "where I left off")", systemImage: "playpause")
+        }
+    }
+
+    var markAsWatchedButton: some View {
+        Button {
+            Watch.markAsWatched(videoID: video.videoID, duration: video.length, context: backgroundContext)
+        } label: {
+            Label("Mark as watched", systemImage: "checkmark.circle.fill")
         }
     }
 
@@ -131,9 +157,37 @@ struct VideoContextMenuView: View {
 
     private var playNowButton: some View {
         Button {
-            player.play(video, inNavigationView: inNavigationView)
+            if player.musicMode {
+                player.toggleMusicMode()
+            }
+
+            player.play(video)
         } label: {
             Label("Play Now", systemImage: "play")
+        }
+    }
+
+    private var playNowInPictureInPictureButton: some View {
+        Button {
+            player.controls.startPiP(startImmediately: false)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                player.play(video, at: watch?.timeToRestart, showingPlayer: false)
+            }
+        } label: {
+            Label("Play in PiP", systemImage: "pip")
+        }
+    }
+
+    private var playNowInMusicMode: some View {
+        Button {
+            if !player.musicMode {
+                player.toggleMusicMode()
+            }
+
+            player.play(video, at: watch?.timeToRestart, showingPlayer: false)
+        } label: {
+            Label("Play Music", systemImage: "music.note")
         }
     }
 
@@ -174,7 +228,7 @@ struct VideoContextMenuView: View {
                     #if os(tvOS)
                         subscriptions.unsubscribe(video.channel.id)
                     #else
-                        navigation.presentUnsubscribeAlert(video.channel)
+                        navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
                     #endif
                 } label: {
                     Label("Unsubscribe", systemImage: "xmark.circle")
@@ -195,7 +249,17 @@ struct VideoContextMenuView: View {
         Button {
             navigation.presentAddToPlaylist(video)
         } label: {
-            Label("Add to playlist...", systemImage: "text.badge.plus")
+            Label("Add to Playlist...", systemImage: "text.badge.plus")
+        }
+    }
+
+    @ViewBuilder private var addToLastPlaylistButton: some View {
+        if let playlist = playlists.lastUsed {
+            Button {
+                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+            } label: {
+                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+            }
         }
     }
 
@@ -203,7 +267,7 @@ struct VideoContextMenuView: View {
         Button {
             playlists.removeVideo(index: video.indexID!, playlistID: playlistID)
         } label: {
-            Label("Remove from playlist", systemImage: "text.badge.minus")
+            Label("Remove from Playlist", systemImage: "text.badge.minus")
         }
     }
 }

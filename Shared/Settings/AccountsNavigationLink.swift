@@ -11,6 +11,10 @@ struct AccountsNavigationLink: View {
         .buttonStyle(.plain)
         .contextMenu {
             removeInstanceButton(instance)
+
+            #if os(tvOS)
+                Button("Cancel", role: .cancel) {}
+            #endif
         }
     }
 

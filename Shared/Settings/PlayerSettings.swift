@@ -5,27 +5,27 @@ struct PlayerSettings: View {
     @Default(.instances) private var instances
     @Default(.playerInstanceID) private var playerInstanceID
     @Default(.quality) private var quality
-    @Default(.commentsInstanceID) private var commentsInstanceID
-
-    #if !os(tvOS)
-        @Default(.commentsPlacement) private var commentsPlacement
-    #endif
 
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
-        @Default(.lockLandscapeWhenEnteringFullscreen) private var lockLandscapeWhenEnteringFullscreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
     #if !os(macOS)
+        @Default(.pauseOnEnteringBackground) private var pauseOnEnteringBackground
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
     #endif
+
+    @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
+    @Default(.systemControlsCommands) private var systemControlsCommands
+
+    @EnvironmentObject<PlayerModel> private var player
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
@@ -59,14 +59,11 @@ struct PlayerSettings: View {
                 sourcePicker
                 qualityPicker
                 pauseOnHidingPlayerToggle
-            }
-
-            Section(header: SettingsHeader(text: "Comments")) {
-                commentsInstancePicker
-                #if !os(tvOS)
-                    commentsPlacementPicker
-                        .disabled(!CommentsModel.enabled)
+                #if !os(macOS)
+                    pauseOnEnteringBackgroundToogle
                 #endif
+                closeLastItemOnPlaybackEndToggle
+                systemControlsCommandsPicker
             }
 
             Section(header: SettingsHeader(text: "Interface")) {
@@ -82,6 +79,7 @@ struct PlayerSettings: View {
 
                 keywordsToggle
                 showHistoryToggle
+                returnYouTubeDislikeToggle
             }
 
             Section(header: SettingsHeader(text: "Picture in Picture")) {
@@ -93,13 +91,11 @@ struct PlayerSettings: View {
             }
 
             #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation"), footer: orientationFooter) {
+                Section(header: SettingsHeader(text: "Orientation")) {
                     if idiom == .pad {
                         enterFullscreenInLandscapeToggle
                     }
                     honorSystemOrientationLockToggle
-                    lockLandscapeOnRotationToggle
-                    lockLandscapeWhenEnteringFullscreenToggle
                 }
             #endif
         }
@@ -112,6 +108,30 @@ struct PlayerSettings: View {
             ForEach(instances) { instance in
                 Text(instance.description).tag(Optional(instance.id))
             }
+        }
+        .labelsHidden()
+        #if os(iOS)
+            .pickerStyle(.automatic)
+        #elseif os(tvOS)
+            .pickerStyle(.inline)
+        #endif
+    }
+
+    private var systemControlsCommandsPicker: some View {
+        func labelText(_ label: String) -> String {
+            #if os(macOS)
+                "System controls show buttons for \(label)"
+            #else
+                label
+            #endif
+        }
+
+        return Picker("System controls buttons", selection: $systemControlsCommands) {
+            Text(labelText("10 seconds forwards/backwards")).tag(SystemControlsCommands.seek)
+            Text(labelText("Restart/Play next")).tag(SystemControlsCommands.restartAndAdvanceToNext)
+        }
+        .onChange(of: systemControlsCommands) { _ in
+            player.updateRemoteCommandCenter()
         }
         .labelsHidden()
         #if os(iOS)
@@ -135,35 +155,6 @@ struct PlayerSettings: View {
             .pickerStyle(.inline)
         #endif
     }
-
-    private var commentsInstancePicker: some View {
-        Picker("Source", selection: $commentsInstanceID) {
-            Text("Disabled").tag(Optional(""))
-
-            ForEach(InstancesModel.all.filter { $0.app.supportsComments }) { instance in
-                Text(instance.description).tag(Optional(instance.id))
-            }
-        }
-        .labelsHidden()
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
-    }
-
-    #if !os(tvOS)
-        private var commentsPlacementPicker: some View {
-            Picker("Placement", selection: $commentsPlacement) {
-                Text("Below video description").tag(CommentsPlacement.info)
-                Text("Separate tab").tag(CommentsPlacement.separate)
-            }
-            .labelsHidden()
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #endif
-        }
-    #endif
 
     private var sidebarPicker: some View {
         Picker("Sidebar", selection: $playerSidebar) {
@@ -194,8 +185,22 @@ struct PlayerSettings: View {
         Toggle("Show history", isOn: $showHistory)
     }
 
+    private var returnYouTubeDislikeToggle: some View {
+        Toggle("Enable Return YouTube Dislike", isOn: $enableReturnYouTubeDislike)
+    }
+
     private var pauseOnHidingPlayerToggle: some View {
         Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
+    }
+
+    #if !os(macOS)
+        private var pauseOnEnteringBackgroundToogle: some View {
+            Toggle("Pause when entering background", isOn: $pauseOnEnteringBackground)
+        }
+    #endif
+
+    private var closeLastItemOnPlaybackEndToggle: some View {
+        Toggle("Close video after playing last in the queue", isOn: $closeLastItemOnPlaybackEnd)
     }
 
     #if os(iOS)
@@ -206,19 +211,6 @@ struct PlayerSettings: View {
 
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
-        }
-
-        private var lockLandscapeOnRotationToggle: some View {
-            Toggle("Lock landscape on rotation", isOn: $lockLandscapeOnRotation)
-                .disabled(!enterFullscreenInLandscape)
-        }
-
-        private var lockLandscapeWhenEnteringFullscreenToggle: some View {
-            Toggle("Rotate and lock landscape on entering fullscreen", isOn: $lockLandscapeWhenEnteringFullscreen)
-        }
-
-        private var orientationFooter: some View {
-            Text("Orientation settings are experimental and do not yet work properly with all devices and iOS versions")
         }
     #endif
 
@@ -239,7 +231,9 @@ struct PlayerSettings: View {
 
 struct PlaybackSettings_Previews: PreviewProvider {
     static var previews: some View {
-        PlayerSettings()
-            .injectFixtureEnvironmentObjects()
+        VStack(alignment: .leading) {
+            PlayerSettings()
+        }
+        .injectFixtureEnvironmentObjects()
     }
 }

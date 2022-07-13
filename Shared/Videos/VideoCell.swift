@@ -1,3 +1,4 @@
+import CoreMedia
 import Defaults
 import SDWebImageSwiftUI
 import SwiftUI
@@ -5,8 +6,8 @@ import SwiftUI
 struct VideoCell: View {
     private var video: Video
 
-    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.navigationStyle) private var navigationStyle
+    @Environment(\.inChannelView) private var inChannelView
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -45,11 +46,8 @@ struct VideoCell: View {
         .buttonStyle(.plain)
         .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .contextMenu {
-            VideoContextMenuView(
-                video: video,
-                playerNavigationLinkActive: $player.playerNavigationLinkActive
-            )
-            .environmentObject(accounts)
+            VideoContextMenuView(video: video)
+                .environmentObject(accounts)
         }
     }
 
@@ -62,34 +60,43 @@ struct VideoCell: View {
     }
 
     private func playAction() {
-        guard video.videoID != Video.fixtureID else {
-            return
-        }
-
-        if watchingNow {
-            if !player.playingInPictureInPicture {
-                player.show()
+        DispatchQueue.main.async {
+            guard video.videoID != Video.fixtureID else {
+                return
             }
 
-            if !playNowContinues {
-                player.player.seek(to: .zero)
+            if player.musicMode {
+                player.toggleMusicMode()
             }
 
-            player.play()
+            if watchingNow {
+                if !player.playingInPictureInPicture {
+                    player.show()
+                }
 
-            return
+                if !playNowContinues {
+                    player.backend.seek(to: .zero)
+                }
+
+                player.play()
+
+                return
+            }
+
+            var playAt: CMTime?
+
+            if saveHistory,
+               playNowContinues,
+               !watch.isNil,
+               !watch!.finished
+            {
+                playAt = .secondsInDefaultTimescale(watch!.stoppedAt)
+            }
+
+            player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
+
+            player.play(video, at: playAt)
         }
-
-        var playAt: TimeInterval?
-
-        if playNowContinues,
-           !watch.isNil,
-           !watch!.finished
-        {
-            playAt = watch!.stoppedAt
-        }
-
-        player.play(video, at: playAt, inNavigationView: inNavigationView)
     }
 
     private var playNowContinues: Bool {
@@ -255,7 +262,6 @@ struct VideoCell: View {
                 HStack(spacing: 8) {
                     if let date = video.publishedDate {
                         HStack(spacing: 2) {
-                            Image(systemName: "calendar")
                             Text(date)
                                 .allowsTightening(true)
                         }
@@ -272,14 +278,13 @@ struct VideoCell: View {
                         Spacer()
 
                         HStack(spacing: 2) {
-                            Image(systemName: "clock")
                             Text(time)
                         }
                     }
                 }
                 .lineLimit(1)
                 .foregroundColor(.secondary)
-                .frame(minHeight: 30, alignment: .top)
+                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
                 #if os(tvOS)
                     .padding(.bottom, 10)
                 #endif
@@ -294,6 +299,10 @@ struct VideoCell: View {
 
     private func channelButton(badge: Bool = true) -> some View {
         Button {
+            guard !inChannelView else {
+                return
+            }
+
             NavigationModel.openChannel(
                 video.channel,
                 player: player,

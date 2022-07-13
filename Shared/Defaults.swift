@@ -1,35 +1,39 @@
 import Defaults
 import Foundation
+import SwiftUI
 #if os(iOS)
     import UIKit
 #endif
 
 extension Defaults.Keys {
-    static let kavinPipedInstanceID = "kavin-piped"
-    static let instances = Key<[Instance]>("instances", default: [
-        .init(
-            app: .piped,
-            id: kavinPipedInstanceID,
-            name: "Kavin",
-            apiURL: "https://pipedapi.kavin.rocks",
-            frontendURL: "https://piped.kavin.rocks"
-        )
-    ])
+    #if os(tvOS)
+        static let defaultForPauseOnHidingPlayer = true
+    #else
+        static let defaultForPauseOnHidingPlayer = false
+    #endif
+
+    #if os(macOS)
+        static let defaultForPlayerDetailsPageButtonLabelStyle = PlayerDetailsPageButtonLabelStyle.iconAndText
+    #else
+        static let defaultForPlayerDetailsPageButtonLabelStyle = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
+    #endif
+
+    static let instancesManifest = Key<String>("instancesManifest", default: "")
+    static let countryOfPublicInstances = Key<String?>("countryOfPublicInstances")
+
+    static let instances = Key<[Instance]>("instances", default: [])
     static let accounts = Key<[Account]>("accounts", default: [])
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
     static let lastUsedPlaylistID = Key<Playlist.ID?>("lastPlaylistID")
+    static let lastAccountIsPublic = Key<Bool>("lastAccountIsPublic", default: false)
 
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
 
+    static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
+
     static let favorites = Key<[FavoriteItem]>("favorites", default: [
-        .init(section: .trending("US", "default")),
-        .init(section: .trending("GB", "default")),
-        .init(section: .trending("ES", "default")),
-        .init(section: .channel("UC-lHJZR3Gqxm24_Vd_AJ5Yw", "PewDiePie")),
-        .init(section: .channel("UCXuqSBlHAE6Xw-yeJA0Tunw", "Linus Tech Tips")),
-        .init(section: .channel("UCBJycsmduvYEL83R_U4JriQ", "Marques Brownlee")),
         .init(section: .channel("UCE_M8A5yxnLfW0KghEeajjw", "Apple"))
     ])
 
@@ -42,17 +46,23 @@ extension Defaults.Keys {
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
+    static let thumbnailsQuality = Key<ThumbnailsQuality>("thumbnailsQuality", default: .highest)
 
+    static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
+    static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
     static let quality = Key<ResolutionSetting>("quality", default: .best)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
-    static let commentsInstanceID = Key<Instance.ID?>("commentsInstance", default: kavinPipedInstanceID)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
-    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: true)
+    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: defaultForPauseOnHidingPlayer)
+    #if !os(macOS)
+        static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
+    #endif
+    static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
@@ -64,6 +74,7 @@ extension Defaults.Keys {
 
     static let queue = Key<[PlayerQueueItem]>("queue", default: [])
     static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
+    static let playbackMode = Key<PlayerModel.PlaybackMode>("playbackMode", default: .queue)
 
     static let saveHistory = Key<Bool>("saveHistory", default: true)
     static let showWatchingProgress = Key<Bool>("showWatchingProgress", default: true)
@@ -79,25 +90,40 @@ extension Defaults.Keys {
 
     static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
 
-    #if os(macOS)
-        static let enableBetaChannel = Key<Bool>("enableBetaChannel", default: false)
-    #endif
-
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
-        static let lockLandscapeOnRotation = Key<Bool>("lockLandscapeOnRotation", default: false)
-        static let lockLandscapeWhenEnteringFullscreen = Key<Bool>("lockLandscapeWhenEnteringFullscreen", default: false)
     #endif
+
+    static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
+
+    static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
+
+    static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
+    static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")
+    static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "2")
+    static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
-    case best, hd720p, sd480p, sd360p, sd240p, sd144p
+    case best
+    case hd2160p60
+    case hd2160p30
+    case hd1440p60
+    case hd1440p30
+    case hd1080p60
+    case hd1080p30
+    case hd720p60
+    case hd720p30
+    case sd480p30
+    case sd360p30
+    case sd240p30
+    case sd144p30
 
     var value: Stream.Resolution {
         switch self {
         case .best:
-            return .hd720p
+            return .hd2160p60
         default:
             return Stream.Resolution(rawValue: rawValue)!
         }
@@ -107,6 +133,10 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
         switch self {
         case .best:
             return "Best available quality"
+        case .hd2160p60:
+            return "4K, 60fps"
+        case .hd2160p30:
+            return "4K"
         default:
             return value.name
         }
@@ -184,3 +214,19 @@ enum WatchedVideoPlayNowBehavior: String, Defaults.Serializable {
         case info, separate
     }
 #endif
+
+enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
+    case iconOnly, iconAndText
+
+    var text: Bool {
+        self == .iconAndText
+    }
+}
+
+enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
+    case highest, medium, low
+}
+
+enum SystemControlsCommands: String, CaseIterable, Defaults.Serializable {
+    case seek, restartAndAdvanceToNext
+}

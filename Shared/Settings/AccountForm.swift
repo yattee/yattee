@@ -118,6 +118,7 @@ struct AccountForm: View {
     var footer: some View {
         HStack {
             AccountValidationStatus(
+                app: .constant(instance.app),
                 isValid: $isValid,
                 isValidated: $isValidated,
                 isValidating: $isValidating,

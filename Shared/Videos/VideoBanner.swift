@@ -24,14 +24,14 @@ struct VideoBanner: View {
                 #endif
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(video?.title ?? "Unknown title")
+                Text(video?.title ?? "Loading...")
                     .truncationMode(.middle)
                     .lineLimit(2)
                     .font(.headline)
                     .frame(alignment: .leading)
 
                 HStack {
-                    Text(video?.author ?? "Unknown author")
+                    Text(video?.author ?? "")
                         .lineLimit(1)
 
                     Spacer()

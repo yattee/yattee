@@ -1,7 +1,7 @@
 if (document.readyState !== 'complete') {
-    window.addEventListener('load', redirectAndReplaceContentWithLink);
+    window.addEventListener('load', redirect);
 } else {
-    redirectAndReplaceContentWithLink();
+    redirect();
 }
 
 function yatteeUrl() {
@@ -14,13 +14,4 @@ function yatteeLink() {
 
 function redirect() {
     window.location.href = yatteeUrl()
-}
-
-function replaceContentWithLink() {
-    document.querySelector('body').innerHTML = '<h1>' + yatteeLink() + '</h1>';
-}
-
-function redirectAndReplaceContentWithLink(){
-    redirect()
-    replaceContentWithLink()
 }

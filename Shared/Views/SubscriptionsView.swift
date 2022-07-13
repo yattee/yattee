@@ -15,7 +15,7 @@ struct SubscriptionsView: View {
     }
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             SignInRequiredView(title: "Subscriptions") {
                 VerticalCells(items: videos)
                     .onAppear {
@@ -77,5 +77,12 @@ struct SubscriptionsView: View {
         } else {
             onCompletion()
         }
+    }
+}
+
+struct SubscriptonsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SubscriptionsView()
+            .injectFixtureEnvironmentObjects()
     }
 }

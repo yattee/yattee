@@ -1,14 +1,17 @@
+import AVFAudio
 import CoreMedia
 import Defaults
 import Foundation
+import SwiftUI
 
 extension PlayerModel {
     func handleSegments(at time: CMTime) {
         if let segment = lastSkipped {
-            if time > .secondsInDefaultTimescale(segment.end + 10) {
+            if time > .secondsInDefaultTimescale(segment.end + 5) {
                 resetLastSegment()
             }
         }
+
         guard let firstSegment = sponsorBlock.segments.first(where: { $0.timeInSegment(time) }) else {
             return
         }
@@ -18,29 +21,42 @@ extension PlayerModel {
         var nextSegments = [firstSegment]
 
         while let segment = sponsorBlock.segments.first(where: {
-            $0.timeInSegment(.secondsInDefaultTimescale(nextSegments.last!.end + 2))
+            !nextSegments.contains($0) &&
+                $0.timeInSegment(.secondsInDefaultTimescale(nextSegments.last!.end + 2))
         }) {
             nextSegments.append(segment)
         }
 
-        if let segmentToSkip = nextSegments.last(where: { $0.endTime <= playerItemDuration ?? .zero }),
-           self.shouldSkip(segmentToSkip, at: time)
-        {
+        if let segmentToSkip = nextSegments.last, shouldSkip(segmentToSkip, at: time) {
             skip(segmentToSkip, at: time)
         }
     }
 
     private func skip(_ segment: Segment, at time: CMTime) {
-        guard segment.endTime.seconds <= playerItemDuration?.seconds ?? .infinity else {
-            logger.error(
-                "segment end time is: \(segment.end) when player item duration is: \(playerItemDuration?.seconds ?? .infinity)"
-            )
+        if let duration = playerItemDuration, segment.endTime.seconds >= duration.seconds - 3 {
+            logger.error("segment end time is: \(segment.end) when player item duration is: \(duration.seconds)")
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                self.pause()
+
+                self.backend.eofPlaybackModeAction()
+            }
+
             return
         }
 
-        player.seek(to: segment.endTime)
-        lastSkipped = segment
-        segmentRestorationTime = time
+        backend.seek(to: segment.endTime)
+
+        DispatchQueue.main.async { [weak self] in
+            withAnimation {
+                self?.lastSkipped = segment
+            }
+            self?.segmentRestorationTime = time
+        }
         logger.info("SponsorBlock skipping to: \(segment.end)")
     }
 
@@ -63,13 +79,18 @@ extension PlayerModel {
         }
 
         restoredSegments.append(segment)
-        player.seek(to: time)
+        backend.seek(to: time)
         resetLastSegment()
     }
 
     private func resetLastSegment() {
-        lastSkipped = nil
-        segmentRestorationTime = nil
+        DispatchQueue.main.async { [weak self] in
+            withAnimation {
+                self?.lastSkipped = nil
+                self?.controls.objectWillChange.send()
+            }
+            self?.segmentRestorationTime = nil
+        }
     }
 
     func resetSegments() {

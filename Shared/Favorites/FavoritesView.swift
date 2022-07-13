@@ -19,7 +19,7 @@ struct FavoritesView: View {
     #endif
 
     var body: some View {
-        PlayerControlsView {
+        BrowserPlayerControls {
             ScrollView(.vertical, showsIndicators: false) {
                 if !accounts.current.isNil {
                     #if os(tvOS)
@@ -39,6 +39,7 @@ struct FavoritesView: View {
                             .padding(.top, item == first && RefreshControl.navigationBarTitleDisplayMode == .inline ? 10 : 0)
                             #endif
                         }
+                        Color.clear.padding(.bottom, 30)
                     #endif
                 }
             }
@@ -69,7 +70,13 @@ struct FavoritesView: View {
 
 struct Favorites_Previews: PreviewProvider {
     static var previews: some View {
-        FavoritesView()
-            .injectFixtureEnvironmentObjects()
+        TabView {
+            FavoritesView()
+                .overlay(VideoPlayerView().injectFixtureEnvironmentObjects())
+                .injectFixtureEnvironmentObjects()
+                .tabItem {
+                    Label("a", systemImage: "")
+                }
+        }
     }
 }

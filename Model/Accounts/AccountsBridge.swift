@@ -12,7 +12,7 @@ struct AccountsBridge: Defaults.Bridge {
 
         return [
             "id": value.id,
-            "instanceID": value.instanceID,
+            "instanceID": value.instanceID ?? "",
             "name": value.name ?? "",
             "apiURL": value.url,
             "username": value.username,

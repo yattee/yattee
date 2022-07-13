@@ -5,8 +5,8 @@ struct InstanceForm: View {
 
     @State private var name = ""
     @State private var url = ""
-    @State private var app = VideosApp.invidious
 
+    @State private var app: VideosApp?
     @State private var isValid = false
     @State private var isValidated = false
     @State private var isValidating = false
@@ -27,7 +27,6 @@ struct InstanceForm: View {
             }
             .frame(maxWidth: 1000)
         }
-        .onChange(of: app) { _ in validate() }
         .onChange(of: url) { _ in validate() }
         #if os(iOS)
             .padding(.vertical)
@@ -35,13 +34,13 @@ struct InstanceForm: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .background(Color.background(scheme: colorScheme))
         #else
-            .frame(width: 400, height: 190)
+            .frame(width: 400, height: 150)
         #endif
     }
 
     private var header: some View {
         HStack(alignment: .center) {
-            Text("Add Instance")
+            Text("Add Location")
                 .font(.title2.bold())
 
             Spacer()
@@ -71,17 +70,9 @@ struct InstanceForm: View {
 
     private var formFields: some View {
         Group {
-            Picker("Application", selection: $app) {
-                ForEach(VideosApp.allCases, id: \.self) { app in
-                    Text(app.rawValue.capitalized).tag(app)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-
             TextField("Name", text: $name)
 
-            TextField("API URL", text: $url)
+            TextField("URL", text: $url)
 
             #if !os(macOS)
                 .autocapitalization(.none)
@@ -92,7 +83,13 @@ struct InstanceForm: View {
 
     private var footer: some View {
         HStack(alignment: .center) {
-            AccountValidationStatus(isValid: $isValid, isValidated: $isValidated, isValidating: $isValidating, error: $validationError)
+            AccountValidationStatus(
+                app: $app,
+                isValid: $isValid,
+                isValidated: $isValidated,
+                isValidating: $isValidating,
+                error: $validationError
+            )
 
             Spacer()
 
@@ -137,7 +134,7 @@ struct InstanceForm: View {
     }
 
     func submitForm() {
-        guard isValid else {
+        guard isValid, let app = app else {
             return
         }
 

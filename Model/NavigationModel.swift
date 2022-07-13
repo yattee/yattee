@@ -13,6 +13,9 @@ final class NavigationModel: ObservableObject {
         case recentlyOpened(String)
         case nowPlaying
         case search
+        #if os(tvOS)
+            case settings
+        #endif
 
         var stringValue: String {
             switch self {
@@ -34,6 +37,10 @@ final class NavigationModel: ObservableObject {
                 return "recentlyOpened"
             case .search:
                 return "search"
+            #if os(tvOS)
+                case .settings: // swiftlint:disable:this switch_case_alignment
+                    return "settings"
+            #endif
             default:
                 return ""
             }
@@ -66,42 +73,43 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
+    @Published var presentingShareSheet = false
+    @Published var shareURL: URL?
+
+    @Published var alert = Alert(title: Text("Error"))
+    @Published var presentingAlert = false
+    #if os(macOS)
+        @Published var presentingAlertInVideoPlayer = false
+    #endif
+
     static func openChannel(
         _ channel: Channel,
         player: PlayerModel,
         recents: RecentsModel,
         navigation: NavigationModel,
-        navigationStyle: NavigationStyle,
-        delay: Bool = true
+        navigationStyle: NavigationStyle
     ) {
         guard channel.id != Video.fixtureChannelID else {
             return
         }
 
-        let recent = RecentItem(from: channel)
+        player.hide()
+        navigation.presentingChannel = false
+
         #if os(macOS)
             Windows.main.open()
-        #else
-            player.hide()
         #endif
 
-        let openRecent = {
-            recents.add(recent)
-            navigation.presentingChannel = true
-        }
+        let recent = RecentItem(from: channel)
+        recents.add(RecentItem(from: channel))
 
-        if navigationStyle == .tab {
-            if delay {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    openRecent()
-                }
-            } else {
-                openRecent()
-            }
-        } else if navigationStyle == .sidebar {
-            openRecent()
+        if navigationStyle == .sidebar {
             navigation.sidebarSectionChanged.toggle()
             navigation.tabSelection = .recentlyOpened(recent.tag)
+        } else {
+            withAnimation {
+                navigation.presentingChannel = true
+            }
         }
     }
 
@@ -110,9 +118,11 @@ final class NavigationModel: ObservableObject {
         player: PlayerModel,
         recents: RecentsModel,
         navigation: NavigationModel,
-        navigationStyle: NavigationStyle,
-        delay: Bool = false
+        navigationStyle: NavigationStyle
     ) {
+        navigation.presentingChannel = false
+        navigation.presentingPlaylist = false
+
         let recent = RecentItem(from: playlist)
         #if os(macOS)
             Windows.main.open()
@@ -120,24 +130,47 @@ final class NavigationModel: ObservableObject {
             player.hide()
         #endif
 
-        let openRecent = {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
-            navigation.presentingPlaylist = true
+
+            if navigationStyle == .sidebar {
+                navigation.sidebarSectionChanged.toggle()
+                navigation.tabSelection = .recentlyOpened(recent.tag)
+            } else {
+                withAnimation {
+                    navigation.presentingPlaylist = true
+                }
+            }
+        }
+    }
+
+    static func openSearchQuery(
+        _ searchQuery: String?,
+        player: PlayerModel,
+        recents: RecentsModel,
+        navigation: NavigationModel,
+        search: SearchModel
+    ) {
+        player.hide()
+        navigation.presentingChannel = false
+        navigation.presentingPlaylist = false
+        navigation.tabSelection = .search
+
+        if let searchQuery = searchQuery {
+            let recent = RecentItem(from: searchQuery)
+            recents.add(recent)
+
+            DispatchQueue.main.async {
+                search.queryText = searchQuery
+                search.changeQuery { query in query.query = searchQuery }
+            }
         }
 
-        if navigationStyle == .tab {
-            if delay {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    openRecent()
-                }
-            } else {
-                openRecent()
+        #if os(macOS)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Windows.main.focus()
             }
-        } else if navigationStyle == .sidebar {
-            openRecent()
-            navigation.sidebarSectionChanged.toggle()
-            navigation.tabSelection = .recentlyOpened(recent.tag)
-        }
+        #endif
     }
 
     var tabSelectionBinding: Binding<TabSelection> {
@@ -166,15 +199,37 @@ final class NavigationModel: ObservableObject {
         presentingPlaylistForm = true
     }
 
-    func presentUnsubscribeAlert(_ channel: Channel?) {
+    func presentUnsubscribeAlert(_ channel: Channel, subscriptions: SubscriptionsModel) {
         channelToUnsubscribe = channel
-        presentingUnsubscribeAlert = channelToUnsubscribe != nil
+        alert = Alert(
+            title: Text(
+                "Are you sure you want to unsubscribe from \(channelToUnsubscribe.name)?"
+            ),
+            primaryButton: .destructive(Text("Unsubscribe")) { [weak self] in
+                if let id = self?.channelToUnsubscribe.id {
+                    subscriptions.unsubscribe(id)
+                }
+            },
+            secondaryButton: .cancel()
+        )
+        presentingAlert = true
     }
 
     func hideKeyboard() {
         #if os(iOS)
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         #endif
+    }
+
+    func presentAlert(title: String, message: String? = nil) {
+        let message = message.isNil ? nil : Text(message!)
+        alert = Alert(title: Text(title), message: message)
+        presentingAlert = true
+    }
+
+    func presentShareSheet(_ url: URL) {
+        shareURL = url
+        presentingShareSheet = true
     }
 }
 

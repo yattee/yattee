@@ -51,11 +51,11 @@ enum VideosApp: String, CaseIterable {
         self == .piped
     }
 
-    var supportsComments: Bool {
-        self == .piped
-    }
-
     var searchUsesIndexedPages: Bool {
         self == .invidious
+    }
+
+    var supportsOpeningChannelsByName: Bool {
+        self == .piped
     }
 }

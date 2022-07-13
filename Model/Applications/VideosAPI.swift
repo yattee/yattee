@@ -7,6 +7,8 @@ protocol VideosAPI {
     var signedIn: Bool { get }
 
     func channel(_ id: String) -> Resource
+    func channelByName(_ name: String) -> Resource?
+    func channelByUsername(_ username: String) -> Resource?
     func channelVideos(_ id: String) -> Resource
     func trending(country: Country, category: TrendingCategory?) -> Resource
     func search(_ query: SearchQuery, page: String?) -> Resource
@@ -57,29 +59,39 @@ protocol VideosAPI {
 
     func channelPlaylist(_ id: String) -> Resource?
 
-    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void)
+    func loadDetails(
+        _ item: PlayerQueueItem,
+        failureHandler: ((RequestError) -> Void)?,
+        completionHandler: @escaping (PlayerQueueItem) -> Void
+    )
     func shareURL(_ item: ContentItem, frontendHost: String?, time: CMTime?) -> URL?
 
     func comments(_ id: Video.ID, page: String?) -> Resource?
 }
 
 extension VideosAPI {
-    func loadDetails(_ item: PlayerQueueItem, completionHandler: @escaping (PlayerQueueItem) -> Void = { _ in }) {
+    func loadDetails(
+        _ item: PlayerQueueItem,
+        failureHandler: ((RequestError) -> Void)? = nil,
+        completionHandler: @escaping (PlayerQueueItem) -> Void = { _ in }
+    ) {
         guard (item.video?.streams ?? []).isEmpty else {
             completionHandler(item)
             return
         }
 
-        video(item.videoID).load().onSuccess { response in
-            guard let video: Video = response.typedContent() else {
-                return
+        video(item.videoID).load()
+            .onSuccess { response in
+                guard let video: Video = response.typedContent() else {
+                    return
+                }
+
+                var newItem = item
+                newItem.video = video
+
+                completionHandler(newItem)
             }
-
-            var newItem = item
-            newItem.video = video
-
-            completionHandler(newItem)
-        }
+            .onFailure { failureHandler?($0) }
     }
 
     func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {
@@ -115,5 +127,55 @@ extension VideosAPI {
         }
 
         return urlComponents.url
+    }
+
+    func extractChapters(from description: String) -> [Chapter] {
+        guard let chaptersRegularExpression = try? NSRegularExpression(
+            pattern: "(?<start>(?:[0-9]+:){1,}(?:[0-9]+))(?:\\s)+(?:- ?)?(?<title>.*)",
+            options: .caseInsensitive
+        ) else { return [] }
+
+        let chapterLines = chaptersRegularExpression.matches(
+            in: description,
+            range: NSRange(description.startIndex..., in: description)
+        )
+
+        return chapterLines.compactMap { line in
+            let titleRange = line.range(withName: "title")
+            let startRange = line.range(withName: "start")
+
+            guard let titleSubstringRange = Range(titleRange, in: description),
+                  let startSubstringRange = Range(startRange, in: description),
+                  let titleCapture = String(description[titleSubstringRange]),
+                  let startCapture = String(description[startSubstringRange]) else { return nil }
+
+            let startComponents = startCapture.components(separatedBy: ":")
+            guard startComponents.count <= 3 else { return nil }
+
+            var hours: Double?
+            var minutes: Double?
+            var seconds: Double?
+
+            if startComponents.count == 3 {
+                hours = Double(startComponents[0])
+                minutes = Double(startComponents[1])
+                seconds = Double(startComponents[2])
+            } else if startComponents.count == 2 {
+                minutes = Double(startComponents[0])
+                seconds = Double(startComponents[1])
+            }
+
+            guard var startSeconds = seconds else { return nil }
+
+            if let minutes = minutes {
+                startSeconds += 60 * minutes
+            }
+
+            if let hours = hours {
+                startSeconds += 60 * 60 * hours
+            }
+
+            return .init(title: titleCapture, start: startSeconds)
+        }
     }
 }

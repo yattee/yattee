@@ -17,6 +17,10 @@ enum Windows: String, CaseIterable {
         }
     }
 
+    var isOpen: Bool {
+        !window.isNil
+    }
+
     func focus() {
         window?.makeKeyAndOrderFront(self)
     }
@@ -33,10 +37,18 @@ enum Windows: String, CaseIterable {
     func open() {
         switch self {
         case .player:
-            NSWorkspace.shared.open(URL(string: "yattee://\(location)")!)
+            if let window = Self.playerWindow {
+                window.makeKeyAndOrderFront(self)
+            } else {
+                NSWorkspace.shared.open(URL(string: "yattee://\(location)")!)
+            }
         case .main:
             Self.main.focus()
         }
+    }
+
+    func toggleFullScreen() {
+        window?.toggleFullScreen(nil)
     }
 }
 

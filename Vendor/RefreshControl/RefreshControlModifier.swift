@@ -17,21 +17,25 @@ struct RefreshControlModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content
-            .background(
-                GeometryReader { geometry in
-                    ScrollViewMatcher(
-                        onResolve: { scrollView in
-                            refreshControl.add(to: scrollView)
-                        },
-                        geometryReaderFrame: $geometryReaderFrame
-                    )
-                    .preference(key: FramePreferenceKey.self, value: geometry.frame(in: .global))
-                    .onPreferenceChange(FramePreferenceKey.self) { frame in
-                        self.geometryReaderFrame = frame
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, *) {
+            return content
+        } else {
+            return content
+                .background(
+                    GeometryReader { geometry in
+                        ScrollViewMatcher(
+                            onResolve: { scrollView in
+                                refreshControl.add(to: scrollView)
+                            },
+                            geometryReaderFrame: $geometryReaderFrame
+                        )
+                        .preference(key: FramePreferenceKey.self, value: geometry.frame(in: .global))
+                        .onPreferenceChange(FramePreferenceKey.self) { frame in
+                            self.geometryReaderFrame = frame
+                        }
                     }
-                }
-            )
+                )
+        }
     }
 }
 

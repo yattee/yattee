@@ -2,46 +2,67 @@ import Siesta
 import SwiftUI
 
 struct ChannelVideosView: View {
-    let channel: Channel
+    #if os(iOS)
+        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
+    #endif
+    var channel: Channel?
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
     @State private var subscriptionToggleButtonDisabled = false
 
+    #if os(iOS)
+        @State private var viewVerticalOffset = Self.hiddenOffset
+    #endif
+
     @StateObject private var store = Store<Channel>()
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.navigationStyle) private var navigationStyle
 
     #if os(iOS)
-        @Environment(\.inNavigationView) private var inNavigationView
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @EnvironmentObject<PlayerModel> private var player
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
     @Namespace private var focusNamespace
+
+    var presentedChannel: Channel? {
+        channel ?? recents.presentedChannel
+    }
 
     var videos: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
     }
 
     var body: some View {
-        #if os(iOS)
-            if inNavigationView {
-                content
-            } else {
-                PlayerControlsView {
+        if navigationStyle == .tab {
+            NavigationView {
+                BrowserPlayerControls {
                     content
                 }
             }
-        #else
-            PlayerControlsView {
+            #if os(iOS)
+            .onChange(of: navigation.presentingChannel) { newValue in
+                if newValue {
+                    store.clear()
+                    viewVerticalOffset = 0
+                    resource?.load()
+                } else {
+                    viewVerticalOffset = Self.hiddenOffset
+                }
+            }
+            #endif
+        } else {
+            BrowserPlayerControls {
                 content
             }
-        #endif
+        }
     }
 
     var content: some View {
@@ -54,8 +75,10 @@ struct ChannelVideosView: View {
 
                     Spacer()
 
-                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
-                        .labelStyle(.iconOnly)
+                    if let channel = presentedChannel {
+                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                            .labelStyle(.iconOnly)
+                    }
 
                     if let subscribers = store.item?.subscriptionsString {
                         Text("**\(subscribers)** subscribers")
@@ -77,48 +100,43 @@ struct ChannelVideosView: View {
         #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                ShareButton(
-                    contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet,
-                    shareURL: $shareURL
-                )
+                if navigationStyle == .tab {
+                    Button("Done") {
+                        withAnimation {
+                            navigation.presentingChannel = false
+                        }
+                    }
+                }
             }
 
             ToolbarItem {
                 HStack {
                     HStack(spacing: 3) {
-                        Text("\(store.item?.subscriptionsString ?? "loading")")
+                        Text("\(store.item?.subscriptionsString ?? "")")
                             .fontWeight(.bold)
                         Text(" subscribers")
+                            .allowsTightening(true)
+                            .foregroundColor(.secondary)
+                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
                     }
-                    .allowsTightening(true)
-                    .foregroundColor(.secondary)
-                    .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+
+                    ShareButton(contentItem: contentItem)
 
                     subscriptionToggleButton
 
-                    FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                    if let channel = presentedChannel {
+                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                    }
                 }
             }
         }
         #endif
-        #if os(iOS)
-        .sheet(isPresented: $presentingShareSheet) {
-            if let shareURL = shareURL {
-                ShareSheet(activityItems: [shareURL])
-            }
-        }
-        #endif
         .onAppear {
-            if store.item.isNil {
-                resource.addObserver(store)
-                resource.load()
-            }
+            resource?.loadIfNeeded()
         }
-        #if os(iOS)
-        .navigationBarHidden(player.playerNavigationLinkActive)
-        #endif
+        #if !os(tvOS)
         .navigationTitle(navigationTitle)
+        #endif
 
         return Group {
             if #available(macOS 12.0, *) {
@@ -135,44 +153,50 @@ struct ChannelVideosView: View {
         }
     }
 
-    private var resource: Resource {
+    private var resource: Resource? {
+        guard let channel = presentedChannel else {
+            return nil
+        }
+
         let resource = accounts.api.channel(channel.id)
         resource.addObserver(store)
 
         return resource
     }
 
-    private var subscriptionToggleButton: some View {
-        Group {
-            if accounts.app.supportsSubscriptions && accounts.signedIn {
-                if subscriptions.isSubscribing(channel.id) {
-                    Button("Unsubscribe") {
-                        subscriptionToggleButtonDisabled = true
+    @ViewBuilder private var subscriptionToggleButton: some View {
+        if let channel = presentedChannel {
+            Group {
+                if accounts.app.supportsSubscriptions && accounts.signedIn {
+                    if subscriptions.isSubscribing(channel.id) {
+                        Button("Unsubscribe") {
+                            subscriptionToggleButtonDisabled = true
 
-                        subscriptions.unsubscribe(channel.id) {
-                            subscriptionToggleButtonDisabled = false
+                            subscriptions.unsubscribe(channel.id) {
+                                subscriptionToggleButtonDisabled = false
+                            }
                         }
-                    }
-                } else {
-                    Button("Subscribe") {
-                        subscriptionToggleButtonDisabled = true
+                    } else {
+                        Button("Subscribe") {
+                            subscriptionToggleButtonDisabled = true
 
-                        subscriptions.subscribe(channel.id) {
-                            subscriptionToggleButtonDisabled = false
-                            navigation.sidebarSectionChanged.toggle()
+                            subscriptions.subscribe(channel.id) {
+                                subscriptionToggleButtonDisabled = false
+                                navigation.sidebarSectionChanged.toggle()
+                            }
                         }
                     }
                 }
             }
+            .disabled(subscriptionToggleButtonDisabled)
         }
-        .disabled(subscriptionToggleButtonDisabled)
     }
 
     private var contentItem: ContentItem {
-        ContentItem(channel: channel)
+        ContentItem(channel: presentedChannel)
     }
 
     private var navigationTitle: String {
-        store.item?.name ?? channel.name
+        presentedChannel?.name ?? store.item?.name ?? "No channel"
     }
 }

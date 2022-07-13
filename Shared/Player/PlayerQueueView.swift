@@ -3,13 +3,15 @@ import Foundation
 import SwiftUI
 
 struct PlayerQueueView: View {
-    @Binding var sidebarQueue: Bool
+    var sidebarQueue: Bool
     @Binding var fullScreen: Bool
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
+    @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveHistory) private var saveHistory
@@ -18,6 +20,9 @@ struct PlayerQueueView: View {
     var body: some View {
         List {
             Group {
+                if player.playbackMode == .related {
+                    autoplaying
+                }
                 playingNext
                 if sidebarQueue {
                     related
@@ -26,9 +31,10 @@ struct PlayerQueueView: View {
                     playedPreviously
                 }
             }
+            .listRowBackground(Color.clear)
             #if !os(iOS)
-            .padding(.vertical, 5)
-            .listRowInsets(EdgeInsets())
+                .padding(.vertical, 5)
+                .listRowInsets(EdgeInsets())
             #endif
         }
 
@@ -36,20 +42,57 @@ struct PlayerQueueView: View {
         .listStyle(.inset)
         #elseif os(iOS)
         .listStyle(.grouped)
+        .backport
+        .scrollContentBackground(false)
         #else
         .listStyle(.plain)
         #endif
     }
 
+    @ViewBuilder var autoplaying: some View {
+        Section(header: autoplayingHeader) {
+            if let item = player.autoplayItem {
+                PlayerQueueRow(item: item, autoplay: true)
+            } else {
+                Group {
+                    if player.currentItem.isNil {
+                        Text("Not Playing")
+                    } else {
+                        Text("Finding something to play...")
+                    }
+                }
+                .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    var autoplayingHeader: some View {
+        HStack {
+            Text("Autoplaying Next")
+            Spacer()
+            Button {
+                player.setRelatedAutoplayItem()
+            } label: {
+                Label("Find Other", systemImage: "arrow.triangle.2.circlepath.circle")
+                    .labelStyle(.iconOnly)
+            }
+            .disabled(player.currentItem.isNil)
+            .buttonStyle(.plain)
+        }
+    }
+
     var playingNext: some View {
-        Section(header: Text("Playing Next")) {
+        Section(header: Text("Queue")) {
             if player.queue.isEmpty {
-                Text("Playback queue is empty")
+                Text("Queue is empty")
                     .foregroundColor(.secondary)
             }
 
             ForEach(player.queue) { item in
                 PlayerQueueRow(item: item, fullScreen: $fullScreen)
+                    .onAppear {
+                        player.loadQueueVideoDetails(item)
+                    }
                     .contextMenu {
                         removeButton(item)
                         removeAllButton()
@@ -65,7 +108,7 @@ struct PlayerQueueView: View {
     var playedPreviously: some View {
         Group {
             if !visibleWatches.isEmpty {
-                Section(header: Text("Played Previously")) {
+                Section(header: Text("History")) {
                     ForEach(visibleWatches, id: \.videoID) { watch in
                         PlayerQueueRow(
                             item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
@@ -102,6 +145,24 @@ struct PlayerQueueView: View {
                                 } label: {
                                     Label("Play Last", systemImage: "text.append")
                                 }
+
+                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
+                                    Section {
+                                        Button {
+                                            navigation.presentAddToPlaylist(video)
+                                        } label: {
+                                            Label("Add to playlist...", systemImage: "text.badge.plus")
+                                        }
+
+                                        if let playlist = playlists.lastUsed {
+                                            Button {
+                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+                                            } label: {
+                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+                                            }
+                                        }
+                                    }
+                                }
                             }
                     }
                 }
@@ -137,7 +198,7 @@ struct PlayerQueueView: View {
 struct PlayerQueueView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            PlayerQueueView(sidebarQueue: .constant(true), fullScreen: .constant(true))
+            PlayerQueueView(sidebarQueue: true, fullScreen: .constant(true))
         }
         .injectFixtureEnvironmentObjects()
     }

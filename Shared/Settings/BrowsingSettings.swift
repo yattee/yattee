@@ -9,6 +9,7 @@ struct BrowsingSettings: View {
     #if os(iOS)
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
     #endif
+    @Default(.thumbnailsQuality) private var thumbnailsQuality
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.visibleSections) private var visibleSections
@@ -65,12 +66,28 @@ struct BrowsingSettings: View {
 
     private var thumbnailsSettings: some View {
         Section(header: SettingsHeader(text: "Thumbnails")) {
+            thumbnailsQualityPicker
             #if !os(tvOS)
                 Toggle("Round corners", isOn: $roundedThumbnails)
             #endif
             Toggle("Show channel name", isOn: $channelOnThumbnail)
             Toggle("Show video length", isOn: $timeOnThumbnail)
         }
+    }
+
+    private var thumbnailsQualityPicker: some View {
+        Picker("Quality", selection: $thumbnailsQuality) {
+            ForEach(ThumbnailsQuality.allCases, id: \.self) { quality in
+                Text(quality.rawValue.capitalized + " quality").tag(quality)
+            }
+        }
+        .labelsHidden()
+
+        #if os(iOS)
+            .pickerStyle(.automatic)
+        #elseif os(tvOS)
+            .pickerStyle(.inline)
+        #endif
     }
 
     private var visibleSectionsSettings: some View {

@@ -2,74 +2,96 @@ import Siesta
 import SwiftUI
 
 struct ChannelPlaylistView: View {
-    var playlist: ChannelPlaylist
+    #if os(iOS)
+        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
+    #endif
+
+    var playlist: ChannelPlaylist?
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
 
+    #if os(iOS)
+        @State private var viewVerticalOffset = Self.hiddenOffset
+    #endif
+
     @StateObject private var store = Store<ChannelPlaylist>()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.inNavigationView) private var inNavigationView
+    @Environment(\.navigationStyle) private var navigationStyle
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<RecentsModel> private var recents
 
-    var items: [ContentItem] {
+    private var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
     }
 
-    var resource: Resource? {
-        accounts.api.channelPlaylist(playlist.id)
+    private var presentedPlaylist: ChannelPlaylist? {
+        playlist ?? recents.presentedPlaylist
+    }
+
+    private var resource: Resource? {
+        guard let playlist = presentedPlaylist else {
+            return nil
+        }
+
+        let resource = accounts.api.channelPlaylist(playlist.id)
+        resource?.addObserver(store)
+
+        return resource
     }
 
     var body: some View {
-        #if os(iOS)
-            if inNavigationView {
-                content
-            } else {
-                PlayerControlsView {
+        if navigationStyle == .tab {
+            NavigationView {
+                BrowserPlayerControls {
                     content
                 }
             }
-        #else
-            PlayerControlsView {
+            #if os(iOS)
+            .onChange(of: navigation.presentingPlaylist) { newValue in
+                if newValue {
+                    store.clear()
+                    viewVerticalOffset = 0
+                    resource?.load()
+                } else {
+                    viewVerticalOffset = Self.hiddenOffset
+                }
+            }
+            #endif
+        } else {
+            BrowserPlayerControls {
                 content
             }
-        #endif
+        }
     }
 
     var content: some View {
         VStack(alignment: .leading) {
             #if os(tvOS)
                 HStack {
-                    Text(playlist.title)
-                        .font(.title2)
-                        .frame(alignment: .leading)
+                    if let playlist = presentedPlaylist {
+                        Text(playlist.title)
+                            .font(.title2)
+                            .frame(alignment: .leading)
 
-                    Spacer()
+                        Spacer()
 
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
-                        .labelStyle(.iconOnly)
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                            .labelStyle(.iconOnly)
+                    }
 
                     playButton
-                        .labelStyle(.iconOnly)
-                    shuffleButton
                         .labelStyle(.iconOnly)
                 }
             #endif
             VerticalCells(items: items)
                 .environment(\.inChannelPlaylistView, true)
         }
-        #if os(iOS)
-        .sheet(isPresented: $presentingShareSheet) {
-            if let shareURL = shareURL {
-                ShareSheet(activityItems: [shareURL])
-            }
-        }
-        #endif
         .onAppear {
-            resource?.addObserver(store)
             resource?.loadIfNeeded()
         }
         #if os(tvOS)
@@ -77,26 +99,28 @@ struct ChannelPlaylistView: View {
         #else
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                ShareButton(
-                    contentItem: contentItem,
-                    presentingShareSheet: $presentingShareSheet,
-                    shareURL: $shareURL
-                )
+                if navigationStyle == .tab {
+                    Button("Done") {
+                        withAnimation {
+                            navigation.presentingPlaylist = false
+                        }
+                    }
+                }
             }
 
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                    ShareButton(contentItem: contentItem)
+
+                    if let playlist = presentedPlaylist {
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                    }
 
                     playButton
-                    shuffleButton
                 }
             }
         }
-        .navigationTitle(playlist.title)
-            #if os(iOS)
-                .navigationBarHidden(player.playerNavigationLinkActive)
-            #endif
+        .navigationTitle(presentedPlaylist?.title ?? "")
         #endif
     }
 
@@ -110,17 +134,10 @@ struct ChannelPlaylistView: View {
 
     private var playButton: some View {
         Button {
-            player.play(videos, inNavigationView: inNavigationView)
+            player.playbackMode = .queue
+            player.play(videos)
         } label: {
             Label("Play All", systemImage: "play")
-        }
-    }
-
-    private var shuffleButton: some View {
-        Button {
-            player.play(videos, shuffling: true, inNavigationView: inNavigationView)
-        } label: {
-            Label("Shuffle", systemImage: "shuffle")
         }
     }
 

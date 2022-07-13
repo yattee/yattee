@@ -15,62 +15,125 @@ import SwiftyJSON
 #endif
 
 final class PlayerModel: ObservableObject {
+    enum PlaybackMode: String, CaseIterable, Defaults.Serializable {
+        case queue, shuffle, loopOne, related
+
+        var systemImage: String {
+            switch self {
+            case .queue:
+                return "list.number"
+            case .shuffle:
+                return "shuffle"
+            case .loopOne:
+                return "repeat.1"
+            case .related:
+                return "infinity"
+            }
+        }
+    }
+
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
-    static let assetKeysToLoad = ["tracks", "playable", "duration"]
     let logger = Logger(label: "stream.yattee.app")
 
-    private(set) var player = AVPlayer()
-    var playerView = Player()
-    var controller: PlayerViewController?
+    var avPlayerView = AppleAVPlayerView()
     var playerItem: AVPlayerItem?
 
-    @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
+    var mpvPlayerView = MPVPlayerView()
 
+    @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
+    @Published var activeBackend = PlayerBackendType.mpv
+
+    var avPlayerBackend: AVPlayerBackend!
+    var mpvBackend: MPVBackend!
+
+    var backends: [PlayerBackend] {
+        [avPlayerBackend, mpvBackend]
+    }
+
+    var backend: PlayerBackend! {
+        switch activeBackend {
+        case .mpv:
+            return mpvBackend
+        case .appleAVPlayer:
+            return avPlayerBackend
+        }
+    }
+
+    @Published var playerSize: CGSize = .zero { didSet {
+        backend.setSize(playerSize.width, playerSize.height)
+    }}
+    @Published var aspectRatio = VideoPlayerView.defaultAspectRatio
     @Published var stream: Stream?
-    @Published var currentRate: Float = 1.0 { didSet { player.rate = currentRate } }
+    @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
 
     @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
-    @Published var queue = [PlayerQueueItem]() { didSet { Defaults[.queue] = queue } }
+    @Published var queue = [PlayerQueueItem]() { didSet { handleQueueChange() } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
+    @Published var videoBeingOpened: Video?
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
-
-    @Published var playerNavigationLinkActive = false { didSet { handleNavigationViewPlayerPresentationChange() } }
 
     @Published var sponsorBlock = SponsorBlockAPI()
     @Published var segmentRestorationTime: CMTime?
     @Published var lastSkipped: Segment? { didSet { rebuildTVMenu() } }
     @Published var restoredSegments = [Segment]()
 
+    @Published var musicMode = false
+    @Published var playbackMode = PlaybackMode.queue { didSet { handlePlaybackModeChange() } }
+    @Published var autoplayItem: PlayerQueueItem?
+    @Published var autoplayItemSource: Video?
+    @Published var advancing = false
+
+    @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
+
+    @Published var isSeeking = false { didSet {
+        backend.setNeedsNetworkStateUpdates(true)
+    }}
+
     #if os(iOS)
-        @Published var motionManager: CMMotionManager!
-        @Published var lockedOrientation: UIInterfaceOrientation?
-        @Published var lastOrientation: UIInterfaceOrientation?
+        @Published var lockedOrientation: UIInterfaceOrientationMask?
     #endif
 
     var accounts: AccountsModel
     var comments: CommentsModel
-
-    var asset: AVURLAsset?
-    var composition = AVMutableComposition()
-    var loadedCompositionAssets = [AVMediaType]()
+    var controls: PlayerControlsModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.controls = controls
+        }
+    }}
+    var playerTime: PlayerTimeModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.playerTime = playerTime
+            backend.playerTime.player = self
+        }
+    }}
+    var networkState: NetworkStateModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.networkState = networkState
+            backend.networkState.player = self
+        }
+    }}
+    var navigation: NavigationModel
 
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
+    var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
-    private var currentArtwork: MPMediaItemArtwork?
-    private var frequentTimeObserver: Any?
-    private var infrequentTimeObserver: Any?
-    private var playerTimeControlStatusObserver: Any?
+    #if os(tvOS)
+        static let fullScreenIsDefault = true
+    #else
+        static let fullScreenIsDefault = false
+    #endif
+    @Published var playingFullScreen = PlayerModel.fullScreenIsDefault
 
-    private var statusObservation: NSKeyValueObservation?
-
-    private var timeObserverThrottle = Throttle(interval: 2)
-
-    var playingInPictureInPicture = false
-    var playingFullscreen = false
+    @Published var playingInPictureInPicture = false
+    var pipController: AVPictureInPictureController?
+    var pipDelegate = PiPDelegate()
 
     @Published var presentingErrorDetails = false
     var playerError: Error? { didSet {
@@ -89,32 +152,79 @@ final class PlayerModel: ObservableObject {
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
     #endif
 
-    init(accounts: AccountsModel? = nil, comments: CommentsModel? = nil) {
-        self.accounts = accounts ?? AccountsModel()
-        self.comments = comments ?? CommentsModel()
+    private var currentArtwork: MPMediaItemArtwork?
+    #if !os(macOS)
+        var playerLayerView: PlayerLayerView!
+    #endif
 
-        addFrequentTimeObserver()
-        addInfrequentTimeObserver()
-        addPlayerTimeControlStatusObserver()
+    var onPresentPlayer: (() -> Void)?
+    private var remoteCommandCenterConfigured = false
+
+    init(
+        accounts: AccountsModel = AccountsModel(),
+        comments: CommentsModel = CommentsModel(),
+        controls: PlayerControlsModel = PlayerControlsModel(),
+        navigation: NavigationModel = NavigationModel(),
+        playerTime: PlayerTimeModel = PlayerTimeModel(),
+        networkState: NetworkStateModel = NetworkStateModel()
+    ) {
+        self.accounts = accounts
+        self.comments = comments
+        self.controls = controls
+        self.navigation = navigation
+        self.playerTime = playerTime
+        self.networkState = networkState
+
+        self.avPlayerBackend = AVPlayerBackend(
+            model: self,
+            controls: controls,
+            playerTime: playerTime
+        )
+        self.mpvBackend = MPVBackend(
+            model: self,
+            playerTime: playerTime,
+            networkState: networkState
+        )
+
+        Defaults[.activeBackend] = .mpv
+        playbackMode = Defaults[.playbackMode]
     }
 
     func show() {
-        guard !presentingPlayer else {
-            #if os(macOS)
+        #if os(macOS)
+            if presentingPlayer {
                 Windows.player.focus()
-            #endif
-            return
+                return
+            }
+        #endif
+
+        DispatchQueue.main.async { [weak self] in
+            withAnimation {
+                self?.presentingPlayer = true
+            }
         }
+
         #if os(macOS)
             Windows.player.open()
             Windows.player.focus()
         #endif
-        presentingPlayer = true
     }
 
     func hide() {
-        presentingPlayer = false
-        playerNavigationLinkActive = false
+        DispatchQueue.main.async { [weak self] in
+            self?.playingFullScreen = false
+            withAnimation {
+                self?.presentingPlayer = false
+            }
+        }
+
+        #if os(iOS)
+            if Defaults[.lockPortraitWhenBrowsing] {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            } else {
+                Orientation.lockOrientation(.allButUpsideDown)
+            }
+        #endif
     }
 
     func togglePlayer() {
@@ -137,11 +247,33 @@ final class PlayerModel: ObservableObject {
             return false
         }
 
-        return player.currentItem == nil || time == nil || !time!.isValid
+        return backend.isLoadingVideo
     }
 
     var isPlaying: Bool {
-        player.timeControlStatus == .playing
+        backend.isPlaying
+    }
+
+    var playerItemDuration: CMTime? {
+        guard !currentItem.isNil else {
+            return nil
+        }
+
+        return backend.playerItemDuration
+    }
+
+    var playerItemDurationWithoutSponsorSegments: CMTime? {
+        guard let playerItemDuration = playerItemDuration, !playerItemDuration.seconds.isZero else {
+            return nil
+        }
+
+        return playerItemDuration - .secondsInDefaultTimescale(
+            sponsorBlock.segments.reduce(0) { $0 + $1.duration }
+        )
+    }
+
+    var videoDuration: TimeInterval? {
+        currentItem?.duration ?? currentVideo?.length ?? playerItemDuration?.seconds
     }
 
     var time: CMTime? {
@@ -152,44 +284,36 @@ final class PlayerModel: ObservableObject {
         currentVideo?.live ?? false
     }
 
-    var playerItemDuration: CMTime? {
-        player.currentItem?.asset.duration
-    }
-
-    var videoDuration: TimeInterval? {
-        currentItem?.duration ?? currentVideo?.length ?? player.currentItem?.asset.duration.seconds
-    }
-
     func togglePlay() {
-        isPlaying ? pause() : play()
+        backend.togglePlay()
     }
 
     func play() {
-        guard player.timeControlStatus != .playing else {
-            return
-        }
-
-        player.play()
+        backend.play()
     }
 
     func pause() {
-        guard player.timeControlStatus != .paused else {
-            return
-        }
-
-        player.pause()
+        backend.pause()
     }
 
-    func play(_ video: Video, at time: TimeInterval? = nil, inNavigationView: Bool = false) {
+    func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
+        pause()
+
+        #if os(iOS)
+            if !playingInPictureInPicture, showingPlayer {
+                onPresentPlayer = { [weak self] in self?.playNow(video, at: time) }
+                show()
+                return
+            }
+        #endif
+
         playNow(video, at: time)
 
         guard !playingInPictureInPicture else {
             return
         }
 
-        if inNavigationView {
-            playerNavigationLinkActive = true
-        } else {
+        if showingPlayer {
             show()
         }
     }
@@ -209,28 +333,50 @@ final class PlayerModel: ObservableObject {
                     videoID: video.videoID,
                     categories: Defaults[.sponsorBlockCategories]
                 )
+
+                guard Defaults[.enableReturnYouTubeDislike] else {
+                    return
+                }
+
+                self?.returnYouTubeDislike.loadDislikes(videoID: video.videoID) { [weak self] dislikes in
+                    self?.currentItem?.video?.dislikes = dislikes
+                }
             }
         }
 
-        if let url = stream.singleAssetURL {
-            logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
-            loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime)
-        } else {
-            logger.info("playing stream with many assets:")
-            logger.info("composition audio asset: \(stream.audioAsset.url)")
-            logger.info("composition video asset: \(stream.videoAsset.url)")
+        playerTime.reset()
 
-            loadComposition(stream, of: video, preservingTime: preservingTime)
-        }
+        backend.playStream(
+            stream,
+            of: video,
+            preservingTime: preservingTime,
+            upgrading: upgrading
+        )
 
         if !upgrading {
             updateCurrentArtwork()
         }
     }
 
-    func upgradeToStream(_ stream: Stream) {
-        if !self.stream.isNil, self.stream != stream {
-            playStream(stream, of: currentVideo!, preservingTime: true, upgrading: true)
+    func saveTime(completionHandler: @escaping () -> Void = {}) {
+        guard let currentTime = backend.currentTime, currentTime.seconds > 0 else {
+            completionHandler()
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.preservedTime = currentTime
+            completionHandler()
+        }
+    }
+
+    func upgradeToStream(_ stream: Stream, force: Bool = false) {
+        guard let video = currentVideo else {
+            return
+        }
+
+        if !self.stream.isNil, force || self.stream != stream {
+            playStream(stream, of: video, preservingTime: true, upgrading: true)
         }
     }
 
@@ -254,6 +400,31 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
+        var delay = 0.0
+
+        #if os(iOS)
+            if presentingPlayer {
+                delay = 0.2
+            }
+        #endif
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self = self else { return }
+            self.backend.setNeedsDrawing(self.presentingPlayer)
+
+            #if os(tvOS)
+                if self.presentingPlayer {
+                    self.controls.show()
+                }
+            #endif
+        }
+
+        controls.hide()
+
+        #if !os(macOS)
+            UIApplication.shared.isIdleTimerDisabled = presentingPlayer
+        #endif
+
         if presentingPlayer, closePiPOnOpeningPlayer, playingInPictureInPicture {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.closePiP()
@@ -266,438 +437,70 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        if !presentingPlayer, !pauseOnHidingPlayer, isPlaying {
+        if !presentingPlayer, !pauseOnHidingPlayer, backend.isPlaying {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 self?.play()
             }
         }
     }
 
-    private func handleNavigationViewPlayerPresentationChange() {
-        if pauseOnHidingPlayer, !playingInPictureInPicture, !playerNavigationLinkActive {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.pause()
-            }
-        }
-    }
-
-    private func insertPlayerItem(
-        _ stream: Stream,
-        for video: Video,
-        preservingTime: Bool = false
-    ) {
-        removeItemDidPlayToEndTimeObserver()
-
-        playerItem = playerItem(stream)
-        guard playerItem != nil else {
+    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType) {
+        guard activeBackend != to else {
             return
         }
 
-        addItemDidPlayToEndTimeObserver()
-        attachMetadata(to: playerItem!, video: video, for: stream)
+        Defaults[.activeBackend] = to
+        self.activeBackend = to
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            self.stream = stream
-            self.composition = AVMutableComposition()
-            self.asset = nil
+        guard var stream = stream else {
+            return
         }
 
-        let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
-            if self.isAutoplaying(self.playerItem!) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                    guard let self = self else {
-                        return
-                    }
-
-                    if !preservingTime,
-                       let segment = self.sponsorBlock.segments.first,
-                       segment.start < 3,
-                       self.lastSkipped.isNil
-                    {
-                        self.player.seek(
-                            to: segment.endTime,
-                            toleranceBefore: .secondsInDefaultTimescale(1),
-                            toleranceAfter: .zero
-                        ) { finished in
-                            guard finished else {
-                                return
-                            }
-
-                            self.lastSkipped = segment
-                            self.play()
-                        }
-                    } else {
-                        self.play()
-                    }
-                }
-            }
+        if to == .mpv {
+            addVideoTrackFromStream()
+        } else {
+            musicMode = false
         }
 
-        let replaceItemAndSeek = {
-            guard video == self.currentVideo else {
-                return
-            }
-            self.player.replaceCurrentItem(with: self.playerItem)
-            self.seekToPreservedTime { finished in
+        inactiveBackends().forEach { $0.pause() }
+
+        let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
+        let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
+
+        if let stream = toBackend.stream, toBackend.video == fromBackend.video {
+            toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero) { finished in
                 guard finished else {
                     return
                 }
-                self.preservedTime = nil
-
-                startPlaying()
-            }
-        }
-
-        if preservingTime {
-            if preservedTime.isNil {
-                saveTime {
-                    replaceItemAndSeek()
-                    startPlaying()
-                }
-            } else {
-                replaceItemAndSeek()
-                startPlaying()
-            }
-        } else {
-            player.replaceCurrentItem(with: playerItem)
-            startPlaying()
-        }
-    }
-
-    private func loadSingleAsset(
-        _ url: URL,
-        stream: Stream,
-        of video: Video,
-        preservingTime: Bool = false
-    ) {
-        asset?.cancelLoading()
-        asset = AVURLAsset(url: url)
-        asset?.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
-            var error: NSError?
-
-            switch self?.asset?.statusOfValue(forKey: "duration", error: &error) {
-            case .loaded:
-                DispatchQueue.main.async { [weak self] in
-                    self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
-                }
-            case .failed:
-                DispatchQueue.main.async { [weak self] in
-                    self?.playerError = error
-                }
-            default:
-                return
-            }
-        }
-    }
-
-    private func loadComposition(
-        _ stream: Stream,
-        of video: Video,
-        preservingTime: Bool = false
-    ) {
-        loadedCompositionAssets = []
-        loadCompositionAsset(stream.audioAsset, stream: stream, type: .audio, of: video, preservingTime: preservingTime)
-        loadCompositionAsset(stream.videoAsset, stream: stream, type: .video, of: video, preservingTime: preservingTime)
-    }
-
-    private func loadCompositionAsset(
-        _ asset: AVURLAsset,
-        stream: Stream,
-        type: AVMediaType,
-        of video: Video,
-        preservingTime: Bool = false
-    ) {
-        asset.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
-            guard let self = self else {
-                return
-            }
-            self.logger.info("loading \(type.rawValue) track")
-
-            let assetTracks = asset.tracks(withMediaType: type)
-
-            guard let compositionTrack = self.composition.addMutableTrack(
-                withMediaType: type,
-                preferredTrackID: kCMPersistentTrackID_Invalid
-            ) else {
-                self.logger.critical("composition \(type.rawValue) addMutableTrack FAILED")
-                return
+                toBackend.play()
             }
 
-            guard let assetTrack = assetTracks.first else {
-                self.logger.critical("asset \(type.rawValue) track FAILED")
-                return
-            }
+            self.stream = stream
+            streamSelection = stream
 
-            try! compositionTrack.insertTimeRange(
-                CMTimeRange(start: .zero, duration: CMTime.secondsInDefaultTimescale(video.length)),
-                of: assetTrack,
-                at: .zero
-            )
-
-            self.logger.critical("\(type.rawValue) LOADED")
-
-            guard self.streamSelection == stream else {
-                self.logger.critical("IGNORING LOADED")
-                return
-            }
-
-            self.loadedCompositionAssets.append(type)
-
-            if self.loadedCompositionAssets.count == 2 {
-                self.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
-            }
-        }
-    }
-
-    private func playerItem(_: Stream) -> AVPlayerItem? {
-        if let asset = asset {
-            return AVPlayerItem(asset: asset)
-        } else {
-            return AVPlayerItem(asset: composition)
-        }
-    }
-
-    private func attachMetadata(to item: AVPlayerItem, video: Video, for _: Stream? = nil) {
-        #if !os(macOS)
-            var externalMetadata = [
-                makeMetadataItem(.commonIdentifierTitle, value: video.title),
-                makeMetadataItem(.quickTimeMetadataGenre, value: video.genre ?? ""),
-                makeMetadataItem(.commonIdentifierDescription, value: video.description ?? "")
-            ]
-            if let thumbnailData = try? Data(contentsOf: video.thumbnailURL(quality: .medium)!),
-               let image = UIImage(data: thumbnailData),
-               let pngData = image.pngData()
-            {
-                let artworkItem = makeMetadataItem(.commonIdentifierArtwork, value: pngData)
-                externalMetadata.append(artworkItem)
-            }
-
-            item.externalMetadata = externalMetadata
-        #endif
-
-        item.preferredForwardBufferDuration = 5
-
-        observePlayerItemStatus(item)
-    }
-
-    private func observePlayerItemStatus(_ item: AVPlayerItem) {
-        statusObservation?.invalidate()
-        statusObservation = item.observe(\.status, options: [.old, .new]) { [weak self] playerItem, _ in
-            guard let self = self else {
-                return
-            }
-
-            switch playerItem.status {
-            case .readyToPlay:
-                if self.isAutoplaying(playerItem) {
-                    self.play()
-                }
-            case .failed:
-                self.playerError = item.error
-
-            default:
-                return
-            }
-        }
-    }
-
-    #if !os(macOS)
-        private func makeMetadataItem(_ identifier: AVMetadataIdentifier, value: Any) -> AVMetadataItem {
-            let item = AVMutableMetadataItem()
-
-            item.identifier = identifier
-            item.value = value as? NSCopying & NSObjectProtocol
-            item.extendedLanguageTag = "und"
-
-            return item.copy() as! AVMetadataItem
-        }
-    #endif
-
-    private func addItemDidPlayToEndTimeObserver() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(itemDidPlayToEndTime),
-            name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-            object: playerItem
-        )
-    }
-
-    private func removeItemDidPlayToEndTimeObserver() {
-        NotificationCenter.default.removeObserver(
-            self,
-            name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-            object: playerItem
-        )
-    }
-
-    @objc func itemDidPlayToEndTime() {
-        prepareCurrentItemForHistory(finished: true)
-
-        if queue.isEmpty {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(false)
-            #endif
-            resetQueue()
-            #if os(tvOS)
-                controller?.playerView.dismiss(animated: false) { [weak self] in
-                    self?.controller?.dismiss(animated: true)
-                }
-            #endif
-        } else {
-            advanceToNextItem()
-        }
-    }
-
-    private func saveTime(completionHandler: @escaping () -> Void = {}) {
-        let currentTime = player.currentTime()
-
-        guard currentTime.seconds > 0 else {
             return
         }
 
-        DispatchQueue.main.async { [weak self] in
-            self?.preservedTime = currentTime
-            completionHandler()
-        }
-    }
+        if !backend.canPlay(stream) || (to == .mpv && !stream.hlsURL.isNil) {
+            guard let preferredStream = preferredStream(availableStreams) else {
+                return
+            }
 
-    private func seekToPreservedTime(completionHandler: @escaping (Bool) -> Void = { _ in }) {
-        guard let time = preservedTime else {
-            return
+            stream = preferredStream
+            streamSelection = preferredStream
         }
 
-        player.seek(
-            to: time,
-            toleranceBefore: .secondsInDefaultTimescale(1),
-            toleranceAfter: .zero,
-            completionHandler: completionHandler
-        )
-    }
-
-    private func addFrequentTimeObserver() {
-        let interval = CMTime.secondsInDefaultTimescale(0.5)
-
-        frequentTimeObserver = player.addPeriodicTimeObserver(
-            forInterval: interval,
-            queue: .main
-        ) { [weak self] _ in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else {
                 return
             }
-
-            guard !self.currentItem.isNil else {
-                return
-            }
-
-            #if !os(tvOS)
-                self.updateNowPlayingInfo()
-            #endif
-
-            self.handleSegments(at: self.player.currentTime())
+            self.upgradeToStream(stream, force: true)
+            self.setNeedsDrawing(self.presentingPlayer)
         }
     }
 
-    private func addInfrequentTimeObserver() {
-        let interval = CMTime.secondsInDefaultTimescale(5)
-
-        infrequentTimeObserver = player.addPeriodicTimeObserver(
-            forInterval: interval,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else {
-                return
-            }
-
-            guard !self.currentItem.isNil else {
-                return
-            }
-
-            self.timeObserverThrottle.execute {
-                self.updateWatch()
-            }
-        }
-    }
-
-    private func addPlayerTimeControlStatusObserver() {
-        playerTimeControlStatusObserver = player.observe(\.timeControlStatus) { [weak self] player, _ in
-            guard let self = self,
-                  self.player == player
-            else {
-                return
-            }
-
-            if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
-                self.objectWillChange.send()
-            }
-
-            if player.timeControlStatus == .playing, player.rate != self.currentRate {
-                player.rate = self.currentRate
-            }
-
-            #if os(macOS)
-                if player.timeControlStatus == .playing {
-                    ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
-                } else {
-                    ScreenSaverManager.shared.enable()
-                }
-            #endif
-
-            self.timeObserverThrottle.execute {
-                self.updateWatch()
-            }
-        }
-    }
-
-    fileprivate func updateNowPlayingInfo() {
-        var nowPlayingInfo: [String: AnyObject] = [
-            MPMediaItemPropertyTitle: currentItem.video.title as AnyObject,
-            MPMediaItemPropertyArtist: currentItem.video.author as AnyObject,
-            MPNowPlayingInfoPropertyIsLiveStream: currentItem.video.live as AnyObject,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: player.currentTime().seconds as AnyObject,
-            MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
-            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
-        ]
-
-        if !currentArtwork.isNil {
-            nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
-        }
-
-        if !currentItem.video.live {
-            let itemDuration = currentItem.videoDuration ?? currentItem.duration
-            let duration = itemDuration.isFinite ? Double(itemDuration) : nil
-
-            if !duration.isNil {
-                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
-            }
-        }
-
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-    }
-
-    private func updateCurrentArtwork() {
-        guard let thumbnailData = try? Data(contentsOf: currentItem.video.thumbnailURL(quality: .medium)!) else {
-            return
-        }
-
-        #if os(macOS)
-            let image = NSImage(data: thumbnailData)
-        #else
-            let image = UIImage(data: thumbnailData)
-        #endif
-
-        if image.isNil {
-            return
-        }
-
-        currentArtwork = MPMediaItemArtwork(boundsSize: image!.size) { _ in image! }
+    private func inactiveBackends() -> [PlayerBackend] {
+        [activeBackend == PlayerBackendType.mpv ? avPlayerBackend : mpvBackend]
     }
 
     func rateLabel(_ rate: Float) -> String {
@@ -708,10 +511,13 @@ final class PlayerModel: ObservableObject {
         return "\(formatter.string(from: NSNumber(value: rate))!)×"
     }
 
-    func closeCurrentItem() {
-        prepareCurrentItemForHistory()
+    func closeCurrentItem(finished: Bool = false) {
+        prepareCurrentItemForHistory(finished: finished)
         currentItem = nil
-        player.replaceCurrentItem(with: nil)
+
+        backend.closeItem()
+        aspectRatio = VideoPlayerView.defaultAspectRatio
+        resetAutoplay()
     }
 
     func closePiP() {
@@ -726,52 +532,165 @@ final class PlayerModel: ObservableObject {
             show()
         #endif
 
-        doClosePiP(wasPlaying: wasPlaying)
+        backend.closePiP(wasPlaying: wasPlaying)
     }
 
-    #if os(tvOS)
-        private func doClosePiP(wasPlaying: Bool) {
-            let item = player.currentItem
-            let time = player.currentTime()
+    func handleQueueChange() {
+        Defaults[.queue] = queue
 
-            self.player.replaceCurrentItem(with: nil)
-
-            guard !item.isNil else {
-                return
-            }
-
-            self.player.seek(to: time)
-            self.player.replaceCurrentItem(with: item)
-
-            guard wasPlaying else {
-                return
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.play()
-            }
-        }
-    #else
-        private func doClosePiP(wasPlaying: Bool) {
-            controller?.playerView.player = nil
-            controller?.playerView.player = player
-
-            guard wasPlaying else {
-                return
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.play()
-            }
-        }
-    #endif
+        updateRemoteCommandCenter()
+        controls.objectWillChange.send()
+    }
 
     func handleCurrentItemChange() {
         #if os(macOS)
             Windows.player.window?.title = windowTitle
         #endif
 
-        Defaults[.lastPlayed] = currentItem
+        DispatchQueue.main.async(qos: .background) { [weak self] in
+            guard let self = self else { return }
+            Defaults[.lastPlayed] = self.currentItem
+
+            if self.playbackMode == .related,
+               let video = self.currentVideo,
+               self.autoplayItemSource.isNil || self.autoplayItemSource?.videoID != video.videoID
+            {
+                self.setRelatedAutoplayItem()
+            }
+        }
+    }
+
+    func handlePlaybackModeChange() {
+        Defaults[.playbackMode] = playbackMode
+
+        updateRemoteCommandCenter()
+
+        guard playbackMode == .related else {
+            autoplayItem = nil
+            return
+        }
+        setRelatedAutoplayItem()
+    }
+
+    func setRelatedAutoplayItem() {
+        guard let video = currentVideo else { return }
+        let related = video.related.filter { $0.videoID != autoplayItem?.video?.videoID }
+
+        let watchFetchRequest = Watch.fetchRequest()
+        watchFetchRequest.predicate = NSPredicate(format: "videoID IN %@", related.map(\.videoID) as [String])
+
+        let results = try? context.fetch(watchFetchRequest)
+
+        context.perform { [weak self] in
+            guard let self = self,
+                  let results = results else { return }
+            let resultsIds = results.map(\.videoID)
+
+            guard let autoplayVideo = related.filter({ !resultsIds.contains($0.videoID) }).randomElement() else {
+                return
+            }
+
+            let item = PlayerQueueItem(autoplayVideo)
+            self.autoplayItem = item
+            self.autoplayItemSource = video
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                guard let self = self else { return }
+                self.accounts.api.loadDetails(item, completionHandler: { newItem in
+                    guard newItem.videoID == self.autoplayItem?.videoID else { return }
+                    self.autoplayItem = newItem
+                    self.updateRemoteCommandCenter()
+                    self.controls.objectWillChange.send()
+                })
+            }
+        }
+    }
+
+    func updateRemoteCommandCenter() {
+        let skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand
+        let skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand
+        let previousTrackCommand = MPRemoteCommandCenter.shared().previousTrackCommand
+        let nextTrackCommand = MPRemoteCommandCenter.shared().nextTrackCommand
+
+        if !remoteCommandCenterConfigured {
+            remoteCommandCenterConfigured = true
+
+            #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .moviePlayback
+                )
+
+                UIApplication.shared.beginReceivingRemoteControlEvents()
+            #endif
+
+            let preferredIntervals = [NSNumber(10)]
+
+            skipForwardCommand.preferredIntervals = preferredIntervals
+            skipBackwardCommand.preferredIntervals = preferredIntervals
+
+            skipForwardCommand.addTarget { [weak self] _ in
+                self?.backend.seek(relative: .secondsInDefaultTimescale(10))
+                return .success
+            }
+
+            skipBackwardCommand.addTarget { [weak self] _ in
+                self?.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                return .success
+            }
+
+            previousTrackCommand.addTarget { [weak self] _ in
+                self?.backend.seek(to: .zero)
+                return .success
+            }
+
+            nextTrackCommand.addTarget { [weak self] _ in
+                self?.advanceToNextItem()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
+                self?.play()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
+                self?.pause()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().togglePlayPauseCommand.addTarget { [weak self] _ in
+                self?.togglePlay()
+                return .success
+            }
+
+            MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
+                guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+
+                self?.backend.seek(to: event.positionTime)
+
+                return .success
+            }
+        }
+
+        switch Defaults[.systemControlsCommands] {
+        case .seek:
+            previousTrackCommand.isEnabled = false
+            nextTrackCommand.isEnabled = false
+            skipForwardCommand.isEnabled = true
+            skipBackwardCommand.isEnabled = true
+
+        case .restartAndAdvanceToNext:
+            skipForwardCommand.isEnabled = false
+            skipBackwardCommand.isEnabled = false
+            previousTrackCommand.isEnabled = true
+            nextTrackCommand.isEnabled = isAdvanceToNextItemAvailable
+        }
+    }
+
+    func resetAutoplay() {
+        autoplayItem = nil
+        autoplayItemSource = nil
     }
 
     #if os(macOS)
@@ -780,6 +699,8 @@ final class PlayerModel: ObservableObject {
         }
     #else
         func handleEnterForeground() {
+            setNeedsDrawing(presentingPlayer)
+
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
             }
@@ -788,26 +709,160 @@ final class PlayerModel: ObservableObject {
             closePiP()
         }
 
+        func handleEnterBackground() {
+            setNeedsDrawing(false)
+
+            if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
+                pause()
+            }
+        }
+
         func enterFullScreen() {
-            guard !playingFullscreen else {
+            guard !playingFullScreen else {
                 return
             }
 
             logger.info("entering fullscreen")
 
-            controller?.playerView
-                .perform(NSSelectorFromString("enterFullScreenAnimated:completionHandler:"), with: false, with: nil)
+            backend.enterFullScreen()
         }
 
         func exitFullScreen() {
-            guard playingFullscreen else {
+            guard playingFullScreen else {
                 return
             }
 
             logger.info("exiting fullscreen")
 
-            controller?.playerView
-                .perform(NSSelectorFromString("exitFullScreenAnimated:completionHandler:"), with: false, with: nil)
+            if playingFullScreen {
+                toggleFullscreen(true)
+            }
+
+            backend.exitFullScreen()
         }
     #endif
+
+    func updateNowPlayingInfo() {
+        guard let video = currentItem?.video else {
+            return
+        }
+
+        let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
+        var nowPlayingInfo: [String: AnyObject] = [
+            MPMediaItemPropertyTitle: video.title as AnyObject,
+            MPMediaItemPropertyArtist: video.author as AnyObject,
+            MPNowPlayingInfoPropertyIsLiveStream: video.live as AnyObject,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
+            MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
+            MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
+            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
+        ]
+
+        if !currentArtwork.isNil {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
+        }
+
+        if !video.live {
+            let itemDuration = (backend.playerItemDuration ?? .zero).seconds
+            let duration = itemDuration.isFinite ? Double(itemDuration) : nil
+
+            if !duration.isNil {
+                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
+            }
+        }
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+
+    func updateCurrentArtwork() {
+        guard let video = currentVideo,
+              let thumbnailURL = video.thumbnailURL(quality: .medium)
+        else {
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: thumbnailURL) { [weak self] thumbnailData, _, _ in
+            guard let thumbnailData = thumbnailData else {
+                return
+            }
+
+            #if os(macOS)
+                guard let image = NSImage(data: thumbnailData) else { return }
+            #else
+                guard let image = UIImage(data: thumbnailData) else { return }
+            #endif
+
+            self?.currentArtwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        }
+
+        task.resume()
+    }
+
+    func toggleFullscreen(_ isFullScreen: Bool) {
+        controls.resetTimer()
+
+        #if os(macOS)
+            if isFullScreen {
+                Windows.player.toggleFullScreen()
+            }
+        #endif
+        #if os(iOS)
+            withAnimation(.linear(duration: 0.2)) {
+                playingFullScreen = !isFullScreen
+            }
+        #else
+            playingFullScreen = !isFullScreen
+        #endif
+
+        #if os(macOS)
+            if !isFullScreen {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    Windows.player.toggleFullScreen()
+                }
+            }
+        #endif
+
+        #if os(iOS)
+            if !playingFullScreen {
+                Orientation.lockOrientation(.allButUpsideDown)
+            }
+        #endif
+    }
+
+    func setNeedsDrawing(_ needsDrawing: Bool) {
+        backends.forEach { $0.setNeedsDrawing(needsDrawing) }
+    }
+
+    func toggleMusicMode() {
+        musicMode.toggle()
+
+        if musicMode {
+            if playingInPictureInPicture {
+                avPlayerBackend.pause()
+                avPlayerBackend.switchToMPVOnPipClose = false
+                closePiP()
+            }
+            changeActiveBackend(from: .appleAVPlayer, to: .mpv)
+            controls.presentingControls = true
+            controls.removeTimer()
+            mpvBackend.setVideoToNo()
+        } else {
+            addVideoTrackFromStream()
+            mpvBackend.setVideoToAuto()
+
+            controls.resetTimer()
+        }
+    }
+
+    func addVideoTrackFromStream() {
+        if let videoTrackURL = stream?.videoAsset?.url,
+           mpvBackend.tracks < 2
+        {
+            logger.info("adding video track")
+
+            mpvBackend.addVideoTrack(videoTrackURL)
+        }
+
+        mpvBackend.setVideoToAuto()
+    }
 }

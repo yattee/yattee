@@ -49,10 +49,10 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: sidebarMinWidth)
 
             VStack {
-                PlayerControlsView {
+                BrowserPlayerControls {
                     HStack(alignment: .center) {
                         Spacer()
-                        Image(systemName: "play.tv")
+                        Image(systemName: "4k.tv")
                             .renderingMode(.original)
                             .font(.system(size: 60))
                             .foregroundColor(.accentColor)
@@ -62,23 +62,6 @@ struct AppSidebarNavigation: View {
             }
         }
         .environment(\.navigationStyle, .sidebar)
-        #if os(iOS)
-            .background(
-                EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                    VideoPlayerView()
-                        .environmentObject(accounts)
-                        .environmentObject(comments)
-                        .environmentObject(instances)
-                        .environmentObject(navigation)
-                        .environmentObject(player)
-                        .environmentObject(playlists)
-                        .environmentObject(recents)
-                        .environmentObject(subscriptions)
-                        .environmentObject(thumbnailsModel)
-                        .environment(\.navigationStyle, .sidebar)
-                }
-            )
-        #endif
     }
 
     var toolbarContent: some ToolbarContent {

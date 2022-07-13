@@ -14,7 +14,7 @@ final class InstancesModel: ObservableObject {
         return InstancesModel.find(id)
     }
 
-    var lastUsed: Instance? {
+    static var lastUsed: Instance? {
         guard let id = Defaults[.lastInstanceID] else {
             return nil
         }
@@ -53,7 +53,7 @@ final class InstancesModel: ObservableObject {
     }
 
     static func remove(_ instance: Instance) {
-        let accounts = InstancesModel.accounts(instance.id)
+        let accounts = Self.accounts(instance.id)
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
             Defaults[.instances].remove(at: index)
             accounts.forEach { AccountsModel.remove($0) }
@@ -61,7 +61,7 @@ final class InstancesModel: ObservableObject {
     }
 
     static func standardizedURL(_ url: String) -> String {
-        if url.last == "/" {
+        if url.count > 7, url.last == "/" {
             return String(url.dropLast())
         } else {
             return url

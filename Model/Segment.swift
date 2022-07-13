@@ -17,8 +17,20 @@ class Segment: ObservableObject, Hashable {
         segment.last!
     }
 
+    var duration: Double {
+        end - start
+    }
+
+    var durationText: String {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 1
+
+        return formatter.string(from: NSNumber(value: duration.rounded())) ?? ""
+    }
+
     var endTime: CMTime {
-        CMTime(seconds: end, preferredTimescale: 1000)
+        .secondsInDefaultTimescale(end)
     }
 
     init(category: String, segment: [Double], uuid: String, videoDuration: Int) {

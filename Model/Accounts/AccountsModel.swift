@@ -8,6 +8,8 @@ final class AccountsModel: ObservableObject {
     @Published private var invidious = InvidiousAPI()
     @Published private var piped = PipedAPI()
 
+    @Published var publicAccount: Account?
+
     private var cancellables = [AnyCancellable]()
 
     var all: [Account] {
@@ -52,6 +54,15 @@ final class AccountsModel: ObservableObject {
         )
     }
 
+    func configureAccount() {
+        if let account = lastUsed ??
+            InstancesModel.lastUsed?.anonymousAccount ??
+            InstancesModel.all.first?.anonymousAccount
+        {
+            setCurrent(account)
+        }
+    }
+
     func setCurrent(_ account: Account! = nil) {
         guard account != current else {
             return
@@ -70,8 +81,12 @@ final class AccountsModel: ObservableObject {
             piped.setAccount(account)
         }
 
-        Defaults[.lastAccountID] = account.anonymous ? nil : account.id
-        Defaults[.lastInstanceID] = account.instanceID
+        Defaults[.lastAccountIsPublic] = account.isPublic
+
+        if !account.isPublic {
+            Defaults[.lastAccountID] = account.anonymous ? nil : account.id
+            Defaults[.lastInstanceID] = account.instanceID
+        }
     }
 
     static func find(_ id: Account.ID) -> Account? {

@@ -2,20 +2,13 @@ import SwiftUI
 
 struct ShareButton: View {
     let contentItem: ContentItem
-    @Binding var presentingShareSheet: Bool
-    @Binding var shareURL: URL?
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
 
-    init(
-        contentItem: ContentItem,
-        presentingShareSheet: Binding<Bool>,
-        shareURL: Binding<URL?>? = nil
-    ) {
+    init(contentItem: ContentItem) {
         self.contentItem = contentItem
-        _presentingShareSheet = presentingShareSheet
-        _shareURL = shareURL ?? .constant(nil)
     }
 
     var body: some View {
@@ -24,8 +17,7 @@ struct ShareButton: View {
             Divider()
             youtubeActions
         } label: {
-            Label("Share", systemImage: "square.and.arrow.up")
-                .labelStyle(.iconOnly)
+            Label("Share...", systemImage: "square.and.arrow.up")
         }
         .menuStyle(.borderlessButton)
         #if os(macOS)
@@ -40,12 +32,12 @@ struct ShareButton: View {
                     shareAction(url)
                 }
 
-                if contentItem.contentType == .video {
+                if contentItemIsPlayerCurrentVideo {
                     Button(labelForShareURL(accounts.app.name, withTime: true)) {
                         shareAction(
                             accounts.api.shareURL(
                                 contentItem,
-                                time: player.player.currentTime()
+                                time: player.backend.currentTime
                             )!
                         )
                     }
@@ -61,13 +53,13 @@ struct ShareButton: View {
                     shareAction(url)
                 }
 
-                if contentItem.contentType == .video {
+                if contentItemIsPlayerCurrentVideo {
                     Button(labelForShareURL("YouTube", withTime: true)) {
                         shareAction(
                             accounts.api.shareURL(
                                 contentItem,
                                 frontendHost: "www.youtube.com",
-                                time: player.player.currentTime()
+                                time: player.backend.currentTime
                             )!
                         )
                     }
@@ -76,13 +68,18 @@ struct ShareButton: View {
         }
     }
 
+    private var contentItemIsPlayerCurrentVideo: Bool {
+        contentItem.contentType == .video && contentItem.video?.videoID == player.currentVideo?.videoID
+    }
+
     private func shareAction(_ url: URL) {
         #if os(macOS)
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(url.absoluteString, forType: .string)
         #else
-            shareURL = url
-            presentingShareSheet = true
+            player.pause()
+            navigation.shareURL = url
+            navigation.presentingShareSheet = true
         #endif
     }
 
@@ -100,8 +97,7 @@ struct ShareButton: View {
 struct ShareButton_Previews: PreviewProvider {
     static var previews: some View {
         ShareButton(
-            contentItem: ContentItem(video: Video.fixture),
-            presentingShareSheet: .constant(false)
+            contentItem: ContentItem(video: Video.fixture)
         )
         .injectFixtureEnvironmentObjects()
     }

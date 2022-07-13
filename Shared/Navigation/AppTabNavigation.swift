@@ -42,51 +42,9 @@ struct AppTabNavigation: View {
             searchNavigationView
         }
         .id(accounts.current?.id ?? "")
+        .overlay(playlistView)
+        .overlay(channelView)
         .environment(\.navigationStyle, .tab)
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingChannel) {
-                if let channel = recents.presentedChannel {
-                    NavigationView {
-                        ChannelVideosView(channel: channel)
-                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                            .environment(\.inChannelView, true)
-                            .environment(\.inNavigationView, true)
-                            .environmentObject(accounts)
-                            .environmentObject(navigation)
-                            .environmentObject(player)
-                            .environmentObject(subscriptions)
-                            .environmentObject(thumbnailsModel)
-
-                            .background(playerNavigationLink)
-                    }
-                }
-            }
-        )
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingPlaylist) {
-                if let playlist = recents.presentedPlaylist {
-                    NavigationView {
-                        ChannelPlaylistView(playlist: playlist)
-                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                            .environment(\.inNavigationView, true)
-                            .environmentObject(accounts)
-                            .environmentObject(navigation)
-                            .environmentObject(player)
-                            .environmentObject(subscriptions)
-                            .environmentObject(thumbnailsModel)
-
-                            .background(playerNavigationLink)
-                    }
-                }
-            }
-        )
-        .background(
-            EmptyView().fullScreenCover(isPresented: $player.presentingPlayer) {
-                videoPlayer
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environment(\.navigationStyle, .tab)
-            }
-        )
     }
 
     private var favoritesNavigationView: some View {
@@ -95,7 +53,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Favorites", systemImage: "heart")
+            Label("Favorites", systemImage: "heart.fill")
                 .accessibility(label: Text("Favorites"))
         }
         .tag(TabSelection.favorites)
@@ -129,7 +87,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Popular", systemImage: "arrow.up.right.circle")
+            Label("Popular", systemImage: "arrow.up.right.circle.fill")
                 .accessibility(label: Text("Popular"))
         }
         .tag(TabSelection.popular)
@@ -141,7 +99,7 @@ struct AppTabNavigation: View {
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Trending", systemImage: "chart.bar")
+            Label("Trending", systemImage: "chart.bar.fill")
                 .accessibility(label: Text("Trending"))
         }
         .tag(TabSelection.trending)
@@ -171,28 +129,6 @@ struct AppTabNavigation: View {
         .tag(TabSelection.search)
     }
 
-    private var playerNavigationLink: some View {
-        NavigationLink(isActive: $player.playerNavigationLinkActive, destination: {
-            videoPlayer
-                .environment(\.inNavigationView, true)
-        }) {
-            EmptyView()
-        }
-    }
-
-    private var videoPlayer: some View {
-        VideoPlayerView()
-            .environmentObject(accounts)
-            .environmentObject(comments)
-            .environmentObject(instances)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(playlists)
-            .environmentObject(recents)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
-    }
-
     var toolbarContent: some ToolbarContent {
         #if os(iOS)
             Group {
@@ -207,5 +143,37 @@ struct AppTabNavigation: View {
                 }
             }
         #endif
+    }
+
+    @ViewBuilder private var channelView: some View {
+        if navigation.presentingChannel {
+            ChannelVideosView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.inChannelView, true)
+                .environment(\.navigationStyle, .tab)
+                .environmentObject(accounts)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
+        } else {
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder private var playlistView: some View {
+        if navigation.presentingPlaylist {
+            ChannelPlaylistView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(accounts)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
+        } else {
+            EmptyView()
+        }
     }
 }

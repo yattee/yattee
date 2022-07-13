@@ -5,10 +5,30 @@ import Foundation
 // swiftlint:disable:next final_class
 class Stream: Equatable, Hashable, Identifiable {
     enum Resolution: String, CaseIterable, Comparable, Defaults.Serializable {
-        case hd1440p60, hd1440p, hd1080p60, hd1080p, hd720p60, hd720p, sd480p, sd360p, sd240p, sd144p, unknown
+        case hd2160p60
+        case hd2160p50
+        case hd2160p48
+        case hd2160p30
+        case hd1440p60
+        case hd1440p50
+        case hd1440p48
+        case hd1440p30
+        case hd1080p60
+        case hd1080p50
+        case hd1080p48
+        case hd1080p30
+        case hd720p60
+        case hd720p50
+        case hd720p48
+        case hd720p30
+        case sd480p30
+        case sd360p30
+        case sd240p30
+        case sd144p30
+        case unknown
 
         var name: String {
-            "\(height)p\(refreshRate != -1 ? ", \(refreshRate) fps" : "")"
+            "\(height)p\(refreshRate != -1 && refreshRate != 30 ? ", \(refreshRate) fps" : "")"
         }
 
         var height: Int {
@@ -26,11 +46,16 @@ class Stream: Equatable, Hashable, Identifiable {
             }
 
             let refreshRatePart = rawValue.components(separatedBy: "p")[1]
+
+            if refreshRatePart.isEmpty {
+                return 30
+            }
+
             return Int(refreshRatePart.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) ?? -1
         }
 
-        static func from(resolution: String) -> Resolution {
-            allCases.first { "\($0)".contains(resolution) } ?? .unknown
+        static func from(resolution: String, fps: Int? = nil) -> Resolution {
+            allCases.first { $0.rawValue.contains(resolution) && $0.refreshRate == (fps ?? 30) } ?? .unknown
         }
 
         static func < (lhs: Resolution, rhs: Resolution) -> Bool {
@@ -57,6 +82,49 @@ class Stream: Equatable, Hashable, Identifiable {
         }
     }
 
+    enum Format: String, Comparable {
+        case webm
+        case avc1
+        case av1
+        case mp4
+        case unknown
+
+        private var sortOrder: Int {
+            switch self {
+            case .mp4:
+                return 0
+            case .avc1:
+                return 1
+            case .av1:
+                return 2
+            case .webm:
+                return 3
+            case .unknown:
+                return 4
+            }
+        }
+
+        static func < (lhs: Self, rhs: Self) -> Bool {
+            lhs.sortOrder < rhs.sortOrder
+        }
+
+        static func from(_ string: String) -> Self {
+            let lowercased = string.lowercased()
+
+            if lowercased.contains("webm") {
+                return .webm
+            } else if lowercased.contains("avc1") {
+                return .avc1
+            } else if lowercased.contains("av01") {
+                return .av1
+            } else if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
+                return .mp4
+            } else {
+                return .unknown
+            }
+        }
+    }
+
     let id = UUID()
 
     var instance: Instance!
@@ -66,8 +134,10 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var resolution: Resolution!
     var kind: Kind!
+    var format: Format!
 
     var encoding: String!
+    var videoFormat: String!
 
     init(
         instance: Instance? = nil,
@@ -76,7 +146,8 @@ class Stream: Equatable, Hashable, Identifiable {
         hlsURL: URL? = nil,
         resolution: Resolution? = nil,
         kind: Kind = .hls,
-        encoding: String? = nil
+        encoding: String? = nil,
+        videoFormat: String? = nil
     ) {
         self.instance = instance
         self.audioAsset = audioAsset
@@ -85,14 +156,24 @@ class Stream: Equatable, Hashable, Identifiable {
         self.resolution = resolution
         self.kind = kind
         self.encoding = encoding
+        format = .from(videoFormat ?? "")
     }
 
     var quality: String {
-        kind == .hls ? "adaptive (HLS)" : "\(resolution.name) \(kind == .stream ? "(\(kind.rawValue))" : "")"
+        kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
+    }
+
+    var shortQuality: String {
+        if kind == .hls {
+            return "HLS"
+        } else {
+            return resolution?.name ?? "?"
+        }
     }
 
     var description: String {
-        "\(quality) - \(instance?.description ?? "")"
+        let formatString = format == .unknown ? "" : " (\(format.rawValue))"
+        return "\(quality)\(formatString) - \(instance?.description ?? "")"
     }
 
     var assets: [AVURLAsset] {

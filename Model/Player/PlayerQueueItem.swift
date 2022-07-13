@@ -28,7 +28,7 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     }
 
     var duration: TimeInterval {
-        videoDuration ?? video.length
+        videoDuration ?? video?.length ?? .zero
     }
 
     var shouldRestartPlaying: Bool {
@@ -37,6 +37,10 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
         }
 
         return duration - seconds <= 10
+    }
+
+    var hasDetailsLoaded: Bool {
+        !video.isNil
     }
 
     func hash(into hasher: inout Hasher) {

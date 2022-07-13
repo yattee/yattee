@@ -66,8 +66,9 @@ struct SearchSuggestions: View {
                 #endif
             }
         }
+        .id(UUID())
         #if os(macOS)
-        .buttonStyle(.link)
+            .buttonStyle(.link)
         #endif
     }
 

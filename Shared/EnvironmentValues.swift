@@ -1,10 +1,6 @@
 import Foundation
 import SwiftUI
 
-private struct InNavigationViewKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
 private struct InChannelViewKey: EnvironmentKey {
     static let defaultValue = false
 }
@@ -29,18 +25,17 @@ private struct CurrentPlaylistID: EnvironmentKey {
     static let defaultValue: String? = nil
 }
 
+typealias LoadMoreContentHandlerType = () -> Void
+
 private struct LoadMoreContentHandler: EnvironmentKey {
     static let defaultValue: LoadMoreContentHandlerType = {}
 }
 
-typealias LoadMoreContentHandlerType = () -> Void
+private struct ScrollViewBottomPaddingKey: EnvironmentKey {
+    static let defaultValue: Double = 30
+}
 
 extension EnvironmentValues {
-    var inNavigationView: Bool {
-        get { self[InNavigationViewKey.self] }
-        set { self[InNavigationViewKey.self] = newValue }
-    }
-
     var inChannelView: Bool {
         get { self[InChannelViewKey.self] }
         set { self[InChannelViewKey.self] = newValue }
@@ -69,5 +64,10 @@ extension EnvironmentValues {
     var loadMoreContentHandler: LoadMoreContentHandlerType {
         get { self[LoadMoreContentHandler.self] }
         set { self[LoadMoreContentHandler.self] = newValue }
+    }
+
+    var scrollViewBottomPadding: Double {
+        get { self[ScrollViewBottomPaddingKey.self] }
+        set { self[ScrollViewBottomPaddingKey.self] = newValue }
     }
 }

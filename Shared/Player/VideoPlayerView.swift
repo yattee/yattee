@@ -7,6 +7,10 @@ import Siesta
 import SwiftUI
 
 struct VideoPlayerView: View {
+    #if os(iOS)
+        static let hiddenOffset = YatteeApp.isForPreviews ? 0 : max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
+    #endif
+
     static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
@@ -16,175 +20,407 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @State private var playerSize: CGSize = .zero
+    @State private var playerSize: CGSize = .zero { didSet {
+        withAnimation {
+            if playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits {
+                sidebarQueue = true
+            } else {
+                sidebarQueue = false
+            }
+        }
+    }}
+    @State private var hoveringPlayer = false
     @State private var fullScreenDetails = false
+    @State private var sidebarQueue = false
 
     @Environment(\.colorScheme) private var colorScheme
 
     #if os(iOS)
-        @Environment(\.presentationMode) private var presentationMode
-        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.verticalSizeClass) private var verticalSizeClass
 
-        @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
-        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
-        @Default(.lockLandscapeOnRotation) private var lockLandscapeOnRotation
-
-        @State private var motionManager: CMMotionManager!
         @State private var orientation = UIInterfaceOrientation.portrait
         @State private var lastOrientation: UIInterfaceOrientation?
+    #elseif os(macOS)
+        var hoverThrottle = Throttle(interval: 0.5)
+        var mouseLocation: CGPoint { NSEvent.mouseLocation }
+    #endif
+
+    #if os(iOS)
+        @State private var viewVerticalOffset = Self.hiddenOffset
+        @State private var orientationObserver: Any?
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<PlayerControlsModel> private var playerControls
+    @EnvironmentObject<RecentsModel> private var recents
+    @EnvironmentObject<SearchModel> private var search
+    @EnvironmentObject<ThumbnailsModel> private var thumbnails
+
+    init() {
+        if Defaults[.playerSidebar] == .always {
+            sidebarQueue = true
+        }
+    }
 
     var body: some View {
+        #if DEBUG
+            // TODO: remove
+            if #available(iOS 15.0, macOS 12.0, *) {
+                _ = Self._printChanges()
+            }
+        #endif
+
         #if os(macOS)
-            HSplitView {
+            return HSplitView {
                 content
             }
-            .onOpenURL { OpenURLHandler(accounts: accounts, player: player).handle($0) }
+            .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
+            .onOpenURL {
+                OpenURLHandler(
+                    accounts: accounts,
+                    navigation: navigation,
+                    recents: recents,
+                    player: player,
+                    search: search
+                ).handle($0)
+            }
             .frame(minWidth: 950, minHeight: 700)
         #else
-            GeometryReader { geometry in
+            return GeometryReader { geometry in
                 HStack(spacing: 0) {
                     content
                         .onAppear {
                             playerSize = geometry.size
-
-                            #if os(iOS)
-                                configureOrientationUpdatesBasedOnAccelerometer()
-                            #endif
                         }
                 }
+                .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
-                #if os(iOS)
-                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                    handleOrientationDidChangeNotification()
+                .onChange(of: fullScreenDetails) { value in
+                    player.backend.setNeedsDrawing(!value)
                 }
-                .onDisappear {
-                    guard !player.playingFullscreen else {
-                        return // swiftlint:disable:this implicit_return
-                    }
+                #if os(iOS)
+                .onChange(of: player.presentingPlayer) { newValue in
+                    if newValue {
+                        viewVerticalOffset = 0
+                        configureOrientationUpdatesBasedOnAccelerometer()
 
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak player] in
+                            player?.onPresentPlayer?()
+                            player?.onPresentPlayer = nil
+                        }
+
+                        if let orientationMask = player.lockedOrientation {
+                            Orientation.lockOrientation(
+                                orientationMask,
+                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
+                            )
+                        }
                     } else {
-                        Orientation.lockOrientation(.allButUpsideDown)
+                        if Defaults[.lockPortraitWhenBrowsing] {
+                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown)
+                        }
+                        viewVerticalOffset = Self.hiddenOffset
+                        stopOrientationUpdates()
+                        player.controls.hideOverlays()
                     }
-
-                    motionManager?.stopAccelerometerUpdates()
-                    motionManager = nil
                 }
                 #endif
             }
-            .navigationBarHidden(true)
+            #if os(iOS)
+            .offset(y: viewVerticalOffset)
+            .animation(.easeOut(duration: 0.3), value: viewVerticalOffset)
+            .backport
+            .persistentSystemOverlays(!fullScreenLayout)
+            #endif
         #endif
+    }
+
+    var playerEdgesIgnoringSafeArea: Edge.Set {
+        #if os(iOS)
+            if fullScreenLayout, UIDevice.current.orientation.isLandscape {
+                return [.vertical]
+            }
+        #endif
+        return []
     }
 
     var content: some View {
         Group {
-            Group {
+            ZStack(alignment: .bottomLeading) {
                 #if os(tvOS)
-                    player.playerView
+                    ZStack {
+                        playerView
+
+                        tvControls
+                    }
+                    .ignoresSafeArea(.all, edges: .all)
+                    .onMoveCommand { direction in
+                        if direction == .up || direction == .down {
+                            playerControls.show()
+                        }
+
+                        playerControls.resetTimer()
+
+                        guard !playerControls.presentingControls else { return }
+
+                        if direction == .left {
+                            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                        }
+                        if direction == .right {
+                            player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                        }
+                    }
+                    .onPlayPauseCommand {
+                        player.togglePlay()
+                    }
+
+                    .onExitCommand {
+                        if playerControls.presentingControls {
+                            playerControls.hide()
+                        } else {
+                            player.hide()
+                        }
+                    }
                 #else
                     GeometryReader { geometry in
-                        VStack(spacing: 0) {
-                            #if os(iOS)
-                                if verticalSizeClass == .regular {
-                                    PlaybackBar()
-                                }
-                            #elseif os(macOS)
-                                PlaybackBar()
-                            #endif
-
-                            if player.currentItem.isNil {
-                                playerPlaceholder(geometry: geometry)
-                            } else if player.playingInPictureInPicture {
-                                pictureInPicturePlaceholder(geometry: geometry)
+                        Group {
+                            if player.playingInPictureInPicture {
+                                pictureInPicturePlaceholder
                             } else {
-                                player.playerView
-                                    .modifier(
-                                        VideoPlayerSizeModifier(
-                                            geometry: geometry,
-                                            aspectRatio: player.controller?.aspectRatio
-                                        )
+                                playerView
+
+                                #if !os(tvOS)
+                                .modifier(
+                                    VideoPlayerSizeModifier(
+                                        geometry: geometry,
+                                        aspectRatio: player.aspectRatio,
+                                        fullScreen: fullScreenLayout
                                     )
+                                )
+                                .overlay(playerPlaceholder)
+                                #endif
                             }
                         }
+                        .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
+                        .onHover { hovering in
+                            hoveringPlayer = hovering
+                            hovering ? playerControls.show() : playerControls.hide()
+                        }
                         #if os(iOS)
-                        .onSwipeGesture(
-                            up: {
-                                withAnimation {
-                                    fullScreenDetails = true
+                        .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
+                        #elseif os(macOS)
+                        .onAppear(perform: {
+                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                hoverThrottle.execute {
+                                    if !player.currentItem.isNil, hoveringPlayer {
+                                        playerControls.resetTimer()
+                                    }
                                 }
-                            },
-                            down: { player.hide() }
-                        )
+
+                                return $0
+                            }
+                        })
                         #endif
 
                         .background(Color.black)
 
-                        Group {
-                            #if os(iOS)
-                                if verticalSizeClass == .regular {
-                                    VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
+                        #if !os(tvOS)
+                            if !fullScreenLayout {
+                                VStack(spacing: 0) {
+                                    #if os(iOS)
+                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
+                                    #else
+                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
+                                    #endif
                                 }
-
-                            #else
-                                VideoDetails(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                            #endif
-                        }
-                        .background(colorScheme == .dark ? Color.black : Color.white)
-                        .modifier(VideoDetailsPaddingModifier(
-                            geometry: geometry,
-                            aspectRatio: player.controller?.aspectRatio,
-                            fullScreen: fullScreenDetails
-                        ))
+                                #if !os(macOS)
+                                .transition(.move(edge: .bottom))
+                                #endif
+                                .background(colorScheme == .dark ? Color.black : Color.white)
+                                .modifier(VideoDetailsPaddingModifier(
+                                    playerSize: player.playerSize,
+                                    fullScreen: fullScreenDetails
+                                ))
+                            }
+                        #endif
                     }
                 #endif
             }
-            .background(colorScheme == .dark ? Color.black : Color.white)
+
+            .background(((colorScheme == .dark || fullScreenLayout) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
-            #if os(iOS)
-                if sidebarQueue {
-                    PlayerQueueView(sidebarQueue: .constant(true), fullScreen: $fullScreenDetails)
-                        .frame(maxWidth: 350)
-                }
-            #elseif os(macOS)
-                if Defaults[.playerSidebar] != .never {
-                    PlayerQueueView(sidebarQueue: sidebarQueueBinding, fullScreen: $fullScreenDetails)
-                        .frame(minWidth: 300)
-                }
-            #endif
+            if !fullScreenLayout {
+                #if os(iOS)
+                    if sidebarQueue {
+                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
+                            .frame(maxWidth: 350)
+                            .transition(.move(edge: .trailing))
+                            .background(colorScheme == .dark ? Color.black : Color.white)
+                    }
+                #elseif os(macOS)
+                    if Defaults[.playerSidebar] != .never {
+                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
+                            .frame(minWidth: 300)
+                            .background(colorScheme == .dark ? Color.black : Color.white)
+                    }
+                #endif
+            }
         }
+        #if os(iOS)
+        .statusBar(hidden: fullScreenLayout)
+        #endif
     }
 
-    func playerPlaceholder(geometry: GeometryProxy) -> some View {
-        HStack {
-            Spacer()
-            VStack {
-                Spacer()
-                VStack(spacing: 10) {
-                    #if !os(tvOS)
-                        Image(systemName: "ticket")
-                            .font(.system(size: 120))
+    var playerView: some View {
+        ZStack(alignment: .top) {
+            Group {
+                switch player.activeBackend {
+                case .mpv:
+                    player.mpvPlayerView
+                case .appleAVPlayer:
+                    player.avPlayerView
+                    #if os(iOS)
+                        .onAppear {
+                            player.pipController = .init(playerLayer: player.playerLayerView.playerLayer)
+                            let pipDelegate = PiPDelegate()
+                            pipDelegate.player = player
+
+                            player.pipDelegate = pipDelegate
+                            player.pipController?.delegate = pipDelegate
+                            player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
+                        }
                     #endif
                 }
-                Spacer()
             }
-            .foregroundColor(.gray)
-            Spacer()
+            .overlay(GeometryReader { proxy in
+                Color.clear
+                    .onAppear { player.playerSize = proxy.size }
+                    .onChange(of: proxy.size) { _ in player.playerSize = proxy.size }
+                    .onChange(of: player.controls.presentingOverlays) { _ in player.playerSize = proxy.size }
+                    .onChange(of: player.aspectRatio) { _ in player.playerSize = proxy.size }
+            })
+            #if os(iOS)
+            .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
+            #endif
+
+            #if !os(tvOS)
+                PlayerGestures()
+                PlayerControls(player: player, thumbnails: thumbnails)
+                #if os(iOS)
+                    .padding(.top, controlsTopPadding)
+                    .padding(.bottom, fullScreenLayout ? safeAreaInsets.bottom : 0)
+                #endif
+            #endif
         }
-        .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
+        #if os(iOS)
+        .statusBarHidden(fullScreenLayout)
+        #endif
     }
 
-    func pictureInPicturePlaceholder(geometry: GeometryProxy) -> some View {
+    #if os(iOS)
+        var playerDragGesture: some Gesture {
+            DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { value in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+
+                    let drag = value.translation.height
+
+                    guard drag > 0 else { return }
+
+                    if drag > 60,
+                       player.playingFullScreen,
+                       !OrientationTracker.shared.currentInterfaceOrientation.isLandscape
+                    {
+                        player.exitFullScreen()
+                        player.lockedOrientation = nil
+                    }
+
+                    viewVerticalOffset = drag
+                }
+                .onEnded { _ in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+                    if viewVerticalOffset > 100 {
+                        player.backend.setNeedsDrawing(false)
+                        player.hide()
+                        player.exitFullScreen()
+                    } else {
+                        viewVerticalOffset = 0
+                        player.backend.setNeedsDrawing(true)
+                        player.show()
+                    }
+                }
+        }
+
+        var controlsTopPadding: Double {
+            guard fullScreenLayout else { return 0 }
+
+            let idiom = UIDevice.current.userInterfaceIdiom
+            guard idiom == .pad else { return 0 }
+
+            return safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top
+        }
+
+        var safeAreaInsets: UIEdgeInsets {
+            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
+        }
+    #endif
+
+    var fullScreenLayout: Bool {
+        #if os(iOS)
+            player.playingFullScreen || verticalSizeClass == .compact
+        #else
+            player.playingFullScreen
+        #endif
+    }
+
+    @ViewBuilder var playerPlaceholder: some View {
+        if player.currentItem.isNil {
+            ZStack(alignment: .topLeading) {
+                HStack {
+                    Spacer()
+                    VStack {
+                        Spacer()
+                        VStack(spacing: 10) {
+                            #if !os(tvOS)
+                                Image(systemName: "ticket")
+                                    .font(.system(size: 120))
+                            #endif
+                        }
+                        Spacer()
+                    }
+                    .foregroundColor(.gray)
+                    Spacer()
+                }
+
+                #if os(iOS)
+                    Button {
+                        player.hide()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 40))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(10)
+                    .foregroundColor(.gray)
+                #endif
+            }
+            .background(Color.black)
+            .contentShape(Rectangle())
+            .frame(width: player.playerSize.width, height: player.playerSize.height)
+        }
+    }
+
+    var pictureInPicturePlaceholder: some View {
         HStack {
             Spacer()
             VStack {
@@ -210,32 +446,14 @@ struct VideoPlayerView: View {
             }
         }
         .contentShape(Rectangle())
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: geometry.size.width / VideoPlayerView.defaultAspectRatio)
-    }
-
-    var sidebarQueue: Bool {
-        switch Defaults[.playerSidebar] {
-        case .never:
-            return false
-        case .always:
-            return true
-        case .whenFits:
-            return playerSize.width > 900
-        }
-    }
-
-    var sidebarQueueBinding: Binding<Bool> {
-        Binding(
-            get: { sidebarQueue },
-            set: { _ in }
-        )
+        .frame(width: player.playerSize.width, height: player.playerSize.height)
     }
 
     #if os(iOS)
         private func configureOrientationUpdatesBasedOnAccelerometer() {
-            if UIDevice.current.orientation.isLandscape,
-               enterFullscreenInLandscape,
-               !player.playingFullscreen,
+            if OrientationTracker.shared.currentInterfaceOrientation.isLandscape,
+               Defaults[.enterFullscreenInLandscape],
+               !player.playingFullScreen,
                !player.playingInPictureInPicture
             {
                 DispatchQueue.main.async {
@@ -243,32 +461,20 @@ struct VideoPlayerView: View {
                 }
             }
 
-            guard !honorSystemOrientationLock, motionManager.isNil else {
-                return
-            }
-
-            motionManager = CMMotionManager()
-            motionManager.accelerometerUpdateInterval = 0.2
-            motionManager.startAccelerometerUpdates(to: OperationQueue()) { data, _ in
-                guard player.presentingPlayer, !player.playingInPictureInPicture, !data.isNil else {
+            orientationObserver = NotificationCenter.default.addObserver(
+                forName: OrientationTracker.deviceOrientationChangedNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                guard !Defaults[.honorSystemOrientationLock],
+                      player.presentingPlayer,
+                      !player.playingInPictureInPicture,
+                      player.lockedOrientation.isNil
+                else {
                     return
                 }
 
-                guard let acceleration = data?.acceleration else {
-                    return
-                }
-
-                var orientation = UIInterfaceOrientation.unknown
-
-                if acceleration.x >= 0.65 {
-                    orientation = .landscapeLeft
-                } else if acceleration.x <= -0.65 {
-                    orientation = .landscapeRight
-                } else if acceleration.y <= -0.65 {
-                    orientation = .portrait
-                } else if acceleration.y >= 0.65 {
-                    orientation = .portraitUpsideDown
-                }
+                let orientation = OrientationTracker.shared.currentInterfaceOrientation
 
                 guard lastOrientation != orientation else {
                     return
@@ -276,71 +482,38 @@ struct VideoPlayerView: View {
 
                 lastOrientation = orientation
 
-                if orientation.isLandscape {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        guard enterFullscreenInLandscape else {
-                            return
-                        }
-
-                        player.enterFullScreen()
-
-                        let orientationLockMask = orientation == .landscapeLeft ?
-                            UIInterfaceOrientationMask.landscapeLeft : .landscapeRight
-
-                        Orientation.lockOrientation(orientationLockMask, andRotateTo: orientation)
-
-                        guard lockLandscapeOnRotation else {
-                            return
-                        }
-
-                        player.lockedOrientation = orientation
-                    }
-                } else {
-                    guard abs(acceleration.z) <= 0.74,
-                          player.lockedOrientation.isNil,
-                          enterFullscreenInLandscape
-                    else {
+                DispatchQueue.main.async {
+                    guard Defaults[.enterFullscreenInLandscape] else {
                         return
                     }
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        player.exitFullScreen()
+                    if orientation.isLandscape {
+                        player.enterFullScreen()
+                        Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
+                    } else {
+                        if !player.playingFullScreen {
+                            player.exitFullScreen()
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                        }
                     }
-
-                    Orientation.lockOrientation(.portrait)
                 }
             }
         }
 
-        private func handleOrientationDidChangeNotification() {
-            let newOrientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
-            if newOrientation?.isLandscape ?? false,
-               player.presentingPlayer,
-               lockLandscapeOnRotation,
-               !player.lockedOrientation.isNil
-            {
-                Orientation.lockOrientation(.landscape, andRotateTo: newOrientation)
-                return
-            }
+        private func stopOrientationUpdates() {
+            guard let observer = orientationObserver else { return }
+            NotificationCenter.default.removeObserver(observer)
+        }
+    #endif
 
-            guard player.presentingPlayer, enterFullscreenInLandscape, honorSystemOrientationLock else {
-                return
-            }
-
-            if UIDevice.current.orientation.isLandscape {
-                DispatchQueue.main.async {
-                    player.lockedOrientation = newOrientation
-                    player.enterFullScreen()
+    #if os(tvOS)
+        var tvControls: some View {
+            TVControls(model: playerControls, player: player, thumbnails: thumbnails)
+                .onReceive(playerControls.reporter) { _ in
+                    playerControls.show()
+                    playerControls.resetTimer()
                 }
-            } else {
-                DispatchQueue.main.async {
-                    player.exitFullScreen()
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    player.exitFullScreen()
-                }
-            }
         }
     #endif
 }
