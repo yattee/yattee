@@ -36,7 +36,7 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
             return false
         }
 
-        return duration - seconds <= 10
+        return duration - seconds <= 20
     }
 
     var hasDetailsLoaded: Bool {
