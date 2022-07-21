@@ -273,7 +273,7 @@ final class PlayerModel: ObservableObject {
     }
 
     var videoDuration: TimeInterval? {
-        currentItem?.duration ?? currentVideo?.length ?? playerItemDuration?.seconds
+        playerItemDuration?.seconds ?? currentItem?.duration ?? currentVideo?.length
     }
 
     var time: CMTime? {
@@ -282,6 +282,18 @@ final class PlayerModel: ObservableObject {
 
     var live: Bool {
         currentVideo?.live ?? false
+    }
+
+    var playingLive: Bool {
+        guard live,
+              let videoDuration = videoDuration,
+              let time = backend.currentTime?.seconds else { return false }
+
+        return videoDuration - time < 30
+    }
+
+    var liveStreamInAVPlayer: Bool {
+        live && activeBackend == .appleAVPlayer
     }
 
     func togglePlay() {
@@ -751,7 +763,7 @@ final class PlayerModel: ObservableObject {
         var nowPlayingInfo: [String: AnyObject] = [
             MPMediaItemPropertyTitle: video.title as AnyObject,
             MPMediaItemPropertyArtist: video.author as AnyObject,
-            MPNowPlayingInfoPropertyIsLiveStream: video.live as AnyObject,
+            MPNowPlayingInfoPropertyIsLiveStream: live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,

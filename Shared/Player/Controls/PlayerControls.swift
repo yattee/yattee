@@ -317,11 +317,12 @@ struct PlayerControls: View {
         button("Seek Backward", systemImage: "gobackward.10", size: 25, cornerRadius: 5, background: false) {
             player.backend.seek(relative: .secondsInDefaultTimescale(-10))
         }
+        .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
-        .focused($focusedField, equals: .backward)
+            .focused($focusedField, equals: .backward)
         #else
-        .keyboardShortcut("k", modifiers: [])
-        .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [])
+            .keyboardShortcut("k", modifiers: [])
+            .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [])
         #endif
     }
 
@@ -329,11 +330,12 @@ struct PlayerControls: View {
         button("Seek Forward", systemImage: "goforward.10", size: 25, cornerRadius: 5, background: false) {
             player.backend.seek(relative: .secondsInDefaultTimescale(10))
         }
+        .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
-        .focused($focusedField, equals: .forward)
+            .focused($focusedField, equals: .forward)
         #else
-        .keyboardShortcut("l", modifiers: [])
-        .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
+            .keyboardShortcut("l", modifiers: [])
+            .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [])
         #endif
     }
 

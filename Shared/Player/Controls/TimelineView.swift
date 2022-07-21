@@ -108,6 +108,7 @@ struct TimelineView: View {
             .animation(.easeOut, value: thumbTooltipOffset)
             HStack(spacing: 4) {
                 Text((dragging ? projectedValue : nil)?.formattedAsPlaybackTime(allowZero: true) ?? playerTime.currentPlaybackTime)
+                    .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                     .frame(minWidth: 35)
                 #if os(tvOS)
                     .font(.system(size: 20))
@@ -190,7 +191,7 @@ struct TimelineView: View {
                         )
                     #endif
                 }
-
+                .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                 .overlay(GeometryReader { proxy in
                     Color.clear
                         .onAppear {
@@ -209,16 +210,43 @@ struct TimelineView: View {
                     })
                 #endif
 
-                Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
-                    .clipShape(RoundedRectangle(cornerRadius: 3))
-                    .frame(minWidth: 35)
-                #if os(tvOS)
-                    .font(.system(size: 20))
-                #endif
+                durationView
+                    .frame(minWidth: 30, alignment: .trailing)
             }
             .clipShape(RoundedRectangle(cornerRadius: 3))
             .font(.system(size: 9).monospacedDigit())
             .zIndex(2)
+        }
+    }
+
+    @ViewBuilder var durationView: some View {
+        if player.live {
+            if player.playingLive || player.activeBackend == .appleAVPlayer {
+                Text("LIVE")
+                    .fontWeight(.bold)
+                    .padding(2)
+                    .foregroundColor(.white)
+                    .background(RoundedRectangle(cornerRadius: 2).foregroundColor(.red))
+            } else {
+                Button {
+                    if let duration = player.videoDuration {
+                        player.backend.seek(to: duration - 5)
+                    }
+                } label: {
+                    Text("LIVE")
+                        .fontWeight(.bold)
+                        .padding(2)
+                        .foregroundColor(.primary)
+                        .background(RoundedRectangle(cornerRadius: 2).strokeBorder(.red, lineWidth: 1).foregroundColor(.white))
+                }
+            }
+        } else {
+            Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
+                .clipShape(RoundedRectangle(cornerRadius: 3))
+                .frame(minWidth: 35)
+            #if os(tvOS)
+                .font(.system(size: 20))
+            #endif
         }
     }
 

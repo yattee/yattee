@@ -132,6 +132,8 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func seek(to time: CMTime, completionHandler: ((Bool) -> Void)?) {
+        guard !model.live else { return }
+
         avPlayer.seek(
             to: time,
             toleranceBefore: .secondsInDefaultTimescale(1),

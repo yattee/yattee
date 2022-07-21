@@ -488,8 +488,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractStreams(from json: JSON) -> [Stream] {
-        extractFormatStreams(from: json["formatStreams"].arrayValue) +
-            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue)
+        let hls = extractHLSStreams(from: json)
+        if json["liveNow"].boolValue {
+            return hls
+        }
+
+        return extractFormatStreams(from: json["formatStreams"].arrayValue) +
+            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue) +
+            hls
     }
 
     private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
@@ -538,6 +544,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
     }
 
+    private func extractHLSStreams(from content: JSON) -> [Stream] {
+        if let hlsURL = content.dictionaryValue["hlsUrl"]?.url {
+            return [Stream(hlsURL: hlsURL)]
+        }
+
+        return []
+    }
+
     private func extractRelated(from content: JSON) -> [Video] {
         content
             .dictionaryValue["recommendedVideos"]?
@@ -576,8 +590,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     private func extractCaptions(from content: JSON) -> [Captions] {
         content["captions"].arrayValue.compactMap { details in
-            guard let baseURL = account.url,
-                  let url = URL(string: baseURL + details["url"].stringValue) else { return nil }
+            let baseURL = account.url
+            guard let url = URL(string: baseURL + details["url"].stringValue) else { return nil }
 
             return Captions(
                 label: details["label"].stringValue,
