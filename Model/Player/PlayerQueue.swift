@@ -119,9 +119,11 @@ extension PlayerModel {
         remove(newItem)
 
         currentItem = newItem
+        currentItem.playbackTime = time
 
-        accounts.api.loadDetails(newItem, failureHandler: videoLoadFailureHandler) { newItem in
-            self.playItem(newItem, at: time)
+        let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
+        accounts.api.loadDetails(currentItem, failureHandler: videoLoadFailureHandler) { newItem in
+            self.playItem(newItem, at: playTime)
         }
     }
 
