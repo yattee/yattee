@@ -9,13 +9,15 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     let name: String
     let apiURL: String
     var frontendURL: String?
+    var proxiesVideos: Bool
 
-    init(app: VideosApp, id: String? = nil, name: String, apiURL: String, frontendURL: String? = nil) {
+    init(app: VideosApp, id: String? = nil, name: String, apiURL: String, frontendURL: String? = nil, proxiesVideos: Bool = false) {
         self.app = app
         self.id = id ?? UUID().uuidString
         self.name = name
         self.apiURL = apiURL
         self.frontendURL = frontendURL
+        self.proxiesVideos = proxiesVideos
     }
 
     var anonymous: VideosAPI {

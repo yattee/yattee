@@ -57,7 +57,7 @@ extension PlayerModel {
         streams.map { stream in
             stream.instance = instance
 
-            if instance.app == .invidious {
+            if instance.app == .invidious, instance.proxiesVideos {
                 if let audio = stream.audioAsset {
                     stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: audio)
                 }
