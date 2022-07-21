@@ -6,7 +6,7 @@ struct AccountsNavigationLink: View {
 
     var body: some View {
         NavigationLink(instance.longDescription) {
-            InstanceSettings(instanceID: instance.id)
+            InstanceSettings(instance: instance)
         }
         .buttonStyle(.plain)
         .contextMenu {

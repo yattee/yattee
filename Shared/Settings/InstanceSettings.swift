@@ -1,22 +1,19 @@
 import SwiftUI
 
 struct InstanceSettings: View {
-    let instanceID: Instance.ID?
+    let instance: Instance
 
     @State private var accountsChanged = false
     @State private var presentingAccountForm = false
 
     @State private var frontendURL = ""
-
-    var instance: Instance! {
-        InstancesModel.find(instanceID)
-    }
+    @State private var proxiesVideos = false
 
     var body: some View {
         List {
             Section(header: Text("Accounts")) {
                 if instance.app.supportsAccounts {
-                    ForEach(InstancesModel.accounts(instanceID), id: \.self) { account in
+                    ForEach(InstancesModel.accounts(instance.id), id: \.self) { account in
                         #if os(tvOS)
                             Button(account.description) {}
                                 .contextMenu {
@@ -80,6 +77,16 @@ struct InstanceSettings: View {
                     .keyboardType(.URL)
                 }
             }
+
+            if instance.app.allowsDisablingVidoesProxying {
+                proxiesVideosToggle
+                    .onAppear {
+                        proxiesVideos = instance.proxiesVideos
+                    }
+                    .onChange(of: proxiesVideos) { newValue in
+                        InstancesModel.setProxiesVideos(instance, newValue)
+                    }
+            }
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -88,6 +95,10 @@ struct InstanceSettings: View {
         #endif
 
         .navigationTitle(instance.description)
+    }
+
+    private var proxiesVideosToggle: some View {
+        Toggle("Proxy videos", isOn: $proxiesVideos)
     }
 
     private func removeAccount(_ account: Account) {

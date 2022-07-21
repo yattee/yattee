@@ -58,4 +58,8 @@ enum VideosApp: String, CaseIterable {
     var supportsOpeningChannelsByName: Bool {
         self == .piped
     }
+
+    var allowsDisablingVidoesProxying: Bool {
+        self == .invidious
+    }
 }

@@ -52,6 +52,17 @@ final class InstancesModel: ObservableObject {
         }
     }
 
+    static func setProxiesVideos(_ instance: Instance, _ proxiesVideos: Bool) {
+        guard let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) else {
+            return
+        }
+
+        var instance = Defaults[.instances][index]
+        instance.proxiesVideos = proxiesVideos
+
+        Defaults[.instances][index] = instance
+    }
+
     static func remove(_ instance: Instance) {
         let accounts = Self.accounts(instance.id)
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
