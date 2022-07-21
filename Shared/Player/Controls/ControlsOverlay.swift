@@ -54,6 +54,7 @@ struct ControlsOverlay: View {
             Text(backend.label)
                 .padding(6)
                 .foregroundColor(player.activeBackend == backend ? .accentColor : .secondary)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

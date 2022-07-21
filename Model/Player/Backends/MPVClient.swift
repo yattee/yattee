@@ -140,6 +140,8 @@ final class MPVClient: ObservableObject {
             options.append("sub-files-append=\"\(subURL)\"")
         }
 
+        options.append("force-seekable=yes")
+
         args.append(options.joined(separator: ","))
 
         command("loadfile", args: args, returnValueCallback: completionHandler)

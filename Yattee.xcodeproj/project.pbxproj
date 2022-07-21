@@ -1450,6 +1450,7 @@
 				37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */,
 				37F13B61285E43C000B137E4 /* ControlsOverlay.swift */,
 				37030FFE27B04DCC00ECDDAA /* PlayerControls.swift */,
+				37E8B0EB27B326C00024006F /* TimelineView.swift */,
 				37648B68286CF5F1003D330B /* TVControls.swift */,
 				37E80F3B287B107F00561799 /* VideoDetailsOverlay.swift */,
 			);
@@ -1499,7 +1500,6 @@
 				37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */,
 				37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */,
 				37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */,
-				37E8B0EB27B326C00024006F /* TimelineView.swift */,
 				37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */,
 				373031F22838388A000CFD59 /* PlayerLayerView.swift */,
 			);
