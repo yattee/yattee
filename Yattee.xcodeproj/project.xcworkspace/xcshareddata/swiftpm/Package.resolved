@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "revision" : "354dda32d89fc8cd4f5c46487f64957d355f53d8",
-        "version" : "5.6.1"
+        "revision" : "8dd85aee02e39dd280c75eef88ffdb86eed4b07b",
+        "version" : "5.6.2"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/libwebp-Xcode.git",
       "state" : {
-        "revision" : "2b3b43faaef54d1b897482428428357b7f7cd08b",
-        "version" : "1.2.1"
+        "revision" : "0f3bdb28a1edc5e8e43876d3835d20c601ef331f",
+        "version" : "1.2.3"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "16cf157658b48eab413a8783df0759861e54245b"
+        "revision" : "7d7debbd262ddac7c75c9d40c78e929839dcbad0"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "18834cac007c8cc982c57d384b00e7a8a129e9db",
-        "version" : "0.8.5"
+        "revision" : "8a0c5e1ae08ed763739262b9dcef64cfb241c14b",
+        "version" : "0.9.0"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/fermoya/SwiftUIPager.git",
       "state" : {
-        "revision" : "6e4170ef7cafd04b3d8ab8dc5b0469036b2bcd6a",
-        "version" : "2.4.0"
+        "revision" : "4ddc04c801aac143090bb14cf26603a3bf9c74cb",
+        "version" : "2.5.0"
       }
     },
     {
