@@ -8,7 +8,7 @@ struct SearchSuggestions: View {
     var body: some View {
         List {
             Button {
-                runQueryAction()
+                runQueryAction(state.queryText)
             } label: {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -25,8 +25,7 @@ struct SearchSuggestions: View {
             ForEach(visibleSuggestions, id: \.self) { suggestion in
                 HStack {
                     Button {
-                        state.queryText = suggestion
-                        runQueryAction()
+                        runQueryAction(suggestion)
                     } label: {
                         HStack {
                             Image(systemName: "magnifyingglass")
@@ -52,7 +51,7 @@ struct SearchSuggestions: View {
                     Spacer()
 
                     Button {
-                        state.queryText = suggestion
+                        state.suggestionSelection = suggestion
                     } label: {
                         Image(systemName: "arrow.up.left.circle")
                             .foregroundColor(.secondary)
@@ -72,14 +71,15 @@ struct SearchSuggestions: View {
         #endif
     }
 
-    private func runQueryAction() {
+    private func runQueryAction(_ queryText: String) {
+        state.suggestionSelection = queryText
+
         state.changeQuery { query in
-            query.query = state.queryText
-            state.fieldIsFocused = false
+            query.query = queryText
             navigation.hideKeyboard()
         }
 
-        recents.addQuery(state.queryText, navigation: navigation)
+        recents.addQuery(queryText, navigation: navigation)
     }
 
     private var visibleSuggestions: [String] {

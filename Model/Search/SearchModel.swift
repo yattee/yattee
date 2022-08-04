@@ -6,14 +6,14 @@ final class SearchModel: ObservableObject {
     @Published var store = Store<[ContentItem]>()
     @Published var page: SearchPage?
 
-    var accounts = AccountsModel()
     @Published var query = SearchQuery()
     @Published var queryText = ""
-    @Published var querySuggestions = Store<[String]>()
     @Published var suggestionsText = ""
+    @Published var suggestionSelection = ""
 
-    @Published var fieldIsFocused = false
+    @Published var querySuggestions = Store<[String]>()
 
+    var accounts = AccountsModel()
     private var resource: Resource!
 
     var isLoading: Bool {
@@ -49,10 +49,9 @@ final class SearchModel: ObservableObject {
         page = nil
         store.replace([])
 
-        resource = newResource
-        resource.addObserver(store)
-
         if !query.isEmpty {
+            resource = newResource
+            resource.addObserver(store)
             loadResource()
         }
     }
@@ -74,7 +73,12 @@ final class SearchModel: ObservableObject {
         }
     }
 
-    private var suggestionsDebounceTimer: Timer?
+    var suggestionsResource: Resource? { didSet {
+        oldValue?.removeObservers(ownedBy: querySuggestions)
+        oldValue?.cancelLoadIfUnobserved()
+
+        objectWillChange.send()
+    }}
 
     func loadSuggestions(_ query: String) {
         guard !query.isEmpty else {
@@ -82,15 +86,11 @@ final class SearchModel: ObservableObject {
             return
         }
 
-        suggestionsDebounceTimer?.invalidate()
+        DispatchQueue.main.async {
+            self.suggestionsResource = self.accounts.api.searchSuggestions(query: query)
+            self.suggestionsResource?.addObserver(self.querySuggestions)
 
-        suggestionsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { _ in
-            let resource = self.accounts.api.searchSuggestions(query: query)
-
-            resource.addObserver(self.querySuggestions)
-            resource.loadIfNeeded()
-
-            if let request = resource.loadIfNeeded() {
+            if let request = self.suggestionsResource?.loadIfNeeded() {
                 request.onSuccess { response in
                     if let suggestions: [String] = response.typedContent() {
                         self.querySuggestions = Store<[String]>(suggestions)
