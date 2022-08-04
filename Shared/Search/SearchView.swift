@@ -17,6 +17,7 @@ struct SearchView: View {
     #endif
 
     @State private var favoriteItem: FavoriteItem?
+    @State private var queryText = ""
 
     @Environment(\.navigationStyle) private var navigationStyle
 
@@ -60,9 +61,9 @@ struct SearchView: View {
         }) {
             #if os(iOS)
                 VStack {
-                    SearchTextField(favoriteItem: $favoriteItem)
+                    SearchTextField(queryText: $queryText, favoriteItem: $favoriteItem)
 
-                    if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                    if state.query.query != queryText, !queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
                         SearchSuggestions()
                     } else {
                         results
@@ -72,8 +73,8 @@ struct SearchView: View {
                 ZStack {
                     results
 
-                    #if !os(tvOS)
-                        if state.query.query != state.queryText, !state.queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                    #if os(macOS)
+                        if state.query.query != queryText, !queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
                             HStack {
                                 Spacer()
                                 SearchSuggestions()
@@ -107,14 +108,15 @@ struct SearchView: View {
                         filtersMenu
                     }
 
-                    SearchTextField()
+                    SearchTextField(queryText: $queryText)
                 }
             #endif
         }
         .onAppear {
-            if query != nil {
-                state.queryText = query!.query
-                state.resetQuery(query!)
+            if let query = query {
+                queryText = query.query
+                state.queryText = query.query
+                state.resetQuery(query)
                 updateFavoriteItem()
             }
 
@@ -122,19 +124,21 @@ struct SearchView: View {
                 state.store.replace(ContentItem.array(of: videos))
             }
         }
-        .onChange(of: state.query.query) { newQuery in
+        .onChange(of: state.queryText) { newQuery in
+            if queryText.isEmpty, queryText != newQuery {
+                queryText = newQuery
+            }
+
             if newQuery.isEmpty {
                 favoriteItem = nil
+                state.resetQuery()
             } else {
                 updateFavoriteItem()
             }
-        }
-        .onChange(of: state.queryText) { newQuery in
-            if newQuery.isEmpty {
-                state.resetQuery()
-            }
 
-            state.loadSuggestions(newQuery)
+            if state.query.query != queryText {
+                state.loadSuggestions(newQuery)
+            }
 
             #if os(tvOS)
                 searchDebounce.invalidate()
@@ -152,7 +156,6 @@ struct SearchView: View {
                 }
             #endif
         }
-
         .onChange(of: searchSortOrder) { order in
             state.changeQuery { query in
                 query.sortBy = order
@@ -308,7 +311,7 @@ struct SearchView: View {
         Button {
             switch item.type {
             case .query:
-                state.queryText = item.title
+                queryText = item.title
                 state.changeQuery { query in query.query = item.title }
 
                 updateFavoriteItem()

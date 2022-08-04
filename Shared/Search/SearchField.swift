@@ -1,3 +1,4 @@
+import Repeat
 import SwiftUI
 
 struct SearchTextField: View {
@@ -7,9 +8,16 @@ struct SearchTextField: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var state
 
+    @Binding var queryText: String
     @Binding var favoriteItem: FavoriteItem?
 
-    init(favoriteItem: Binding<FavoriteItem?>? = nil) {
+    private var queryDebouncer = Debouncer(.milliseconds(800))
+
+    init(
+        queryText: Binding<String>,
+        favoriteItem: Binding<FavoriteItem?>? = nil
+    ) {
+        _queryText = queryText
         _favoriteItem = favoriteItem ?? .constant(nil)
     }
 
@@ -28,17 +36,24 @@ struct SearchTextField: View {
                         .padding(.horizontal, 8)
                         .opacity(0.8)
                 #endif
-                TextField("Search...", text: $state.queryText) {
+                TextField("Search...", text: $queryText) {
                     state.changeQuery { query in
                         query.query = state.queryText
                         navigation.hideKeyboard()
                     }
                     recents.addQuery(state.queryText, navigation: navigation)
                 }
-                .onChange(of: state.queryText) { _ in
-                    if state.query.query.compare(state.queryText, options: .caseInsensitive) == .orderedSame {
-                        state.fieldIsFocused = true
+                .disableAutocorrection(true)
+                .onChange(of: state.suggestionSelection) { newValue in
+                    self.queryText = newValue
+                }
+                .onChange(of: queryText) { newValue in
+                    queryDebouncer.callback = {
+                        DispatchQueue.main.async {
+                            state.queryText = newValue
+                        }
                     }
+                    queryDebouncer.call()
                 }
                 #if os(macOS)
                 .frame(maxWidth: 190)
@@ -74,16 +89,14 @@ struct SearchTextField: View {
             .frame(width: 250, height: 32)
             .overlay(
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .stroke(
-                        state.fieldIsFocused ? Color.blue.opacity(0.7) : Color.gray.opacity(0.4),
-                        lineWidth: state.fieldIsFocused ? 3 : 1
-                    )
+                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                     .frame(width: 250, height: 31)
             )
     }
 
     private var clearButton: some View {
         Button(action: {
+            queryText = ""
             self.state.queryText = ""
         }) {
             Image(systemName: "xmark.circle.fill")
