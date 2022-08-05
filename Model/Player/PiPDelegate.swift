@@ -1,5 +1,6 @@
 import AVKit
 import Foundation
+import SwiftUI
 
 final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     var player: PlayerModel!
@@ -45,8 +46,11 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     ) {
         var delay = 0.0
         #if os(iOS)
-            if player.currentItem.isNil {
+            if !player.presentingPlayer {
                 delay = 0.5
+            }
+            if player.currentItem.isNil {
+                delay = 1
             }
         #endif
 
@@ -54,7 +58,11 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
             player?.show()
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            withAnimation(.linear(duration: 0.3)) {
+                self?.player.playingInPictureInPicture = false
+            }
+
             completionHandler(true)
         }
     }
