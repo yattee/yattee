@@ -234,7 +234,16 @@ extension PlayerModel {
     }
 
     private func videoLoadFailureHandler(_ error: RequestError) {
-        navigation.presentAlert(title: "Could not load video", message: error.userMessage)
+        var message = error.userMessage
+        if let errorDictionary = error.json.dictionaryObject,
+           let errorMessage = errorDictionary["message"] ?? errorDictionary["error"],
+           let errorString = errorMessage as? String
+        {
+            message += "\n"
+            message += errorString
+        }
+
+        navigation.presentAlert(title: "Could not load video", message: message)
         advancing = false
         videoBeingOpened = nil
         currentItem = nil
