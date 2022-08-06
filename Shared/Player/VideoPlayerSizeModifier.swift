@@ -37,12 +37,12 @@ struct VideoPlayerSizeModifier: ViewModifier {
             return VideoPlayerView.defaultAspectRatio
         }
 
-        return [aspectRatio, VideoPlayerView.defaultAspectRatio].min()!
+        return aspectRatio
     }
 
     var usedAspectRatioContentMode: ContentMode {
         #if os(iOS)
-            !fullScreen ? .fit : .fill
+            fullScreen ? .fill : .fit
         #else
                 .fit
         #endif

@@ -95,6 +95,9 @@ struct VideoPlayerView: View {
                             playerSize = geometry.size
                         }
                 }
+                #if os(iOS)
+                .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
+                #endif
                 .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
@@ -141,25 +144,32 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    var playerEdgesIgnoringSafeArea: Edge.Set {
-        #if os(iOS)
+    #if os(iOS)
+        var playerWidth: Double? {
+            fullScreenLayout ? (UIScreen.main.bounds.size.width - safeAreaInsets.left - safeAreaInsets.right) : nil
+        }
+
+        var playerHeight: Double? {
+            fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? (safeAreaInsets.top + safeAreaInsets.bottom) : 0) : nil
+        }
+
+        var playerEdgesIgnoringSafeArea: Edge.Set {
             if fullScreenLayout, UIDevice.current.orientation.isLandscape {
                 return [.vertical]
             }
-        #endif
-        return []
-    }
+            return []
+        }
+    #endif
 
     var content: some View {
         Group {
             ZStack(alignment: .bottomLeading) {
                 #if os(tvOS)
                     ZStack {
-                        playerView
+                        PlayerBackendView()
 
                         tvControls
                     }
-                    .ignoresSafeArea(.all, edges: .all)
                     .onMoveCommand { direction in
                         if direction == .up || direction == .down {
                             playerControls.show()
@@ -193,17 +203,16 @@ struct VideoPlayerView: View {
                             if player.playingInPictureInPicture {
                                 pictureInPicturePlaceholder
                             } else {
-                                playerView
-
+                                PlayerBackendView()
                                 #if !os(tvOS)
-                                .modifier(
-                                    VideoPlayerSizeModifier(
-                                        geometry: geometry,
-                                        aspectRatio: player.aspectRatio,
-                                        fullScreen: fullScreenLayout
+                                    .modifier(
+                                        VideoPlayerSizeModifier(
+                                            geometry: geometry,
+                                            aspectRatio: player.aspectRatio,
+                                            fullScreen: fullScreenLayout
+                                        )
                                     )
-                                )
-                                .overlay(playerPlaceholder)
+                                    .overlay(playerPlaceholder)
                                 #endif
                             }
                         }
@@ -239,8 +248,8 @@ struct VideoPlayerView: View {
                                         VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                     #endif
                                 }
-                                #if !os(macOS)
-                                .transition(.move(edge: .bottom))
+                                #if os(iOS)
+                                .transition(.asymmetric(insertion: .opacity, removal: .identity))
                                 #endif
                                 .background(colorScheme == .dark ? Color.black : Color.white)
                                 .modifier(VideoDetailsPaddingModifier(
@@ -278,102 +287,6 @@ struct VideoPlayerView: View {
         .statusBar(hidden: fullScreenLayout)
         #endif
     }
-
-    var playerView: some View {
-        ZStack(alignment: .top) {
-            Group {
-                switch player.activeBackend {
-                case .mpv:
-                    player.mpvPlayerView
-                case .appleAVPlayer:
-                    player.avPlayerView
-                    #if os(iOS)
-                        .onAppear {
-                            player.pipController = .init(playerLayer: player.playerLayerView.playerLayer)
-                            let pipDelegate = PiPDelegate()
-                            pipDelegate.player = player
-
-                            player.pipDelegate = pipDelegate
-                            player.pipController?.delegate = pipDelegate
-                            player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
-                        }
-                    #endif
-                }
-            }
-            .overlay(GeometryReader { proxy in
-                Color.clear
-                    .onAppear { player.playerSize = proxy.size }
-                    .onChange(of: proxy.size) { _ in player.playerSize = proxy.size }
-                    .onChange(of: player.controls.presentingOverlays) { _ in player.playerSize = proxy.size }
-                    .onChange(of: player.aspectRatio) { _ in player.playerSize = proxy.size }
-            })
-            #if os(iOS)
-            .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
-            #endif
-
-            #if !os(tvOS)
-                PlayerGestures()
-                PlayerControls(player: player, thumbnails: thumbnails)
-                #if os(iOS)
-                    .padding(.top, controlsTopPadding)
-                    .padding(.bottom, fullScreenLayout ? safeAreaInsets.bottom : 0)
-                #endif
-            #endif
-        }
-        #if os(iOS)
-        .statusBarHidden(fullScreenLayout)
-        #endif
-    }
-
-    #if os(iOS)
-        var playerDragGesture: some Gesture {
-            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                .onChanged { value in
-                    guard player.presentingPlayer,
-                          !playerControls.presentingControlsOverlay else { return }
-
-                    let drag = value.translation.height
-
-                    guard drag > 0 else { return }
-
-                    if drag > 60,
-                       player.playingFullScreen,
-                       !OrientationTracker.shared.currentInterfaceOrientation.isLandscape
-                    {
-                        player.exitFullScreen()
-                        player.lockedOrientation = nil
-                    }
-
-                    viewVerticalOffset = drag
-                }
-                .onEnded { _ in
-                    guard player.presentingPlayer,
-                          !playerControls.presentingControlsOverlay else { return }
-                    if viewVerticalOffset > 100 {
-                        player.backend.setNeedsDrawing(false)
-                        player.hide()
-                        player.exitFullScreen()
-                    } else {
-                        viewVerticalOffset = 0
-                        player.backend.setNeedsDrawing(true)
-                        player.show()
-                    }
-                }
-        }
-
-        var controlsTopPadding: Double {
-            guard fullScreenLayout else { return 0 }
-
-            let idiom = UIDevice.current.userInterfaceIdiom
-            guard idiom == .pad else { return 0 }
-
-            return safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top
-        }
-
-        var safeAreaInsets: UIEdgeInsets {
-            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
-        }
-    #endif
 
     var fullScreenLayout: Bool {
         #if os(iOS)
@@ -450,6 +363,49 @@ struct VideoPlayerView: View {
     }
 
     #if os(iOS)
+        var playerDragGesture: some Gesture {
+            DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { value in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+
+                    if player.controls.presentingControls {
+                        player.controls.presentingControls = false
+                    }
+
+                    let drag = value.translation.height
+
+                    guard drag > 0 else { return }
+
+                    if drag > 60,
+                       player.playingFullScreen,
+                       !OrientationTracker.shared.currentInterfaceOrientation.isLandscape
+                    {
+                        player.exitFullScreen()
+                        player.lockedOrientation = nil
+                    }
+
+                    viewVerticalOffset = drag
+                }
+                .onEnded { _ in
+                    guard player.presentingPlayer,
+                          !playerControls.presentingControlsOverlay else { return }
+                    if viewVerticalOffset > 100 {
+                        player.backend.setNeedsDrawing(false)
+                        player.hide()
+                        player.exitFullScreen()
+                    } else {
+                        viewVerticalOffset = 0
+                        player.backend.setNeedsDrawing(true)
+                        player.show()
+                    }
+                }
+        }
+
+        var safeAreaInsets: UIEdgeInsets {
+            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
+        }
+
         private func configureOrientationUpdatesBasedOnAccelerometer() {
             if OrientationTracker.shared.currentInterfaceOrientation.isLandscape,
                Defaults[.enterFullscreenInLandscape],
@@ -457,6 +413,7 @@ struct VideoPlayerView: View {
                !player.playingInPictureInPicture
             {
                 DispatchQueue.main.async {
+                    player.controls.presentingControls = false
                     player.enterFullScreen()
                 }
             }
@@ -488,14 +445,12 @@ struct VideoPlayerView: View {
                     }
 
                     if orientation.isLandscape {
+                        player.controls.presentingControls = false
                         player.enterFullScreen()
                         Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                     } else {
-                        if !player.playingFullScreen {
-                            player.exitFullScreen()
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                        }
+                        player.exitFullScreen()
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                     }
                 }
             }
