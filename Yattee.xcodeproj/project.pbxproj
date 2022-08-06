@@ -779,6 +779,9 @@
 		37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
 		37F64FE526FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
 		37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
+		37F7D82C289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F7D82B289EB05F00E2B3D0 /* SettingsPickerModifier.swift */; };
+		37F7D82D289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F7D82B289EB05F00E2B3D0 /* SettingsPickerModifier.swift */; };
+		37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F7D82B289EB05F00E2B3D0 /* SettingsPickerModifier.swift */; };
 		37F9619B27BD89E000058149 /* TapRecognizerViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */; };
 		37F9619C27BD89E000058149 /* TapRecognizerViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */; };
 		37F9619F27BD90BB00058149 /* PlayerBackendType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9619E27BD90BB00058149 /* PlayerBackendType.swift */; };
@@ -1211,6 +1214,7 @@
 		37F4AD2528613B81004D0F66 /* Color+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Debug.swift"; sourceTree = "<group>"; };
 		37F4AE7126828F0900BD60EA /* VerticalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalCells.swift; sourceTree = "<group>"; };
 		37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedrawOnModifier.swift; sourceTree = "<group>"; };
+		37F7D82B289EB05F00E2B3D0 /* SettingsPickerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPickerModifier.swift; sourceTree = "<group>"; };
 		37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapRecognizerViewModifier.swift; sourceTree = "<group>"; };
 		37F9619E27BD90BB00058149 /* PlayerBackendType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBackendType.swift; sourceTree = "<group>"; };
 		37FADFFF272ED58000330459 /* EditFavorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFavorites.swift; sourceTree = "<group>"; };
@@ -1560,6 +1564,7 @@
 				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
 				37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
+				37F7D82B289EB05F00E2B3D0 /* SettingsPickerModifier.swift */,
 				3784B23C2728B85300B09468 /* ShareButton.swift */,
 				376B2E0626F920D600B1D64D /* SignInRequiredView.swift */,
 				37AAF29F26741C97007FC770 /* SubscriptionsView.swift */,
@@ -2728,6 +2733,7 @@
 				37DD9DB12785D58D00539416 /* RefreshControl.swift in Sources */,
 				37B4E805277D0AB4004BF56A /* Orientation.swift in Sources */,
 				37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
+				37F7D82C289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				371B7E662759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				37BE0BD326A1D4780092E2DB /* AppleAVPlayerView.swift in Sources */,
 				37A9965E26D6F9B9006E3224 /* FavoritesView.swift in Sources */,
@@ -2908,6 +2914,7 @@
 				37EAD86C267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				37C3A24E272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
+				37F7D82D289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				3751BA8427E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				377ABC4D286E6A78009C986F /* LocationsSettings.swift in Sources */,
 				3782B95027553A6700990149 /* SearchSuggestions.swift in Sources */,
@@ -3263,6 +3270,7 @@
 				37B2631C2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
 				37484C2B26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
+				37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
 				377ABC42286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,

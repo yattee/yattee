@@ -81,13 +81,7 @@ struct BrowsingSettings: View {
                 Text(quality.rawValue.capitalized + " quality").tag(quality)
             }
         }
-        .labelsHidden()
-
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
+        .modifier(SettingsPickerModifier())
     }
 
     private var visibleSectionsSettings: some View {

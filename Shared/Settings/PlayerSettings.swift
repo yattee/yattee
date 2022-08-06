@@ -109,12 +109,7 @@ struct PlayerSettings: View {
                 Text(instance.description).tag(Optional(instance.id))
             }
         }
-        .labelsHidden()
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
+        .modifier(SettingsPickerModifier())
     }
 
     private var systemControlsCommandsPicker: some View {
@@ -133,12 +128,7 @@ struct PlayerSettings: View {
         .onChange(of: systemControlsCommands) { _ in
             player.updateRemoteCommandCenter()
         }
-        .labelsHidden()
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
+        .modifier(SettingsPickerModifier())
     }
 
     private var qualityPicker: some View {
@@ -147,13 +137,7 @@ struct PlayerSettings: View {
                 Text(resolution.description).tag(resolution)
             }
         }
-        .labelsHidden()
-
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
+        .modifier(SettingsPickerModifier())
     }
 
     private var sidebarPicker: some View {
@@ -168,13 +152,7 @@ struct PlayerSettings: View {
 
             Text("Hide sidebar").tag(PlayerSidebarSetting.never)
         }
-        .labelsHidden()
-
-        #if os(iOS)
-            .pickerStyle(.automatic)
-        #elseif os(tvOS)
-            .pickerStyle(.inline)
-        #endif
+        .modifier(SettingsPickerModifier())
     }
 
     private var keywordsToggle: some View {
