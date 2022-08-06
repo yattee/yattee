@@ -170,6 +170,7 @@ struct VideoPlayerView: View {
 
                         tvControls
                     }
+                    .ignoresSafeArea()
                     .onMoveCommand { direction in
                         if direction == .up || direction == .down {
                             playerControls.show()
