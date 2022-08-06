@@ -93,13 +93,7 @@ struct HistorySettings: View {
                 }
             }
             .disabled(!saveHistory)
-            .labelsHidden()
-
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #elseif os(tvOS)
-                .pickerStyle(.inline)
-            #endif
+            .modifier(SettingsPickerModifier())
         }
     }
 
@@ -112,13 +106,7 @@ struct HistorySettings: View {
                 Text("Badge & Decreased opacity").tag(WatchedVideoStyle.both)
             }
             .disabled(!saveHistory)
-            .labelsHidden()
-
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #elseif os(tvOS)
-                .pickerStyle(.inline)
-            #endif
+            .modifier(SettingsPickerModifier())
         }
     }
 
@@ -132,13 +120,7 @@ struct HistorySettings: View {
             .disabled(!saveHistory)
             .disabled(watchedVideoStyle == .decreasedOpacity)
             .disabled(watchedVideoStyle == .nothing)
-            .labelsHidden()
-
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #elseif os(tvOS)
-                .pickerStyle(.inline)
-            #endif
+            .modifier(SettingsPickerModifier())
         }
     }
 
@@ -149,13 +131,7 @@ struct HistorySettings: View {
                 Text("Restart").tag(WatchedVideoPlayNowBehavior.restart)
             }
             .disabled(!saveHistory)
-            .labelsHidden()
-
-            #if os(iOS)
-                .pickerStyle(.automatic)
-            #elseif os(tvOS)
-                .pickerStyle(.inline)
-            #endif
+            .modifier(SettingsPickerModifier())
         }
     }
 
