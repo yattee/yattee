@@ -340,6 +340,9 @@
 		375E45F627B1976B00BA7902 /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F427B1976B00BA7902 /* MPVOGLView.swift */; };
 		375E45F827B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
 		375E45F927B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
+		375F7410289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
+		375F7411289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
+		375F7412289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
 		3761ABFD26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */; };
 		3761ABFE26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */; };
 		3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */; };
@@ -1033,6 +1036,7 @@
 		375DFB5726F9DA010013F468 /* InstancesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesModel.swift; sourceTree = "<group>"; };
 		375E45F427B1976B00BA7902 /* MPVOGLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsModel.swift; sourceTree = "<group>"; };
+		375F740F289DC35A00747050 /* PlayerBackendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBackendView.swift; sourceTree = "<group>"; };
 		3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnvironmentValues.swift; sourceTree = "<group>"; };
 		3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarRecents.swift; sourceTree = "<group>"; };
 		37648B68286CF5F1003D330B /* TVControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVControls.swift; sourceTree = "<group>"; };
@@ -1491,7 +1495,9 @@
 				371B7E602759706A00D21217 /* CommentsView.swift */,
 				37EF9A75275BEB8E0043B585 /* CommentView.swift */,
 				37DD9DA22785BBC900539416 /* NoCommentsView.swift */,
+				375F740F289DC35A00747050 /* PlayerBackendView.swift */,
 				3703100127B0713600ECDDAA /* PlayerGestures.swift */,
+				373031F22838388A000CFD59 /* PlayerLayerView.swift */,
 				3743CA4D270EFE3400E4D32B /* PlayerQueueRow.swift */,
 				37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */,
 				373197D82732015300EF734F /* RelatedView.swift */,
@@ -1501,7 +1507,6 @@
 				37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */,
 				37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */,
 				37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */,
-				373031F22838388A000CFD59 /* PlayerLayerView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2789,6 +2794,7 @@
 				37C3A24527235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				37030FFF27B04DCC00ECDDAA /* PlayerControls.swift in Sources */,
 				374C053F272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
+				375F7410289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37FB28412721B22200A57617 /* ContentItem.swift in Sources */,
 				37C3A24D272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				37484C2D26FC844700287258 /* InstanceSettings.swift in Sources */,
@@ -3008,6 +3014,7 @@
 				3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				3784B23E2728B85300B09468 /* ShareButton.swift in Sources */,
 				37BE0BDA26A214630092E2DB /* AppleAVPlayerViewController.swift in Sources */,
+				375F7411289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37E64DD226D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				374108D1272B11B2006C5CC8 /* PictureInPictureDelegate.swift in Sources */,
@@ -3226,6 +3233,7 @@
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */,
 				376A33E62720CB35000C1D6B /* Account.swift in Sources */,
+				375F7412289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37599F3A272B4D740087F250 /* FavoriteButton.swift in Sources */,
 				37EF5C242739D37B00B03725 /* MenuModel.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,

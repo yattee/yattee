@@ -811,7 +811,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func toggleFullscreen(_ isFullScreen: Bool) {
-        controls.resetTimer()
+        controls.presentingControls = false
 
         #if os(macOS)
             if isFullScreen {
