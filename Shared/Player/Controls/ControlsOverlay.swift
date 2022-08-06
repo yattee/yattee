@@ -114,7 +114,7 @@ struct ControlsOverlay: View {
                 StreamControl()
                     .frame(width: 45, height: 30)
                 #if os(iOS)
-                    .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
+                    .modifier(ControlBackgroundModifier())
                 #endif
                     .mask(RoundedRectangle(cornerRadius: 3))
             } label: {
@@ -127,12 +127,8 @@ struct ControlsOverlay: View {
             .buttonStyle(.plain)
             .foregroundColor(.primary)
             .frame(width: 140, height: 30)
-            #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-            #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-            #endif
-                .mask(RoundedRectangle(cornerRadius: 3))
+            .modifier(ControlBackgroundModifier())
+            .mask(RoundedRectangle(cornerRadius: 3))
         #endif
     }
 

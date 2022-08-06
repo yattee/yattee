@@ -29,17 +29,8 @@ struct DetailBadge: View {
         @Environment(\.colorScheme) private var colorScheme
 
         func body(content: Content) -> some View {
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                content
-                    .background(.thinMaterial)
-            } else {
-                content
-                #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-                #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-                #endif
-            }
+            content
+                .modifier(ControlBackgroundModifier())
         }
     }
 
