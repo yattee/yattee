@@ -41,6 +41,8 @@ struct ControlsOverlay: View {
     private var backendButtons: some View {
         ForEach(PlayerBackendType.allCases, id: \.self) { backend in
             backendButton(backend)
+                .modifier(ControlBackgroundModifier())
+                .clipShape(RoundedRectangle(cornerRadius: 4))
         }
     }
 
@@ -67,6 +69,7 @@ struct ControlsOverlay: View {
             }
         } label: {
             Label("Increase rate", systemImage: "plus")
+                .foregroundColor(.primary)
                 .labelStyle(.iconOnly)
                 .padding(8)
                 .frame(height: 30)
@@ -90,6 +93,7 @@ struct ControlsOverlay: View {
             }
         } label: {
             Label("Decrease rate", systemImage: "minus")
+                .foregroundColor(.primary)
                 .labelStyle(.iconOnly)
                 .padding(8)
                 .frame(height: 30)
