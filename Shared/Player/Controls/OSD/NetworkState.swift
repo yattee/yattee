@@ -10,7 +10,7 @@ struct NetworkState: View {
     }
 
     var visible: Bool {
-        player.isPlaying && (model.pausedForCache || player.isSeeking)
+        player.isPlaying && ((player.activeBackend == .mpv && model.pausedForCache) || player.isSeeking)
     }
 }
 

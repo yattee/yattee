@@ -97,8 +97,8 @@ struct VideoPlayerView: View {
                 }
                 #if os(iOS)
                 .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
-                #endif
                 .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
+                #endif
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
