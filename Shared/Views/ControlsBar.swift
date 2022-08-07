@@ -113,7 +113,6 @@ struct ControlsBar: View {
 
             Button {
                 model.closeCurrentItem()
-                model.closePiP()
             } label: {
                 Label("Close Video", systemImage: "xmark")
                     .padding(.vertical, 10)

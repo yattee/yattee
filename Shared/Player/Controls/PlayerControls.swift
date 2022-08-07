@@ -23,6 +23,10 @@ struct PlayerControls: View {
         @FocusState private var focusedField: Field?
     #endif
 
+    #if !os(macOS)
+        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
+    #endif
+
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
         self.thumbnails = thumbnails
@@ -242,18 +246,7 @@ struct PlayerControls: View {
 
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
-            player.pause()
-
-            player.hide()
-            player.closePiP()
-
-            var delay = 0.2
-            #if os(macOS)
-                delay = 0.0
-            #endif
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                player.closeCurrentItem()
-            }
+            player.closeCurrentItem()
         }
     }
 

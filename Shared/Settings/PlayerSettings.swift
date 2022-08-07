@@ -18,6 +18,7 @@ struct PlayerSettings: View {
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
     #if !os(macOS)
+        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
         @Default(.pauseOnEnteringBackground) private var pauseOnEnteringBackground
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
     #endif
@@ -61,6 +62,7 @@ struct PlayerSettings: View {
                 pauseOnHidingPlayerToggle
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
+                    closePlayerOnItemCloseToggle
                 #endif
                 closeLastItemOnPlaybackEndToggle
                 systemControlsCommandsPicker
@@ -175,6 +177,10 @@ struct PlayerSettings: View {
         private var pauseOnEnteringBackgroundToogle: some View {
             Toggle("Pause when entering background", isOn: $pauseOnEnteringBackground)
         }
+
+        private var closePlayerOnItemCloseToggle: some View {
+            Toggle("Close player when closing video", isOn: $closePlayerOnItemClose)
+        }
     #endif
 
     private var closeLastItemOnPlaybackEndToggle: some View {
@@ -207,7 +213,7 @@ struct PlayerSettings: View {
     #endif
 }
 
-struct PlaybackSettings_Previews: PreviewProvider {
+struct PlayerSettings_Previews: PreviewProvider {
     static var previews: some View {
         VStack(alignment: .leading) {
             PlayerSettings()
