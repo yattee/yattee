@@ -95,6 +95,7 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
+        @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
     #endif
 
     var accounts: AccountsModel
@@ -103,6 +104,7 @@ final class PlayerModel: ObservableObject {
         backends.forEach { backend in
             var backend = backend
             backend.controls = controls
+            backend.controls.player = self
         }
     }}
     var playerTime: PlayerTimeModel { didSet {
@@ -741,28 +743,18 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        func enterFullScreen() {
-            guard !playingFullScreen else {
-                return
-            }
+        func enterFullScreen(showControls: Bool = true) {
+            guard !playingFullScreen else { return }
 
             logger.info("entering fullscreen")
-
-            backend.enterFullScreen()
+            toggleFullscreen(false, showControls: showControls)
         }
 
-        func exitFullScreen() {
-            guard playingFullScreen else {
-                return
-            }
+        func exitFullScreen(showControls: Bool = true) {
+            guard playingFullScreen else { return }
 
             logger.info("exiting fullscreen")
-
-            if playingFullScreen {
-                toggleFullscreen(true)
-            }
-
-            backend.exitFullScreen()
+            toggleFullscreen(true, showControls: showControls)
         }
     #endif
 
@@ -822,8 +814,8 @@ final class PlayerModel: ObservableObject {
         task.resume()
     }
 
-    func toggleFullscreen(_ isFullScreen: Bool) {
-        controls.presentingControls = false
+    func toggleFullscreen(_ isFullScreen: Bool, showControls: Bool = true) {
+        controls.presentingControls = showControls && isFullScreen
 
         #if os(macOS)
             if isFullScreen {
@@ -848,7 +840,8 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if !playingFullScreen {
-                Orientation.lockOrientation(.allButUpsideDown)
+                let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
             }
         #endif
     }

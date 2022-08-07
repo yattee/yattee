@@ -45,9 +45,6 @@ protocol PlayerBackend {
 
     func closeItem()
 
-    func enterFullScreen()
-    func exitFullScreen()
-
     func closePiP(wasPlaying: Bool)
 
     func updateControls()

@@ -156,12 +156,6 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.replaceCurrentItem(with: nil)
     }
 
-    func enterFullScreen() {
-        model.toggleFullscreen(model?.playingFullScreen ?? false)
-    }
-
-    func exitFullScreen() {}
-
     #if os(tvOS)
         func closePiP(wasPlaying: Bool) {
             let item = avPlayer.currentItem

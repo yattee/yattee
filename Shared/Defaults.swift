@@ -94,6 +94,7 @@ extension Defaults.Keys {
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let rotateToPortraitOnExitFullScreen = Key<Bool>("rotateToPortraitOnExitFullScreen", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)

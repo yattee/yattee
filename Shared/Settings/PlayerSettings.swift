@@ -14,6 +14,7 @@ struct PlayerSettings: View {
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
+        @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
@@ -84,6 +85,16 @@ struct PlayerSettings: View {
                 returnYouTubeDislikeToggle
             }
 
+            #if os(iOS)
+                Section(header: SettingsHeader(text: "Orientation")) {
+                    if idiom == .pad {
+                        enterFullscreenInLandscapeToggle
+                    }
+                    rotateToPortraitOnExitFullScreenToggle
+                    honorSystemOrientationLockToggle
+                }
+            #endif
+
             Section(header: SettingsHeader(text: "Picture in Picture")) {
                 closePiPOnNavigationToggle
                 closePiPOnOpeningPlayerToggle
@@ -91,15 +102,6 @@ struct PlayerSettings: View {
                     closePiPAndOpenPlayerOnEnteringForegroundToggle
                 #endif
             }
-
-            #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation")) {
-                    if idiom == .pad {
-                        enterFullscreenInLandscapeToggle
-                    }
-                    honorSystemOrientationLockToggle
-                }
-            #endif
         }
     }
 
@@ -195,6 +197,10 @@ struct PlayerSettings: View {
 
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
+        }
+
+        private var rotateToPortraitOnExitFullScreenToggle: some View {
+            Toggle("Rotate to portrait when exiting fullscreen", isOn: $rotateToPortraitOnExitFullScreen)
         }
     #endif
 
