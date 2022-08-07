@@ -415,7 +415,7 @@ struct VideoPlayerView: View {
             {
                 DispatchQueue.main.async {
                     player.controls.presentingControls = false
-                    player.enterFullScreen()
+                    player.enterFullScreen(showControls: false)
                 }
             }
 
@@ -447,10 +447,10 @@ struct VideoPlayerView: View {
 
                     if orientation.isLandscape {
                         player.controls.presentingControls = false
-                        player.enterFullScreen()
+                        player.enterFullScreen(showControls: false)
                         Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                     } else {
-                        player.exitFullScreen()
+                        player.exitFullScreen(showControls: false)
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                     }
                 }

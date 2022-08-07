@@ -318,12 +318,6 @@ final class MPVBackend: PlayerBackend {
         client?.stop()
     }
 
-    func enterFullScreen() {
-        model.toggleFullscreen(model?.playingFullScreen ?? false)
-    }
-
-    func exitFullScreen() {}
-
     func closePiP(wasPlaying _: Bool) {}
 
     func updateControls() {
