@@ -150,6 +150,7 @@ final class PlayerModel: ObservableObject {
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
+        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
     #endif
 
     private var currentArtwork: MPMediaItemArtwork?
@@ -524,12 +525,23 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
+        pause()
+
         prepareCurrentItemForHistory(finished: finished)
         currentItem = nil
 
         backend.closeItem()
         aspectRatio = VideoPlayerView.defaultAspectRatio
         resetAutoplay()
+
+        closePiP()
+        exitFullScreen()
+
+        #if !os(macOS)
+            if closePlayerOnItemClose {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in self?.hide() }
+            }
+        #endif
     }
 
     func closePiP() {

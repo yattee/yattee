@@ -299,7 +299,7 @@ struct VideoPlayerView: View {
 
     @ViewBuilder var playerPlaceholder: some View {
         if player.currentItem.isNil {
-            ZStack(alignment: .topLeading) {
+            ZStack(alignment: .topTrailing) {
                 HStack {
                     Spacer()
                     VStack {

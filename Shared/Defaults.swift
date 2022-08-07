@@ -63,6 +63,7 @@ extension Defaults.Keys {
         static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
     #endif
     static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
+    static let closePlayerOnItemClose = Key<Bool>("closePlayerOnItemClose", default: false)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
