@@ -68,9 +68,9 @@ struct PlayerBackendView: View {
             guard fullScreenLayout else { return 0 }
 
             if UIDevice.current.userInterfaceIdiom != .pad {
-                return verticalSizeClass == .compact ? safeAreaInsets.top : 0
+                return verticalSizeClass == .compact ? SafeArea.insets.top : 0
             } else {
-                return safeAreaInsets.top.isZero ? safeAreaInsets.bottom : safeAreaInsets.top
+                return SafeArea.insets.top.isZero ? SafeArea.insets.bottom : SafeArea.insets.top
             }
         }
 
@@ -78,14 +78,10 @@ struct PlayerBackendView: View {
             guard fullScreenLayout else { return 0 }
 
             if UIDevice.current.userInterfaceIdiom != .pad {
-                return fullScreenLayout && verticalSizeClass == .compact ? safeAreaInsets.bottom : 0
+                return fullScreenLayout && verticalSizeClass == .compact ? SafeArea.insets.bottom : 0
             } else {
-                return fullScreenLayout ? safeAreaInsets.bottom : 0
+                return fullScreenLayout ? SafeArea.insets.bottom : 0
             }
-        }
-
-        var safeAreaInsets: UIEdgeInsets {
-            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
         }
     #endif
 }

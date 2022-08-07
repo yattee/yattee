@@ -146,11 +146,11 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         var playerWidth: Double? {
-            fullScreenLayout ? (UIScreen.main.bounds.size.width - safeAreaInsets.left - safeAreaInsets.right) : nil
+            fullScreenLayout ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
         }
 
         var playerHeight: Double? {
-            fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? (safeAreaInsets.top + safeAreaInsets.bottom) : 0) : nil
+            fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
         }
 
         var playerEdgesIgnoringSafeArea: Edge.Set {
@@ -401,10 +401,6 @@ struct VideoPlayerView: View {
                         player.show()
                     }
                 }
-        }
-
-        var safeAreaInsets: UIEdgeInsets {
-            UIApplication.shared.windows.first?.safeAreaInsets ?? .init()
         }
 
         private func configureOrientationUpdatesBasedOnAccelerometer() {
