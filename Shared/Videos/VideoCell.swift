@@ -160,7 +160,7 @@ struct VideoCell: View {
                     videoDetail(video.title, lineLimit: 5)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    if !channelOnThumbnail {
+                    if !channelOnThumbnail, !inChannelView {
                         channelButton(badge: false)
                     }
 
@@ -242,7 +242,7 @@ struct VideoCell: View {
                         #else
                             .frame(minHeight: 40, alignment: .top)
                         #endif
-                        if !channelOnThumbnail {
+                        if !channelOnThumbnail, !inChannelView {
                             channelButton(badge: false)
                                 .padding(.top, 4)
                                 .padding(.bottom, 6)
@@ -359,7 +359,7 @@ struct VideoCell: View {
 
                     Spacer()
 
-                    if channelOnThumbnail {
+                    if channelOnThumbnail, !inChannelView {
                         channelButton()
                     }
                 }
