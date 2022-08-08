@@ -39,7 +39,7 @@ struct PlayerControls: View {
                     OpeningStream()
                     NetworkState()
 
-                    Group {
+                    if model.presentingControls && !model.presentingOverlays {
                         VStack(spacing: 4) {
                             buttonsBar
 
@@ -80,9 +80,10 @@ struct PlayerControls: View {
                         }
                         .padding(.top, 2)
                         .padding(.horizontal, 2)
+                        .transition(.opacity)
                     }
-                    .opacity(model.presentingOverlays ? 0 : model.presentingControls ? 1 : 0)
                 }
+                .frame(maxHeight: .infinity)
             }
             #if os(tvOS)
             .onChange(of: model.presentingControls) { _ in
@@ -98,39 +99,53 @@ struct PlayerControls: View {
                     .background(controlsBackground)
             #endif
 
-            ControlsOverlay()
-                .frame(height: overlayHeight)
-                .padding()
-                .modifier(ControlBackgroundModifier())
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .opacity(model.presentingControlsOverlay ? 1 : 0)
+            if model.presentingControlsOverlay {
+                ControlsOverlay()
+                    .frame(height: overlayHeight)
+                    .padding()
+                    .modifier(ControlBackgroundModifier())
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .transition(.opacity)
+            }
 
-            VideoDetailsOverlay()
-                .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
-                .modifier(ControlBackgroundModifier())
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .opacity(model.presentingDetailsOverlay ? 1 : 0)
+            if model.presentingDetailsOverlay {
+                VideoDetailsOverlay()
+                    .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
+                    .modifier(ControlBackgroundModifier())
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .transition(.opacity)
+            }
 
-            Button {
-                player.restoreLastSkippedSegment()
-            } label: {
-                HStack(spacing: 10) {
-                    if let segment = player.lastSkipped {
+            if !model.presentingControls,
+               !model.presentingControls,
+               let segment = player.lastSkipped
+            {
+                Button {
+                    player.restoreLastSkippedSegment()
+                } label: {
+                    HStack(spacing: 10) {
                         Image(systemName: "arrow.counterclockwise")
 
                         Text("Skipped \(segment.durationText) seconds of \(SponsorBlockAPI.categoryDescription(segment.category)?.lowercased() ?? "segment")")
                             .frame(alignment: .bottomLeading)
                     }
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 5)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                    .modifier(ControlBackgroundModifier())
+                    .clipShape(RoundedRectangle(cornerRadius: 2))
                 }
-                .padding(.vertical, 4)
-                .padding(.horizontal, 5)
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-                .modifier(ControlBackgroundModifier())
-                .clipShape(RoundedRectangle(cornerRadius: 2))
+                .buttonStyle(.plain)
+                .transition(.opacity)
             }
-            .buttonStyle(.plain)
-            .opacity(model.presentingControls || model.presentingOverlays ? 0 : player.lastSkipped.isNil ? 0 : 1)
+        }
+        .onChange(of: player.controls.presentingOverlays) { newValue in
+            if newValue {
+                player.backend.stopControlsUpdates()
+            } else {
+                player.backend.startControlsUpdates()
+            }
         }
     }
 
