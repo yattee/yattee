@@ -237,5 +237,7 @@ struct YatteeApp: App {
         #else
             player.updateRemoteCommandCenter()
         #endif
+
+        player.presentingPlayer = false
     }
 }

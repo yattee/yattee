@@ -9,6 +9,9 @@ import SwiftUI
 struct VideoPlayerView: View {
     #if os(iOS)
         static let hiddenOffset = YatteeApp.isForPreviews ? 0 : max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
+        static let defaultSidebarQueueValue = UIScreen.main.bounds.width > 900 && Defaults[.playerSidebar] == .whenFits
+    #else
+        static let defaultSidebarQueueValue = Defaults[.playerSidebar] != .never
     #endif
 
     static let defaultAspectRatio = 16 / 9.0
@@ -21,17 +24,11 @@ struct VideoPlayerView: View {
     }
 
     @State private var playerSize: CGSize = .zero { didSet {
-        withAnimation {
-            if playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits {
-                sidebarQueue = true
-            } else {
-                sidebarQueue = false
-            }
-        }
+        sidebarQueue = playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits
     }}
     @State private var hoveringPlayer = false
     @State private var fullScreenDetails = false
-    @State private var sidebarQueue = false
+    @State private var sidebarQueue = defaultSidebarQueueValue
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -46,7 +43,9 @@ struct VideoPlayerView: View {
     #endif
 
     #if os(iOS)
-        @State private var viewVerticalOffset = Self.hiddenOffset
+        @GestureState private var dragGestureState = false
+        @GestureState private var dragGestureOffset = CGSize.zero
+        @State private var viewDragOffset = 0.0
         @State private var orientationObserver: Any?
     #endif
 
@@ -58,17 +57,11 @@ struct VideoPlayerView: View {
     @EnvironmentObject<SearchModel> private var search
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
-    init() {
-        if Defaults[.playerSidebar] == .always {
-            sidebarQueue = true
-        }
-    }
-
     var body: some View {
         #if DEBUG
             // TODO: remove
             if #available(iOS 15.0, macOS 12.0, *) {
-                _ = Self._printChanges()
+                Self._printChanges()
             }
         #endif
 
@@ -105,10 +98,9 @@ struct VideoPlayerView: View {
                 .onChange(of: fullScreenDetails) { value in
                     player.backend.setNeedsDrawing(!value)
                 }
-                #if os(iOS)
-                .onChange(of: player.presentingPlayer) { newValue in
-                    if newValue {
-                        viewVerticalOffset = 0
+                .onAppear {
+                    #if os(iOS)
+                        viewDragOffset = 0.0
                         configureOrientationUpdatesBasedOnAccelerometer()
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak player] in
@@ -122,22 +114,25 @@ struct VideoPlayerView: View {
                                 andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
                             )
                         }
-                    } else {
+                    #endif
+                }
+                .onDisappear {
+                    #if os(iOS)
                         if Defaults[.lockPortraitWhenBrowsing] {
                             Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
                         } else {
                             Orientation.lockOrientation(.allButUpsideDown)
                         }
-                        viewVerticalOffset = Self.hiddenOffset
                         stopOrientationUpdates()
                         player.controls.hideOverlays()
-                    }
+
+                        player.lockedOrientation = nil
+                    #endif
                 }
-                #endif
             }
             #if os(iOS)
-            .offset(y: viewVerticalOffset)
-            .animation(.easeOut(duration: 0.3), value: viewVerticalOffset)
+            .offset(y: playerOffset)
+            .animation(.linear(duration: 0.2), value: playerOffset)
             .backport
             .persistentSystemOverlays(!fullScreenLayout)
             #endif
@@ -145,6 +140,10 @@ struct VideoPlayerView: View {
     }
 
     #if os(iOS)
+        var playerOffset: Double {
+            dragGestureState ? dragGestureOffset.height : viewDragOffset
+        }
+
         var playerWidth: Double? {
             fullScreenLayout ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
         }
@@ -224,6 +223,11 @@ struct VideoPlayerView: View {
                         }
                         #if os(iOS)
                         .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
+                        .onChange(of: dragGestureState) { _ in
+                            if !dragGestureState {
+                                onPlayerDragGestureEnded()
+                            }
+                        }
                         #elseif os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
@@ -242,21 +246,16 @@ struct VideoPlayerView: View {
 
                         #if !os(tvOS)
                             if !fullScreenLayout {
-                                VStack(spacing: 0) {
-                                    #if os(iOS)
-                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
-                                    #else
-                                        VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
-                                    #endif
-                                }
+                                VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                 #if os(iOS)
-                                .transition(.asymmetric(insertion: .opacity, removal: .identity))
+                                    .ignoresSafeArea(.all, edges: .bottom)
+                                    .transition(.move(edge: .bottom))
                                 #endif
-                                .background(colorScheme == .dark ? Color.black : Color.white)
-                                .modifier(VideoDetailsPaddingModifier(
-                                    playerSize: player.playerSize,
-                                    fullScreen: fullScreenDetails
-                                ))
+                                    .background(colorScheme == .dark ? Color.black : Color.white)
+                                    .modifier(VideoDetailsPaddingModifier(
+                                        playerSize: player.playerSize,
+                                        fullScreen: fullScreenDetails
+                                    ))
                             }
                         #endif
                     }
@@ -272,8 +271,8 @@ struct VideoPlayerView: View {
                     if sidebarQueue {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
                             .frame(maxWidth: 350)
-                            .transition(.move(edge: .trailing))
                             .background(colorScheme == .dark ? Color.black : Color.white)
+                            .transition(.move(edge: .bottom))
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
@@ -366,6 +365,12 @@ struct VideoPlayerView: View {
     #if os(iOS)
         var playerDragGesture: some Gesture {
             DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .updating($dragGestureOffset) { value, state, _ in
+                    state = value.translation.height > 0 ? value.translation : .zero
+                }
+                .updating($dragGestureState) { _, state, _ in
+                    state = true
+                }
                 .onChanged { value in
                     guard player.presentingPlayer,
                           !playerControls.presentingControlsOverlay else { return }
@@ -378,33 +383,46 @@ struct VideoPlayerView: View {
 
                     guard drag > 0 else { return }
 
+                    viewDragOffset = drag
+
                     if drag > 60,
-                       player.playingFullScreen,
-                       !OrientationTracker.shared.currentInterfaceOrientation.isLandscape
+                       player.playingFullScreen
                     {
                         player.exitFullScreen()
-                        player.lockedOrientation = nil
+                        if Defaults[.rotateToPortraitOnExitFullScreen] {
+                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                            playerControls.show()
+                        }
                     }
-
-                    viewVerticalOffset = drag
                 }
                 .onEnded { _ in
-                    guard player.presentingPlayer,
-                          !playerControls.presentingControlsOverlay else { return }
-                    if viewVerticalOffset > 100 {
-                        player.backend.setNeedsDrawing(false)
-                        player.hide()
-                        player.exitFullScreen()
-                    } else {
-                        viewVerticalOffset = 0
-                        player.backend.setNeedsDrawing(true)
-                        player.show()
-                    }
+                    onPlayerDragGestureEnded()
                 }
         }
 
+        private func onPlayerDragGestureEnded() {
+            guard player.presentingPlayer,
+                  !playerControls.presentingControlsOverlay else { return }
+
+            if viewDragOffset > 100 {
+                player.hide()
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    player.backend.setNeedsDrawing(false)
+                    player.exitFullScreen()
+                }
+            } else {
+                withAnimation(.linear(duration: 0.2)) {
+                    viewDragOffset = 0
+                }
+                player.backend.setNeedsDrawing(true)
+                player.show()
+            }
+        }
+
         private func configureOrientationUpdatesBasedOnAccelerometer() {
-            if OrientationTracker.shared.currentInterfaceOrientation.isLandscape,
+            let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
+            if currentOrientation.isLandscape,
                Defaults[.enterFullscreenInLandscape],
                !player.playingFullScreen,
                !player.playingInPictureInPicture
@@ -413,6 +431,8 @@ struct VideoPlayerView: View {
                     player.controls.presentingControls = false
                     player.enterFullScreen(showControls: false)
                 }
+
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
             }
 
             orientationObserver = NotificationCenter.default.addObserver(

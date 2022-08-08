@@ -63,6 +63,8 @@ struct ControlsBar: View {
             }
         } else if detailsToggleFullScreen {
             Button {
+                playerControls.presentingControlsOverlay = false
+                playerControls.presentingControls = false
                 withAnimation {
                     fullScreen.toggle()
                 }

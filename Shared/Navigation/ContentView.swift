@@ -131,18 +131,21 @@ struct ContentView: View {
     }
 
     @ViewBuilder var videoPlayer: some View {
-        VideoPlayerView()
-            .environmentObject(accounts)
-            .environmentObject(comments)
-            .environmentObject(instances)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(playerControls)
-            .environmentObject(playlists)
-            .environmentObject(recents)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
-            .environment(\.navigationStyle, navigationStyle)
+        if player.presentingPlayer {
+            VideoPlayerView()
+                .environmentObject(accounts)
+                .environmentObject(comments)
+                .environmentObject(instances)
+                .environmentObject(navigation)
+                .environmentObject(player)
+                .environmentObject(playerControls)
+                .environmentObject(playlists)
+                .environmentObject(recents)
+                .environmentObject(subscriptions)
+                .environmentObject(thumbnailsModel)
+                .environment(\.navigationStyle, navigationStyle)
+                .transition(.move(edge: .bottom))
+        }
     }
 }
 
