@@ -164,7 +164,9 @@ struct YatteeApp: App {
         }
         configured = true
 
-        SiestaLog.Category.enabled = .common
+        #if DEBUG
+            SiestaLog.Category.enabled = .common
+        #endif
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
