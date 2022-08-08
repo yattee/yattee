@@ -107,7 +107,7 @@ final class NavigationModel: ObservableObject {
             navigation.sidebarSectionChanged.toggle()
             navigation.tabSelection = .recentlyOpened(recent.tag)
         } else {
-            withAnimation {
+            withAnimation(.linear(duration: 0.3)) {
                 navigation.presentingChannel = true
             }
         }
@@ -137,7 +137,7 @@ final class NavigationModel: ObservableObject {
                 navigation.sidebarSectionChanged.toggle()
                 navigation.tabSelection = .recentlyOpened(recent.tag)
             } else {
-                withAnimation {
+                withAnimation(.linear(duration: 0.3)) {
                     navigation.presentingPlaylist = true
                 }
             }

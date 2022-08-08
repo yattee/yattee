@@ -156,9 +156,8 @@ struct AppTabNavigation: View {
                 .environmentObject(player)
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnailsModel)
-                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
-        } else {
-            EmptyView()
+                .id("channelVideos")
+                .transition(.move(edge: .bottom))
         }
     }
 
@@ -171,9 +170,8 @@ struct AppTabNavigation: View {
                 .environmentObject(player)
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnailsModel)
-                .transition(.asymmetric(insertion: .flipFromBottom, removal: .move(edge: .bottom)))
-        } else {
-            EmptyView()
+                .id("channelPlaylist")
+                .transition(.move(edge: .bottom))
         }
     }
 }
