@@ -5,7 +5,7 @@ import SwiftUI
 import SwiftUIPager
 
 struct VideoDetails: View {
-    enum DetailsPage: CaseIterable {
+    enum DetailsPage: String, CaseIterable, Defaults.Serializable {
         case info, chapters, comments, related, queue
 
         var index: Int {
@@ -41,6 +41,7 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @Default(.videoDetailsPage) private var videoDetailsPage
     @Default(.showKeywords) private var showKeywords
     @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
 
@@ -53,7 +54,11 @@ struct VideoDetails: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        if #available(iOS 15, macOS 12, *) {
+            Self._printChanges()
+        }
+
+        return VStack(alignment: .leading, spacing: 0) {
             ControlsBar(
                 fullScreen: $fullScreen,
                 presentingControls: false,
@@ -87,12 +92,12 @@ struct VideoDetails: View {
                 if pageIndex == DetailsPage.comments.index {
                     comments.load()
                 }
+
+                videoDetailsPage = DetailsPage.allCases.first { $0.index == pageIndex } ?? .info
             }
         }
         .onAppear {
-            if video.isNil && !sidebarQueue {
-                page.update(.new(index: DetailsPage.queue.index))
-            }
+            page.update(.new(index: videoDetailsPage.index))
 
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
@@ -139,6 +144,7 @@ struct VideoDetails: View {
         Button(action: {
             page.update(.new(index: destination.index))
             pageChangeAction?()
+            videoDetailsPage = destination
         }) {
             HStack {
                 Spacer()
@@ -180,13 +186,14 @@ struct VideoDetails: View {
             case .chapters:
                 ChaptersView()
 
-            case .queue:
-                PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: $fullScreen)
+            case .comments:
+                CommentsView(embedInScrollView: true)
 
             case .related:
                 RelatedView()
-            case .comments:
-                CommentsView(embedInScrollView: true)
+
+            case .queue:
+                PlayerQueueView(sidebarQueue: sidebarQueue, fullScreen: $fullScreen)
             }
         }
         .contentShape(Rectangle())

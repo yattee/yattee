@@ -40,7 +40,7 @@ final class PlayerModel: ObservableObject {
 
     var mpvPlayerView = MPVPlayerView()
 
-    @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
+    @Published var presentingPlayer = true { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
 
     var avPlayerBackend: AVPlayerBackend!
@@ -149,6 +149,7 @@ final class PlayerModel: ObservableObject {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
+    @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
@@ -202,7 +203,7 @@ final class PlayerModel: ObservableObject {
         #endif
 
         DispatchQueue.main.async { [weak self] in
-            withAnimation {
+            withAnimation(.linear(duration: 0.25)) {
                 self?.presentingPlayer = true
             }
         }
@@ -214,11 +215,12 @@ final class PlayerModel: ObservableObject {
     }
 
     func hide() {
+        withAnimation(.linear(duration: 0.25)) {
+            presentingPlayer = false
+        }
+
         DispatchQueue.main.async { [weak self] in
             self?.playingFullScreen = false
-            withAnimation {
-                self?.presentingPlayer = false
-            }
         }
 
         #if os(iOS)
@@ -742,21 +744,21 @@ final class PlayerModel: ObservableObject {
                 pause()
             }
         }
-
-        func enterFullScreen(showControls: Bool = true) {
-            guard !playingFullScreen else { return }
-
-            logger.info("entering fullscreen")
-            toggleFullscreen(false, showControls: showControls)
-        }
-
-        func exitFullScreen(showControls: Bool = true) {
-            guard playingFullScreen else { return }
-
-            logger.info("exiting fullscreen")
-            toggleFullscreen(true, showControls: showControls)
-        }
     #endif
+
+    func enterFullScreen(showControls: Bool = true) {
+        guard !playingFullScreen else { return }
+
+        logger.info("entering fullscreen")
+        toggleFullscreen(false, showControls: showControls)
+    }
+
+    func exitFullScreen(showControls: Bool = true) {
+        guard playingFullScreen else { return }
+
+        logger.info("exiting fullscreen")
+        toggleFullscreen(true, showControls: showControls)
+    }
 
     func updateNowPlayingInfo() {
         guard let video = currentItem?.video else {
@@ -818,25 +820,10 @@ final class PlayerModel: ObservableObject {
         controls.presentingControls = showControls && isFullScreen
 
         #if os(macOS)
-            if isFullScreen {
-                Windows.player.toggleFullScreen()
-            }
-        #endif
-        #if os(iOS)
-            withAnimation(.linear(duration: 0.2)) {
-                playingFullScreen = !isFullScreen
-            }
-        #else
-            playingFullScreen = !isFullScreen
+            Windows.player.toggleFullScreen()
         #endif
 
-        #if os(macOS)
-            if !isFullScreen {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    Windows.player.toggleFullScreen()
-                }
-            }
-        #endif
+        playingFullScreen = !isFullScreen
 
         #if os(iOS)
             if !playingFullScreen {
