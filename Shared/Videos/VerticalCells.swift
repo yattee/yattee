@@ -25,6 +25,7 @@ struct VerticalCells: View {
                 Color.clear.padding(.bottom, scrollViewBottomPadding)
             #endif
         }
+        .animation(nil)
         .edgesIgnoringSafeArea(.horizontal)
         #if os(macOS)
             .background(Color.secondaryBackground)
