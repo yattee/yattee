@@ -53,7 +53,7 @@ extension PlayerModel {
             } else {
                 watch = results?.first
 
-                if !Defaults[.resetWatchedStatusOnPlaying], watch.finished {
+                if !self.resetWatchedStatusOnPlaying, watch.finished {
                     return
                 }
             }
