@@ -2,18 +2,10 @@ import Siesta
 import SwiftUI
 
 struct ChannelPlaylistView: View {
-    #if os(iOS)
-        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
-    #endif
-
     var playlist: ChannelPlaylist?
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
-
-    #if os(iOS)
-        @State private var viewVerticalOffset = Self.hiddenOffset
-    #endif
 
     @StateObject private var store = Store<ChannelPlaylist>()
 
@@ -51,17 +43,6 @@ struct ChannelPlaylistView: View {
                     content
                 }
             }
-            #if os(iOS)
-            .onChange(of: navigation.presentingPlaylist) { newValue in
-                if newValue {
-                    store.clear()
-                    viewVerticalOffset = 0
-                    resource?.load()
-                } else {
-                    viewVerticalOffset = Self.hiddenOffset
-                }
-            }
-            #endif
         } else {
             BrowserPlayerControls {
                 content
@@ -92,7 +73,13 @@ struct ChannelPlaylistView: View {
                 .environment(\.inChannelPlaylistView, true)
         }
         .onAppear {
-            resource?.loadIfNeeded()
+            if navigationStyle == .tab {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    resource?.loadIfNeeded()
+                }
+            } else {
+                resource?.loadIfNeeded()
+            }
         }
         #if os(tvOS)
         .background(Color.background(scheme: colorScheme))

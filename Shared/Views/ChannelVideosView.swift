@@ -2,18 +2,11 @@ import Siesta
 import SwiftUI
 
 struct ChannelVideosView: View {
-    #if os(iOS)
-        static let hiddenOffset = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width) + 100
-    #endif
     var channel: Channel?
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
     @State private var subscriptionToggleButtonDisabled = false
-
-    #if os(iOS)
-        @State private var viewVerticalOffset = Self.hiddenOffset
-    #endif
 
     @StateObject private var store = Store<Channel>()
 
@@ -47,17 +40,6 @@ struct ChannelVideosView: View {
                     content
                 }
             }
-            #if os(iOS)
-            .onChange(of: navigation.presentingChannel) { newValue in
-                if newValue {
-                    store.clear()
-                    viewVerticalOffset = 0
-                    resource?.load()
-                } else {
-                    viewVerticalOffset = Self.hiddenOffset
-                }
-            }
-            #endif
         } else {
             BrowserPlayerControls {
                 content
@@ -132,7 +114,13 @@ struct ChannelVideosView: View {
         }
         #endif
         .onAppear {
-            resource?.loadIfNeeded()
+            if navigationStyle == .tab {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    resource?.loadIfNeeded()
+                }
+            } else {
+                resource?.loadIfNeeded()
+            }
         }
         #if !os(tvOS)
         .navigationTitle(navigationTitle)
