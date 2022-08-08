@@ -281,7 +281,7 @@ struct TimelineView: View {
     }
 
     var thumbTooltipOffset: Double {
-        let leadingOffset = size.width / 2 - (tooltipSize.width / 2)
+        let leadingOffset = abs(size.width / 2 - (tooltipSize.width / 2))
         let offsetForThumb = thumbOffset - thumbLeadingOffset
 
         guard offsetForThumb > tooltipSize.width / 2 else {
