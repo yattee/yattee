@@ -18,11 +18,14 @@ struct ChaptersView: View {
                         .buttonStyle(.plain)
                     }
                 }
+                .listRowBackground(Color.clear)
             }
             #if os(macOS)
             .listStyle(.inset)
             #elseif os(iOS)
             .listStyle(.grouped)
+            .backport
+            .scrollContentBackground(false)
             #else
             .listStyle(.plain)
             #endif

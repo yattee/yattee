@@ -411,6 +411,8 @@ struct VideoPlayerView: View {
                     player.backend.setNeedsDrawing(false)
                     player.exitFullScreen()
                 }
+
+                viewDragOffset = Self.hiddenOffset
             } else {
                 withAnimation(.linear(duration: 0.2)) {
                     viewDragOffset = 0
