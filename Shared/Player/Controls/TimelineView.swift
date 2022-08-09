@@ -138,22 +138,22 @@ struct TimelineView: View {
                             .zIndex(3)
                     }
 
-                    Circle()
+                    Rectangle()
                         .contentShape(Rectangle())
-                        .foregroundColor(.clear)
-                        .background(
+                        .foregroundColor(Color.clear)
+                        .overlay(
                             ZStack {
                                 Circle()
                                     .fill(dragging ? .white : .gray)
-                                    .frame(maxWidth: 8)
+                                    .frame(width: 13)
 
                                 Circle()
                                     .fill(dragging ? .gray : .white)
-                                    .frame(maxWidth: 6)
+                                    .frame(width: 11)
                             }
                         )
                         .offset(x: thumbOffset)
-                        .frame(maxWidth: thumbAreaWidth, minHeight: thumbAreaWidth)
+                        .frame(width: thumbAreaWidth, height: thumbAreaWidth)
 
                     #if !os(tvOS)
                         .gesture(

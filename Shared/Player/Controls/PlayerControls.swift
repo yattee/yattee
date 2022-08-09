@@ -44,7 +44,7 @@ struct PlayerControls: View {
                             buttonsBar
 
                             HStack {
-                                if !player.currentVideo.isNil, player.playingFullScreen {
+                                if !player.currentVideo.isNil, fullScreenLayout {
                                     Button {
                                         withAnimation(Self.animation) {
                                             model.presentingDetailsOverlay = true
