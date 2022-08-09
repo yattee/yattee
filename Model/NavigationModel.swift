@@ -93,6 +93,7 @@ final class NavigationModel: ObservableObject {
             return
         }
 
+        navigation.hideKeyboard()
         player.hide()
         navigation.presentingChannel = false
 
@@ -130,6 +131,8 @@ final class NavigationModel: ObservableObject {
             player.hide()
         #endif
 
+        navigation.hideKeyboard()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
 
@@ -155,6 +158,8 @@ final class NavigationModel: ObservableObject {
         navigation.presentingChannel = false
         navigation.presentingPlaylist = false
         navigation.tabSelection = .search
+
+        navigation.hideKeyboard()
 
         if let searchQuery = searchQuery {
             let recent = RecentItem(from: searchQuery)

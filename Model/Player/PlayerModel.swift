@@ -202,6 +202,8 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
+        navigation.hideKeyboard()
+
         DispatchQueue.main.async { [weak self] in
             withAnimation(.linear(duration: 0.25)) {
                 self?.presentingPlayer = true
