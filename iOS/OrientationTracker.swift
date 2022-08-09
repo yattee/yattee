@@ -76,14 +76,14 @@ public class OrientationTracker {
     }
 
     private func deviceOrientation(forAccelerometerData accelerometerData: CMAccelerometerData) -> UIDeviceOrientation {
-        let treshold = 0.55
-        if accelerometerData.acceleration.x >= treshold {
+        let threshold = 0.55
+        if accelerometerData.acceleration.x >= threshold {
             return .landscapeLeft
-        } else if accelerometerData.acceleration.x <= -treshold {
+        } else if accelerometerData.acceleration.x <= -threshold {
             return .landscapeRight
-        } else if accelerometerData.acceleration.y <= -treshold {
+        } else if accelerometerData.acceleration.y <= -threshold {
             return .portrait
-        } else if accelerometerData.acceleration.y >= treshold {
+        } else if accelerometerData.acceleration.y >= threshold {
             return .portraitUpsideDown
         } else {
             return currentDeviceOrientation
