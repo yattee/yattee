@@ -276,16 +276,23 @@ struct VideoPlayerView: View {
                 #endif
             }
         }
+        .onChange(of: fullScreenLayout) { newValue in
+            if !newValue { playerControls.presentingDetailsOverlay = false }
+        }
         #if os(iOS)
         .statusBar(hidden: fullScreenLayout)
         #endif
     }
 
     var fullScreenLayout: Bool {
+        if player.currentItem.isNil {
+            return false
+        }
+
         #if os(iOS)
-            player.playingFullScreen || verticalSizeClass == .compact
+            return player.playingFullScreen || verticalSizeClass == .compact
         #else
-            player.playingFullScreen
+            return player.playingFullScreen
         #endif
     }
 
