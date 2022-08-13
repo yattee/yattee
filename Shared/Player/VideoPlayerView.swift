@@ -199,23 +199,17 @@ struct VideoPlayerView: View {
                     }
                 #else
                     GeometryReader { geometry in
-                        Group {
-                            if player.playingInPictureInPicture {
-                                pictureInPicturePlaceholder
-                            } else {
-                                PlayerBackendView()
-                                #if !os(tvOS)
-                                    .modifier(
-                                        VideoPlayerSizeModifier(
-                                            geometry: geometry,
-                                            aspectRatio: player.aspectRatio,
-                                            fullScreen: fullScreenLayout
-                                        )
-                                    )
-                                    .overlay(playerPlaceholder)
-                                #endif
-                            }
-                        }
+                        PlayerBackendView()
+                        #if !os(tvOS)
+                            .modifier(
+                                VideoPlayerSizeModifier(
+                                    geometry: geometry,
+                                    aspectRatio: player.aspectRatio,
+                                    fullScreen: fullScreenLayout
+                                )
+                            )
+                            .overlay(playerPlaceholder)
+                        #endif
                         .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
                         .onHover { hovering in
                             hoveringPlayer = hovering
@@ -261,7 +255,6 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
-
             .background(((colorScheme == .dark || fullScreenLayout) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
@@ -331,35 +324,6 @@ struct VideoPlayerView: View {
             .contentShape(Rectangle())
             .frame(width: player.playerSize.width, height: player.playerSize.height)
         }
-    }
-
-    var pictureInPicturePlaceholder: some View {
-        HStack {
-            Spacer()
-            VStack {
-                Spacer()
-                VStack(spacing: 10) {
-                    #if !os(tvOS)
-                        Image(systemName: "pip")
-                            .font(.system(size: 120))
-                    #endif
-
-                    Text("Playing in Picture in Picture")
-                }
-                Spacer()
-            }
-            .foregroundColor(.gray)
-            Spacer()
-        }
-        .contextMenu {
-            Button {
-                player.closePiP()
-            } label: {
-                Label("Exit Picture in Picture", systemImage: "pip.exit")
-            }
-        }
-        .contentShape(Rectangle())
-        .frame(width: player.playerSize.width, height: player.playerSize.height)
     }
 
     #if os(iOS)
