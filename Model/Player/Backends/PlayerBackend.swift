@@ -95,10 +95,4 @@ extension PlayerBackend {
             model.advanceToItem(item)
         }
     }
-
-    func updatePlayerAspectRatio() {
-        DispatchQueue.main.async {
-            self.model.aspectRatio = aspectRatio
-        }
-    }
 }

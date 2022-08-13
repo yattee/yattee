@@ -70,6 +70,8 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var timeObserverThrottle = Throttle(interval: 2)
 
+    private var controlsUpdates = false
+
     init(model: PlayerModel, controls: PlayerControlsModel?, playerTime: PlayerTimeModel?) {
         self.model = model
         self.controls = controls
@@ -314,8 +316,6 @@ final class AVPlayerBackend: PlayerBackend {
                     return
                 }
 
-                self.updatePlayerAspectRatio()
-
                 if !preservingTime,
                    let segment = self.model.sponsorBlock.segments.first,
                    segment.start < 3,
@@ -454,7 +454,9 @@ final class AVPlayerBackend: PlayerBackend {
 
             switch playerItem.status {
             case .readyToPlay:
-                if self.isAutoplaying(playerItem) {
+                if self.model.activeBackend == .appleAVPlayer,
+                   self.isAutoplaying(playerItem) {
+                    self.model.updateAspectRatio()
                     self.model.play()
                 }
             case .failed:
@@ -506,8 +508,10 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            self.playerTime.duration = self.playerItemDuration ?? .zero
-            self.playerTime.currentTime = self.currentTime ?? .zero
+            if self.controlsUpdates {
+                self.playerTime.duration = self.playerItemDuration ?? .zero
+                self.playerTime.currentTime = self.currentTime ?? .zero
+            }
 
             #if !os(tvOS)
                 self.model.updateNowPlayingInfo()
@@ -548,8 +552,12 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            DispatchQueue.main.async {
-                self.controls.isPlaying = player.timeControlStatus == .playing
+            let isPlaying = player.timeControlStatus == .playing
+
+            if self.controls.isPlaying != isPlaying {
+                DispatchQueue.main.async {
+                    self.controls.isPlaying = player.timeControlStatus == .playing
+                }
             }
 
             if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
@@ -590,8 +598,15 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func updateControls() {}
-    func startControlsUpdates() {}
-    func stopControlsUpdates() {}
+
+    func startControlsUpdates() {
+        controlsUpdates = true
+    }
+
+    func stopControlsUpdates() {
+        controlsUpdates = false
+    }
+
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
     func setNeedsNetworkStateUpdates(_: Bool) {}
