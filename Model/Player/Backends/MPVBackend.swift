@@ -45,7 +45,7 @@ final class MPVBackend: PlayerBackend {
         networkStateTimer.start()
 
         if isPlaying {
-            self.updatePlayerAspectRatio()
+            self.model.updateAspectRatio()
             startClientUpdates()
         } else {
             stopControlsUpdates()

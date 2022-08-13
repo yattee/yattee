@@ -871,4 +871,14 @@ final class PlayerModel: ObservableObject {
 
         mpvBackend.setVideoToAuto()
     }
+
+
+    func updateAspectRatio() {
+        guard aspectRatio != backend.aspectRatio else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.aspectRatio = self.backend.aspectRatio
+        }
+    }
 }
