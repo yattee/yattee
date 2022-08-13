@@ -45,7 +45,7 @@ final class MPVBackend: PlayerBackend {
         networkStateTimer.start()
 
         if isPlaying {
-            self.model.updateAspectRatio()
+            model.updateAspectRatio()
             startClientUpdates()
         } else {
             stopControlsUpdates()
@@ -53,7 +53,13 @@ final class MPVBackend: PlayerBackend {
 
         updateControlsIsPlaying()
 
-        #if !os(macOS)
+        #if os(macOS)
+            if isPlaying {
+                ScreenSaverManager.shared.disable(reason: "Yattee is playing video")
+            } else {
+                ScreenSaverManager.shared.enable()
+            }
+        #else
             DispatchQueue.main.async {
                 UIApplication.shared.isIdleTimerDisabled = self.model.presentingPlayer && self.isPlaying
             }
