@@ -27,7 +27,7 @@ struct OpenURLHandler {
             }
         #endif
 
-        let parser = URLParser(url: urlByRemovingYatteeProtocol(url))
+        let parser = URLParser(url: urlByReplacingYatteeProtocol(url))
 
         switch parser.destination {
         case .video:
@@ -66,6 +66,10 @@ struct OpenURLHandler {
             #endif
         default:
             navigation.presentAlert(title: "Error", message: "This URL could not be opened")
+            #if os(macOS)
+            guard !Windows.main.isOpen else { return }
+            navigation.presentingAlertInVideoPlayer = true
+            #endif
         }
     }
 
@@ -75,7 +79,7 @@ struct OpenURLHandler {
         navigation.presentingPlaylist = false
     }
 
-    private func urlByRemovingYatteeProtocol(_ url: URL) -> URL! {
+    private func urlByReplacingYatteeProtocol(_ url: URL, with urlProtocol: String = "https") -> URL! {
         var urlAbsoluteString = url.absoluteString
 
         guard urlAbsoluteString.hasPrefix(Self.yatteeProtocol) else {
@@ -84,7 +88,7 @@ struct OpenURLHandler {
 
         urlAbsoluteString = String(urlAbsoluteString.dropFirst(Self.yatteeProtocol.count))
 
-        return URL(string: urlAbsoluteString)
+        return URL(string: "\(urlProtocol)://\(urlAbsoluteString)")
     }
 
     private func handleVideoUrlOpen(_ parser: URLParser) {
