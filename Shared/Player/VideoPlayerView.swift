@@ -210,33 +210,33 @@ struct VideoPlayerView: View {
                             )
                             .overlay(playerPlaceholder)
                         #endif
-                        .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
-                        .onHover { hovering in
-                            hoveringPlayer = hovering
-                            hovering ? playerControls.show() : playerControls.hide()
-                        }
+                            .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
+                            .onHover { hovering in
+                                hoveringPlayer = hovering
+                                hovering ? playerControls.show() : playerControls.hide()
+                            }
                         #if os(iOS)
-                        .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
-                        .onChange(of: dragGestureState) { _ in
-                            if !dragGestureState {
-                                onPlayerDragGestureEnded()
-                            }
-                        }
-                        #elseif os(macOS)
-                        .onAppear(perform: {
-                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                hoverThrottle.execute {
-                                    if !player.currentItem.isNil, hoveringPlayer {
-                                        playerControls.resetTimer()
-                                    }
+                            .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
+                            .onChange(of: dragGestureState) { _ in
+                                if !dragGestureState {
+                                    onPlayerDragGestureEnded()
                                 }
-
-                                return $0
                             }
-                        })
+                        #elseif os(macOS)
+                            .onAppear(perform: {
+                                NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                    hoverThrottle.execute {
+                                        if !player.currentItem.isNil, hoveringPlayer {
+                                            playerControls.resetTimer()
+                                        }
+                                    }
+
+                                    return $0
+                                }
+                            })
                         #endif
 
-                        .background(Color.black)
+                            .background(Color.black)
 
                         #if !os(tvOS)
                             if !fullScreenLayout {

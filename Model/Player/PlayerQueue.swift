@@ -9,9 +9,7 @@ extension PlayerModel {
     }
 
     func play(_ videos: [Video]) {
-        videos.forEach { video in
-            enqueueVideo(video, loadDetails: false)
-        }
+        videos.forEach { enqueueVideo($0, loadDetails: false) }
 
         #if os(iOS)
             onPresentPlayer = { [weak self] in self?.advanceToNextItem() }

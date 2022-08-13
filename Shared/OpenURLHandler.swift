@@ -67,8 +67,8 @@ struct OpenURLHandler {
         default:
             navigation.presentAlert(title: "Error", message: "This URL could not be opened")
             #if os(macOS)
-            guard !Windows.main.isOpen else { return }
-            navigation.presentingAlertInVideoPlayer = true
+                guard !Windows.main.isOpen else { return }
+                navigation.presentingAlertInVideoPlayer = true
             #endif
         }
     }
