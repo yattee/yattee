@@ -7,12 +7,12 @@ struct ContentItemView: View {
     var body: some View {
         Group {
             switch item.contentType {
+            case .video:
+                VideoCell(video: item.video)
             case .playlist:
                 ChannelPlaylistCell(playlist: item.playlist)
             case .channel:
                 ChannelCell(channel: item.channel)
-            case .video:
-                VideoCell(video: item.video)
             default:
                 PlaceholderCell()
             }

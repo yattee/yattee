@@ -455,7 +455,8 @@ final class AVPlayerBackend: PlayerBackend {
             switch playerItem.status {
             case .readyToPlay:
                 if self.model.activeBackend == .appleAVPlayer,
-                   self.isAutoplaying(playerItem) {
+                   self.isAutoplaying(playerItem)
+                {
                     self.model.updateAspectRatio()
                     self.model.play()
                 }

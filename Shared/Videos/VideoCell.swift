@@ -37,10 +37,8 @@ struct VideoCell: View {
     }
 
     var body: some View {
-        Group {
-            Button(action: playAction) {
-                content
-            }
+        Button(action: playAction) {
+            content
         }
         .opacity(contentOpacity)
         .buttonStyle(.plain)
