@@ -340,6 +340,9 @@
 		375E45F627B1976B00BA7902 /* MPVOGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F427B1976B00BA7902 /* MPVOGLView.swift */; };
 		375E45F827B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
 		375E45F927B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
+		375EC972289F2ABF00751258 /* MultiselectRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375EC971289F2ABF00751258 /* MultiselectRow.swift */; };
+		375EC973289F2ABF00751258 /* MultiselectRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375EC971289F2ABF00751258 /* MultiselectRow.swift */; };
+		375EC974289F2ABF00751258 /* MultiselectRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375EC971289F2ABF00751258 /* MultiselectRow.swift */; };
 		375F7410289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
 		375F7411289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
 		375F7412289DC35A00747050 /* PlayerBackendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375F740F289DC35A00747050 /* PlayerBackendView.swift */; };
@@ -1040,6 +1043,7 @@
 		375DFB5726F9DA010013F468 /* InstancesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesModel.swift; sourceTree = "<group>"; };
 		375E45F427B1976B00BA7902 /* MPVOGLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsModel.swift; sourceTree = "<group>"; };
+		375EC971289F2ABF00751258 /* MultiselectRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiselectRow.swift; sourceTree = "<group>"; };
 		375F740F289DC35A00747050 /* PlayerBackendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBackendView.swift; sourceTree = "<group>"; };
 		3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnvironmentValues.swift; sourceTree = "<group>"; };
 		3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarRecents.swift; sourceTree = "<group>"; };
@@ -1687,6 +1691,7 @@
 				374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */,
 				376BE50627347B57009AD608 /* SettingsHeader.swift */,
 				37B044B626F7AB9000E1419D /* SettingsView.swift */,
+				375EC971289F2ABF00751258 /* MultiselectRow.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -2873,6 +2878,7 @@
 				37030FFB27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				3756C2AA2861151C00E4B059 /* NetworkStateModel.swift in Sources */,
 				3758638A2721B0A9000CB14E /* ChannelCell.swift in Sources */,
+				375EC972289F2ABF00751258 /* MultiselectRow.swift in Sources */,
 				37001563271B1F250049C794 /* AccountsModel.swift in Sources */,
 				3795593627B08538007FF8F4 /* StreamControl.swift in Sources */,
 				37CC3F50270D010D00608308 /* VideoBanner.swift in Sources */,
@@ -2970,6 +2976,7 @@
 				378AE93C274EDFB2006A4EE1 /* Backport.swift in Sources */,
 				37152EEB26EFEB95004FB96D /* LazyView.swift in Sources */,
 				37F4AD2028612DFD004D0F66 /* Buffering.swift in Sources */,
+				375EC973289F2ABF00751258 /* MultiselectRow.swift in Sources */,
 				377FC7E2267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F961A027BD90BB00058149 /* PlayerBackendType.swift in Sources */,

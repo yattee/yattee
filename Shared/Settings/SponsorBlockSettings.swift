@@ -42,7 +42,7 @@ struct SponsorBlockSettings: View {
             Section(header: SettingsHeader(text: "Categories to Skip"), footer: categoriesDetails) {
                 #if os(macOS)
                     let list = ForEach(SponsorBlockAPI.categories, id: \.self) { category in
-                        SponsorBlockCategorySelectionRow(
+                        MultiselectRow(
                             title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
                             selected: sponsorBlockCategories.contains(category)
                         ) { value in
@@ -62,7 +62,7 @@ struct SponsorBlockSettings: View {
                     Spacer()
                 #else
                     ForEach(SponsorBlockAPI.categories, id: \.self) { category in
-                        SponsorBlockCategorySelectionRow(
+                        MultiselectRow(
                             title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
                             selected: sponsorBlockCategories.contains(category)
                         ) { value in
@@ -97,46 +97,6 @@ struct SponsorBlockSettings: View {
             sponsorBlockCategories.remove(at: index)
         } else if value {
             sponsorBlockCategories.insert(category)
-        }
-    }
-
-    struct SponsorBlockCategorySelectionRow: View {
-        let title: String
-        let selected: Bool
-        var action: (Bool) -> Void
-
-        @State private var toggleChecked = false
-
-        var body: some View {
-            Button(action: { action(!selected) }) {
-                HStack {
-                    #if os(macOS)
-                        Toggle(isOn: $toggleChecked) {
-                            Text(self.title)
-                            Spacer()
-                        }
-                        .onAppear {
-                            toggleChecked = selected
-                        }
-                        .onChange(of: toggleChecked) { new in
-                            action(new)
-                        }
-                    #else
-                        Text(self.title)
-                        Spacer()
-                        if selected {
-                            Image(systemName: "checkmark")
-                            #if os(iOS)
-                                .foregroundColor(.accentColor)
-                            #endif
-                        }
-                    #endif
-                }
-                .contentShape(Rectangle())
-            }
-            #if !os(tvOS)
-            .buttonStyle(.plain)
-            #endif
         }
     }
 }
