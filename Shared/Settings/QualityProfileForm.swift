@@ -11,7 +11,7 @@ struct QualityProfileForm: View {
 
     @State private var name = ""
     @State private var backend = PlayerBackendType.mpv
-    @State private var resolution = ResolutionSetting.best
+    @State private var resolution = ResolutionSetting.hd1080p60
     @State private var formats = [QualityProfile.Format]()
 
     var qualityProfile: QualityProfile! {
@@ -270,7 +270,7 @@ struct QualityProfileForm: View {
     func isResolutionDisabled(_ resolution: ResolutionSetting) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        return resolution != .best && resolution.value.height > 720
+        return resolution.value.height > 720
     }
 
     func initializeForm() {
