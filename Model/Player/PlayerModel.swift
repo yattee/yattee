@@ -40,7 +40,12 @@ final class PlayerModel: ObservableObject {
 
     var mpvPlayerView = MPVPlayerView()
 
-    @Published var presentingPlayer = true { didSet { handlePresentationChange() } }
+    #if os(iOS)
+        static let presentingPlayerDefault = true
+    #else
+        static let presentingPlayerDefault = false
+    #endif
+    @Published var presentingPlayer = presentingPlayerDefault { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
 
     var avPlayerBackend: AVPlayerBackend!
@@ -63,7 +68,9 @@ final class PlayerModel: ObservableObject {
     }
 
     @Published var playerSize: CGSize = .zero { didSet {
-        backend.setSize(playerSize.width, playerSize.height)
+        #if !os(tvOS)
+            backend.setSize(playerSize.width, playerSize.height)
+        #endif
     }}
     @Published var aspectRatio = VideoPlayerView.defaultAspectRatio
     @Published var stream: Stream?
@@ -880,13 +887,14 @@ final class PlayerModel: ObservableObject {
         mpvBackend.setVideoToAuto()
     }
 
-
     func updateAspectRatio() {
-        guard aspectRatio != backend.aspectRatio else { return }
+        #if !os(tvOS)
+            guard aspectRatio != backend.aspectRatio else { return }
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.aspectRatio = self.backend.aspectRatio
-        }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.aspectRatio = self.backend.aspectRatio
+            }
+        #endif
     }
 }

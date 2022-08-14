@@ -10,8 +10,6 @@ struct TVControls: UIViewRepresentable {
     @State private var controlsArea = UIView()
 
     func makeUIView(context: Context) -> UIView {
-        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(sender:)))
-
         let leftSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(sender:)))
         leftSwipe.direction = .left
 
@@ -24,7 +22,6 @@ struct TVControls: UIViewRepresentable {
         let downSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(sender:)))
         downSwipe.direction = .down
 
-        controlsArea.addGestureRecognizer(tapGesture)
         controlsArea.addGestureRecognizer(leftSwipe)
         controlsArea.addGestureRecognizer(rightSwipe)
         controlsArea.addGestureRecognizer(upSwipe)
@@ -62,16 +59,9 @@ struct TVControls: UIViewRepresentable {
             fatalError("init(coder:) has not been implemented")
         }
 
-        @objc func handleTap(sender: UITapGestureRecognizer) {
-            let location = sender.location(in: view)
-            model.reporter.send("tap \(location)")
-            print("tap \(location)")
-        }
-
         @objc func handleSwipe(sender: UISwipeGestureRecognizer) {
             let location = sender.location(in: view)
             model.reporter.send("swipe \(location)")
-            print("swipe \(location)")
         }
     }
 }
