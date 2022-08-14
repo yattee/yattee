@@ -96,6 +96,10 @@ struct PlayerQueueView: View {
                     .contextMenu {
                         removeButton(item)
                         removeAllButton()
+
+                        if let video = item.video {
+                            VideoContextMenuView(video: video)
+                        }
                     }
             }
         }
@@ -119,7 +123,7 @@ struct PlayerQueueView: View {
                             player.loadHistoryVideoDetails(watch.videoID)
                         }
                         .contextMenu {
-                            removeHistoryButton(watch)
+                            VideoContextMenuView(video: watch.video)
                         }
                     }
                 }
@@ -134,35 +138,7 @@ struct PlayerQueueView: View {
                     ForEach(player.currentVideo!.related) { video in
                         PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
                             .contextMenu {
-                                Button {
-                                    player.playNext(video)
-                                } label: {
-                                    Label("Play Next", systemImage: "text.insert")
-                                }
-
-                                Button {
-                                    player.enqueueVideo(video)
-                                } label: {
-                                    Label("Play Last", systemImage: "text.append")
-                                }
-
-                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
-                                    Section {
-                                        Button {
-                                            navigation.presentAddToPlaylist(video)
-                                        } label: {
-                                            Label("Add to playlist...", systemImage: "text.badge.plus")
-                                        }
-
-                                        if let playlist = playlists.lastUsed {
-                                            Button {
-                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
-                                            } label: {
-                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
-                                            }
-                                        }
-                                    }
-                                }
+                                VideoContextMenuView(video: video)
                             }
                     }
                 }
@@ -174,7 +150,7 @@ struct PlayerQueueView: View {
         Button {
             player.remove(item)
         } label: {
-            Label("Remove", systemImage: "trash")
+            Label("Remove from the queue", systemImage: "trash")
         }
     }
 
@@ -182,15 +158,7 @@ struct PlayerQueueView: View {
         Button {
             player.removeQueueItems()
         } label: {
-            Label("Remove All", systemImage: "trash.fill")
-        }
-    }
-
-    private func removeHistoryButton(_ watch: Watch) -> some View {
-        Button {
-            player.removeWatch(watch)
-        } label: {
-            Label("Remove", systemImage: "trash")
+            Label("Clear the queue", systemImage: "trash.fill")
         }
     }
 }
