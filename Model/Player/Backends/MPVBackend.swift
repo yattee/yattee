@@ -327,9 +327,13 @@ final class MPVBackend: PlayerBackend {
     func closePiP(wasPlaying _: Bool) {}
 
     func updateControls() {
-        guard model.presentingPlayer else {
+        self.logger.info("updating controls")
+
+        guard model.presentingPlayer, !model.controls.presentingOverlays else {
+            self.logger.info("ignored controls update")
             return
         }
+
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {
                 return
@@ -341,6 +345,10 @@ final class MPVBackend: PlayerBackend {
     }
 
     func startControlsUpdates() {
+        guard model.presentingPlayer, !model.controls.presentingOverlays else {
+            self.logger.info("ignored controls update start")
+            return
+        }
         self.logger.info("starting controls updates")
         controlsUpdates = true
     }

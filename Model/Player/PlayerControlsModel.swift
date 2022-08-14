@@ -10,7 +10,7 @@ final class PlayerControlsModel: ObservableObject {
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
     @Published var presentingControlsOverlay = false { didSet { handleSettingsOverlayPresentationChange() } }
     @Published var presentingDetailsOverlay = false { didSet { handleDetailsOverlayPresentationChange() } }
-    @Published var timer: Timer?
+    var timer: Timer?
 
     #if os(tvOS)
         var reporter = PassthroughSubject<String, Never>()
