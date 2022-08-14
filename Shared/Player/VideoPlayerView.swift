@@ -223,7 +223,8 @@ struct VideoPlayerView: View {
         }
 
         var playerHeight: Double? {
-            fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
+            let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
+            return fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
         }
 
         var playerEdgesIgnoringSafeArea: Edge.Set {
@@ -372,10 +373,6 @@ struct VideoPlayerView: View {
     }
 
     var fullScreenLayout: Bool {
-        if player.currentItem.isNil {
-            return false
-        }
-
         #if os(iOS)
             return player.playingFullScreen || verticalSizeClass == .compact
         #else
