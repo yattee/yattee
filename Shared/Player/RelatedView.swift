@@ -15,36 +15,7 @@ struct RelatedView: View {
                         PlayerQueueRow(item: PlayerQueueItem(video))
                             .listRowBackground(Color.clear)
                             .contextMenu {
-                                Section {
-                                    Button {
-                                        player.playNext(video)
-                                    } label: {
-                                        Label("Play Next", systemImage: "text.insert")
-                                    }
-                                    Button {
-                                        player.enqueueVideo(video)
-                                    } label: {
-                                        Label("Play Last", systemImage: "text.append")
-                                    }
-                                }
-
-                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
-                                    Section {
-                                        Button {
-                                            navigation.presentAddToPlaylist(video)
-                                        } label: {
-                                            Label("Add to playlist...", systemImage: "text.badge.plus")
-                                        }
-
-                                        if let playlist = playlists.lastUsed {
-                                            Button {
-                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
-                                            } label: {
-                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
-                                            }
-                                        }
-                                    }
-                                }
+                                VideoContextMenuView(video: video)
                             }
                     }
                 }
