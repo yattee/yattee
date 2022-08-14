@@ -21,6 +21,7 @@ struct ControlsOverlay: View {
         }
 
         @FocusState private var focusedField: Field?
+        @State private var presentingButtonHintAlert = false
     #endif
 
     var body: some View {
@@ -57,7 +58,13 @@ struct ControlsOverlay: View {
                     #endif
                 }
 
-                Section(header: controlsHeader("Stream & Player")) {
+                #if os(tvOS)
+                    let streamAndPlayerHeaderText = "Stream"
+                #else
+                    let streamAndPlayerHeaderText = "Stream & Player"
+                #endif
+
+                Section(header: controlsHeader(streamAndPlayerHeaderText)) {
                     qualityButton
                     #if os(tvOS)
                     .focused($focusedField, equals: .stream)
@@ -96,6 +103,9 @@ struct ControlsOverlay: View {
         }
         .frame(maxHeight: overlayHeight)
         #if os(tvOS)
+            .alert(isPresented: $presentingButtonHintAlert) {
+                Alert(title: Text("Press and hold to open this menu"))
+            }
             .onAppear {
                 focusedField = .qualityProfile
             }
@@ -255,14 +265,17 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            Button {} label: {
+            Button {
+                presentingButtonHintAlert = true
+            } label: {
                 Text(player.qualityProfileSelection?.description ?? "Auto")
                     .lineLimit(1)
                     .frame(maxWidth: 320)
             }
             .contextMenu {
+                Button("Automatic") { player.qualityProfileSelection = nil }
+
                 ForEach(qualityProfiles) { qualityProfile in
-                    Button("Default") { player.qualityProfileSelection = nil }
                     Button {
                         player.qualityProfileSelection = qualityProfile
                     } label: {
@@ -306,7 +319,7 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            StreamControl()
+            StreamControl(presentingButtonHintAlert: $presentingButtonHintAlert)
         #endif
     }
 
@@ -336,7 +349,9 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            Button {} label: {
+            Button {
+                presentingButtonHintAlert = true
+            } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "text.bubble")
                     if let captions = captionsBinding.wrappedValue {
