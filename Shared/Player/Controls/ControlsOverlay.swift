@@ -140,7 +140,7 @@ struct ControlsOverlay: View {
         }
         #if os(macOS)
         .buttonStyle(.bordered)
-        #else
+        #elseif os(tvOS)
         .modifier(ControlBackgroundModifier())
         .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
