@@ -10,6 +10,8 @@ struct TVNavigationView: View {
 
     @Default(.visibleSections) private var visibleSections
 
+    @State private var playerInitialized = false
+
     var body: some View {
         NavigationView {
             TabView(selection: navigation.tabSelectionBinding) {
@@ -52,11 +54,11 @@ struct TVNavigationView: View {
                     .tag(TabSelection.search)
 
                 SettingsView()
-                    .navigationBarHidden(true)
                     .tabItem { Image(systemName: "gear") }
                     .tag(TabSelection.settings)
             }
         }
+        .background(videoPlayerInitialize)
         .fullScreenCover(isPresented: $navigation.presentingAddToPlaylist) {
             if let video = navigation.videoToAddToPlaylist {
                 AddToPlaylistView(video: video)
@@ -74,6 +76,18 @@ struct TVNavigationView: View {
             if let playlist = recents.presentedPlaylist {
                 ChannelPlaylistView(playlist: playlist)
             }
+        }
+    }
+
+    @ViewBuilder var videoPlayerInitialize: some View {
+        if !playerInitialized {
+            VideoPlayerView()
+                .scaleEffect(0.00001)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        playerInitialized = true
+                    }
+                }
         }
     }
 }
