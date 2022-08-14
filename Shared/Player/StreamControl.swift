@@ -1,7 +1,13 @@
 import SwiftUI
 
 struct StreamControl: View {
+    @Binding var presentingButtonHintAlert: Bool
+
     @EnvironmentObject<PlayerModel> private var player
+
+    init(presentingButtonHintAlert: Binding<Bool> = .constant(false)) {
+        _presentingButtonHintAlert = presentingButtonHintAlert
+    }
 
     var body: some View {
         Group {
@@ -47,7 +53,9 @@ struct StreamControl: View {
                 .fixedSize(horizontal: true, vertical: true)
                 .disabled(player.isLoadingAvailableStreams)
             #else
-                Button {} label: {
+                Button {
+                    presentingButtonHintAlert = true
+                } label: {
                     Text(player.streamSelection?.shortQuality ?? "loading")
                         .frame(maxWidth: 320)
                 }
