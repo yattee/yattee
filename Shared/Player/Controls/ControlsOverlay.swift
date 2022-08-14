@@ -6,43 +6,125 @@ struct ControlsOverlay: View {
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var model
 
+    @State private var contentSize: CGSize = .zero
+
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
+    @Default(.qualityProfiles) private var qualityProfiles
+
+    #if os(tvOS)
+        enum Field: Hashable {
+            case qualityProfile
+            case stream
+            case increaseRate
+            case decreaseRate
+            case captions
+        }
+
+        @FocusState private var focusedField: Field?
+    #endif
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 6) {
-                HStack {
-                    backendButtons
-                }
-                qualityButton
+            VStack {
+                Section(header: controlsHeader("Rate & Captions")) {
+                    HStack(spacing: rateButtonsSpacing) {
+                        decreaseRateButton
+                        #if os(tvOS)
+                        .focused($focusedField, equals: .decreaseRate)
+                        #endif
+                        rateButton
+                        increaseRateButton
+                        #if os(tvOS)
+                        .focused($focusedField, equals: .increaseRate)
+                        #endif
+                    }
 
-                if player.activeBackend == .mpv {
                     captionsButton
+                    #if os(tvOS)
+                    .focused($focusedField, equals: .captions)
+                    #endif
+                    .disabled(player.activeBackend != .mpv)
+
+                    #if os(iOS)
+                        .foregroundColor(.white)
+                    #endif
                 }
 
-                HStack {
-                    decreaseRateButton
-                    rateButton
-                    increaseRateButton
+                Section(header: controlsHeader("Quality Profile")) {
+                    qualityProfileButton
+                    #if os(tvOS)
+                    .focused($focusedField, equals: .qualityProfile)
+                    #endif
                 }
-                #if os(iOS)
-                .foregroundColor(.white)
-                #endif
+
+                Section(header: controlsHeader("Stream & Player")) {
+                    qualityButton
+                    #if os(tvOS)
+                    .focused($focusedField, equals: .stream)
+                    #endif
+
+                    #if !os(tvOS)
+                        HStack {
+                            backendButtons
+                        }
+                    #endif
+                }
 
                 if player.activeBackend == .mpv,
                    showMPVPlaybackStats
                 {
-                    mpvPlaybackStats
+                    Section(header: controlsHeader("Statistics")) {
+                        mpvPlaybackStats
+                    }
+                    #if os(tvOS)
+                    .frame(width: 400)
+                    #else
+                    .frame(width: 240)
+                    #endif
                 }
             }
+            .overlay(
+                GeometryReader { geometry in
+                    Color.clear.onAppear {
+                        contentSize = geometry.size
+                    }
+                }
+            )
+            #if os(tvOS)
+            .padding(.horizontal, 40)
+            #endif
         }
+        .frame(maxHeight: overlayHeight)
+        #if os(tvOS)
+            .onAppear {
+                focusedField = .qualityProfile
+            }
+        #endif
+    }
+
+    private var overlayHeight: Double {
+        #if os(tvOS)
+            contentSize.height + 50.0
+        #else
+            contentSize.height
+        #endif
+    }
+
+    private func controlsHeader(_ text: String) -> some View {
+        Text(text)
+            .font(.system(.caption))
+            .foregroundColor(.secondary)
     }
 
     private var backendButtons: some View {
         ForEach(PlayerBackendType.allCases, id: \.self) { backend in
             backendButton(backend)
+                .frame(height: 40)
+            #if os(iOS)
+                .frame(maxWidth: 115)
                 .modifier(ControlBackgroundModifier())
                 .clipShape(RoundedRectangle(cornerRadius: 4))
+            #endif
         }
     }
 
@@ -54,11 +136,48 @@ struct ControlsOverlay: View {
             }
         } label: {
             Text(backend.label)
-                .padding(6)
                 .foregroundColor(player.activeBackend == backend ? .accentColor : .secondary)
-                .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        #if os(macOS)
+        .buttonStyle(.bordered)
+        #else
+        .modifier(ControlBackgroundModifier())
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        #endif
+    }
+
+    @ViewBuilder private var rateButton: some View {
+        #if os(macOS)
+            ratePicker
+                .labelsHidden()
+                .frame(maxWidth: 100)
+        #elseif os(iOS)
+            Menu {
+                ratePicker
+            } label: {
+                Text(player.rateLabel(player.currentRate))
+                    .foregroundColor(.primary)
+                    .frame(width: 123)
+            }
+            .transaction { t in t.animation = .none }
+            .buttonStyle(.plain)
+            .foregroundColor(.primary)
+            .frame(width: 123, height: 40)
+            .modifier(ControlBackgroundModifier())
+            .mask(RoundedRectangle(cornerRadius: 3))
+        #else
+            Text(player.rateLabel(player.currentRate))
+                .frame(minWidth: 120)
+        #endif
+    }
+
+    var ratePicker: some View {
+        Picker("Rate", selection: $player.currentRate) {
+            ForEach(PlayerModel.availableRates, id: \.self) { rate in
+                Text(player.rateLabel(rate)).tag(rate)
+            }
+        }
+        .transaction { t in t.animation = .none }
     }
 
     private var increaseRateButton: some View {
@@ -72,12 +191,12 @@ struct ControlsOverlay: View {
                 .foregroundColor(.primary)
                 .labelStyle(.iconOnly)
                 .padding(8)
-                .frame(height: 30)
+                .frame(width: 50, height: 40)
                 .contentShape(Rectangle())
         }
         #if os(macOS)
         .buttonStyle(.bordered)
-        #else
+        #elseif os(iOS)
         .modifier(ControlBackgroundModifier())
         .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
@@ -96,16 +215,74 @@ struct ControlsOverlay: View {
                 .foregroundColor(.primary)
                 .labelStyle(.iconOnly)
                 .padding(8)
-                .frame(height: 30)
+                .frame(width: 50, height: 40)
                 .contentShape(Rectangle())
         }
         #if os(macOS)
         .buttonStyle(.bordered)
-        #else
+        #elseif os(iOS)
         .modifier(ControlBackgroundModifier())
         .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
         .disabled(decreasedRate.isNil)
+    }
+
+    private var rateButtonsSpacing: Double {
+        #if os(tvOS)
+            10
+        #else
+            8
+        #endif
+    }
+
+    @ViewBuilder private var qualityProfileButton: some View {
+        #if os(macOS)
+            qualityProfilePicker
+                .labelsHidden()
+                .frame(maxWidth: 300)
+        #elseif os(iOS)
+            Menu {
+                qualityProfilePicker
+            } label: {
+                Text(player.qualityProfileSelection?.description ?? "Auto")
+                    .frame(maxWidth: 240)
+            }
+            .transaction { t in t.animation = .none }
+            .buttonStyle(.plain)
+            .foregroundColor(.primary)
+            .frame(maxWidth: 240)
+            .frame(height: 40)
+            .modifier(ControlBackgroundModifier())
+            .mask(RoundedRectangle(cornerRadius: 3))
+        #else
+            Button {} label: {
+                Text(player.qualityProfileSelection?.description ?? "Auto")
+                    .lineLimit(1)
+                    .frame(maxWidth: 320)
+            }
+            .contextMenu {
+                ForEach(qualityProfiles) { qualityProfile in
+                    Button("Default") { player.qualityProfileSelection = nil }
+                    Button {
+                        player.qualityProfileSelection = qualityProfile
+                    } label: {
+                        Text(qualityProfile.description)
+                    }
+
+                    Button("Cancel", role: .cancel) {}
+                }
+            }
+        #endif
+    }
+
+    private var qualityProfilePicker: some View {
+        Picker("Quality Profile", selection: $player.qualityProfileSelection) {
+            Text("Automatic").tag(QualityProfile?.none)
+            ForEach(qualityProfiles) { qualityProfile in
+                Text(qualityProfile.description).tag(qualityProfile as QualityProfile?)
+            }
+        }
+        .transaction { t in t.animation = .none }
     }
 
     @ViewBuilder private var qualityButton: some View {
@@ -116,23 +293,20 @@ struct ControlsOverlay: View {
         #elseif os(iOS)
             Menu {
                 StreamControl()
-                    .frame(width: 45, height: 30)
-                #if os(iOS)
-                    .modifier(ControlBackgroundModifier())
-                #endif
-                    .mask(RoundedRectangle(cornerRadius: 3))
             } label: {
                 Text(player.streamSelection?.shortQuality ?? "loading")
-                    .frame(width: 140, height: 30)
+                    .frame(width: 140, height: 40)
                     .foregroundColor(.primary)
             }
             .transaction { t in t.animation = .none }
 
             .buttonStyle(.plain)
             .foregroundColor(.primary)
-            .frame(width: 140, height: 30)
+            .frame(width: 240, height: 40)
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
+        #else
+            StreamControl()
         #endif
     }
 
@@ -144,8 +318,6 @@ struct ControlsOverlay: View {
         #elseif os(iOS)
             Menu {
                 captionsPicker
-                    .frame(width: 140, height: 30)
-                    .mask(RoundedRectangle(cornerRadius: 3))
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "text.bubble")
@@ -154,14 +326,32 @@ struct ControlsOverlay: View {
                             .foregroundColor(.primary)
                     }
                 }
-                .frame(width: 140, height: 30)
+                .frame(width: 240)
+                .frame(height: 40)
             }
             .transaction { t in t.animation = .none }
             .buttonStyle(.plain)
             .foregroundColor(.primary)
-            .frame(width: 140, height: 30)
+            .frame(width: 240)
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
+        #else
+            Button {} label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "text.bubble")
+                    if let captions = captionsBinding.wrappedValue {
+                        Text(captions.code)
+                    }
+                }
+                .frame(maxWidth: 320)
+            }
+            .contextMenu {
+                ForEach(player.currentVideo?.captions ?? []) { caption in
+                    Button(caption.description) { captionsBinding.wrappedValue = caption }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+
         #endif
     }
 
@@ -190,57 +380,28 @@ struct ControlsOverlay: View {
         )
     }
 
-    @ViewBuilder private var rateButton: some View {
-        #if os(macOS)
-            ratePicker
-                .labelsHidden()
-                .frame(maxWidth: 100)
-        #elseif os(iOS)
-            Menu {
-                ratePicker
-                    .frame(width: 100, height: 30)
-                    .mask(RoundedRectangle(cornerRadius: 3))
-            } label: {
-                Text(player.rateLabel(player.currentRate))
-                    .foregroundColor(.primary)
-                    .frame(width: 80)
-            }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
-            .foregroundColor(.primary)
-            .frame(width: 100, height: 30)
-            .modifier(ControlBackgroundModifier())
-            .mask(RoundedRectangle(cornerRadius: 3))
-        #endif
-    }
-
-    var ratePicker: some View {
-        Picker("Rate", selection: rateBinding) {
-            ForEach(PlayerModel.availableRates, id: \.self) { rate in
-                Text(player.rateLabel(rate)).tag(rate)
-            }
-        }
-        .transaction { t in t.animation = .none }
-    }
-
-    private var rateBinding: Binding<Float> {
-        .init(get: { player.currentRate }, set: { rate in player.currentRate = rate })
-    }
-
     var mpvPlaybackStats: some View {
-        Group {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("hw decoder: \(player.mpvBackend.hwDecoder)")
-                Text("dropped: \(player.mpvBackend.frameDropCount)")
-                Text("video: \(String(format: "%.2ffps", player.mpvBackend.outputFps))")
-                Text("buffering: \(String(format: "%.0f%%", networkState.bufferingState))")
-                Text("cache: \(String(format: "%.2fs", player.mpvBackend.cacheDuration))")
-            }
-            .mask(RoundedRectangle(cornerRadius: 3))
+        VStack(alignment: .leading, spacing: 6) {
+            mpvPlaybackStatRow("Hardware decoder", player.mpvBackend.hwDecoder)
+            mpvPlaybackStatRow("Dropped frames", String(player.mpvBackend.frameDropCount))
+            mpvPlaybackStatRow("Stream FPS", String(format: "%.2ffps", player.mpvBackend.outputFps))
+            mpvPlaybackStatRow("Cached time", String(format: "%.2fs", player.mpvBackend.cacheDuration))
         }
-        #if !os(tvOS)
-        .font(.system(size: 9))
+        .padding(.top, 2)
+        #if os(tvOS)
+            .font(.system(size: 20))
+        #else
+            .font(.system(size: 11))
         #endif
+    }
+
+    func mpvPlaybackStatRow(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(label)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+        }
     }
 }
 

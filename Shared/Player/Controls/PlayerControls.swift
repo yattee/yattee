@@ -18,6 +18,8 @@ struct PlayerControls: View {
             case play
             case backward
             case forward
+            case settings
+            case close
         }
 
         @FocusState private var focusedField: Field?
@@ -41,23 +43,25 @@ struct PlayerControls: View {
 
                     if model.presentingControls && !model.presentingOverlays {
                         VStack(spacing: 4) {
-                            buttonsBar
+                            #if !os(tvOS)
+                                buttonsBar
 
-                            HStack {
-                                if !player.currentVideo.isNil, fullScreenLayout {
-                                    Button {
-                                        withAnimation(Self.animation) {
-                                            model.presentingDetailsOverlay = true
+                                HStack {
+                                    if !player.currentVideo.isNil, fullScreenLayout {
+                                        Button {
+                                            withAnimation(Self.animation) {
+                                                model.presentingDetailsOverlay = true
+                                            }
+                                        } label: {
+                                            ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
+                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                .frame(maxWidth: 300, alignment: .leading)
                                         }
-                                    } label: {
-                                        ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
-                                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                                            .frame(maxWidth: 300, alignment: .leading)
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
+                                    Spacer()
                                 }
-                                Spacer()
-                            }
+                            #endif
 
                             Spacer()
 
@@ -86,27 +90,14 @@ struct PlayerControls: View {
                 .frame(maxHeight: .infinity)
             }
             #if os(tvOS)
-            .onChange(of: model.presentingControls) { _ in
-                if model.presentingControls {
-                    focusedField = .play
-                }
+            .onChange(of: model.presentingControls) { newValue in
+                if newValue { focusedField = .play }
             }
-            .onChange(of: focusedField) { _ in
-                model.resetTimer()
-            }
+            .onChange(of: focusedField) { _ in model.resetTimer() }
             #else
-                    .background(PlayerGestures())
-                    .background(controlsBackground)
+            .background(PlayerGestures())
+            .background(controlsBackground)
             #endif
-
-            if model.presentingControlsOverlay {
-                ControlsOverlay()
-                    .frame(height: overlayHeight)
-                    .padding()
-                    .modifier(ControlBackgroundModifier())
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .transition(.opacity)
-            }
 
             if model.presentingDetailsOverlay {
                 VideoDetailsOverlay()
@@ -117,7 +108,7 @@ struct PlayerControls: View {
             }
 
             if !model.presentingControls,
-               !model.presentingControls,
+               !model.presentingOverlays,
                let segment = player.lastSkipped
             {
                 Button {
@@ -140,18 +131,22 @@ struct PlayerControls: View {
                 .transition(.opacity)
             }
         }
-        .onChange(of: player.controls.presentingOverlays) { newValue in
+        .onChange(of: model.presentingOverlays) { newValue in
             if newValue {
                 player.backend.stopControlsUpdates()
             } else {
+                #if os(tvOS)
+                    focusedField = .play
+                #endif
                 player.backend.startControlsUpdates()
             }
         }
-    }
-
-    var overlayHeight: Double {
-        guard let player = player, player.playerSize.height.isFinite else { return 0 }
-        return [0, [player.playerSize.height - 40, 140].min()!].max()!
+        #if os(tvOS)
+        .onReceive(model.reporter) { _ in
+            model.show()
+            model.resetTimer()
+        }
+        #endif
     }
 
     var detailsWidth: Double {
@@ -226,24 +221,17 @@ struct PlayerControls: View {
 
     var buttonsBar: some View {
         HStack(spacing: 20) {
-            #if !os(tvOS)
-                fullscreenButton
+            fullscreenButton
 
-                #if os(iOS)
-                    pipButton
-                    lockOrientationButton
-                #endif
-
-                Spacer()
-
-                button("settings", systemImage: "gearshape", active: model.presentingControlsOverlay) {
-                    withAnimation(Self.animation) {
-                        model.presentingControlsOverlay.toggle()
-                    }
-                }
-
-                closeVideoButton
+            #if os(iOS)
+                pipButton
+                lockOrientationButton
             #endif
+
+            Spacer()
+
+            settingsButton
+            closeVideoButton
         }
     }
 
@@ -259,10 +247,24 @@ struct PlayerControls: View {
         #endif
     }
 
+    private var settingsButton: some View {
+        button("settings", systemImage: "gearshape", active: model.presentingControlsOverlay) {
+            withAnimation(Self.animation) {
+                model.presentingControlsOverlay.toggle()
+            }
+        }
+        #if os(tvOS)
+        .focused($focusedField, equals: .settings)
+        #endif
+    }
+
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
             player.closeCurrentItem()
         }
+        #if os(tvOS)
+        .focused($focusedField, equals: .close)
+        #endif
     }
 
     private var musicModeButton: some View {
@@ -308,6 +310,9 @@ struct PlayerControls: View {
                 advanceToNextItemButton
                 #if !os(tvOS)
                     musicModeButton
+                #else
+                    settingsButton
+                    closeVideoButton
                 #endif
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -388,7 +393,12 @@ struct PlayerControls: View {
         active: Bool = false,
         action: @escaping () -> Void = {}
     ) -> some View {
-        Button {
+        #if os(tvOS)
+            let useBackground = false
+        #else
+            let useBackground = background
+        #endif
+        return Button {
             action()
             model.resetTimer()
         } label: {
@@ -408,7 +418,7 @@ struct PlayerControls: View {
         .buttonStyle(.plain)
         .foregroundColor(active ? Color("AppRedColor") : .primary)
         .frame(width: width ?? size, height: height ?? size)
-        .modifier(ControlBackgroundModifier(enabled: background))
+        .modifier(ControlBackgroundModifier(enabled: useBackground))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 

@@ -46,6 +46,15 @@
       }
     },
     {
+      "identity" : "reachability.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ashleymills/Reachability.swift",
+      "state" : {
+        "revision" : "c01bbdf2d633cf049ae1ed1a68a2020a8bda32e2",
+        "version" : "5.1.0"
+      }
+    },
+    {
       "identity" : "repeat",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/malcommac/Repeat.git",

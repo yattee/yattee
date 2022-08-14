@@ -76,6 +76,8 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
 
+    @Published var qualityProfileSelection: QualityProfile? { didSet { handleQualityProfileChange() }}
+
     @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
@@ -156,6 +158,7 @@ final class PlayerModel: ObservableObject {
         #endif
     }}
 
+    @Default(.qualityProfiles) var qualityProfiles
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
@@ -421,7 +424,11 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        guard let stream = preferredStream(availableStreams) else {
+        if let qualityProfileBackend = qualityProfile?.backend, qualityProfileBackend != activeBackend {
+            changeActiveBackend(from: activeBackend, to: qualityProfileBackend)
+        }
+
+        guard let stream = streamByQualityProfile else {
             return
         }
 
@@ -445,12 +452,6 @@ final class PlayerModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self = self else { return }
             self.backend.setNeedsDrawing(self.presentingPlayer)
-
-            #if os(tvOS)
-                if self.presentingPlayer {
-                    self.controls.show()
-                }
-            #endif
         }
 
         controls.hide()
@@ -483,6 +484,8 @@ final class PlayerModel: ObservableObject {
             return
         }
 
+        pause()
+
         Defaults[.activeBackend] = to
         self.activeBackend = to
 
@@ -495,8 +498,6 @@ final class PlayerModel: ObservableObject {
         } else {
             musicMode = false
         }
-
-        inactiveBackends().forEach { $0.pause() }
 
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
@@ -516,7 +517,7 @@ final class PlayerModel: ObservableObject {
         }
 
         if !backend.canPlay(stream) || (to == .mpv && !stream.hlsURL.isNil) {
-            guard let preferredStream = preferredStream(availableStreams) else {
+            guard let preferredStream = streamByQualityProfile else {
                 return
             }
 
@@ -533,8 +534,16 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    private func inactiveBackends() -> [PlayerBackend] {
-        [activeBackend == PlayerBackendType.mpv ? avPlayerBackend : mpvBackend]
+    func handleQualityProfileChange() {
+        guard let profile = qualityProfile else { return }
+
+        if activeBackend != profile.backend { changeActiveBackend(from: activeBackend, to: profile.backend) }
+        guard let profileStream = streamByQualityProfile, stream != profileStream else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.streamSelection = profileStream
+            self?.upgradeToStream(profileStream)
+        }
     }
 
     func rateLabel(_ rate: Float) -> String {

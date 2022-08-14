@@ -1,3 +1,4 @@
+#import <ifaddrs.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import "../Vendor/mpv/include/client.h"
 #import "../Vendor/mpv/include/render.h"

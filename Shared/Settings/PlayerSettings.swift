@@ -4,7 +4,6 @@ import SwiftUI
 struct PlayerSettings: View {
     @Default(.instances) private var instances
     @Default(.playerInstanceID) private var playerInstanceID
-    @Default(.quality) private var quality
 
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
@@ -59,7 +58,6 @@ struct PlayerSettings: View {
         Group {
             Section(header: SettingsHeader(text: "Playback")) {
                 sourcePicker
-                qualityPicker
                 pauseOnHidingPlayerToggle
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
@@ -107,7 +105,7 @@ struct PlayerSettings: View {
 
     private var sourcePicker: some View {
         Picker("Source", selection: $playerInstanceID) {
-            Text("Best available stream").tag(String?.none)
+            Text("Account Instance").tag(String?.none)
 
             ForEach(instances) { instance in
                 Text(instance.description).tag(Optional(instance.id))
@@ -131,15 +129,6 @@ struct PlayerSettings: View {
         }
         .onChange(of: systemControlsCommands) { _ in
             player.updateRemoteCommandCenter()
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var qualityPicker: some View {
-        Picker("Quality", selection: $quality) {
-            ForEach(ResolutionSetting.allCases, id: \.self) { resolution in
-                Text(resolution.description).tag(resolution)
-            }
         }
         .modifier(SettingsPickerModifier())
     }
