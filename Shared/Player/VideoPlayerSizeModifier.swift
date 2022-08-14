@@ -33,7 +33,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     var usedAspectRatio: Double {
-        guard let aspectRatio = aspectRatio, aspectRatio != 0 else {
+        guard let aspectRatio = aspectRatio, aspectRatio > 0, aspectRatio < VideoPlayerView.defaultAspectRatio else {
             return VideoPlayerView.defaultAspectRatio
         }
 
