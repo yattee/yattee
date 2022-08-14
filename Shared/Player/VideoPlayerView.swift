@@ -66,28 +66,40 @@ struct VideoPlayerView: View {
 
             if playerControls.presentingControlsOverlay {
                 HStack {
-                    ControlsOverlay()
-                    #if os(tvOS)
-                        .onExitCommand {
-                            withAnimation(PlayerControls.animation) {
-                                playerControls.hideOverlays()
+                    HStack {
+                        #if !os(tvOS)
+                            Spacer()
+                        #endif
+                        ControlsOverlay()
+                        #if os(tvOS)
+                            .onExitCommand {
+                                withAnimation(PlayerControls.animation) {
+                                    playerControls.hideOverlays()
+                                }
                             }
-                        }
-                        .onPlayPauseCommand {
-                            player.togglePlay()
-                        }
-                    #else
-                            .frame(maxWidth: overlayWidth)
-                    #endif
+                            .onPlayPauseCommand {
+                                player.togglePlay()
+                            }
+                        #endif
                             .padding()
                             .modifier(ControlBackgroundModifier())
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .transition(.opacity)
+
+                        #if !os(tvOS)
+                            Spacer()
+                        #endif
+                    }
+                    #if os(macOS)
+                    .frame(width: player.playerSize.width)
+                    #endif
+
+                    #if !os(tvOS)
+                        Spacer()
+                    #endif
                 }
                 #if os(tvOS)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                #else
-                .frame(maxWidth: player.playerSize.width)
                 #endif
             }
         }
@@ -105,9 +117,9 @@ struct VideoPlayerView: View {
             return GeometryReader { geometry in
                 HSplitView {
                     content
-                        .onAppear {
-                            playerSize = geometry.size
-                        }
+                }
+                .onAppear {
+                    playerSize = geometry.size
                 }
             }
             .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
