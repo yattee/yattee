@@ -559,6 +559,7 @@ final class PlayerModel: ObservableObject {
 
         prepareCurrentItemForHistory(finished: finished)
         currentItem = nil
+        updateNowPlayingInfo()
 
         backend.closeItem()
         aspectRatio = VideoPlayerView.defaultAspectRatio
@@ -749,7 +750,7 @@ final class PlayerModel: ObservableObject {
 
     #if os(macOS)
         var windowTitle: String {
-            currentVideo.isNil ? "Not playing" : "\(currentVideo!.title) - \(currentVideo!.author)"
+            currentVideo.isNil ? "Not Playing" : "\(currentVideo!.title) - \(currentVideo!.author)"
         }
     #else
         func handleEnterForeground() {
@@ -788,6 +789,7 @@ final class PlayerModel: ObservableObject {
 
     func updateNowPlayingInfo() {
         guard let video = currentItem?.video else {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = .none
             return
         }
 
