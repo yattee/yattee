@@ -6,18 +6,6 @@ import SwiftUI
 #endif
 
 extension Defaults.Keys {
-    #if os(tvOS)
-        static let defaultForPauseOnHidingPlayer = true
-    #else
-        static let defaultForPauseOnHidingPlayer = false
-    #endif
-
-    #if os(macOS)
-        static let defaultForPlayerDetailsPageButtonLabelStyle = PlayerDetailsPageButtonLabelStyle.iconAndText
-    #else
-        static let defaultForPlayerDetailsPageButtonLabelStyle = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
-    #endif
-
     static let instancesManifest = Key<String>("instancesManifest", default: "")
     static let countryOfPublicInstances = Key<String?>("countryOfPublicInstances")
 
@@ -50,7 +38,12 @@ extension Defaults.Keys {
 
     static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
     static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
-    static let quality = Key<ResolutionSetting>("quality", default: .best)
+    static let qualityProfiles = Key<[QualityProfile]>("qualityProfiles", default: [QualityProfile.defaultProfile, QualityProfile.highQualityProfile])
+    static let batteryCellularProfile = Key<QualityProfile.ID>("batteryCellularProfile", default: QualityProfile.defaultProfile.id)
+    static let batteryNonCellularProfile = Key<QualityProfile.ID>("batteryNonCellularProfile", default: QualityProfile.defaultProfile.id)
+    static let chargingCellularProfile = Key<QualityProfile.ID>("chargingCellularProfile", default: QualityProfile.defaultProfile.id)
+    static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: QualityProfile.defaultProfile.id)
+
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
     static let showKeywords = Key<Bool>("showKeywords", default: false)
@@ -58,12 +51,25 @@ extension Defaults.Keys {
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
-    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: defaultForPauseOnHidingPlayer)
+
+    #if os(tvOS)
+        static let pauseOnHidingPlayerDefault = true
+    #else
+        static let pauseOnHidingPlayerDefault = false
+    #endif
+    static let pauseOnHidingPlayer = Key<Bool>("pauseOnHidingPlayer", default: pauseOnHidingPlayerDefault)
+
     #if !os(macOS)
         static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
     #endif
     static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
-    static let closePlayerOnItemClose = Key<Bool>("closePlayerOnItemClose", default: false)
+
+    #if os(tvOS)
+        static let closePlayerOnItemCloseDefault = true
+    #else
+        static let closePlayerOnItemCloseDefault = false
+    #endif
+    static let closePlayerOnItemClose = Key<Bool>("closePlayerOnItemClose", default: closePlayerOnItemCloseDefault)
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
@@ -100,7 +106,12 @@ extension Defaults.Keys {
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
 
-    static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: defaultForPlayerDetailsPageButtonLabelStyle)
+    #if os(macOS)
+        static let playerDetailsPageButtonLabelStyleDefault = PlayerDetailsPageButtonLabelStyle.iconAndText
+    #else
+        static let playerDetailsPageButtonLabelStyleDefault = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
+    #endif
+    static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")

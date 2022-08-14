@@ -1,14 +1,13 @@
 import Defaults
 import Foundation
 import SwiftUI
-
 struct SettingsView: View {
     static let matrixURL = URL(string: "https://tinyurl.com/matrix-yattee")!
     static let discordURL = URL(string: "https://yattee.stream/discord")!
 
     #if os(macOS)
         private enum Tabs: Hashable {
-            case locations, browsing, player, history, sponsorBlock, advanced, help
+            case locations, browsing, player, quality, history, sponsorBlock, advanced, help
         }
 
         @State private var selection = Tabs.locations
@@ -60,6 +59,14 @@ struct SettingsView: View {
                 .tag(Tabs.player)
 
                 Form {
+                    QualitySettings()
+                }
+                .tabItem {
+                    Label("Quality", systemImage: "4k.tv")
+                }
+                .tag(Tabs.quality)
+
+                Form {
                     HistorySettings()
                 }
                 .tabItem {
@@ -92,18 +99,14 @@ struct SettingsView: View {
                 .tag(Tabs.help)
             }
             .padding(20)
-            .frame(width: 480, height: windowHeight)
+            .frame(width: 520, height: windowHeight)
         #else
-            Group {
+            NavigationView {
+                settingsList
                 #if os(tvOS)
-                    settingsList
-                #else
-                    NavigationView {
-                        settingsList
-                    }
+                .navigationBarHidden(true)
                 #endif
             }
-
         #endif
     }
 
@@ -140,6 +143,12 @@ struct SettingsView: View {
                         PlayerSettings()
                     } label: {
                         Label("Player", systemImage: "play.rectangle")
+                    }
+
+                    NavigationLink {
+                        QualitySettings()
+                    } label: {
+                        Label("Quality", systemImage: "4k.tv")
                     }
 
                     NavigationLink {
@@ -219,6 +228,8 @@ struct SettingsView: View {
                 return 390
             case .player:
                 return 420
+            case .quality:
+                return 400
             case .history:
                 return 480
             case .sponsorBlock:

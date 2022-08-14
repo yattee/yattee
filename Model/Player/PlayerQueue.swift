@@ -39,7 +39,7 @@ extension PlayerModel {
     func playItem(_ item: PlayerQueueItem, at time: CMTime? = nil) {
         advancing = false
 
-        if !playingInPictureInPicture {
+        if !playingInPictureInPicture, !currentItem.isNil {
             backend.closeItem()
         }
 
@@ -70,8 +70,21 @@ extension PlayerModel {
         }
     }
 
-    func preferredStream(_ streams: [Stream]) -> Stream? {
-        backend.bestPlayable(streams.filter { backend.canPlay($0) }, maxResolution: Defaults[.quality])
+    var qualityProfile: QualityProfile? {
+        qualityProfileSelection ?? QualityProfilesModel.shared.automaticProfile
+    }
+
+    var streamByQualityProfile: Stream? {
+        let profile = qualityProfile ?? .defaultProfile
+
+        if let streamPreferredForProfile = backend.bestPlayable(
+            availableStreams.filter { backend.canPlay($0) && profile.isPreferred($0) },
+            maxResolution: profile.resolution
+        ) {
+            return streamPreferredForProfile
+        }
+
+        return backend.bestPlayable(availableStreams.filter { backend.canPlay($0) }, maxResolution: profile.resolution)
     }
 
     func advanceToNextItem() {
@@ -97,6 +110,8 @@ extension PlayerModel {
 
         if let nextItem = nextItem {
             advanceToItem(nextItem)
+        } else {
+            advancing = false
         }
     }
 

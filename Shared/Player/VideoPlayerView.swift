@@ -58,6 +58,42 @@ struct VideoPlayerView: View {
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
     var body: some View {
+        ZStack(alignment: overlayAlignment) {
+            videoPlayer
+            #if os(iOS)
+            .gesture(playerControls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
+            #endif
+
+            if playerControls.presentingControlsOverlay {
+                HStack {
+                    ControlsOverlay()
+                    #if os(tvOS)
+                        .onExitCommand {
+                            withAnimation(PlayerControls.animation) {
+                                playerControls.hideOverlays()
+                            }
+                        }
+                        .onPlayPauseCommand {
+                            player.togglePlay()
+                        }
+                    #else
+                            .frame(maxWidth: overlayWidth)
+                    #endif
+                            .padding()
+                            .modifier(ControlBackgroundModifier())
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .transition(.opacity)
+                }
+                #if os(tvOS)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                #else
+                .frame(maxWidth: player.playerSize.width)
+                #endif
+            }
+        }
+    }
+
+    var videoPlayer: some View {
         #if DEBUG
             // TODO: remove
             if #available(iOS 15.0, macOS 12.0, *) {
@@ -66,8 +102,13 @@ struct VideoPlayerView: View {
         #endif
 
         #if os(macOS)
-            return HSplitView {
-                content
+            return GeometryReader { geometry in
+                HSplitView {
+                    content
+                        .onAppear {
+                            playerSize = geometry.size
+                        }
+                }
             }
             .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
             .onOpenURL {
@@ -124,7 +165,7 @@ struct VideoPlayerView: View {
                             Orientation.lockOrientation(.allButUpsideDown)
                         }
                         stopOrientationUpdates()
-                        player.controls.hideOverlays()
+                        playerControls.hideOverlays()
 
                         player.lockedOrientation = nil
                     #endif
@@ -139,7 +180,28 @@ struct VideoPlayerView: View {
         #endif
     }
 
+    var overlayWidth: Double {
+        guard playerSize.width.isFinite else { return 200 }
+        return [playerSize.width - 50, 250].min()!
+    }
+
+    var overlayAlignment: Alignment {
+        #if os(tvOS)
+            return .bottomTrailing
+        #else
+            return .top
+        #endif
+    }
+
     #if os(iOS)
+        var videoPlayerCloseControlsOverlayGesture: some Gesture {
+            TapGesture().onEnded {
+                withAnimation(PlayerControls.animation) {
+                    playerControls.hideOverlays()
+                }
+            }
+        }
+
         var playerOffset: Double {
             dragGestureState ? dragGestureOffset.height : viewDragOffset
         }
@@ -153,9 +215,14 @@ struct VideoPlayerView: View {
         }
 
         var playerEdgesIgnoringSafeArea: Edge.Set {
+            if let orientation = player.lockedOrientation, orientation.contains(.portrait) {
+                return []
+            }
+
             if fullScreenLayout, UIDevice.current.orientation.isLandscape {
                 return [.vertical]
             }
+
             return []
         }
     #endif
@@ -170,33 +237,6 @@ struct VideoPlayerView: View {
                         tvControls
                     }
                     .ignoresSafeArea()
-                    .onMoveCommand { direction in
-                        if direction == .up || direction == .down {
-                            playerControls.show()
-                        }
-
-                        playerControls.resetTimer()
-
-                        guard !playerControls.presentingControls else { return }
-
-                        if direction == .left {
-                            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
-                        }
-                        if direction == .right {
-                            player.backend.seek(relative: .secondsInDefaultTimescale(10))
-                        }
-                    }
-                    .onPlayPauseCommand {
-                        player.togglePlay()
-                    }
-
-                    .onExitCommand {
-                        if playerControls.presentingControls {
-                            playerControls.hide()
-                        } else {
-                            player.hide()
-                        }
-                    }
                 #else
                     GeometryReader { geometry in
                         PlayerBackendView()
@@ -259,6 +299,41 @@ struct VideoPlayerView: View {
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
+            #if os(tvOS)
+            .onMoveCommand { direction in
+                if direction == .up {
+                    playerControls.show()
+                } else if direction == .down, !playerControls.presentingControlsOverlay {
+                    withAnimation(PlayerControls.animation) {
+                        playerControls.presentingControlsOverlay = true
+                    }
+                }
+
+                playerControls.resetTimer()
+
+                guard !playerControls.presentingControls else { return }
+
+                if direction == .left {
+                    player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                }
+                if direction == .right {
+                    player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                }
+            }
+            .onPlayPauseCommand {
+                player.togglePlay()
+            }
+            .onExitCommand {
+                if playerControls.presentingOverlays {
+                    playerControls.hideOverlays()
+                }
+                if playerControls.presentingControls {
+                    playerControls.hide()
+                } else {
+                    player.hide()
+                }
+            }
+            #endif
             if !fullScreenLayout {
                 #if os(iOS)
                     if sidebarQueue {
@@ -277,7 +352,7 @@ struct VideoPlayerView: View {
             }
         }
         .onChange(of: fullScreenLayout) { newValue in
-            if !newValue { playerControls.presentingDetailsOverlay = false }
+            if !newValue { playerControls.hideOverlays() }
         }
         #if os(iOS)
         .statusBar(hidden: fullScreenLayout)
@@ -346,8 +421,8 @@ struct VideoPlayerView: View {
                     guard player.presentingPlayer,
                           !playerControls.presentingControlsOverlay else { return }
 
-                    if player.controls.presentingControls {
-                        player.controls.presentingControls = false
+                    if playerControls.presentingControls {
+                        playerControls.presentingControls = false
                     }
 
                     let drag = value.translation.height
@@ -401,7 +476,7 @@ struct VideoPlayerView: View {
                !player.playingInPictureInPicture
             {
                 DispatchQueue.main.async {
-                    player.controls.presentingControls = false
+                    playerControls.presentingControls = false
                     player.enterFullScreen(showControls: false)
                 }
 
@@ -435,7 +510,7 @@ struct VideoPlayerView: View {
                     }
 
                     if orientation.isLandscape {
-                        player.controls.presentingControls = false
+                        playerControls.presentingControls = false
                         player.enterFullScreen(showControls: false)
                         Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                     } else {
@@ -455,10 +530,6 @@ struct VideoPlayerView: View {
     #if os(tvOS)
         var tvControls: some View {
             TVControls(model: playerControls, player: player, thumbnails: thumbnails)
-                .onReceive(playerControls.reporter) { _ in
-                    playerControls.show()
-                    playerControls.resetTimer()
-                }
         }
     #endif
 }

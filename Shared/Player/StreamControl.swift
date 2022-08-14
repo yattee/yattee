@@ -28,7 +28,7 @@ struct StreamControl: View {
                 }
                 .disabled(player.isLoadingAvailableStreams)
 
-            #else
+            #elseif os(iOS)
                 Picker("", selection: $player.streamSelection) {
                     ForEach(InstancesModel.all) { instance in
                         let instanceStreams = availableStreamsForInstance(instance)
@@ -46,16 +46,26 @@ struct StreamControl: View {
                 .frame(minWidth: 110)
                 .fixedSize(horizontal: true, vertical: true)
                 .disabled(player.isLoadingAvailableStreams)
+            #else
+                Button {} label: {
+                    Text(player.streamSelection?.shortQuality ?? "loading")
+                        .frame(maxWidth: 320)
+                }
+                .contextMenu {
+                    ForEach(player.availableStreamsSorted) { stream in
+                        Button(stream.description) { player.streamSelection = stream }
+                    }
+
+                    Button("Close", role: .cancel) {}
+                }
             #endif
         }
 
         .transaction { t in t.animation = .none }
         .onChange(of: player.streamSelection) { selection in
-            guard !selection.isNil else {
-                return
-            }
-
-            player.upgradeToStream(selection!)
+            guard let selection = selection else { return }
+            player.upgradeToStream(selection)
+            player.controls.hideOverlays()
         }
         .frame(alignment: .trailing)
     }
