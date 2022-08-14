@@ -7,10 +7,10 @@ struct Power {
 
         for ps in psList {
             if let psDesc = IOPSGetPowerSourceDescription(psInfo, ps).takeUnretainedValue() as? [String: Any] {
-                if let type = psDesc[kIOPSTypeKey] as? String {
-                    if type == "InternalBattery" {
-                        return true
-                    }
+                if let type = psDesc[kIOPSTypeKey] as? String,
+                   type == kIOPSInternalBatteryType
+                {
+                    return true
                 }
             }
         }
@@ -25,7 +25,7 @@ struct Power {
         for ps in psList {
             if let psDesc = IOPSGetPowerSourceDescription(psInfo, ps).takeUnretainedValue() as? [String: Any] {
                 if let type = psDesc[kIOPSTypeKey] as? String,
-                   type == "InternalBattery",
+                   type == kIOPSInternalBatteryType,
                    let powerSourceState = (psDesc[kIOPSPowerSourceStateKey] as? String)
                 {
                     return powerSourceState == kIOPSACPowerValue
