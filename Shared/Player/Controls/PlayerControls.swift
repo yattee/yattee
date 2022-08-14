@@ -323,6 +323,7 @@ struct PlayerControls: View {
     var playbackModeButton: some View {
         button("Playback Mode", systemImage: player.playbackMode.systemImage, background: false) {
             player.playbackMode = player.playbackMode.next()
+            model.objectWillChange.send()
         }
     }
 
