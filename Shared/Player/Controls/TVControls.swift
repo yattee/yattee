@@ -19,7 +19,7 @@ struct TVControls: UIViewRepresentable {
         let upSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(sender:)))
         upSwipe.direction = .up
 
-        let downSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(sender:)))
+        let downSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipeDown(sender:)))
         downSwipe.direction = .down
 
         controlsArea.addGestureRecognizer(leftSwipe)
@@ -62,6 +62,10 @@ struct TVControls: UIViewRepresentable {
         @objc func handleSwipe(sender: UISwipeGestureRecognizer) {
             let location = sender.location(in: view)
             model.reporter.send("swipe \(location)")
+        }
+
+        @objc func handleSwipeDown(sender _: UISwipeGestureRecognizer) {
+            model.reporter.send("swipe down")
         }
     }
 }

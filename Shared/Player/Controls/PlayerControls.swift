@@ -142,8 +142,14 @@ struct PlayerControls: View {
             }
         }
         #if os(tvOS)
-        .onReceive(model.reporter) { _ in
-            model.show()
+        .onReceive(model.reporter) { value in
+            if value == "swipe down", !model.presentingControls, !model.presentingOverlays {
+                withAnimation(Self.animation) {
+                    model.presentingControlsOverlay = true
+                }
+            } else {
+                model.show()
+            }
             model.resetTimer()
         }
         #endif
