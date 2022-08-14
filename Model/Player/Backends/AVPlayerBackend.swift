@@ -188,9 +188,7 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.play()
-            }
+            play()
         }
     #endif
 

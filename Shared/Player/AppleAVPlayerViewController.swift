@@ -118,11 +118,11 @@ final class AppleAVPlayerViewController: UIViewController {
 
 extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
     func playerViewControllerShouldDismiss(_: AVPlayerViewController) -> Bool {
-        true
+        false
     }
 
     func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
-        true
+        false
     }
 
     func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
