@@ -311,7 +311,11 @@ struct SearchView: View {
         Button {
             switch item.type {
             case .query:
-                queryText = item.title
+                #if os(tvOS)
+                    state.queryText = item.title
+                #else
+                    queryText = item.title
+                #endif
                 state.changeQuery { query in query.query = item.title }
 
                 updateFavoriteItem()
@@ -351,6 +355,9 @@ struct SearchView: View {
         .contextMenu {
             removeButton(item)
             removeAllButton
+            #if os(tvOS)
+                Button("Cancel", role: .cancel) {}
+            #endif
         }
     }
 
