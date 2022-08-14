@@ -2,7 +2,8 @@ import SwiftUI
 
 struct MultiselectRow: View {
     let title: String
-    let selected: Bool
+    var selected: Bool
+    var disabled = false
     var action: (Bool) -> Void
 
     @State private var toggleChecked = false
@@ -16,6 +17,7 @@ struct MultiselectRow: View {
                         Spacer()
                     }
                     .onAppear {
+                        guard !disabled else { return }
                         toggleChecked = selected
                     }
                     .onChange(of: toggleChecked) { new in
@@ -34,8 +36,9 @@ struct MultiselectRow: View {
             }
             .contentShape(Rectangle())
         }
+        .disabled(disabled)
         #if !os(tvOS)
-        .buttonStyle(.plain)
+            .buttonStyle(.plain)
         #endif
     }
 }
