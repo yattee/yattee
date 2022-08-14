@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct QualityProfileForm: View {
-    var qualityProfileID: QualityProfile.ID!
+    @Binding var qualityProfileID: QualityProfile.ID?
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
@@ -23,31 +23,18 @@ struct QualityProfileForm: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack {
-                Group {
-                    header
-                    #if os(iOS)
-                        NavigationView {
-                            EmptyView()
-
-                            form
-                                .navigationBarHidden(true)
-                                .navigationBarTitle(Text("Back"))
-                                .edgesIgnoringSafeArea([.top, .bottom])
-                        }
-                        .navigationViewStyle(.stack)
-                    #else
-                        form
-                    #endif
-                    footer
-                }
-                .frame(maxWidth: 1000)
+        VStack {
+            Group {
+                header
+                form
+                footer
             }
-            #if os(tvOS)
-            .padding(20)
-            #endif
+            .frame(maxWidth: 1000)
         }
+        #if os(tvOS)
+        .padding(20)
+        #endif
+
         .onAppear(perform: initializeForm)
         .onChange(of: backend, perform: backendChanged)
         .onChange(of: formats) { _ in validate() }
@@ -80,15 +67,20 @@ struct QualityProfileForm: View {
     }
 
     var form: some View {
-        #if !os(tvOS)
+        #if os(tvOS)
+            ScrollView {
+                VStack {
+                    formFields
+                }
+                .padding(.horizontal, 20)
+            }
+        #else
             Form {
                 formFields
                 #if os(macOS)
                 .padding(.horizontal)
                 #endif
             }
-        #else
-            formFields
         #endif
     }
 
@@ -121,8 +113,6 @@ struct QualityProfileForm: View {
     @ViewBuilder var nameHeader: some View {
         #if os(macOS)
             Text("Name")
-        #else
-            EmptyView()
         #endif
     }
 
@@ -132,13 +122,30 @@ struct QualityProfileForm: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    var qualityPicker: some View {
-        Picker("Resolution", selection: $resolution) {
+    @ViewBuilder var qualityPicker: some View {
+        let picker = Picker("Resolution", selection: $resolution) {
             ForEach(availableResolutions, id: \.self) { resolution in
                 Text(resolution.description).tag(resolution)
             }
         }
         .modifier(SettingsPickerModifier())
+
+        #if os(iOS)
+            return HStack {
+                Text("Resolution")
+                Spacer()
+                Menu {
+                    picker
+                } label: {
+                    Text(resolution.description)
+                        .frame(minWidth: 120, alignment: .trailing)
+                }
+                .transaction { t in t.animation = .none }
+            }
+
+        #else
+            return picker
+        #endif
     }
 
     #if os(tvOS)
@@ -160,13 +167,29 @@ struct QualityProfileForm: View {
         ResolutionSetting.allCases.filter { !isResolutionDisabled($0) }
     }
 
-    var backendPicker: some View {
-        Picker("Backend", selection: $backend) {
+    @ViewBuilder var backendPicker: some View {
+        let picker = Picker("Backend", selection: $backend) {
             ForEach(PlayerBackendType.allCases, id: \.self) { backend in
                 Text(backend.label).tag(backend)
             }
         }
         .modifier(SettingsPickerModifier())
+        #if os(iOS)
+            return HStack {
+                Text("Backend")
+                Spacer()
+                Menu {
+                    picker
+                } label: {
+                    Text(backend.label)
+                        .frame(minWidth: 120, alignment: .trailing)
+                }
+                .transaction { t in t.animation = .none }
+            }
+
+        #else
+            return picker
+        #endif
     }
 
     @ViewBuilder var formatsPicker: some View {
@@ -307,6 +330,7 @@ struct QualityProfileForm: View {
 
 struct QualityProfileForm_Previews: PreviewProvider {
     static var previews: some View {
-        QualityProfileForm(qualityProfileID: QualityProfile.defaultProfile.id)
+        QualityProfileForm(qualityProfileID: .constant(QualityProfile.defaultProfile.id))
+            .environment(\.navigationStyle, .tab)
     }
 }

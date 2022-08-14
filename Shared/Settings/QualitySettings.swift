@@ -3,7 +3,7 @@ import SwiftUI
 
 struct QualitySettings: View {
     @State private var presentingProfileForm = false
-    @State private var editedProfile: QualityProfile?
+    @State private var editedProfileID: QualityProfile.ID?
 
     @Default(.qualityProfiles) private var qualityProfiles
 
@@ -25,7 +25,7 @@ struct QualitySettings: View {
             #endif
         }
         .sheet(isPresented: $presentingProfileForm) {
-            QualityProfileForm(qualityProfileID: editedProfile?.id)
+            QualityProfileForm(qualityProfileID: $editedProfileID)
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -68,7 +68,7 @@ struct QualitySettings: View {
                 profilesList
 
                 Button {
-                    editedProfile = nil
+                    editedProfileID = nil
                     presentingProfileForm = true
                 } label: {
                     Label("Add profile...", systemImage: "plus")
@@ -130,7 +130,7 @@ struct QualitySettings: View {
                         #endif
                     }
                     Button {
-                        editedProfile = qualityProfile
+                        editedProfileID = qualityProfile.id
                         presentingProfileForm = true
                     } label: {
                         Label("Edit...", systemImage: "pencil")
