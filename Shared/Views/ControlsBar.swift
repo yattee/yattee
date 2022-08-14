@@ -224,7 +224,7 @@ struct ControlsBar: View {
                 }
 
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(model.currentVideo?.title ?? "Not playing")
+                    Text(model.currentVideo?.title ?? "Not Playing")
                         .font(.system(size: 14))
                         .fontWeight(.semibold)
                         .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)

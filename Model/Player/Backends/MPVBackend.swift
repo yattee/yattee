@@ -345,7 +345,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func startControlsUpdates() {
-        guard model.presentingPlayer, !model.controls.presentingOverlays else {
+        guard model.presentingPlayer, model.controls.presentingControls, !model.controls.presentingOverlays else {
             self.logger.info("ignored controls update start")
             return
         }

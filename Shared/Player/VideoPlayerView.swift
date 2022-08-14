@@ -315,7 +315,7 @@ struct VideoPlayerView: View {
             .onMoveCommand { direction in
                 if direction == .up {
                     playerControls.show()
-                } else if direction == .down, !playerControls.presentingControlsOverlay {
+                } else if direction == .down, !playerControls.presentingControlsOverlay, !playerControls.presentingControls {
                     withAnimation(PlayerControls.animation) {
                         playerControls.presentingControlsOverlay = true
                     }
