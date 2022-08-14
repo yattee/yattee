@@ -2,15 +2,10 @@ import SwiftUI
 
 #if !os(macOS)
     struct MPVPlayerView: UIViewControllerRepresentable {
-        @State private var controller = MPVViewController()
-
         @EnvironmentObject<PlayerModel> private var player
 
         func makeUIViewController(context _: Context) -> some UIViewController {
-            player.mpvBackend.controller = controller
-            player.mpvBackend.client = controller.client
-
-            return controller
+            player.mpvController
         }
 
         func updateUIViewController(_: UIViewControllerType, context _: Context) {}

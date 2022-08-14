@@ -45,6 +45,9 @@ final class PlayerModel: ObservableObject {
 
     var avPlayerBackend: AVPlayerBackend!
     var mpvBackend: MPVBackend!
+    #if !os(macOS)
+        var mpvController = MPVViewController()
+    #endif
 
     var backends: [PlayerBackend] {
         [avPlayerBackend, mpvBackend]
@@ -189,6 +192,11 @@ final class PlayerModel: ObservableObject {
             playerTime: playerTime,
             networkState: networkState
         )
+
+        #if !os(macOS)
+            mpvBackend.controller = mpvController
+            mpvBackend.client = mpvController.client
+        #endif
 
         Defaults[.activeBackend] = .mpv
         playbackMode = Defaults[.playbackMode]
