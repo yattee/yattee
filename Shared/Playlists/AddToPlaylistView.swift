@@ -19,15 +19,15 @@ struct AddToPlaylistView: View {
     var body: some View {
         Group {
             VStack {
+                header
+                Spacer()
                 if model.isEmpty {
                     emptyPlaylistsMessage
                 } else {
-                    header
-                    Spacer()
                     form
-                    Spacer()
-                    footer
                 }
+                Spacer()
+                footer
             }
             .frame(maxWidth: 1000, maxHeight: height)
         }
