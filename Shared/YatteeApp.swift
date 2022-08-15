@@ -226,6 +226,8 @@ struct YatteeApp: App {
 
         navigation.tabSelection = section ?? .search
 
+        NavigationModel.shared = navigation
+
         subscriptions.load()
         playlists.load()
 

@@ -121,6 +121,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         )
         .onSuccess { response in
             self.account.token = response.json.dictionaryValue["token"]?.string ?? ""
+            if let error = response.json.dictionaryValue["error"]?.string {
+                NavigationModel.shared.presentAlert(
+                    title: "Could not connect with your account",
+                    message: error
+                )
+            }
+
             self.configure()
         }
     }
