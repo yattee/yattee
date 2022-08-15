@@ -66,8 +66,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             .onSuccess { _ in
                 self.signedIn = true
             }
-            .onFailure { _ in
+            .onFailure { requestError in
                 self.signedIn = false
+                NavigationModel.shared.presentAlert(
+                    title: "Could not connect with your account",
+                    message: "\(requestError.httpStatusCode ?? -1) - \(requestError.userMessage)\nIf this issue persists, try removing and adding your account again in Settings."
+                )
             }
     }
 

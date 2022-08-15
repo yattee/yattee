@@ -2,6 +2,8 @@ import Foundation
 import SwiftUI
 
 final class NavigationModel: ObservableObject {
+    static var shared: NavigationModel!
+
     enum TabSelection: Hashable {
         case favorites
         case subscriptions
