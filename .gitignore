@@ -81,6 +81,9 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+fastlane/builds
+fastlane/.env
+fastlane/*.p8
 
 # Code Injection
 #

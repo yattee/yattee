@@ -1,0 +1,108 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+DEVELOPER_KEY_ID = ENV['DEVELOPER_KEY_ID']
+DEVELOPER_KEY_ISSUER_ID = ENV['DEVELOPER_KEY_ISSUER_ID']
+DEVELOPER_KEY_FILEPATH = ENV['DEVELOPER_KEY_FILEPATH']
+
+add_extra_platforms(platforms: [:tvos])
+
+before_all do
+  update_fastlane
+end
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    xcode_select("/Applications/Xcode-13.4.1.app")
+
+    app_store_connect_api_key(
+      key_id: DEVELOPER_KEY_ID,
+      issuer_id: DEVELOPER_KEY_ISSUER_ID,
+      key_filepath: DEVELOPER_KEY_FILEPATH
+    )
+
+    increment_build_number(xcodeproj: "Yattee.xcodeproj")
+
+    version = get_version_number(
+      xcodeproj: "Yattee.xcodeproj",
+      target: "Yattee (iOS)"
+    )
+
+    build_app(
+      scheme: "Yattee (iOS)",
+      output_directory: "fastlane/builds/#{version}-#{lane_context[SharedValues::BUILD_NUMBER]}/iOS",
+      output_name: "Yattee-#{version}-iOS.ipa",
+    )
+
+    upload_to_testflight
+  end
+end
+
+platform :tvos do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    xcode_select("/Applications/Xcode-13.4.1.app")
+
+    app_store_connect_api_key(
+      key_id: DEVELOPER_KEY_ID,
+      issuer_id: DEVELOPER_KEY_ISSUER_ID,
+      key_filepath: DEVELOPER_KEY_FILEPATH
+    )
+
+    increment_build_number(xcodeproj: "Yattee.xcodeproj")
+
+    version = get_version_number(
+      xcodeproj: "Yattee.xcodeproj",
+      target: "Yattee (tvOS)"
+    )
+
+    build_app(
+      scheme: "Yattee (tvOS)",
+      output_directory: "fastlane/builds/#{version}-#{lane_context[SharedValues::BUILD_NUMBER]}/tvOS",
+      output_name: "Yattee-#{version}-tvOS.ipa",
+    )
+
+    upload_to_testflight
+  end
+end
+
+platform :mac do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    xcode_select("/Applications/Xcode-13.4.1.app")
+
+    app_store_connect_api_key(
+      key_id: DEVELOPER_KEY_ID,
+      issuer_id: DEVELOPER_KEY_ISSUER_ID,
+      key_filepath: DEVELOPER_KEY_FILEPATH
+    )
+
+    increment_build_number(xcodeproj: "Yattee.xcodeproj")
+
+    version = get_version_number(
+      xcodeproj: "Yattee.xcodeproj",
+      target: "Yattee (macOS)"
+    )
+
+    build_app(
+      scheme: "Yattee (macOS)",
+      output_directory: "fastlane/builds/#{version}-#{lane_context[SharedValues::BUILD_NUMBER]}/macOS",
+      output_name: "Yattee-#{version}-macOS.app",
+    )
+
+    upload_to_testflight
+  end
+end
