@@ -26,8 +26,6 @@ end
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    xcode_select("/Applications/Xcode-13.4.1.app")
-
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
@@ -46,15 +44,16 @@ platform :ios do
       output_name: "Yattee-#{version}-iOS.ipa",
     )
 
-    upload_to_testflight
+    altool(
+      altool_app_type: "ios",
+      altool_ipa_path: lane_context[SharedValues::IPA_OUTPUT_PATH]
+    )
   end
 end
 
 platform :tvos do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    xcode_select("/Applications/Xcode-13.4.1.app")
-
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
@@ -73,15 +72,16 @@ platform :tvos do
       output_name: "Yattee-#{version}-tvOS.ipa",
     )
 
-    upload_to_testflight
+    altool(
+      altool_app_type: "tvos",
+      altool_ipa_path: lane_context[SharedValues::IPA_OUTPUT_PATH]
+    )
   end
 end
 
 platform :mac do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    xcode_select("/Applications/Xcode-13.4.1.app")
-
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
@@ -100,6 +100,9 @@ platform :mac do
       output_name: "Yattee-#{version}-macOS.app",
     )
 
-    upload_to_testflight
+    altool(
+      altool_app_type: "macos",
+      altool_ipa_path: lane_context[SharedValues::PKG_OUTPUT_PATH]
+    )
   end
 end
