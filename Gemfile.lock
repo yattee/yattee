@@ -1,3 +1,9 @@
+GIT
+  remote: git@github.com:yattee/fastlane-plugin-altool.git
+  revision: 4390a87c61f68a0efabb76236606d9861708bd46
+  specs:
+    fastlane-plugin-altool (1.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -213,6 +219,7 @@ PLATFORMS
 
 DEPENDENCIES
   fastlane
+  fastlane-plugin-altool!
 
 BUNDLED WITH
    2.3.6
