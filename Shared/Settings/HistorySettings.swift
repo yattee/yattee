@@ -150,7 +150,7 @@ struct HistorySettings: View {
                     "Are you sure you want to clear history of watched videos?"
                 ),
                 message: Text(
-                    "This cannot be undone. You might need to switch between views or restart the app to see changes."
+                    "This cannot be reverted. You might need to switch between views or restart the app to see changes."
                 ),
                 primaryButton: .destructive(Text("Clear All")) {
                     player.removeAllWatches()
