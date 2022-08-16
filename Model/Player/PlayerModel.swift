@@ -651,7 +651,7 @@ final class PlayerModel: ObservableObject {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 guard let self = self else { return }
-                self.accounts.api.loadDetails(item, completionHandler: { newItem in
+                self.playerAPI.loadDetails(item, completionHandler: { newItem in
                     guard newItem.videoID == self.autoplayItem?.videoID else { return }
                     self.autoplayItem = newItem
                     self.updateRemoteCommandCenter()

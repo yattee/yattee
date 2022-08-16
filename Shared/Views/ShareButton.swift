@@ -27,7 +27,7 @@ struct ShareButton: View {
 
     private var instanceActions: some View {
         Group {
-            if let url = accounts.api.shareURL(contentItem) {
+            if let url = player.playerAPI.shareURL(contentItem) {
                 Button(labelForShareURL(accounts.app.name)) {
                     shareAction(url)
                 }
@@ -35,7 +35,7 @@ struct ShareButton: View {
                 if contentItemIsPlayerCurrentVideo {
                     Button(labelForShareURL(accounts.app.name, withTime: true)) {
                         shareAction(
-                            accounts.api.shareURL(
+                            player.playerAPI.shareURL(
                                 contentItem,
                                 time: player.backend.currentTime
                             )!

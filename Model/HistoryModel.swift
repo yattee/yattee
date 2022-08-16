@@ -13,7 +13,7 @@ extension PlayerModel {
             return
         }
 
-        accounts.api.video(id).load().onSuccess { [weak self] response in
+        playerAPI.video(id).load().onSuccess { [weak self] response in
             guard let video: Video = response.typedContent() else {
                 return
             }
