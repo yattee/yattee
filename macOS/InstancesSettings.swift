@@ -13,6 +13,7 @@ struct InstancesSettings: View {
     @State private var presentingInstanceRemovalConfirmation = false
 
     @State private var frontendURL = ""
+    @State private var proxiesVideos = false
 
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject<AccountsModel> private var accounts
@@ -98,6 +99,16 @@ struct InstancesSettings: View {
                     .foregroundColor(.secondary)
             }
 
+            if selectedInstance != nil, selectedInstance.app.allowsDisablingVidoesProxying {
+                proxiesVideosToggle
+                    .onAppear {
+                        proxiesVideos = selectedInstance.proxiesVideos
+                    }
+                    .onChange(of: proxiesVideos) { newValue in
+                        InstancesModel.setProxiesVideos(selectedInstance, newValue)
+                    }
+            }
+
             if selectedInstance != nil, !selectedInstance.app.supportsAccounts {
                 Spacer()
                 Text("Accounts are not supported for the application of this instance")
@@ -176,6 +187,10 @@ struct InstancesSettings: View {
         }
 
         return InstancesModel.accounts(selectedInstanceID)
+    }
+
+    private var proxiesVideosToggle: some View {
+        Toggle("Proxy videos", isOn: $proxiesVideos)
     }
 }
 
