@@ -222,7 +222,7 @@ struct PlaylistFormView: View {
         .alert(isPresented: $presentingDeleteConfirmation) {
             Alert(
                 title: Text("Are you sure you want to delete playlist?"),
-                message: Text("Playlist \"\(playlist.title)\" will be deleted.\nIt cannot be undone."),
+                message: Text("Playlist \"\(playlist.title)\" will be deleted.\nIt cannot be reverted."),
                 primaryButton: .destructive(Text("Delete"), action: deletePlaylistAndDismiss),
                 secondaryButton: .cancel()
             )
