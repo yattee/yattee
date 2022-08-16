@@ -259,7 +259,8 @@ final class MPVClient: ObservableObject {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 UIView.animate(withDuration: 0.2, animations: {
-                    let height = [self.backend.model.playerSize.height, self.backend.model.playerSize.width / self.aspectRatio].min()!
+                    let aspectRatio = self.aspectRatio > 0 && self.aspectRatio < VideoPlayerView.defaultAspectRatio ? self.aspectRatio : VideoPlayerView.defaultAspectRatio
+                    let height = [self.backend.model.playerSize.height, self.backend.model.playerSize.width / aspectRatio].min()!
                     let offsetY = self.backend.model.playingFullScreen ? ((self.backend.model.playerSize.height / 2.0) - (height / 2)) : 0
                     self.glView?.frame = CGRect(x: 0, y: offsetY, width: roundedWidth, height: height)
                 }) { completion in
