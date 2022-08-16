@@ -68,6 +68,7 @@ struct LocationsSettings: View {
         Section(header: SettingsHeader(text: "Custom Locations")) {
             #if os(macOS)
                 InstancesSettings()
+                    .environmentObject(model)
             #else
                 ForEach(instances) { instance in
                     AccountsNavigationLink(instance: instance)

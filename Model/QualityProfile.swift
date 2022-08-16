@@ -4,7 +4,6 @@ import Foundation
 struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     static var bridge = QualityProfileBridge()
     static var defaultProfile = Self(id: "default", backend: .mpv, resolution: .hd720p60, formats: [.stream])
-    static var highQualityProfile = Self(id: "highQuality", backend: .mpv, resolution: .hd2160p60, formats: [.webm, .mp4, .av1, .avc1])
 
     enum Format: String, CaseIterable, Identifiable, Defaults.Serializable {
         case hls

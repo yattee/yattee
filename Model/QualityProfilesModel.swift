@@ -15,11 +15,7 @@ struct QualityProfilesModel {
     #endif
 
     func find(_ id: QualityProfile.ID) -> QualityProfile? {
-        if id == "default" {
-            return QualityProfile.defaultProfile
-        } else if id == "highQuality" {
-            return QualityProfile.highQualityProfile
-        }
+        guard id != "default" else { return QualityProfile.defaultProfile }
 
         return Defaults[.qualityProfiles].first { $0.id == id }
     }
@@ -45,6 +41,14 @@ struct QualityProfilesModel {
         Defaults[.batteryNonCellularProfile] = qualityProfile.id
         Defaults[.chargingCellularProfile] = qualityProfile.id
         Defaults[.chargingNonCellularProfile] = qualityProfile.id
+    }
+
+    func reset() {
+        Defaults.reset(.qualityProfiles)
+        Defaults.reset(.batteryCellularProfile)
+        Defaults.reset(.batteryNonCellularProfile)
+        Defaults.reset(.chargingCellularProfile)
+        Defaults.reset(.chargingNonCellularProfile)
     }
 
     #if os(iOS)

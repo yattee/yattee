@@ -5,8 +5,9 @@ struct QualitySettings: View {
     @State private var presentingProfileForm = false
     @State private var editedProfileID: QualityProfile.ID?
 
-    @Default(.qualityProfiles) private var qualityProfiles
+    @EnvironmentObject<SettingsModel> private var settings
 
+    @Default(.qualityProfiles) private var qualityProfiles
     @Default(.batteryCellularProfile) private var batteryCellularProfile
     @Default(.batteryNonCellularProfile) private var batteryNonCellularProfile
     @Default(.chargingCellularProfile) private var chargingCellularProfile
@@ -75,6 +76,25 @@ struct QualitySettings: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack {
+                Button {
+                    settings.presentAlert(
+                        Alert(
+                            title: Text("Are you sure you want to restore default quality profiles?"),
+                            message: Text("This will remove all your custom profiles and return their default values. This cannot be reverted."),
+                            primaryButton: .destructive(Text("Reset")) {
+                                QualityProfilesModel.shared.reset()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    )
+                } label: {
+                    Text("Restore default profiles...")
+                        .foregroundColor(.red)
+                }
+                Spacer()
+            }
         }
     }
 
