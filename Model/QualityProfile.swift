@@ -57,7 +57,17 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
 
     var description: String {
         if let name = name, !name.isEmpty { return name }
-        return "\(backend.label) - \(resolution.description) - \(formats.map(\.description).joined(separator: ", "))"
+        return "\(backend.label) - \(resolution.description) - \(formatsDescription)"
+    }
+
+    var formatsDescription: String {
+        if formats.count == Format.allCases.count {
+            return "Any format"
+        } else if formats.count <= 3 {
+            return formats.map(\.description).joined(separator: ", ")
+        }
+
+        return "\(formats.count) formats"
     }
 
     func isPreferred(_ stream: Stream) -> Bool {
