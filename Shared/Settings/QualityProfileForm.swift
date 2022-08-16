@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct QualityProfileForm: View {
@@ -13,6 +14,8 @@ struct QualityProfileForm: View {
     @State private var backend = PlayerBackendType.mpv
     @State private var resolution = ResolutionSetting.hd1080p60
     @State private var formats = [QualityProfile.Format]()
+
+    @Default(.qualityProfiles) private var qualityProfiles
 
     var qualityProfile: QualityProfile! {
         if let id = qualityProfileID {
@@ -131,7 +134,7 @@ struct QualityProfileForm: View {
         .modifier(SettingsPickerModifier())
 
         #if os(iOS)
-            return HStack {
+            HStack {
                 Text("Resolution")
                 Spacer()
                 Menu {
@@ -175,7 +178,7 @@ struct QualityProfileForm: View {
         }
         .modifier(SettingsPickerModifier())
         #if os(iOS)
-            return HStack {
+            HStack {
                 Text("Backend")
                 Spacer()
                 Menu {
@@ -321,7 +324,12 @@ struct QualityProfileForm: View {
         if editing {
             QualityProfilesModel.shared.update(qualityProfile, formProfile)
         } else {
+            let wasEmpty = qualityProfiles.isEmpty
             QualityProfilesModel.shared.add(formProfile)
+
+            if wasEmpty {
+                QualityProfilesModel.shared.applyToAll(formProfile)
+            }
         }
 
         presentationMode.wrappedValue.dismiss()
