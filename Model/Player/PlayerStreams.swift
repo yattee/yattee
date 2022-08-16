@@ -18,13 +18,10 @@ extension PlayerModel {
     func loadAvailableStreams(_ video: Video) {
         availableStreams = []
 
-        guard let playerInstance = InstancesModel.forPlayer ?? InstancesModel.all.first else {
-            return
-        }
+        guard let playerInstance = playerInstance else { return }
 
         logger.info("loading streams from \(playerInstance.description)")
-
-        fetchStreams(playerInstance.anonymous.video(video.videoID), instance: playerInstance, video: video)
+        fetchStreams(playerAPI.video(video.videoID), instance: playerInstance, video: video)
     }
 
     private func fetchStreams(

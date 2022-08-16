@@ -56,18 +56,30 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
 
         DispatchQueue.main.async { [weak self] in
-            guard let video = self?.currentVideo else {
+            guard let self = self else { return }
+            guard let video = self.currentVideo else {
                 return
             }
-            self?.videoBeingOpened = nil
 
-            if video.streams.isEmpty {
-                self?.loadAvailableStreams(video)
+            self.videoBeingOpened = nil
+
+            guard let playerInstance = self.playerInstance else { return }
+            let streamsInstance = video.streams.compactMap(\.instance).first
+
+            if video.streams.isEmpty || streamsInstance != playerInstance {
+                self.loadAvailableStreams(video)
             } else {
-                guard let instance = self?.accounts.current?.instance ?? InstancesModel.forPlayer ?? InstancesModel.all.first else { return }
-                self?.availableStreams = self?.streamsWithInstance(instance: instance, streams: video.streams) ?? video.streams
+                self.availableStreams = self.streamsWithInstance(instance: playerInstance, streams: video.streams)
             }
         }
+    }
+
+    var playerInstance: Instance? {
+        InstancesModel.forPlayer ?? accounts.current?.instance ?? InstancesModel.all.first
+    }
+
+    var playerAPI: VideosAPI {
+        playerInstance?.anonymous ?? accounts.api
     }
 
     var qualityProfile: QualityProfile? {
@@ -135,7 +147,7 @@ extension PlayerModel {
         currentItem.playbackTime = time
 
         let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
-        accounts.api.loadDetails(currentItem, failureHandler: videoLoadFailureHandler) { newItem in
+        playerAPI.loadDetails(currentItem, failureHandler: videoLoadFailureHandler) { newItem in
             self.playItem(newItem, at: playTime)
         }
     }
@@ -178,7 +190,7 @@ extension PlayerModel {
         }
 
         if loadDetails {
-            accounts.api.loadDetails(item, failureHandler: videoLoadFailureHandler) { [weak self] newItem in
+            playerAPI.loadDetails(item, failureHandler: videoLoadFailureHandler) { [weak self] newItem in
                 guard let self = self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
@@ -239,7 +251,7 @@ extension PlayerModel {
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
         guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
 
-        accounts.api.loadDetails(item, completionHandler: { newItem in
+        playerAPI.loadDetails(item, completionHandler: { newItem in
             if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
                 self.queue[index] = newItem
             }

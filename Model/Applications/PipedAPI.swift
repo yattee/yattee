@@ -517,7 +517,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         var streams = [Stream]()
 
         if let hlsURL = content.dictionaryValue["hls"]?.url {
-            streams.append(Stream(hlsURL: hlsURL))
+            streams.append(Stream(instance: account.instance, hlsURL: hlsURL))
         }
 
         let audioStreams = content
@@ -560,6 +560,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             if videoOnly {
                 streams.append(
                     Stream(
+                        instance: account.instance,
                         audioAsset: audioAsset,
                         videoAsset: videoAsset,
                         resolution: resolution,
@@ -569,7 +570,12 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                 )
             } else {
                 streams.append(
-                    SingleAssetStream(avAsset: videoAsset, resolution: resolution, kind: .stream)
+                    SingleAssetStream(
+                        instance: account.instance,
+                        avAsset: videoAsset,
+                        resolution: resolution,
+                        kind: .stream
+                    )
                 )
             }
         }

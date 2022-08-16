@@ -509,6 +509,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             }
 
             return SingleAssetStream(
+                instance: account.instance,
                 avAsset: AVURLAsset(url: streamURL),
                 resolution: Stream.Resolution.from(resolution: stream["resolution"].string ?? ""),
                 kind: .stream,
@@ -538,6 +539,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             }
 
             return Stream(
+                instance: account.instance,
                 audioAsset: AVURLAsset(url: audioAssetURL),
                 videoAsset: AVURLAsset(url: videoAssetURL),
                 resolution: Stream.Resolution.from(resolution: videoStream["resolution"].stringValue),
@@ -550,7 +552,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     private func extractHLSStreams(from content: JSON) -> [Stream] {
         if let hlsURL = content.dictionaryValue["hlsUrl"]?.url {
-            return [Stream(hlsURL: hlsURL)]
+            return [Stream(instance: account.instance, hlsURL: hlsURL)]
         }
 
         return []
