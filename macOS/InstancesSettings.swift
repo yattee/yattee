@@ -9,9 +9,6 @@ struct InstancesSettings: View {
     @State private var presentingInstanceForm = false
     @State private var savedFormInstanceID: Instance.ID?
 
-    @State private var presentingAccountRemovalConfirmation = false
-    @State private var presentingInstanceRemovalConfirmation = false
-
     @State private var frontendURL = ""
     @State private var proxiesVideos = false
 
@@ -53,25 +50,24 @@ struct InstancesSettings: View {
                             Spacer()
 
                             Button("Remove") {
-                                presentingAccountRemovalConfirmation = true
+                                settings.presentAlert(
+                                    Alert(
+                                        title: Text(
+                                            "Are you sure you want to remove \(selectedAccount?.description ?? "") account?"
+                                        ),
+                                        message: Text("This cannot be reverted"),
+                                        primaryButton: .destructive(Text("Remove")) {
+                                            AccountsModel.remove(selectedAccount!)
+                                        },
+                                        secondaryButton: .cancel()
+                                    )
+                                )
                             }
                             .foregroundColor(colorScheme == .dark ? .white : .red)
                             .opacity(account == selectedAccount ? 1 : 0)
                         }
                         .tag(account)
                     }
-                }
-                .alert(isPresented: $presentingAccountRemovalConfirmation) {
-                    Alert(
-                        title: Text(
-                            "Are you sure you want to remove \(selectedAccount?.description ?? "") account?"
-                        ),
-                        message: Text("This cannot be undone"),
-                        primaryButton: .destructive(Text("Remove")) {
-                            AccountsModel.remove(selectedAccount!)
-                        },
-                        secondaryButton: .cancel()
-                    )
                 }
 
                 if #available(macOS 12.0, *) {
@@ -127,12 +123,11 @@ struct InstancesSettings: View {
                     Spacer()
 
                     Button("Remove Location") {
-                        presentingInstanceRemovalConfirmation = true
                         settings.presentAlert(Alert(
                             title: Text(
                                 "Are you sure you want to remove \(selectedInstance!.longDescription) location?"
                             ),
-                            message: Text("This cannot be undone"),
+                            message: Text("This cannot be reverted"),
                             primaryButton: .destructive(Text("Remove")) {
                                 if accounts.current?.instance == selectedInstance {
                                     accounts.setCurrent(nil)
