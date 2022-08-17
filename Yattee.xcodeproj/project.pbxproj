@@ -399,6 +399,7 @@
 		376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
+		376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */; };
 		3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003227E8EEA100CB2475 /* AudioToolbox.framework */; };
 		3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003427E8EEA100CB2475 /* AVFoundation.framework */; };
 		3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003527E8EEA100CB2475 /* CoreMedia.framework */; };
@@ -1078,6 +1079,7 @@
 		376BE50627347B57009AD608 /* SettingsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHeader.swift; sourceTree = "<group>"; };
 		376BE50A27349108009AD608 /* BrowsingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingSettings.swift; sourceTree = "<group>"; };
 		376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Instance+Fixtures.swift"; sourceTree = "<group>"; };
+		376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollDismissesKeyboard+Backport.swift"; sourceTree = "<group>"; };
 		3772002527E8ED2600CB2475 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		3772003127E8EEA100CB2475 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		3772003227E8EEA100CB2475 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
@@ -1613,6 +1615,7 @@
 				3722AEBF274DAEB8005EA4D6 /* Tint+Backport.swift */,
 				3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */,
 				3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */,
+				376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */,
 			);
 			path = Backports;
 			sourceTree = "<group>";
@@ -2812,6 +2815,7 @@
 				373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */,
 				3700155B271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				373031F32838388A000CFD59 /* PlayerLayerView.swift in Sources */,
+				376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */,
 				37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37C3A251272366440087A57A /* ChannelPlaylistView.swift in Sources */,

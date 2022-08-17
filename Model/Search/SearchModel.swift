@@ -1,4 +1,5 @@
 import Defaults
+import Repeat
 import Siesta
 import SwiftUI
 
@@ -9,9 +10,9 @@ final class SearchModel: ObservableObject {
     @Published var query = SearchQuery()
     @Published var queryText = ""
     @Published var suggestionsText = ""
-    @Published var suggestionSelection = ""
 
-    @Published var querySuggestions = Store<[String]>()
+    @Published var querySuggestions = [String]()
+    private var suggestionsDebouncer = Debouncer(.milliseconds(200))
 
     var accounts = AccountsModel()
     private var resource: Resource!
@@ -74,34 +75,27 @@ final class SearchModel: ObservableObject {
     }
 
     var suggestionsResource: Resource? { didSet {
-        oldValue?.removeObservers(ownedBy: querySuggestions)
         oldValue?.cancelLoadIfUnobserved()
 
         objectWillChange.send()
     }}
 
     func loadSuggestions(_ query: String) {
-        guard !query.isEmpty else {
-            querySuggestions.replace([])
-            return
-        }
-
-        DispatchQueue.main.async {
-            self.suggestionsResource = self.accounts.api.searchSuggestions(query: query)
-            self.suggestionsResource?.addObserver(self.querySuggestions)
-
-            if let request = self.suggestionsResource?.loadIfNeeded() {
-                request.onSuccess { response in
+        suggestionsDebouncer.callback = {
+            guard !query.isEmpty else { return }
+            DispatchQueue.main.async {
+                self.accounts.api.searchSuggestions(query: query).load().onSuccess { response in
                     if let suggestions: [String] = response.typedContent() {
-                        self.querySuggestions = Store<[String]>(suggestions)
+                        self.querySuggestions = suggestions
+                    } else {
+                        self.querySuggestions = []
                     }
                     self.suggestionsText = query
                 }
-            } else {
-                self.querySuggestions = Store<[String]>(self.querySuggestions.collection)
-                self.suggestionsText = query
             }
         }
+
+        suggestionsDebouncer.call()
     }
 
     func loadNextPage() {
