@@ -7,20 +7,22 @@ struct SearchSuggestions: View {
 
     var body: some View {
         List {
-            Button {
-                runQueryAction(state.queryText)
-            } label: {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                    Text(state.queryText)
-                        .lineLimit(1)
+            if !state.queryText.isEmpty {
+                Button {
+                    runQueryAction(state.queryText)
+                } label: {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                        Text(state.queryText)
+                            .lineLimit(1)
+                    }
                 }
-            }
-            .padding(.vertical, 5)
+                .padding(.vertical, 5)
 
-            #if os(macOS)
-                .onHover(perform: onHover(_:))
-            #endif
+                #if os(macOS)
+                    .onHover(perform: onHover(_:))
+                #endif
+            }
 
             ForEach(visibleSuggestions, id: \.self) { suggestion in
                 HStack {
@@ -51,7 +53,7 @@ struct SearchSuggestions: View {
                     Spacer()
 
                     Button {
-                        state.suggestionSelection = suggestion
+                        state.queryText = suggestion
                     } label: {
                         Image(systemName: "arrow.up.left.circle")
                             .foregroundColor(.secondary)
@@ -65,14 +67,16 @@ struct SearchSuggestions: View {
                 #endif
             }
         }
-        .id(UUID())
+        #if os(iOS)
+        .padding(.bottom, 90)
+        #endif
         #if os(macOS)
-            .buttonStyle(.link)
+        .buttonStyle(.link)
         #endif
     }
 
     private func runQueryAction(_ queryText: String) {
-        state.suggestionSelection = queryText
+        state.queryText = queryText
 
         state.changeQuery { query in
             query.query = queryText
@@ -83,7 +87,7 @@ struct SearchSuggestions: View {
     }
 
     private var visibleSuggestions: [String] {
-        state.querySuggestions.collection.filter {
+        state.querySuggestions.filter {
             $0.compare(state.queryText, options: .caseInsensitive) != .orderedSame
         }
     }

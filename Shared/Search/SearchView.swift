@@ -17,7 +17,6 @@ struct SearchView: View {
     #endif
 
     @State private var favoriteItem: FavoriteItem?
-    @State private var queryText = ""
 
     @Environment(\.navigationStyle) private var navigationStyle
 
@@ -61,25 +60,29 @@ struct SearchView: View {
         }) {
             #if os(iOS)
                 VStack {
-                    SearchTextField(queryText: $queryText, favoriteItem: $favoriteItem)
+                    SearchTextField(favoriteItem: $favoriteItem)
 
-                    if state.query.query != queryText, !queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                    if state.query.query != state.queryText {
                         SearchSuggestions()
+                            .opacity(state.queryText.isEmpty ? 0 : 1)
                     } else {
                         results
                     }
                 }
+                .backport
+                .scrollDismissesKeyboard()
             #else
                 ZStack {
                     results
 
                     #if os(macOS)
-                        if state.query.query != queryText, !queryText.isEmpty, !state.querySuggestions.collection.isEmpty {
+                        if state.query.query != state.queryText {
                             HStack {
                                 Spacer()
                                 SearchSuggestions()
                                     .borderLeading(width: 1, color: Color("ControlsBorderColor"))
                                     .frame(maxWidth: 280)
+                                    .opacity(state.queryText.isEmpty ? 0 : 1)
                             }
                         }
                     #endif
@@ -108,13 +111,12 @@ struct SearchView: View {
                         filtersMenu
                     }
 
-                    SearchTextField(queryText: $queryText)
+                    SearchTextField(favoriteItem: $favoriteItem)
                 }
             #endif
         }
         .onAppear {
             if let query = query {
-                queryText = query.query
                 state.queryText = query.query
                 state.resetQuery(query)
                 updateFavoriteItem()
@@ -125,10 +127,6 @@ struct SearchView: View {
             }
         }
         .onChange(of: state.queryText) { newQuery in
-            if queryText.isEmpty, queryText != newQuery {
-                queryText = newQuery
-            }
-
             if newQuery.isEmpty {
                 favoriteItem = nil
                 state.resetQuery()
@@ -136,9 +134,7 @@ struct SearchView: View {
                 updateFavoriteItem()
             }
 
-            if state.query.query != queryText {
-                state.loadSuggestions(newQuery)
-            }
+            state.loadSuggestions(newQuery)
 
             #if os(tvOS)
                 searchDebounce.invalidate()
@@ -147,7 +143,6 @@ struct SearchView: View {
                 searchDebounce.debouncing(2) {
                     state.changeQuery { query in
                         query.query = newQuery
-                        updateFavoriteItem()
                     }
                 }
 
@@ -176,9 +171,11 @@ struct SearchView: View {
         }
         #if os(tvOS)
         .searchable(text: $state.queryText) {
-            ForEach(state.querySuggestions.collection, id: \.self) { suggestion in
-                Text(suggestion)
-                    .searchCompletion(suggestion)
+            if !state.queryText.isEmpty {
+                ForEach(state.querySuggestions, id: \.self) { suggestion in
+                    Text(suggestion)
+                        .searchCompletion(suggestion)
+                }
             }
         }
         #else
@@ -224,6 +221,9 @@ struct SearchView: View {
         VStack {
             if showRecentQueries {
                 recentQueries
+                #if os(iOS)
+                .padding(.bottom, 90)
+                #endif
             } else {
                 #if os(tvOS)
                     ScrollView(.vertical, showsIndicators: false) {
@@ -311,12 +311,9 @@ struct SearchView: View {
         Button {
             switch item.type {
             case .query:
-                #if os(tvOS)
-                    state.queryText = item.title
-                #else
-                    queryText = item.title
-                #endif
+                state.queryText = item.title
                 state.changeQuery { query in query.query = item.title }
+                navigation.hideKeyboard()
 
                 updateFavoriteItem()
                 recents.add(item)
@@ -493,10 +490,10 @@ struct SearchView: View {
 
     private func updateFavoriteItem() {
         favoriteItem = FavoriteItem(section: .searchQuery(
-            state.query.query,
-            state.query.date?.rawValue ?? "",
-            state.query.duration?.rawValue ?? "",
-            state.query.sortBy.rawValue
+            state.queryText,
+            searchDate.rawValue,
+            searchDuration.rawValue,
+            searchSortOrder.rawValue
         ))
     }
 }
