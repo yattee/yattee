@@ -132,20 +132,28 @@ struct ContentView: View {
 
     @ViewBuilder var videoPlayer: some View {
         if player.presentingPlayer {
-            VideoPlayerView()
-                .environmentObject(accounts)
-                .environmentObject(comments)
-                .environmentObject(instances)
-                .environmentObject(navigation)
-                .environmentObject(player)
-                .environmentObject(playerControls)
-                .environmentObject(playlists)
-                .environmentObject(recents)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnailsModel)
-                .environment(\.navigationStyle, navigationStyle)
+            playerView
                 .transition(.move(edge: .bottom))
+        } else if player.activeBackend == .appleAVPlayer {
+            #if os(iOS)
+                playerView.offset(y: UIScreen.main.bounds.height)
+            #endif
         }
+    }
+
+    var playerView: some View {
+        VideoPlayerView()
+            .environmentObject(accounts)
+            .environmentObject(comments)
+            .environmentObject(instances)
+            .environmentObject(navigation)
+            .environmentObject(player)
+            .environmentObject(playerControls)
+            .environmentObject(playlists)
+            .environmentObject(recents)
+            .environmentObject(subscriptions)
+            .environmentObject(thumbnailsModel)
+            .environment(\.navigationStyle, navigationStyle)
     }
 }
 

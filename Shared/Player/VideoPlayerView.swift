@@ -245,14 +245,14 @@ struct VideoPlayerView: View {
             ZStack(alignment: .bottomLeading) {
                 #if os(tvOS)
                     ZStack {
-                        PlayerBackendView()
+                        player.playerBackendView
 
                         tvControls
                     }
                     .ignoresSafeArea()
                 #else
                     GeometryReader { geometry in
-                        PlayerBackendView()
+                        player.playerBackendView
                         #if !os(tvOS)
                             .modifier(
                                 VideoPlayerSizeModifier(

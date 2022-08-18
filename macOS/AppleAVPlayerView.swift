@@ -1,27 +1,16 @@
 import Defaults
 import SwiftUI
 
-struct AppleAVPlayerView: NSViewControllerRepresentable {
+struct AppleAVPlayerView: NSViewRepresentable {
     @EnvironmentObject<PlayerModel> private var player
 
-    @State private var controller: AppleAVPlayerViewController?
+    func makeNSView(context _: Context) -> some NSView {
+        let playerLayerView = PlayerLayerView(frame: .zero)
 
-    init(controller: AppleAVPlayerViewController? = nil) {
-        self.controller = controller
+        playerLayerView.player = player
+
+        return playerLayerView
     }
 
-    func makeNSViewController(context _: Context) -> AppleAVPlayerViewController {
-        if self.controller != nil {
-            return self.controller!
-        }
-
-        let controller = AppleAVPlayerViewController()
-
-        controller.playerModel = player
-        player.avPlayerBackend.controller = controller
-
-        return controller
-    }
-
-    func updateNSViewController(_: AppleAVPlayerViewController, context _: Context) {}
+    func updateNSView(_: NSViewType, context _: Context) {}
 }

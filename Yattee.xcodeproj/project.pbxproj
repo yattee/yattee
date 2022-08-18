@@ -161,6 +161,7 @@
 		37169AA62729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
+		37192D5528B0D5D60012EEDD /* PlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F22838388A000CFD59 /* PlayerLayerView.swift */; };
 		371B7E5C27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5D27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5E27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
@@ -623,7 +624,6 @@
 		37BE0BD426A1D47D0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
 		37BE0BD626A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
 		37BE0BD726A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
-		37BE0BDA26A214630092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD926A214630092E2DB /* AppleAVPlayerViewController.swift */; };
 		37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */; };
 		37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661B27308859008CCFB0 /* DropFavorite.swift */; };
 		37BF661D27308859008CCFB0 /* DropFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661B27308859008CCFB0 /* DropFavorite.swift */; };
@@ -1000,7 +1000,7 @@
 		3729037D2739E47400EA99F6 /* MenuCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCommands.swift; sourceTree = "<group>"; };
 		372915E52687E3B900F5A35B /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
 		372CFD14285F2E2A00B0B54B /* ControlsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsBar.swift; sourceTree = "<group>"; };
-		373031F22838388A000CFD59 /* PlayerLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerLayerView.swift; sourceTree = "<group>"; };
+		373031F22838388A000CFD59 /* PlayerLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerLayerView.swift; sourceTree = "<group>"; tabWidth = 5; };
 		373031F428383A89000CFD59 /* PiPDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiPDelegate.swift; sourceTree = "<group>"; };
 		3730D89F2712E2B70020ED53 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
@@ -1161,7 +1161,6 @@
 		37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerViewController.swift; sourceTree = "<group>"; };
-		37BE0BD926A214630092E2DB /* AppleAVPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerViewController.swift; sourceTree = "<group>"; };
 		37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
 		37BF661B27308859008CCFB0 /* DropFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropFavorite.swift; sourceTree = "<group>"; };
 		37BF661E27308884008CCFB0 /* DropFavoriteOutside.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropFavoriteOutside.swift; sourceTree = "<group>"; };
@@ -1889,7 +1888,6 @@
 			children = (
 				374C0542272496E4009BDDBE /* AppDelegate.swift */,
 				37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */,
-				37BE0BD926A214630092E2DB /* AppleAVPlayerViewController.swift */,
 				37FD43DB270470B70073EE42 /* InstancesSettings.swift */,
 				3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */,
 				374108D0272B11B2006C5CC8 /* PictureInPictureDelegate.swift */,
@@ -2972,6 +2970,7 @@
 				377ABC4D286E6A78009C986F /* LocationsSettings.swift in Sources */,
 				3782B95027553A6700990149 /* SearchSuggestions.swift in Sources */,
 				371B7E6B2759791900D21217 /* CommentsModel.swift in Sources */,
+				37192D5528B0D5D60012EEDD /* PlayerLayerView.swift in Sources */,
 				371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				3756C2AB2861151C00E4B059 /* NetworkStateModel.swift in Sources */,
 				375EC95A289EEB8200751258 /* QualityProfileForm.swift in Sources */,
@@ -3075,7 +3074,6 @@
 				377ABC49286E5887009C986F /* Sequence+Unique.swift in Sources */,
 				3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				3784B23E2728B85300B09468 /* ShareButton.swift in Sources */,
-				37BE0BDA26A214630092E2DB /* AppleAVPlayerViewController.swift in Sources */,
 				375F7411289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37E64DD226D597EB00C71877 /* SubscriptionsModel.swift in Sources */,

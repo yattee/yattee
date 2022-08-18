@@ -45,7 +45,7 @@ protocol PlayerBackend {
 
     func closeItem()
 
-    func closePiP(wasPlaying: Bool)
+    func closePiP()
 
     func updateControls()
     func startControlsUpdates()

@@ -35,10 +35,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     var aspectRatio: Double {
         #if os(iOS)
-            guard let view = model?.playerLayerView else { return VideoPlayerView.defaultAspectRatio }
-
-            let videoRect = view.playerLayer.videoRect
-            return videoRect.width / videoRect.height
+            playerLayer.videoRect.width / playerLayer.videoRect.height
         #else
             VideoPlayerView.defaultAspectRatio
         #endif
@@ -54,7 +51,10 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     private(set) var avPlayer = AVPlayer()
-    var controller: AppleAVPlayerViewController?
+    private(set) var playerLayer = AVPlayerLayer()
+    #if os(tvOS)
+        var controller: AppleAVPlayerViewController?
+    #endif
     var startPictureInPictureOnPlay = false
 
     private var asset: AVURLAsset?
@@ -79,6 +79,8 @@ final class AVPlayerBackend: PlayerBackend {
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
         addPlayerTimeControlStatusObserver()
+
+        playerLayer.player = avPlayer
     }
 
     func bestPlayable(_ streams: [Stream], maxResolution _: ResolutionSetting) -> Stream? {
@@ -157,39 +159,9 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.replaceCurrentItem(with: nil)
     }
 
-    #if os(tvOS)
-        func closePiP(wasPlaying: Bool) {
-            let item = avPlayer.currentItem
-            let time = avPlayer.currentTime()
-
-            avPlayer.replaceCurrentItem(with: nil)
-
-            guard !item.isNil else {
-                return
-            }
-
-            avPlayer.seek(to: time)
-            avPlayer.replaceCurrentItem(with: item)
-
-            guard wasPlaying else {
-                return
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.play()
-            }
-        }
-    #else
-        func closePiP(wasPlaying: Bool) {
-            model.pipController?.stopPictureInPicture()
-
-            guard wasPlaying else {
-                return
-            }
-
-            play()
-        }
-    #endif
+    func closePiP() {
+        model.pipController?.stopPictureInPicture()
+    }
 
     private func loadSingleAsset(
         _ url: URL,
