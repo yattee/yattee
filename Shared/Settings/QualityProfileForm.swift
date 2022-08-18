@@ -299,7 +299,9 @@ struct QualityProfileForm: View {
             }
         }
 
-        if let newResolution = availableResolutions.first {
+        if isResolutionDisabled(resolution),
+           let newResolution = availableResolutions.first
+        {
             resolution = newResolution
         }
     }
