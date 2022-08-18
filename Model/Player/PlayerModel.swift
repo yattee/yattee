@@ -149,13 +149,10 @@ final class PlayerModel: ObservableObject {
     var pipController: AVPictureInPictureController?
     var pipDelegate = PiPDelegate()
 
-    @Published var presentingErrorDetails = false
     var playerError: Error? { didSet {
-        #if !os(tvOS)
-            if !playerError.isNil {
-                presentingErrorDetails = true
-            }
-        #endif
+        if let error = playerError {
+            navigation.presentAlert(title: "Failed loading video", message: error.localizedDescription)
+        }
     }}
 
     @Default(.qualityProfiles) var qualityProfiles
