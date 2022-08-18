@@ -24,17 +24,6 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
             return
         }
 
-        if player.avPlayerBackend.switchToMPVOnPipClose,
-           !player.currentItem.isNil
-        {
-            DispatchQueue.main.async {
-                player.avPlayerBackend.switchToMPVOnPipClose = false
-                player.saveTime {
-                    player.changeActiveBackend(from: .appleAVPlayer, to: .mpv)
-                }
-            }
-        }
-
         player.playingInPictureInPicture = false
     }
 

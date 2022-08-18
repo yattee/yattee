@@ -132,10 +132,6 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func startPiP(startImmediately: Bool = true) {
-        if player.activeBackend == .mpv {
-            player.avPlayerBackend.switchToMPVOnPipClose = true
-        }
-
         #if !os(macOS)
             player.exitFullScreen()
         #endif
