@@ -227,8 +227,8 @@ struct PlayerControls: View {
         HStack(spacing: 20) {
             fullscreenButton
 
+            pipButton
             #if os(iOS)
-                pipButton
                 lockOrientationButton
             #endif
 

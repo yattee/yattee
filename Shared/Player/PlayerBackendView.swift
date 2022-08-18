@@ -15,17 +15,6 @@ struct PlayerBackendView: View {
                     player.mpvPlayerView
                 case .appleAVPlayer:
                     player.avPlayerView
-                    #if os(iOS)
-                        .onAppear {
-                            player.pipController = .init(playerLayer: player.playerLayerView.playerLayer)
-                            let pipDelegate = PiPDelegate()
-                            pipDelegate.player = player
-
-                            player.pipDelegate = pipDelegate
-                            player.pipController?.delegate = pipDelegate
-                            player.playerLayerView.playerLayer.player = player.avPlayerBackend.avPlayer
-                        }
-                    #endif
                 }
             }
             .overlay(GeometryReader { proxy in

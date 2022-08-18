@@ -67,6 +67,8 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    var playerBackendView = PlayerBackendView()
+
     @Published var playerSize: CGSize = .zero { didSet {
         #if !os(tvOS)
             backend.setSize(playerSize.width, playerSize.height)
@@ -167,9 +169,6 @@ final class PlayerModel: ObservableObject {
     #endif
 
     private var currentArtwork: MPMediaItemArtwork?
-    #if !os(macOS)
-        var playerLayerView: PlayerLayerView!
-    #endif
 
     var onPresentPlayer: (() -> Void)?
     private var remoteCommandCenterConfigured = false
@@ -207,6 +206,14 @@ final class PlayerModel: ObservableObject {
 
         Defaults[.activeBackend] = .mpv
         playbackMode = Defaults[.playbackMode]
+
+        guard pipController.isNil else { return }
+        pipController = .init(playerLayer: avPlayerBackend.playerLayer)
+        let pipDelegate = PiPDelegate()
+        pipDelegate.player = self
+
+        self.pipDelegate = pipDelegate
+        pipController?.delegate = pipDelegate
     }
 
     func show() {
@@ -421,7 +428,9 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        if let qualityProfileBackend = qualityProfile?.backend, qualityProfileBackend != activeBackend {
+        if let qualityProfileBackend = qualityProfile?.backend, qualityProfileBackend != activeBackend,
+           qualityProfileBackend == .appleAVPlayer || !(avPlayerBackend.startPictureInPictureOnPlay || playingInPictureInPicture)
+        {
             changeActiveBackend(from: activeBackend, to: qualityProfileBackend)
         }
 
@@ -464,14 +473,8 @@ final class PlayerModel: ObservableObject {
         }
 
         if !presentingPlayer, pauseOnHidingPlayer, !playingInPictureInPicture {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 self?.pause()
-            }
-        }
-
-        if !presentingPlayer, !pauseOnHidingPlayer, backend.isPlaying {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.play()
             }
         }
     }
@@ -482,6 +485,10 @@ final class PlayerModel: ObservableObject {
         }
 
         pause()
+
+        if to == .mpv {
+            closePiP()
+        }
 
         Defaults[.activeBackend] = to
         self.activeBackend = to
@@ -553,6 +560,7 @@ final class PlayerModel: ObservableObject {
 
     func closeCurrentItem(finished: Bool = false) {
         pause()
+        closePiP()
 
         prepareCurrentItemForHistory(finished: finished)
         currentItem = nil
@@ -562,7 +570,6 @@ final class PlayerModel: ObservableObject {
         aspectRatio = VideoPlayerView.defaultAspectRatio
         resetAutoplay()
 
-        closePiP()
         exitFullScreen()
 
         #if !os(macOS)
@@ -577,14 +584,11 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        let wasPlaying = isPlaying
-        pause()
-
         #if os(tvOS)
             show()
         #endif
 
-        backend.closePiP(wasPlaying: wasPlaying)
+        backend.closePiP()
     }
 
     func handleQueueChange() {

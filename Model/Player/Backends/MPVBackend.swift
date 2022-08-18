@@ -324,7 +324,7 @@ final class MPVBackend: PlayerBackend {
         client?.stop()
     }
 
-    func closePiP(wasPlaying _: Bool) {}
+    func closePiP() {}
 
     func updateControls() {
         self.logger.info("updating controls")

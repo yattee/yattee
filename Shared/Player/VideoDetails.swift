@@ -33,7 +33,9 @@ struct VideoDetails: View {
     @StateObject private var page: Page = .first()
 
     @Environment(\.navigationStyle) private var navigationStyle
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #if os(iOS)
+        @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<CommentsModel> private var comments
@@ -227,7 +229,9 @@ struct VideoDetails: View {
                             .redacted(reason: .placeholder)
                         } else if video.description != nil, !video.description!.isEmpty {
                             VideoDescription(video: video, detailsSize: detailsSize)
+                            #if os(iOS)
                                 .padding(.bottom, fullScreenLayout ? 10 : SafeArea.insets.bottom)
+                            #endif
                         } else {
                             Text("No description")
                                 .foregroundColor(.secondary)

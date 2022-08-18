@@ -59,10 +59,8 @@ struct VideoContextMenuView: View {
 
         Section {
             playNowButton
-            #if os(iOS)
-                playNowInPictureInPictureButton
-            #endif
             #if !os(tvOS)
+                playNowInPictureInPictureButton
                 playNowInMusicMode
             #endif
         }
@@ -169,7 +167,8 @@ struct VideoContextMenuView: View {
 
     private var playNowInPictureInPictureButton: some View {
         Button {
-            player.controls.startPiP(startImmediately: false)
+            player.controls.startPiP(startImmediately: player.presentingPlayer && player.activeBackend == .appleAVPlayer)
+            player.hide()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 player.play(video, at: watch?.timeToRestart, showingPlayer: false)
