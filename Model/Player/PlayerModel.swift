@@ -868,7 +868,6 @@ final class PlayerModel: ObservableObject {
         if musicMode {
             if playingInPictureInPicture {
                 avPlayerBackend.pause()
-                avPlayerBackend.switchToMPVOnPipClose = false
                 closePiP()
             }
             changeActiveBackend(from: .appleAVPlayer, to: .mpv)

@@ -56,7 +56,6 @@ final class AVPlayerBackend: PlayerBackend {
     private(set) var avPlayer = AVPlayer()
     var controller: AppleAVPlayerViewController?
     var startPictureInPictureOnPlay = false
-    var switchToMPVOnPipClose = false
 
     private var asset: AVURLAsset?
     private var composition = AVMutableComposition()
