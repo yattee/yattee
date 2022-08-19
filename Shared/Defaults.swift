@@ -140,7 +140,6 @@ extension Defaults.Keys {
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
     static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
-    static let videoDetailsPage = Key<VideoDetails.DetailsPage>("videoDetailsPage", default: .info)
 
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)

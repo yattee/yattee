@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "activelabel.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yattee/ActiveLabel.swift.git",
+      "state" : {
+        "branch" : "feature/timestamp",
+        "revision" : "2a88b80e44f84aa614032466039307c65815b2f3"
+      }
+    },
+    {
       "identity" : "alamofire",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
