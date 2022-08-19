@@ -39,11 +39,11 @@ extension Defaults.Keys {
     static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
     static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
 
-    static let hd2160pMPVProfile = QualityProfile(backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases)
-    static let hd1080pMPVProfile = QualityProfile(backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases)
-    static let hd720pMPVProfile = QualityProfile(backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases)
-    static let hd720pAVPlayerProfile = QualityProfile(backend: .appleAVPlayer, resolution: .hd720p60, formats: [.hls, .stream])
-    static let sd360pAVPlayerProfile = QualityProfile(backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream])
+    static let hd2160pMPVProfile = QualityProfile(id: "hd2160pMPVProfile", backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases)
+    static let hd1080pMPVProfile = QualityProfile(id: "hd1080pMPVProfile", backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases)
+    static let hd720pMPVProfile = QualityProfile(id: "hd720pMPVProfile", backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases)
+    static let hd720pAVPlayerProfile = QualityProfile(id: "hd720pAVPlayerProfile", backend: .appleAVPlayer, resolution: .hd720p60, formats: [.hls, .stream])
+    static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream])
 
     #if os(iOS)
         static let qualityProfilesDefault = UIDevice.current.userInterfaceIdiom == .pad ? [
