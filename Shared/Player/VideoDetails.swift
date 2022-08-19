@@ -33,6 +33,7 @@ struct VideoDetails: View {
     @StateObject private var page: Page = .first()
 
     @Environment(\.navigationStyle) private var navigationStyle
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<CommentsModel> private var comments
@@ -41,8 +42,6 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
-    @Default(.videoDetailsPage) private var videoDetailsPage
-    @Default(.showKeywords) private var showKeywords
     @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
 
     var currentPage: DetailsPage {
@@ -92,12 +91,10 @@ struct VideoDetails: View {
                 if pageIndex == DetailsPage.comments.index {
                     comments.load()
                 }
-
-                videoDetailsPage = DetailsPage.allCases.first { $0.index == pageIndex } ?? .info
             }
         }
         .onAppear {
-            page.update(.new(index: videoDetailsPage.index))
+            page.update(.moveToFirst)
 
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
@@ -114,11 +111,20 @@ struct VideoDetails: View {
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        .overlay(GeometryReader { proxy in
+            Color.clear
+                .onAppear {
+                    detailsSize = proxy.size
+                }
+                .onChange(of: proxy.size) { newSize in
+                    detailsSize = newSize
+                }
+        })
     }
 
     var publishedDateSection: some View {
         Group {
-            if let video = player.currentVideo {
+            if let video = video {
                 HStack(spacing: 4) {
                     if let published = video.publishedDate {
                         Text(published)
@@ -144,7 +150,6 @@ struct VideoDetails: View {
         Button(action: {
             page.update(.new(index: destination.index))
             pageChangeAction?()
-            videoDetailsPage = destination
         }) {
             HStack {
                 Spacer()
@@ -199,10 +204,12 @@ struct VideoDetails: View {
         .contentShape(Rectangle())
     }
 
+    @State private var detailsSize = CGSize.zero
+
     var detailsPage: some View {
         Group {
             VStack(alignment: .leading, spacing: 0) {
-                if let video = player.currentVideo {
+                if let video = video {
                     VStack(spacing: 6) {
                         videoProperties
 
@@ -218,52 +225,26 @@ struct VideoDetails: View {
                                 }
                             }
                             .redacted(reason: .placeholder)
-                        } else if let description = video.description {
-                            Group {
-                                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                                    Text(description)
-                                    #if !os(tvOS)
-                                        .textSelection(.enabled)
-                                    #endif
-                                } else {
-                                    Text(description)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.system(size: 14))
-                            .lineSpacing(3)
+                        } else if video.description != nil, !video.description!.isEmpty {
+                            VideoDescription(video: video, detailsSize: detailsSize)
+                                .padding(.bottom, fullScreenLayout ? 10 : SafeArea.insets.bottom)
                         } else {
                             Text("No description")
                                 .foregroundColor(.secondary)
-                        }
-
-                        if showKeywords {
-                            ScrollView(.horizontal, showsIndicators: showScrollIndicators) {
-                                HStack {
-                                    ForEach(video.keywords, id: \.self) { keyword in
-                                        HStack(alignment: .center, spacing: 0) {
-                                            Text("#")
-                                                .font(.system(size: 11).bold())
-
-                                            Text(keyword)
-                                                .frame(maxWidth: 500)
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 4)
-                                        .padding(.horizontal, 8)
-                                        .background(Color("KeywordBackgroundColor"))
-                                        .mask(RoundedRectangle(cornerRadius: 3))
-                                    }
-                                }
-                                .padding(.bottom, 10)
-                            }
                         }
                     }
                 }
             }
             .padding(.horizontal)
         }
+    }
+
+    var fullScreenLayout: Bool {
+        #if os(iOS)
+            return player.playingFullScreen || verticalSizeClass == .compact
+        #else
+            return player.playingFullScreen
+        #endif
     }
 
     @ViewBuilder var videoProperties: some View {
@@ -318,14 +299,6 @@ struct VideoDetails: View {
         }
 
         .frame(maxWidth: 100)
-    }
-
-    var showScrollIndicators: Bool {
-        #if os(macOS)
-            false
-        #else
-            true
-        #endif
     }
 }
 

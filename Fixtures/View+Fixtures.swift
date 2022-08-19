@@ -43,9 +43,25 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
     private var player: PlayerModel {
         let player = PlayerModel()
 
-        player.currentItem = PlayerQueueItem(Video(videoID: "", title: "", author: "", length: 0, published: "2 days ago", views: 43434, channel: .init(id: "", name: ""), likes: 2332, dislikes: 30))
+        player.currentItem = PlayerQueueItem(
+            Video(
+                videoID: "",
+                title: "",
+                author: "",
+                length: 0,
+                published: "2 days ago",
+                views: 43434,
+                description: "The 14\" and 16\" MacBook Pros are incredible. I can finally retire the travel iMac.\nThat shirt! http://shop.MKBHD.com\nMacBook Pro skins: https://dbrand.com/macbooks\n\n0:00 Intro\n1:38 Top Notch Design\n2:27 Let's Talk Ports\n7:11 RIP Touchbar\n8:20 The new displays\n10:12 Living with the notch\n12:37 Performance\n19:39 Battery\n20:30 So should you get it?\n\nThe Verge Review: https://youtu.be/ftU1HzBKd5Y\nTyler Stalman Review: https://youtu.be/I10WMJV96ns\nDeveloper's tweet: https://twitter.com/softwarejameson/status/1455971162060697613?s=09&t=WbOkVKgDdcegIdyOdurSNQ&utm_source=pocket_mylist\n\nTech I'm using right now: https://www.amazon.com/shop/MKBHD\n\nIntro Track: http://youtube.com/20syl\nPlaylist of MKBHD Intro music: https://goo.gl/B3AWV5\n\nLaptop provided by Apple for review.\n\n~\nhttp://twitter.com/MKBHD\nhttp://instagram.com/MKBHD\nhttp://facebook.com/MKBHD",
+                channel: .init(id: "", name: "Channel Name"),
+                likes: 2332,
+                dislikes: 30,
+                keywords: ["Video", "Computer", "Long Long Keyword"]
+            )
+        )
+        #if os(iOS)
+            player.playerSize = .init(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        #endif
         player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
-        player.videoBeingOpened = Video.fixture
 
         return player
     }

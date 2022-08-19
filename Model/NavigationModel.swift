@@ -96,6 +96,7 @@ final class NavigationModel: ObservableObject {
         }
 
         navigation.hideKeyboard()
+        let presentingPlayer = player.presentingPlayer
         player.hide()
         navigation.presentingChannel = false
 
@@ -110,8 +111,14 @@ final class NavigationModel: ObservableObject {
             navigation.sidebarSectionChanged.toggle()
             navigation.tabSelection = .recentlyOpened(recent.tag)
         } else {
-            withAnimation(.linear(duration: 0.3)) {
-                navigation.presentingChannel = true
+            var delay = 0.0
+            #if os(iOS)
+                if presentingPlayer { delay = 1.0 }
+            #endif
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation(.linear(duration: 0.3)) {
+                    navigation.presentingChannel = true
+                }
             }
         }
     }
@@ -134,6 +141,8 @@ final class NavigationModel: ObservableObject {
         #endif
 
         navigation.hideKeyboard()
+        let presentingPlayer = player.presentingPlayer
+        player.hide()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             recents.add(recent)
@@ -142,8 +151,14 @@ final class NavigationModel: ObservableObject {
                 navigation.sidebarSectionChanged.toggle()
                 navigation.tabSelection = .recentlyOpened(recent.tag)
             } else {
-                withAnimation(.linear(duration: 0.3)) {
-                    navigation.presentingPlaylist = true
+                var delay = 0.0
+                #if os(iOS)
+                    if presentingPlayer { delay = 1.0 }
+                #endif
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    withAnimation(.linear(duration: 0.3)) {
+                        navigation.presentingPlaylist = true
+                    }
                 }
             }
         }
@@ -156,18 +171,24 @@ final class NavigationModel: ObservableObject {
         navigation: NavigationModel,
         search: SearchModel
     ) {
-        player.hide()
         navigation.presentingChannel = false
         navigation.presentingPlaylist = false
         navigation.tabSelection = .search
 
         navigation.hideKeyboard()
 
+        let presentingPlayer = player.presentingPlayer
+        player.hide()
+
         if let searchQuery = searchQuery {
             let recent = RecentItem(from: searchQuery)
             recents.add(recent)
 
-            DispatchQueue.main.async {
+            var delay = 0.0
+            #if os(iOS)
+                if presentingPlayer { delay = 1.0 }
+            #endif
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 search.queryText = searchQuery
                 search.changeQuery { query in query.query = searchQuery }
             }

@@ -102,8 +102,6 @@ struct PlayerControls: View {
             if model.presentingDetailsOverlay {
                 VideoDetailsOverlay()
                     .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
-                    .modifier(ControlBackgroundModifier())
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
                     .transition(.opacity)
             }
 

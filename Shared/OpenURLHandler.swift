@@ -101,6 +101,8 @@ struct OpenURLHandler {
             Windows.main.open()
         #endif
 
+        player.videoBeingOpened = Video(videoID: id)
+
         player.playerAPI.video(id)
             .load()
             .onSuccess { response in

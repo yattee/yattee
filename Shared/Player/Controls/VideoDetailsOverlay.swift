@@ -6,6 +6,8 @@ struct VideoDetailsOverlay: View {
 
     var body: some View {
         VideoDetails(sidebarQueue: false, fullScreen: fullScreenBinding)
+            .modifier(ControlBackgroundModifier())
+            .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 
     var fullScreenBinding: Binding<Bool> {

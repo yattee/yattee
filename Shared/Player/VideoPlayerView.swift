@@ -303,6 +303,11 @@ struct VideoPlayerView: View {
                                         playerSize: player.playerSize,
                                         fullScreen: fullScreenDetails
                                     ))
+                                    .onDisappear {
+                                        if player.presentingPlayer {
+                                            player.setNeedsDrawing(true)
+                                        }
+                                    }
                             }
                         #endif
                     }

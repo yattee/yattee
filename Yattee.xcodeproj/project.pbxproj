@@ -528,6 +528,7 @@
 		379775932689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775942689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		379775952689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
+		3799AC0928B03CED001376F9 /* ActiveLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 3799AC0828B03CED001376F9 /* ActiveLabel */; };
 		379B0253287A1CDF001015B5 /* OrientationTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B0252287A1CDF001015B5 /* OrientationTracker.swift */; };
 		379F141F289ECE7F00DE48B5 /* QualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F141E289ECE7F00DE48B5 /* QualitySettings.swift */; };
 		379F1420289ECE7F00DE48B5 /* QualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F141E289ECE7F00DE48B5 /* QualitySettings.swift */; };
@@ -685,6 +686,9 @@
 		37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8328535E4F00B71E37 /* SDWebImage */; };
 		37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8528535E5A00B71E37 /* SDWebImage */; };
 		37CF8B8828535E6300B71E37 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF8B8728535E6300B71E37 /* SDWebImage */; };
+		37CFB48528AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
+		37CFB48628AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
+		37CFB48728AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
 		37D4B0D92671614900C925CA /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0D82671614900C925CA /* Tests_iOS.swift */; };
 		37D4B0E32671614900C925CA /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0E22671614900C925CA /* Tests_macOS.swift */; };
 		37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
@@ -1187,6 +1191,7 @@
 		37CC3F4F270D010D00608308 /* VideoBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoBanner.swift; sourceTree = "<group>"; };
 		37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleAssetStream.swift; sourceTree = "<group>"; };
 		37CEE4C02677B697005A1EFE /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		37CFB48428AFE2510070024C /* VideoDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDescription.swift; sourceTree = "<group>"; };
 		37D4B0C22671614700C925CA /* YatteeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YatteeApp.swift; sourceTree = "<group>"; };
 		37D4B0C32671614700C925CA /* AppTabNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabNavigation.swift; sourceTree = "<group>"; };
 		37D4B0C42671614800C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1287,6 +1292,7 @@
 				37C2212B27ADA43700305B41 /* VideoToolbox.framework in Frameworks */,
 				3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
 				3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
+				3799AC0928B03CED001376F9 /* ActiveLabel in Frameworks */,
 				3736A218286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
 				3736A206286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */,
 				37C2212927ADA41400305B41 /* CoreMedia.framework in Frameworks */,
@@ -1539,6 +1545,7 @@
 				3795593527B08538007FF8F4 /* StreamControl.swift */,
 				37B81AFE26D2CA3700675966 /* VideoDetails.swift */,
 				37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */,
+				37CFB48428AFE2510070024C /* VideoDescription.swift */,
 				37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */,
 				37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */,
 				37F9619A27BD89E000058149 /* TapRecognizerViewModifier.swift */,
@@ -2270,6 +2277,7 @@
 				37A5DBC3285DFF5400CA4DD1 /* SwiftUIPager */,
 				372AA40F286D067B0000B1DC /* Repeat */,
 				37EE6DC428A305AD00BFD632 /* Reachability */,
+				3799AC0828B03CED001376F9 /* ActiveLabel */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2480,6 +2488,7 @@
 				37A5DBC2285DFF5400CA4DD1 /* XCRemoteSwiftPackageReference "SwiftUIPager" */,
 				372AA40E286D067B0000B1DC /* XCRemoteSwiftPackageReference "Repeat" */,
 				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
+				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -2860,6 +2869,7 @@
 				37B17DA2268A1F8A006AEE9B /* VideoContextMenuView.swift in Sources */,
 				3784B23B272894DA00B09468 /* ShareSheet.swift in Sources */,
 				379775932689365600DD52A8 /* Array+Next.swift in Sources */,
+				37CFB48528AFE2510070024C /* VideoDescription.swift in Sources */,
 				37B81AFC26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */,
 				37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37BA794F26DC3E0E002A0235 /* Int+Format.swift in Sources */,
@@ -3124,6 +3134,7 @@
 				37C3A252272366440087A57A /* ChannelPlaylistView.swift in Sources */,
 				373CFADC269663F1003CB2C6 /* Thumbnail.swift in Sources */,
 				37C0697B2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
+				37CFB48628AFE2510070024C /* VideoDescription.swift in Sources */,
 				37C3A24A27235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				377ABC41286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
@@ -3236,6 +3247,7 @@
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
 				37E70925271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				376BE50D27349108009AD608 /* BrowsingSettings.swift in Sources */,
+				37CFB48728AFE2510070024C /* VideoDescription.swift in Sources */,
 				37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				378AE93E274EDFB4006A4EE1 /* Tint+Backport.swift in Sources */,
 				37FFC442272734C3009FFD26 /* Throttle.swift in Sources */,
@@ -4304,6 +4316,14 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yattee/ActiveLabel.swift.git";
+			requirement = {
+				branch = feature/timestamp;
+				kind = branch;
+			};
+		};
 		37A5DBC2285DFF5400CA4DD1 /* XCRemoteSwiftPackageReference "SwiftUIPager" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/fermoya/SwiftUIPager.git";
@@ -4501,6 +4521,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
 			productName = Siesta;
+		};
+		3799AC0828B03CED001376F9 /* ActiveLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */;
+			productName = ActiveLabel;
 		};
 		37A5DBC3285DFF5400CA4DD1 /* SwiftUIPager */ = {
 			isa = XCSwiftPackageProductDependency;

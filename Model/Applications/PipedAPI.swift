@@ -499,6 +499,22 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             range: nil
         )
 
+        let linkRegex = #"(<a\s+(?:[^>]*?\s+)?href=\"[^"]*\">[^<]*<\/a>)"#
+        let hrefRegex = #"href=\"([^"]*)\">"#
+        guard let hrefRegex = try? NSRegularExpression(pattern: hrefRegex) else { return description }
+
+        description = description.replacingMatches(regex: linkRegex) { matchingGroup in
+            let results = hrefRegex.matches(in: matchingGroup, range: NSRange(matchingGroup.startIndex..., in: matchingGroup))
+
+            if let result = results.first {
+                if let swiftRange = Range(result.range(at: 1), in: matchingGroup) {
+                    return String(matchingGroup[swiftRange])
+                }
+            }
+
+            return matchingGroup
+        }
+
         description = description.replacingOccurrences(
             of: "<[^>]+>",
             with: "",
