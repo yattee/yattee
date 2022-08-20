@@ -342,6 +342,13 @@ final class MPVBackend: PlayerBackend {
                 return
             }
 
+            #if !os(macOS)
+                guard UIApplication.shared.applicationState != .background else {
+                    self.logger.info("not performing controls updates in background")
+                    return
+                }
+            #endif
+
             self.playerTime.currentTime = self.currentTime ?? .zero
             self.playerTime.duration = self.playerItemDuration ?? .zero
         }
