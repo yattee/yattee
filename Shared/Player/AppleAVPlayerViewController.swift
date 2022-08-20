@@ -4,125 +4,93 @@ import SwiftUI
 
 final class AppleAVPlayerViewController: UIViewController {
     var playerLoaded = false
+    var accountsModel: AccountsModel!
     var commentsModel: CommentsModel!
     var navigationModel: NavigationModel!
     var playerModel: PlayerModel!
+    var playlistsModel: PlaylistsModel!
     var subscriptionsModel: SubscriptionsModel!
     var playerView = AVPlayerViewController()
 
     let persistenceController = PersistenceController.shared
-
-    #if os(iOS)
-        var aspectRatio: Double? {
-            let ratio = Double(playerView.videoBounds.width) / Double(playerView.videoBounds.height)
-
-            guard ratio.isFinite else {
-                return VideoPlayerView.defaultAspectRatio // swiftlint:disable:this implicit_return
-            }
-
-            return [ratio, 1.0].max()!
-        }
-    #endif
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         loadPlayer()
 
-        #if os(tvOS)
-            if !playerView.isBeingPresented, !playerView.isBeingDismissed {
-                present(playerView, animated: false)
-            }
-        #endif
+        if playerModel.presentingPlayer, !playerView.isBeingPresented, !playerView.isBeingDismissed {
+            present(playerView, animated: false)
+        }
     }
 
-    #if os(tvOS)
-        override func viewDidDisappear(_ animated: Bool) {
-            super.viewDidDisappear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
 
-            if !playerModel.presentingPlayer, !Defaults[.pauseOnHidingPlayer], !playerModel.isPlaying {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                    self?.playerModel.play()
-                }
+        if !playerModel.presentingPlayer, !Defaults[.pauseOnHidingPlayer], !playerModel.isPlaying {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.playerModel.play()
             }
         }
-    #endif
+    }
 
     func loadPlayer() {
         guard !playerLoaded else {
             return
         }
 
-        playerModel.avPlayerBackend.controller = self
         playerView.player = playerModel.avPlayerBackend.avPlayer
         playerView.allowsPictureInPicturePlayback = true
-        playerView.showsPlaybackControls = false
-        #if os(iOS)
-            if #available(iOS 14.2, *) {
-                playerView.canStartPictureInPictureAutomaticallyFromInline = true
-            }
-        #endif
+        playerView.showsPlaybackControls = true
         playerView.delegate = self
 
-        #if os(tvOS)
-            var infoViewControllers = [UIHostingController<AnyView>]()
-            infoViewControllers.append(infoViewController([.comments], title: "Comments"))
+        var infoViewControllers = [UIHostingController<AnyView>]()
+        infoViewControllers.append(infoViewController([.chapters], title: "Chapters"))
+        infoViewControllers.append(infoViewController([.comments], title: "Comments"))
 
-            var queueSections = [NowPlayingView.ViewSection.playingNext]
-            if Defaults[.showHistoryInPlayer] {
-                queueSections.append(.playedPreviously)
-            }
+        var queueSections = [NowPlayingView.ViewSection.playingNext]
+        if Defaults[.showHistoryInPlayer] {
+            queueSections.append(.playedPreviously)
+        }
 
-            infoViewControllers.append(contentsOf: [
-                infoViewController([.related], title: "Related"),
-                infoViewController(queueSections, title: "Queue")
-            ])
+        infoViewControllers.append(contentsOf: [
+            infoViewController([.related], title: "Related"),
+            infoViewController(queueSections, title: "Queue")
+        ])
 
-            playerView.customInfoViewControllers = infoViewControllers
-        #else
-            embedViewController()
-        #endif
+        playerView.customInfoViewControllers = infoViewControllers
     }
 
-    #if os(tvOS)
-        func infoViewController(
-            _ sections: [NowPlayingView.ViewSection],
-            title: String
-        ) -> UIHostingController<AnyView> {
-            let controller = UIHostingController(rootView:
-                AnyView(
-                    NowPlayingView(sections: sections, inInfoViewController: true)
-                        .frame(maxHeight: 600)
-                        .environmentObject(commentsModel)
-                        .environmentObject(playerModel)
-                        .environmentObject(subscriptionsModel)
-                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                )
+    func infoViewController(
+        _ sections: [NowPlayingView.ViewSection],
+        title: String
+    ) -> UIHostingController<AnyView> {
+        let controller = UIHostingController(rootView:
+            AnyView(
+                NowPlayingView(sections: sections, inInfoViewController: true)
+                    .frame(maxHeight: 600)
+                    .environmentObject(accountsModel)
+                    .environmentObject(commentsModel)
+                    .environmentObject(playerModel)
+                    .environmentObject(playlistsModel)
+                    .environmentObject(subscriptionsModel)
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
             )
+        )
 
-            controller.title = title
+        controller.title = title
 
-            return controller
-        }
-    #else
-        func embedViewController() {
-            playerView.view.frame = view.bounds
-
-            addChild(playerView)
-            view.addSubview(playerView.view)
-
-            playerView.didMove(toParent: self)
-        }
-    #endif
+        return controller
+    }
 }
 
 extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
     func playerViewControllerShouldDismiss(_: AVPlayerViewController) -> Bool {
-        false
+        true
     }
 
     func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
-        false
+        true
     }
 
     func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {

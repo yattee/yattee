@@ -89,14 +89,15 @@ struct PlayerControls: View {
                 }
                 .frame(maxHeight: .infinity)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             #if os(tvOS)
-            .onChange(of: model.presentingControls) { newValue in
-                if newValue { focusedField = .play }
-            }
-            .onChange(of: focusedField) { _ in model.resetTimer() }
+                .onChange(of: model.presentingControls) { newValue in
+                    if newValue { focusedField = .play }
+                }
+                .onChange(of: focusedField) { _ in model.resetTimer() }
             #else
-            .background(PlayerGestures())
-            .background(controlsBackground)
+                .background(PlayerGestures())
+                .background(controlsBackground)
             #endif
 
             if model.presentingDetailsOverlay {
@@ -176,6 +177,7 @@ struct PlayerControls: View {
                 }
                 .retryOnAppear(true)
                 .indicator(.activity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -273,7 +275,6 @@ struct PlayerControls: View {
 
     private var musicModeButton: some View {
         button("Music Mode", systemImage: "music.note", background: false, active: player.musicMode, action: player.toggleMusicMode)
-            .disabled(player.activeBackend == .appleAVPlayer)
     }
 
     private var pipButton: some View {

@@ -60,7 +60,7 @@ struct StreamControl: View {
                         .frame(maxWidth: 320)
                 }
                 .contextMenu {
-                    ForEach(player.availableStreamsSorted) { stream in
+                    ForEach(streams) { stream in
                         Button(stream.description) { player.streamSelection = stream }
                     }
 
@@ -79,9 +79,13 @@ struct StreamControl: View {
     }
 
     private func availableStreamsForInstance(_ instance: Instance) -> [Stream.Kind: [Stream]] {
-        let streams = player.availableStreamsSorted.filter { $0.instance == instance }.filter { player.backend.canPlay($0) }
+        let streams = streams.filter { $0.instance == instance }.filter { player.backend.canPlay($0) }
 
         return Dictionary(grouping: streams, by: \.kind!)
+    }
+
+    var streams: [Stream] {
+        player.availableStreamsSorted.filter { player.backend.canPlay($0) }
     }
 }
 

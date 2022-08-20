@@ -58,23 +58,15 @@ struct ControlsOverlay: View {
                     #endif
                 }
 
-                #if os(tvOS)
-                    let streamAndPlayerHeaderText = "Stream"
-                #else
-                    let streamAndPlayerHeaderText = "Stream & Player"
-                #endif
-
-                Section(header: controlsHeader(streamAndPlayerHeaderText)) {
+                Section(header: controlsHeader("Stream & Player")) {
                     qualityButton
                     #if os(tvOS)
                     .focused($focusedField, equals: .stream)
                     #endif
 
-                    #if !os(tvOS)
-                        HStack {
-                            backendButtons
-                        }
-                    #endif
+                    HStack(spacing: 8) {
+                        backendButtons
+                    }
                 }
 
                 if player.activeBackend == .mpv,
@@ -129,11 +121,13 @@ struct ControlsOverlay: View {
     private var backendButtons: some View {
         ForEach(PlayerBackendType.allCases, id: \.self) { backend in
             backendButton(backend)
+            #if !os(tvOS)
                 .frame(height: 40)
+            #endif
             #if os(iOS)
-                .frame(maxWidth: 115)
-                .modifier(ControlBackgroundModifier())
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+            .frame(maxWidth: 115)
+            .modifier(ControlBackgroundModifier())
+            .clipShape(RoundedRectangle(cornerRadius: 4))
             #endif
         }
     }
@@ -150,9 +144,6 @@ struct ControlsOverlay: View {
         }
         #if os(macOS)
         .buttonStyle(.bordered)
-        #elseif os(tvOS)
-        .modifier(ControlBackgroundModifier())
-        .clipShape(RoundedRectangle(cornerRadius: 4))
         #endif
     }
 

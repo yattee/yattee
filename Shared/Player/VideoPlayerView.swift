@@ -252,7 +252,9 @@ struct VideoPlayerView: View {
                     ZStack {
                         player.playerBackendView
 
-                        tvControls
+                        if player.activeBackend == .mpv {
+                            tvControls
+                        }
                     }
                     .ignoresSafeArea()
                 #else
