@@ -789,36 +789,38 @@ final class PlayerModel: ObservableObject {
     }
 
     func updateNowPlayingInfo() {
-        guard let video = currentItem?.video else {
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = .none
-            return
-        }
-
-        let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
-        var nowPlayingInfo: [String: AnyObject] = [
-            MPMediaItemPropertyTitle: video.title as AnyObject,
-            MPMediaItemPropertyArtist: video.author as AnyObject,
-            MPNowPlayingInfoPropertyIsLiveStream: live as AnyObject,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
-            MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
-            MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
-            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
-        ]
-
-        if !currentArtwork.isNil {
-            nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
-        }
-
-        if !video.live {
-            let itemDuration = (backend.playerItemDuration ?? .zero).seconds
-            let duration = itemDuration.isFinite ? Double(itemDuration) : nil
-
-            if !duration.isNil {
-                nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
+        #if !os(tvOS)
+            guard let video = currentItem?.video else {
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = .none
+                return
             }
-        }
 
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+            let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
+            var nowPlayingInfo: [String: AnyObject] = [
+                MPMediaItemPropertyTitle: video.title as AnyObject,
+                MPMediaItemPropertyArtist: video.author as AnyObject,
+                MPNowPlayingInfoPropertyIsLiveStream: live as AnyObject,
+                MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
+                MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
+                MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
+                MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
+            ]
+
+            if !currentArtwork.isNil {
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = currentArtwork as AnyObject
+            }
+
+            if !video.live {
+                let itemDuration = (backend.playerItemDuration ?? .zero).seconds
+                let duration = itemDuration.isFinite ? Double(itemDuration) : nil
+
+                if !duration.isNil {
+                    nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration as AnyObject
+                }
+            }
+
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        #endif
     }
 
     func updateCurrentArtwork() {

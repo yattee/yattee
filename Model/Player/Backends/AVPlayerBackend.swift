@@ -489,6 +489,18 @@ final class AVPlayerBackend: PlayerBackend {
             if let currentTime = self.currentTime {
                 self.model.handleSegments(at: currentTime)
             }
+
+            #if !os(macOS)
+                guard UIApplication.shared.applicationState != .background else {
+                    print("not performing controls updates in background")
+                    return
+                }
+            #endif
+
+            if self.controlsUpdates {
+                self.playerTime.duration = self.playerItemDuration ?? .zero
+                self.playerTime.currentTime = self.currentTime ?? .zero
+            }
         }
     }
 
