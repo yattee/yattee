@@ -480,13 +480,10 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            if self.controlsUpdates {
-                self.playerTime.duration = self.playerItemDuration ?? .zero
-                self.playerTime.currentTime = self.currentTime ?? .zero
-            }
+            self.model.updateNowPlayingInfo()
 
-            #if !os(tvOS)
-                self.model.updateNowPlayingInfo()
+            #if os(macOS)
+                MPNowPlayingInfoCenter.default().playbackState = self.avPlayer.timeControlStatus == .playing ? .playing : .paused
             #endif
 
             if let currentTime = self.currentTime {
