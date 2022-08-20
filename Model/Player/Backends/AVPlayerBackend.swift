@@ -588,6 +588,42 @@ final class AVPlayerBackend: PlayerBackend {
         controlsUpdates = false
     }
 
+    func startMusicMode() {
+        if model.playingInPictureInPicture {
+            closePiP()
+        }
+
+        playerLayer.player = nil
+
+        toggleVisualTracksEnabled(false)
+    }
+
+    func stopMusicMode() {
+        playerLayer.player = avPlayer
+
+        toggleVisualTracksEnabled(true)
+    }
+
+    func toggleVisualTracksEnabled(_ value: Bool) {
+        if let item = avPlayer.currentItem {
+            for playerItemTrack in item.tracks {
+                if let assetTrack = playerItemTrack.assetTrack,
+                   assetTrack.hasMediaCharacteristic(AVMediaCharacteristic.visual)
+                {
+                    playerItemTrack.isEnabled = value
+                }
+            }
+        }
+    }
+
+    func didChangeTo() {
+        if model.musicMode {
+            startMusicMode()
+        } else {
+            stopMusicMode()
+        }
+    }
+
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
     func setNeedsNetworkStateUpdates(_: Bool) {}
