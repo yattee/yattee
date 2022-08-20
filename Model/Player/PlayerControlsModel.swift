@@ -38,14 +38,18 @@ final class PlayerControlsModel: ObservableObject {
 
     func handlePresentationChange() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self = self,
+                  let player = self.player else { return }
             if self.presentingControls {
-                self.player?.backend.startControlsUpdates()
+                player.backend.startControlsUpdates()
                 self.resetTimer()
             } else {
-                self.player?.backend.stopControlsUpdates()
-                self.timer?.invalidate()
-                self.timer = nil
+                if !player.musicMode {
+                    player.backend.stopControlsUpdates()
+                    self.removeTimer()
+                } else {
+                    self.presentingControls = true
+                }
             }
         }
     }
@@ -132,6 +136,8 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func startPiP(startImmediately: Bool = true) {
+        player?.avPlayerBackend.startPictureInPictureOnPlay = true
+
         #if !os(macOS)
             player.exitFullScreen()
         #endif
@@ -143,7 +149,6 @@ final class PlayerControlsModel: ObservableObject {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak player] in
-            player?.avPlayerBackend.startPictureInPictureOnPlay = true
             if startImmediately {
                 player?.pipController?.startPictureInPicture()
             }

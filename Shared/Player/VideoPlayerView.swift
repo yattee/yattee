@@ -90,7 +90,7 @@ struct VideoPlayerView: View {
                             Spacer()
                         #endif
                     }
-                    #if os(macOS)
+                    #if !os(tvOS)
                     .frame(width: player.playerSize.width)
                     #endif
 
@@ -101,6 +101,11 @@ struct VideoPlayerView: View {
                 #if os(tvOS)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 #endif
+            }
+        }
+        .onAppear {
+            if player.musicMode {
+                player.backend.startControlsUpdates()
             }
         }
     }
@@ -435,8 +440,12 @@ struct VideoPlayerView: View {
                     guard player.presentingPlayer,
                           !playerControls.presentingControlsOverlay else { return }
 
-                    if playerControls.presentingControls {
+                    if playerControls.presentingControls, !player.musicMode {
                         playerControls.presentingControls = false
+                    }
+
+                    if player.musicMode {
+                        player.backend.stopControlsUpdates()
                     }
 
                     let drag = value.translation.height
@@ -479,6 +488,10 @@ struct VideoPlayerView: View {
                 }
                 player.backend.setNeedsDrawing(true)
                 player.show()
+
+                if player.musicMode {
+                    player.backend.startControlsUpdates()
+                }
             }
         }
 

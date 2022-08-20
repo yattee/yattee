@@ -512,4 +512,36 @@ final class MPVBackend: PlayerBackend {
             networkStateTimer.pause()
         }
     }
+
+    func startMusicMode() {
+        setVideoToNo()
+    }
+
+    func stopMusicMode() {
+        addVideoTrackFromStream()
+        setVideoToAuto()
+
+        controls.resetTimer()
+    }
+
+    func addVideoTrackFromStream() {
+        if let videoTrackURL = model.stream?.videoAsset?.url,
+           tracks < 2
+        {
+            logger.info("adding video track")
+            addVideoTrack(videoTrackURL)
+        }
+
+        setVideoToAuto()
+    }
+
+    func didChangeTo() {
+        setNeedsDrawing(model.presentingPlayer)
+
+        if model.musicMode {
+            startMusicMode()
+        } else {
+            stopMusicMode()
+        }
+    }
 }

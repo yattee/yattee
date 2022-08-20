@@ -47,9 +47,14 @@ protocol PlayerBackend {
 
     func closePiP()
 
+    func startMusicMode()
+    func stopMusicMode()
+
     func updateControls()
     func startControlsUpdates()
     func stopControlsUpdates()
+
+    func didChangeTo()
 
     func setNeedsNetworkStateUpdates(_ needsUpdates: Bool)
 

@@ -226,9 +226,11 @@ final class PlayerModel: ObservableObject {
 
         navigation.hideKeyboard()
 
-        DispatchQueue.main.async { [weak self] in
-            withAnimation(.linear(duration: 0.25)) {
-                self?.presentingPlayer = true
+        if !presentingPlayer {
+            DispatchQueue.main.async { [weak self] in
+                withAnimation(.linear(duration: 0.25)) {
+                    self?.presentingPlayer = true
+                }
             }
         }
 
@@ -340,14 +342,30 @@ final class PlayerModel: ObservableObject {
     func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
         pause()
 
+        var changeBackendHandler: (() -> Void)?
+
+        if let backend = qualityProfile?.backend ?? QualityProfilesModel.shared.automaticProfile?.backend,
+           activeBackend != backend,
+           backend == .appleAVPlayer || !avPlayerBackend.startPictureInPictureOnPlay
+        {
+            changeBackendHandler = { [weak self] in
+                guard let self = self else { return }
+                self.changeActiveBackend(from: self.activeBackend, to: backend)
+            }
+        }
+
         #if os(iOS)
             if !playingInPictureInPicture, showingPlayer {
-                onPresentPlayer = { [weak self] in self?.playNow(video, at: time) }
+                onPresentPlayer = { [weak self] in
+                    changeBackendHandler?()
+                    self?.playNow(video, at: time)
+                }
                 show()
                 return
             }
         #endif
 
+        changeBackendHandler?()
         playNow(video, at: time)
 
         guard !playingInPictureInPicture else {
@@ -493,14 +511,10 @@ final class PlayerModel: ObservableObject {
         Defaults[.activeBackend] = to
         self.activeBackend = to
 
+        self.backend.didChangeTo()
+
         guard var stream = stream else {
             return
-        }
-
-        if to == .mpv {
-            addVideoTrackFromStream()
-        } else {
-            musicMode = false
         }
 
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
@@ -534,7 +548,6 @@ final class PlayerModel: ObservableObject {
                 return
             }
             self.upgradeToStream(stream, force: true)
-            self.setNeedsDrawing(self.presentingPlayer)
         }
     }
 
@@ -756,6 +769,7 @@ final class PlayerModel: ObservableObject {
     #else
         func handleEnterForeground() {
             setNeedsDrawing(presentingPlayer)
+            avPlayerBackend.playerLayer.player = avPlayerBackend.avPlayer
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
@@ -766,10 +780,10 @@ final class PlayerModel: ObservableObject {
         }
 
         func handleEnterBackground() {
-            setNeedsDrawing(false)
-
             if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
                 pause()
+            } else if !playingInPictureInPicture {
+                avPlayerBackend.playerLayer.player = nil
             }
         }
     #endif
@@ -872,32 +886,15 @@ final class PlayerModel: ObservableObject {
         musicMode.toggle()
 
         if musicMode {
-            if playingInPictureInPicture {
-                avPlayerBackend.pause()
-                closePiP()
-            }
-            changeActiveBackend(from: .appleAVPlayer, to: .mpv)
             controls.presentingControls = true
             controls.removeTimer()
-            mpvBackend.setVideoToNo()
+
+            backend.startMusicMode()
         } else {
-            addVideoTrackFromStream()
-            mpvBackend.setVideoToAuto()
+            backend.stopMusicMode()
 
             controls.resetTimer()
         }
-    }
-
-    func addVideoTrackFromStream() {
-        if let videoTrackURL = stream?.videoAsset?.url,
-           mpvBackend.tracks < 2
-        {
-            logger.info("adding video track")
-
-            mpvBackend.addVideoTrack(videoTrackURL)
-        }
-
-        mpvBackend.setVideoToAuto()
     }
 
     func updateAspectRatio() {
