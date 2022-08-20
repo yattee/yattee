@@ -4,7 +4,7 @@ import SwiftUI
 
 struct NowPlayingView: View {
     enum ViewSection: CaseIterable {
-        case nowPlaying, playingNext, playedPreviously, related, comments
+        case nowPlaying, playingNext, playedPreviously, related, comments, chapters
     }
 
     var sections = [ViewSection.nowPlaying, .playingNext, .playedPreviously, .related]
@@ -84,23 +84,16 @@ struct NowPlayingView: View {
                     }
                 }
 
-                if sections.contains(.related), !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
-                    Section(header: inInfoViewController ? AnyView(EmptyView()) : AnyView(Text("Related"))) {
-                        ForEach(player.currentVideo!.related) { video in
+                if sections.contains(.related), let video = player.currentVideo, !video.related.isEmpty {
+                    Section(header: Text("Related")) {
+                        ForEach(video.related) { video in
                             Button {
-                                player.playNow(video)
-                                player.show()
+                                player.play(video)
                             } label: {
                                 VideoBanner(video: video)
                             }
                             .contextMenu {
-                                Button("Play Next") {
-                                    player.playNext(video)
-                                }
-                                Button("Play Last") {
-                                    player.enqueueVideo(video)
-                                }
-                                Button("Cancel", role: .cancel) {}
+                                VideoContextMenuView(video: video)
                             }
                         }
                     }
@@ -125,9 +118,7 @@ struct NowPlayingView: View {
                                 player.loadHistoryVideoDetails(watch.videoID)
                             }
                             .contextMenu {
-                                Button("Remove", role: .destructive) {
-                                    player.removeWatch(watch)
-                                }
+                                VideoContextMenuView(video: watch.video)
                             }
                         }
                     }
@@ -161,6 +152,20 @@ struct NowPlayingView: View {
                         }
                     }
                 }
+
+                if sections.contains(.chapters) {
+                    if let video = player.currentVideo {
+                        if video.chapters.isEmpty {
+                            NoCommentsView(text: "No chapters information available", systemImage: "xmark.circle.fill")
+                        } else {
+                            Section(header: Text("Chapters")) {
+                                ForEach(video.chapters) { chapter in
+                                    ChapterView(chapter: chapter)
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 20))
             .padding(.vertical, 20)
@@ -177,7 +182,7 @@ struct NowPlayingView: View {
 
 struct NowPlayingView_Previews: PreviewProvider {
     static var previews: some View {
-        NowPlayingView()
+        NowPlayingView(sections: [.chapters])
             .injectFixtureEnvironmentObjects()
 
         NowPlayingView(inInfoViewController: true)

@@ -136,8 +136,8 @@ class Stream: Equatable, Hashable, Identifiable {
     var kind: Kind!
     var format: Format!
 
-    var encoding: String!
-    var videoFormat: String!
+    var encoding: String?
+    var videoFormat: String?
 
     init(
         instance: Instance? = nil,

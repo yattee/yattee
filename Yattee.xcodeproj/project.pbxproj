@@ -162,6 +162,9 @@
 		37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37192D5528B0D5D60012EEDD /* PlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F22838388A000CFD59 /* PlayerLayerView.swift */; };
+		37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
+		37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
+		37192D5928B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
 		371B7E5C27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5D27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5E27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
@@ -312,9 +315,9 @@
 		37520699285E8DD300CA655F /* Chapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37520698285E8DD300CA655F /* Chapter.swift */; };
 		3752069A285E8DD300CA655F /* Chapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37520698285E8DD300CA655F /* Chapter.swift */; };
 		3752069B285E8DD300CA655F /* Chapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37520698285E8DD300CA655F /* Chapter.swift */; };
-		3752069D285E910600CA655F /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChaptersView.swift */; };
-		3752069E285E910600CA655F /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChaptersView.swift */; };
-		3752069F285E910600CA655F /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChaptersView.swift */; };
+		3752069D285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
+		3752069E285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
+		3752069F285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
 		3756C2A62861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
 		3756C2A72861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
 		3756C2A82861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
@@ -622,7 +625,6 @@
 		37BE0BD126A0E2D50092E2DB /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */; };
 		37BE0BD326A1D4780092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
 		37BE0BD426A1D47D0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
-		37BE0BD626A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
 		37BE0BD726A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
 		37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */; };
 		37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661B27308859008CCFB0 /* DropFavorite.swift */; };
@@ -987,6 +989,7 @@
 		37152EE926EFEB95004FB96D /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
 		37169AA12729D98A0011DE61 /* InstancesBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesBridge.swift; sourceTree = "<group>"; };
 		37169AA52729E2CC0011DE61 /* AccountsBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsBridge.swift; sourceTree = "<group>"; };
+		37192D5628B179D60012EEDD /* ChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChaptersView.swift; sourceTree = "<group>"; };
 		371B7E5B27596B8400D21217 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		371B7E602759706A00D21217 /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		371B7E652759786B00D21217 /* Comment+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comment+Fixtures.swift"; sourceTree = "<group>"; };
@@ -1053,7 +1056,7 @@
 		3751BA7F27E64244007B1A60 /* VideoLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLayer.swift; sourceTree = "<group>"; };
 		3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnYouTubeDislikeAPI.swift; sourceTree = "<group>"; };
 		37520698285E8DD300CA655F /* Chapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chapter.swift; sourceTree = "<group>"; };
-		3752069C285E910600CA655F /* ChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChaptersView.swift; sourceTree = "<group>"; };
+		3752069C285E910600CA655F /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
 		3756C2A52861131100E4B059 /* NetworkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkState.swift; sourceTree = "<group>"; };
 		3756C2A92861151C00E4B059 /* NetworkStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStateModel.swift; sourceTree = "<group>"; };
 		37579D5C27864F5F00FD0B98 /* Help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Help.swift; sourceTree = "<group>"; };
@@ -1531,7 +1534,8 @@
 				375E45F327B1973400BA7902 /* MPV */,
 				37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */,
 				37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */,
-				3752069C285E910600CA655F /* ChaptersView.swift */,
+				3752069C285E910600CA655F /* ChapterView.swift */,
+				37192D5628B179D60012EEDD /* ChaptersView.swift */,
 				371B7E602759706A00D21217 /* CommentsView.swift */,
 				37EF9A75275BEB8E0043B585 /* CommentView.swift */,
 				37DD9DA22785BBC900539416 /* NoCommentsView.swift */,
@@ -2760,7 +2764,6 @@
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
 				37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */,
-				37BE0BD626A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */,
 				3776ADD6287381240078EBC4 /* Captions.swift in Sources */,
 				37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
@@ -2770,6 +2773,7 @@
 				37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37EBD8C427AF0DA800F1C24B /* PlayerBackend.swift in Sources */,
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
+				37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */,
 				37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */,
 				37C0698227260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
 				37BC50A82778A84700510953 /* HistorySettings.swift in Sources */,
@@ -2792,7 +2796,7 @@
 				37030FF727B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
 				37BA794726DC2E56002A0235 /* AppSidebarSubscriptions.swift in Sources */,
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
-				3752069D285E910600CA655F /* ChaptersView.swift in Sources */,
+				3752069D285E910600CA655F /* ChapterView.swift in Sources */,
 				375EC96A289F232600751258 /* QualityProfilesModel.swift in Sources */,
 				3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
@@ -2981,6 +2985,7 @@
 				3743CA4F270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				374C053C2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
+				37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */,
 				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
 				37E80F3D287B107F00561799 /* VideoDetailsOverlay.swift in Sources */,
 				37DD9DBB2785D60300539416 /* FramePreferenceKey.swift in Sources */,
@@ -3025,7 +3030,7 @@
 				37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F961A027BD90BB00058149 /* PlayerBackendType.swift in Sources */,
 				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
-				3752069E285E910600CA655F /* ChaptersView.swift in Sources */,
+				3752069E285E910600CA655F /* ChapterView.swift in Sources */,
 				37030FF827B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
 				378E50FC26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37169AA32729D98A0011DE61 /* InstancesBridge.swift in Sources */,
@@ -3278,6 +3283,7 @@
 				37E80F44287B7AB400561799 /* VideoDetails.swift in Sources */,
 				3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				37030FFD27B0398000ECDDAA /* MPVClient.swift in Sources */,
+				37192D5928B179D60012EEDD /* ChaptersView.swift in Sources */,
 				37B767DD2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
 				373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				3784CDE427772EE40055BBF2 /* Watch.swift in Sources */,
@@ -3341,7 +3347,7 @@
 				37FEF11527EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
-				3752069F285E910600CA655F /* ChaptersView.swift in Sources */,
+				3752069F285E910600CA655F /* ChapterView.swift in Sources */,
 				37F4AD1D28612B23004D0F66 /* OpeningStream.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
 				373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */,

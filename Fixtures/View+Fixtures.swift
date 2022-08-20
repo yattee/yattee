@@ -55,7 +55,19 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
                 channel: .init(id: "", name: "Channel Name"),
                 likes: 2332,
                 dislikes: 30,
-                keywords: ["Video", "Computer", "Long Long Keyword"]
+                keywords: ["Video", "Computer", "Long Long Keyword"],
+                chapters: [
+                    .init(
+                        title: "Abc",
+                        image: URL(string: "https://pipedproxy.kavin.rocks/vi/rr2XfL_df3o/hqdefault_29633.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&rs=AOn4CLDFDm9D5SvsIA7D3v5n5KZahLs_UA&host=i.ytimg.com")!,
+                        start: 3
+                    ),
+                    .init(
+                        title: "Def",
+                        image: URL(string: "https://pipedproxy.kavin.rocks/vi/rr2XfL_df3o/hqdefault_98900.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&rs=AOn4CLCfjXJBJb2O2q0jT0RHIi7hARVahw&host=i.ytimg.com")!,
+                        start: 33
+                    )
+                ]
             )
         )
         #if os(iOS)

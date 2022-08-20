@@ -65,7 +65,7 @@ extension Defaults.Keys {
         static let qualityProfilesDefault = [
             hd2160pMPVProfile,
             hd1080pMPVProfile,
-            hd720pMPVProfile
+            hd720pAVPlayerProfile
         ]
         static let batteryCellularProfileDefault = hd1080pMPVProfile.id
         static let batteryNonCellularProfileDefault = hd1080pMPVProfile.id

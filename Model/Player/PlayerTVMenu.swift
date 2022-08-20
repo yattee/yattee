@@ -20,7 +20,7 @@ extension PlayerModel {
                 ]
             }
 
-            return availableStreamsSorted.map { stream in
+            return availableStreamsSorted.filter { backend.canPlay($0) }.map { stream in
                 let state = stream == streamSelection ? UIAction.State.on : .off
 
                 return UIAction(title: stream.description, state: state) { _ in
@@ -40,6 +40,13 @@ extension PlayerModel {
                 image: UIImage(systemName: "arrow.uturn.left.circle")
             ) { _ in
                 self.restoreLastSkippedSegment()
+            }
+        }
+
+        var switchToMPVAction: UIAction? {
+            UIAction(title: "Switch to MPV", image: UIImage(systemName: "m.circle")) { _ in
+                self.avPlayerBackend.controller?.dismiss(animated: false)
+                self.changeActiveBackend(from: .appleAVPlayer, to: .mpv)
             }
         }
 
@@ -69,7 +76,8 @@ extension PlayerModel {
             avPlayerBackend.controller?.playerView.transportBarCustomMenuItems = [
                 restoreLastSkippedSegmentAction,
                 rateMenu,
-                streamsMenu
+                streamsMenu,
+                switchToMPVAction
             ].compactMap { $0 }
         #endif
     }

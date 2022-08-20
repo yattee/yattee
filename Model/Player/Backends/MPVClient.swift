@@ -142,7 +142,9 @@ final class MPVClient: ObservableObject {
 
         options.append("force-seekable=yes")
 
-        args.append(options.joined(separator: ","))
+        if !options.isEmpty {
+            args.append(options.joined(separator: ","))
+        }
 
         command("loadfile", args: args, returnValueCallback: completionHandler)
     }

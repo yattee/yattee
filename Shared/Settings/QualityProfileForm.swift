@@ -99,6 +99,9 @@ struct QualityProfileForm: View {
                     Section(header: Text("Resolution")) {
                         qualityButton
                     }
+                    Section(header: Text("Backend")) {
+                        backendPicker
+                    }
                 #else
                     backendPicker
                     qualityPicker
@@ -147,7 +150,7 @@ struct QualityProfileForm: View {
             }
 
         #else
-            return picker
+            picker
         #endif
     }
 
@@ -191,7 +194,7 @@ struct QualityProfileForm: View {
             }
 
         #else
-            return picker
+            picker
         #endif
     }
 
