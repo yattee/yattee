@@ -3,6 +3,7 @@ import CoreMedia
 import Defaults
 import Foundation
 import Logging
+import MediaPlayer
 import Repeat
 import SwiftUI
 
@@ -59,6 +60,8 @@ final class MPVBackend: PlayerBackend {
             } else {
                 ScreenSaverManager.shared.enable()
             }
+
+            MPNowPlayingInfoCenter.default().playbackState = isPlaying ? .playing : .paused
         #else
             DispatchQueue.main.async {
                 UIApplication.shared.isIdleTimerDisabled = self.model.presentingPlayer && self.isPlaying
