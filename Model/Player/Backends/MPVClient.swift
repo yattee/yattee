@@ -123,7 +123,14 @@ final class MPVClient: ObservableObject {
         }
     }
 
-    func loadFile(_ url: URL, audio: URL? = nil, sub: URL? = nil, time: CMTime? = nil, completionHandler: ((Int32) -> Void)? = nil) {
+    func loadFile(
+        _ url: URL,
+        audio: URL? = nil,
+        sub: URL? = nil,
+        time: CMTime? = nil,
+        forceSeekable: Bool = false,
+        completionHandler: ((Int32) -> Void)? = nil
+    ) {
         var args = [url.absoluteString]
         var options = [String]()
 
@@ -140,7 +147,9 @@ final class MPVClient: ObservableObject {
             options.append("sub-files-append=\"\(subURL)\"")
         }
 
-        options.append("force-seekable=yes")
+        if forceSeekable {
+            options.append("force-seekable=yes")
+        }
 
         if !options.isEmpty {
             args.append(options.joined(separator: ","))
