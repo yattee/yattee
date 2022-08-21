@@ -96,10 +96,19 @@ struct ChannelVideosView: View {
                     HStack(spacing: 3) {
                         Text("\(store.item?.subscriptionsString ?? "")")
                             .fontWeight(.bold)
-                        Text(" subscribers")
+
+                        let subscribers = Text(" subscribers")
                             .allowsTightening(true)
                             .foregroundColor(.secondary)
                             .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
+
+                        #if os(iOS)
+                            if navigationStyle == .sidebar {
+                                subscribers
+                            }
+                        #else
+                            subscribers
+                        #endif
                     }
 
                     ShareButton(contentItem: contentItem)
@@ -157,21 +166,35 @@ struct ChannelVideosView: View {
             Group {
                 if accounts.app.supportsSubscriptions && accounts.signedIn {
                     if subscriptions.isSubscribing(channel.id) {
-                        Button("Unsubscribe") {
+                        Button {
                             subscriptionToggleButtonDisabled = true
 
                             subscriptions.unsubscribe(channel.id) {
                                 subscriptionToggleButtonDisabled = false
                             }
+                        } label: {
+                            Label("Unsubscribe", systemImage: "circle")
+                            #if os(iOS)
+                                .labelStyle(.automatic)
+                            #else
+                                .labelStyle(.titleOnly)
+                            #endif
                         }
                     } else {
-                        Button("Subscribe") {
+                        Button {
                             subscriptionToggleButtonDisabled = true
 
                             subscriptions.subscribe(channel.id) {
                                 subscriptionToggleButtonDisabled = false
                                 navigation.sidebarSectionChanged.toggle()
                             }
+                        } label: {
+                            Label("Subscribe", systemImage: "star.circle")
+                            #if os(iOS)
+                                .labelStyle(.automatic)
+                            #else
+                                .labelStyle(.titleOnly)
+                            #endif
                         }
                     }
                 }
