@@ -32,7 +32,7 @@ struct AppSidebarPlaylists: View {
     @ViewBuilder func playlistLabel(_ playlist: Playlist) -> some View {
         let label = Label(playlist.title, systemImage: RecentsModel.symbolSystemImage(playlist.title))
 
-        if player.accounts.app.userPlaylistsEndpointIncludesVideos {
+        if player.accounts.app.userPlaylistsEndpointIncludesVideos, !playlist.videos.isEmpty {
             label
                 .backport
                 .badge(Text("\(playlist.videos.count)"))
