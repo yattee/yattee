@@ -108,6 +108,16 @@ class Stream: Equatable, Hashable, Identifiable {
             lhs.sortOrder < rhs.sortOrder
         }
 
+        var description: String {
+            switch self {
+            case .webm:
+                return "WebM"
+
+            default:
+                return rawValue.uppercased()
+            }
+        }
+
         static func from(_ string: String) -> Self {
             let lowercased = string.lowercased()
 
@@ -172,8 +182,13 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var description: String {
-        let formatString = format == .unknown ? "" : " (\(format.rawValue))"
-        return "\(quality)\(formatString) - \(instance?.description ?? "")"
+        let instanceString = instance.isNil ? "" : " - (\(instance!.description))"
+        return "\(resolutionAndFormat)\(instanceString)"
+    }
+
+    var resolutionAndFormat: String {
+        let formatString = format == .unknown ? "" : " (\(format.description))"
+        return "\(quality)\(formatString)"
     }
 
     var assets: [AVURLAsset] {

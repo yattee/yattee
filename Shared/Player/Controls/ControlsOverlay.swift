@@ -245,7 +245,7 @@ struct ControlsOverlay: View {
             Menu {
                 qualityProfilePicker
             } label: {
-                Text(player.qualityProfileSelection?.description ?? "Auto")
+                Text(player.qualityProfileSelection?.description ?? "Automatic")
                     .frame(maxWidth: 240)
             }
             .transaction { t in t.animation = .none }
@@ -259,7 +259,7 @@ struct ControlsOverlay: View {
             Button {
                 presentingButtonHintAlert = true
             } label: {
-                Text(player.qualityProfileSelection?.description ?? "Auto")
+                Text(player.qualityProfileSelection?.description ?? "Automatic")
                     .lineLimit(1)
                     .frame(maxWidth: 320)
             }
@@ -298,7 +298,7 @@ struct ControlsOverlay: View {
             Menu {
                 StreamControl()
             } label: {
-                Text(player.streamSelection?.shortQuality ?? "loading")
+                Text(player.streamSelection?.resolutionAndFormat ?? "loading")
                     .frame(width: 140, height: 40)
                     .foregroundColor(.primary)
             }

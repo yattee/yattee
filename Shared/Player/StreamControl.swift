@@ -92,5 +92,6 @@ struct StreamControl: View {
 struct StreamControl_Previews: PreviewProvider {
     static var previews: some View {
         StreamControl()
+            .injectFixtureEnvironmentObjects()
     }
 }
