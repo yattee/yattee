@@ -239,6 +239,7 @@ struct PlaylistsView: View {
 
                 selectedPlaylistID = model.all.next(after: currentPlaylist!)?.id ?? ""
             }
+            .lineLimit(1)
             .contextMenu {
                 ForEach(model.all) { playlist in
                     Button(playlist.title) {
