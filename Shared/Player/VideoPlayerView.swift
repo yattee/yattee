@@ -67,9 +67,6 @@ struct VideoPlayerView: View {
             if playerControls.presentingControlsOverlay {
                 HStack {
                     HStack {
-                        #if !os(tvOS)
-                            Spacer()
-                        #endif
                         ControlsOverlay()
                         #if os(tvOS)
                             .onExitCommand {
@@ -85,17 +82,15 @@ struct VideoPlayerView: View {
                             .modifier(ControlBackgroundModifier())
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                             .transition(.opacity)
-
-                        #if !os(tvOS)
-                            Spacer()
-                        #endif
                     }
                     #if !os(tvOS)
-                    .frame(width: player.playerSize.width)
+                    .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
                     #endif
 
                     #if !os(tvOS)
-                        Spacer()
+                        if !fullScreenLayout && sidebarQueue {
+                            Spacer()
+                        }
                     #endif
                 }
                 #if os(tvOS)
