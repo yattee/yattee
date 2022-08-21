@@ -35,7 +35,7 @@ struct PlayerControls: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack(alignment: .center) {
             VStack {
                 ZStack(alignment: .center) {
                     OpeningStream()
@@ -101,9 +101,12 @@ struct PlayerControls: View {
             #endif
 
             if model.presentingDetailsOverlay {
-                VideoDetailsOverlay()
-                    .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
-                    .transition(.opacity)
+                Section {
+                    VideoDetailsOverlay()
+                        .frame(maxWidth: detailsWidth, maxHeight: detailsHeight)
+                        .transition(.opacity)
+                }
+                .frame(maxHeight: .infinity, alignment: .top)
             }
 
             if !model.presentingControls,
@@ -126,6 +129,7 @@ struct PlayerControls: View {
                     .modifier(ControlBackgroundModifier())
                     .clipShape(RoundedRectangle(cornerRadius: 2))
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
                 .buttonStyle(.plain)
                 .transition(.opacity)
             }
