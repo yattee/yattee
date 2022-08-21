@@ -255,6 +255,11 @@ final class NavigationModel: ObservableObject {
         presentingAlert = true
     }
 
+    func presentAlert(_ alert: Alert) {
+        self.alert = alert
+        presentingAlert = true
+    }
+
     func presentShareSheet(_ url: URL) {
         shareURL = url
         presentingShareSheet = true

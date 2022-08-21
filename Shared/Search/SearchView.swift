@@ -221,9 +221,6 @@ struct SearchView: View {
         VStack {
             if showRecentQueries {
                 recentQueries
-                #if os(iOS)
-                .padding(.bottom, 90)
-                #endif
             } else {
                 #if os(tvOS)
                     ScrollView(.vertical, showsIndicators: false) {
@@ -299,8 +296,11 @@ struct SearchView: View {
                     }
                 }
                 .redrawOn(change: recentsChanged)
+
+                Section(footer: Color.clear.frame(minHeight: 80)) {
+                    clearHistoryButton
+                }
             }
-            .id(UUID())
         }
         #if os(iOS)
         .listStyle(.insetGrouped)
@@ -351,7 +351,7 @@ struct SearchView: View {
         }
         .contextMenu {
             removeButton(item)
-            removeAllButton
+
             #if os(tvOS)
                 Button("Cancel", role: .cancel) {}
             #endif
@@ -367,13 +367,24 @@ struct SearchView: View {
         }
     }
 
-    private var removeAllButton: some View {
+    private var clearHistoryButton: some View {
         Button {
-            recents.clear()
-            recentsChanged.toggle()
+            navigation.presentAlert(
+                Alert(
+                    title: Text("Are you sure you want to clear search history?"),
+                    message: Text("This cannot be reverted"),
+                    primaryButton: .destructive(Text("Clear")) {
+                        recents.clear()
+                        recentsChanged.toggle()
+                    },
+                    secondaryButton: .cancel()
+                )
+            )
         } label: {
-            Label("Remove All", systemImage: "trash.fill")
+            Label("Clear Search History...", systemImage: "trash.fill")
         }
+        .labelStyle(.titleOnly)
+        .foregroundColor(Color("AppRedColor"))
     }
 
     private var searchFiltersActive: Bool {
