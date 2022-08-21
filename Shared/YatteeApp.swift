@@ -170,12 +170,6 @@ struct YatteeApp: App {
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
-        #if os(iOS)
-            if Defaults[.lockPortraitWhenBrowsing] {
-                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-            }
-        #endif
-
         if !Defaults[.lastAccountIsPublic] {
             accounts.configureAccount()
         }
@@ -243,5 +237,13 @@ struct YatteeApp: App {
         if player.presentingPlayer {
             player.presentingPlayer = false
         }
+
+        #if os(iOS)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                if Defaults[.lockPortraitWhenBrowsing] {
+                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                }
+            }
+        #endif
     }
 }
