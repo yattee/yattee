@@ -13,6 +13,7 @@ final class URLParserTests: XCTestCase {
 
     private static let channelsByName: [String: String] = [
         "https://www.youtube.com/c/tennistv": "tennistv",
+        "https://www.youtube.com/achannel": "achannel",
         "youtube.com/c/MKBHD": "MKBHD",
         "c/ABCDE": "ABCDE"
     ]

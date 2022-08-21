@@ -43,10 +43,20 @@ struct URLParser {
         }
 
         guard let id = videoID, !id.isEmpty else {
+            if isYoutubeHost {
+                return .channel
+            }
+
             return nil
         }
 
         return .video
+    }
+
+    var isYoutubeHost: Bool {
+        guard let urlComponents = urlComponents else { return false }
+
+        return urlComponents.host == "youtube.com" || urlComponents.host == "www.youtube.com"
     }
 
     var videoID: String? {
@@ -88,7 +98,10 @@ struct URLParser {
     }
 
     var channelName: String? {
-        guard hasAnyOfPrefixes(path, ["c/", "/c/"]) else { return nil }
+        guard hasAnyOfPrefixes(path, ["c/", "/c/"]) else {
+            if isYoutubeHost { return pathWithoutForwardSlash }
+            return nil
+        }
         return removePrefixes(path, Self.prefixes[.channel]!.map { [$0, "/"].joined() })
     }
 
@@ -106,6 +119,12 @@ struct URLParser {
 
     private var host: String {
         urlComponents?.host ?? ""
+    }
+
+    private var pathWithoutForwardSlash: String {
+        guard let urlComponents = urlComponents else { return "" }
+
+        return String(urlComponents.path.dropFirst())
     }
 
     private var path: String {
