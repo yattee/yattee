@@ -7,13 +7,14 @@ struct PlaylistVideosView: View {
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var model
 
-    @StateObject private var store = Store<ChannelPlaylist>()
+    @StateObject private var channelPlaylist = Store<ChannelPlaylist>()
+    @StateObject private var userPlaylist = Store<Playlist>()
 
     var contentItems: [ContentItem] {
         var videos = playlist.videos
 
         if videos.isEmpty {
-            videos = store.item?.videos ?? []
+            videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
             if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
                 var i = 0
 
@@ -31,7 +32,12 @@ struct PlaylistVideosView: View {
 
     private var resource: Resource? {
         let resource = player.accounts.api.playlist(playlist.id)
-        resource?.addObserver(store)
+
+        if player.accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
+            resource?.addObserver(channelPlaylist)
+        } else {
+            resource?.addObserver(userPlaylist)
+        }
 
         return resource
     }
@@ -48,9 +54,8 @@ struct PlaylistVideosView: View {
         BrowserPlayerControls {
             VerticalCells(items: contentItems)
                 .onAppear {
-                    if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
-                        resource?.load()
-                    }
+                    guard contentItems.isEmpty else { return }
+                    resource?.load()
                 }
                 .onChange(of: model.reloadPlaylists) { _ in
                     resource?.load()

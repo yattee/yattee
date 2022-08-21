@@ -11,7 +11,8 @@ struct PlaylistsView: View {
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
 
-    @StateObject private var store = Store<ChannelPlaylist>()
+    @StateObject private var channelPlaylist = Store<ChannelPlaylist>()
+    @StateObject private var userPlaylist = Store<Playlist>()
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
@@ -23,7 +24,8 @@ struct PlaylistsView: View {
         var videos = currentPlaylist?.videos ?? []
 
         if videos.isEmpty {
-            videos = store.item?.videos ?? []
+            videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
+
             if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
                 var i = 0
 
@@ -40,14 +42,15 @@ struct PlaylistsView: View {
     }
 
     private var resource: Resource? {
-        guard !player.accounts.app.userPlaylistsEndpointIncludesVideos,
-              let playlist = currentPlaylist
-        else {
-            return nil
-        }
+        guard let playlist = currentPlaylist else { return nil }
 
         let resource = player.accounts.api.playlist(playlist.id)
-        resource?.addObserver(store)
+
+        if player.accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
+            resource?.addObserver(channelPlaylist)
+        } else {
+            resource?.addObserver(userPlaylist)
+        }
 
         return resource
     }
@@ -118,8 +121,9 @@ struct PlaylistsView: View {
         }
         .onChange(of: accounts.current) { _ in
             model.load(force: true)
+            resource?.load()
         }
-        .onChange(of: selectedPlaylistID) { _ in
+        .onChange(of: currentPlaylist) { _ in
             resource?.load()
         }
         .onChange(of: model.reloadPlaylists) { _ in
