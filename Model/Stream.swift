@@ -59,7 +59,7 @@ class Stream: Equatable, Hashable, Identifiable {
         }
 
         static func < (lhs: Resolution, rhs: Resolution) -> Bool {
-            lhs.height < rhs.height
+            lhs.height == rhs.height ? (lhs.refreshRate < rhs.refreshRate) : (lhs.height < rhs.height)
         }
     }
 
