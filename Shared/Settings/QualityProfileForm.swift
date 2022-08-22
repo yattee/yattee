@@ -268,7 +268,7 @@ struct QualityProfileForm: View {
     func isFormatDisabled(_ format: QualityProfile.Format) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        let avPlayerFormats = [QualityProfile.Format.hls, .stream]
+        let avPlayerFormats = [QualityProfile.Format.hls, .stream, .mp4]
 
         return !avPlayerFormats.contains(format)
     }
@@ -276,7 +276,7 @@ struct QualityProfileForm: View {
     func isResolutionDisabled(_ resolution: ResolutionSetting) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        return resolution.value.height > 720
+        return resolution.value > .hd720p30
     }
 
     func initializeForm() {
