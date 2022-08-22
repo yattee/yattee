@@ -322,7 +322,10 @@ final class AVPlayerBackend: PlayerBackend {
                 guard finished else {
                     return
                 }
-                self.model.preservedTime = nil
+
+                DispatchQueue.main.async { [weak self] in
+                    self?.model.preservedTime = nil
+                }
 
                 startPlaying()
             }
