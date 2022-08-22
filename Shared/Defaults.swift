@@ -87,6 +87,7 @@ extension Defaults.Keys {
     static let batteryNonCellularProfile = Key<QualityProfile.ID>("batteryNonCellularProfile", default: batteryNonCellularProfileDefault)
     static let chargingCellularProfile = Key<QualityProfile.ID>("chargingCellularProfile", default: chargingCellularProfileDefault)
     static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: chargingNonCellularProfileDefault)
+    static let forceAVPlayerForLiveStreams = Key<Bool>("forceAVPlayerForLiveStreams", default: true)
 
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")

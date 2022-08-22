@@ -12,9 +12,10 @@ struct QualitySettings: View {
     @Default(.batteryNonCellularProfile) private var batteryNonCellularProfile
     @Default(.chargingCellularProfile) private var chargingCellularProfile
     @Default(.chargingNonCellularProfile) private var chargingNonCellularProfile
+    @Default(.forceAVPlayerForLiveStreams) private var forceAVPlayerForLiveStreams
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             #if os(macOS)
                 sections
 
@@ -63,6 +64,8 @@ struct QualitySettings: View {
                         Picker("Default", selection: $chargingNonCellularProfile) { profilePickerOptions }
                     }
                 #endif
+
+                forceAVPlayerForLiveStreamsToggle
             }
             .disabled(qualityProfiles.isEmpty)
             Section(header: SettingsHeader(text: "Profiles"), footer: profilesFooter) {
@@ -101,6 +104,10 @@ struct QualitySettings: View {
     @ViewBuilder var nonCellularBatteryDevicesProfilesPickers: some View {
         Picker("Battery", selection: $batteryNonCellularProfile) { profilePickerOptions }
         Picker("Charging", selection: $chargingNonCellularProfile) { profilePickerOptions }
+    }
+
+    @ViewBuilder var forceAVPlayerForLiveStreamsToggle: some View {
+        Toggle("Always use AVPlayer for live videos", isOn: $forceAVPlayerForLiveStreams)
     }
 
     @ViewBuilder func profileControl(_ qualityProfile: QualityProfile) -> some View {

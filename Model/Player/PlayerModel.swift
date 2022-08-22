@@ -158,6 +158,7 @@ final class PlayerModel: ObservableObject {
     }}
 
     @Default(.qualityProfiles) var qualityProfiles
+    @Default(.forceAVPlayerForLiveStreams) var forceAVPlayerForLiveStreams
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
@@ -344,9 +345,10 @@ final class PlayerModel: ObservableObject {
 
         var changeBackendHandler: (() -> Void)?
 
-        if let backend = qualityProfile?.backend ?? QualityProfilesModel.shared.automaticProfile?.backend,
-           activeBackend != backend,
-           backend == .appleAVPlayer || !avPlayerBackend.startPictureInPictureOnPlay
+        if let backend = (live && forceAVPlayerForLiveStreams) ? PlayerBackendType.appleAVPlayer :
+            (qualityProfile?.backend ?? QualityProfilesModel.shared.automaticProfile?.backend),
+            activeBackend != backend,
+            backend == .appleAVPlayer || !avPlayerBackend.startPictureInPictureOnPlay
         {
             changeBackendHandler = { [weak self] in
                 guard let self = self else { return }
@@ -446,10 +448,11 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        if let qualityProfileBackend = qualityProfile?.backend, qualityProfileBackend != activeBackend,
-           qualityProfileBackend == .appleAVPlayer || !(avPlayerBackend.startPictureInPictureOnPlay || playingInPictureInPicture)
+        if let backend = (live && forceAVPlayerForLiveStreams) ? PlayerBackendType.appleAVPlayer : qualityProfile?.backend,
+           backend != activeBackend,
+           backend == .appleAVPlayer || !(avPlayerBackend.startPictureInPictureOnPlay || playingInPictureInPicture)
         {
-            changeActiveBackend(from: activeBackend, to: qualityProfileBackend)
+            changeActiveBackend(from: activeBackend, to: backend)
         }
 
         guard let stream = streamByQualityProfile else {
@@ -501,6 +504,8 @@ final class PlayerModel: ObservableObject {
         guard activeBackend != to else {
             return
         }
+
+        logger.info("changing backend from \(from.rawValue) to \(to.rawValue)")
 
         pause()
 
