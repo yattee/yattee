@@ -26,7 +26,12 @@ extension Defaults.Keys {
     ])
 
     #if !os(tvOS)
-        static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: false)
+        #if os(macOS)
+            static let accountPickerDisplaysUsernameDefault = true
+        #else
+            static let accountPickerDisplaysUsernameDefault = UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+        static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: accountPickerDisplaysUsernameDefault)
     #endif
     #if os(iOS)
         static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
