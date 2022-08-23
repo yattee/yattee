@@ -103,7 +103,7 @@ struct VideoDescription: View {
         }
 
         func updateUIView(_: UIViewType, context _: Context) {
-            customizeLabel()
+            updatePreferredMaxLayoutWidth()
         }
 
         func customizeLabel() {
@@ -142,6 +142,10 @@ struct VideoDescription: View {
                     player.backend.seek(to: timestamp.timeInterval)
                 }
             }
+        }
+
+        func updatePreferredMaxLayoutWidth() {
+            label.preferredMaxLayoutWidth = (detailsSize?.width ?? 330) - 30
         }
     }
 #endif
