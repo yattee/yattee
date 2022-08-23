@@ -515,6 +515,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             return matchingGroup
         }
 
+        description = description.replacingOccurrences(of: "&amp;", with: "&")
+
         description = description.replacingOccurrences(
             of: "<[^>]+>",
             with: "",
