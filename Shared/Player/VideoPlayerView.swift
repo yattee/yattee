@@ -60,42 +60,46 @@ struct VideoPlayerView: View {
     var body: some View {
         ZStack(alignment: overlayAlignment) {
             videoPlayer
+                .zIndex(-1)
             #if os(iOS)
-            .gesture(playerControls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
+                .gesture(playerControls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
             #endif
 
-            if playerControls.presentingControlsOverlay {
-                HStack {
+            VStack {
+                if playerControls.presentingControlsOverlay {
                     HStack {
-                        ControlsOverlay()
-                        #if os(tvOS)
-                            .onExitCommand {
-                                withAnimation(PlayerControls.animation) {
-                                    playerControls.hideOverlays()
+                        HStack {
+                            ControlsOverlay()
+                            #if os(tvOS)
+                                .onExitCommand {
+                                    withAnimation(PlayerControls.animation) {
+                                        playerControls.hideOverlays()
+                                    }
                                 }
-                            }
-                            .onPlayPauseCommand {
-                                player.togglePlay()
+                                .onPlayPauseCommand {
+                                    player.togglePlay()
+                                }
+                            #endif
+                                .padding()
+                                .modifier(ControlBackgroundModifier())
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                        }
+                        #if !os(tvOS)
+                        .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
+                        #endif
+
+                        #if !os(tvOS)
+                            if !fullScreenLayout && sidebarQueue {
+                                Spacer()
                             }
                         #endif
-                            .padding()
-                            .modifier(ControlBackgroundModifier())
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .transition(.opacity)
                     }
-                    #if !os(tvOS)
-                    .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
+                    #if os(tvOS)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     #endif
-
-                    #if !os(tvOS)
-                        if !fullScreenLayout && sidebarQueue {
-                            Spacer()
-                        }
-                    #endif
+                    .zIndex(1)
+                    .transition(.opacity)
                 }
-                #if os(tvOS)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                #endif
             }
         }
         .onAppear {
