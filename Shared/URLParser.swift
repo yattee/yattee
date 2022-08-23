@@ -2,6 +2,7 @@ import CoreMedia
 import Foundation
 
 struct URLParser {
+    static var shortsPrefix = "/shorts/"
     static let prefixes: [Destination: [String]] = [
         .playlist: ["/playlist", "playlist"],
         .channel: ["/c", "c", "/channel", "channel", "/user", "user"],
@@ -59,9 +60,18 @@ struct URLParser {
         return urlComponents.host == "youtube.com" || urlComponents.host == "www.youtube.com"
     }
 
+    var isShortsPath: Bool {
+        path.hasPrefix(Self.shortsPrefix)
+    }
+
     var videoID: String? {
         if host == "youtu.be", !path.isEmpty {
             return String(path.suffix(from: path.index(path.startIndex, offsetBy: 1)))
+        }
+
+        if isYoutubeHost, isShortsPath {
+            let index = path.index(path.startIndex, offsetBy: Self.shortsPrefix.count)
+            return String(path[index...])
         }
 
         return queryItemValue("v")
@@ -99,7 +109,7 @@ struct URLParser {
 
     var channelName: String? {
         guard hasAnyOfPrefixes(path, ["c/", "/c/"]) else {
-            if isYoutubeHost { return pathWithoutForwardSlash }
+            if channelID == nil, username == nil { return pathWithoutForwardSlash }
             return nil
         }
         return removePrefixes(path, Self.prefixes[.channel]!.map { [$0, "/"].joined() })

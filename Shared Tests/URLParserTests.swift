@@ -5,6 +5,7 @@ final class URLParserTests: XCTestCase {
         "https://www.youtube.com/watch?v=_E0PWQvW-14&list=WL&index=4&t=155s": "_E0PWQvW-14",
         "https://youtu.be/IRsc57nK8mg?t=20": "IRsc57nK8mg",
         "yattee://youtu.be/oCtYBqcN7QE": "oCtYBqcN7QE",
+        "https://www.youtube.com/shorts/TjOh-gfIE2s": "TjOh-gfIE2s",
         "https://www.youtube-nocookie.com/watch?index=4&v=cE1PSQrWc11&list=WL&t=155s": "cE1PSQrWc11",
         "https://invidious.snopyta.org/watch?v=XpowfENlJAw": "XpowfENlJAw",
         "/watch?v=VQ_f5RymW70": "VQ_f5RymW70",
