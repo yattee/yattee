@@ -71,6 +71,7 @@ final class AppleAVPlayerViewController: UIViewController {
                     .frame(maxHeight: 600)
                     .environmentObject(accountsModel)
                     .environmentObject(commentsModel)
+                    .environmentObject(navigationModel)
                     .environmentObject(playerModel)
                     .environmentObject(playlistsModel)
                     .environmentObject(subscriptionsModel)
