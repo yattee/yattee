@@ -23,9 +23,9 @@ struct TimelineView: View {
     @State private var size = CGSize.zero
     @State private var tooltipSize = CGSize.zero
     @State private var dragging = false { didSet {
-        if dragging {
+        if dragging, player.backend.controlsUpdates {
             player.backend.stopControlsUpdates()
-        } else {
+        } else if !dragging, !player.backend.controlsUpdates {
             player.backend.startControlsUpdates()
         }
     }}

@@ -1,6 +1,7 @@
 import AVFoundation
 import Defaults
 import Foundation
+import Logging
 import MediaPlayer
 #if !os(macOS)
     import UIKit
@@ -8,6 +9,8 @@ import MediaPlayer
 
 final class AVPlayerBackend: PlayerBackend {
     static let assetKeysToLoad = ["tracks", "playable", "duration"]
+
+    private var logger = Logger(label: "avplayer-backend")
 
     var model: PlayerModel!
     var controls: PlayerControlsModel!
@@ -69,7 +72,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var timeObserverThrottle = Throttle(interval: 2)
 
-    private var controlsUpdates = false
+    internal var controlsUpdates = false
 
     init(model: PlayerModel, controls: PlayerControlsModel?, playerTime: PlayerTimeModel?) {
         self.model = model
@@ -589,6 +592,11 @@ final class AVPlayerBackend: PlayerBackend {
     func updateControls() {}
 
     func startControlsUpdates() {
+        guard model.presentingPlayer, model.controls.presentingControls, !model.controls.presentingOverlays else {
+            logger.info("ignored controls update start")
+            return
+        }
+        logger.info("starting controls updates")
         controlsUpdates = true
     }
 

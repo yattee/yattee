@@ -39,14 +39,20 @@ final class PlayerControlsModel: ObservableObject {
     func handlePresentationChange() {
         guard let player = player else { return }
         if presentingControls {
-            player.backend.startControlsUpdates()
-            resetTimer()
+            DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
+                player.backend.startControlsUpdates()
+                self?.resetTimer()
+            }
         } else {
             if !player.musicMode {
-                player.backend.stopControlsUpdates()
-                removeTimer()
+                DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
+                    player.backend.stopControlsUpdates()
+                    self?.removeTimer()
+                }
             } else {
-                presentingControls = true
+                DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
+                    self?.presentingControls = true
+                }
             }
         }
     }
@@ -116,7 +122,6 @@ final class PlayerControlsModel: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
             withAnimation(PlayerControls.animation) { [weak self] in
                 self?.presentingControls = false
-                self?.player.backend.stopControlsUpdates()
             }
         }
     }

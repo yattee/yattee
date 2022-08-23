@@ -89,7 +89,7 @@ final class MPVBackend: PlayerBackend {
 
     private var onFileLoaded: (() -> Void)?
 
-    private var controlsUpdates = false
+    internal var controlsUpdates = false
     private var timeObserverThrottle = Throttle(interval: 2)
 
     var tracks: Int {
@@ -337,7 +337,7 @@ final class MPVBackend: PlayerBackend {
             return
         }
 
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
             guard let self = self else {
                 return
             }
