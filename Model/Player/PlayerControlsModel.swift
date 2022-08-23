@@ -37,39 +37,25 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func handlePresentationChange() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  let player = self.player else { return }
-            if self.presentingControls {
-                player.backend.startControlsUpdates()
-                self.resetTimer()
+        guard let player = player else { return }
+        if presentingControls {
+            player.backend.startControlsUpdates()
+            resetTimer()
+        } else {
+            if !player.musicMode {
+                player.backend.stopControlsUpdates()
+                removeTimer()
             } else {
-                if !player.musicMode {
-                    player.backend.stopControlsUpdates()
-                    self.removeTimer()
-                } else {
-                    self.presentingControls = true
-                }
+                presentingControls = true
             }
         }
     }
 
     func handleSettingsOverlayPresentationChange() {
         player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay && Defaults[.showMPVPlaybackStats])
-        if presentingControlsOverlay {
-            removeTimer()
-        } else {
-            resetTimer()
-        }
     }
 
-    func handleDetailsOverlayPresentationChange() {
-        if presentingDetailsOverlay {
-            removeTimer()
-        } else {
-            resetTimer()
-        }
-    }
+    func handleDetailsOverlayPresentationChange() {}
 
     var presentingOverlays: Bool {
         presentingDetailsOverlay || presentingControlsOverlay

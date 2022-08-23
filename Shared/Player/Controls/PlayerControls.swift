@@ -136,12 +136,7 @@ struct PlayerControls: View {
         }
         .onChange(of: model.presentingOverlays) { newValue in
             if newValue {
-                player.backend.stopControlsUpdates()
-            } else {
-                #if os(tvOS)
-                    focusedField = .play
-                #endif
-                player.backend.startControlsUpdates()
+                model.hide()
             }
         }
         #if os(tvOS)

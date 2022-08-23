@@ -454,10 +454,9 @@ struct VideoPlayerView: View {
                     if drag > 60,
                        player.playingFullScreen
                     {
-                        player.exitFullScreen()
+                        player.exitFullScreen(showControls: false)
                         if Defaults[.rotateToPortraitOnExitFullScreen] {
                             Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                            playerControls.show()
                         }
                     }
                 }

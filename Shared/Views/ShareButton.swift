@@ -27,20 +27,25 @@ struct ShareButton: View {
 
     private var instanceActions: some View {
         Group {
-            if let url = player.playerAPI.shareURL(contentItem) {
-                Button(labelForShareURL(accounts.app.name)) {
+            Button(labelForShareURL(accounts.app.name)) {
+                if let url = player.playerAPI.shareURL(contentItem) {
                     shareAction(url)
+                } else {
+                    navigation.presentAlert(
+                        title: "Could not create share link",
+                        message: "For custom locations you can configure Frontend URL in Locations settings"
+                    )
                 }
+            }
 
-                if contentItemIsPlayerCurrentVideo {
-                    Button(labelForShareURL(accounts.app.name, withTime: true)) {
-                        shareAction(
-                            player.playerAPI.shareURL(
-                                contentItem,
-                                time: player.backend.currentTime
-                            )!
-                        )
-                    }
+            if contentItemIsPlayerCurrentVideo {
+                Button(labelForShareURL(accounts.app.name, withTime: true)) {
+                    shareAction(
+                        player.playerAPI.shareURL(
+                            contentItem,
+                            time: player.backend.currentTime
+                        )!
+                    )
                 }
             }
         }
