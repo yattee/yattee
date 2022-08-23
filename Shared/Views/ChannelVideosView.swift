@@ -173,7 +173,7 @@ struct ChannelVideosView: View {
                                 subscriptionToggleButtonDisabled = false
                             }
                         } label: {
-                            Label("Unsubscribe", systemImage: "circle")
+                            Label("Unsubscribe", systemImage: "star.circle")
                             #if os(iOS)
                                 .labelStyle(.automatic)
                             #else
@@ -189,7 +189,7 @@ struct ChannelVideosView: View {
                                 navigation.sidebarSectionChanged.toggle()
                             }
                         } label: {
-                            Label("Subscribe", systemImage: "star.circle")
+                            Label("Subscribe", systemImage: "circle")
                             #if os(iOS)
                                 .labelStyle(.automatic)
                             #else
@@ -209,5 +209,12 @@ struct ChannelVideosView: View {
 
     private var navigationTitle: String {
         presentedChannel?.name ?? store.item?.name ?? "No channel"
+    }
+}
+
+struct ChannelVideosView_Previews: PreviewProvider {
+    static var previews: some View {
+        ChannelVideosView(channel: Video.fixture.channel)
+            .injectFixtureEnvironmentObjects()
     }
 }
