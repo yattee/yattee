@@ -6,6 +6,7 @@ struct BrowsingSettings: View {
         @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
         @Default(.roundedThumbnails) private var roundedThumbnails
     #endif
+    @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
     #if os(iOS)
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
     #endif
@@ -37,9 +38,7 @@ struct BrowsingSettings: View {
 
     private var sections: some View {
         Group {
-            #if !os(tvOS)
-                interfaceSettings
-            #endif
+            interfaceSettings
             thumbnailsSettings
             visibleSectionsSettings
         }
@@ -61,6 +60,8 @@ struct BrowsingSettings: View {
             #if !os(tvOS)
                 Toggle("Show account username", isOn: $accountPickerDisplaysUsername)
             #endif
+
+            Toggle("Show anonymous accounts", isOn: $accountPickerDisplaysAnonymousAccounts)
         }
     }
 

@@ -211,6 +211,7 @@
 		37319F0527103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
+		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
 		3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
@@ -340,6 +341,11 @@
 		37599F38272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
 		37599F39272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
 		37599F3A272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
+		375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 375B8AB028B57F4200397B31 /* KeychainAccess */; };
+		375B8AB328B580D300397B31 /* KeychainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375B8AB228B580D300397B31 /* KeychainModel.swift */; };
+		375B8AB428B580D300397B31 /* KeychainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375B8AB228B580D300397B31 /* KeychainModel.swift */; };
+		375B8AB528B580D300397B31 /* KeychainModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375B8AB228B580D300397B31 /* KeychainModel.swift */; };
+		375B8AB728B583BD00397B31 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 375B8AB628B583BD00397B31 /* KeychainAccess */; };
 		375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
 		375DFB5926F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
 		375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375DFB5726F9DA010013F468 /* InstancesModel.swift */; };
@@ -1073,6 +1079,7 @@
 		37599F2F272B42810087F250 /* FavoriteItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItem.swift; sourceTree = "<group>"; };
 		37599F33272B44000087F250 /* FavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesModel.swift; sourceTree = "<group>"; };
 		37599F37272B4D740087F250 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
+		375B8AB228B580D300397B31 /* KeychainModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainModel.swift; sourceTree = "<group>"; };
 		375DFB5726F9DA010013F468 /* InstancesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesModel.swift; sourceTree = "<group>"; };
 		375E45F427B1976B00BA7902 /* MPVOGLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVOGLView.swift; sourceTree = "<group>"; };
 		375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsModel.swift; sourceTree = "<group>"; };
@@ -1321,6 +1328,7 @@
 				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
 				37FB284B2722099E00A57617 /* SDWebImageSwiftUI in Frameworks */,
 				3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
+				375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */,
 				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
@@ -1375,6 +1383,7 @@
 				370F4FD927CC16CB001B35DC /* libxcb-shm.0.0.0.dylib in Frameworks */,
 				370F4FCA27CC16CB001B35DC /* libXau.6.dylib in Frameworks */,
 				370F4FD527CC16CB001B35DC /* libfontconfig.1.dylib in Frameworks */,
+				375B8AB728B583BD00397B31 /* KeychainAccess in Frameworks */,
 				37A5DBC6285E06B100CA4DD1 /* SwiftUIPager in Frameworks */,
 				370F4FCE27CC16CB001B35DC /* libswresample.4.3.100.dylib in Frameworks */,
 				370F4FDA27CC16CB001B35DC /* libmpv.dylib in Frameworks */,
@@ -1422,6 +1431,7 @@
 				3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
+				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
 				3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */,
 				3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
@@ -2072,6 +2082,7 @@
 				37599F33272B44000087F250 /* FavoritesModel.swift */,
 				37BC50AB2778BCBA00510953 /* HistoryModel.swift */,
 				377ABC3F286E4AD5009C986F /* InstancesManifest.swift */,
+				375B8AB228B580D300397B31 /* KeychainModel.swift */,
 				377ABC43286E4B74009C986F /* ManifestedInstance.swift */,
 				37EF5C212739D37B00B03725 /* MenuModel.swift */,
 				371F2F19269B43D300E4A7AB /* NavigationModel.swift */,
@@ -2295,6 +2306,7 @@
 				372AA40F286D067B0000B1DC /* Repeat */,
 				37EE6DC428A305AD00BFD632 /* Reachability */,
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
+				375B8AB028B57F4200397B31 /* KeychainAccess */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2331,6 +2343,7 @@
 				37CF8B8528535E5A00B71E37 /* SDWebImage */,
 				37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */,
 				372AA413286D06A10000B1DC /* Repeat */,
+				375B8AB628B583BD00397B31 /* KeychainAccess */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2407,6 +2420,7 @@
 				37CF8B8728535E6300B71E37 /* SDWebImage */,
 				372AA411286D06950000B1DC /* Repeat */,
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
+				3732BFCF28B83763009F3F4D /* KeychainAccess */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2506,6 +2520,7 @@
 				372AA40E286D067B0000B1DC /* XCRemoteSwiftPackageReference "Repeat" */,
 				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
+				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -2857,6 +2872,7 @@
 				376A33E42720CB35000C1D6B /* Account.swift in Sources */,
 				3756C2A62861131100E4B059 /* NetworkState.swift in Sources */,
 				37BA794326DBA973002A0235 /* PlaylistsModel.swift in Sources */,
+				375B8AB328B580D300397B31 /* KeychainModel.swift in Sources */,
 				37BC50AC2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37AAF29026740715007FC770 /* Channel.swift in Sources */,
 				37DD9DBA2785D60300539416 /* FramePreferenceKey.swift in Sources */,
@@ -3032,6 +3048,7 @@
 				37F64FE526FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				377ABC45286E4B74009C986F /* ManifestedInstance.swift in Sources */,
 				3795593727B08538007FF8F4 /* StreamControl.swift in Sources */,
+				375B8AB428B580D300397B31 /* KeychainModel.swift in Sources */,
 				37F7AB5528A951B200FB46B5 /* Power.swift in Sources */,
 				372CFD16285F2E2A00B0B54B /* ControlsBar.swift in Sources */,
 				37FFC441272734C3009FFD26 /* Throttle.swift in Sources */,
@@ -3372,6 +3389,7 @@
 				3752069F285E910600CA655F /* ChapterView.swift in Sources */,
 				37F4AD1D28612B23004D0F66 /* OpeningStream.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
+				375B8AB528B580D300397B31 /* KeychainModel.swift in Sources */,
 				373CFACD26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				37C3A24B27235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				37F4AD2128612DFD004D0F66 /* Buffering.swift in Sources */,
@@ -4328,6 +4346,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pinterest/PINCache";
@@ -4499,6 +4525,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 372AA40E286D067B0000B1DC /* XCRemoteSwiftPackageReference "Repeat" */;
 			productName = Repeat;
+		};
+		3732BFCF28B83763009F3F4D /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		375B8AB028B57F4200397B31 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		375B8AB628B583BD00397B31 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 		3765917B27237D21009F956E /* PINCache */ = {
 			isa = XCSwiftPackageProductDependency;

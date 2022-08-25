@@ -5,13 +5,12 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     static var bridge = AccountsBridge()
 
     let id: String
-    let app: VideosApp
+    var app: VideosApp?
     let instanceID: String?
     var name: String?
     let url: String
-    let username: String
-    let password: String?
-    var token: String?
+    var username: String
+    var password: String?
     let anonymous: Bool
     let country: String?
     let region: String?
@@ -24,7 +23,6 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         url: String? = nil,
         username: String? = nil,
         password: String? = nil,
-        token: String? = nil,
         anonymous: Bool = false,
         country: String? = nil,
         region: String? = nil
@@ -32,19 +30,26 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         self.anonymous = anonymous
 
         self.id = id ?? (anonymous ? "anonymous-\(instanceID ?? url ?? UUID().uuidString)" : UUID().uuidString)
-        self.app = app ?? .invidious
         self.instanceID = instanceID
         self.name = name
         self.url = url ?? ""
         self.username = username ?? ""
-        self.token = token
         self.password = password ?? ""
         self.country = country
         self.region = region
+        self.app = app ?? instance.app
+    }
+
+    var token: String? {
+        KeychainModel.shared.getAccountKey(self, "token")
+    }
+
+    var credentials: (String?, String?) {
+        AccountsModel.getCredentials(self)
     }
 
     var instance: Instance! {
-        Defaults[.instances].first { $0.id == instanceID } ?? Instance(app: app, name: url, apiURL: url)
+        Defaults[.instances].first { $0.id == instanceID } ?? Instance(app: app ?? .invidious, name: url, apiURL: url)
     }
 
     var isPublic: Bool {
@@ -52,8 +57,12 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var shortUsername: String {
-        guard username.count > 10 else {
-            return username
+        let (username, _) = credentials
+
+        guard let username = username,
+              username.count > 10
+        else {
+            return username ?? ""
         }
 
         let index = username.index(username.startIndex, offsetBy: 11)
@@ -61,7 +70,11 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var description: String {
-        (name != nil && name!.isEmpty) ? shortUsername : name!
+        guard let name = name, !name.isEmpty else {
+            return shortUsername
+        }
+
+        return name
     }
 
     func hash(into hasher: inout Hasher) {

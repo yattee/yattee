@@ -7,6 +7,7 @@ struct AccountsMenuView: View {
     @Default(.accounts) private var accounts
     @Default(.instances) private var instances
     @Default(.accountPickerDisplaysUsername) private var accountPickerDisplaysUsername
+    @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
 
     @ViewBuilder var body: some View {
         if !instances.isEmpty {
@@ -48,7 +49,8 @@ struct AccountsMenuView: View {
     }
 
     private var allAccounts: [Account] {
-        accounts + instances.map(\.anonymousAccount) + [model.publicAccount].compactMap { $0 }
+        let anonymousAccounts = accountPickerDisplaysAnonymousAccounts ? instances.map(\.anonymousAccount) : []
+        return accounts + anonymousAccounts + [model.publicAccount].compactMap { $0 }
     }
 
     private func accountButtonTitle(account: Account) -> String {

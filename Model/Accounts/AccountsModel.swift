@@ -93,22 +93,47 @@ final class AccountsModel: ObservableObject {
         Defaults[.accounts].first { $0.id == id }
     }
 
-    static func add(instance: Instance, name: String, username: String, password: String? = nil) -> Account {
-        let account = Account(
-            instanceID: instance.id,
-            name: name,
-            url: instance.apiURL,
-            username: username,
-            password: password
-        )
+    static func add(instance: Instance, name: String, username: String, password: String) -> Account {
+        let account = Account(instanceID: instance.id, name: name, url: instance.apiURL)
         Defaults[.accounts].append(account)
+
+        setCredentials(account, username: username, password: password)
 
         return account
     }
 
     static func remove(_ account: Account) {
         if let accountIndex = Defaults[.accounts].firstIndex(where: { $0.id == account.id }) {
+            let account = Defaults[.accounts][accountIndex]
+            KeychainModel.shared.removeAccountKeys(account)
             Defaults[.accounts].remove(at: accountIndex)
+        }
+    }
+
+    static func setToken(_ account: Account, _ token: String) {
+        KeychainModel.shared.updateAccountKey(account, "token", token)
+    }
+
+    static func setCredentials(_ account: Account, username: String, password: String) {
+        KeychainModel.shared.updateAccountKey(account, "username", username)
+        KeychainModel.shared.updateAccountKey(account, "password", password)
+    }
+
+    static func getCredentials(_ account: Account) -> (String?, String?) {
+        (
+            KeychainModel.shared.getAccountKey(account, "username"),
+            KeychainModel.shared.getAccountKey(account, "password")
+        )
+    }
+
+    static func removeDefaultsCredentials(_ account: Account) {
+        if let accountIndex = Defaults[.accounts].firstIndex(where: { $0.id == account.id }) {
+            var account = Defaults[.accounts][accountIndex]
+            account.name = ""
+            account.username = ""
+            account.password = nil
+
+            Defaults[.accounts][accountIndex] = account
         }
     }
 }

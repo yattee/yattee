@@ -109,22 +109,32 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     func updateToken() {
-        guard !account.anonymous else {
+        let (username, password) = AccountsModel.getCredentials(account)
+
+        guard !account.anonymous,
+              let username = username,
+              let password = password
+        else {
             return
         }
 
-        account.token = nil
-
         login.request(
             .post,
-            json: ["username": account.username, "password": account.password]
+            json: ["username": username, "password": password]
         )
         .onSuccess { response in
-            self.account.token = response.json.dictionaryValue["token"]?.string ?? ""
+            let token = response.json.dictionaryValue["token"]?.string ?? ""
             if let error = response.json.dictionaryValue["error"]?.string {
                 NavigationModel.shared.presentAlert(
-                    title: "Could not connect with your account",
+                    title: "Account Error",
                     message: error
+                )
+            } else if !token.isEmpty {
+                AccountsModel.setToken(self.account, token)
+            } else {
+                NavigationModel.shared.presentAlert(
+                    title: "Account Error",
+                    message: "Could not update your token."
                 )
             }
 

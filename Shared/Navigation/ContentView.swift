@@ -46,11 +46,14 @@ struct ContentView: View {
                     .environmentObject(settings)
             #endif
         }
+        .onChange(of: accounts.current) { _ in
+            subscriptions.load(force: true)
+            playlists.load(force: true)
+        }
         .onChange(of: accounts.signedIn) { _ in
             subscriptions.load(force: true)
             playlists.load(force: true)
         }
-
         .environmentObject(accounts)
         .environmentObject(comments)
         .environmentObject(instances)

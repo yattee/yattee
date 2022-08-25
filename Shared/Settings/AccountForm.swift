@@ -63,10 +63,6 @@ struct AccountForm: View {
                     #if os(macOS)
                     .padding(.horizontal)
                     #endif
-
-                    #if os(iOS)
-                        helpButton
-                    #endif
                 }
             #else
                 formFields
@@ -76,33 +72,10 @@ struct AccountForm: View {
         .onChange(of: password) { _ in validate() }
     }
 
-    var helpButton: some View {
-        Group {
-            if instance.app == .invidious {
-                Button {
-                    openURL(URL(string: "https://github.com/yattee/yattee/wiki/Adding-Invidious-instance-and-account")!)
-                } label: {
-                    Label("How to add Invidious account?", systemImage: "questionmark.circle")
-                    #if os(macOS)
-                        .help("How to add Invidious account?")
-                        .labelStyle(.iconOnly)
-                    #endif
-                }
-            }
-        }
-    }
-
     var formFields: some View {
         Group {
-            if !instance.app.accountsUsePassword {
-                TextField("Name", text: $name)
-            }
-
-            TextField(usernamePrompt, text: $username)
-
-            if instance.app.accountsUsePassword {
-                SecureField("Password", text: $password)
-            }
+            TextField("Username", text: $username)
+            SecureField("Password", text: $password)
         }
     }
 
@@ -127,10 +100,6 @@ struct AccountForm: View {
 
             Spacer()
 
-            #if os(macOS)
-                helpButton
-            #endif
-
             Button("Save", action: submitForm)
                 .disabled(!isValid)
             #if !os(tvOS)
@@ -148,9 +117,7 @@ struct AccountForm: View {
         isValid = false
         validationDebounce.invalidate()
 
-        let passwordIsValid = instance.app.accountsUsePassword ? !password.isEmpty : true
-
-        guard !username.isEmpty, passwordIsValid else {
+        guard !username.isEmpty, !password.isEmpty else {
             validator.reset()
             return
         }

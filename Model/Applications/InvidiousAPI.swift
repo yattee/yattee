@@ -1,3 +1,4 @@
+import Alamofire
 import AVKit
 import Defaults
 import Foundation
@@ -10,7 +11,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     @Published var account: Account!
 
     @Published var validInstance = true
-    @Published var signedIn = false
+
+    var signedIn: Bool {
+        guard let account = account else { return false }
+
+        return !account.anonymous && !(account.token?.isEmpty ?? true)
+    }
 
     init(account: Account? = nil) {
         super.init()
@@ -25,7 +31,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func setAccount(_ account: Account) {
         self.account = account
-        signedIn = false
 
         validInstance = account.anonymous
 
@@ -57,28 +62,23 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func validateSID() {
-        guard !signedIn else {
+        guard signedIn, !(account.token?.isEmpty ?? true) else {
             return
         }
 
         feed?
             .load()
-            .onSuccess { _ in
-                self.signedIn = true
-            }
-            .onFailure { requestError in
-                self.signedIn = false
-                NavigationModel.shared.presentAlert(
-                    title: "Could not connect with your account",
-                    message: "\(requestError.httpStatusCode ?? -1) - \(requestError.userMessage)\nIf this issue persists, try removing and adding your account again in Settings."
-                )
+            .onFailure { _ in
+                self.updateToken(force: true)
             }
     }
 
     func configure() {
+        invalidateConfiguration()
+
         configure {
-            if !self.account.username.isEmpty {
-                $0.headers["Cookie"] = self.cookieHeader
+            if let cookie = self.cookieHeader {
+                $0.headers["Cookie"] = cookie
             }
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
@@ -170,6 +170,71 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
             return CommentsPage(comments: comments, nextPage: nextPage, disabled: disabled)
         }
+
+        updateToken()
+    }
+
+    func updateToken(force: Bool = false) {
+        let (username, password) = AccountsModel.getCredentials(account)
+        guard !account.anonymous,
+              (account.token?.isEmpty ?? true) || force
+        else {
+            return
+        }
+
+        guard let username = username,
+              let password = password,
+              !username.isEmpty,
+              !password.isEmpty
+        else {
+            NavigationModel.shared.presentAlert(
+                title: "Account Error",
+                message: "Remove and add your account again in Settings."
+            )
+            return
+        }
+
+        let presentTokenUpdateFailedAlert: (AFDataResponse<Data?>?, String?) -> Void = { response, message in
+            NavigationModel.shared.presentAlert(
+                title: "Account Error",
+                message: message ?? "\(response?.response?.statusCode ?? -1) - \(response?.error?.errorDescription ?? "unknown")\nIf this issue persists, try removing and adding your account again in Settings."
+            )
+        }
+
+        AF
+            .request(login.url, method: .post, parameters: ["email": username, "password": password], encoding: URLEncoding.default)
+            .redirect(using: .doNotFollow)
+            .response { response in
+                guard let headers = response.response?.headers,
+                      let cookies = headers["Set-Cookie"]
+                else {
+                    presentTokenUpdateFailedAlert(response, nil)
+                    return
+                }
+
+                let sidRegex = #"SID=(?<sid>[^;]*);"#
+                guard let sidRegex = try? NSRegularExpression(pattern: sidRegex),
+                      let match = sidRegex.matches(in: cookies, range: NSRange(cookies.startIndex..., in: cookies)).first
+                else {
+                    presentTokenUpdateFailedAlert(nil, "Could not extract SID from received cookies: \(cookies)")
+                    return
+                }
+
+                let matchRange = match.range(withName: "sid")
+
+                if let substringRange = Range(matchRange, in: cookies) {
+                    print("updating invidious token")
+                    let sid = String(cookies[substringRange])
+                    AccountsModel.setToken(self.account, sid)
+                    self.configure()
+                } else {
+                    presentTokenUpdateFailedAlert(nil, "Could not extract SID from received cookies: \(cookies)")
+                }
+            }
+    }
+
+    var login: Resource {
+        resource(baseURL: account.url, path: "login")
     }
 
     private func pathPattern(_ path: String) -> String {
@@ -180,8 +245,9 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         "\(Self.basePath)/\(path)"
     }
 
-    private var cookieHeader: String {
-        "SID=\(account.username)"
+    private var cookieHeader: String? {
+        guard let token = account?.token, !token.isEmpty else { return nil }
+        return "SID=\(token)"
     }
 
     var popular: Resource? {
