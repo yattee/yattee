@@ -6,12 +6,12 @@ import SwiftUI
 struct VideoCell: View {
     private var video: Video
 
-    @Environment(\.navigationStyle) private var navigationStyle
+    @Environment(\.horizontalCells) private var horizontalCells
     @Environment(\.inChannelView) private var inChannelView
+    @Environment(\.navigationStyle) private var navigationStyle
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
-        @Environment(\.horizontalCells) private var horizontalCells
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
@@ -39,14 +39,21 @@ struct VideoCell: View {
     var body: some View {
         Button(action: playAction) {
             content
+            #if os(tvOS)
+            .frame(width: 580, height: 470)
+            #endif
         }
         .opacity(contentOpacity)
-        .buttonStyle(.plain)
-        .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
-        .contextMenu {
-            VideoContextMenuView(video: video)
-                .environmentObject(accounts)
-        }
+        #if os(tvOS)
+            .buttonStyle(.card)
+        #else
+            .buttonStyle(.plain)
+        #endif
+            .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
+            .contextMenu {
+                VideoContextMenuView(video: video)
+                    .environmentObject(accounts)
+            }
     }
 
     private var thumbnailRoundingCornerRadius: Double {
@@ -290,7 +297,7 @@ struct VideoCell: View {
             .padding(.top, 4)
             .frame(minWidth: 0, maxWidth: .infinity, alignment: .topLeading)
             #if os(tvOS)
-                .padding(.horizontal, 8)
+                .padding(.horizontal, horizontalCells ? 10 : 20)
             #endif
         }
     }
@@ -318,7 +325,11 @@ struct VideoCell: View {
                     .foregroundColor(.secondary)
             }
         }
+        #if os(tvOS)
+        .buttonStyle(.card)
+        #else
         .buttonStyle(.plain)
+        #endif
         .help("\(video.channel.name) Channel")
     }
 
