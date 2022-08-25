@@ -5,6 +5,7 @@ import SwiftUI
 struct PlayerQueueView: View {
     var sidebarQueue: Bool
     @Binding var fullScreen: Bool
+    @State private var relatedVisible = false
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -24,7 +25,7 @@ struct PlayerQueueView: View {
                     autoplaying
                 }
                 playingNext
-                if sidebarQueue {
+                if sidebarQueue, relatedVisible {
                     related
                 }
                 if saveHistory, showHistoryInPlayer {
@@ -37,7 +38,15 @@ struct PlayerQueueView: View {
                 .listRowInsets(EdgeInsets())
             #endif
         }
+        .onChange(of: player.currentItem) { _ in
+            relatedVisible = false
 
+            Delay.by(2) {
+                withAnimation(.easeIn(duration: 0.25)) {
+                    self.relatedVisible = true
+                }
+            }
+        }
         #if os(macOS)
         .listStyle(.inset)
         #elseif os(iOS)
@@ -131,18 +140,18 @@ struct PlayerQueueView: View {
         }
     }
 
-    private var related: some View {
-        Group {
-            if !player.currentVideo.isNil, !player.currentVideo!.related.isEmpty {
-                Section(header: Text("Related")) {
-                    ForEach(player.currentVideo!.related) { video in
-                        PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
-                            .contextMenu {
-                                VideoContextMenuView(video: video)
-                            }
-                    }
+    @ViewBuilder private var related: some View {
+        if let related = player.currentVideo?.related, !related.isEmpty {
+            Section(header: Text("Related")) {
+                ForEach(related) { video in
+                    PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
+                        .contextMenu {
+                            VideoContextMenuView(video: video)
+                        }
+                        .id(video.videoID)
                 }
             }
+            .transaction { t in t.disablesAnimations = true }
         }
     }
 

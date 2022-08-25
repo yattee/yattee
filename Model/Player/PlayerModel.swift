@@ -225,15 +225,13 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
-        navigation.hideKeyboard()
-
-        if !presentingPlayer {
-            DispatchQueue.main.async { [weak self] in
-                withAnimation(.linear(duration: 0.25)) {
-                    self?.presentingPlayer = true
-                }
+        #if os(iOS)
+            Delay.by(0.5) {
+                self.navigation.hideKeyboard()
             }
-        }
+        #endif
+
+        if !presentingPlayer { presentingPlayer = true }
 
         #if os(macOS)
             Windows.player.open()
@@ -241,13 +239,17 @@ final class PlayerModel: ObservableObject {
         #endif
     }
 
-    func hide() {
-        withAnimation(.linear(duration: 0.25)) {
+    func hide(animate: Bool = true) {
+        if animate {
+            withAnimation(.easeOut(duration: 0.2)) {
+                presentingPlayer = false
+            }
+        } else {
             presentingPlayer = false
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.playingFullScreen = false
+            self?.exitFullScreen(showControls: false)
         }
 
         #if os(iOS)
@@ -591,9 +593,7 @@ final class PlayerModel: ObservableObject {
         exitFullScreen()
 
         #if !os(macOS)
-            if closePlayerOnItemClose {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in self?.hide() }
-            }
+            if closePlayerOnItemClose { Delay.by(0.2) { self.hide() } }
         #endif
     }
 

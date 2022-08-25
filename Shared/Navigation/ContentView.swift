@@ -133,7 +133,8 @@ struct ContentView: View {
     @ViewBuilder var videoPlayer: some View {
         if player.presentingPlayer {
             playerView
-                .transition(.move(edge: .bottom))
+                .transition(.asymmetric(insertion: .identity, removal: .move(edge: .bottom)))
+                .zIndex(3)
         } else if player.activeBackend == .appleAVPlayer {
             #if os(iOS)
                 playerView.offset(y: UIScreen.main.bounds.height)

@@ -124,13 +124,14 @@ struct VideoDescription: View {
                         components.scheme = "yattee"
                         if let yatteeURL = components.url {
                             let parser = URLParser(url: urlToOpen)
-                            if parser.destination == .video,
+                            let destination = parser.destination
+                            if destination == .video,
                                parser.videoID == player.currentVideo?.videoID,
                                let time = parser.time
                             {
                                 player.backend.seek(to: Double(time))
                                 return
-                            } else {
+                            } else if destination != nil {
                                 urlToOpen = yatteeURL
                             }
                         }
