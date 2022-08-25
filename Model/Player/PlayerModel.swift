@@ -30,6 +30,19 @@ final class PlayerModel: ObservableObject {
                 return "infinity"
             }
         }
+
+        var description: String {
+            switch self {
+            case .queue:
+                return "Queue"
+            case .shuffle:
+                return "Queue, shuffled"
+            case .loopOne:
+                return "Loop one"
+            case .related:
+                return "Autoplay next"
+            }
+        }
     }
 
     static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
