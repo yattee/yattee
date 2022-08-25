@@ -88,7 +88,7 @@ struct ChannelPlaylistView: View {
             ToolbarItem(placement: .navigation) {
                 if navigationStyle == .tab {
                     Button("Done") {
-                        withAnimation {
+                        withAnimation(Constants.overlayAnimation) {
                             navigation.presentingPlaylist = false
                         }
                     }

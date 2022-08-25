@@ -318,6 +318,9 @@
 		3752069D285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
 		3752069E285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
 		3752069F285E910600CA655F /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3752069C285E910600CA655F /* ChapterView.swift */; };
+		3754B01528B7F84D009717C8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754B01428B7F84D009717C8 /* Constants.swift */; };
+		3754B01628B7F84D009717C8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754B01428B7F84D009717C8 /* Constants.swift */; };
+		3754B01728B7F84D009717C8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754B01428B7F84D009717C8 /* Constants.swift */; };
 		3756C2A62861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
 		3756C2A72861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
 		3756C2A82861131100E4B059 /* NetworkState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3756C2A52861131100E4B059 /* NetworkState.swift */; };
@@ -691,6 +694,12 @@
 		37CFB48528AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
 		37CFB48628AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
 		37CFB48728AFE2510070024C /* VideoDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFB48428AFE2510070024C /* VideoDescription.swift */; };
+		37D2E0D028B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0CF28B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift */; };
+		37D2E0D128B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0CF28B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift */; };
+		37D2E0D228B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0CF28B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift */; };
+		37D2E0D428B67EFC00F64D52 /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0D328B67EFC00F64D52 /* Delay.swift */; };
+		37D2E0D528B67EFC00F64D52 /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0D328B67EFC00F64D52 /* Delay.swift */; };
+		37D2E0D628B67EFC00F64D52 /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2E0D328B67EFC00F64D52 /* Delay.swift */; };
 		37D4B0D92671614900C925CA /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0D82671614900C925CA /* Tests_iOS.swift */; };
 		37D4B0E32671614900C925CA /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0E22671614900C925CA /* Tests_macOS.swift */; };
 		37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C22671614700C925CA /* YatteeApp.swift */; };
@@ -1057,6 +1066,7 @@
 		3751BA8227E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnYouTubeDislikeAPI.swift; sourceTree = "<group>"; };
 		37520698285E8DD300CA655F /* Chapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chapter.swift; sourceTree = "<group>"; };
 		3752069C285E910600CA655F /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
+		3754B01428B7F84D009717C8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3756C2A52861131100E4B059 /* NetworkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkState.swift; sourceTree = "<group>"; };
 		3756C2A92861151C00E4B059 /* NetworkStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStateModel.swift; sourceTree = "<group>"; };
 		37579D5C27864F5F00FD0B98 /* Help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Help.swift; sourceTree = "<group>"; };
@@ -1194,6 +1204,8 @@
 		37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleAssetStream.swift; sourceTree = "<group>"; };
 		37CEE4C02677B697005A1EFE /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		37CFB48428AFE2510070024C /* VideoDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDescription.swift; sourceTree = "<group>"; };
+		37D2E0CF28B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletionObserverModifier.swift; sourceTree = "<group>"; };
+		37D2E0D328B67EFC00F64D52 /* Delay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Delay.swift; sourceTree = "<group>"; };
 		37D4B0C22671614700C925CA /* YatteeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YatteeApp.swift; sourceTree = "<group>"; };
 		37D4B0C32671614700C925CA /* AppTabNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabNavigation.swift; sourceTree = "<group>"; };
 		37D4B0C42671614800C925CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1796,6 +1808,7 @@
 			isa = PBXGroup;
 			children = (
 				37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */,
+				37D2E0CF28B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift */,
 			);
 			path = Modifiers;
 			sourceTree = "<group>";
@@ -1965,8 +1978,10 @@
 				371AAE2526CEBF0B00901972 /* Trending */,
 				371AAE2726CEBF4700901972 /* Videos */,
 				371AAE2826CEC7D900901972 /* Views */,
+				3754B01428B7F84D009717C8 /* Constants.swift */,
 				375168D52700FAFF008F96A6 /* Debounce.swift */,
 				372915E52687E3B900F5A35B /* Defaults.swift */,
+				37D2E0D328B67EFC00F64D52 /* Delay.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
@@ -2740,6 +2755,7 @@
 				372CFD15285F2E2A00B0B54B /* ControlsBar.swift in Sources */,
 				37BD07C82698B71C003EBB87 /* AppTabNavigation.swift in Sources */,
 				37599F38272B4D740087F250 /* FavoriteButton.swift in Sources */,
+				3754B01528B7F84D009717C8 /* Constants.swift in Sources */,
 				378FFBC428660172009E3FBE /* URLParser.swift in Sources */,
 				3784B23D2728B85300B09468 /* ShareButton.swift in Sources */,
 				37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
@@ -2750,6 +2766,7 @@
 				37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */,
 				377ABC40286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */,
+				37D2E0D428B67EFC00F64D52 /* Delay.swift in Sources */,
 				37130A5B277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37152EEA26EFEB95004FB96D /* LazyView.swift in Sources */,
 				3761ABFD26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
@@ -2760,6 +2777,7 @@
 				37C7A1DA267CACF50010EAD6 /* TrendingCountry.swift in Sources */,
 				37E80F40287B472300561799 /* ScrollContentBackground+Backport.swift in Sources */,
 				375EC959289EEB8200751258 /* QualityProfileForm.swift in Sources */,
+				37D2E0D028B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				3727B74A27872A920021C15E /* VisualEffectBlur-iOS.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
@@ -2991,6 +3009,7 @@
 				37DD9DBB2785D60300539416 /* FramePreferenceKey.swift in Sources */,
 				375DFB5926F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */,
+				37D2E0D128B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				37FB285F272225E800A57617 /* ContentItemView.swift in Sources */,
 				37FD43DC270470B70073EE42 /* InstancesSettings.swift in Sources */,
 				3756C2A72861131100E4B059 /* NetworkState.swift in Sources */,
@@ -3125,6 +3144,7 @@
 				37484C2A26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37BE0BD026A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
 				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
+				37D2E0D528B67EFC00F64D52 /* Delay.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
@@ -3135,6 +3155,7 @@
 				3748186B26A764FB0084E870 /* Thumbnail+Fixtures.swift in Sources */,
 				3782B95E2755858100990149 /* NSTextField+FocusRingType.swift in Sources */,
 				37C3A252272366440087A57A /* ChannelPlaylistView.swift in Sources */,
+				3754B01628B7F84D009717C8 /* Constants.swift in Sources */,
 				373CFADC269663F1003CB2C6 /* Thumbnail.swift in Sources */,
 				37C0697B2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
 				37CFB48628AFE2510070024C /* VideoDescription.swift in Sources */,
@@ -3234,6 +3255,7 @@
 				3748187026A769D60084E870 /* DetailBadge.swift in Sources */,
 				3741A32C27E7EFFD00D266D1 /* PlayerControls.swift in Sources */,
 				371B7E632759706A00D21217 /* CommentsView.swift in Sources */,
+				37D2E0D628B67EFC00F64D52 /* Delay.swift in Sources */,
 				379F1421289ECE7F00DE48B5 /* QualitySettings.swift in Sources */,
 				37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				3782B95727557E6E00990149 /* SearchSuggestions.swift in Sources */,
@@ -3372,6 +3394,7 @@
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
 				378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
+				3754B01728B7F84D009717C8 /* Constants.swift in Sources */,
 				37BC50AE2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37D526E02720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				37599F36272B44000087F250 /* FavoritesModel.swift in Sources */,
@@ -3383,6 +3406,7 @@
 				3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37C3A24F272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				37FB28432721B22200A57617 /* ContentItem.swift in Sources */,
+				37D2E0D228B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37484C1B26FC837400287258 /* PlayerSettings.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,

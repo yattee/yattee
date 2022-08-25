@@ -89,11 +89,13 @@ struct VideoDetails: View {
                     VStack {}
                 }
             }
+
             .onPageWillChange { pageIndex in
                 if pageIndex == DetailsPage.comments.index {
                     comments.load()
                 }
             }
+            .frame(maxWidth: detailsSize.width)
         }
         .onAppear {
             page.update(.moveToFirst)
@@ -209,38 +211,36 @@ struct VideoDetails: View {
     @State private var detailsSize = CGSize.zero
 
     var detailsPage: some View {
-        Group {
-            VStack(alignment: .leading, spacing: 0) {
-                if let video = video {
-                    VStack(spacing: 6) {
-                        videoProperties
+        VStack(alignment: .leading, spacing: 0) {
+            if let video = video {
+                VStack(spacing: 6) {
+                    videoProperties
 
-                        Divider()
-                    }
-                    .padding(.bottom, 6)
+                    Divider()
+                }
+                .padding(.bottom, 6)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
-                            VStack(alignment: .leading, spacing: 0) {
-                                ForEach(1 ... Int.random(in: 2 ... 5), id: \.self) { _ in
-                                    Text(String(repeating: Video.fixture.description ?? "", count: Int.random(in: 1 ... 4)))
-                                }
+                VStack(alignment: .leading, spacing: 10) {
+                    if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(1 ... Int.random(in: 2 ... 5), id: \.self) { _ in
+                                Text(String(repeating: Video.fixture.description ?? "", count: Int.random(in: 1 ... 4)))
                             }
-                            .redacted(reason: .placeholder)
-                        } else if video.description != nil, !video.description!.isEmpty {
-                            VideoDescription(video: video, detailsSize: detailsSize)
-                            #if os(iOS)
-                                .padding(.bottom, fullScreenLayout ? 10 : SafeArea.insets.bottom)
-                            #endif
-                        } else {
-                            Text("No description")
-                                .foregroundColor(.secondary)
                         }
+                        .redacted(reason: .placeholder)
+                    } else if video.description != nil, !video.description!.isEmpty {
+                        VideoDescription(video: video, detailsSize: detailsSize)
+                        #if os(iOS)
+                            .padding(.bottom, fullScreenLayout ? 10 : SafeArea.insets.bottom)
+                        #endif
+                    } else {
+                        Text("No description")
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-            .padding(.horizontal)
         }
+        .padding(.horizontal)
     }
 
     var fullScreenLayout: Bool {

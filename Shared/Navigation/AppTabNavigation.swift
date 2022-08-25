@@ -157,6 +157,7 @@ struct AppTabNavigation: View {
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnailsModel)
                 .id("channelVideos")
+                .zIndex(player.presentingPlayer ? -1 : 2)
                 .transition(.move(edge: .bottom))
         }
     }
@@ -171,6 +172,7 @@ struct AppTabNavigation: View {
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnailsModel)
                 .id("channelPlaylist")
+                .zIndex(player.presentingPlayer ? -1 : 1)
                 .transition(.move(edge: .bottom))
         }
     }

@@ -116,7 +116,7 @@ final class NavigationModel: ObservableObject {
                 if presentingPlayer { delay = 1.0 }
             #endif
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.linear(duration: 0.3)) {
+                withAnimation(Constants.overlayAnimation) {
                     navigation.presentingChannel = true
                 }
             }
@@ -156,7 +156,7 @@ final class NavigationModel: ObservableObject {
                     if presentingPlayer { delay = 1.0 }
                 #endif
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    withAnimation(.linear(duration: 0.3)) {
+                    withAnimation(Constants.overlayAnimation) {
                         navigation.presentingPlaylist = true
                     }
                 }

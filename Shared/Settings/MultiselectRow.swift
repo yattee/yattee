@@ -45,6 +45,6 @@ struct MultiselectRow: View {
 
 struct MultiselectRow_Previews: PreviewProvider {
     static var previews: some View {
-        MultiselectRow(title: "Title", selected: false, action: { _ in })
+        MultiselectRow(title: "Title", selected: false) { _ in }
     }
 }

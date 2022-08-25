@@ -12,7 +12,7 @@ import Foundation
             wantsLayer = true
         }}
 
-        override init(frame frameRect: NSRect) {
+        override init(frame frameRect: CGRect) {
             super.init(frame: frameRect)
         }
 
