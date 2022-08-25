@@ -69,6 +69,20 @@ extension PlayerModel {
                 }
             }
         }
+
+        private var playbackModeMenu: UIMenu {
+            UIMenu(title: "Playback Mode", image: UIImage(systemName: playbackMode.systemImage), children: playbackModeMenuActions)
+        }
+
+        private var playbackModeMenuActions: [UIAction] {
+            PlaybackMode.allCases.map { mode in
+                UIAction(title: mode.description, image: UIImage(systemName: mode.systemImage)) { _ in
+                    DispatchQueue.main.async {
+                        self.playbackMode = mode
+                    }
+                }
+            }
+        }
     #endif
 
     func rebuildTVMenu() {
@@ -77,6 +91,7 @@ extension PlayerModel {
                 restoreLastSkippedSegmentAction,
                 rateMenu,
                 streamsMenu,
+                playbackModeMenu,
                 switchToMPVAction
             ].compactMap { $0 }
         #endif
