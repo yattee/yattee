@@ -225,11 +225,11 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case .browsing:
-                return 390
+                return 400
             case .player:
                 return 420
             case .quality:
-                return 400
+                return 420
             case .history:
                 return 480
             case .sponsorBlock:

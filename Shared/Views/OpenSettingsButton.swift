@@ -19,6 +19,7 @@ struct OpenSettingsButton: View {
         } label: {
             Label("Open Settings", systemImage: "gearshape.2")
         }
+        .buttonStyle(.plain)
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             button

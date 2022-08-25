@@ -35,7 +35,6 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
         let api = InvidiousAPI()
 
         api.validInstance = true
-        api.signedIn = true
 
         return api
     }

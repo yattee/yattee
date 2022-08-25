@@ -9,6 +9,7 @@ struct AccountSelectionView: View {
 
     @Default(.accounts) private var accounts
     @Default(.instances) private var instances
+    @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
 
     var body: some View {
         Section(header: Text(showHeader ? "Current Location" : "")) {
@@ -32,7 +33,8 @@ struct AccountSelectionView: View {
     }
 
     var allAccounts: [Account] {
-        accounts + instances.map(\.anonymousAccount) + [accountsModel.publicAccount].compactMap { $0 }
+        let anonymousAccounts = accountPickerDisplaysAnonymousAccounts ? instances.map(\.anonymousAccount) : []
+        return accounts + anonymousAccounts + [accountsModel.publicAccount].compactMap { $0 }
     }
 
     private var nextAccount: Account? {

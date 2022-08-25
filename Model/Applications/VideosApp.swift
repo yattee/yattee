@@ -11,10 +11,6 @@ enum VideosApp: String, CaseIterable {
         true
     }
 
-    var accountsUsePassword: Bool {
-        self == .piped
-    }
-
     var supportsPopular: Bool {
         self == .invidious
     }

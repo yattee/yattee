@@ -170,6 +170,8 @@ struct YatteeApp: App {
         SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
         SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
+        migrateAccounts()
+
         if !Defaults[.lastAccountIsPublic] {
             accounts.configureAccount()
         }
@@ -245,5 +247,29 @@ struct YatteeApp: App {
                 }
             }
         #endif
+    }
+
+    func migrateAccounts() {
+        Defaults[.accounts].forEach { account in
+            if !account.username.isEmpty || !(account.password?.isEmpty ?? true) || !(account.name?.isEmpty ?? true) {
+                print("Account needs migration: \(account.description)")
+                if account.app == .invidious {
+                    if let name = account.name, !name.isEmpty {
+                        AccountsModel.setCredentials(account, username: name, password: "")
+                    }
+                    if !account.username.isEmpty {
+                        AccountsModel.setToken(account, account.username)
+                    }
+                } else if account.app == .piped,
+                          !account.username.isEmpty,
+                          let password = account.password,
+                          !password.isEmpty
+                {
+                    AccountsModel.setCredentials(account, username: account.username, password: password)
+                }
+
+                AccountsModel.removeDefaultsCredentials(account)
+            }
+        }
     }
 }

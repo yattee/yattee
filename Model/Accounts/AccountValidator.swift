@@ -43,14 +43,6 @@ final class AccountValidator: Service {
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
 
-        configure("/api/v1/auth/feed", requestMethods: [.get]) {
-            guard self.account != nil else {
-                return
-            }
-
-            $0.headers["Cookie"] = self.invidiousCookieHeader
-        }
-
         configure("/login", requestMethods: [.post]) {
             $0.headers["Content-Type"] = "application/json"
         }
@@ -167,7 +159,8 @@ final class AccountValidator: Service {
     var accountRequest: Request? {
         switch app.wrappedValue {
         case .invidious:
-            return feed.load()
+            guard let password = account.password else { return nil }
+            return login.request(.post, urlEncoded: ["email": account.username, "password": password])
         case .piped:
             return login.request(.post, json: ["username": account.username, "password": account.password])
         default:
@@ -184,16 +177,8 @@ final class AccountValidator: Service {
         error?.wrappedValue = nil
     }
 
-    var invidiousCookieHeader: String {
-        "SID=\(account.username)"
-    }
-
     var login: Resource {
         resource("/login")
-    }
-
-    var feed: Resource {
-        resource("/api/v1/auth/feed")
     }
 
     var videoResourceBasePath: String {

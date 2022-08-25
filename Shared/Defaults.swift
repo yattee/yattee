@@ -33,6 +33,7 @@ extension Defaults.Keys {
         #endif
         static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: accountPickerDisplaysUsernameDefault)
     #endif
+    static let accountPickerDisplaysAnonymousAccounts = Key<Bool>("accountPickerDisplaysAnonymousAccounts", default: true)
     #if os(iOS)
         static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
