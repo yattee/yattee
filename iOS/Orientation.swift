@@ -32,5 +32,17 @@ struct Orientation {
 
         UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         UINavigationController.attemptRotationToDeviceOrientation()
+
+        if #available(iOS 16, *) {
+            guard let windowScene = SafeArea.scene else { return }
+            let rotateOrientationMask = rotateOrientation == .portrait ? UIInterfaceOrientationMask.portrait :
+                rotateOrientation == .landscapeLeft ? .landscapeLeft :
+                rotateOrientation == .landscapeRight ? .landscapeRight :
+                .allButUpsideDown
+
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: rotateOrientationMask)) { error in
+                print("denied rotation \(error)")
+            }
+        }
     }
 }
