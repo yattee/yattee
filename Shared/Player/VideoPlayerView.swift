@@ -183,8 +183,8 @@ struct VideoPlayerView: View {
                 .onAnimationCompleted(for: viewDragOffset) {
                     guard !dragGestureState else { return }
                     if viewDragOffset == 0 {
-                        player.onPresentPlayer?()
-                        player.onPresentPlayer = nil
+                        player.onPresentPlayer.forEach { $0() }
+                        player.onPresentPlayer = []
                     } else if viewDragOffset == Self.hiddenOffset {
                         player.hide(animate: false)
                     }
@@ -506,7 +506,9 @@ struct VideoPlayerView: View {
                     player.enterFullScreen(showControls: false)
                 }
 
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
+                player.onPresentPlayer.append {
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
+                }
             }
 
             orientationObserver = NotificationCenter.default.addObserver(

@@ -12,7 +12,7 @@ extension PlayerModel {
         videos.forEach { enqueueVideo($0, loadDetails: false) }
 
         #if os(iOS)
-            onPresentPlayer = { [weak self] in self?.advanceToNextItem() }
+            onPresentPlayer.append { [weak self] in self?.advanceToNextItem() }
         #else
             advanceToNextItem()
         #endif

@@ -184,7 +184,7 @@ final class PlayerModel: ObservableObject {
 
     private var currentArtwork: MPMediaItemArtwork?
 
-    var onPresentPlayer: (() -> Void)?
+    var onPresentPlayer = [() -> Void]()
     private var remoteCommandCenterConfigured = false
 
     init(
@@ -373,7 +373,7 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if !playingInPictureInPicture, showingPlayer {
-                onPresentPlayer = { [weak self] in
+                onPresentPlayer.append { [weak self] in
                     changeBackendHandler?()
                     self?.playNow(video, at: time)
                 }
