@@ -12,7 +12,7 @@ struct TimelineView: View {
 
     private var current: Double {
         get {
-            playerTime.currentTime.seconds
+            max(0, playerTime.currentTime.seconds)
         }
 
         set(value) {
