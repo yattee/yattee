@@ -1,4 +1,5 @@
 import AVKit
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -15,16 +16,21 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     func pictureInPictureControllerWillStartPictureInPicture(_: AVPictureInPictureController) {}
 
     func pictureInPictureControllerDidStartPictureInPicture(_: AVPictureInPictureController) {
-        player?.playingInPictureInPicture = true
-        player?.avPlayerBackend.startPictureInPictureOnPlay = false
+        guard let player = player else { return }
+
+        player.playingInPictureInPicture = true
+        player.avPlayerBackend.startPictureInPictureOnPlay = false
+        player.avPlayerBackend.startPictureInPictureOnSwitch = false
+        player.controls.objectWillChange.send()
+
+        if Defaults[.closePlayerOnOpeningPiP] { Delay.by(0.1) { player.hide() } }
     }
 
     func pictureInPictureControllerDidStopPictureInPicture(_: AVPictureInPictureController) {
-        guard let player = player else {
-            return
-        }
+        guard let player = player else { return }
 
         player.playingInPictureInPicture = false
+        player.controls.objectWillChange.send()
     }
 
     func pictureInPictureControllerWillStopPictureInPicture(_: AVPictureInPictureController) {}

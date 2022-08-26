@@ -167,7 +167,15 @@ struct VideoContextMenuView: View {
 
     private var playNowInPictureInPictureButton: some View {
         Button {
-            player.controls.startPiP(startImmediately: player.presentingPlayer && player.activeBackend == .appleAVPlayer)
+            player.avPlayerBackend.startPictureInPictureOnPlay = true
+
+            #if !os(macOS)
+                player.exitFullScreen()
+            #endif
+
+            if player.activeBackend != PlayerBackendType.appleAVPlayer {
+                player.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
+            }
             player.hide()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

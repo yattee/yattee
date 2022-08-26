@@ -127,6 +127,7 @@ extension Defaults.Keys {
     #if !os(macOS)
         static let closePiPAndOpenPlayerOnEnteringForeground = Key<Bool>("closePiPAndOpenPlayerOnEnteringForeground", default: false)
     #endif
+    static let closePlayerOnOpeningPiP = Key<Bool>("closePlayerOnOpeningPiP", default: false)
 
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 

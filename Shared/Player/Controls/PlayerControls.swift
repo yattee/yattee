@@ -277,9 +277,11 @@ struct PlayerControls: View {
     }
 
     private var pipButton: some View {
-        button("PiP", systemImage: "pip") {
-            model.startPiP()
+        let image = player.transitioningToPiP ? "pip.fill" : player.pipController?.isPictureInPictureActive ?? false ? "pip.exit" : "pip.enter"
+        return button("PiP", systemImage: image) {
+            (player.pipController?.isPictureInPictureActive ?? false) ? player.closePiP() : player.startPiP()
         }
+        .disabled(!player.pipPossible)
     }
 
     #if os(iOS)

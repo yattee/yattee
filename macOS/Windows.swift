@@ -47,8 +47,16 @@ enum Windows: String, CaseIterable {
         }
     }
 
+    func hide() {
+        window?.close()
+    }
+
     func toggleFullScreen() {
         window?.toggleFullScreen(nil)
+    }
+
+    var visible: Bool {
+        window?.isVisible ?? false
     }
 }
 

@@ -59,6 +59,7 @@ final class AVPlayerBackend: PlayerBackend {
         var controller: AppleAVPlayerViewController?
     #endif
     var startPictureInPictureOnPlay = false
+    var startPictureInPictureOnSwitch = false
 
     private var asset: AVURLAsset?
     private var composition = AVMutableComposition()
@@ -124,6 +125,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         avPlayer.play()
+        model.objectWillChange.send()
     }
 
     func pause() {
@@ -132,6 +134,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         avPlayer.pause()
+        model.objectWillChange.send()
     }
 
     func togglePlay() {
@@ -147,7 +150,7 @@ final class AVPlayerBackend: PlayerBackend {
 
         avPlayer.seek(
             to: time,
-            toleranceBefore: .secondsInDefaultTimescale(1),
+            toleranceBefore: .zero,
             toleranceAfter: .zero,
             completionHandler: completionHandler ?? { _ in }
         )
@@ -165,6 +168,8 @@ final class AVPlayerBackend: PlayerBackend {
 
     func closeItem() {
         avPlayer.replaceCurrentItem(with: nil)
+        video = nil
+        stream = nil
     }
 
     func closePiP() {
@@ -294,6 +299,7 @@ final class AVPlayerBackend: PlayerBackend {
                 }
 
                 if !preservingTime,
+                   !self.model.transitioningToPiP,
                    let segment = self.model.sponsorBlock.segments.first,
                    segment.start < 3,
                    self.model.lastSkipped.isNil
@@ -434,11 +440,37 @@ final class AVPlayerBackend: PlayerBackend {
 
             switch playerItem.status {
             case .readyToPlay:
+                if self.model.playingInPictureInPicture {
+                    self.startPictureInPictureOnSwitch = false
+                    self.startPictureInPictureOnPlay = false
+                }
                 if self.model.activeBackend == .appleAVPlayer,
                    self.isAutoplaying(playerItem)
                 {
                     self.model.updateAspectRatio()
-                    self.model.play()
+
+                    if self.startPictureInPictureOnPlay,
+                       let controller = self.model.pipController,
+                       controller.isPictureInPicturePossible
+                    {
+                        self.tryStartingPictureInPicture()
+                    } else {
+                        self.model.play()
+                    }
+                } else if self.startPictureInPictureOnPlay {
+                    self.startPictureInPictureOnPlay = false
+                    self.model.stream = self.stream
+                    self.model.streamSelection = self.stream
+
+                    if self.model.activeBackend != .appleAVPlayer {
+                        self.startPictureInPictureOnSwitch = true
+                        let seconds = self.model.mpvBackend.currentTime?.seconds ?? 0
+                        self.seek(to: seconds) { finished in
+                            guard finished else { return }
+                            self.model.pause()
+                            self.model.changeActiveBackend(from: .mpv, to: .appleAVPlayer, changingStream: false)
+                        }
+                    }
                 }
             case .failed:
                 DispatchQueue.main.async {
@@ -483,7 +515,7 @@ final class AVPlayerBackend: PlayerBackend {
             forInterval: interval,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else {
+            guard let self = self, self.model.activeBackend == .appleAVPlayer else {
                 return
             }
 
@@ -511,6 +543,7 @@ final class AVPlayerBackend: PlayerBackend {
             if self.controlsUpdates {
                 self.playerTime.duration = self.playerItemDuration ?? .zero
                 self.playerTime.currentTime = self.currentTime ?? .zero
+                self.model.objectWillChange.send()
             }
         }
     }
@@ -553,17 +586,6 @@ final class AVPlayerBackend: PlayerBackend {
             }
 
             if player.timeControlStatus != .waitingToPlayAtSpecifiedRate {
-                if let controller = self.model.pipController {
-                    if controller.isPictureInPicturePossible {
-                        if self.startPictureInPictureOnPlay {
-                            self.startPictureInPictureOnPlay = false
-                            DispatchQueue.main.async {
-                                self.model.pipController?.startPictureInPicture()
-                            }
-                        }
-                    }
-                }
-
                 DispatchQueue.main.async { [weak self] in
                     self?.model.objectWillChange.send()
                 }
@@ -598,10 +620,12 @@ final class AVPlayerBackend: PlayerBackend {
         }
         logger.info("starting controls updates")
         controlsUpdates = true
+        model.objectWillChange.send()
     }
 
     func stopControlsUpdates() {
         controlsUpdates = false
+        model.objectWillChange.send()
     }
 
     func startMusicMode() {
@@ -633,10 +657,30 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func didChangeTo() {
-        if model.musicMode {
+        if startPictureInPictureOnSwitch {
+            startPictureInPictureOnSwitch = false
+            tryStartingPictureInPicture()
+        } else if model.musicMode {
             startMusicMode()
         } else {
             stopMusicMode()
+        }
+    }
+
+    func tryStartingPictureInPicture() {
+        guard let controller = model.pipController else { return }
+
+        var opened = false
+        for delay in [0.1, 0.3, 0.5, 1, 2, 3, 5] {
+            Delay.by(delay) {
+                guard !opened else { return }
+                if controller.isPictureInPicturePossible {
+                    opened = true
+                    controller.startPictureInPicture()
+                } else {
+                    print("PiP not possible, waited \(delay) seconds")
+                }
+            }
         }
     }
 
