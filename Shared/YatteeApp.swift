@@ -247,6 +247,11 @@ struct YatteeApp: App {
                 }
             }
         #endif
+
+        #if !os(macOS)
+            try? AVAudioSession.sharedInstance().setCategory(.playback)
+            try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
     }
 
     func migrateAccounts() {

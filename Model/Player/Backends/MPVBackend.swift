@@ -192,10 +192,6 @@ final class MPVBackend: PlayerBackend {
         }
 
         let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {
                     return
