@@ -81,12 +81,14 @@ struct ChannelVideosView: View {
 
         #if !os(tvOS)
         .toolbar {
-            ToolbarItem(placement: .navigation) {
+            ToolbarItem(placement: .cancellationAction) {
                 if navigationStyle == .tab {
-                    Button("Done") {
+                    Button {
                         withAnimation(Constants.overlayAnimation) {
                             navigation.presentingChannel = false
                         }
+                    } label: {
+                        Label("Close", systemImage: "xmark")
                     }
                 }
             }
