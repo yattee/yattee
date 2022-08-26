@@ -126,26 +126,6 @@ final class PlayerControlsModel: ObservableObject {
         }
     }
 
-    func startPiP(startImmediately: Bool = true) {
-        player?.avPlayerBackend.startPictureInPictureOnPlay = true
-
-        #if !os(macOS)
-            player.exitFullScreen()
-        #endif
-
-        if player.activeBackend != PlayerBackendType.appleAVPlayer {
-            player.saveTime { [weak player] in
-                player?.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak player] in
-            if startImmediately {
-                player?.pipController?.startPictureInPicture()
-            }
-        }
-    }
-
     func removeTimer() {
         timer?.invalidate()
         timer = nil

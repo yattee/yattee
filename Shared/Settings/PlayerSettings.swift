@@ -17,6 +17,7 @@ struct PlayerSettings: View {
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
+    @Default(.closePlayerOnOpeningPiP) private var closePlayerOnOpeningPiP
     #if !os(macOS)
         @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
         @Default(.pauseOnEnteringBackground) private var pauseOnEnteringBackground
@@ -96,6 +97,7 @@ struct PlayerSettings: View {
             Section(header: SettingsHeader(text: "Picture in Picture")) {
                 closePiPOnNavigationToggle
                 closePiPOnOpeningPlayerToggle
+                closePlayerOnOpeningPiPToggle
                 #if !os(macOS)
                     closePiPAndOpenPlayerOnEnteringForegroundToggle
                 #endif
@@ -199,6 +201,10 @@ struct PlayerSettings: View {
 
     private var closePiPOnOpeningPlayerToggle: some View {
         Toggle("Close PiP when player is opened", isOn: $closePiPOnOpeningPlayer)
+    }
+
+    private var closePlayerOnOpeningPiPToggle: some View {
+        Toggle("Close player when starting PiP", isOn: $closePlayerOnOpeningPiP)
     }
 
     #if !os(macOS)

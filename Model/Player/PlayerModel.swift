@@ -272,6 +272,9 @@ final class PlayerModel: ObservableObject {
                 Orientation.lockOrientation(.allButUpsideDown)
             }
         #endif
+        #if os(macOS)
+            Windows.player.hide()
+        #endif
     }
 
     func togglePlayer() {
@@ -280,6 +283,13 @@ final class PlayerModel: ObservableObject {
                 Windows.player.open()
             }
             Windows.player.focus()
+
+            if Windows.player.visible,
+               closePiPOnOpeningPlayer
+            {
+                closePiP()
+            }
+
         #else
             if presentingPlayer {
                 hide()
@@ -398,7 +408,8 @@ final class PlayerModel: ObservableObject {
         _ stream: Stream,
         of video: Video,
         preservingTime: Bool = false,
-        upgrading: Bool = false
+        upgrading: Bool = false,
+        withBackend: PlayerBackend? = nil
     ) {
         playerError = nil
         if !upgrading {
@@ -420,9 +431,7 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        playerTime.reset()
-
-        backend.playStream(
+        (withBackend ?? backend).playStream(
             stream,
             of: video,
             preservingTime: preservingTime,
@@ -515,14 +524,12 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType) {
+    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType, changingStream: Bool = true) {
         guard activeBackend != to else {
             return
         }
 
         logger.info("changing backend from \(from.rawValue) to \(to.rawValue)")
-
-        pause()
 
         if to == .mpv {
             closePiP()
@@ -531,14 +538,16 @@ final class PlayerModel: ObservableObject {
         Defaults[.activeBackend] = to
         self.activeBackend = to
 
-        self.backend.didChangeTo()
-
-        guard var stream = stream else {
-            return
-        }
-
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
+
+        self.backend.didChangeTo()
+
+        fromBackend.pause()
+
+        guard var stream = stream, changingStream else {
+            return
+        }
 
         if let stream = toBackend.stream, toBackend.video == fromBackend.video {
             toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero) { finished in
@@ -610,10 +619,53 @@ final class PlayerModel: ObservableObject {
         #endif
     }
 
+    func startPiP() {
+        avPlayerBackend.startPictureInPictureOnPlay = false
+        avPlayerBackend.startPictureInPictureOnSwitch = false
+
+        if activeBackend == .appleAVPlayer {
+            avPlayerBackend.tryStartingPictureInPicture()
+            return
+        }
+
+        guard let video = currentVideo else { return }
+        guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30) else { return }
+
+        exitFullScreen()
+
+        if avPlayerBackend.video == video {
+            if activeBackend != .appleAVPlayer {
+                avPlayerBackend.startPictureInPictureOnSwitch = true
+                changeActiveBackend(from: activeBackend, to: .appleAVPlayer)
+            }
+        } else {
+            avPlayerBackend.startPictureInPictureOnPlay = true
+            playStream(stream, of: video, preservingTime: true, upgrading: true, withBackend: avPlayerBackend)
+        }
+
+        controls.objectWillChange.send()
+    }
+
+    var transitioningToPiP: Bool {
+        avPlayerBackend.startPictureInPictureOnPlay || avPlayerBackend.startPictureInPictureOnSwitch
+    }
+
+    var pipPossible: Bool {
+        guard activeBackend == .appleAVPlayer else { return !transitioningToPiP }
+
+        guard let pipController = pipController else { return false }
+        guard !pipController.isPictureInPictureActive else { return true }
+
+        return pipController.isPictureInPicturePossible && !transitioningToPiP
+    }
+
     func closePiP() {
         guard playingInPictureInPicture else {
             return
         }
+
+        avPlayerBackend.startPictureInPictureOnPlay = false
+        avPlayerBackend.startPictureInPictureOnSwitch = false
 
         #if os(tvOS)
             show()

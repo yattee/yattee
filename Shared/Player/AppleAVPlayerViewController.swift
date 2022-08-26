@@ -95,7 +95,7 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
     }
 
     func playerViewControllerWillBeginDismissalTransition(_: AVPlayerViewController) {
-        if Defaults[.pauseOnHidingPlayer] {
+        if Defaults[.pauseOnHidingPlayer], !playerModel.playingInPictureInPicture {
             playerModel.pause()
         }
         dismiss(animated: false)
@@ -121,15 +121,12 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
             self.playerModel.show()
             self.playerModel.setNeedsDrawing(true)
 
-            #if os(tvOS)
-                if self.playerModel.playingInPictureInPicture {
-                    self.present(self.playerView, animated: false) {
-                        completionHandler(true)
-                    }
+            if self.playerModel.playingInPictureInPicture {
+                self.present(self.playerView, animated: false) {
+                    completionHandler(true)
                 }
-            #else
-                completionHandler(true)
-            #endif
+            }
+            completionHandler(true)
         }
     }
 

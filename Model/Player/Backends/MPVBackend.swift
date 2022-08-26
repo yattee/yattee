@@ -169,7 +169,7 @@ final class MPVBackend: PlayerBackend {
         stream.resolution != .unknown && stream.format != .av1
     }
 
-    func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading _: Bool) {
+    func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading: Bool) {
         #if !os(macOS)
             if model.presentingPlayer {
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -204,6 +204,7 @@ final class MPVBackend: PlayerBackend {
                 self.startClientUpdates()
 
                 if !preservingTime,
+                   !upgrading,
                    let segment = self.model.sponsorBlock.segments.first,
                    self.model.lastSkipped.isNil
                 {
@@ -325,6 +326,8 @@ final class MPVBackend: PlayerBackend {
     func closeItem() {
         client?.pause()
         client?.stop()
+        self.video = nil
+        self.stream = nil
     }
 
     func closePiP() {}
