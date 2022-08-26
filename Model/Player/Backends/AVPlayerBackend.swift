@@ -285,10 +285,6 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
-
             self.setRate(self.model.currentRate)
 
             guard let item = self.model.playerItem, self.isAutoplaying(item) else { return }
