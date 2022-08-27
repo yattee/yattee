@@ -77,7 +77,7 @@ struct TimelineView: View {
                                 .fixedSize()
                         }
                     }
-                    Text((dragging ? projectedValue : current).formattedAsPlaybackTime(allowZero: true) ?? PlayerTimeModel.timePlaceholder)
+                    Text((dragging ? projectedValue : current).formattedAsPlaybackTime(allowZero: true, forceHours: playerTime.forceHours) ?? PlayerTimeModel.timePlaceholder)
                         .font(.system(size: 11).monospacedDigit())
                 }
 
@@ -107,7 +107,7 @@ struct TimelineView: View {
             .opacity(dragging ? 1 : 0)
             .animation(.easeOut, value: thumbTooltipOffset)
             HStack(spacing: 4) {
-                Text((dragging ? projectedValue : nil)?.formattedAsPlaybackTime(allowZero: true) ?? playerTime.currentPlaybackTime)
+                Text((dragging ? projectedValue : nil)?.formattedAsPlaybackTime(allowZero: true, forceHours: playerTime.forceHours) ?? playerTime.currentPlaybackTime)
                     .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                     .frame(minWidth: 35)
                 #if os(tvOS)

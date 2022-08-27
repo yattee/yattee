@@ -1,7 +1,7 @@
 import Foundation
 
 extension Double {
-    func formattedAsPlaybackTime(allowZero: Bool = false) -> String? {
+    func formattedAsPlaybackTime(allowZero: Bool = false, forceHours: Bool = false) -> String? {
         guard allowZero || !isZero, isFinite else {
             return nil
         }
@@ -9,7 +9,7 @@ extension Double {
         let formatter = DateComponentsFormatter()
 
         formatter.unitsStyle = .positional
-        formatter.allowedUnits = self >= (60 * 60) ? [.hour, .minute, .second] : [.minute, .second]
+        formatter.allowedUnits = self >= (60 * 60) || forceHours ? [.hour, .minute, .second] : [.minute, .second]
         formatter.zeroFormattingBehavior = [.pad]
 
         return formatter.string(from: self)
