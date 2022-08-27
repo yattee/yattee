@@ -9,12 +9,16 @@ final class PlayerTimeModel: ObservableObject {
 
     var player: PlayerModel?
 
+    var forceHours: Bool {
+        duration.seconds >= 60 * 60
+    }
+
     var currentPlaybackTime: String {
         if player?.currentItem.isNil ?? true || duration.seconds.isZero {
             return Self.timePlaceholder
         }
 
-        return currentTime.seconds.formattedAsPlaybackTime(allowZero: true) ?? Self.timePlaceholder
+        return currentTime.seconds.formattedAsPlaybackTime(allowZero: true, forceHours: forceHours) ?? Self.timePlaceholder
     }
 
     var durationPlaybackTime: String {
@@ -30,17 +34,7 @@ final class PlayerTimeModel: ObservableObject {
             return Self.timePlaceholder
         }
 
-        return withoutSegmentsDuration.formattedAsPlaybackTime() ?? Self.timePlaceholder
-    }
-
-    var durationAndWithoutSegmentsPlaybackTime: String {
-        var durationAndWithoutSegmentsPlaybackTime = "\(durationPlaybackTime)"
-
-        if withoutSegmentsPlaybackTime != durationPlaybackTime {
-            durationAndWithoutSegmentsPlaybackTime += " (\(withoutSegmentsPlaybackTime))"
-        }
-
-        return durationAndWithoutSegmentsPlaybackTime
+        return withoutSegmentsDuration.formattedAsPlaybackTime(forceHours: forceHours) ?? Self.timePlaceholder
     }
 
     func reset() {
