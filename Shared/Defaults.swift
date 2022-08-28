@@ -102,8 +102,8 @@ extension Defaults.Keys {
         static let playerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
         static let fullScreenPlayerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
     #elseif os(tvOS)
-        static let playerControlsLayoutDefault = PlayerControlsLayout.veryLarge
-        static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.veryLarge
+        static let playerControlsLayoutDefault = PlayerControlsLayout.tvRegular
+        static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.tvRegular
     #else
         static let playerControlsLayoutDefault = PlayerControlsLayout.medium
         static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.medium
@@ -129,7 +129,12 @@ extension Defaults.Keys {
     #if !os(macOS)
         static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
     #endif
-    static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: false)
+    #if os(tvOS)
+        static let closeLastItemOnPlaybackEndDefault = true
+    #else
+        static let closeLastItemOnPlaybackEndDefault = false
+    #endif
+    static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: closeLastItemOnPlaybackEndDefault)
 
     #if os(tvOS)
         static let closePlayerOnItemCloseDefault = true

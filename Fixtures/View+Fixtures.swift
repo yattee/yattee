@@ -45,7 +45,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
         player.currentItem = PlayerQueueItem(
             Video(
                 videoID: "",
-                title: "",
+                title: "Video Name",
                 author: "",
                 length: 0,
                 published: "2 days ago",

@@ -60,7 +60,9 @@ struct VideoPlayerView: View {
     @EnvironmentObject<PlayerModel> internal var player
     @EnvironmentObject<PlayerControlsModel> internal var playerControls
     @EnvironmentObject<RecentsModel> internal var recents
-    @EnvironmentObject<SearchModel> internal var search
+    #if os(macOS)
+        @EnvironmentObject<SearchModel> internal var search
+    #endif
     @EnvironmentObject<ThumbnailsModel> internal var thumbnails
 
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled

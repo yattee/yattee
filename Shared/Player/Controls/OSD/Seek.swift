@@ -19,9 +19,9 @@ struct Seek: View {
 
     var body: some View {
         Button(action: model.restoreTime) {
-            VStack(spacing: 2) {
+            VStack(spacing: playerControlsLayout.osdSpacing) {
                 ProgressBar(value: progress)
-                    .frame(maxHeight: 5)
+                    .frame(maxHeight: playerControlsLayout.osdProgressBarHeight)
 
                 timeline
 
@@ -37,6 +37,7 @@ struct Seek: View {
                         Text(chapter.title)
                             .multilineTextAlignment(.center)
                             .font(.system(size: playerControlsLayout.chapterFontSize))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     if let segment = projectedSegment {
                         Text(SponsorBlockAPI.categoryDescription(segment.category) ?? "Sponsor")
@@ -44,14 +45,15 @@ struct Seek: View {
                             .foregroundColor(Color("AppRedColor"))
                     }
                 } else {
-                    if !model.restoreSeekTime.isNil {
-                        Divider()
-                        Label(model.restoreSeekPlaybackTime, systemImage: "arrow.counterclockwise")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
-                            .frame(height: playerControlsLayout.chapterFontSize + 5)
-                    }
-
+                    #if !os(tvOS)
+                        if !model.restoreSeekTime.isNil {
+                            Divider()
+                            Label(model.restoreSeekPlaybackTime, systemImage: "arrow.counterclockwise")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
+                                .frame(height: playerControlsLayout.chapterFontSize + 5)
+                        }
+                    #endif
                     Group {
                         switch model.lastSeekType {
                         case let .segmentSkip(category):
@@ -67,7 +69,7 @@ struct Seek: View {
             }
             #if os(tvOS)
             .frame(minWidth: 250, minHeight: 100)
-            .padding(10)
+            .padding(30)
             #endif
             .frame(maxWidth: playerControlsLayout.seekOSDWidth)
             .padding(2)
