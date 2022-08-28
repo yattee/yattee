@@ -158,6 +158,12 @@ struct PlaylistsView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
+        #if !os(macOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            model.load()
+            resource?.loadIfNeeded()
+        }
+        #endif
     }
 
     #if os(tvOS)

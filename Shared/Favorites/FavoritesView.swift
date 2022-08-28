@@ -49,6 +49,7 @@ struct FavoritesView: View {
                 }
                 .tieToLifetime(of: accounts)
             }
+
             .redrawOn(change: favoritesChanged)
 
             #if os(tvOS)
@@ -63,6 +64,11 @@ struct FavoritesView: View {
             #endif
             #if os(iOS)
             .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+            #endif
+            #if !os(macOS)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                favoritesChanged.toggle()
+            }
             #endif
         }
     }
