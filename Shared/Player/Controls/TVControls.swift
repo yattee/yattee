@@ -22,10 +22,13 @@ struct TVControls: UIViewRepresentable {
         let downSwipe = UISwipeGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipeDown(sender:)))
         downSwipe.direction = .down
 
+        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(sender:)))
+
         controlsArea.addGestureRecognizer(leftSwipe)
         controlsArea.addGestureRecognizer(rightSwipe)
         controlsArea.addGestureRecognizer(upSwipe)
         controlsArea.addGestureRecognizer(downSwipe)
+        controlsArea.addGestureRecognizer(tap)
 
         let controls = UIHostingController(rootView: PlayerControls(player: player, thumbnails: thumbnails))
         controls.view.frame = .init(
@@ -66,6 +69,12 @@ struct TVControls: UIViewRepresentable {
 
         @objc func handleSwipeDown(sender _: UISwipeGestureRecognizer) {
             model.reporter.send("swipe down")
+        }
+
+        @objc func handleTap(sender _: UITapGestureRecognizer) {
+            if !model.presentingControls, model.player.playerTime.seekOSDDismissed {
+                model.show()
+            }
         }
     }
 }

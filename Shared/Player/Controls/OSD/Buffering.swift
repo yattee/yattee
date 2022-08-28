@@ -1,9 +1,31 @@
+import Defaults
 import Foundation
 import SwiftUI
 
 struct Buffering: View {
     var reason = "Buffering stream..."
     var state: String?
+
+    #if os(iOS)
+        @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #endif
+
+    @EnvironmentObject<PlayerModel> private var player
+
+    @Default(.playerControlsLayout) private var regularPlayerControlsLayout
+    @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+
+    var playerControlsLayout: PlayerControlsLayout {
+        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
+    }
+
+    var fullScreenLayout: Bool {
+        #if os(iOS)
+            player.playingFullScreen || verticalSizeClass == .compact
+        #else
+            player.playingFullScreen
+        #endif
+    }
 
     var body: some View {
         VStack(spacing: 2) {
@@ -17,10 +39,10 @@ struct Buffering: View {
                 .progressViewStyle(.circular)
 
             Text(reason)
-                .font(.caption)
+                .font(.system(size: playerControlsLayout.timeFontSize))
             if let state = state {
                 Text(state)
-                    .font(.caption2.monospacedDigit())
+                    .font(.system(size: playerControlsLayout.bufferingStateFontSize).monospacedDigit())
             }
         }
         .padding(8)

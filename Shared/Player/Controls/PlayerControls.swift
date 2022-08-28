@@ -15,6 +15,7 @@ struct PlayerControls: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #elseif os(tvOS)
         enum Field: Hashable {
+            case seekOSD
             case play
             case backward
             case forward
@@ -29,67 +30,125 @@ struct PlayerControls: View {
         @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
     #endif
 
+    @Default(.playerControlsLayout) private var regularPlayerControlsLayout
+    @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+
+    var playerControlsLayout: PlayerControlsLayout {
+        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
+    }
+
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
         self.player = player
         self.thumbnails = thumbnails
     }
 
     var body: some View {
-        ZStack(alignment: .center) {
-            VStack {
-                ZStack(alignment: .center) {
-                    OpeningStream()
-                    NetworkState()
-
-                    if model.presentingControls && !model.presentingOverlays {
-                        VStack(spacing: 4) {
-                            #if !os(tvOS)
-                                buttonsBar
-
-                                HStack {
-                                    if !player.currentVideo.isNil, fullScreenLayout {
-                                        Button {
-                                            withAnimation(Self.animation) {
-                                                model.presentingDetailsOverlay = true
-                                            }
-                                        } label: {
-                                            ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
-                                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                                .frame(maxWidth: 300, alignment: .leading)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                    Spacer()
-                                }
-                            #endif
-
-                            Spacer()
-
-                            Group {
-                                ZStack(alignment: .bottom) {
-                                    floatingControls
-                                        .padding(.top, 20)
-                                        .padding(4)
-                                        .modifier(ControlBackgroundModifier())
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                                    timeline
-                                        .padding(4)
-                                        .offset(y: -25)
-                                        .zIndex(1)
-                                }
-                                .frame(maxWidth: 500)
-                                .padding(.bottom, 2)
-                            }
-                        }
-                        .padding(.top, 2)
-                        .padding(.horizontal, 2)
-                        .transition(.opacity)
+        ZStack(alignment: .topLeading) {
+            Seek()
+                .zIndex(4)
+                .transition(.opacity)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            #if os(tvOS)
+                .offset(x: 10, y: 5)
+                .focused($focusedField, equals: .seekOSD)
+                .onChange(of: player.playerTime.lastSeekTime) { _ in
+                    if !model.presentingControls {
+                        focusedField = .seekOSD
                     }
                 }
-                .frame(maxHeight: .infinity)
+            #else
+                    .offset(y: 2)
+            #endif
+
+            VStack {
+                ZStack(alignment: .center) {
+                    VStack(spacing: 0) {
+                        ZStack {
+                            OpeningStream()
+                            NetworkState()
+                        }
+
+                        Spacer()
+                    }
+                    .offset(y: playerControlsLayout.osdVerticalOffset + 5)
+
+                    if model.presentingControls, !model.presentingOverlays {
+                        #if !os(tvOS)
+                            HStack {
+                                seekBackwardButton
+                                Spacer()
+                                togglePlayButton
+                                Spacer()
+                                seekForwardButton
+                            }
+                            .font(.system(size: playerControlsLayout.bigButtonFontSize))
+                        #endif
+
+                        ZStack(alignment: .bottom) {
+                            VStack(spacing: 4) {
+                                #if !os(tvOS)
+                                    buttonsBar
+
+                                    HStack {
+                                        if !player.currentVideo.isNil, fullScreenLayout {
+                                            Button {
+                                                withAnimation(Self.animation) {
+                                                    model.presentingDetailsOverlay = true
+                                                }
+                                            } label: {
+                                                ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                    .frame(maxWidth: 300, alignment: .leading)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                        Spacer()
+                                    }
+                                #endif
+
+                                Spacer()
+
+                                timeline
+                                    .frame(maxWidth: 1000)
+                                    .padding(.bottom, 2)
+                            }
+                            .zIndex(1)
+                            .padding(.top, 2)
+                            .transition(.opacity)
+
+                            HStack(spacing: playerControlsLayout.buttonsSpacing) {
+                                #if os(tvOS)
+                                    togglePlayButton
+                                    seekBackwardButton
+                                    seekForwardButton
+                                #endif
+                                restartVideoButton
+                                advanceToNextItemButton
+                                Spacer()
+                                #if os(tvOS)
+                                    settingsButton
+                                #endif
+                                playbackModeButton
+                                #if os(tvOS)
+                                    closeVideoButton
+                                #else
+                                    musicModeButton
+                                #endif
+                            }
+                            #if os(tvOS)
+                            .frame(width: 1200)
+                            #endif
+                            .zIndex(0)
+                            #if os(tvOS)
+                                .offset(y: -playerControlsLayout.timelineHeight - 30)
+                            #else
+                                .offset(y: -playerControlsLayout.timelineHeight - 5)
+                            #endif
+                        }
+                    }
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             #if os(tvOS)
                 .onChange(of: model.presentingControls) { newValue in
                     if newValue { focusedField = .play }
@@ -108,31 +167,6 @@ struct PlayerControls: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
             }
-
-            if !model.presentingControls,
-               !model.presentingOverlays,
-               let segment = player.lastSkipped
-            {
-                Button {
-                    player.restoreLastSkippedSegment()
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "arrow.counterclockwise")
-
-                        Text("Skipped \(segment.durationText) seconds of \(SponsorBlockAPI.categoryDescription(segment.category)?.lowercased() ?? "segment")")
-                            .frame(alignment: .bottomLeading)
-                    }
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 5)
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-                    .modifier(ControlBackgroundModifier())
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                }
-                .frame(maxHeight: .infinity, alignment: .top)
-                .buttonStyle(.plain)
-                .transition(.opacity)
-            }
         }
         .onChange(of: model.presentingOverlays) { newValue in
             if newValue {
@@ -141,6 +175,7 @@ struct PlayerControls: View {
         }
         #if os(tvOS)
         .onReceive(model.reporter) { value in
+            guard player.presentingPlayer else { return }
             if value == "swipe down", !model.presentingControls, !model.presentingOverlays {
                 withAnimation(Self.animation) {
                     model.presentingControlsOverlay = true
@@ -225,7 +260,7 @@ struct PlayerControls: View {
     }
 
     var buttonsBar: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: playerControlsLayout.buttonsSpacing) {
             fullscreenButton
 
             pipButton
@@ -273,7 +308,7 @@ struct PlayerControls: View {
     }
 
     private var musicModeButton: some View {
-        button("Music Mode", systemImage: "music.note", background: false, active: player.musicMode, action: player.toggleMusicMode)
+        button("Music Mode", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
     }
 
     private var pipButton: some View {
@@ -299,43 +334,25 @@ struct PlayerControls: View {
         }
     #endif
 
-    var floatingControls: some View {
-        HStack {
-            HStack(spacing: 20) {
-                togglePlayButton
-                seekBackwardButton
-                seekForwardButton
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Spacer()
-
-            HStack(spacing: 20) {
-                playbackModeButton
-                restartVideoButton
-                advanceToNextItemButton
-                #if !os(tvOS)
-                    musicModeButton
-                #else
-                    settingsButton
-                    closeVideoButton
-                #endif
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-        }
-        .font(.system(size: 20))
-    }
-
     var playbackModeButton: some View {
-        button("Playback Mode", systemImage: player.playbackMode.systemImage, background: false) {
+        button("Playback Mode", systemImage: player.playbackMode.systemImage) {
             player.playbackMode = player.playbackMode.next()
             model.objectWillChange.send()
         }
     }
 
     var seekBackwardButton: some View {
-        button("Seek Backward", systemImage: "gobackward.10", size: 25, cornerRadius: 5, background: false) {
-            player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+        var foregroundColor: Color?
+        var fontSize: Double?
+        var size: Double?
+        #if !os(tvOS)
+            foregroundColor = .white
+            fontSize = playerControlsLayout.bigButtonFontSize
+            size = playerControlsLayout.bigButtonSize
+        #endif
+
+        return button("Seek Backward", systemImage: "gobackward.10", fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
         }
         .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
@@ -347,8 +364,17 @@ struct PlayerControls: View {
     }
 
     var seekForwardButton: some View {
-        button("Seek Forward", systemImage: "goforward.10", size: 25, cornerRadius: 5, background: false) {
-            player.backend.seek(relative: .secondsInDefaultTimescale(10))
+        var foregroundColor: Color?
+        var fontSize: Double?
+        var size: Double?
+        #if !os(tvOS)
+            foregroundColor = .white
+            fontSize = playerControlsLayout.bigButtonFontSize
+            size = playerControlsLayout.bigButtonSize
+        #endif
+
+        return button("Seek Forward", systemImage: "goforward.10", fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
         }
         .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
@@ -360,16 +386,27 @@ struct PlayerControls: View {
     }
 
     private var restartVideoButton: some View {
-        button("Restart video", systemImage: "backward.end.fill", size: 25, cornerRadius: 5, background: false) {
-            player.backend.seek(to: 0.0)
+        button("Restart video", systemImage: "backward.end.fill", cornerRadius: 5) {
+            player.backend.seek(to: 0.0, seekType: .userInteracted)
         }
     }
 
     private var togglePlayButton: some View {
-        button(
+        var foregroundColor: Color?
+        var fontSize: Double?
+        var size: Double?
+        #if !os(tvOS)
+            foregroundColor = .white
+            fontSize = playerControlsLayout.bigButtonFontSize
+            size = playerControlsLayout.bigButtonSize
+        #endif
+
+        return button(
             model.isPlaying ? "Pause" : "Play",
             systemImage: model.isPlaying ? "pause.fill" : "play.fill",
-            size: 25, cornerRadius: 5, background: false
+            fontSize: fontSize,
+            size: size,
+            background: false, foregroundColor: foregroundColor
         ) {
             player.backend.togglePlay()
         }
@@ -383,7 +420,7 @@ struct PlayerControls: View {
     }
 
     private var advanceToNextItemButton: some View {
-        button("Next", systemImage: "forward.fill", size: 25, cornerRadius: 5, background: false) {
+        button("Next", systemImage: "forward.fill", cornerRadius: 5) {
             player.advanceToNextItem()
         }
         .disabled(!player.isAdvanceToNextItemAvailable)
@@ -392,11 +429,13 @@ struct PlayerControls: View {
     func button(
         _ label: String,
         systemImage: String? = nil,
-        size: Double = 25,
-        width: Double? = nil,
-        height: Double? = nil,
+        fontSize: Double? = nil,
+        size: Double? = nil,
+        width _: Double? = nil,
+        height _: Double? = nil,
         cornerRadius: Double = 3,
         background: Bool = true,
+        foregroundColor: Color? = nil,
         active: Bool = false,
         action: @escaping () -> Void = {}
     ) -> some View {
@@ -420,11 +459,12 @@ struct PlayerControls: View {
             }
             .padding()
             .contentShape(Rectangle())
+            .shadow(radius: (foregroundColor == .white || !useBackground) ? 3 : 0)
         }
-        .font(.system(size: 13))
+        .font(.system(size: fontSize ?? playerControlsLayout.buttonFontSize))
         .buttonStyle(.plain)
-        .foregroundColor(active ? Color("AppRedColor") : .primary)
-        .frame(width: width ?? size, height: height ?? size)
+        .foregroundColor(foregroundColor.isNil ? (active ? Color("AppRedColor") : .primary) : foregroundColor)
+        .frame(width: size ?? playerControlsLayout.buttonSize, height: size ?? playerControlsLayout.buttonSize)
         .modifier(ControlBackgroundModifier(enabled: useBackground))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }

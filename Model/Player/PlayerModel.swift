@@ -98,7 +98,7 @@ final class PlayerModel: ObservableObject {
 
     @Published var queue = [PlayerQueueItem]() { didSet { handleQueueChange() } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
-    @Published var videoBeingOpened: Video?
+    @Published var videoBeingOpened: Video? { didSet { playerTime.reset() } }
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
@@ -505,7 +505,16 @@ final class PlayerModel: ObservableObject {
             self.backend.setNeedsDrawing(self.presentingPlayer)
         }
 
-        controls.hide()
+        #if os(tvOS)
+            if presentingPlayer {
+                controls.show()
+                Delay.by(1) { [weak self] in
+                    self?.controls.hide()
+                }
+            }
+        #else
+            controls.hide()
+        #endif
 
         #if !os(macOS)
             UIApplication.shared.isIdleTimerDisabled = presentingPlayer
@@ -531,6 +540,8 @@ final class PlayerModel: ObservableObject {
 
         logger.info("changing backend from \(from.rawValue) to \(to.rawValue)")
 
+        let wasPlaying = isPlaying
+
         if to == .mpv {
             closePiP()
         }
@@ -543,18 +554,22 @@ final class PlayerModel: ObservableObject {
 
         self.backend.didChangeTo()
 
-        fromBackend.pause()
+        if wasPlaying {
+            fromBackend.pause()
+        }
 
         guard var stream = stream, changingStream else {
             return
         }
 
         if let stream = toBackend.stream, toBackend.video == fromBackend.video {
-            toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero) { finished in
+            toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero, seekType: .backendSync) { finished in
                 guard finished else {
                     return
                 }
-                toBackend.play()
+                if wasPlaying {
+                    toBackend.play()
+                }
             }
 
             self.stream = stream
@@ -764,17 +779,17 @@ final class PlayerModel: ObservableObject {
             skipBackwardCommand.preferredIntervals = preferredIntervals
 
             skipForwardCommand.addTarget { [weak self] _ in
-                self?.backend.seek(relative: .secondsInDefaultTimescale(10))
+                self?.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
                 return .success
             }
 
             skipBackwardCommand.addTarget { [weak self] _ in
-                self?.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                self?.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
                 return .success
             }
 
             previousTrackCommand.addTarget { [weak self] _ in
-                self?.backend.seek(to: .zero)
+                self?.backend.seek(to: .zero, seekType: .userInteracted)
                 return .success
             }
 
@@ -801,7 +816,7 @@ final class PlayerModel: ObservableObject {
             MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
                 guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
-                self?.backend.seek(to: event.positionTime)
+                self?.backend.seek(to: event.positionTime, seekType: .userInteracted)
 
                 return .success
             }

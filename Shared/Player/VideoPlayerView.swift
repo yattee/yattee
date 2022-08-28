@@ -14,6 +14,10 @@ struct VideoPlayerView: View {
         static let defaultSidebarQueueValue = Defaults[.playerSidebar] != .never
     #endif
 
+    #if os(macOS)
+        static let hiddenOffset = 0.0
+    #endif
+
     static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
@@ -35,27 +39,32 @@ struct VideoPlayerView: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
 
-        @State private var orientation = UIInterfaceOrientation.portrait
-        @State private var lastOrientation: UIInterfaceOrientation?
+        @State internal var orientation = UIInterfaceOrientation.portrait
+        @State internal var lastOrientation: UIInterfaceOrientation?
     #elseif os(macOS)
         var hoverThrottle = Throttle(interval: 0.5)
         var mouseLocation: CGPoint { NSEvent.mouseLocation }
     #endif
 
-    #if os(iOS)
-        @GestureState private var dragGestureState = false
-        @GestureState private var dragGestureOffset = CGSize.zero
-        @State private var viewDragOffset = Self.hiddenOffset
-        @State private var orientationObserver: Any?
+    #if !os(tvOS)
+        @GestureState internal var dragGestureState = false
+        @GestureState internal var dragGestureOffset = CGSize.zero
+        @State internal var isHorizontalDrag = false
+        @State internal var isVerticalDrag = false
+        @State internal var viewDragOffset = Self.hiddenOffset
+        @State internal var orientationObserver: Any?
     #endif
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlayerControlsModel> private var playerControls
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
-    @EnvironmentObject<ThumbnailsModel> private var thumbnails
+    @EnvironmentObject<AccountsModel> internal var accounts
+    @EnvironmentObject<NavigationModel> internal var navigation
+    @EnvironmentObject<PlayerModel> internal var player
+    @EnvironmentObject<PlayerControlsModel> internal var playerControls
+    @EnvironmentObject<RecentsModel> internal var recents
+    @EnvironmentObject<SearchModel> internal var search
+    @EnvironmentObject<ThumbnailsModel> internal var thumbnails
+
+    @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
+    @Default(.seekGestureSpeed) var seekGestureSpeed
 
     var body: some View {
         ZStack(alignment: overlayAlignment) {
@@ -65,42 +74,7 @@ struct VideoPlayerView: View {
                 .gesture(playerControls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
             #endif
 
-            VStack {
-                if playerControls.presentingControlsOverlay {
-                    HStack {
-                        HStack {
-                            ControlsOverlay()
-                            #if os(tvOS)
-                                .onExitCommand {
-                                    withAnimation(PlayerControls.animation) {
-                                        playerControls.hideOverlays()
-                                    }
-                                }
-                                .onPlayPauseCommand {
-                                    player.togglePlay()
-                                }
-                            #endif
-                                .padding()
-                                .modifier(ControlBackgroundModifier())
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                        }
-                        #if !os(tvOS)
-                        .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
-                        #endif
-
-                        #if !os(tvOS)
-                            if !fullScreenLayout && sidebarQueue {
-                                Spacer()
-                            }
-                        #endif
-                    }
-                    #if os(tvOS)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    #endif
-                    .zIndex(1)
-                    .transition(.opacity)
-                }
-            }
+            overlay
         }
         .animation(nil, value: player.playerSize)
         .onAppear {
@@ -189,17 +163,54 @@ struct VideoPlayerView: View {
                         player.hide(animate: false)
                     }
                 }
-
                 #endif
             }
-            .compositingGroup()
             #if os(iOS)
-                .offset(y: playerOffset)
-                .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
-                .backport
-                .persistentSystemOverlays(!fullScreenLayout)
+            .offset(y: playerOffset)
+            .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
+            .backport
+            .persistentSystemOverlays(!fullScreenLayout)
             #endif
         #endif
+    }
+
+    var overlay: some View {
+        VStack {
+            if playerControls.presentingControlsOverlay {
+                HStack {
+                    HStack {
+                        ControlsOverlay()
+                        #if os(tvOS)
+                            .onExitCommand {
+                                withAnimation(PlayerControls.animation) {
+                                    playerControls.hideOverlays()
+                                }
+                            }
+                            .onPlayPauseCommand {
+                                player.togglePlay()
+                            }
+                        #endif
+                            .padding()
+                            .modifier(ControlBackgroundModifier())
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+                    #if !os(tvOS)
+                    .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
+                    #endif
+
+                    #if !os(tvOS)
+                        if !fullScreenLayout && sidebarQueue {
+                            Spacer()
+                        }
+                    #endif
+                }
+                #if os(tvOS)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                #endif
+                .zIndex(1)
+                .transition(.opacity)
+            }
+        }
     }
 
     var overlayWidth: Double {
@@ -225,7 +236,7 @@ struct VideoPlayerView: View {
         }
 
         var playerOffset: Double {
-            dragGestureState ? dragGestureOffset.height : viewDragOffset
+            dragGestureState && !isHorizontalDrag ? dragGestureOffset.height : viewDragOffset
         }
 
         var playerWidth: Double? {
@@ -280,23 +291,24 @@ struct VideoPlayerView: View {
                                 hoveringPlayer = hovering
                                 hovering ? playerControls.show() : playerControls.hide()
                             }
-                        #if os(iOS)
+                        #if !os(tvOS)
                             .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
-                        #elseif os(macOS)
-                            .onAppear(perform: {
-                                NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                    hoverThrottle.execute {
-                                        if !player.currentItem.isNil, hoveringPlayer {
-                                            playerControls.resetTimer()
-                                        }
+                        #endif
+                        #if os(macOS)
+                        .onAppear(perform: {
+                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                hoverThrottle.execute {
+                                    if !player.currentItem.isNil, hoveringPlayer {
+                                        playerControls.resetTimer()
                                     }
-
-                                    return $0
                                 }
-                            })
+
+                                return $0
+                            }
+                        })
                         #endif
 
-                            .background(Color.black)
+                        .background(Color.black)
 
                         #if !os(tvOS)
                             if !fullScreenLayout {
@@ -338,10 +350,10 @@ struct VideoPlayerView: View {
                 guard !playerControls.presentingControls else { return }
 
                 if direction == .left {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                    player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
                 }
                 if direction == .right {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                    player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
                 }
             }
             .onPlayPauseCommand {
@@ -429,133 +441,6 @@ struct VideoPlayerView: View {
             .frame(width: player.playerSize.width, height: player.playerSize.height)
         }
     }
-
-    #if os(iOS)
-        var playerDragGesture: some Gesture {
-            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                .updating($dragGestureOffset) { value, state, _ in
-                    state = value.translation.height > 0 ? value.translation : .zero
-                }
-                .updating($dragGestureState) { _, state, _ in
-                    state = true
-                }
-                .onChanged { value in
-                    guard player.presentingPlayer,
-                          !playerControls.presentingControlsOverlay else { return }
-
-                    if playerControls.presentingControls, !player.musicMode {
-                        playerControls.presentingControls = false
-                    }
-
-                    if player.musicMode {
-                        player.backend.stopControlsUpdates()
-                    }
-
-                    let drag = value.translation.height
-
-                    guard drag > 0 else { return }
-
-                    viewDragOffset = drag
-
-                    if drag > 60,
-                       player.playingFullScreen
-                    {
-                        player.exitFullScreen(showControls: false)
-                        if Defaults[.rotateToPortraitOnExitFullScreen] {
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                        }
-                    }
-                }
-                .onEnded { _ in
-                    onPlayerDragGestureEnded()
-                }
-        }
-
-        private func onPlayerDragGestureEnded() {
-            guard player.presentingPlayer,
-                  !playerControls.presentingControlsOverlay else { return }
-
-            if viewDragOffset > 100 {
-                withAnimation(Constants.overlayAnimation) {
-                    viewDragOffset = Self.hiddenOffset
-                }
-            } else {
-                withAnimation(Constants.overlayAnimation) {
-                    viewDragOffset = 0
-                }
-                player.backend.setNeedsDrawing(true)
-                player.show()
-
-                if player.musicMode {
-                    player.backend.startControlsUpdates()
-                }
-            }
-        }
-
-        private func configureOrientationUpdatesBasedOnAccelerometer() {
-            let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
-            if currentOrientation.isLandscape,
-               Defaults[.enterFullscreenInLandscape],
-               !player.playingFullScreen,
-               !player.playingInPictureInPicture
-            {
-                guard player.presentingPlayer else { return }
-
-                DispatchQueue.main.async {
-                    playerControls.presentingControls = false
-                    player.enterFullScreen(showControls: false)
-                }
-
-                player.onPresentPlayer.append {
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
-                }
-            }
-
-            orientationObserver = NotificationCenter.default.addObserver(
-                forName: OrientationTracker.deviceOrientationChangedNotification,
-                object: nil,
-                queue: .main
-            ) { _ in
-                guard !Defaults[.honorSystemOrientationLock],
-                      player.presentingPlayer,
-                      !player.playingInPictureInPicture,
-                      player.lockedOrientation.isNil
-                else {
-                    return
-                }
-
-                let orientation = OrientationTracker.shared.currentInterfaceOrientation
-
-                guard lastOrientation != orientation else {
-                    return
-                }
-
-                lastOrientation = orientation
-
-                DispatchQueue.main.async {
-                    guard Defaults[.enterFullscreenInLandscape],
-                          player.presentingPlayer
-                    else {
-                        return
-                    }
-
-                    if orientation.isLandscape {
-                        playerControls.presentingControls = false
-                        player.enterFullScreen(showControls: false)
-                        Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
-                    } else {
-                        player.exitFullScreen(showControls: false)
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                    }
-                }
-            }
-        }
-
-        private func stopOrientationUpdates() {
-            guard let observer = orientationObserver else { return }
-            NotificationCenter.default.removeObserver(observer)
-        }
-    #endif
 
     #if os(tvOS)
         var tvControls: some View {

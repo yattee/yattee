@@ -11,7 +11,7 @@ struct PlayerGestures: View {
                     tapSensitivity: 0.2,
                     singleTapAction: { singleTapAction() },
                     doubleTapAction: {
-                        player.backend.seek(relative: .secondsInDefaultTimescale(-10))
+                        player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
                     },
                     anyTapAction: {
                         model.update()
@@ -35,7 +35,7 @@ struct PlayerGestures: View {
                     tapSensitivity: 0.2,
                     singleTapAction: { singleTapAction() },
                     doubleTapAction: {
-                        player.backend.seek(relative: .secondsInDefaultTimescale(10))
+                        player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
                     },
                     anyTapAction: {
                         model.update()

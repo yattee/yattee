@@ -97,6 +97,22 @@ extension Defaults.Keys {
 
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
+
+    #if os(iOS)
+        static let playerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
+        static let fullScreenPlayerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
+    #elseif os(tvOS)
+        static let playerControlsLayoutDefault = PlayerControlsLayout.veryLarge
+        static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.veryLarge
+    #else
+        static let playerControlsLayoutDefault = PlayerControlsLayout.medium
+        static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.medium
+    #endif
+
+    static let playerControlsLayout = Key<PlayerControlsLayout>("playerControlsLayout", default: playerControlsLayoutDefault)
+    static let fullScreenPlayerControlsLayout = Key<PlayerControlsLayout>("fullScreenPlayerControlsLayout", default: fullScreenPlayerControlsLayoutDefault)
+    static let horizontalPlayerGestureEnabled = Key<Bool>("horizontalPlayerGestureEnabled", default: true)
+    static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
     #if !os(tvOS)

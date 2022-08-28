@@ -8,7 +8,7 @@ import Repeat
 import SwiftUI
 
 final class MPVBackend: PlayerBackend {
-    static var controlsUpdateInterval = 0.5
+    static var timeUpdateInterval = 0.5
     static var networkStateUpdateInterval = 1.0
 
     private var logger = Logger(label: "mpv-backend")
@@ -131,8 +131,8 @@ final class MPVBackend: PlayerBackend {
         self.playerTime = playerTime
         self.networkState = networkState
 
-        clientTimer = .init(interval: .seconds(Self.controlsUpdateInterval), mode: .infinite) { [weak self] _ in
-            self?.getClientUpdates()
+        clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
+            self?.getTimeUpdates()
         }
 
         networkStateTimer = .init(interval: .seconds(Self.networkStateUpdateInterval), mode: .infinite) { [weak self] _ in
@@ -204,7 +204,7 @@ final class MPVBackend: PlayerBackend {
                    let segment = self.model.sponsorBlock.segments.first,
                    self.model.lastSkipped.isNil
                 {
-                    self.seek(to: segment.endTime) { finished in
+                    self.seek(to: segment.endTime, seekType: .segmentSkip(segment.category)) { finished in
                         guard finished else {
                             return
                         }
@@ -299,17 +299,9 @@ final class MPVBackend: PlayerBackend {
         client?.stop()
     }
 
-    func seek(to time: CMTime, completionHandler: ((Bool) -> Void)?) {
+    func seek(to time: CMTime, seekType _: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?) {
         client?.seek(to: time) { [weak self] _ in
-            self?.getClientUpdates()
-            self?.updateControls()
-            completionHandler?(true)
-        }
-    }
-
-    func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        client?.seek(relative: time) { [weak self] _ in
-            self?.getClientUpdates()
+            self?.getTimeUpdates()
             self?.updateControls()
             completionHandler?(true)
         }
@@ -327,31 +319,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func closePiP() {}
-
-    func updateControls() {
-        self.logger.info("updating controls")
-
-        guard model.presentingPlayer, !model.controls.presentingOverlays else {
-            self.logger.info("ignored controls update")
-            return
-        }
-
-        DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            #if !os(macOS)
-                guard UIApplication.shared.applicationState != .background else {
-                    self.logger.info("not performing controls updates in background")
-                    return
-                }
-            #endif
-
-            self.playerTime.currentTime = self.currentTime ?? .zero
-            self.playerTime.duration = self.playerItemDuration ?? .zero
-        }
-    }
 
     func startControlsUpdates() {
         guard model.presentingPlayer, model.controls.presentingControls, !model.controls.presentingOverlays else {
@@ -373,7 +340,7 @@ final class MPVBackend: PlayerBackend {
 
     private var handleSegmentsThrottle = Throttle(interval: 1)
 
-    private func getClientUpdates() {
+    func getTimeUpdates() {
         currentTime = client?.currentTime
         playerItemDuration = client?.duration
 
@@ -458,8 +425,7 @@ final class MPVBackend: PlayerBackend {
             return
         }
 
-        getClientUpdates()
-
+        getTimeUpdates()
         eofPlaybackModeAction()
     }
 

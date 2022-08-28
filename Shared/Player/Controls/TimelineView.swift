@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct TimelineView: View {
@@ -39,9 +40,28 @@ struct TimelineView: View {
     var thumbAreaWidth: Double = 40
     var context: Context
 
+    #if os(iOS)
+        @Environment(\.verticalSizeClass) private var verticalSizeClass
+    #endif
+
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var controls
     @EnvironmentObject<PlayerTimeModel> private var playerTime
+
+    @Default(.playerControlsLayout) private var regularPlayerControlsLayout
+    @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+
+    var playerControlsLayout: PlayerControlsLayout {
+        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
+    }
+
+    var fullScreenLayout: Bool {
+        #if os(iOS)
+            player.playingFullScreen || verticalSizeClass == .compact
+        #else
+            player.playingFullScreen
+        #endif
+    }
 
     var chapters: [Chapter] {
         player.currentVideo?.chapters ?? []
@@ -64,23 +84,23 @@ struct TimelineView: View {
                            let description = SponsorBlockAPI.categoryDescription(segment.category)
                         {
                             Text(description)
-                                .font(.system(size: 8))
+                                .font(.system(size: playerControlsLayout.segmentFontSize))
                                 .fixedSize()
-                                .lineLimit(1)
                                 .foregroundColor(Color("AppRedColor"))
                         }
                         if let chapter = projectedChapter {
                             Text(chapter.title)
                                 .lineLimit(3)
-                                .font(.system(size: 11).bold())
-                                .frame(maxWidth: 250)
+                                .font(.system(size: playerControlsLayout.chapterFontSize).bold())
+                                .frame(maxWidth: player.playerSize.width - 100)
                                 .fixedSize()
                         }
                     }
                     Text((dragging ? projectedValue : current).formattedAsPlaybackTime(allowZero: true, forceHours: playerTime.forceHours) ?? PlayerTimeModel.timePlaceholder)
-                        .font(.system(size: 11).monospacedDigit())
+                        .font(.system(size: playerControlsLayout.projectedTimeFontSize).monospacedDigit())
                 }
-
+                .animation(.easeIn(duration: 0.2), value: projectedChapter)
+                .animation(.easeIn(duration: 0.2), value: projectedSegment)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 8)
                 .background(
@@ -90,7 +110,6 @@ struct TimelineView: View {
 
                 .foregroundColor(.white)
             }
-            .animation(.easeInOut(duration: 0.2))
             .frame(maxHeight: 300, alignment: .bottom)
             .offset(x: thumbTooltipOffset)
             .overlay(GeometryReader { proxy in
@@ -110,9 +129,8 @@ struct TimelineView: View {
                 Text((dragging ? projectedValue : nil)?.formattedAsPlaybackTime(allowZero: true, forceHours: playerTime.forceHours) ?? playerTime.currentPlaybackTime)
                     .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                     .frame(minWidth: 35)
-                #if os(tvOS)
-                    .font(.system(size: 20))
-                #endif
+                    .padding(.leading, playerControlsLayout.timeLeadingEdgePadding)
+                    .padding(.trailing, playerControlsLayout.timeTrailingEdgePadding)
 
                 ZStack(alignment: .center) {
                     ZStack(alignment: .leading) {
@@ -145,51 +163,15 @@ struct TimelineView: View {
                             ZStack {
                                 Circle()
                                     .fill(dragging ? .white : .gray)
-                                    .frame(width: 13)
+                                    .frame(width: playerControlsLayout.thumbSize)
 
                                 Circle()
                                     .fill(dragging ? .gray : .white)
-                                    .frame(width: 11)
+                                    .frame(width: playerControlsLayout.thumbSize * 0.95)
                             }
                         )
                         .offset(x: thumbOffset)
                         .frame(width: thumbAreaWidth, height: thumbAreaWidth)
-
-                    #if !os(tvOS)
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    if !dragging {
-                                        controls.removeTimer()
-                                        draggedFrom = current
-                                    }
-
-                                    dragging = true
-
-                                    let drag = value.translation.width
-                                    let change = (drag / size.width) * units
-                                    let changedCurrent = current + change
-
-                                    guard changedCurrent >= start, changedCurrent <= duration else {
-                                        return
-                                    }
-                                    withAnimation(Animation.linear(duration: 0.2)) {
-                                        dragOffset = drag
-                                    }
-                                }
-                                .onEnded { _ in
-                                    if abs(dragOffset) > 0 {
-                                        playerTime.currentTime = .secondsInDefaultTimescale(projectedValue)
-                                        player.backend.seek(to: projectedValue)
-                                    }
-
-                                    dragging = false
-                                    dragOffset = 0.0
-                                    draggedFrom = 0.0
-                                    controls.resetTimer()
-                                }
-                        )
-                    #endif
                 }
                 .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                 .overlay(GeometryReader { proxy in
@@ -201,20 +183,57 @@ struct TimelineView: View {
                             self.size = size
                         }
                 })
-                .frame(maxHeight: 20)
+                .frame(maxHeight: playerControlsLayout.timelineHeight)
                 #if !os(tvOS)
                     .gesture(DragGesture(minimumDistance: 0).onEnded { value in
                         let target = (value.location.x / size.width) * units
                         self.playerTime.currentTime = .secondsInDefaultTimescale(target)
-                        player.backend.seek(to: target)
+                        player.backend.seek(to: target, seekType: .userInteracted)
                     })
                 #endif
 
                 durationView
+                    .padding(.leading, playerControlsLayout.timeTrailingEdgePadding)
+                    .padding(.trailing, playerControlsLayout.timeLeadingEdgePadding)
                     .frame(minWidth: 30, alignment: .trailing)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 3))
-            .font(.system(size: 9).monospacedDigit())
+            #if !os(tvOS)
+            .highPriorityGesture(
+                DragGesture(minimumDistance: 5, coordinateSpace: .global)
+                    .onChanged { value in
+                        if !dragging {
+                            controls.removeTimer()
+                            draggedFrom = current
+                        }
+
+                        dragging = true
+
+                        let drag = value.translation.width
+                        let change = (drag / size.width) * units
+                        let changedCurrent = current + change
+
+                        guard changedCurrent >= start, changedCurrent <= duration else {
+                            return
+                        }
+
+                        dragOffset = drag
+                    }
+                    .onEnded { _ in
+                        if abs(dragOffset) > 0 {
+                            playerTime.currentTime = .secondsInDefaultTimescale(projectedValue)
+                            player.backend.seek(to: projectedValue, seekType: .userInteracted)
+                        }
+
+                        dragging = false
+                        dragOffset = 0.0
+                        draggedFrom = 0.0
+                        controls.resetTimer()
+                    }
+            )
+            #endif
+            .modifier(ControlBackgroundModifier())
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .font(.system(size: playerControlsLayout.timeFontSize).monospacedDigit())
             .zIndex(2)
         }
     }
@@ -230,7 +249,7 @@ struct TimelineView: View {
             } else {
                 Button {
                     if let duration = player.videoDuration {
-                        player.backend.seek(to: duration - 5)
+                        player.backend.seek(to: duration - 5, seekType: .userInteracted)
                     }
                 } label: {
                     Text("LIVE")
@@ -244,9 +263,6 @@ struct TimelineView: View {
             Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
                 .frame(minWidth: 35)
-            #if os(tvOS)
-                .font(.system(size: 20))
-            #endif
         }
     }
 

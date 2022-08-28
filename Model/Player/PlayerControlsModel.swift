@@ -13,7 +13,7 @@ final class PlayerControlsModel: ObservableObject {
     var timer: Timer?
 
     #if os(tvOS)
-        var reporter = PassthroughSubject<String, Never>()
+        private(set) var reporter = PassthroughSubject<String, Never>()
     #endif
 
     var player: PlayerModel!
