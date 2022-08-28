@@ -49,7 +49,7 @@ extension PlayerModel {
             return
         }
 
-        backend.seek(to: segment.endTime)
+        backend.seek(to: segment.endTime, seekType: .segmentSkip(segment.category))
 
         DispatchQueue.main.async { [weak self] in
             withAnimation {
@@ -79,7 +79,7 @@ extension PlayerModel {
         }
 
         restoredSegments.append(segment)
-        backend.seek(to: time)
+        backend.seek(to: time, seekType: .segmentRestore)
         resetLastSegment()
     }
 

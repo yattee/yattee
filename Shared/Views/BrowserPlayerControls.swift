@@ -27,32 +27,36 @@ struct BrowserPlayerControls<Content: View, Toolbar: View>: View {
     }
 
     var body: some View {
-        // TODO: remove
-        #if DEBUG
-            if #available(iOS 15.0, macOS 12.0, *) {
-                Self._printChanges()
-            }
-        #endif
-
-        return ZStack(alignment: .bottomLeading) {
-            content
-                .frame(maxHeight: .infinity)
-
-            #if !os(tvOS)
-                VStack(spacing: 0) {
-                    #if os(iOS)
-                        toolbar
-                            .frame(height: 35)
-                            .frame(maxWidth: .infinity)
-                            .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
-                            .modifier(ControlBackgroundModifier())
-                    #endif
-
-                    ControlsBar(fullScreen: .constant(false))
-                        .edgesIgnoringSafeArea(.bottom)
+        #if os(tvOS)
+            return content
+        #else
+            // TODO: remove
+            #if DEBUG
+                if #available(iOS 15.0, macOS 12.0, *) {
+                    Self._printChanges()
                 }
             #endif
-        }
+
+            return ZStack(alignment: .bottomLeading) {
+                content
+                    .frame(maxHeight: .infinity)
+
+                #if !os(tvOS)
+                    VStack(spacing: 0) {
+                        #if os(iOS)
+                            toolbar
+                                .frame(height: 35)
+                                .frame(maxWidth: .infinity)
+                                .borderTop(height: 0.4, color: Color("ControlsBorderColor"))
+                                .modifier(ControlBackgroundModifier())
+                        #endif
+
+                        ControlsBar(fullScreen: .constant(false))
+                            .edgesIgnoringSafeArea(.bottom)
+                    }
+                #endif
+            }
+        #endif
     }
 }
 

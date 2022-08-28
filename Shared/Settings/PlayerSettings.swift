@@ -7,6 +7,10 @@ struct PlayerSettings: View {
 
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showHistoryInPlayer) private var showHistory
+    @Default(.playerControlsLayout) private var playerControlsLayout
+    @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+    @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
+    @Default(.seekGestureSpeed) private var seekGestureSpeed
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
@@ -66,6 +70,18 @@ struct PlayerSettings: View {
                 #endif
                 closeLastItemOnPlaybackEndToggle
                 systemControlsCommandsPicker
+            }
+
+            Section(header: SettingsHeader(text: "Controls"), footer: controlsLayoutFooter) {
+                #if !os(tvOS)
+                    horizontalPlayerGestureEnabledToggle
+                    SettingsHeader(text: "Seek gesture sensitivity", secondary: true)
+                    seekGestureSpeedPicker
+                    SettingsHeader(text: "Regular size", secondary: true)
+                    playerControlsLayoutPicker
+                    SettingsHeader(text: "Fullscreen size", secondary: true)
+                #endif
+                fullScreenPlayerControlsLayoutPicker
             }
 
             Section(header: SettingsHeader(text: "Interface")) {
@@ -146,6 +162,44 @@ struct PlayerSettings: View {
             #endif
 
             Text("Hide sidebar").tag(PlayerSidebarSetting.never)
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var horizontalPlayerGestureEnabledToggle: some View {
+        Toggle("Seek with horizontal swipe on video", isOn: $horizontalPlayerGestureEnabled)
+    }
+
+    private var seekGestureSpeedPicker: some View {
+        Picker("Seek gesture sensitivity", selection: $seekGestureSpeed) {
+            ForEach([1, 0.75, 0.66, 0.5, 0.33, 0.25, 0.1], id: \.self) { value in
+                Text(String(format: "%.0f%%", value * 100)).tag(value)
+            }
+        }
+        .disabled(!horizontalPlayerGestureEnabled)
+        .modifier(SettingsPickerModifier())
+    }
+
+    @ViewBuilder private var controlsLayoutFooter: some View {
+        #if os(iOS)
+            Text("Large and very large sizes are not suitable for all devices and using them may cause controls not to fit on the screen.")
+        #endif
+    }
+
+    private var playerControlsLayoutPicker: some View {
+        Picker("Regular Size", selection: $playerControlsLayout) {
+            ForEach(PlayerControlsLayout.allCases, id: \.self) { layout in
+                Text(layout.description).tag(layout.rawValue)
+            }
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var fullScreenPlayerControlsLayoutPicker: some View {
+        Picker("Fullscreen Size", selection: $fullScreenPlayerControlsLayout) {
+            ForEach(PlayerControlsLayout.allCases, id: \.self) { layout in
+                Text(layout.description).tag(layout.rawValue)
+            }
         }
         .modifier(SettingsPickerModifier())
     }

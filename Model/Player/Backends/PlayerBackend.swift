@@ -1,6 +1,9 @@
 import CoreMedia
 import Defaults
 import Foundation
+#if !os(macOS)
+    import UIKit
+#endif
 
 protocol PlayerBackend {
     var model: PlayerModel! { get set }
@@ -38,9 +41,8 @@ protocol PlayerBackend {
 
     func stop()
 
-    func seek(to time: CMTime, completionHandler: ((Bool) -> Void)?)
-    func seek(to seconds: Double, completionHandler: ((Bool) -> Void)?)
-    func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)?)
+    func seek(to time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?)
+    func seek(to seconds: Double, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?)
 
     func setRate(_ rate: Float)
 
@@ -51,7 +53,8 @@ protocol PlayerBackend {
     func startMusicMode()
     func stopMusicMode()
 
-    func updateControls()
+    func getTimeUpdates()
+    func updateControls(completionHandler: (() -> Void)?)
     func startControlsUpdates()
     func stopControlsUpdates()
 
@@ -64,16 +67,23 @@ protocol PlayerBackend {
 }
 
 extension PlayerBackend {
-    func seek(to time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        seek(to: time, completionHandler: completionHandler)
+    func seek(to time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+        playerTime.registerSeek(at: time, type: seekType, restore: currentTime)
+        seek(to: time, seekType: seekType, completionHandler: completionHandler)
     }
 
-    func seek(to seconds: Double, completionHandler: ((Bool) -> Void)? = nil) {
-        seek(to: .secondsInDefaultTimescale(seconds), completionHandler: completionHandler)
+    func seek(to seconds: Double, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+        let seconds = CMTime.secondsInDefaultTimescale(seconds)
+        playerTime.registerSeek(at: seconds, type: seekType, restore: currentTime)
+        seek(to: seconds, seekType: seekType, completionHandler: completionHandler)
     }
 
-    func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        seek(relative: time, completionHandler: completionHandler)
+    func seek(relative time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+        if let currentTime = currentTime, let duration = playerItemDuration {
+            let seekTime = min(max(0, currentTime.seconds + time.seconds), duration.seconds)
+            playerTime.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
+            seek(to: seekTime, seekType: seekType, completionHandler: completionHandler)
+        }
     }
 
     func eofPlaybackModeAction() {
@@ -92,13 +102,36 @@ extension PlayerBackend {
                 model.advanceToNextItem()
             }
         case .loopOne:
-            model.backend.seek(to: .zero) { _ in
+            model.backend.seek(to: .zero, seekType: .loopRestart) { _ in
                 self.model.play()
             }
         case .related:
             guard let item = model.autoplayItem else { return }
             model.resetAutoplay()
             model.advanceToItem(item)
+        }
+    }
+
+    func updateControls(completionHandler: (() -> Void)? = nil) {
+        print("updating controls")
+
+        guard model.presentingPlayer, !model.controls.presentingOverlays else {
+            print("ignored controls update")
+            completionHandler?()
+            return
+        }
+
+        DispatchQueue.main.async(qos: .userInteractive) {
+            #if !os(macOS)
+                guard UIApplication.shared.applicationState != .background else {
+                    print("not performing controls updates in background")
+                    completionHandler?()
+                    return
+                }
+            #endif
+            self.playerTime.currentTime = self.currentTime ?? .zero
+            self.playerTime.duration = self.playerItemDuration ?? .zero
+            completionHandler?()
         }
     }
 }

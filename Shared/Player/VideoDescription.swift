@@ -117,36 +117,40 @@ struct VideoDescription: View {
                 label.preferredMaxLayoutWidth = (detailsSize?.width ?? 330) - 30
                 label.URLColor = UIColor(Color.accentColor)
                 label.timestampColor = UIColor(Color.accentColor)
-                label.handleURLTap { url in
-                    var urlToOpen = url
-
-                    if var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-                        components.scheme = "yattee"
-                        if let yatteeURL = components.url {
-                            let parser = URLParser(url: urlToOpen)
-                            let destination = parser.destination
-                            if destination == .video,
-                               parser.videoID == player.currentVideo?.videoID,
-                               let time = parser.time
-                            {
-                                player.backend.seek(to: Double(time))
-                                return
-                            } else if destination != nil {
-                                urlToOpen = yatteeURL
-                            }
-                        }
-                    }
-
-                    openURL(urlToOpen)
-                }
-                label.handleTimestampTap { timestamp in
-                    player.backend.seek(to: timestamp.timeInterval)
-                }
+                label.handleURLTap(urlTapHandler(_:))
+                label.handleTimestampTap(timestampTapHandler(_:))
             }
         }
 
         func updatePreferredMaxLayoutWidth() {
             label.preferredMaxLayoutWidth = (detailsSize?.width ?? 330) - 30
+        }
+
+        func urlTapHandler(_ url: URL) {
+            var urlToOpen = url
+
+            if var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.scheme = "yattee"
+                if let yatteeURL = components.url {
+                    let parser = URLParser(url: urlToOpen)
+                    let destination = parser.destination
+                    if destination == .video,
+                       parser.videoID == player.currentVideo?.videoID,
+                       let time = parser.time
+                    {
+                        player.backend.seek(to: Double(time), seekType: .userInteracted)
+                        return
+                    } else if destination != nil {
+                        urlToOpen = yatteeURL
+                    }
+                }
+            }
+
+            openURL(urlToOpen)
+        }
+
+        func timestampTapHandler(_ timestamp: Timestamp) {
+            player.backend.seek(to: timestamp.timeInterval, seekType: .userInteracted)
         }
     }
 #endif

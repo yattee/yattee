@@ -80,7 +80,7 @@ struct VideoCell: View {
                 }
 
                 if !playNowContinues {
-                    player.backend.seek(to: .zero)
+                    player.backend.seek(to: .zero, seekType: .userInteracted)
                 }
 
                 player.play()

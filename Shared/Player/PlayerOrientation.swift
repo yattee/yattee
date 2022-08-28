@@ -1,0 +1,69 @@
+import Defaults
+import Foundation
+import SwiftUI
+
+extension VideoPlayerView {
+    func configureOrientationUpdatesBasedOnAccelerometer() {
+        let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
+        if currentOrientation.isLandscape,
+           Defaults[.enterFullscreenInLandscape],
+           !player.playingFullScreen,
+           !player.playingInPictureInPicture
+        {
+            guard player.presentingPlayer else { return }
+
+            DispatchQueue.main.async {
+                playerControls.presentingControls = false
+                player.enterFullScreen(showControls: false)
+            }
+
+            player.onPresentPlayer.append {
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
+            }
+        }
+
+        orientationObserver = NotificationCenter.default.addObserver(
+            forName: OrientationTracker.deviceOrientationChangedNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            guard !Defaults[.honorSystemOrientationLock],
+                  player.presentingPlayer,
+                  !player.playingInPictureInPicture,
+                  player.lockedOrientation.isNil
+            else {
+                return
+            }
+
+            let orientation = OrientationTracker.shared.currentInterfaceOrientation
+
+            guard lastOrientation != orientation else {
+                return
+            }
+
+            lastOrientation = orientation
+
+            DispatchQueue.main.async {
+                guard Defaults[.enterFullscreenInLandscape],
+                      player.presentingPlayer
+                else {
+                    return
+                }
+
+                if orientation.isLandscape {
+                    playerControls.presentingControls = false
+                    player.enterFullScreen(showControls: false)
+                    Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
+                } else {
+                    player.exitFullScreen(showControls: false)
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                }
+            }
+        }
+    }
+
+    func stopOrientationUpdates() {
+        guard let observer = orientationObserver else { return }
+        NotificationCenter.default.removeObserver(observer)
+    }
+}

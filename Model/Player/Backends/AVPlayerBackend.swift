@@ -145,7 +145,7 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.replaceCurrentItem(with: nil)
     }
 
-    func seek(to time: CMTime, completionHandler: ((Bool) -> Void)?) {
+    func seek(to time: CMTime, seekType _: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?) {
         guard !model.live else { return }
 
         avPlayer.seek(
@@ -154,12 +154,6 @@ final class AVPlayerBackend: PlayerBackend {
             toleranceAfter: .zero,
             completionHandler: completionHandler ?? { _ in }
         )
-    }
-
-    func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
-        if let currentTime = currentTime {
-            seek(to: currentTime + time, completionHandler: completionHandler)
-        }
     }
 
     func setRate(_ rate: Float) {
@@ -461,10 +455,11 @@ final class AVPlayerBackend: PlayerBackend {
                     if self.model.activeBackend != .appleAVPlayer {
                         self.startPictureInPictureOnSwitch = true
                         let seconds = self.model.mpvBackend.currentTime?.seconds ?? 0
-                        self.seek(to: seconds) { finished in
-                            guard finished else { return }
-                            self.model.pause()
-                            self.model.changeActiveBackend(from: .mpv, to: .appleAVPlayer, changingStream: false)
+                        self.seek(to: seconds, seekType: .backendSync) { _ in
+                            DispatchQueue.main.async {
+                                self.model.pause()
+                                self.model.changeActiveBackend(from: .mpv, to: .appleAVPlayer, changingStream: false)
+                            }
                         }
                     }
                 }
@@ -537,9 +532,7 @@ final class AVPlayerBackend: PlayerBackend {
             #endif
 
             if self.controlsUpdates {
-                self.playerTime.duration = self.playerItemDuration ?? .zero
-                self.playerTime.currentTime = self.currentTime ?? .zero
-                self.model.objectWillChange.send()
+                self.updateControls()
             }
         }
     }
@@ -606,8 +599,6 @@ final class AVPlayerBackend: PlayerBackend {
             }
         }
     }
-
-    func updateControls() {}
 
     func startControlsUpdates() {
         guard model.presentingPlayer, model.controls.presentingControls, !model.controls.presentingOverlays else {
@@ -680,6 +671,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
     }
 
+    func getTimeUpdates() {}
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
     func setNeedsNetworkStateUpdates(_: Bool) {}

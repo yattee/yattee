@@ -9,7 +9,7 @@ struct ChapterView: View {
 
     var body: some View {
         Button {
-            player.backend.seek(to: chapter.start)
+            player.backend.seek(to: chapter.start, seekType: .userInteracted)
         } label: {
             HStack(spacing: 12) {
                 if !chapter.image.isNil {
