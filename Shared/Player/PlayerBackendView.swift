@@ -34,6 +34,8 @@ struct PlayerBackendView: View {
                     .padding(.top, controlsTopPadding)
                     .padding(.bottom, controlsBottomPadding)
                 #endif
+            #else
+                hiddenControlsButton
             #endif
         }
         #if os(iOS)
@@ -67,6 +69,22 @@ struct PlayerBackendView: View {
                 return fullScreenLayout && verticalSizeClass == .compact ? SafeArea.insets.bottom : 0
             } else {
                 return fullScreenLayout ? SafeArea.insets.bottom : 0
+            }
+        }
+    #endif
+
+    #if os(tvOS)
+        private var hiddenControlsButton: some View {
+            VStack {
+                Button {
+                    player.controls.show()
+                } label: {
+                    EmptyView()
+                }
+                .offset(y: -100)
+                .buttonStyle(.plain)
+                .background(Color.clear)
+                .foregroundColor(.clear)
             }
         }
     #endif
