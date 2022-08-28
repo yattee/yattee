@@ -47,5 +47,10 @@ struct PopularView: View {
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
+        #if !os(macOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            resource?.loadIfNeeded()
+        }
+        #endif
     }
 }

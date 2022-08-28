@@ -50,6 +50,11 @@ struct SubscriptionsView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
+        #if !os(macOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            loadResources()
+        }
+        #endif
     }
 
     private func loadResources(force: Bool = false, onCompletion: @escaping () -> Void = {}) {
