@@ -2,6 +2,7 @@ import Defaults
 import Foundation
 
 enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
+    case tvRegular
     case veryLarge
     case large
     case medium
@@ -10,6 +11,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var description: String {
         switch self {
+        case .tvRegular:
+            return "TV"
         case .veryLarge:
             return "Very Large"
         default:
@@ -19,6 +22,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var buttonsSpacing: Double {
         switch self {
+        case .tvRegular:
+            return 80
         case .veryLarge:
             return 40
         case .large:
@@ -34,6 +39,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var buttonFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 48
         case .veryLarge:
             return 35
         case .large:
@@ -49,6 +56,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var bigButtonFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 65
         case .veryLarge:
             return 55
         case .large:
@@ -64,6 +73,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var buttonSize: Double {
         switch self {
+        case .tvRegular:
+            return 90
         case .veryLarge:
             return 60
         case .large:
@@ -79,6 +90,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var bigButtonSize: Double {
         switch self {
+        case .tvRegular:
+            return 100
         case .veryLarge:
             return 85
         case .large:
@@ -94,6 +107,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var segmentFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 20
         case .veryLarge:
             return 16
         case .large:
@@ -109,6 +124,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var chapterFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 24
         case .veryLarge:
             return 20
         case .large:
@@ -124,6 +141,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var projectedTimeFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 30
         case .veryLarge:
             return 25
         case .large:
@@ -139,6 +158,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var thumbSize: Double {
         switch self {
+        case .tvRegular:
+            return 45
         case .veryLarge:
             return 35
         case .large:
@@ -154,6 +175,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var timeFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 45
         case .veryLarge:
             return 35
         case .large:
@@ -169,6 +192,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var bufferingStateFontSize: Double {
         switch self {
+        case .tvRegular:
+            return 45
         case .veryLarge:
             return 30
         case .large:
@@ -184,6 +209,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var timeLeadingEdgePadding: Double {
         switch self {
+        case .tvRegular:
+            return 20
         case .veryLarge:
             return 5
         case .large:
@@ -199,6 +226,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var timeTrailingEdgePadding: Double {
         switch self {
+        case .tvRegular:
+            return 20
         case .veryLarge:
             return 16
         case .large:
@@ -214,6 +243,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var timelineHeight: Double {
         switch self {
+        case .tvRegular:
+            return 80
         case .veryLarge:
             return 40
         case .large:
@@ -229,6 +260,8 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var seekOSDWidth: Double {
         switch self {
+        case .tvRegular:
+            return 240
         case .veryLarge:
             return 240
         case .large:
@@ -244,5 +277,51 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
 
     var osdVerticalOffset: Double {
         buttonSize
+    }
+
+    var osdProgressBarHeight: Double {
+        switch self {
+        case .tvRegular:
+            return 20
+        case .veryLarge:
+            return 10
+        case .large:
+            return 8
+        case .medium:
+            return 5
+        case .small:
+            return 5
+        case .smaller:
+            return 2
+        }
+    }
+
+    var osdSpacing: Double {
+        switch self {
+        case .tvRegular:
+            return 8
+        case .veryLarge:
+            return 8
+        case .large:
+            return 6
+        case .medium:
+            return 4
+        case .small:
+            return 2
+        case .smaller:
+            return 2
+        }
+    }
+
+    var displaysTitleLine: Bool {
+        self == .tvRegular
+    }
+
+    var titleLineFontSize: Double {
+        60
+    }
+
+    var authorLineFontSize: Double {
+        30
     }
 }

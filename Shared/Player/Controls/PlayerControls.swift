@@ -49,7 +49,7 @@ struct PlayerControls: View {
                 .transition(.opacity)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             #if os(tvOS)
-                .offset(x: 10, y: 5)
+                .offset(x: 10, y: 10)
                 .focused($focusedField, equals: .seekOSD)
                 .onChange(of: player.playerTime.lastSeekTime) { _ in
                     if !model.presentingControls {
@@ -108,8 +108,26 @@ struct PlayerControls: View {
 
                                 Spacer()
 
+                                if playerControlsLayout.displaysTitleLine {
+                                    VStack(alignment: .leading) {
+                                        Text(player.currentVideo?.title ?? "Not Playing")
+                                            .shadow(radius: 10)
+                                            .font(.system(size: playerControlsLayout.titleLineFontSize).bold())
+                                            .lineLimit(1)
+
+                                        Text(player.currentVideo?.channel.name ?? "")
+                                            .fontWeight(.semibold)
+                                            .shadow(radius: 10)
+                                            .foregroundColor(.secondary)
+                                            .font(.system(size: playerControlsLayout.authorLineFontSize))
+                                            .lineLimit(1)
+                                    }
+
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .offset(y: -40)
+                                }
+
                                 timeline
-                                    .frame(maxWidth: 1000)
                                     .padding(.bottom, 2)
                             }
                             .zIndex(1)
@@ -135,9 +153,6 @@ struct PlayerControls: View {
                                     musicModeButton
                                 #endif
                             }
-                            #if os(tvOS)
-                            .frame(width: 1200)
-                            #endif
                             .zIndex(0)
                             #if os(tvOS)
                                 .offset(y: -playerControlsLayout.timelineHeight - 30)
