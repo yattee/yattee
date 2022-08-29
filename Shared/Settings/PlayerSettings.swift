@@ -197,13 +197,13 @@ struct PlayerSettings: View {
 
     @ViewBuilder private var controlsLayoutFooter: some View {
         #if os(iOS)
-            Text("Large and bigger layouts are not suitable for all devices and using them may cause controls not to fit on the screen.")
+            Text("Large layout is not suitable for all devices and using it may cause controls not to fit on the screen.")
         #endif
     }
 
     private var playerControlsLayoutPicker: some View {
         Picker("Regular Size", selection: $playerControlsLayout) {
-            ForEach(PlayerControlsLayout.allCases, id: \.self) { layout in
+            ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
                 Text(layout.description).tag(layout.rawValue)
             }
         }
@@ -212,7 +212,7 @@ struct PlayerSettings: View {
 
     private var fullScreenPlayerControlsLayoutPicker: some View {
         Picker("Fullscreen Size", selection: $fullScreenPlayerControlsLayout) {
-            ForEach(PlayerControlsLayout.allCases, id: \.self) { layout in
+            ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
                 Text(layout.description).tag(layout.rawValue)
             }
         }
