@@ -231,12 +231,7 @@ struct YatteeApp: App {
         subscriptions.load()
         playlists.load()
 
-        #if os(macOS)
-            Windows.player.open()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                Windows.main.focus()
-            }
-        #else
+        #if !os(macOS)
             player.updateRemoteCommandCenter()
         #endif
 
