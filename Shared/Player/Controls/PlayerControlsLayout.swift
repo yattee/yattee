@@ -1,5 +1,8 @@
 import Defaults
 import Foundation
+#if os(iOS)
+    import UIKit
+#endif
 
 enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
     case tvRegular
@@ -8,6 +11,36 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
     case medium
     case small
     case smaller
+
+    var available: Bool {
+        var isATV = false
+        var isIPad = false
+        #if os(tvOS)
+            isATV = true
+        #endif
+        #if os(iOS)
+            isIPad = UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+        switch self {
+        case .tvRegular:
+            return isATV
+        case .veryLarge:
+            #if os(macOS)
+                return true
+            #else
+                return isIPad
+            #endif
+
+        case .large:
+            return true
+        case .medium:
+            return true
+        case .small:
+            return true
+        case .smaller:
+            return true
+        }
+    }
 
     var description: String {
         switch self {
