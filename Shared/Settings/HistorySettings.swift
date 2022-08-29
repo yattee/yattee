@@ -160,7 +160,6 @@ struct HistorySettings: View {
             )
         }
         .foregroundColor(.red)
-        .disabled(!saveHistory)
     }
 }
 
