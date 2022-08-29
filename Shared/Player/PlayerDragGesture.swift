@@ -89,6 +89,7 @@ extension VideoPlayerView {
             withAnimation(Constants.overlayAnimation) {
                 viewDragOffset = Self.hiddenOffset
             }
+            player.backend.setNeedsDrawing(false)
         } else {
             withAnimation(Constants.overlayAnimation) {
                 viewDragOffset = 0
