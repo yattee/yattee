@@ -609,6 +609,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
+        controls.hide()
         pause()
         closePiP()
 
@@ -960,12 +961,16 @@ final class PlayerModel: ObservableObject {
         musicMode.toggle()
 
         if musicMode {
+            aspectRatio = VideoPlayerView.defaultAspectRatio
             controls.presentingControls = true
             controls.removeTimer()
 
             backend.startMusicMode()
         } else {
             backend.stopMusicMode()
+            Delay.by(0.25) {
+                self.updateAspectRatio()
+            }
 
             controls.resetTimer()
         }
