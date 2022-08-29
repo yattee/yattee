@@ -74,7 +74,7 @@ struct ChannelPlaylistView: View {
         }
         .onAppear {
             if navigationStyle == .tab {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     resource?.loadIfNeeded()
                 }
             } else {
