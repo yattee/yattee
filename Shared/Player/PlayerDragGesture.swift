@@ -36,7 +36,7 @@ extension VideoPlayerView {
                     }
                 #endif
 
-                if !isVerticalDrag, abs(horizontalDrag) > 15, !isHorizontalDrag {
+                if !isVerticalDrag, horizontalPlayerGestureEnabled, abs(horizontalDrag) > seekGestureSensitivity, !isHorizontalDrag {
                     isHorizontalDrag = true
                     player.seek.onSeekGestureStart()
                     viewDragOffset = 0
