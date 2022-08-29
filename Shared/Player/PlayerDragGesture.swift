@@ -38,14 +38,19 @@ extension VideoPlayerView {
 
                 if !isVerticalDrag, abs(horizontalDrag) > 15, !isHorizontalDrag {
                     isHorizontalDrag = true
-                    player.playerTime.resetSeek()
+                    player.seek.onSeekGestureStart()
                     viewDragOffset = 0
                 }
 
                 if horizontalPlayerGestureEnabled, isHorizontalDrag {
-                    player.playerTime.onSeekGestureStart {
-                        let timeSeek = (player.playerTime.duration.seconds / player.playerSize.width) * horizontalDrag * seekGestureSpeed
-                        player.playerTime.gestureSeek = timeSeek
+                    player.seek.updateCurrentTime {
+                        let time = player.backend.playerItemDuration?.seconds ?? 0
+                        if player.seek.gestureStart.isNil {
+                            player.seek.gestureStart = time
+                        }
+                        let timeSeek = (time / player.playerSize.width) * horizontalDrag * seekGestureSpeed
+
+                        player.seek.gestureSeek = timeSeek
                     }
                     return
                 }
@@ -72,7 +77,7 @@ extension VideoPlayerView {
     private func onPlayerDragGestureEnded() {
         if horizontalPlayerGestureEnabled, isHorizontalDrag {
             isHorizontalDrag = false
-            player.playerTime.onSeekGestureEnd()
+            player.seek.onSeekGestureEnd()
         }
 
         isVerticalDrag = false

@@ -9,6 +9,7 @@ protocol PlayerBackend {
     var model: PlayerModel! { get set }
     var controls: PlayerControlsModel! { get set }
     var playerTime: PlayerTimeModel! { get set }
+    var seek: SeekModel! { get set }
     var networkState: NetworkStateModel! { get set }
 
     var stream: Stream? { get set }
@@ -41,8 +42,8 @@ protocol PlayerBackend {
 
     func stop()
 
-    func seek(to time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?)
-    func seek(to seconds: Double, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?)
+    func seek(to time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)?)
+    func seek(to seconds: Double, seekType: SeekType, completionHandler: ((Bool) -> Void)?)
 
     func setRate(_ rate: Float)
 
@@ -67,21 +68,21 @@ protocol PlayerBackend {
 }
 
 extension PlayerBackend {
-    func seek(to time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
-        playerTime.registerSeek(at: time, type: seekType, restore: currentTime)
+    func seek(to time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+        seek.registerSeek(at: time, type: seekType, restore: currentTime)
         seek(to: time, seekType: seekType, completionHandler: completionHandler)
     }
 
-    func seek(to seconds: Double, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+    func seek(to seconds: Double, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
         let seconds = CMTime.secondsInDefaultTimescale(seconds)
-        playerTime.registerSeek(at: seconds, type: seekType, restore: currentTime)
+        seek.registerSeek(at: seconds, type: seekType, restore: currentTime)
         seek(to: seconds, seekType: seekType, completionHandler: completionHandler)
     }
 
-    func seek(relative time: CMTime, seekType: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)? = nil) {
+    func seek(relative time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
         if let currentTime = currentTime, let duration = playerItemDuration {
             let seekTime = min(max(0, currentTime.seconds + time.seconds), duration.seconds)
-            playerTime.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
+            seek.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
             seek(to: seekTime, seekType: seekType, completionHandler: completionHandler)
         }
     }

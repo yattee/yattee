@@ -44,6 +44,7 @@ struct YatteeApp: App {
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
+    @StateObject private var seek = SeekModel()
     @StateObject private var settings = SettingsModel()
     @StateObject private var subscriptions = SubscriptionsModel()
     @StateObject private var thumbnails = ThumbnailsModel()
@@ -65,6 +66,7 @@ struct YatteeApp: App {
                 .environmentObject(playerTime)
                 .environmentObject(playlists)
                 .environmentObject(recents)
+                .environmentObject(seek)
                 .environmentObject(settings)
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnails)
@@ -139,6 +141,7 @@ struct YatteeApp: App {
                     .environmentObject(playlists)
                     .environmentObject(recents)
                     .environmentObject(search)
+                    .environmentObject(seek)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnails)
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
@@ -203,6 +206,7 @@ struct YatteeApp: App {
         player.navigation = navigation
         player.networkState = networkState
         player.playerTime = playerTime
+        player.seek = seek
 
         if !accounts.current.isNil {
             player.restoreQueue()

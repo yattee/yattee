@@ -51,7 +51,7 @@ struct PlayerControls: View {
             #if os(tvOS)
                 .offset(x: 10, y: 10)
                 .focused($focusedField, equals: .seekOSD)
-                .onChange(of: player.playerTime.lastSeekTime) { _ in
+                .onChange(of: player.seek.lastSeekTime) { _ in
                     if !model.presentingControls {
                         focusedField = .seekOSD
                     }

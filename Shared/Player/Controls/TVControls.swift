@@ -72,7 +72,7 @@ struct TVControls: UIViewRepresentable {
         }
 
         @objc func handleTap(sender _: UITapGestureRecognizer) {
-            if !model.presentingControls, model.player.playerTime.seekOSDDismissed {
+            if !model.presentingControls {
                 model.show()
             }
         }
