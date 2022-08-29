@@ -297,6 +297,12 @@
 		37484C3126FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
+		374AB3D728BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
+		374AB3D828BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
+		374AB3D928BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
+		374AB3DB28BCAF7E00DF56FB /* SeekType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3DA28BCAF7E00DF56FB /* SeekType.swift */; };
+		374AB3DC28BCAF7E00DF56FB /* SeekType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3DA28BCAF7E00DF56FB /* SeekType.swift */; };
+		374AB3DD28BCAF7E00DF56FB /* SeekType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3DA28BCAF7E00DF56FB /* SeekType.swift */; };
 		374C053527242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
 		374C053627242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
 		374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */; };
@@ -1072,6 +1078,8 @@
 		3749BF7027ADA135000480FF /* stream_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_cb.h; sourceTree = "<group>"; };
 		3749BF7127ADA135000480FF /* qthelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = qthelper.hpp; sourceTree = "<group>"; };
 		3749BF9227ADA142000480FF /* BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
+		374AB3D628BCAF0000DF56FB /* SeekModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SeekModel.swift; path = Model/SeekModel.swift; sourceTree = SOURCE_ROOT; };
+		374AB3DA28BCAF7E00DF56FB /* SeekType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekType.swift; sourceTree = "<group>"; };
 		374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSettings.swift; sourceTree = "<group>"; };
 		374C053A2724614F009BDDBE /* PlayerTVMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTVMenu.swift; sourceTree = "<group>"; };
 		374C053E272472C0009BDDBE /* PlayerSponsorBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSponsorBlock.swift; sourceTree = "<group>"; };
@@ -2112,6 +2120,8 @@
 				375EC95C289EEEE000751258 /* QualityProfile.swift */,
 				375EC969289F232600751258 /* QualityProfilesModel.swift */,
 				37C194C626F6A9C8005D3B96 /* RecentsModel.swift */,
+				374AB3D628BCAF0000DF56FB /* SeekModel.swift */,
+				374AB3DA28BCAF7E00DF56FB /* SeekType.swift */,
 				37EAD86E267B9ED100D9E01B /* Segment.swift */,
 				37F0F4E9286F397E00C06C2E /* SettingsModel.swift */,
 				37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */,
@@ -2817,6 +2827,7 @@
 				37D2E0D028B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				3727B74A27872A920021C15E /* VisualEffectBlur-iOS.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				374AB3D728BCAF0000DF56FB /* SeekModel.swift in Sources */,
 				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
 				37FD43E32704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				3776ADD6287381240078EBC4 /* Captions.swift in Sources */,
@@ -2828,6 +2839,7 @@
 				37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37EBD8C427AF0DA800F1C24B /* PlayerBackend.swift in Sources */,
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
+				374AB3DB28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */,
 				37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */,
 				37C0698227260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
@@ -3055,6 +3067,7 @@
 				3756C2A72861131100E4B059 /* NetworkState.swift in Sources */,
 				3729037F2739E47400EA99F6 /* MenuCommands.swift in Sources */,
 				37C0698327260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
+				374AB3DC28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				376B2E0826F920D600B1D64D /* SignInRequiredView.swift in Sources */,
 				37CC3F4D270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37B81B0026D2CA3700675966 /* VideoDetails.swift in Sources */,
@@ -3151,6 +3164,7 @@
 				37A5DBC9285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */,
 				3797758C2689345500DD52A8 /* Store.swift in Sources */,
 				371B7E622759706A00D21217 /* CommentsView.swift in Sources */,
+				374AB3D828BCAF0000DF56FB /* SeekModel.swift in Sources */,
 				375EC95E289EEEE000751258 /* QualityProfile.swift in Sources */,
 				37141674267A8E10006CA35D /* Country.swift in Sources */,
 				3703100027B04DCC00ECDDAA /* PlayerControls.swift in Sources */,
@@ -3408,6 +3422,7 @@
 				37484C2B26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
 				37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
+				374AB3DD28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
 				377ABC42286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
@@ -3449,6 +3464,7 @@
 				3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				37E084AD2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */,
 				371B7E6C2759791900D21217 /* CommentsModel.swift in Sources */,
+				374AB3D928BCAF0000DF56FB /* SeekModel.swift in Sources */,
 				375E45F927B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */,
 				3782B95627557E4E00990149 /* SearchView.swift in Sources */,
 				3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,

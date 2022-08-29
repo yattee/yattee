@@ -91,14 +91,14 @@ final class PlayerModel: ObservableObject {
     @Published var stream: Stream?
     @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
 
-    @Published var qualityProfileSelection: QualityProfile? { didSet { handleQualityProfileChange() }}
+    @Published var qualityProfileSelection: QualityProfile? { didSet { handleQualityProfileChange() } }
 
     @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
     @Published var queue = [PlayerQueueItem]() { didSet { handleQueueChange() } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
-    @Published var videoBeingOpened: Video? { didSet { playerTime.reset() } }
+    @Published var videoBeingOpened: Video? { didSet { seek.reset() } }
     @Published var historyVideos = [Video]()
 
     @Published var preservedTime: CMTime?
@@ -148,6 +148,13 @@ final class PlayerModel: ObservableObject {
             backend.networkState.player = self
         }
     }}
+    var seek: SeekModel { didSet {
+        backends.forEach { backend in
+            var backend = backend
+            backend.seek = seek
+            backend.seek.player = self
+        }
+    }}
     var navigation: NavigationModel
 
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
@@ -193,7 +200,8 @@ final class PlayerModel: ObservableObject {
         controls: PlayerControlsModel = PlayerControlsModel(),
         navigation: NavigationModel = NavigationModel(),
         playerTime: PlayerTimeModel = PlayerTimeModel(),
-        networkState: NetworkStateModel = NetworkStateModel()
+        networkState: NetworkStateModel = NetworkStateModel(),
+        seek: SeekModel = SeekModel()
     ) {
         self.accounts = accounts
         self.comments = comments
@@ -201,6 +209,7 @@ final class PlayerModel: ObservableObject {
         self.navigation = navigation
         self.playerTime = playerTime
         self.networkState = networkState
+        self.seek = seek
 
         self.avPlayerBackend = AVPlayerBackend(
             model: self,
@@ -244,7 +253,7 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
-        if !presentingPlayer { presentingPlayer = true }
+        presentingPlayer = true 
 
         #if os(macOS)
             Windows.player.open()

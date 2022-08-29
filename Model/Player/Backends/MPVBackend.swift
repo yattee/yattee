@@ -17,6 +17,7 @@ final class MPVBackend: PlayerBackend {
     var controls: PlayerControlsModel!
     var playerTime: PlayerTimeModel!
     var networkState: NetworkStateModel!
+    var seek: SeekModel!
 
     var stream: Stream?
     var video: Video?
@@ -299,7 +300,7 @@ final class MPVBackend: PlayerBackend {
         client?.stop()
     }
 
-    func seek(to time: CMTime, seekType _: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?) {
+    func seek(to time: CMTime, seekType _: SeekType, completionHandler: ((Bool) -> Void)?) {
         client?.seek(to: time) { [weak self] _ in
             self?.getTimeUpdates()
             self?.updateControls()

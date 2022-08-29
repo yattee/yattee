@@ -16,6 +16,7 @@ final class AVPlayerBackend: PlayerBackend {
     var controls: PlayerControlsModel!
     var playerTime: PlayerTimeModel!
     var networkState: NetworkStateModel!
+    var seek: SeekModel!
 
     var stream: Stream?
     var video: Video?
@@ -145,7 +146,7 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.replaceCurrentItem(with: nil)
     }
 
-    func seek(to time: CMTime, seekType _: PlayerTimeModel.SeekType, completionHandler: ((Bool) -> Void)?) {
+    func seek(to time: CMTime, seekType _: SeekType, completionHandler: ((Bool) -> Void)?) {
         guard !model.live else { return }
 
         avPlayer.seek(

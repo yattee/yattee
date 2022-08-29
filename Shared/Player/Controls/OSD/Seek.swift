@@ -7,10 +7,7 @@ struct Seek: View {
     #endif
 
     @EnvironmentObject<PlayerControlsModel> private var controls
-    @EnvironmentObject<PlayerTimeModel> private var model
-
-    @State private var dismissTimer: Timer?
-    @State private var isSeeking = false
+    @EnvironmentObject<SeekModel> private var model
 
     private var updateThrottle = Throttle(interval: 2)
 
@@ -20,12 +17,12 @@ struct Seek: View {
     var body: some View {
         Button(action: model.restoreTime) {
             VStack(spacing: playerControlsLayout.osdSpacing) {
-                ProgressBar(value: progress)
+                ProgressBar(value: model.progress)
                     .frame(maxHeight: playerControlsLayout.osdProgressBarHeight)
 
                 timeline
 
-                if isSeeking {
+                if model.isSeeking {
                     Divider()
                     gestureSeekTime
                         .foregroundColor(.secondary)
@@ -84,38 +81,10 @@ struct Seek: View {
         .buttonStyle(.plain)
         #endif
         .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
-        .onChange(of: model.lastSeekTime) { _ in
-            isSeeking = false
-            dismissTimer?.invalidate()
-            dismissTimer = Delay.by(3) {
-                withAnimation(.easeIn(duration: 0.1)) { model.seekOSDDismissed = true }
-            }
-
-            if model.seekOSDDismissed {
-                withAnimation(.easeIn(duration: 0.1)) { self.model.seekOSDDismissed = false }
-            }
-        }
-        .onChange(of: model.gestureSeek) { newValue in
-            let newIsSeekingValue = isSeeking || model.gestureSeek != 0
-            if !isSeeking, newIsSeekingValue {
-                model.onSeekGestureStart()
-            }
-            isSeeking = newIsSeekingValue
-            guard newValue != 0 else { return }
-            updateThrottle.execute {
-                model.player.backend.getTimeUpdates()
-                model.player.backend.updateControls()
-            }
-
-            dismissTimer?.invalidate()
-            if model.seekOSDDismissed {
-                withAnimation(.easeIn(duration: 0.1)) { self.model.seekOSDDismissed = false }
-            }
-        }
     }
 
     var timeline: some View {
-        let text = model.gestureSeek != 0 && model.lastSeekTime.isNil ?
+        let text = model.isSeeking ?
             "\(model.gestureSeekDestinationPlaybackTime)/\(model.durationPlaybackTime)" :
             "\(model.lastSeekPlaybackTime)/\(model.durationPlaybackTime)"
 
@@ -141,21 +110,10 @@ struct Seek: View {
     }
 
     var visible: Bool {
-        guard !(model.lastSeekTime.isNil && !isSeeking) else { return false }
+        guard !(model.lastSeekTime.isNil && !model.isSeeking) else { return false }
         if let type = model.lastSeekType, !type.presentable { return false }
 
-        return !controls.presentingControls && !controls.presentingOverlays && !model.seekOSDDismissed
-    }
-
-    var progress: Double {
-        if isSeeking {
-            return model.gestureSeekDestinationTime / model.duration.seconds
-        }
-
-        guard model.duration.seconds.isFinite, model.duration.seconds > 0 else { return 0 }
-        guard let seekTime = model.lastSeekTime else { return model.currentTime.seconds / model.duration.seconds }
-
-        return seekTime.seconds / model.duration.seconds
+        return !controls.presentingControls && !controls.presentingOverlays && model.presentingOSD
     }
 
     var projectedChapter: Chapter? {
