@@ -253,7 +253,7 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
-        presentingPlayer = true 
+        presentingPlayer = true
 
         #if os(macOS)
             Windows.player.open()

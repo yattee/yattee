@@ -67,6 +67,7 @@ struct VideoPlayerView: View {
 
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
     @Default(.seekGestureSpeed) var seekGestureSpeed
+    @Default(.seekGestureSensitivity) var seekGestureSensitivity
 
     var body: some View {
         ZStack(alignment: overlayAlignment) {

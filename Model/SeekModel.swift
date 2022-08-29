@@ -98,12 +98,6 @@ final class SeekModel: ObservableObject {
             self.dismissTimer?.invalidate()
             self.showOSD()
         }
-
-//
-//           player.backend.updateControls {
-//               self.gestureStart = self.currentTime.seconds
-//               completionHandler?()
-//           }
     }
 
     func onSeekGestureEnd() {

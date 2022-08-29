@@ -11,6 +11,7 @@ struct PlayerSettings: View {
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
     @Default(.seekGestureSpeed) private var seekGestureSpeed
+    @Default(.seekGestureSensitivity) private var seekGestureSensitivity
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
@@ -72,17 +73,19 @@ struct PlayerSettings: View {
                 systemControlsCommandsPicker
             }
 
-            Section(header: SettingsHeader(text: "Controls"), footer: controlsLayoutFooter) {
-                #if !os(tvOS)
+            #if !os(tvOS)
+                Section(header: SettingsHeader(text: "Controls"), footer: controlsLayoutFooter) {
                     horizontalPlayerGestureEnabledToggle
                     SettingsHeader(text: "Seek gesture sensitivity", secondary: true)
+                    seekGestureSensitivityPicker
+                    SettingsHeader(text: "Seek gesture speed", secondary: true)
                     seekGestureSpeedPicker
                     SettingsHeader(text: "Regular size", secondary: true)
                     playerControlsLayoutPicker
                     SettingsHeader(text: "Fullscreen size", secondary: true)
-                #endif
-                fullScreenPlayerControlsLayoutPicker
-            }
+                    fullScreenPlayerControlsLayoutPicker
+                }
+            #endif
 
             Section(header: SettingsHeader(text: "Interface")) {
                 #if os(iOS)
@@ -171,7 +174,7 @@ struct PlayerSettings: View {
     }
 
     private var seekGestureSpeedPicker: some View {
-        Picker("Seek gesture sensitivity", selection: $seekGestureSpeed) {
+        Picker("Seek gesture speed", selection: $seekGestureSpeed) {
             ForEach([1, 0.75, 0.66, 0.5, 0.33, 0.25, 0.1], id: \.self) { value in
                 Text(String(format: "%.0f%%", value * 100)).tag(value)
             }
@@ -180,9 +183,21 @@ struct PlayerSettings: View {
         .modifier(SettingsPickerModifier())
     }
 
+    private var seekGestureSensitivityPicker: some View {
+        Picker("Seek gesture sensitivity", selection: $seekGestureSensitivity) {
+            Text("Highest").tag(1.0)
+            Text("High").tag(10.0)
+            Text("Normal").tag(30.0)
+            Text("Low").tag(50.0)
+            Text("Lowest").tag(100.0)
+        }
+        .disabled(!horizontalPlayerGestureEnabled)
+        .modifier(SettingsPickerModifier())
+    }
+
     @ViewBuilder private var controlsLayoutFooter: some View {
         #if os(iOS)
-            Text("Large and very large sizes are not suitable for all devices and using them may cause controls not to fit on the screen.")
+            Text("Large and bigger layouts are not suitable for all devices and using them may cause controls not to fit on the screen.")
         #endif
     }
 
