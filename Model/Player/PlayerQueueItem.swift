@@ -32,6 +32,8 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     }
 
     var shouldRestartPlaying: Bool {
+        guard Defaults[.watchedVideoPlayNowBehavior] == .continue else { return true }
+
         guard let seconds = playbackTime?.seconds else {
             return false
         }

@@ -227,7 +227,7 @@ extension PlayerModel {
 
         let newItem = enqueueVideo(video, atTime: time, prepending: true)
 
-        advanceToItem(newItem!)
+        advanceToItem(newItem!, at: time)
     }
 
     func removeQueueItems() {
