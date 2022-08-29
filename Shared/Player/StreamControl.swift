@@ -11,47 +11,30 @@ struct StreamControl: View {
 
     var body: some View {
         Group {
-            #if os(macOS)
+            #if !os(tvOS)
                 Picker("", selection: $player.streamSelection) {
-                    ForEach(InstancesModel.all) { instance in
-                        let instanceStreams = availableStreamsForInstance(instance)
-                        if !instanceStreams.values.isEmpty {
-                            let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
+                    if !availableStreamsByKind.values.isEmpty {
+                        let kinds = Array(availableStreamsByKind.keys).sorted { $0 < $1 }
 
-                            Section(header: Text(instance.longDescription)) {
-                                ForEach(kinds, id: \.self) { key in
-                                    ForEach(instanceStreams[key] ?? []) { stream in
-                                        Text(stream.description).tag(Stream?.some(stream))
-                                    }
-
-                                    if kinds.count > 1 {
-                                        Divider()
-                                    }
-                                }
+                        ForEach(kinds, id: \.self) { key in
+                            ForEach(availableStreamsByKind[key] ?? []) { stream in
+                                Text(stream.description).tag(Stream?.some(stream))
                             }
+
+                            #if os(macOS)
+                                if kinds.count > 1 {
+                                    Divider()
+                                }
+                            #endif
                         }
                     }
                 }
                 .disabled(player.isLoadingAvailableStreams)
-
-            #elseif os(iOS)
-                Picker("", selection: $player.streamSelection) {
-                    ForEach(InstancesModel.all) { instance in
-                        let instanceStreams = availableStreamsForInstance(instance)
-                        if !instanceStreams.values.isEmpty {
-                            let kinds = Array(instanceStreams.keys).sorted { $0 < $1 }
-
-                            ForEach(kinds, id: \.self) { key in
-                                ForEach(instanceStreams[key] ?? []) { stream in
-                                    Text(stream.description).tag(Stream?.some(stream))
-                                }
-                            }
-                        }
-                    }
-                }
-                .frame(minWidth: 110)
-                .fixedSize(horizontal: true, vertical: true)
-                .disabled(player.isLoadingAvailableStreams)
+                #if os(iOS)
+                    .frame(minWidth: 110)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .disabled(player.isLoadingAvailableStreams)
+                #endif
             #else
                 Button {
                     presentingButtonHintAlert = true
@@ -78,10 +61,8 @@ struct StreamControl: View {
         .frame(alignment: .trailing)
     }
 
-    private func availableStreamsForInstance(_ instance: Instance) -> [Stream.Kind: [Stream]] {
-        let streams = streams.filter { $0.instance == instance }.filter { player.backend.canPlay($0) }
-
-        return Dictionary(grouping: streams, by: \.kind!)
+    private var availableStreamsByKind: [Stream.Kind: [Stream]] {
+        Dictionary(grouping: streams, by: \.kind!)
     }
 
     var streams: [Stream] {
