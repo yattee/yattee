@@ -53,12 +53,7 @@ final class PlayerModel: ObservableObject {
 
     var mpvPlayerView = MPVPlayerView()
 
-    #if os(iOS)
-        static let presentingPlayerDefault = true
-    #else
-        static let presentingPlayerDefault = false
-    #endif
-    @Published var presentingPlayer = presentingPlayerDefault { didSet { handlePresentationChange() } }
+    @Published var presentingPlayer = false
     @Published var activeBackend = PlayerBackendType.mpv
 
     var avPlayerBackend: AVPlayerBackend!
