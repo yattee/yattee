@@ -166,6 +166,10 @@ struct VideoPlayerView: View {
                 #endif
             }
             #if os(iOS)
+            .onChange(of: dragGestureState) { newValue in
+                guard !newValue else { return }
+                onPlayerDragGestureEnded()
+            }
             .offset(y: playerOffset)
             .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
             .backport

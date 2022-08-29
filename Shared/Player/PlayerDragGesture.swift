@@ -74,7 +74,7 @@ extension VideoPlayerView {
             }
     }
 
-    private func onPlayerDragGestureEnded() {
+    func onPlayerDragGestureEnded() {
         if horizontalPlayerGestureEnabled, isHorizontalDrag {
             isHorizontalDrag = false
             player.seek.onSeekGestureEnd()
