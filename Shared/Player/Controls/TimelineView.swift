@@ -139,13 +139,13 @@ struct TimelineView: View {
                             Rectangle()
                                 .fill(Color.white.opacity(0.2))
                                 .frame(maxHeight: height)
-                                .offset(x: current * oneUnitWidth)
+                                .offset(x: (dragging ? projectedValue : current) * oneUnitWidth)
                                 .zIndex(1)
 
                             Rectangle()
                                 .fill(Color.white.opacity(0.6))
                                 .frame(maxHeight: height)
-                                .frame(width: current * oneUnitWidth)
+                                .frame(width: (dragging ? projectedValue : current) * oneUnitWidth)
                                 .zIndex(1)
 
                             segmentsLayers
@@ -156,23 +156,6 @@ struct TimelineView: View {
                         chaptersLayers
                             .zIndex(3)
                     }
-
-                    Rectangle()
-                        .contentShape(Rectangle())
-                        .foregroundColor(Color.clear)
-                        .overlay(
-                            ZStack {
-                                Circle()
-                                    .fill(dragging ? .white : .gray)
-                                    .frame(width: playerControlsLayout.thumbSize)
-
-                                Circle()
-                                    .fill(dragging ? .gray : .white)
-                                    .frame(width: playerControlsLayout.thumbSize * 0.95)
-                            }
-                        )
-                        .offset(x: thumbOffset)
-                        .frame(width: thumbAreaWidth, height: thumbAreaWidth)
                 }
                 .opacity(player.liveStreamInAVPlayer ? 0 : 1)
                 .overlay(GeometryReader { proxy in
