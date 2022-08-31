@@ -131,6 +131,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                 )
             } else if !token.isEmpty {
                 AccountsModel.setToken(self.account, token)
+                self.objectWillChange.send()
             } else {
                 NavigationModel.shared.presentAlert(
                     title: "Account Error",

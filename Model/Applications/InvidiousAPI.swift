@@ -226,10 +226,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                     print("updating invidious token")
                     let sid = String(cookies[substringRange])
                     AccountsModel.setToken(self.account, sid)
-                    self.configure()
+                    self.objectWillChange.send()
                 } else {
                     presentTokenUpdateFailedAlert(nil, "Could not extract SID from received cookies: \(cookies)")
                 }
+
+                self.configure()
             }
     }
 
