@@ -185,6 +185,8 @@ struct YatteeApp: App {
             InstancesManifest.shared.setPublicAccount(countryOfPublicInstances!, accounts: accounts, asCurrent: accounts.current.isNil)
         }
 
+        PlayerModel.shared = player
+
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
