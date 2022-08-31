@@ -249,7 +249,6 @@ final class PlayerModel: ObservableObject {
         #endif
 
         presentingPlayer = true
-        setNeedsDrawing(true)
 
         #if os(macOS)
             Windows.player.open()
@@ -505,7 +504,10 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
-        backend.setNeedsDrawing(presentingPlayer)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self = self else { return }
+            self.backend.setNeedsDrawing(self.presentingPlayer)
+        }
 
         controls.hide()
 
