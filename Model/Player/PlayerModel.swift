@@ -53,7 +53,7 @@ final class PlayerModel: ObservableObject {
 
     var mpvPlayerView = MPVPlayerView()
 
-    @Published var presentingPlayer = false
+    @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
 
     var avPlayerBackend: AVPlayerBackend!
@@ -324,11 +324,7 @@ final class PlayerModel: ObservableObject {
     }
 
     var playerItemDurationWithoutSponsorSegments: CMTime? {
-        guard let playerItemDuration = playerItemDuration, !playerItemDuration.seconds.isZero else {
-            return nil
-        }
-
-        return playerItemDuration - .secondsInDefaultTimescale(
+        PlayerTimeModel.shared.duration - .secondsInDefaultTimescale(
             sponsorBlock.segments.reduce(0) { $0 + $1.duration }
         )
     }
@@ -496,18 +492,7 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
-        var delay = 0.0
-
-        #if os(iOS)
-            if presentingPlayer {
-                delay = 0.2
-            }
-        #endif
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-            guard let self = self else { return }
-            self.backend.setNeedsDrawing(self.presentingPlayer)
-        }
+        backend.setNeedsDrawing(presentingPlayer)
 
         controls.hide()
 

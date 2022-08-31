@@ -60,7 +60,7 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
         case .veryLarge:
             return 40
         case .large:
-            return 30
+            return 25
         case .medium:
             return 25
         case .small:

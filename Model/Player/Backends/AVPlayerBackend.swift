@@ -79,7 +79,7 @@ final class AVPlayerBackend: PlayerBackend {
     init(model: PlayerModel, controls: PlayerControlsModel?, playerTime: PlayerTimeModel?) {
         self.model = model
         self.controls = controls
-        self.playerTime = playerTime
+        self.playerTime = playerTime ?? PlayerTimeModel.shared
 
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
@@ -582,6 +582,7 @@ final class AVPlayerBackend: PlayerBackend {
             }
 
             if player.timeControlStatus == .playing {
+                self.model.objectWillChange.send()
                 if player.rate != self.model.currentRate {
                     player.rate = self.model.currentRate
                 }

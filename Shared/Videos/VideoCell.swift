@@ -382,7 +382,7 @@ struct VideoCell: View {
 
                 HStack(alignment: .center) {
                     if saveHistory,
-                       watchedVideoStyle == .badge || watchedVideoStyle == .both,
+                       watchedVideoStyle.isShowingBadge,
                        watch?.finished ?? false
                     {
                         Image(systemName: "checkmark.circle.fill")
@@ -419,27 +419,32 @@ struct VideoCell: View {
 
     private var thumbnailImage: some View {
         Group {
-            if let url = thumbnails.best(video) {
+            let url = thumbnails.best(video)
+            if #available(iOS 15, macOS 12, *) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                } placeholder: {
+                    Rectangle().foregroundColor(Color("PlaceholderColor"))
+                }
+#if os(tvOS)
+                    .frame(minHeight: 320)
+#endif
+            } else {
                 WebImage(url: url)
                     .resizable()
                     .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
+                        Rectangle().foregroundColor(Color("PlaceholderColor"))
                     }
                     .retryOnAppear(true)
                     .onFailure { _ in
+                        guard let url = url else { return }
                         thumbnails.insertUnloadable(url)
                     }
-                    .indicator(.activity)
 
-                #if os(tvOS)
+#if os(tvOS)
                     .frame(minHeight: 320)
-                #endif
-            } else {
-                ZStack {
-                    Color("PlaceholderColor")
-                    Image(systemName: "exclamationmark.triangle")
-                }
-                .font(.system(size: 30))
+#endif
             }
         }
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))

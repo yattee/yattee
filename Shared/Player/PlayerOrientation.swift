@@ -50,14 +50,20 @@ extension VideoPlayerView {
                     return
                 }
 
-                if orientation.isLandscape {
-                    playerControls.presentingControls = false
-                    player.enterFullScreen(showControls: false)
-                    Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
-                } else {
-                    player.exitFullScreen(showControls: false)
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                orientationDebouncer.callback = {
+                    DispatchQueue.main.async {
+                        if orientation.isLandscape {
+                            playerControls.presentingControls = false
+                            player.enterFullScreen(showControls: false)
+                            Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
+                        } else {
+                            player.exitFullScreen(showControls: false)
+                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                        }
+                    }
                 }
+
+                orientationDebouncer.call()
             }
         }
     }

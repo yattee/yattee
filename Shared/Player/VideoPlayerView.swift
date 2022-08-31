@@ -3,6 +3,7 @@ import AVKit
     import CoreMotion
 #endif
 import Defaults
+import Repeat
 import Siesta
 import SwiftUI
 
@@ -41,6 +42,7 @@ struct VideoPlayerView: View {
 
         @State internal var orientation = UIInterfaceOrientation.portrait
         @State internal var lastOrientation: UIInterfaceOrientation?
+        @State internal var orientationDebouncer = Debouncer(.milliseconds(300))
     #elseif os(macOS)
         var hoverThrottle = Throttle(interval: 0.5)
         var mouseLocation: CGPoint { NSEvent.mouseLocation }

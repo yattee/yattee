@@ -3,6 +3,7 @@ import Foundation
 import SwiftUI
 
 final class PlayerTimeModel: ObservableObject {
+    static let shared = PlayerTimeModel()
     static let timePlaceholder = "--:--"
 
     @Published var currentTime = CMTime.zero

@@ -145,10 +145,10 @@ extension VideosAPI {
             let startRange = line.range(withName: "start")
 
             guard let titleSubstringRange = Range(titleRange, in: description),
-                  let startSubstringRange = Range(startRange, in: description),
-                  let titleCapture = String(description[titleSubstringRange]),
-                  let startCapture = String(description[startSubstringRange]) else { return nil }
+                  let startSubstringRange = Range(startRange, in: description) else { return nil }
 
+            let titleCapture = String(description[titleSubstringRange])
+            let startCapture = String(description[startSubstringRange])
             let startComponents = startCapture.components(separatedBy: ":")
             guard startComponents.count <= 3 else { return nil }
 

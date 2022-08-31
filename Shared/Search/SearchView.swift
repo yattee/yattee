@@ -27,6 +27,7 @@ struct SearchView: View {
     @EnvironmentObject<SearchModel> private var state
     private var favorites = FavoritesModel.shared
 
+    @Default(.recentlyOpened) private var recentlyOpened
     @Default(.saveRecents) private var saveRecents
 
     private var videos = [Video]()
@@ -287,11 +288,11 @@ struct SearchView: View {
         VStack {
             List {
                 Section(header: Text("Recents")) {
-                    if recentItems.isEmpty {
+                    if recentlyOpened.isEmpty {
                         Text("Search history is empty")
                             .foregroundColor(.secondary)
                     }
-                    ForEach(recentItems) { item in
+                    ForEach(recentlyOpened, id: \.tag) { item in
                         recentItemButton(item)
                     }
                 }
@@ -347,7 +348,6 @@ struct SearchView: View {
                 item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
                 "list.and.film"
             Label(item.title, systemImage: systemImage)
-                .lineLimit(1)
         }
         .contextMenu {
             removeButton(item)
@@ -389,10 +389,6 @@ struct SearchView: View {
 
     private var searchFiltersActive: Bool {
         searchDate != .any || searchDuration != .any
-    }
-
-    private var recentItems: [RecentItem] {
-        Defaults[.recentlyOpened].reversed()
     }
 
     private var searchSortOrderPicker: some View {

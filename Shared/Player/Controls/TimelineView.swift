@@ -44,9 +44,10 @@ struct TimelineView: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
+    @ObservedObject private var playerTime = PlayerTimeModel.shared
+
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var controls
-    @EnvironmentObject<PlayerTimeModel> private var playerTime
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
@@ -392,7 +393,7 @@ struct TimelineView_Previews: PreviewProvider {
     static var previews: some View {
         let playerModel = PlayerModel()
         playerModel.currentItem = .init(Video.fixture)
-        let playerTimeModel = PlayerTimeModel()
+        let playerTimeModel = PlayerTimeModel.shared
         playerTimeModel.player = playerModel
         playerTimeModel.currentTime = .secondsInDefaultTimescale(33)
         playerTimeModel.duration = .secondsInDefaultTimescale(100)
@@ -400,7 +401,6 @@ struct TimelineView_Previews: PreviewProvider {
             TimelineView()
         }
         .environmentObject(playerModel)
-        .environmentObject(playerTimeModel)
         .environmentObject(PlayerControlsModel())
         .padding()
     }

@@ -40,7 +40,6 @@ struct YatteeApp: App {
     @StateObject private var networkState = NetworkStateModel()
     @StateObject private var player = PlayerModel()
     @StateObject private var playerControls = PlayerControlsModel()
-    @StateObject private var playerTime = PlayerTimeModel()
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
@@ -63,7 +62,6 @@ struct YatteeApp: App {
                 .environmentObject(networkState)
                 .environmentObject(player)
                 .environmentObject(playerControls)
-                .environmentObject(playerTime)
                 .environmentObject(playlists)
                 .environmentObject(recents)
                 .environmentObject(seek)
@@ -137,7 +135,6 @@ struct YatteeApp: App {
                     .environmentObject(networkState)
                     .environmentObject(player)
                     .environmentObject(playerControls)
-                    .environmentObject(playerTime)
                     .environmentObject(playlists)
                     .environmentObject(recents)
                     .environmentObject(search)
@@ -205,8 +202,9 @@ struct YatteeApp: App {
         player.controls = playerControls
         player.navigation = navigation
         player.networkState = networkState
-        player.playerTime = playerTime
         player.seek = seek
+
+        PlayerTimeModel.shared.player = player
 
         if !accounts.current.isNil {
             player.restoreQueue()

@@ -278,6 +278,14 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
 enum WatchedVideoStyle: String, Defaults.Serializable {
     case nothing, badge, decreasedOpacity, both
+
+    var isShowingBadge: Bool {
+        self == .badge || self == .both
+    }
+
+    var isDecreasingOpacity: Bool {
+        self == .decreasedOpacity || self == .both
+    }
 }
 
 enum WatchedVideoBadgeColor: String, Defaults.Serializable {
