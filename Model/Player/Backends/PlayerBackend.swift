@@ -130,8 +130,8 @@ extension PlayerBackend {
                     return
                 }
             #endif
-            self.playerTime.currentTime = self.currentTime ?? .zero
-            self.playerTime.duration = self.playerItemDuration ?? .zero
+            PlayerTimeModel.shared.currentTime = self.currentTime ?? .zero
+            PlayerTimeModel.shared.duration = self.playerItemDuration ?? .zero
             completionHandler?()
         }
     }

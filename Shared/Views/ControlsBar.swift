@@ -12,7 +12,6 @@ struct ControlsBar: View {
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerControlsModel> private var playerControls
     @EnvironmentObject<PlayerModel> private var model
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
@@ -63,8 +62,8 @@ struct ControlsBar: View {
             }
         } else if detailsToggleFullScreen {
             Button {
-                playerControls.presentingControlsOverlay = false
-                playerControls.presentingControls = false
+                model.controls.presentingControlsOverlay = false
+                model.controls.presentingControls = false
                 withAnimation {
                     fullScreen.toggle()
                 }
@@ -83,7 +82,7 @@ struct ControlsBar: View {
     var controls: some View {
         HStack(spacing: 4) {
             Group {
-                if playerControls.isPlaying {
+                if model.controls.isPlaying {
                     Button(action: {
                         model.pause()
                     }) {
@@ -103,7 +102,7 @@ struct ControlsBar: View {
                     }
                 }
             }
-            .disabled(playerControls.isLoadingVideo || model.currentItem.isNil)
+            .disabled(model.controls.isLoadingVideo || model.currentItem.isNil)
 
             Button(action: { model.advanceToNextItem() }) {
                 Label("Next", systemImage: "forward.fill")
@@ -268,13 +267,22 @@ struct ControlsBar: View {
     private var authorAvatar: some View {
         Group {
             if let video = model.currentItem?.video, let url = video.channel.thumbnailURL {
-                WebImage(url: url)
-                    .resizable()
-                    .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
+                if #available(iOS 15, macOS 12, *) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                    } placeholder: {
+                        Rectangle().foregroundColor(Color("PlaceholderColor"))
                     }
-                    .retryOnAppear(true)
-                    .indicator(.activity)
+                } else {
+                    WebImage(url: url)
+                        .resizable()
+                        .placeholder {
+                            Rectangle().fill(Color("PlaceholderColor"))
+                        }
+                        .retryOnAppear(true)
+                        .indicator(.activity)
+                }
             } else {
                 ZStack {
                     Color(white: 0.6)

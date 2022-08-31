@@ -72,7 +72,7 @@ struct PlayerControls: View {
                     }
                     .offset(y: playerControlsLayout.osdVerticalOffset + 5)
 
-                    if model.presentingControls, !model.presentingOverlays {
+                    Section {
                         #if !os(tvOS)
                             HStack {
                                 seekBackwardButton
@@ -160,7 +160,8 @@ struct PlayerControls: View {
                                 .offset(y: -playerControlsLayout.timelineHeight - 5)
                             #endif
                         }
-                    }
+                    }.opacity(model.presentingControls && !model.presentingOverlays ? 1 : 0)
+                    
                 }
             }
             .frame(maxWidth: .infinity)
@@ -219,14 +220,23 @@ struct PlayerControls: View {
            let video = item.video,
            let url = thumbnails.best(video)
         {
-            WebImage(url: url)
-                .resizable()
-                .placeholder {
-                    Rectangle().fill(Color("PlaceholderColor"))
+            if #available(iOS 15, macOS 12, *) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                } placeholder: {
+                    Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
-                .retryOnAppear(true)
-                .indicator(.activity)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                WebImage(url: url)
+                    .resizable()
+                    .placeholder {
+                        Rectangle().fill(Color("PlaceholderColor"))
+                    }
+                    .retryOnAppear(true)
+                    .indicator(.activity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
     }
 

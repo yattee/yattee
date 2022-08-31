@@ -24,17 +24,12 @@ final class SearchModel: ObservableObject {
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
         changeHandler(query)
 
-        let newResource = accounts.api.search(query, page: nil)
-        guard newResource != resource else {
-            return
-        }
-
         page = nil
 
-        resource = newResource
-        resource.addObserver(store)
-
         if !query.isEmpty {
+            resource = accounts.api.search(query, page: nil)
+            resource.addObserver(store)
+
             loadResource()
         }
     }

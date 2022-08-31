@@ -12,10 +12,8 @@ struct ContentView: View {
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<NetworkStateModel> private var networkState
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var playerControls
-    @EnvironmentObject<PlayerTimeModel> private var playerTime
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
@@ -60,9 +58,7 @@ struct ContentView: View {
         .environmentObject(comments)
         .environmentObject(instances)
         .environmentObject(navigation)
-        .environmentObject(networkState)
         .environmentObject(player)
-        .environmentObject(playerTime)
         .environmentObject(playlists)
         .environmentObject(recents)
         .environmentObject(search)

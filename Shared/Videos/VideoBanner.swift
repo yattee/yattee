@@ -70,20 +70,37 @@ struct VideoBanner: View {
         #endif
     }
 
-    private var smallThumbnail: some View {
-        WebImage(url: video?.thumbnailURL(quality: .medium))
-            .resizable()
-            .placeholder {
-                ProgressView()
+    @ViewBuilder private var smallThumbnail: some View {
+        let url = video?.thumbnailURL(quality: .medium)
+        if #available(iOS 15, macOS 12, *) {
+            AsyncImage(url: url) { image in
+                image
+                    .resizable()
+            } placeholder: {
+                Rectangle().foregroundColor(Color("PlaceholderColor"))
             }
-            .indicator(.activity)
-        #if os(tvOS)
-            .frame(width: thumbnailWidth, height: 140)
-            .mask(RoundedRectangle(cornerRadius: 12))
-        #else
-            .frame(width: thumbnailWidth, height: 60)
-            .mask(RoundedRectangle(cornerRadius: 6))
-        #endif
+#if os(tvOS)
+                .frame(width: thumbnailWidth, height: 140)
+                .mask(RoundedRectangle(cornerRadius: 12))
+#else
+                .frame(width: thumbnailWidth, height: 60)
+                .mask(RoundedRectangle(cornerRadius: 6))
+#endif
+        } else {
+            WebImage(url: url)
+                .resizable()
+                .placeholder {
+                    ProgressView()
+                }
+                .indicator(.activity)
+#if os(tvOS)
+                .frame(width: thumbnailWidth, height: 140)
+                .mask(RoundedRectangle(cornerRadius: 12))
+#else
+                .frame(width: thumbnailWidth, height: 60)
+                .mask(RoundedRectangle(cornerRadius: 6))
+#endif
+        }
     }
 
     private var thumbnailWidth: Double {
