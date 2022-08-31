@@ -502,7 +502,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func didChangeTo() {
-        setNeedsDrawing(true)
+        setNeedsDrawing(model.presentingPlayer)
 
         if model.musicMode {
             startMusicMode()

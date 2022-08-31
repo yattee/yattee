@@ -126,6 +126,9 @@ struct VideoPlayerView: View {
                 .onChange(of: geometry.size) { size in
                     self.playerSize = size
                 }
+                .onChange(of: fullScreenDetails) { value in
+                    player.backend.setNeedsDrawing(!value)
+                }
                 #if os(iOS)
                 .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
                 .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
