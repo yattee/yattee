@@ -49,7 +49,6 @@ struct PlayerControls: View {
                 .transition(.opacity)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             #if os(tvOS)
-                .offset(x: 10, y: 10)
                 .focused($focusedField, equals: .seekOSD)
                 .onChange(of: player.seek.lastSeekTime) { _ in
                     if !model.presentingControls {
@@ -161,7 +160,6 @@ struct PlayerControls: View {
                             #endif
                         }
                     }.opacity(model.presentingControls && !model.presentingOverlays ? 1 : 0)
-                    
                 }
             }
             .frame(maxWidth: .infinity)
@@ -313,7 +311,7 @@ struct PlayerControls: View {
     }
 
     private var settingsButton: some View {
-        button("settings", systemImage: "gearshape", active: model.presentingControlsOverlay) {
+        button("settings", systemImage: "gearshape") {
             withAnimation(Self.animation) {
                 model.presentingControlsOverlay.toggle()
             }

@@ -79,13 +79,13 @@ struct VideoBanner: View {
             } placeholder: {
                 Rectangle().foregroundColor(Color("PlaceholderColor"))
             }
-#if os(tvOS)
-                .frame(width: thumbnailWidth, height: 140)
-                .mask(RoundedRectangle(cornerRadius: 12))
-#else
-                .frame(width: thumbnailWidth, height: 60)
-                .mask(RoundedRectangle(cornerRadius: 6))
-#endif
+            #if os(tvOS)
+            .frame(width: thumbnailWidth, height: 140)
+            .mask(RoundedRectangle(cornerRadius: 12))
+            #else
+            .frame(width: thumbnailWidth, height: 60)
+            .mask(RoundedRectangle(cornerRadius: 6))
+            #endif
         } else {
             WebImage(url: url)
                 .resizable()
@@ -93,13 +93,13 @@ struct VideoBanner: View {
                     ProgressView()
                 }
                 .indicator(.activity)
-#if os(tvOS)
+            #if os(tvOS)
                 .frame(width: thumbnailWidth, height: 140)
                 .mask(RoundedRectangle(cornerRadius: 12))
-#else
+            #else
                 .frame(width: thumbnailWidth, height: 60)
                 .mask(RoundedRectangle(cornerRadius: 6))
-#endif
+            #endif
         }
     }
 

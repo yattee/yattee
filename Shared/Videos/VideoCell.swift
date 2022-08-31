@@ -428,9 +428,9 @@ struct VideoCell: View {
                 } placeholder: {
                     Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
-#if os(tvOS)
-                    .frame(minHeight: 320)
-#endif
+                #if os(tvOS)
+                .frame(minHeight: 320)
+                #endif
             } else {
                 WebImage(url: url)
                     .resizable()
@@ -443,9 +443,9 @@ struct VideoCell: View {
                         thumbnails.insertUnloadable(url)
                     }
 
-#if os(tvOS)
+                #if os(tvOS)
                     .frame(minHeight: 320)
-#endif
+                #endif
             }
         }
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))

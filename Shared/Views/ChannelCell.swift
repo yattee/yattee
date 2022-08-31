@@ -38,7 +38,7 @@ struct ChannelCell: View {
             }
             .foregroundColor(.secondary)
             if #available(iOS 15, macOS 12, *) {
-                AsyncImage(url:  channel.thumbnailURL) { image in
+                AsyncImage(url: channel.thumbnailURL) { image in
                     image
                         .resizable()
                 } placeholder: {
