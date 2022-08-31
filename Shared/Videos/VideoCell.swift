@@ -15,8 +15,6 @@ struct VideoCell: View {
     #endif
 
     @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<ThumbnailsModel> private var thumbnails
 
@@ -28,6 +26,9 @@ struct VideoCell: View {
     @Default(.watchedVideoStyle) private var watchedVideoStyle
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
+
+    private var navigation: NavigationModel { .shared }
+    private var player: PlayerModel { .shared }
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
