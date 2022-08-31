@@ -129,7 +129,7 @@ final class MPVBackend: PlayerBackend {
     ) {
         self.model = model
         self.controls = controls
-        self.playerTime = playerTime  ?? PlayerTimeModel.shared
+        self.playerTime = playerTime ?? PlayerTimeModel.shared
         self.networkState = networkState
 
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in

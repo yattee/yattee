@@ -64,22 +64,18 @@ struct Seek: View {
                     }
                 }
             }
-            #if os(tvOS)
-            .frame(minWidth: 250, minHeight: 100)
-            .padding(30)
-            #endif
             .frame(maxWidth: playerControlsLayout.seekOSDWidth)
-            .padding(2)
-            .modifier(ControlBackgroundModifier())
-            .clipShape(RoundedRectangle(cornerRadius: 3))
-            .foregroundColor(.primary)
+            #if os(tvOS)
+                .padding(30)
+            #else
+                .padding(2)
+                .modifier(ControlBackgroundModifier())
+                .clipShape(RoundedRectangle(cornerRadius: 3))
+            #endif
+
+                .foregroundColor(.primary)
         }
-        #if os(tvOS)
-        .fixedSize()
-        .buttonStyle(.card)
-        #else
         .buttonStyle(.plain)
-        #endif
         .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
     }
 

@@ -215,6 +215,7 @@
 		37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
+		3732C9FD28C012E600E7DCAF /* SafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECED55289FE166002BC2C9 /* SafeArea.swift */; };
 		3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
@@ -1901,7 +1902,6 @@
 				37B4E802277D0A72004BF56A /* AppDelegate.swift */,
 				37B4E804277D0AB4004BF56A /* Orientation.swift */,
 				379B0252287A1CDF001015B5 /* OrientationTracker.swift */,
-				37ECED55289FE166002BC2C9 /* SafeArea.swift */,
 				3784B23A272894DA00B09468 /* ShareSheet.swift */,
 				3749BF9227ADA142000480FF /* BridgingHeader.h */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
@@ -2022,6 +2022,7 @@
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
+				37ECED55289FE166002BC2C9 /* SafeArea.swift */,
 				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
 				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				378FFBC328660172009E3FBE /* URLParser.swift */,
@@ -3327,6 +3328,7 @@
 				376B2E0926F920D600B1D64D /* SignInRequiredView.swift in Sources */,
 				378FFBC628660172009E3FBE /* URLParser.swift in Sources */,
 				37141671267A8ACC006CA35D /* TrendingView.swift in Sources */,
+				3732C9FD28C012E600E7DCAF /* SafeArea.swift in Sources */,
 				37C3A24727235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,

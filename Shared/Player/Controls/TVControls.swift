@@ -32,8 +32,11 @@ struct TVControls: UIViewRepresentable {
 
         let controls = UIHostingController(rootView: PlayerControls(player: player, thumbnails: thumbnails))
         controls.view.frame = .init(
-            origin: .zero,
-            size: .init(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+            origin: .init(x: SafeArea.insets.left, y: SafeArea.insets.top),
+            size: .init(
+                width: UIScreen.main.bounds.width - SafeArea.horizontalInsets,
+                height: UIScreen.main.bounds.height - SafeArea.verticalInset
+            )
         )
 
         controlsArea.addSubview(controls.view)
