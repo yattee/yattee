@@ -47,7 +47,6 @@ final class MPVBackend: PlayerBackend {
         networkStateTimer.start()
 
         if isPlaying {
-            model.updateAspectRatio()
             startClientUpdates()
         } else {
             stopControlsUpdates()
@@ -409,6 +408,9 @@ final class MPVBackend: PlayerBackend {
             isLoadingVideo = false
             isSeeking = false
             networkStateTimer.start()
+
+        case MPV_EVENT_VIDEO_RECONFIG:
+            model.updateAspectRatio()
 
         case MPV_EVENT_SEEK:
             isSeeking = true
