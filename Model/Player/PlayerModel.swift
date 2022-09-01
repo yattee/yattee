@@ -889,13 +889,24 @@ final class PlayerModel: ObservableObject {
             Windows.player.toggleFullScreen()
         #endif
 
-        playingFullScreen = !isFullScreen
-
         #if os(iOS)
             if !playingFullScreen {
+                playingFullScreen = true
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+            } else {
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
+                // TODO: rework to move view before rotating
+                if SafeArea.insets.left > 0 {
+                    Delay.by(0.15) {
+                        self.playingFullScreen = false
+                    }
+                } else {
+                    self.playingFullScreen = false
+                }
             }
+        #else
+            playingFullScreen = !isFullScreen
         #endif
     }
 
