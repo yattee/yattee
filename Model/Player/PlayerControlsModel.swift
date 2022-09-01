@@ -5,6 +5,8 @@ import Foundation
 import SwiftUI
 
 final class PlayerControlsModel: ObservableObject {
+    static var shared = PlayerControlsModel()
+
     @Published var isLoadingVideo = false
     @Published var isPlaying = true
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
@@ -33,7 +35,7 @@ final class PlayerControlsModel: ObservableObject {
         self.presentingControlsOverlay = presentingControlsOverlay
         self.presentingDetailsOverlay = presentingDetailsOverlay
         self.timer = timer
-        self.player = player
+        self.player = player ?? .shared
     }
 
     func handlePresentationChange() {
@@ -129,9 +131,5 @@ final class PlayerControlsModel: ObservableObject {
     func removeTimer() {
         timer?.invalidate()
         timer = nil
-    }
-
-    func update() {
-        player?.backend.updateControls()
     }
 }

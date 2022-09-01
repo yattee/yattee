@@ -39,7 +39,6 @@ struct YatteeApp: App {
     @StateObject private var navigation = NavigationModel()
     @StateObject private var networkState = NetworkStateModel()
     @StateObject private var player = PlayerModel()
-    @StateObject private var playerControls = PlayerControlsModel()
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
@@ -48,6 +47,8 @@ struct YatteeApp: App {
     @StateObject private var thumbnails = ThumbnailsModel()
 
     let persistenceController = PersistenceController.shared
+
+    var playerControls: PlayerControlsModel { .shared }
 
     var body: some Scene {
         WindowGroup {

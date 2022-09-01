@@ -60,7 +60,6 @@ struct VideoPlayerView: View {
     @EnvironmentObject<AccountsModel> internal var accounts
     @EnvironmentObject<NavigationModel> internal var navigation
     @EnvironmentObject<PlayerModel> internal var player
-    @EnvironmentObject<PlayerControlsModel> internal var playerControls
     @EnvironmentObject<RecentsModel> internal var recents
     #if os(macOS)
         @EnvironmentObject<SearchModel> internal var search
@@ -76,7 +75,7 @@ struct VideoPlayerView: View {
             videoPlayer
                 .zIndex(-1)
             #if os(iOS)
-                .gesture(playerControls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
+                .gesture(player.controls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
             #endif
 
             overlay
@@ -155,7 +154,7 @@ struct VideoPlayerView: View {
                         Orientation.lockOrientation(.allButUpsideDown)
                     }
                     stopOrientationUpdates()
-                    playerControls.hideOverlays()
+                    player.controls.hideOverlays()
 
                     player.lockedOrientation = nil
                 }
@@ -185,14 +184,14 @@ struct VideoPlayerView: View {
 
     var overlay: some View {
         VStack {
-            if playerControls.presentingControlsOverlay {
+            if player.controls.presentingControlsOverlay {
                 HStack {
                     HStack {
                         ControlsOverlay()
                         #if os(tvOS)
                             .onExitCommand {
-                                withAnimation(PlayerControls.animation) {
-                                    playerControls.hideOverlays()
+                                withAnimation(Player.controls.animation) {
+                                    player.controls.hideOverlays()
                                 }
                             }
                             .onPlayPauseCommand {
@@ -239,7 +238,7 @@ struct VideoPlayerView: View {
         var videoPlayerCloseControlsOverlayGesture: some Gesture {
             TapGesture().onEnded {
                 withAnimation(PlayerControls.animation) {
-                    playerControls.hideOverlays()
+                    player.controls.hideOverlays()
                 }
             }
         }
@@ -298,17 +297,17 @@ struct VideoPlayerView: View {
                             .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
                             .onHover { hovering in
                                 hoveringPlayer = hovering
-                                hovering ? playerControls.show() : playerControls.hide()
+                                hovering ? player.controls.show() : player.controls.hide()
                             }
                         #if !os(tvOS)
-                            .gesture(playerControls.presentingOverlays ? nil : playerDragGesture)
+                            .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
                         #endif
                         #if os(macOS)
                         .onAppear(perform: {
                             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
                                 hoverThrottle.execute {
                                     if !player.currentItem.isNil, hoveringPlayer {
-                                        playerControls.resetTimer()
+                                        player.controls.resetTimer()
                                     }
                                 }
 
@@ -347,16 +346,16 @@ struct VideoPlayerView: View {
             #if os(tvOS)
             .onMoveCommand { direction in
                 if direction == .up {
-                    playerControls.show()
-                } else if direction == .down, !playerControls.presentingControlsOverlay, !playerControls.presentingControls {
-                    withAnimation(PlayerControls.animation) {
-                        playerControls.presentingControlsOverlay = true
+                    player.controls.show()
+                } else if direction == .down, !player.controls.presentingControlsOverlay, !player.controls.presentingControls {
+                    withAnimation(Player.controls.animation) {
+                        player.controls.presentingControlsOverlay = true
                     }
                 }
 
-                playerControls.resetTimer()
+                player.controls.resetTimer()
 
-                guard !playerControls.presentingControls else { return }
+                guard !player.controls.presentingControls else { return }
 
                 if direction == .left {
                     player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
@@ -369,11 +368,11 @@ struct VideoPlayerView: View {
                 player.togglePlay()
             }
             .onExitCommand {
-                if playerControls.presentingOverlays {
-                    playerControls.hideOverlays()
+                if player.controls.presentingOverlays {
+                    player.controls.hideOverlays()
                 }
-                if playerControls.presentingControls {
-                    playerControls.hide()
+                if player.controls.presentingControls {
+                    player.controls.hide()
                 } else {
                     player.hide()
                 }
@@ -397,7 +396,7 @@ struct VideoPlayerView: View {
             }
         }
         .onChange(of: fullScreenLayout) { newValue in
-            if !newValue { playerControls.hideOverlays() }
+            if !newValue { player.controls.hideOverlays() }
         }
         #if os(iOS)
         .statusBar(hidden: fullScreenLayout)
