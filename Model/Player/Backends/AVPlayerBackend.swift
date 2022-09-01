@@ -521,6 +521,12 @@ final class AVPlayerBackend: PlayerBackend {
                 MPNowPlayingInfoCenter.default().playbackState = self.avPlayer.timeControlStatus == .playing ? .playing : .paused
             #endif
 
+            if self.controls.isPlaying != self.isPlaying {
+                DispatchQueue.main.async {
+                    self.controls.isPlaying = self.isPlaying
+                }
+            }
+
             if let currentTime = self.currentTime {
                 self.model.handleSegments(at: currentTime)
             }
@@ -562,7 +568,8 @@ final class AVPlayerBackend: PlayerBackend {
     private func addPlayerTimeControlStatusObserver() {
         playerTimeControlStatusObserver = avPlayer.observe(\.timeControlStatus) { [weak self] player, _ in
             guard let self = self,
-                  self.avPlayer == player
+                  self.avPlayer == player,
+                  self.model.activeBackend == .appleAVPlayer
             else {
                 return
             }
