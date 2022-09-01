@@ -1,3 +1,4 @@
+import CachedAsyncImage
 import CoreMedia
 import Foundation
 import SDWebImageSwiftUI
@@ -73,7 +74,7 @@ struct VideoBanner: View {
     @ViewBuilder private var smallThumbnail: some View {
         let url = video?.thumbnailURL(quality: .medium)
         if #available(iOS 15, macOS 12, *) {
-            AsyncImage(url: url) { image in
+            CachedAsyncImage(url: url) { image in
                 image
                     .resizable()
             } placeholder: {

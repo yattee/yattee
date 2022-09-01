@@ -246,6 +246,9 @@
 		3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
 		3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
 		3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
+		373AD20128BF504B00DB3ADA /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 373AD20028BF504B00DB3ADA /* CachedAsyncImage */; };
+		373AD20328BF512400DB3ADA /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 373AD20228BF512400DB3ADA /* CachedAsyncImage */; };
+		373AD20528BF579F00DB3ADA /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 373AD20428BF579F00DB3ADA /* CachedAsyncImage */; };
 		373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE5275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE6275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
@@ -1355,6 +1358,7 @@
 				375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */,
 				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
+				373AD20328BF512400DB3ADA /* CachedAsyncImage in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
 				3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
@@ -1418,6 +1422,7 @@
 				3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */,
 				370F4FD627CC16CB001B35DC /* libbrotlidec.1.0.9.dylib in Frameworks */,
 				370F4FCD27CC16CB001B35DC /* libfribidi.0.dylib in Frameworks */,
+				373AD20528BF579F00DB3ADA /* CachedAsyncImage in Frameworks */,
 				370F4FE027CC16CB001B35DC /* libX11.6.dylib in Frameworks */,
 				370F4FD727CC16CB001B35DC /* libharfbuzz-subset.0.dylib in Frameworks */,
 			);
@@ -1467,6 +1472,7 @@
 				3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
 				37FB28462722054C00A57617 /* SDWebImageSwiftUI in Frameworks */,
 				3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
+				373AD20128BF504B00DB3ADA /* CachedAsyncImage in Frameworks */,
 				3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917E27237D2A009F956E /* PINCache in Frameworks */,
 				3772003E27E8EEEB00CB2475 /* VideoToolbox.framework in Frameworks */,
@@ -2337,6 +2343,7 @@
 				37EE6DC428A305AD00BFD632 /* Reachability */,
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
+				373AD20228BF512400DB3ADA /* CachedAsyncImage */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2374,6 +2381,7 @@
 				37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */,
 				372AA413286D06A10000B1DC /* Repeat */,
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
+				373AD20428BF579F00DB3ADA /* CachedAsyncImage */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2451,6 +2459,7 @@
 				372AA411286D06950000B1DC /* Repeat */,
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
+				373AD20028BF504B00DB3ADA /* CachedAsyncImage */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2551,6 +2560,7 @@
 				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				373AD1FF28BF504B00DB3ADA /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4394,6 +4404,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		373AD1FF28BF504B00DB3ADA /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
@@ -4578,6 +4596,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		373AD20028BF504B00DB3ADA /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 373AD1FF28BF504B00DB3ADA /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
+		};
+		373AD20228BF512400DB3ADA /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 373AD1FF28BF504B00DB3ADA /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
+		};
+		373AD20428BF579F00DB3ADA /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 373AD1FF28BF504B00DB3ADA /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
 		};
 		375B8AB028B57F4200397B31 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;

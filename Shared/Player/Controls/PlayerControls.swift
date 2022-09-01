@@ -1,3 +1,4 @@
+import CachedAsyncImage
 import Defaults
 import Foundation
 import SDWebImageSwiftUI
@@ -219,7 +220,7 @@ struct PlayerControls: View {
            let url = thumbnails.best(video)
         {
             if #available(iOS 15, macOS 12, *) {
-                AsyncImage(url: url) { image in
+                CachedAsyncImage(url: url) { image in
                     image
                         .resizable()
                 } placeholder: {
