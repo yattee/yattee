@@ -13,11 +13,11 @@ final class MPVBackend: PlayerBackend {
 
     private var logger = Logger(label: "mpv-backend")
 
-    var model: PlayerModel!
-    var controls: PlayerControlsModel!
-    var playerTime: PlayerTimeModel!
-    var networkState: NetworkStateModel!
-    var seek: SeekModel!
+    var model: PlayerModel! { .shared }
+    var controls: PlayerControlsModel! { .shared }
+    var playerTime: PlayerTimeModel! { .shared }
+    var networkState: NetworkStateModel! { .shared }
+    var seek: SeekModel! { .shared }
 
     var stream: Stream?
     var video: Video?
@@ -120,17 +120,7 @@ final class MPVBackend: PlayerBackend {
         client?.cacheDuration ?? 0
     }
 
-    init(
-        model: PlayerModel,
-        controls: PlayerControlsModel? = nil,
-        playerTime: PlayerTimeModel? = nil,
-        networkState: NetworkStateModel? = nil
-    ) {
-        self.model = model
-        self.controls = controls
-        self.playerTime = playerTime ?? PlayerTimeModel.shared
-        self.networkState = networkState
-
+    init() {
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
             self?.getTimeUpdates()
         }

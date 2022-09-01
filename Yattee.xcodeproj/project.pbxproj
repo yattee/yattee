@@ -810,6 +810,9 @@
 		37EF9A77275BEB8E0043B585 /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EF9A75275BEB8E0043B585 /* CommentView.swift */; };
 		37EF9A78275BEB8E0043B585 /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EF9A75275BEB8E0043B585 /* CommentView.swift */; };
 		37EF9A79275BEB8E0043B585 /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EF9A75275BEB8E0043B585 /* CommentView.swift */; };
+		37EFAC0828C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EFAC0728C138CD00ED9B89 /* ControlsOverlayModel.swift */; };
+		37EFAC0928C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EFAC0728C138CD00ED9B89 /* ControlsOverlayModel.swift */; };
+		37EFAC0A28C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EFAC0728C138CD00ED9B89 /* ControlsOverlayModel.swift */; };
 		37F0F4EA286F397E00C06C2E /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F0F4E9286F397E00C06C2E /* SettingsModel.swift */; };
 		37F0F4EB286F397E00C06C2E /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F0F4E9286F397E00C06C2E /* SettingsModel.swift */; };
 		37F0F4EC286F397E00C06C2E /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F0F4E9286F397E00C06C2E /* SettingsModel.swift */; };
@@ -1284,6 +1287,7 @@
 		37ECED55289FE166002BC2C9 /* SafeArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeArea.swift; sourceTree = "<group>"; };
 		37EF5C212739D37B00B03725 /* MenuModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuModel.swift; sourceTree = "<group>"; };
 		37EF9A75275BEB8E0043B585 /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
+		37EFAC0728C138CD00ED9B89 /* ControlsOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsOverlayModel.swift; sourceTree = "<group>"; };
 		37F0F4E9286F397E00C06C2E /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		37F0F4ED286F734400C06C2E /* AdvancedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettings.swift; sourceTree = "<group>"; };
 		37F13B61285E43C000B137E4 /* ControlsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsOverlay.swift; sourceTree = "<group>"; };
@@ -1723,6 +1727,7 @@
 			isa = PBXGroup;
 			children = (
 				37EBD8C227AF0D7C00F1C24B /* Backends */,
+				37EFAC0728C138CD00ED9B89 /* ControlsOverlayModel.swift */,
 				373031F428383A89000CFD59 /* PiPDelegate.swift */,
 				37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */,
 				37319F0427103F94004ECCD0 /* PlayerQueue.swift */,
@@ -2885,6 +2890,7 @@
 				376BE50927347B5F009AD608 /* SettingsHeader.swift in Sources */,
 				376527BB285F60F700102284 /* PlayerTimeModel.swift in Sources */,
 				3722AEBE274DA401005EA4D6 /* Backport.swift in Sources */,
+				37EFAC0828C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */,
 				37F4AD2628613B81004D0F66 /* Color+Debug.swift in Sources */,
 				3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37F13B62285E43C000B137E4 /* ControlsOverlay.swift in Sources */,
@@ -3142,6 +3148,7 @@
 				372915E72687E3B900F5A35B /* Defaults.swift in Sources */,
 				37C3A242272359900087A57A /* Double+Format.swift in Sources */,
 				37B795912771DAE0001CF27B /* OpenURLHandler.swift in Sources */,
+				37EFAC0928C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */,
 				37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				376578922685490700D4EA09 /* PlaylistsView.swift in Sources */,
 				37F9619C27BD89E000058149 /* TapRecognizerViewModifier.swift in Sources */,
@@ -3307,6 +3314,7 @@
 				37DD9DBC2785D60300539416 /* FramePreferenceKey.swift in Sources */,
 				375EC974289F2ABF00751258 /* MultiselectRow.swift in Sources */,
 				37EBD8C827AF26B300F1C24B /* AVPlayerBackend.swift in Sources */,
+				37EFAC0A28C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */,
 				37CC3F52270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F49BA526CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,

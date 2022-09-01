@@ -53,15 +53,7 @@ struct TimelineView: View {
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
 
     var playerControlsLayout: PlayerControlsLayout {
-        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
-    }
-
-    var fullScreenLayout: Bool {
-        #if os(iOS)
-            player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            player.playingFullScreen
-        #endif
+        player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
     }
 
     var chapters: [Chapter] {

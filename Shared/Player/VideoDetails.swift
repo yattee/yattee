@@ -231,7 +231,7 @@ struct VideoDetails: View {
                     } else if video.description != nil, !video.description!.isEmpty {
                         VideoDescription(video: video, detailsSize: detailsSize)
                         #if os(iOS)
-                            .padding(.bottom, fullScreenLayout ? 10 : SafeArea.insets.bottom)
+                            .padding(.bottom, player.playingFullScreen ? 10 : SafeArea.insets.bottom)
                         #endif
                     } else {
                         Text("No description")
@@ -241,14 +241,6 @@ struct VideoDetails: View {
             }
         }
         .padding(.horizontal)
-    }
-
-    var fullScreenLayout: Bool {
-        #if os(iOS)
-            return player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            return player.playingFullScreen
-        #endif
     }
 
     @ViewBuilder var videoProperties: some View {

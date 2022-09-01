@@ -17,7 +17,7 @@ final class SeekModel: ObservableObject {
 
     @Published var presentingOSD = false
 
-    var player: PlayerModel!
+    var player: PlayerModel! { .shared }
 
     var dismissTimer: Timer?
 

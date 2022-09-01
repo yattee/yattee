@@ -58,8 +58,8 @@ final class PlayerModel: ObservableObject {
     @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
 
-    var avPlayerBackend: AVPlayerBackend!
-    var mpvBackend: MPVBackend!
+    var avPlayerBackend = AVPlayerBackend()
+    var mpvBackend = MPVBackend()
     #if !os(macOS)
         var mpvController = MPVViewController()
     #endif
@@ -124,34 +124,10 @@ final class PlayerModel: ObservableObject {
 
     var accounts: AccountsModel
     var comments: CommentsModel
-    var controls: PlayerControlsModel { didSet {
-        backends.forEach { backend in
-            var backend = backend
-            backend.controls = controls
-            backend.controls.player = self
-        }
-    }}
-    var playerTime: PlayerTimeModel { didSet {
-        backends.forEach { backend in
-            var backend = backend
-            backend.playerTime = playerTime
-            backend.playerTime.player = self
-        }
-    }}
-    var networkState: NetworkStateModel { didSet {
-        backends.forEach { backend in
-            var backend = backend
-            backend.networkState = networkState
-            backend.networkState.player = self
-        }
-    }}
-    var seek: SeekModel { didSet {
-        backends.forEach { backend in
-            var backend = backend
-            backend.seek = seek
-            backend.seek.player = self
-        }
-    }}
+    var controls: PlayerControlsModel { .shared }
+    var playerTime: PlayerTimeModel { .shared }
+    var networkState: NetworkStateModel { .shared }
+    var seek: SeekModel { .shared }
     var navigation: NavigationModel
 
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
@@ -194,30 +170,11 @@ final class PlayerModel: ObservableObject {
     init(
         accounts: AccountsModel = AccountsModel(),
         comments: CommentsModel = CommentsModel(),
-        controls: PlayerControlsModel = PlayerControlsModel(),
-        navigation: NavigationModel = NavigationModel(),
-        playerTime: PlayerTimeModel = PlayerTimeModel(),
-        networkState: NetworkStateModel = NetworkStateModel(),
-        seek: SeekModel = SeekModel()
+        navigation: NavigationModel = NavigationModel()
     ) {
         self.accounts = accounts
         self.comments = comments
-        self.controls = controls
         self.navigation = navigation
-        self.playerTime = playerTime
-        self.networkState = networkState
-        self.seek = seek
-
-        self.avPlayerBackend = AVPlayerBackend(
-            model: self,
-            controls: controls,
-            playerTime: playerTime
-        )
-        self.mpvBackend = MPVBackend(
-            model: self,
-            playerTime: playerTime,
-            networkState: networkState
-        )
 
         #if !os(macOS)
             mpvBackend.controller = mpvController

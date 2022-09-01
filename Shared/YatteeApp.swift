@@ -137,7 +137,6 @@ struct YatteeApp: App {
                     .environmentObject(playlists)
                     .environmentObject(recents)
                     .environmentObject(search)
-                    .environmentObject(seek)
                     .environmentObject(subscriptions)
                     .environmentObject(thumbnails)
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
@@ -184,8 +183,6 @@ struct YatteeApp: App {
             InstancesManifest.shared.setPublicAccount(countryOfPublicInstances!, accounts: accounts, asCurrent: accounts.current.isNil)
         }
 
-        PlayerModel.shared = player
-
         playlists.accounts = accounts
         search.accounts = accounts
         subscriptions.accounts = accounts
@@ -196,15 +193,11 @@ struct YatteeApp: App {
         menu.navigation = navigation
         menu.player = player
 
-        playerControls.player = player
-
         player.accounts = accounts
         player.comments = comments
-        player.controls = playerControls
         player.navigation = navigation
-        player.networkState = networkState
-        player.seek = .shared
 
+        PlayerModel.shared = player
         PlayerTimeModel.shared.player = player
 
         if !accounts.current.isNil {

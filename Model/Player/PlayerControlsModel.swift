@@ -10,7 +10,6 @@ final class PlayerControlsModel: ObservableObject {
     @Published var isLoadingVideo = false
     @Published var isPlaying = true
     @Published var presentingControls = false { didSet { handlePresentationChange() } }
-    @Published var presentingControlsOverlay = false { didSet { handleSettingsOverlayPresentationChange() } }
     @Published var presentingDetailsOverlay = false { didSet { handleDetailsOverlayPresentationChange() } }
     var timer: Timer?
 
@@ -18,24 +17,21 @@ final class PlayerControlsModel: ObservableObject {
         private(set) var reporter = PassthroughSubject<String, Never>()
     #endif
 
-    var player: PlayerModel!
+    private var player: PlayerModel! { .shared }
+    private var controlsOverlayModel = ControlOverlaysModel.shared
 
     init(
         isLoadingVideo: Bool = false,
         isPlaying: Bool = true,
         presentingControls: Bool = false,
-        presentingControlsOverlay: Bool = false,
         presentingDetailsOverlay: Bool = false,
-        timer: Timer? = nil,
-        player: PlayerModel? = nil
+        timer: Timer? = nil
     ) {
         self.isLoadingVideo = isLoadingVideo
         self.isPlaying = isPlaying
         self.presentingControls = presentingControls
-        self.presentingControlsOverlay = presentingControlsOverlay
         self.presentingDetailsOverlay = presentingDetailsOverlay
         self.timer = timer
-        self.player = player ?? .shared
     }
 
     func handlePresentationChange() {
@@ -60,26 +56,22 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func handleSettingsOverlayPresentationChange() {
-        player?.backend.setNeedsNetworkStateUpdates(presentingControlsOverlay && Defaults[.showMPVPlaybackStats])
+        player?.backend.setNeedsNetworkStateUpdates(controlsOverlayModel.presenting && Defaults[.showMPVPlaybackStats])
     }
 
     func handleDetailsOverlayPresentationChange() {}
 
     var presentingOverlays: Bool {
-        presentingDetailsOverlay || presentingControlsOverlay
+        presentingDetailsOverlay || controlsOverlayModel.presenting
     }
 
     func hideOverlays() {
         presentingDetailsOverlay = false
-        presentingControlsOverlay = false
+        controlsOverlayModel.presenting = false
     }
 
     func show() {
-        guard !(player?.currentItem.isNil ?? true) else {
-            return
-        }
-
-        guard !presentingControls else {
+        guard !player.currentItem.isNil, !presentingControls else {
             return
         }
 
@@ -131,5 +123,9 @@ final class PlayerControlsModel: ObservableObject {
     func removeTimer() {
         timer?.invalidate()
         timer = nil
+    }
+
+    func update() {
+        player?.backend.updateControls()
     }
 }

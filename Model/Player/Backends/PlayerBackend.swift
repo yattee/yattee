@@ -6,11 +6,10 @@ import Foundation
 #endif
 
 protocol PlayerBackend {
-    var model: PlayerModel! { get set }
-    var controls: PlayerControlsModel! { get set }
-    var playerTime: PlayerTimeModel! { get set }
-    var seek: SeekModel! { get set }
-    var networkState: NetworkStateModel! { get set }
+    var model: PlayerModel! { get }
+    var controls: PlayerControlsModel! { get }
+    var playerTime: PlayerTimeModel! { get }
+    var networkState: NetworkStateModel! { get }
 
     var stream: Stream? { get set }
     var video: Video? { get set }
@@ -69,20 +68,20 @@ protocol PlayerBackend {
 
 extension PlayerBackend {
     func seek(to time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
-        seek.registerSeek(at: time, type: seekType, restore: currentTime)
+        model.seek.registerSeek(at: time, type: seekType, restore: currentTime)
         seek(to: time, seekType: seekType, completionHandler: completionHandler)
     }
 
     func seek(to seconds: Double, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
         let seconds = CMTime.secondsInDefaultTimescale(seconds)
-        seek.registerSeek(at: seconds, type: seekType, restore: currentTime)
+        model.seek.registerSeek(at: seconds, type: seekType, restore: currentTime)
         seek(to: seconds, seekType: seekType, completionHandler: completionHandler)
     }
 
     func seek(relative time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
         if let currentTime = currentTime, let duration = playerItemDuration {
             let seekTime = min(max(0, currentTime.seconds + time.seconds), duration.seconds)
-            seek.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
+            model.seek.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
             seek(to: seekTime, seekType: seekType, completionHandler: completionHandler)
         }
     }

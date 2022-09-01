@@ -1,16 +1,11 @@
 import SwiftUI
 
 struct NetworkState: View {
-    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<NetworkStateModel> private var model
 
     var body: some View {
         Buffering(state: model.fullStateText)
-            .opacity(visible ? 1 : 0)
-    }
-
-    var visible: Bool {
-        player.isPlaying && ((player.activeBackend == .mpv && model.pausedForCache) || player.isSeeking)
+            .opacity(model.osdVisible ? 1 : 0)
     }
 }
 

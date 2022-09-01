@@ -26,6 +26,8 @@ struct ControlsBar: View {
     var detailsToggleFullScreen = false
     var titleLineLimit = 2
 
+    private let controlsOverlayModel = ControlOverlaysModel.shared
+
     var body: some View {
         HStack(spacing: 0) {
             detailsButton
@@ -63,7 +65,7 @@ struct ControlsBar: View {
             }
         } else if detailsToggleFullScreen {
             Button {
-                model.controls.presentingControlsOverlay = false
+                controlsOverlayModel.presenting = false
                 model.controls.presentingControls = false
                 withAnimation {
                     fullScreen.toggle()
