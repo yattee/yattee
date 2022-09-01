@@ -429,9 +429,6 @@ struct VideoCell: View {
                 } placeholder: {
                     Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
-                #if os(tvOS)
-                .frame(minHeight: 320)
-                #endif
             } else {
                 WebImage(url: url)
                     .resizable()
@@ -443,12 +440,11 @@ struct VideoCell: View {
                         guard let url = url else { return }
                         thumbnails.insertUnloadable(url)
                     }
-
-                #if os(tvOS)
-                    .frame(minHeight: 320)
-                #endif
             }
         }
+        #if os(tvOS)
+        .frame(minHeight: 320)
+        #endif
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .modifier(AspectRatioModifier())
     }
