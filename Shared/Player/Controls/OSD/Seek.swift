@@ -7,7 +7,7 @@ struct Seek: View {
     #endif
 
     @EnvironmentObject<PlayerControlsModel> private var controls
-    @EnvironmentObject<SeekModel> private var model
+    @StateObject private var model = SeekModel.shared
 
     private var updateThrottle = Throttle(interval: 2)
 

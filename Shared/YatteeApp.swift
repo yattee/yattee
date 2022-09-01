@@ -43,7 +43,6 @@ struct YatteeApp: App {
     @StateObject private var playlists = PlaylistsModel()
     @StateObject private var recents = RecentsModel()
     @StateObject private var search = SearchModel()
-    @StateObject private var seek = SeekModel()
     @StateObject private var settings = SettingsModel()
     @StateObject private var subscriptions = SubscriptionsModel()
     @StateObject private var thumbnails = ThumbnailsModel()
@@ -64,7 +63,6 @@ struct YatteeApp: App {
                 .environmentObject(playerControls)
                 .environmentObject(playlists)
                 .environmentObject(recents)
-                .environmentObject(seek)
                 .environmentObject(settings)
                 .environmentObject(subscriptions)
                 .environmentObject(thumbnails)
@@ -204,7 +202,7 @@ struct YatteeApp: App {
         player.controls = playerControls
         player.navigation = navigation
         player.networkState = networkState
-        player.seek = seek
+        player.seek = .shared
 
         PlayerTimeModel.shared.player = player
 
