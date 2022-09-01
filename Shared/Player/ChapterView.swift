@@ -32,28 +32,30 @@ struct ChapterView: View {
     }
 
     @ViewBuilder func smallImage(_ chapter: Chapter) -> some View {
-        if #available(iOS 15, macOS 12, *) {
-            CachedAsyncImage(url: chapter.image) { image in
-                image
-                    .resizable()
-            } placeholder: {
-                Rectangle().foregroundColor(Color("PlaceholderColor"))
-            }
-        } else {
-            WebImage(url: chapter.image)
-                .resizable()
-                .placeholder {
-                    ProgressView()
+        Group {
+            if #available(iOS 15, macOS 12, *) {
+                CachedAsyncImage(url: chapter.image) { image in
+                    image
+                        .resizable()
+                } placeholder: {
+                    Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
-                .indicator(.activity)
-            #if os(tvOS)
-                .frame(width: thumbnailWidth, height: 140)
-                .mask(RoundedRectangle(cornerRadius: 12))
-            #else
-                .frame(width: thumbnailWidth, height: 60)
-                .mask(RoundedRectangle(cornerRadius: 6))
-            #endif
+            } else {
+                WebImage(url: chapter.image)
+                    .resizable()
+                    .placeholder {
+                        ProgressView()
+                    }
+                    .indicator(.activity)
+            }
         }
+        #if os(tvOS)
+        .frame(width: thumbnailWidth, height: 140)
+        .mask(RoundedRectangle(cornerRadius: 12))
+        #else
+        .frame(width: thumbnailWidth, height: 60)
+        .mask(RoundedRectangle(cornerRadius: 6))
+        #endif
     }
 
     private var thumbnailWidth: Double {
