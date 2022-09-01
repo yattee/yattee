@@ -461,7 +461,6 @@ struct VideoPlayerView: View {
 struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
-            .environmentObject(SeekModel())
             .injectFixtureEnvironmentObjects()
     }
 }
