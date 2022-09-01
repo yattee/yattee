@@ -12,9 +12,6 @@ struct PlayerGestures: View {
                     singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
-                    },
-                    anyTapAction: {
-                        model.update()
                     }
                 )
 
@@ -24,9 +21,6 @@ struct PlayerGestures: View {
                     singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.togglePlay()
-                    },
-                    anyTapAction: {
-                        model.update()
                     }
                 )
 
@@ -36,9 +30,6 @@ struct PlayerGestures: View {
                     singleTapAction: { singleTapAction() },
                     doubleTapAction: {
                         player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
-                    },
-                    anyTapAction: {
-                        model.update()
                     }
                 )
         }

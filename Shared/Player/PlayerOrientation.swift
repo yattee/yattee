@@ -13,7 +13,7 @@ extension VideoPlayerView {
             guard player.presentingPlayer else { return }
 
             DispatchQueue.main.async {
-                playerControls.presentingControls = false
+                player.controls.presentingControls = false
                 player.enterFullScreen(showControls: false)
             }
 
@@ -53,7 +53,7 @@ extension VideoPlayerView {
                 orientationDebouncer.callback = {
                     DispatchQueue.main.async {
                         if orientation.isLandscape {
-                            playerControls.presentingControls = false
+                            player.controls.presentingControls = false
                             player.enterFullScreen(showControls: false)
                             Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                         } else {

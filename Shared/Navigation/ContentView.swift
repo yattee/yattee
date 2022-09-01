@@ -12,7 +12,7 @@ struct ContentView: View {
     @EnvironmentObject<CommentsModel> private var comments
     @EnvironmentObject<InstancesModel> private var instances
     @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerControlsModel> private var playerControls
+    @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlaylistsModel> private var playlists
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SearchModel> private var search
@@ -28,7 +28,7 @@ struct ContentView: View {
 
     @State private var playerInitialized = false
 
-    private var player = PlayerModel.shared
+    var playerControls: PlayerControlsModel { .shared }
 
     let persistenceController = PersistenceController.shared
 

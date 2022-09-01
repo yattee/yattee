@@ -17,10 +17,10 @@ extension VideoPlayerView {
             }
             .onChanged { value in
                 guard player.presentingPlayer,
-                      !playerControls.presentingControlsOverlay else { return }
+                      !player.controls.presentingControlsOverlay else { return }
 
-                if playerControls.presentingControls, !player.musicMode {
-                    playerControls.presentingControls = false
+                if player.controls.presentingControls, !player.musicMode {
+                    player.controls.presentingControls = false
                 }
 
                 if player.musicMode {
@@ -83,7 +83,7 @@ extension VideoPlayerView {
         isVerticalDrag = false
 
         guard player.presentingPlayer,
-              !playerControls.presentingControlsOverlay else { return }
+              !player.controls.presentingControlsOverlay else { return }
 
         if viewDragOffset > 100 {
             withAnimation(Constants.overlayAnimation) {

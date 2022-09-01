@@ -4,7 +4,7 @@ import SwiftUI
 
 final class SeekModel: ObservableObject {
     static let shared = SeekModel()
-    
+
     @Published var currentTime = CMTime.zero
     @Published var duration = CMTime.zero
 
