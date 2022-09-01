@@ -2,7 +2,6 @@ import Defaults
 import SwiftUI
 
 struct ControlsOverlay: View {
-    @EnvironmentObject<NetworkStateModel> private var networkState
     @EnvironmentObject<PlayerModel> private var player
     @EnvironmentObject<PlayerControlsModel> private var model
 
@@ -73,7 +72,7 @@ struct ControlsOverlay: View {
                    showMPVPlaybackStats
                 {
                     Section(header: controlsHeader("Statistics")) {
-                        mpvPlaybackStats
+                        PlaybackStatsView()
                     }
                     #if os(tvOS)
                     .frame(width: 400)
@@ -384,30 +383,6 @@ struct ControlsOverlay: View {
                 Defaults[.captionsLanguageCode] = $0?.code
             }
         )
-    }
-
-    var mpvPlaybackStats: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            mpvPlaybackStatRow("Hardware decoder", player.mpvBackend.hwDecoder)
-            mpvPlaybackStatRow("Dropped frames", String(player.mpvBackend.frameDropCount))
-            mpvPlaybackStatRow("Stream FPS", String(format: "%.2ffps", player.mpvBackend.outputFps))
-            mpvPlaybackStatRow("Cached time", String(format: "%.2fs", player.mpvBackend.cacheDuration))
-        }
-        .padding(.top, 2)
-        #if os(tvOS)
-            .font(.system(size: 20))
-        #else
-            .font(.system(size: 11))
-        #endif
-    }
-
-    func mpvPlaybackStatRow(_ label: String, _ value: String) -> some View {
-        HStack {
-            Text(label)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-        }
     }
 }
 

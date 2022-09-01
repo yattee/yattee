@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct NetworkState: View {
-    @EnvironmentObject<NetworkStateModel> private var model
+    @ObservedObject private var model = NetworkStateModel.shared
 
     var body: some View {
         Buffering(state: model.fullStateText)
