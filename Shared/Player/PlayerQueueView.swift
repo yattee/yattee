@@ -5,7 +5,6 @@ import SwiftUI
 struct PlayerQueueView: View {
     var sidebarQueue: Bool
     @Binding var fullScreen: Bool
-    @State private var relatedVisible = false
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -25,7 +24,7 @@ struct PlayerQueueView: View {
                     autoplaying
                 }
                 playingNext
-                if sidebarQueue, relatedVisible {
+                if sidebarQueue {
                     related
                 }
                 if saveHistory, showHistoryInPlayer {
@@ -37,15 +36,6 @@ struct PlayerQueueView: View {
                 .padding(.vertical, 5)
                 .listRowInsets(EdgeInsets())
             #endif
-        }
-        .onChange(of: player.currentItem) { _ in
-            relatedVisible = false
-
-            Delay.by(2) {
-                withAnimation(.easeIn(duration: 0.25)) {
-                    self.relatedVisible = true
-                }
-            }
         }
         #if os(macOS)
         .listStyle(.inset)
