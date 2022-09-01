@@ -133,6 +133,13 @@ struct VideoPlayerView: View {
                 #if os(iOS)
                 .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
                 .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
+                .onChange(of: player.presentingPlayer) { newValue in
+                    if newValue {
+                        viewDragOffset = 0
+                    } else {
+                        viewDragOffset = Self.hiddenOffset
+                    }
+                }
                 .onAppear {
                     viewDragOffset = 0
 
