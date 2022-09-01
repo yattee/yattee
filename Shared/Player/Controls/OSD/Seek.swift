@@ -15,68 +15,77 @@ struct Seek: View {
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
 
     var body: some View {
-        Button(action: model.restoreTime) {
-            VStack(spacing: playerControlsLayout.osdSpacing) {
-                ProgressBar(value: model.progress)
-                    .frame(maxHeight: playerControlsLayout.osdProgressBarHeight)
+        Group {
+            #if os(tvOS)
+                content
+                    .shadow(radius: 3)
+            #else
+                Button(action: model.restoreTime) { content }
+                    .buttonStyle(.plain)
+            #endif
+        }
+        .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
+    }
 
-                timeline
+    var content: some View {
+        VStack(spacing: playerControlsLayout.osdSpacing) {
+            ProgressBar(value: model.progress)
+                .frame(maxHeight: playerControlsLayout.osdProgressBarHeight)
 
-                if model.isSeeking {
+            timeline
+
+            if model.isSeeking {
+                Divider()
+                gestureSeekTime
+                    .foregroundColor(.secondary)
+                    .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
+                    .frame(height: playerControlsLayout.chapterFontSize + 5)
+
+                if let chapter = projectedChapter {
                     Divider()
-                    gestureSeekTime
-                        .foregroundColor(.secondary)
-                        .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
-                        .frame(height: playerControlsLayout.chapterFontSize + 5)
-
-                    if let chapter = projectedChapter {
+                    Text(chapter.title)
+                        .multilineTextAlignment(.center)
+                        .font(.system(size: playerControlsLayout.chapterFontSize))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if let segment = projectedSegment {
+                    Text(SponsorBlockAPI.categoryDescription(segment.category) ?? "Sponsor")
+                        .font(.system(size: playerControlsLayout.segmentFontSize))
+                        .foregroundColor(Color("AppRedColor"))
+                }
+            } else {
+                #if !os(tvOS)
+                    if !model.restoreSeekTime.isNil {
                         Divider()
-                        Text(chapter.title)
-                            .multilineTextAlignment(.center)
-                            .font(.system(size: playerControlsLayout.chapterFontSize))
-                            .fixedSize(horizontal: false, vertical: true)
+                        Label(model.restoreSeekPlaybackTime, systemImage: "arrow.counterclockwise")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
+                            .frame(height: playerControlsLayout.chapterFontSize + 5)
                     }
-                    if let segment = projectedSegment {
-                        Text(SponsorBlockAPI.categoryDescription(segment.category) ?? "Sponsor")
+                #endif
+                Group {
+                    switch model.lastSeekType {
+                    case let .segmentSkip(category):
+                        Divider()
+                        Text(SponsorBlockAPI.categoryDescription(category) ?? "Sponsor")
                             .font(.system(size: playerControlsLayout.segmentFontSize))
                             .foregroundColor(Color("AppRedColor"))
-                    }
-                } else {
-                    #if !os(tvOS)
-                        if !model.restoreSeekTime.isNil {
-                            Divider()
-                            Label(model.restoreSeekPlaybackTime, systemImage: "arrow.counterclockwise")
-                                .foregroundColor(.secondary)
-                                .font(.system(size: playerControlsLayout.chapterFontSize).monospacedDigit())
-                                .frame(height: playerControlsLayout.chapterFontSize + 5)
-                        }
-                    #endif
-                    Group {
-                        switch model.lastSeekType {
-                        case let .segmentSkip(category):
-                            Divider()
-                            Text(SponsorBlockAPI.categoryDescription(category) ?? "Sponsor")
-                                .font(.system(size: playerControlsLayout.segmentFontSize))
-                                .foregroundColor(Color("AppRedColor"))
-                        default:
-                            EmptyView()
-                        }
+                    default:
+                        EmptyView()
                     }
                 }
             }
-            .frame(maxWidth: playerControlsLayout.seekOSDWidth)
-            #if os(tvOS)
-                .padding(30)
-            #else
-                .padding(2)
-                .modifier(ControlBackgroundModifier())
-                .clipShape(RoundedRectangle(cornerRadius: 3))
-            #endif
-
-                .foregroundColor(.primary)
         }
-        .buttonStyle(.plain)
-        .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
+        .frame(maxWidth: playerControlsLayout.seekOSDWidth)
+        #if os(tvOS)
+            .padding(30)
+        #else
+            .padding(2)
+            .modifier(ControlBackgroundModifier())
+            .clipShape(RoundedRectangle(cornerRadius: 3))
+        #endif
+
+            .foregroundColor(.primary)
     }
 
     var timeline: some View {
@@ -121,16 +130,7 @@ struct Seek: View {
     }
 
     var playerControlsLayout: PlayerControlsLayout {
-        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
-    }
-
-    var fullScreenLayout: Bool {
-        guard let player = model.player else { return false }
-        #if os(iOS)
-            return player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            return player.playingFullScreen
-        #endif
+        (model.player?.playingFullScreen ?? false) ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
     }
 }
 

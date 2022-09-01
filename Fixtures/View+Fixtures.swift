@@ -78,7 +78,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
     }
 
     private var playerControls: PlayerControlsModel {
-        PlayerControlsModel(presentingControls: true, presentingControlsOverlay: false, player: player)
+        PlayerControlsModel(presentingControls: true)
     }
 
     private var subscriptions: SubscriptionsModel {

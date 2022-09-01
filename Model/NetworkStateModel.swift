@@ -1,11 +1,19 @@
 import Foundation
 
 final class NetworkStateModel: ObservableObject {
+    static var shared = NetworkStateModel()
+
     @Published var pausedForCache = false
     @Published var cacheDuration = 0.0
     @Published var bufferingState = 0.0
 
-    var player: PlayerModel!
+    private var player: PlayerModel! { .shared }
+    private let controlsOverlayModel = ControlOverlaysModel.shared
+
+    var osdVisible: Bool {
+        guard let player = player else { return false }
+        return player.isPlaying && ((player.activeBackend == .mpv && pausedForCache) || player.isSeeking)
+    }
 
     var fullStateText: String? {
         guard let bufferingStateText = bufferingStateText,
@@ -34,7 +42,7 @@ final class NetworkStateModel: ObservableObject {
 
     var needsUpdates: Bool {
         if let player = player {
-            return !player.currentItem.isNil && (pausedForCache || player.isSeeking || player.isLoadingVideo || player.controls.presentingControlsOverlay)
+            return !player.currentItem.isNil && (pausedForCache || player.isSeeking || player.isLoadingVideo || controlsOverlayModel.presenting)
         }
 
         return false

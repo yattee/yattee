@@ -10,7 +10,7 @@ struct PlayerControls: View {
     private var player: PlayerModel!
     private var thumbnails: ThumbnailsModel!
 
-    @EnvironmentObject<PlayerControlsModel> private var model
+    @ObservedObject private var model = PlayerControlsModel.shared
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -34,8 +34,10 @@ struct PlayerControls: View {
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
 
+    private let controlsOverlayModel = ControlOverlaysModel.shared
+
     var playerControlsLayout: PlayerControlsLayout {
-        fullScreenLayout ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
+        player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
     }
 
     init(player: PlayerModel, thumbnails: ThumbnailsModel) {
@@ -90,7 +92,7 @@ struct PlayerControls: View {
                                     buttonsBar
 
                                     HStack {
-                                        if !player.currentVideo.isNil, fullScreenLayout {
+                                        if !player.currentVideo.isNil, player.playingFullScreen {
                                             Button {
                                                 withAnimation(Self.animation) {
                                                     model.presentingDetailsOverlay = true
@@ -160,7 +162,8 @@ struct PlayerControls: View {
                                 .offset(y: -playerControlsLayout.timelineHeight - 5)
                             #endif
                         }
-                    }.opacity(model.presentingControls && !model.presentingOverlays ? 1 : 0)
+                    }
+                    .opacity(model.presentingControls ? 1 : 0)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -193,7 +196,7 @@ struct PlayerControls: View {
             guard player.presentingPlayer else { return }
             if value == "swipe down", !model.presentingControls, !model.presentingOverlays {
                 withAnimation(Self.animation) {
-                    model.presentingControlsOverlay = true
+                    controlsOverlayModel.presenting = false
                 }
             } else {
                 model.show()
@@ -302,19 +305,19 @@ struct PlayerControls: View {
     var fullscreenButton: some View {
         button(
             "Fullscreen",
-            systemImage: fullScreenLayout ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+            systemImage: player.playingFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
         ) {
-            player.toggleFullscreen(fullScreenLayout)
+            player.toggleFullscreen(player.playingFullScreen)
         }
         #if !os(tvOS)
-        .keyboardShortcut(fullScreenLayout ? .cancelAction : .defaultAction)
+        .keyboardShortcut(player.playingFullScreen ? .cancelAction : .defaultAction)
         #endif
     }
 
     private var settingsButton: some View {
         button("settings", systemImage: "gearshape") {
             withAnimation(Self.animation) {
-                model.presentingControlsOverlay.toggle()
+                controlsOverlayModel.toggle()
             }
         }
         #if os(tvOS)
@@ -491,14 +494,6 @@ struct PlayerControls: View {
         .frame(width: size ?? playerControlsLayout.buttonSize, height: size ?? playerControlsLayout.buttonSize)
         .modifier(ControlBackgroundModifier(enabled: useBackground))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-    }
-
-    var fullScreenLayout: Bool {
-        #if os(iOS)
-            player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            player.playingFullScreen
-        #endif
     }
 }
 

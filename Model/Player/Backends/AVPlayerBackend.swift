@@ -12,11 +12,11 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var logger = Logger(label: "avplayer-backend")
 
-    var model: PlayerModel!
-    var controls: PlayerControlsModel!
-    var playerTime: PlayerTimeModel!
-    var networkState: NetworkStateModel!
-    var seek: SeekModel!
+    var model: PlayerModel! { .shared }
+    var controls: PlayerControlsModel! { .shared }
+    var playerTime: PlayerTimeModel! { .shared }
+    var networkState: NetworkStateModel! { .shared }
+    var seek: SeekModel! { .shared }
 
     var stream: Stream?
     var video: Video?
@@ -76,11 +76,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     internal var controlsUpdates = false
 
-    init(model: PlayerModel, controls: PlayerControlsModel?, playerTime: PlayerTimeModel?) {
-        self.model = model
-        self.controls = controls
-        self.playerTime = playerTime ?? PlayerTimeModel.shared
-
+    init() {
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
         addPlayerTimeControlStatusObserver()

@@ -39,21 +39,13 @@ struct PlayerBackendView: View {
             #endif
         }
         #if os(iOS)
-        .statusBarHidden(fullScreenLayout)
-        #endif
-    }
-
-    var fullScreenLayout: Bool {
-        #if os(iOS)
-            player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            player.playingFullScreen
+        .statusBarHidden(player.playingFullScreen)
         #endif
     }
 
     #if os(iOS)
         var controlsTopPadding: Double {
-            guard fullScreenLayout else { return 0 }
+            guard player.playingFullScreen else { return 0 }
 
             if UIDevice.current.userInterfaceIdiom != .pad {
                 return verticalSizeClass == .compact ? SafeArea.insets.top : 0
@@ -63,12 +55,12 @@ struct PlayerBackendView: View {
         }
 
         var controlsBottomPadding: Double {
-            guard fullScreenLayout else { return 0 }
+            guard player.playingFullScreen else { return 0 }
 
             if UIDevice.current.userInterfaceIdiom != .pad {
-                return fullScreenLayout && verticalSizeClass == .compact ? SafeArea.insets.bottom : 0
+                return player.playingFullScreen && verticalSizeClass == .compact ? SafeArea.insets.bottom : 0
             } else {
-                return fullScreenLayout ? SafeArea.insets.bottom : 0
+                return player.playingFullScreen ? SafeArea.insets.bottom : 0
             }
         }
     #endif

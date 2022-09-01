@@ -70,17 +70,18 @@ struct VideoPlayerView: View {
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
 
+    @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
+
     var body: some View {
         ZStack(alignment: overlayAlignment) {
             videoPlayer
                 .zIndex(-1)
             #if os(iOS)
-                .gesture(player.controls.presentingControlsOverlay ? videoPlayerCloseControlsOverlayGesture : nil)
+                .gesture(controlsOverlayModel.presenting ? videoPlayerCloseControlsOverlayGesture : nil)
             #endif
 
             overlay
         }
-        .animation(nil, value: player.playerSize)
         .onAppear {
             if player.musicMode {
                 player.backend.startControlsUpdates()
@@ -184,20 +185,20 @@ struct VideoPlayerView: View {
             .offset(y: playerOffset)
             .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
             .backport
-            .persistentSystemOverlays(!fullScreenLayout)
+            .persistentSystemOverlays(!player.playingFullScreen)
             #endif
         #endif
     }
 
     var overlay: some View {
         VStack {
-            if player.controls.presentingControlsOverlay {
+            if controlsOverlayModel.presenting {
                 HStack {
                     HStack {
                         ControlsOverlay()
                         #if os(tvOS)
                             .onExitCommand {
-                                withAnimation(Player.controls.animation) {
+                                withAnimation(PlayerControls.animation) {
                                     player.controls.hideOverlays()
                                 }
                             }
@@ -210,11 +211,11 @@ struct VideoPlayerView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
                     #if !os(tvOS)
-                    .frame(maxWidth: fullScreenLayout ? .infinity : player.playerSize.width)
+                    .frame(maxWidth: player.playingFullScreen ? .infinity : player.playerSize.width)
                     #endif
 
                     #if !os(tvOS)
-                        if !fullScreenLayout && sidebarQueue {
+                        if !player.playingFullScreen && sidebarQueue {
                             Spacer()
                         }
                     #endif
@@ -255,12 +256,12 @@ struct VideoPlayerView: View {
         }
 
         var playerWidth: Double? {
-            fullScreenLayout ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
+            player.playingFullScreen ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
         }
 
         var playerHeight: Double? {
             let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
-            return fullScreenLayout ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
+            return player.playingFullScreen ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
         }
 
         var playerEdgesIgnoringSafeArea: Edge.Set {
@@ -268,7 +269,7 @@ struct VideoPlayerView: View {
                 return []
             }
 
-            if fullScreenLayout, UIDevice.current.orientation.isLandscape {
+            if player.playingFullScreen, UIDevice.current.orientation.isLandscape {
                 return [.vertical]
             }
 
@@ -296,12 +297,12 @@ struct VideoPlayerView: View {
                                 VideoPlayerSizeModifier(
                                     geometry: geometry,
                                     aspectRatio: player.aspectRatio,
-                                    fullScreen: fullScreenLayout
+                                    fullScreen: player.playingFullScreen
                                 )
                             )
                             .overlay(playerPlaceholder)
                         #endif
-                            .frame(maxWidth: fullScreenLayout ? .infinity : nil, maxHeight: fullScreenLayout ? .infinity : nil)
+                            .frame(maxWidth: player.playingFullScreen ? .infinity : nil, maxHeight: player.playingFullScreen ? .infinity : nil)
                             .onHover { hovering in
                                 hoveringPlayer = hovering
                                 hovering ? player.controls.show() : player.controls.hide()
@@ -326,7 +327,7 @@ struct VideoPlayerView: View {
                         .background(Color.black)
 
                         #if !os(tvOS)
-                            if !fullScreenLayout {
+                            if !player.playingFullScreen {
                                 VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                 #if os(iOS)
                                     .ignoresSafeArea(.all, edges: .bottom)
@@ -346,7 +347,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
-            .background(((colorScheme == .dark || fullScreenLayout) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
+            .background(((colorScheme == .dark || player.playingFullScreen) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
@@ -354,9 +355,9 @@ struct VideoPlayerView: View {
             .onMoveCommand { direction in
                 if direction == .up {
                     player.controls.show()
-                } else if direction == .down, !player.controls.presentingControlsOverlay, !player.controls.presentingControls {
-                    withAnimation(Player.controls.animation) {
-                        player.controls.presentingControlsOverlay = true
+                } else if direction == .down, !controlsOverlayModel.presenting, !player.controls.presentingControls {
+                    withAnimation(PlayerControls.animation) {
+                        controlsOverlayModel.presenting = true
                     }
                 }
 
@@ -385,7 +386,7 @@ struct VideoPlayerView: View {
                 }
             }
             #endif
-            if !fullScreenLayout {
+            if !player.playingFullScreen {
                 #if os(iOS)
                     if sidebarQueue {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
@@ -402,19 +403,11 @@ struct VideoPlayerView: View {
                 #endif
             }
         }
-        .onChange(of: fullScreenLayout) { newValue in
+        .onChange(of: player.playingFullScreen) { newValue in
             if !newValue { player.controls.hideOverlays() }
         }
         #if os(iOS)
-        .statusBar(hidden: fullScreenLayout)
-        #endif
-    }
-
-    var fullScreenLayout: Bool {
-        #if os(iOS)
-            return player.playingFullScreen || verticalSizeClass == .compact
-        #else
-            return player.playingFullScreen
+        .statusBar(hidden: player.playingFullScreen)
         #endif
     }
 
@@ -459,7 +452,7 @@ struct VideoPlayerView: View {
 
     #if os(tvOS)
         var tvControls: some View {
-            TVControls(model: playerControls, player: player, thumbnails: thumbnails)
+            TVControls(player: player, thumbnails: thumbnails)
         }
     #endif
 }

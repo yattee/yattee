@@ -47,16 +47,16 @@ struct TVControls: UIViewRepresentable {
     func updateUIView(_: UIView, context _: Context) {}
 
     func makeCoordinator() -> TVControls.Coordinator {
-        Coordinator(controlsArea, model: model)
+        Coordinator(controlsArea)
     }
 
     final class Coordinator: NSObject {
         private let view: UIView
         private let model: PlayerControlsModel
 
-        init(_ view: UIView, model: PlayerControlsModel) {
+        init(_ view: UIView) {
             self.view = view
-            self.model = model
+            model = .shared
             super.init()
         }
 
