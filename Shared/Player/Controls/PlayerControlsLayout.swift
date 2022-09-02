@@ -189,23 +189,6 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
         }
     }
 
-    var thumbSize: Double {
-        switch self {
-        case .tvRegular:
-            return 45
-        case .veryLarge:
-            return 35
-        case .large:
-            return 30
-        case .medium:
-            return 20
-        case .small:
-            return 15
-        case .smaller:
-            return 13
-        }
-    }
-
     var timeFontSize: Double {
         switch self {
         case .tvRegular:
@@ -258,20 +241,7 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
     }
 
     var timeTrailingEdgePadding: Double {
-        switch self {
-        case .tvRegular:
-            return 20
-        case .veryLarge:
-            return 16
-        case .large:
-            return 14
-        case .medium:
-            return 9
-        case .small:
-            return 6
-        case .smaller:
-            return 2
-        }
+        timeLeadingEdgePadding
     }
 
     var timelineHeight: Double {
