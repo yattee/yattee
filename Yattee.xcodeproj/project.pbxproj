@@ -748,6 +748,7 @@
 		37D6025928C17375009E8D98 /* PlaybackStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025828C17375009E8D98 /* PlaybackStatsView.swift */; };
 		37D6025A28C17375009E8D98 /* PlaybackStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025828C17375009E8D98 /* PlaybackStatsView.swift */; };
 		37D6025B28C17375009E8D98 /* PlaybackStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025828C17375009E8D98 /* PlaybackStatsView.swift */; };
+		37D6025D28C17719009E8D98 /* ControlsOverlayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -1264,6 +1265,7 @@
 		37D4B1AE26729DEB00C925CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37D526DD2720AC4400ED2F5E /* VideosAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosAPI.swift; sourceTree = "<group>"; };
 		37D6025828C17375009E8D98 /* PlaybackStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackStatsView.swift; sourceTree = "<group>"; };
+		37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsOverlayButton.swift; sourceTree = "<group>"; };
 		37D9169A27388A81002B1BAA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStreams.swift; sourceTree = "<group>"; };
 		37DD9DA22785BBC900539416 /* NoCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCommentsView.swift; sourceTree = "<group>"; };
@@ -2086,6 +2088,7 @@
 			isa = PBXGroup;
 			children = (
 				37666BA927023AF000F869E5 /* AccountSelectionView.swift */,
+				37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */,
 				37FADFFF272ED58000330459 /* EditFavorites.swift */,
 				3730D89F2712E2B70020ED53 /* NowPlayingView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
@@ -3341,6 +3344,7 @@
 				3748187026A769D60084E870 /* DetailBadge.swift in Sources */,
 				3741A32C27E7EFFD00D266D1 /* PlayerControls.swift in Sources */,
 				371B7E632759706A00D21217 /* CommentsView.swift in Sources */,
+				37D6025D28C17719009E8D98 /* ControlsOverlayButton.swift in Sources */,
 				37D2E0D628B67EFC00F64D52 /* Delay.swift in Sources */,
 				379F1421289ECE7F00DE48B5 /* QualitySettings.swift in Sources */,
 				37A9965C26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
