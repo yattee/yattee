@@ -268,15 +268,15 @@ final class MPVClient: ObservableObject {
             }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                guard let self = self, let model = self.backend.model else { return }
                 UIView.animate(withDuration: 0.2, animations: {
                     let aspectRatio = self.aspectRatio > 0 && self.aspectRatio < VideoPlayerView.defaultAspectRatio ? self.aspectRatio : VideoPlayerView.defaultAspectRatio
-                    let height = [self.backend.model.playerSize.height, self.backend.model.playerSize.width / aspectRatio].min()!
+                    let height = [model.playerSize.height, model.playerSize.width / aspectRatio].min()!
                     var insets = 0.0
                     #if os(iOS)
                         insets = OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? SafeArea.insets.bottom : 0
                     #endif
-                    let offsetY = self.backend.model.playingFullScreen ? ((self.backend.model.playerSize.height / 2.0) - ((height + insets) / 2)) : 0
+                    let offsetY = model.playingFullScreen ? ((model.playerSize.height / 2.0) - ((height + insets) / 2)) : 0
                     self.glView?.frame = CGRect(x: 0, y: offsetY, width: roundedWidth, height: height)
                 }) { completion in
                     if completion {
@@ -296,7 +296,7 @@ final class MPVClient: ObservableObject {
     func setNeedsDrawing(_ needsDrawing: Bool) {
         logger.info("needs drawing: \(needsDrawing)")
         #if !os(macOS)
-            glView.needsDrawing = needsDrawing
+            glView?.needsDrawing = needsDrawing
         #endif
     }
 
@@ -356,6 +356,7 @@ final class MPVClient: ObservableObject {
     }
 
     private func setFlagAsync(_ name: String, _ flag: Bool) {
+        guard mpv != nil else { return }
         var data: Int = flag ? 1 : 0
         mpv_set_property_async(mpv, 0, name, MPV_FORMAT_FLAG, &data)
     }
