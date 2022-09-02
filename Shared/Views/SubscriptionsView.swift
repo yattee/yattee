@@ -30,6 +30,10 @@ struct SubscriptionsView: View {
                             refreshControl.endRefreshing()
                         }
                     }
+                    .backport
+                    .refreshable {
+                        loadResources(force: true)
+                    }
                 #endif
             }
         }
@@ -78,6 +82,9 @@ struct SubscriptionsView: View {
         if let request = force ? feed?.load() : feed?.loadIfNeeded() {
             request.onCompletion { _ in
                 onCompletion()
+            }
+            .onFailure { error in
+                NavigationModel.shared.presentAlert(title: "Could not refresh Subscriptions", message: error.userMessage)
             }
         } else {
             onCompletion()
