@@ -18,6 +18,8 @@ struct ControlsBar: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @ObservedObject private var controls = PlayerControlsModel.shared
+
     var presentingControls = true
     var backgroundEnabled = true
     var borderTop = true
@@ -33,7 +35,7 @@ struct ControlsBar: View {
             detailsButton
 
             if presentingControls {
-                controls
+                controlsView
                     .frame(maxWidth: 120)
             }
         }
@@ -66,7 +68,7 @@ struct ControlsBar: View {
         } else if detailsToggleFullScreen {
             Button {
                 controlsOverlayModel.presenting = false
-                model.controls.presentingControls = false
+                controls.presentingControls = false
                 withAnimation {
                     fullScreen.toggle()
                 }
@@ -82,10 +84,10 @@ struct ControlsBar: View {
         }
     }
 
-    var controls: some View {
+    var controlsView: some View {
         HStack(spacing: 4) {
             Group {
-                if model.controls.isPlaying {
+                if controls.isPlaying {
                     Button(action: {
                         model.pause()
                     }) {
@@ -105,7 +107,7 @@ struct ControlsBar: View {
                     }
                 }
             }
-            .disabled(model.controls.isLoadingVideo || model.currentItem.isNil)
+            .disabled(controls.isLoadingVideo || model.currentItem.isNil)
 
             Button(action: { model.advanceToNextItem() }) {
                 Label("Next", systemImage: "forward.fill")
