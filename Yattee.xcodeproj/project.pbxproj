@@ -350,6 +350,7 @@
 		37579D5E27864F5F00FD0B98 /* Help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37579D5C27864F5F00FD0B98 /* Help.swift */; };
 		37579D5F27864F5F00FD0B98 /* Help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37579D5C27864F5F00FD0B98 /* Help.swift */; };
 		3758638A2721B0A9000CB14E /* ChannelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3743B86727216D3600261544 /* ChannelCell.swift */; };
+		3759234628C26C7B00C052EC /* Refreshable+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759234528C26C7B00C052EC /* Refreshable+Backport.swift */; };
 		37599F30272B42810087F250 /* FavoriteItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F2F272B42810087F250 /* FavoriteItem.swift */; };
 		37599F31272B42810087F250 /* FavoriteItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F2F272B42810087F250 /* FavoriteItem.swift */; };
 		37599F32272B42810087F250 /* FavoriteItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F2F272B42810087F250 /* FavoriteItem.swift */; };
@@ -1109,6 +1110,7 @@
 		3756C2A52861131100E4B059 /* NetworkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkState.swift; sourceTree = "<group>"; };
 		3756C2A92861151C00E4B059 /* NetworkStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStateModel.swift; sourceTree = "<group>"; };
 		37579D5C27864F5F00FD0B98 /* Help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Help.swift; sourceTree = "<group>"; };
+		3759234528C26C7B00C052EC /* Refreshable+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Refreshable+Backport.swift"; sourceTree = "<group>"; };
 		37599F2F272B42810087F250 /* FavoriteItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItem.swift; sourceTree = "<group>"; };
 		37599F33272B44000087F250 /* FavoritesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesModel.swift; sourceTree = "<group>"; };
 		37599F37272B4D740087F250 /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
@@ -1688,6 +1690,7 @@
 				3722AEBD274DA401005EA4D6 /* Backport.swift */,
 				3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */,
 				37136CAB286273060095C0CF /* PersistentSystemOverlays+Backport.swift */,
+				3759234528C26C7B00C052EC /* Refreshable+Backport.swift */,
 				37E80F3F287B472300561799 /* ScrollContentBackground+Backport.swift */,
 				3722AEBF274DAEB8005EA4D6 /* Tint+Backport.swift */,
 				3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */,
@@ -2837,6 +2840,7 @@
 				377ABC40286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */,
 				37D2E0D428B67EFC00F64D52 /* Delay.swift in Sources */,
+				3759234628C26C7B00C052EC /* Refreshable+Backport.swift in Sources */,
 				37130A5B277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37152EEA26EFEB95004FB96D /* LazyView.swift in Sources */,
 				3761ABFD26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,

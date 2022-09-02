@@ -17,7 +17,7 @@ struct RefreshControlModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, *) {
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             return content
         } else {
             return content

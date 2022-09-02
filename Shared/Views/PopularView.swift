@@ -44,6 +44,13 @@ struct PopularView: View {
             resource?.load().onCompletion { _ in
                 refreshControl.endRefreshing()
             }
+            .onFailure { error in
+                NavigationModel.shared.presentAlert(title: "Could not refresh Trending", message: error.userMessage)
+            }
+        }
+        .backport
+        .refreshable {
+            resource?.load()
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
