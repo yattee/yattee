@@ -292,7 +292,7 @@ struct SearchView: View {
                         Text("Search history is empty")
                             .foregroundColor(.secondary)
                     }
-                    ForEach(recentlyOpened, id: \.tag) { item in
+                    ForEach(recentlyOpened.reversed(), id: \.tag) { item in
                         recentItemButton(item)
                     }
                 }
