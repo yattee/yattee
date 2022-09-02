@@ -12,7 +12,7 @@ final class NetworkStateModel: ObservableObject {
 
     var osdVisible: Bool {
         guard let player = player else { return false }
-        return player.isPlaying && ((player.activeBackend == .mpv && pausedForCache) || player.isSeeking)
+        return player.isPlaying && ((player.activeBackend == .mpv && pausedForCache) || player.isSeeking) && bufferingState < 100.0
     }
 
     var fullStateText: String? {
