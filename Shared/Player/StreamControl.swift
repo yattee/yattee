@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct StreamControl: View {
-    @Binding var presentingButtonHintAlert: Bool
+    #if os(tvOS)
+        var focusedField: FocusState<ControlsOverlay.Field?>.Binding?
+
+        init(focusedField: FocusState<ControlsOverlay.Field?>.Binding?) {
+            self.focusedField = focusedField
+        }
+    #endif
 
     @EnvironmentObject<PlayerModel> private var player
-
-    init(presentingButtonHintAlert: Binding<Bool> = .constant(false)) {
-        _presentingButtonHintAlert = presentingButtonHintAlert
-    }
 
     var body: some View {
         Group {
@@ -36,9 +38,7 @@ struct StreamControl: View {
                     .disabled(player.isLoadingAvailableStreams)
                 #endif
             #else
-                Button {
-                    presentingButtonHintAlert = true
-                } label: {
+                ControlsOverlayButton(focusedField: focusedField!, field: .stream) {
                     Text(player.streamSelection?.shortQuality ?? "loading")
                         .frame(maxWidth: 320)
                 }
@@ -51,7 +51,6 @@ struct StreamControl: View {
                 }
             #endif
         }
-
         .transaction { t in t.animation = .none }
         .onChange(of: player.streamSelection) { selection in
             guard let selection = selection else { return }
@@ -72,7 +71,11 @@ struct StreamControl: View {
 
 struct StreamControl_Previews: PreviewProvider {
     static var previews: some View {
-        StreamControl()
-            .injectFixtureEnvironmentObjects()
+        #if os(tvOS)
+            StreamControl(focusedField: .none)
+                .injectFixtureEnvironmentObjects()
+        #else
+            StreamControl()
+        #endif
     }
 }

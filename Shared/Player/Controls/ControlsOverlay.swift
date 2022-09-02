@@ -91,6 +91,13 @@ struct ControlsOverlay: View {
             #if os(tvOS)
             .padding(.horizontal, 40)
             #endif
+
+            #if os(tvOS)
+                Text("Press and hold remote button to open captions and quality menus")
+                    .frame(maxWidth: 400)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            #endif
         }
         .frame(maxHeight: overlayHeight)
         #if os(tvOS)
@@ -105,7 +112,7 @@ struct ControlsOverlay: View {
 
     private var overlayHeight: Double {
         #if os(tvOS)
-            contentSize.height + 50.0
+            contentSize.height + 80.0
         #else
             contentSize.height
         #endif
@@ -255,9 +262,7 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            Button {
-                presentingButtonHintAlert = true
-            } label: {
+            ControlsOverlayButton(focusedField: $focusedField, field: .qualityProfile) {
                 Text(player.qualityProfileSelection?.description ?? "Automatic")
                     .lineLimit(1)
                     .frame(maxWidth: 320)
@@ -309,7 +314,7 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            StreamControl(presentingButtonHintAlert: $presentingButtonHintAlert)
+            StreamControl(focusedField: $focusedField)
         #endif
     }
 
@@ -339,9 +344,7 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            Button {
-                presentingButtonHintAlert = true
-            } label: {
+            ControlsOverlayButton(focusedField: $focusedField, field: .captions) {
                 HStack(spacing: 8) {
                     Image(systemName: "text.bubble")
                     if let captions = captionsBinding.wrappedValue {
