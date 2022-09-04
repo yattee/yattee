@@ -14,44 +14,44 @@ struct TVNavigationView: View {
         NavigationView {
             TabView(selection: navigation.tabSelectionBinding) {
                 if visibleSections.contains(.favorites) {
-                    FavoritesView()
+                    LazyView(FavoritesView())
                         .tabItem { Text("Favorites") }
                         .tag(TabSelection.favorites)
                 }
 
                 if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
-                    SubscriptionsView()
+                    LazyView(SubscriptionsView())
                         .tabItem { Text("Subscriptions") }
                         .tag(TabSelection.subscriptions)
                 }
 
                 if visibleSections.contains(.popular), accounts.app.supportsPopular {
-                    PopularView()
+                    LazyView(PopularView())
                         .tabItem { Text("Popular") }
                         .tag(TabSelection.popular)
                 }
 
                 if visibleSections.contains(.trending) {
-                    TrendingView()
+                    LazyView(TrendingView())
                         .tabItem { Text("Trending") }
                         .tag(TabSelection.trending)
                 }
 
                 if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists, accounts.signedIn {
-                    PlaylistsView()
+                    LazyView(PlaylistsView())
                         .tabItem { Text("Playlists") }
                         .tag(TabSelection.playlists)
                 }
 
-                NowPlayingView()
+                LazyView(NowPlayingView())
                     .tabItem { Text("Now Playing") }
                     .tag(TabSelection.nowPlaying)
 
-                SearchView()
+                LazyView(SearchView())
                     .tabItem { Image(systemName: "magnifyingglass") }
                     .tag(TabSelection.search)
 
-                SettingsView()
+                LazyView(SettingsView())
                     .tabItem { Image(systemName: "gear") }
                     .tag(TabSelection.settings)
             }
