@@ -18,6 +18,9 @@ struct AppSidebarPlaylists: View {
                     Button("Play All") {
                         player.play(playlists.find(id: playlist.id)?.videos ?? [])
                     }
+                    Button("Shuffle All") {
+                        player.play(playlists.find(id: playlist.id)?.videos ?? [], shuffling: true)
+                    }
                     Button("Edit") {
                         navigation.presentEditPlaylistForm(playlists.find(id: playlist.id))
                     }

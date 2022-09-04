@@ -8,7 +8,9 @@ extension PlayerModel {
         currentItem?.video
     }
 
-    func play(_ videos: [Video]) {
+    func play(_ videos: [Video], shuffling: Bool = false) {
+        playbackMode = shuffling ? .shuffle : .queue
+
         videos.forEach { enqueueVideo($0, loadDetails: false) }
 
         #if os(iOS)
