@@ -32,7 +32,7 @@ struct SubscriptionsView: View {
                     }
                     .backport
                     .refreshable {
-                        loadResources(force: true)
+                        await loadResources(force: true)
                     }
                 #endif
             }

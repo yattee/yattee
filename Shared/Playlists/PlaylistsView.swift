@@ -129,6 +129,21 @@ struct PlaylistsView: View {
         .onChange(of: model.reloadPlaylists) { _ in
             resource?.load()
         }
+        #if os(iOS)
+        .refreshControl { refreshControl in
+            model.load(force: true) {
+                model.reloadPlaylists.toggle()
+                refreshControl.endRefreshing()
+            }
+        }
+        .backport
+        .refreshable {
+            DispatchQueue.main.async {
+                model.load(force: true) { model.reloadPlaylists.toggle() }
+            }
+        }
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
             PlaylistFormView(playlist: $createdPlaylist)
@@ -155,14 +170,21 @@ struct PlaylistsView: View {
                 }
         )
         #endif
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
-        #endif
+
         #if !os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             model.load()
             resource?.loadIfNeeded()
         }
+        #endif
+        #if !os(tvOS)
+        .background(
+            Button("Refresh") {
+                resource?.load()
+            }
+            .keyboardShortcut("r")
+            .opacity(0)
+        )
         #endif
     }
 

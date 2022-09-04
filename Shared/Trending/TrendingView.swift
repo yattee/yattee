@@ -140,8 +140,10 @@ struct TrendingView: View {
         }
         .backport
         .refreshable {
-            resource.load().onFailure { error in
-                NavigationModel.shared.presentAlert(title: "Could not refresh Trending", message: error.userMessage)
+            DispatchQueue.main.async {
+                resource.load().onFailure { error in
+                    NavigationModel.shared.presentAlert(title: "Could not refresh Trending", message: error.userMessage)
+                }
             }
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
