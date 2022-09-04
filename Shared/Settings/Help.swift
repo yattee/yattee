@@ -8,6 +8,7 @@ struct Help: View {
     static let milestonesURL = URL(string: "https://github.com/yattee/yattee/milestones")!
     static let donationsURL = URL(string: "https://github.com/yattee/yattee/wiki/Donations")!
     static let contributingURL = URL(string: "https://github.com/yattee/yattee/wiki/Contributing")!
+    static let translationURL = URL(string: "https://github.com/yattee/yattee/wiki/Translation")!
 
     @Environment(\.openURL) private var openURL
 
@@ -61,12 +62,13 @@ struct Help: View {
                         header("I like this app!")
 
                         Text("That's nice to hear. It is fun to deliver apps other people want to use. " +
-                            "You can consider donating to the project or help by contributing to new features development.")
+                            "You can consider donating to the project or help by contributing to new features development or translate to your favorite language.")
                             .padding(.bottom, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
                             helpItemLink("Donations", url: Self.donationsURL, systemImage: "dollarsign.circle")
                             helpItemLink("Contributing", url: Self.contributingURL, systemImage: "hammer")
+                            helpItemLink("Translation", url: Self.translationURL, systemImage: "book")
                         }
                         .padding(.bottom, 8)
                     }
