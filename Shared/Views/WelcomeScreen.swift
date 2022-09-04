@@ -61,8 +61,8 @@ struct WelcomeScreen: View {
                     .background(RoundedRectangle(cornerRadius: 4).foregroundColor(Color.accentColor))
                     .frame(maxWidth: .infinity)
             #endif
-            Text("This information will be processed only on your device and used to connect you to the server in the specified country.\n" +
-                "It can be changed later in settings. You can use your own locations too.")
+            Text("This information will be processed only on your device and used to connect you to the server in the specified country.".localized() + "\n" +
+                "It can be changed later in settings. You can use your own locations too.".localized())
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

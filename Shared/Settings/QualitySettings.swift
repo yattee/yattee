@@ -68,7 +68,7 @@ struct QualitySettings: View {
                 forceAVPlayerForLiveStreamsToggle
             }
             .disabled(qualityProfiles.isEmpty)
-            Section(header: SettingsHeader(text: "Profiles"), footer: profilesFooter) {
+            Section(header: SettingsHeader(text: "Profiles".localized()), footer: profilesFooter) {
                 profilesList
 
                 Button {

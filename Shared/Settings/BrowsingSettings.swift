@@ -45,7 +45,7 @@ struct BrowsingSettings: View {
     }
 
     private var interfaceSettings: some View {
-        Section(header: SettingsHeader(text: "Interface")) {
+        Section(header: SettingsHeader(text: "Interface".localized())) {
             #if os(iOS)
                 Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                     .onChange(of: lockPortraitWhenBrowsing) { lock in
@@ -66,7 +66,7 @@ struct BrowsingSettings: View {
     }
 
     private var thumbnailsSettings: some View {
-        Section(header: SettingsHeader(text: "Thumbnails")) {
+        Section(header: SettingsHeader(text: "Thumbnails".localized())) {
             thumbnailsQualityPicker
             #if !os(tvOS)
                 Toggle("Round corners", isOn: $roundedThumbnails)
@@ -79,14 +79,14 @@ struct BrowsingSettings: View {
     private var thumbnailsQualityPicker: some View {
         Picker("Quality", selection: $thumbnailsQuality) {
             ForEach(ThumbnailsQuality.allCases, id: \.self) { quality in
-                Text(quality.rawValue.capitalized + " quality").tag(quality)
+                Text(quality.description)
             }
         }
         .modifier(SettingsPickerModifier())
     }
 
     private var visibleSectionsSettings: some View {
-        Section(header: SettingsHeader(text: "Sections")) {
+        Section(header: SettingsHeader(text: "Sections".localized())) {
             #if os(macOS)
                 let list = ForEach(VisibleSection.allCases, id: \.self) { section in
                     VisibleSectionSelectionRow(

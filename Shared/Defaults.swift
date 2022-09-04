@@ -238,7 +238,7 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
     case favorites, subscriptions, popular, trending, playlists
 
     var title: String {
-        rawValue.localizedCapitalized
+        rawValue.capitalized.localized()
     }
 
     var tabSelection: TabSelection {
@@ -312,6 +312,17 @@ enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializa
 
 enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
     case highest, medium, low
+
+    var description: String {
+        switch self {
+        case .highest:
+            return "Highest quality".localized()
+        case .medium:
+            return "Medium quality".localized()
+        case .low:
+            return "Low quality".localized()
+        }
+    }
 }
 
 enum SystemControlsCommands: String, CaseIterable, Defaults.Serializable {

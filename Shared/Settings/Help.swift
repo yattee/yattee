@@ -17,34 +17,34 @@ struct Help: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
                     Section {
-                        header("I am lost")
+                        header("I am lost".localized())
 
                         Text("You can find information about using Yattee in the Wiki pages.")
                             .padding(.bottom, 8)
 
-                        helpItemLink("Wiki", url: Self.wikiURL, systemImage: "questionmark.circle")
+                        helpItemLink("Wiki".localized(), url: Self.wikiURL, systemImage: "questionmark.circle")
                             .padding(.bottom, 8)
                     }
 
                     Spacer()
 
                     Section {
-                        header("I want to ask a question")
+                        header("I want to ask a question".localized())
 
                         Text("Discussions take place in Discord and Matrix. It's a good spot for general questions.")
                             .padding(.bottom, 8)
 
-                        helpItemLink("Discord Server", url: Self.discordURL, systemImage: "message")
+                        helpItemLink("Discord Server".localized(), url: Self.discordURL, systemImage: "message")
                             .padding(.bottom, 8)
-                        helpItemLink("Matrix Channel", url: Self.matrixURL, systemImage: "message")
+                        helpItemLink("Matrix Channel".localized(), url: Self.matrixURL, systemImage: "message")
                             .padding(.bottom, 8)
                     }
 
                     Spacer()
 
                     Section {
-                        header("I found a bug /")
-                        header("I have a feature request")
+                        header("I found a bug /".localized())
+                        header("I have a feature request".localized())
 
                         Text("Bugs and great feature ideas can be sent to the GitHub issues tracker. ")
                         Text("If you are reporting a bug, include all relevant details (especially: app\u{00a0}version, used device and system version, steps to reproduce).")
@@ -52,8 +52,8 @@ struct Help: View {
                             .padding(.bottom, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            helpItemLink("Issues Tracker", url: Self.issuesURL, systemImage: "ladybug")
-                            helpItemLink("Milestones", url: Self.milestonesURL, systemImage: "list.star")
+                            helpItemLink("Issues Tracker".localized(), url: Self.issuesURL, systemImage: "ladybug")
+                            helpItemLink("Milestones".localized(), url: Self.milestonesURL, systemImage: "list.star")
                         }
                         .padding(.bottom, 8)
                     }
@@ -61,15 +61,14 @@ struct Help: View {
                     Spacer()
 
                     Section {
-                        header("I like this app!")
+                        header("I like this app!".localized())
 
-                        Text("That's nice to hear. It is fun to deliver apps other people want to use. " +
-                            "You can consider donating to the project or help by contributing to new features development.")
+                        Text("That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development.")
                             .padding(.bottom, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            helpItemLink("Donations", url: Self.donationsURL, systemImage: "dollarsign.circle")
-                            helpItemLink("Contributing", url: Self.contributingURL, systemImage: "hammer")
+                            helpItemLink("Donations".localized(), url: Self.donationsURL, systemImage: "dollarsign.circle")
+                            helpItemLink("Contributing".localized(), url: Self.contributingURL, systemImage: "hammer")
                         }
                         .padding(.bottom, 8)
                     }

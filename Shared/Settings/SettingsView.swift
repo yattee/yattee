@@ -99,7 +99,7 @@ struct SettingsView: View {
                 .tag(Tabs.help)
             }
             .padding(20)
-            .frame(width: 520, height: windowHeight)
+            .frame(width: 600, height: windowHeight)
         #else
             NavigationView {
                 settingsList

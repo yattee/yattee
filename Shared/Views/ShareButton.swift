@@ -89,13 +89,19 @@ struct ShareButton: View {
     }
 
     private func labelForShareURL(_ app: String, withTime: Bool = false) -> String {
-        let time = withTime ? "with time" : ""
-
-        #if os(macOS)
-            return "Copy \(app) link \(time)"
-        #else
-            return "Share \(app) link \(time)"
-        #endif
+        if withTime {
+            #if os(macOS)
+                return String(format: "Copy %@ link with time".localized(), app)
+            #else
+                return String(format: "Share %@ link with time".localized(), app)
+            #endif
+        } else {
+            #if os(macOS)
+                return String(format: "Copy %@ link".localized(), app)
+            #else
+                return String(format: "Share %@ link".localized(), app)
+            #endif
+        }
     }
 }
 

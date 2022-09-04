@@ -36,7 +36,7 @@ struct InstancesSettings: View {
             }
 
             if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
-                SettingsHeader(text: "Accounts")
+                SettingsHeader(text: "Accounts".localized())
 
                 let list = List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
@@ -79,7 +79,7 @@ struct InstancesSettings: View {
             }
 
             if selectedInstance != nil, selectedInstance.app.hasFrontendURL {
-                SettingsHeader(text: "Frontend URL")
+                SettingsHeader(text: "Frontend URL".localized())
 
                 TextField("Frontend URL", text: $frontendURL)
                     .onChange(of: selectedInstance) { _ in

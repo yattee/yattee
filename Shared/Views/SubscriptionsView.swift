@@ -16,7 +16,7 @@ struct SubscriptionsView: View {
 
     var body: some View {
         BrowserPlayerControls {
-            SignInRequiredView(title: "Subscriptions") {
+            SignInRequiredView(title: "Subscriptions".localized()) {
                 VerticalCells(items: videos)
                     .onAppear {
                         loadResources()
