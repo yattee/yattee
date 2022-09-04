@@ -299,12 +299,20 @@ struct PlaylistsView: View {
 
     private var playButton: some View {
         Button {
-            player.playbackMode = .queue
             player.play(items.compactMap(\.video))
         } label: {
             Image(systemName: "play")
                 .padding(8)
                 .contentShape(Rectangle())
+        }
+        .contextMenu {
+            Button {
+                player.play(items.compactMap(\.video), shuffling: true)
+            } label: {
+                Label("Shuffle", systemImage: "shuffle")
+                    .padding(8)
+                    .contentShape(Rectangle())
+            }
         }
     }
 

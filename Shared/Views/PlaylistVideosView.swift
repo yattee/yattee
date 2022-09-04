@@ -70,10 +70,16 @@ struct PlaylistVideosView: View {
                     FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
 
                     Button {
-                        player.playbackMode = .queue
                         player.play(videos)
                     } label: {
                         Label("Play All", systemImage: "play")
+                    }
+                    .contextMenu {
+                        Button {
+                            player.play(videos, shuffling: true)
+                        } label: {
+                            Label("Shuffle All", systemImage: "shuffle")
+                        }
                     }
                 }
             }
