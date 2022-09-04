@@ -50,7 +50,9 @@ struct PopularView: View {
         }
         .backport
         .refreshable {
-            resource?.load()
+            DispatchQueue.main.async {
+                resource?.load()
+            }
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif

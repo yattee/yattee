@@ -53,8 +53,9 @@ final class PlaylistsModel: ObservableObject {
                     onSuccess()
                 }
             }
-            .onFailure { _ in
+            .onFailure { error in
                 self.playlists = []
+                NavigationModel.shared.presentAlert(title: "Could not refresh Playlists", message: error.userMessage)
             }
     }
 
