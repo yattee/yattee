@@ -61,6 +61,15 @@ If you're interestred in contributing, you can browse the [issues](https://githu
 Use [building instructions](https://github.com/yattee/yattee/wiki/Building-instructions) or
 join [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you need an advice or want to discuss the project.
 
+## Translation
+<a href="https://hosted.weblate.org/engage/yattee/">
+<img src="https://hosted.weblate.org/widgets/yattee/-/287x66-grey.png" alt="Translation status" />
+</a>
+
+If you are interested and can help with translations, you can do it using [Weblate](https://hosted.weblate.org/engage/yattee/), an Web-based localization tool.
+
+You can start translating the Language that you can see in the list or add new Language you might want the Yattee to have.
+
 ## License
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
 
