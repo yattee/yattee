@@ -18,12 +18,18 @@ final class SponsorBlockAPI: ObservableObject {
         }
 
         switch name {
+        case "sponsor":
+            return "Sponsor".localized()
         case "selfpromo":
-            return "Self-promotion"
-
+            return "Self-promotion".localized()
+        case "intro":
+            return "Intro".localized()
+        case "outro":
+            return "Outro".localized()
+        case "interaction":
+            return "Interaction".localized()
         case "music_offtopic":
-            return "Offtopic in Music Videos"
-
+            return "Offtopic in Music Videos".localized()
         default:
             return name.capitalized
         }
@@ -36,25 +42,25 @@ final class SponsorBlockAPI: ObservableObject {
 
         switch name {
         case "sponsor":
-            return "Part of a video promoting a product or service not directly related to the creator. " +
-                "The creator will receive payment or compensation in the form of money or free products."
+            return ("Part of a video promoting a product or service not directly related to the creator. " +
+                "The creator will receive payment or compensation in the form of money or free products.").localized()
 
         case "selfpromo":
-            return "Promoting a product or service that is directly related to the creator themselves. " +
-                "This usually includes merchandise or promotion of monetized platforms."
+            return ("Promoting a product or service that is directly related to the creator themselves. " +
+                "This usually includes merchandise or promotion of monetized platforms.").localized()
 
         case "intro":
-            return "Segments typically found at the start of a video that include an animation, " +
-                "still frame or clip which are also seen in other videos by the same creator."
+            return ("Segments typically found at the start of a video that include an animation, " +
+                "still frame or clip which are also seen in other videos by the same creator.").localized()
 
         case "outro":
-            return "Typically near or at the end of the video when the credits pop up and/or endcards are shown."
+            return ("Typically near or at the end of the video when the credits pop up and/or endcards are shown.").localized()
 
         case "interaction":
-            return "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)."
+            return ("Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).").localized()
 
         case "music_offtopic":
-            return "For videos which feature music as the primary content."
+            return ("For videos which feature music as the primary content.").localized()
 
         default:
             return nil

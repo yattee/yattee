@@ -11,7 +11,7 @@ struct InstanceSettings: View {
 
     var body: some View {
         List {
-            Section(header: Text("Accounts")) {
+            Section(header: Text("Accounts".localized())) {
                 if instance.app.supportsAccounts {
                     ForEach(InstancesModel.accounts(instance.id), id: \.self) { account in
                         #if os(tvOS)
@@ -61,7 +61,7 @@ struct InstanceSettings: View {
                 }
             }
             if instance.app.hasFrontendURL {
-                Section(header: Text("Frontend URL")) {
+                Section(header: Text("Frontend URL".localized())) {
                     TextField(
                         "Frontend URL",
                         text: $frontendURL

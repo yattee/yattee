@@ -45,11 +45,11 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
     var description: String {
         switch self {
         case .tvRegular:
-            return "TV"
+            return "TV".localized()
         case .veryLarge:
-            return "Very Large"
+            return "Very Large".localized()
         default:
-            return rawValue.capitalized
+            return rawValue.capitalized.localized()
         }
     }
 

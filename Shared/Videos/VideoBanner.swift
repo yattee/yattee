@@ -24,7 +24,7 @@ struct VideoBanner: View {
                 #endif
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(video?.title ?? "Loading...")
+                Text(video?.title ?? "Loading...".localized())
                     .truncationMode(.middle)
                     .lineLimit(2)
                     .font(.headline)

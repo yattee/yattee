@@ -10,7 +10,7 @@ final class SearchQuery: ObservableObject {
         }
 
         var name: String {
-            rawValue.capitalized
+            rawValue.capitalized.localized()
         }
     }
 
@@ -22,7 +22,7 @@ final class SearchQuery: ObservableObject {
         }
 
         var name: String {
-            rawValue.capitalized
+            rawValue.capitalized.localized()
         }
     }
 
@@ -36,11 +36,11 @@ final class SearchQuery: ObservableObject {
         var name: String {
             switch self {
             case .uploadDate:
-                return "Date"
+                return "Date".localized()
             case .viewCount:
-                return "Views"
+                return "Views".localized()
             default:
-                return rawValue.capitalized
+                return rawValue.capitalized.localized()
             }
         }
 

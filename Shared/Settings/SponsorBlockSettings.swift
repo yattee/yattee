@@ -39,7 +39,7 @@ struct SponsorBlockSettings: View {
                 #endif
             }
 
-            Section(header: SettingsHeader(text: "Categories to Skip"), footer: categoriesDetails) {
+            Section(header: SettingsHeader(text: "Categories to Skip".localized()), footer: categoriesDetails) {
                 #if os(macOS)
                     let list = ForEach(SponsorBlockAPI.categories, id: \.self) { category in
                         MultiselectRow(

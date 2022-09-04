@@ -61,7 +61,7 @@ struct PlayerSettings: View {
 
     private var sections: some View {
         Group {
-            Section(header: SettingsHeader(text: "Playback")) {
+            Section(header: SettingsHeader(text: "Playback".localized())) {
                 sourcePicker
                 pauseOnHidingPlayerToggle
                 #if !os(macOS)
@@ -73,20 +73,20 @@ struct PlayerSettings: View {
             }
 
             #if !os(tvOS)
-                Section(header: SettingsHeader(text: "Controls"), footer: controlsLayoutFooter) {
+                Section(header: SettingsHeader(text: "Controls".localized()), footer: controlsLayoutFooter) {
                     horizontalPlayerGestureEnabledToggle
-                    SettingsHeader(text: "Seek gesture sensitivity", secondary: true)
+                    SettingsHeader(text: "Seek gesture sensitivity".localized(), secondary: true)
                     seekGestureSensitivityPicker
-                    SettingsHeader(text: "Seek gesture speed", secondary: true)
+                    SettingsHeader(text: "Seek gesture speed".localized(), secondary: true)
                     seekGestureSpeedPicker
-                    SettingsHeader(text: "Regular size", secondary: true)
+                    SettingsHeader(text: "Regular size".localized(), secondary: true)
                     playerControlsLayoutPicker
-                    SettingsHeader(text: "Fullscreen size", secondary: true)
+                    SettingsHeader(text: "Fullscreen size".localized(), secondary: true)
                     fullScreenPlayerControlsLayoutPicker
                 }
             #endif
 
-            Section(header: SettingsHeader(text: "Interface")) {
+            Section(header: SettingsHeader(text: "Interface".localized())) {
                 #if os(iOS)
                     if idiom == .pad {
                         sidebarPicker
@@ -103,7 +103,7 @@ struct PlayerSettings: View {
             }
 
             #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation")) {
+                Section(header: SettingsHeader(text: "Orientation".localized())) {
                     if idiom == .pad {
                         enterFullscreenInLandscapeToggle
                     }
@@ -111,7 +111,7 @@ struct PlayerSettings: View {
                 }
             #endif
 
-            Section(header: SettingsHeader(text: "Picture in Picture")) {
+            Section(header: SettingsHeader(text: "Picture in Picture".localized())) {
                 closePiPOnNavigationToggle
                 closePiPOnOpeningPlayerToggle
                 closePlayerOnOpeningPiPToggle
@@ -124,7 +124,7 @@ struct PlayerSettings: View {
 
     private var sourcePicker: some View {
         Picker("Source", selection: $playerInstanceID) {
-            Text("Account Instance").tag(String?.none)
+            Text("Instance of current account").tag(String?.none)
 
             ForEach(instances) { instance in
                 Text(instance.description).tag(Optional(instance.id))
@@ -136,15 +136,15 @@ struct PlayerSettings: View {
     private var systemControlsCommandsPicker: some View {
         func labelText(_ label: String) -> String {
             #if os(macOS)
-                "System controls show buttons for \(label)"
+                String(format: "System controls show buttons for %@".localized(), label)
             #else
                 label
             #endif
         }
 
         return Picker("System controls buttons", selection: $systemControlsCommands) {
-            Text(labelText("10 seconds forwards/backwards")).tag(SystemControlsCommands.seek)
-            Text(labelText("Restart/Play next")).tag(SystemControlsCommands.restartAndAdvanceToNext)
+            Text(labelText("10 seconds forwards/backwards".localized())).tag(SystemControlsCommands.seek)
+            Text(labelText("Restart/Play next".localized())).tag(SystemControlsCommands.restartAndAdvanceToNext)
         }
         .onChange(of: systemControlsCommands) { _ in
             player.updateRemoteCommandCenter()

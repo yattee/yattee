@@ -70,11 +70,26 @@ struct VideoDetails: View {
             )
 
             HStack(spacing: 4) {
-                pageButton("Info", "info.circle", .info, !video.isNil)
-                pageButton("Chapters", "bookmark", .chapters, !(video?.chapters.isEmpty ?? true))
-                pageButton("Comments", "text.bubble", .comments, !video.isNil) { comments.load() }
-                pageButton("Related", "rectangle.stack.fill", .related, !video.isNil)
-                pageButton("Queue", "list.number", .queue, !player.queue.isEmpty)
+                pageButton(
+                    "Info".localized(),
+                    "info.circle", .info, !video.isNil
+                )
+                pageButton(
+                    "Chapters".localized(),
+                    "bookmark", .chapters, !(video?.chapters.isEmpty ?? true)
+                )
+                pageButton(
+                    "Comments".localized(),
+                    "text.bubble", .comments, !video.isNil
+                ) { comments.load() }
+                pageButton(
+                    "Related".localized(),
+                    "rectangle.stack.fill", .related, !video.isNil
+                )
+                pageButton(
+                    "Queue".localized(),
+                    "list.number", .queue, !player.queue.isEmpty
+                )
             }
             .onChange(of: player.currentItem) { _ in
                 page.update(.moveToFirst)

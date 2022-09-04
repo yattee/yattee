@@ -42,7 +42,7 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var anonymousAccount: Account {
-        Account(instanceID: id, name: "Anonymous", url: apiURL, anonymous: true)
+        Account(instanceID: id, name: "Anonymous".localized(), url: apiURL, anonymous: true)
     }
 
     var urlComponents: URLComponents {
