@@ -150,6 +150,8 @@ final class PlayerModel: ObservableObject {
         }
     }}
 
+    @Default(.saveLastPlayed) var saveLastPlayed
+    @Default(.lastPlayed) var lastPlayed
     @Default(.qualityProfiles) var qualityProfiles
     @Default(.forceAVPlayerForLiveStreams) var forceAVPlayerForLiveStreams
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
@@ -643,7 +645,9 @@ final class PlayerModel: ObservableObject {
 
         DispatchQueue.main.async(qos: .background) { [weak self] in
             guard let self = self else { return }
-            Defaults[.lastPlayed] = self.currentItem
+            if self.saveLastPlayed {
+                self.lastPlayed = self.currentItem
+            }
 
             if self.playbackMode == .related,
                let video = self.currentVideo,
