@@ -185,7 +185,7 @@ struct VideoPlayerView: View {
             .offset(y: playerOffset)
             .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
             .backport
-            .persistentSystemOverlays(!player.playingFullScreen)
+            .persistentSystemOverlays(!fullScreenPlayer)
             #endif
         #endif
     }
@@ -211,11 +211,11 @@ struct VideoPlayerView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
                     #if !os(tvOS)
-                    .frame(maxWidth: player.playingFullScreen ? .infinity : player.playerSize.width)
+                    .frame(maxWidth: fullScreenPlayer ? .infinity : player.playerSize.width)
                     #endif
 
                     #if !os(tvOS)
-                        if !player.playingFullScreen && sidebarQueue {
+                        if !fullScreenPlayer && sidebarQueue {
                             Spacer()
                         }
                     #endif
@@ -256,12 +256,12 @@ struct VideoPlayerView: View {
         }
 
         var playerWidth: Double? {
-            player.playingFullScreen ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
+            fullScreenPlayer ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
         }
 
         var playerHeight: Double? {
             let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
-            return player.playingFullScreen ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
+            return fullScreenPlayer ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
         }
 
         var playerEdgesIgnoringSafeArea: Edge.Set {
@@ -269,7 +269,7 @@ struct VideoPlayerView: View {
                 return []
             }
 
-            if player.playingFullScreen, UIDevice.current.orientation.isLandscape {
+            if fullScreenPlayer, UIDevice.current.orientation.isLandscape {
                 return [.vertical]
             }
 
@@ -297,12 +297,12 @@ struct VideoPlayerView: View {
                                 VideoPlayerSizeModifier(
                                     geometry: geometry,
                                     aspectRatio: player.aspectRatio,
-                                    fullScreen: player.playingFullScreen
+                                    fullScreen: fullScreenPlayer
                                 )
                             )
                             .overlay(playerPlaceholder)
                         #endif
-                            .frame(maxWidth: player.playingFullScreen ? .infinity : nil, maxHeight: player.playingFullScreen ? .infinity : nil)
+                            .frame(maxWidth: fullScreenPlayer ? .infinity : nil, maxHeight: fullScreenPlayer ? .infinity : nil)
                             .onHover { hovering in
                                 hoveringPlayer = hovering
                                 hovering ? player.controls.show() : player.controls.hide()
@@ -327,7 +327,7 @@ struct VideoPlayerView: View {
                         .background(Color.black)
 
                         #if !os(tvOS)
-                            if !player.playingFullScreen {
+                            if !fullScreenPlayer {
                                 VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                 #if os(iOS)
                                     .ignoresSafeArea(.all, edges: .bottom)
@@ -347,7 +347,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
-            .background(((colorScheme == .dark || player.playingFullScreen) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
+            .background(((colorScheme == .dark || fullScreenPlayer) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
             #endif
@@ -386,7 +386,7 @@ struct VideoPlayerView: View {
                 }
             }
             #endif
-            if !player.playingFullScreen {
+            if !fullScreenPlayer {
                 #if os(iOS)
                     if sidebarQueue {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
@@ -403,11 +403,21 @@ struct VideoPlayerView: View {
                 #endif
             }
         }
-        .onChange(of: player.playingFullScreen) { newValue in
+        .onChange(of: fullScreenPlayer) { newValue in
             if !newValue { player.controls.hideOverlays() }
         }
         #if os(iOS)
-        .statusBar(hidden: player.playingFullScreen)
+        .statusBar(hidden: fullScreenPlayer)
+        #endif
+    }
+
+    var fullScreenPlayer: Bool {
+        #if os(iOS)
+            player.playingFullScreen || verticalSizeClass == .compact
+        #elseif os(macOS)
+            player.playingFullScreen
+        #elseif os(tvOS)
+            true
         #endif
     }
 
