@@ -1,4 +1,3 @@
-import CachedAsyncImage
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
@@ -33,7 +32,7 @@ struct ChapterView: View {
 
     @ViewBuilder func smallImage(_ chapter: Chapter) -> some View {
         if #available(iOS 15, macOS 12, *) {
-            CachedAsyncImage(url: chapter.image) { image in
+            AsyncImage(url: chapter.image) { image in
                 image
                     .resizable()
             } placeholder: {

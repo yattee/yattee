@@ -1,4 +1,3 @@
-import CachedAsyncImage
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
@@ -39,7 +38,7 @@ struct ChannelCell: View {
             }
             .foregroundColor(.secondary)
             if #available(iOS 15, macOS 12, *) {
-                CachedAsyncImage(url: channel.thumbnailURL) { image in
+                AsyncImage(url: channel.thumbnailURL) { image in
                     image
                         .resizable()
                 } placeholder: {
