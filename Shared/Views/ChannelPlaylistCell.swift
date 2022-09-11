@@ -37,23 +37,14 @@ struct ChannelPlaylistCell: View {
             }
             .foregroundColor(.secondary)
 
-            if #available(iOS 15, macOS 12, *) {
-                AsyncImage(url: playlist.thumbnailURL) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    Rectangle().foregroundColor(Color("PlaceholderColor"))
+            WebImage(url: playlist.thumbnailURL)
+                .resizable()
+                .placeholder {
+                    Rectangle().fill(Color("PlaceholderColor"))
                 }
-            } else {
-                WebImage(url: playlist.thumbnailURL)
-                    .resizable()
-                    .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
-                    }
-                    .indicator(.activity)
-                    .frame(width: 165, height: 88)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            }
+                .indicator(.activity)
+                .frame(width: 165, height: 88)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             Group {
                 DetailBadge(text: playlist.title, style: .prominent)
                     .lineLimit(2)

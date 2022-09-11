@@ -68,7 +68,6 @@
 		3703205827D2BAE4007A0CB8 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205727D2BAE4007A0CB8 /* Siesta */; };
 		3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205B27D2BAF3007A0CB8 /* SwiftyJSON */; };
 		3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205D27D2BB12007A0CB8 /* SDWebImageWebPCoder */; };
-		3703206027D2BB16007A0CB8 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205F27D2BB16007A0CB8 /* SDWebImageSwiftUI */; };
 		3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206127D2BB1B007A0CB8 /* SDWebImagePINPlugin */; };
 		3703206427D2BB30007A0CB8 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206327D2BB30007A0CB8 /* Logging */; };
 		3703206627D2BB35007A0CB8 /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206527D2BB35007A0CB8 /* PINCache */; };
@@ -429,6 +428,9 @@
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */; };
+		376FF6CA28CE6D6900260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */; };
+		376FF6CC28CE6D8200260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */; };
+		376FF6CE28CE6D8B00260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */; };
 		3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003227E8EEA100CB2475 /* AudioToolbox.framework */; };
 		3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003427E8EEA100CB2475 /* AVFoundation.framework */; };
 		3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003527E8EEA100CB2475 /* CoreMedia.framework */; };
@@ -858,9 +860,7 @@
 		37FB28412721B22200A57617 /* ContentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB28402721B22200A57617 /* ContentItem.swift */; };
 		37FB28422721B22200A57617 /* ContentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB28402721B22200A57617 /* ContentItem.swift */; };
 		37FB28432721B22200A57617 /* ContentItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB28402721B22200A57617 /* ContentItem.swift */; };
-		37FB28462722054C00A57617 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB28452722054C00A57617 /* SDWebImageSwiftUI */; };
 		37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB2848272207F000A57617 /* SDWebImageWebPCoder */; };
-		37FB284B2722099E00A57617 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB284A2722099E00A57617 /* SDWebImageSwiftUI */; };
 		37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB284C2722099E00A57617 /* SDWebImageWebPCoder */; };
 		37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB285327220D8400A57617 /* SDWebImagePINPlugin */; };
 		37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 37FB285527220D9000A57617 /* SDWebImagePINPlugin */; };
@@ -1362,7 +1362,6 @@
 				37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */,
 				37EE6DC528A305AD00BFD632 /* Reachability in Frameworks */,
 				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
-				37FB284B2722099E00A57617 /* SDWebImageSwiftUI in Frameworks */,
 				3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
 				375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */,
 				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
@@ -1375,6 +1374,7 @@
 				3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
 				3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
+				376FF6CA28CE6D6900260DD6 /* SDWebImageSwiftUI in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
 				3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
@@ -1406,8 +1406,8 @@
 				370F4FC927CC16CB001B35DC /* libssl.3.dylib in Frameworks */,
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
-				3703206027D2BB16007A0CB8 /* SDWebImageSwiftUI in Frameworks */,
 				370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */,
+				376FF6CC28CE6D8200260DD6 /* SDWebImageSwiftUI in Frameworks */,
 				370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */,
 				370F4FDD27CC16CB001B35DC /* liblcms2.2.dylib in Frameworks */,
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
@@ -1458,6 +1458,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				376FF6CE28CE6D8B00260DD6 /* SDWebImageSwiftUI in Frameworks */,
 				3772003C27E8EED000CB2475 /* libz.tbd in Frameworks */,
 				3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
 				3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
@@ -1477,7 +1478,6 @@
 				372AA412286D06950000B1DC /* Repeat in Frameworks */,
 				3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */,
 				3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
-				37FB28462722054C00A57617 /* SDWebImageSwiftUI in Frameworks */,
 				3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
 				3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917E27237D2A009F956E /* PINCache in Frameworks */,
@@ -2343,7 +2343,6 @@
 				37BD07B82698AB2E003EBB87 /* Siesta */,
 				37BD07C62698B27B003EBB87 /* Introspect */,
 				37BADCA42699FB72009BE4FB /* Alamofire */,
-				37FB284A2722099E00A57617 /* SDWebImageSwiftUI */,
 				37FB284C2722099E00A57617 /* SDWebImageWebPCoder */,
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
 				3765917B27237D21009F956E /* PINCache */,
@@ -2353,6 +2352,7 @@
 				37EE6DC428A305AD00BFD632 /* Reachability */,
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
+				376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2380,7 +2380,6 @@
 				3703205727D2BAE4007A0CB8 /* Siesta */,
 				3703205B27D2BAF3007A0CB8 /* SwiftyJSON */,
 				3703205D27D2BB12007A0CB8 /* SDWebImageWebPCoder */,
-				3703205F27D2BB16007A0CB8 /* SDWebImageSwiftUI */,
 				3703206127D2BB1B007A0CB8 /* SDWebImagePINPlugin */,
 				3703206327D2BB30007A0CB8 /* Logging */,
 				3703206527D2BB35007A0CB8 /* PINCache */,
@@ -2390,6 +2389,7 @@
 				37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */,
 				372AA413286D06A10000B1DC /* Repeat */,
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
+				376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2459,7 +2459,6 @@
 				372915E32687E33E00F5A35B /* Defaults */,
 				3797757C268922D100DD52A8 /* Siesta */,
 				37BADCA8269A570B009BE4FB /* Alamofire */,
-				37FB28452722054C00A57617 /* SDWebImageSwiftUI */,
 				37FB2848272207F000A57617 /* SDWebImageWebPCoder */,
 				37FB285327220D8400A57617 /* SDWebImagePINPlugin */,
 				3765917D27237D2A009F956E /* PINCache */,
@@ -2467,6 +2466,7 @@
 				372AA411286D06950000B1DC /* Repeat */,
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
+				376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2557,7 +2557,6 @@
 				3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */,
 				37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */,
-				37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */,
 				37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */,
 				3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */,
@@ -2567,6 +2566,7 @@
 				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4434,6 +4434,14 @@
 				kind = branch;
 			};
 		};
+		376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/garrettrayj/SDWebImageSwiftUI.git";
+			requirement = {
+				branch = "ios16-undefined-behavior";
+				kind = branch;
+			};
+		};
 		3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bustoutsolutions/siesta";
@@ -4506,14 +4514,6 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 		37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageWebPCoder.git";
@@ -4547,11 +4547,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */;
 			productName = SDWebImageWebPCoder;
-		};
-		3703205F27D2BB16007A0CB8 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
 		};
 		3703206127D2BB1B007A0CB8 /* SDWebImagePINPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -4622,6 +4617,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
 			productName = PINCache;
+		};
+		376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		3774127327387E8500423605 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -4738,20 +4748,10 @@
 			package = 37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
-		37FB28452722054C00A57617 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
 		37FB2848272207F000A57617 /* SDWebImageWebPCoder */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */;
 			productName = SDWebImageWebPCoder;
-		};
-		37FB284A2722099E00A57617 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37FB28442722054B00A57617 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
 		};
 		37FB284C2722099E00A57617 /* SDWebImageWebPCoder */ = {
 			isa = XCSwiftPackageProductDependency;

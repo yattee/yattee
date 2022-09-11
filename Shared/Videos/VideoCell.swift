@@ -421,32 +421,21 @@ struct VideoCell: View {
     private var thumbnailImage: some View {
         Group {
             let url = thumbnails.best(video)
-            if #available(iOS 15, macOS 12, *) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                } placeholder: {
+
+            WebImage(url: url)
+                .resizable()
+                .placeholder {
                     Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
-                #if os(tvOS)
-                .frame(minHeight: 320)
-                #endif
-            } else {
-                WebImage(url: url)
-                    .resizable()
-                    .placeholder {
-                        Rectangle().foregroundColor(Color("PlaceholderColor"))
-                    }
-                    .retryOnAppear(true)
-                    .onFailure { _ in
-                        guard let url = url else { return }
-                        thumbnails.insertUnloadable(url)
-                    }
+                .retryOnAppear(true)
+                .onFailure { _ in
+                    guard let url = url else { return }
+                    thumbnails.insertUnloadable(url)
+                }
 
-                #if os(tvOS)
-                    .frame(minHeight: 320)
-                #endif
-            }
+            #if os(tvOS)
+                .frame(minHeight: 320)
+            #endif
         }
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
         .modifier(AspectRatioModifier())
