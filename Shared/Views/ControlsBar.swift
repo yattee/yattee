@@ -271,22 +271,13 @@ struct ControlsBar: View {
     private var authorAvatar: some View {
         Group {
             if let video = model.currentItem?.video, let url = video.channel.thumbnailURL {
-                if #available(iOS 15, macOS 12, *) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                    } placeholder: {
-                        Rectangle().foregroundColor(Color("PlaceholderColor"))
+                WebImage(url: url)
+                    .resizable()
+                    .placeholder {
+                        Rectangle().fill(Color("PlaceholderColor"))
                     }
-                } else {
-                    WebImage(url: url)
-                        .resizable()
-                        .placeholder {
-                            Rectangle().fill(Color("PlaceholderColor"))
-                        }
-                        .retryOnAppear(true)
-                        .indicator(.activity)
-                }
+                    .retryOnAppear(true)
+                    .indicator(.activity)
             } else {
                 ZStack {
                     Color(white: 0.6)

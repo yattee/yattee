@@ -221,23 +221,14 @@ struct PlayerControls: View {
            let video = item.video,
            let url = thumbnails.best(video)
         {
-            if #available(iOS 15, macOS 12, *) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    Rectangle().foregroundColor(Color("PlaceholderColor"))
+            WebImage(url: url)
+                .resizable()
+                .placeholder {
+                    Rectangle().fill(Color("PlaceholderColor"))
                 }
-            } else {
-                WebImage(url: url)
-                    .resizable()
-                    .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
-                    }
-                    .retryOnAppear(true)
-                    .indicator(.activity)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+                .retryOnAppear(true)
+                .indicator(.activity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
