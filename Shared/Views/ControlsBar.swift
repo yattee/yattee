@@ -1,4 +1,3 @@
-import CachedAsyncImage
 import Defaults
 import SDWebImageSwiftUI
 import SwiftUI
@@ -273,7 +272,7 @@ struct ControlsBar: View {
         Group {
             if let video = model.currentItem?.video, let url = video.channel.thumbnailURL {
                 if #available(iOS 15, macOS 12, *) {
-                    CachedAsyncImage(url: url) { image in
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                     } placeholder: {

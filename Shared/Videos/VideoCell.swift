@@ -1,4 +1,3 @@
-import CachedAsyncImage
 import CoreMedia
 import Defaults
 import SDWebImageSwiftUI
@@ -423,7 +422,7 @@ struct VideoCell: View {
         Group {
             let url = thumbnails.best(video)
             if #available(iOS 15, macOS 12, *) {
-                CachedAsyncImage(url: url) { image in
+                AsyncImage(url: url) { image in
                     image
                         .resizable()
                 } placeholder: {
