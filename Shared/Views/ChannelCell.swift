@@ -38,26 +38,23 @@ struct ChannelCell: View {
                     .opacity(0.6)
             }
             .foregroundColor(.secondary)
-
-            Group {
-                if #available(iOS 15, macOS 12, *) {
-                    CachedAsyncImage(url: channel.thumbnailURL) { image in
-                        image
-                            .resizable()
-                    } placeholder: {
-                        Rectangle().foregroundColor(Color("PlaceholderColor"))
-                    }
-                } else {
-                    WebImage(url: channel.thumbnailURL)
+            if #available(iOS 15, macOS 12, *) {
+                CachedAsyncImage(url: channel.thumbnailURL) { image in
+                    image
                         .resizable()
-                        .placeholder {
-                            Rectangle().fill(Color("PlaceholderColor"))
-                        }
-                        .indicator(.activity)
+                } placeholder: {
+                    Rectangle().foregroundColor(Color("PlaceholderColor"))
                 }
+            } else {
+                WebImage(url: channel.thumbnailURL)
+                    .resizable()
+                    .placeholder {
+                        Rectangle().fill(Color("PlaceholderColor"))
+                    }
+                    .indicator(.activity)
+                    .frame(width: 88, height: 88)
+                    .clipShape(Circle())
             }
-            .frame(width: 88, height: 88)
-            .clipShape(Circle())
 
             DetailBadge(text: channel.name, style: .prominent)
 
