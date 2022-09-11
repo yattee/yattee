@@ -154,6 +154,7 @@ extension Defaults.Keys {
     static let recentlyOpened = Key<[RecentItem]>("recentlyOpened", default: [])
 
     static let queue = Key<[PlayerQueueItem]>("queue", default: [])
+    static let saveLastPlayed = Key<Bool>("saveLastPlayed", default: false)
     static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
     static let playbackMode = Key<PlayerModel.PlaybackMode>("playbackMode", default: .queue)
 

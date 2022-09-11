@@ -239,11 +239,11 @@ extension PlayerModel {
     func restoreQueue() {
         var restoredQueue = [PlayerQueueItem?]()
 
-        if let lastPlayed = Defaults[.lastPlayed],
+        if let lastPlayed = lastPlayed,
            !Defaults[.queue].contains(where: { $0.videoID == lastPlayed.videoID })
         {
             restoredQueue.append(lastPlayed)
-            Defaults[.lastPlayed] = nil
+            self.lastPlayed = nil
         }
 
         restoredQueue.append(contentsOf: Defaults[.queue])

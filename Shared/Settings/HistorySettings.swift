@@ -9,6 +9,7 @@ struct HistorySettings: View {
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveRecents) private var saveRecents
+    @Default(.saveLastPlayed) private var saveLastPlayed
     @Default(.saveHistory) private var saveHistory
     @Default(.showWatchingProgress) private var showWatchingProgress
     @Default(.watchedThreshold) private var watchedThreshold
@@ -57,6 +58,7 @@ struct HistorySettings: View {
                     Toggle("Save history of played videos", isOn: $saveHistory)
                     Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
                         .disabled(!saveHistory)
+                    Toggle("Keep last played video in the queue after restart", isOn: $saveLastPlayed)
                 }
 
                 Section(header: SettingsHeader(text: "Watched")) {
