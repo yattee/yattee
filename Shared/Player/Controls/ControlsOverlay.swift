@@ -354,6 +354,8 @@ struct ControlsOverlay: View {
                 .frame(maxWidth: 320)
             }
             .contextMenu {
+                Button("Disabled") { captionsBinding.wrappedValue = nil }
+
                 ForEach(player.currentVideo?.captions ?? []) { caption in
                     Button(caption.description) { captionsBinding.wrappedValue = caption }
                 }
