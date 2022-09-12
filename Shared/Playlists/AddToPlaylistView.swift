@@ -94,7 +94,7 @@ struct AddToPlaylistView: View {
                     selectPlaylistButton
                 #else
                     Picker("Playlist", selection: $selectedPlaylistID) {
-                        ForEach(model.all) { playlist in
+                        ForEach(model.all.filter(\.editable)) { playlist in
                             Text(playlist.title).tag(playlist.id)
                         }
                     }
