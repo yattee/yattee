@@ -634,10 +634,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractPlaylist(from content: JSON) -> Playlist {
-        .init(
-            id: content["playlistId"].stringValue,
+        let id = content["playlistId"].stringValue
+        return Playlist(
+            id: id,
             title: content["title"].stringValue,
             visibility: content["isListed"].boolValue ? .public : .private,
+            editable: id.starts(with: "IV"),
             updated: content["updated"].doubleValue,
             videos: content["videos"].arrayValue.map { extractVideo(from: $0) }
         )

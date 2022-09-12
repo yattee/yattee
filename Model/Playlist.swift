@@ -17,15 +17,17 @@ struct Playlist: Identifiable, Equatable, Hashable {
     let id: String
     var title: String
     var visibility: Visibility
+    var editable = true
 
     var updated: TimeInterval?
 
     var videos = [Video]()
 
-    init(id: String, title: String, visibility: Visibility, updated: TimeInterval? = nil, videos: [Video] = []) {
+    init(id: String, title: String, visibility: Visibility, editable: Bool = true, updated: TimeInterval? = nil, videos: [Video] = []) {
         self.id = id
         self.title = title
         self.visibility = visibility
+        self.editable = editable
         self.updated = updated
         self.videos = videos
     }
