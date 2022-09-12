@@ -124,6 +124,8 @@ struct PlaylistsView: View {
             resource?.load()
         }
         .onChange(of: currentPlaylist) { _ in
+            channelPlaylist.clear()
+            userPlaylist.clear()
             resource?.load()
         }
         .onChange(of: model.reloadPlaylists) { _ in
