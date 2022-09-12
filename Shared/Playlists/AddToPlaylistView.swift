@@ -94,7 +94,7 @@ struct AddToPlaylistView: View {
                     selectPlaylistButton
                 #else
                     Picker("Playlist", selection: $selectedPlaylistID) {
-                        ForEach(model.all.filter(\.editable)) { playlist in
+                        ForEach(editablePlaylists) { playlist in
                             Text(playlist.title).tag(playlist.id)
                         }
                     }
@@ -109,6 +109,10 @@ struct AddToPlaylistView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    var editablePlaylists: [Playlist] {
+        model.all.filter(\.editable)
     }
 
     private var formAlignment: HorizontalAlignment {
@@ -139,10 +143,10 @@ struct AddToPlaylistView: View {
                     return // swiftlint:disable:this implicit_return
                 }
 
-                selectedPlaylistID = model.all.next(after: selectedPlaylist!)!.id
+                selectedPlaylistID = editablePlaylists.next(after: selectedPlaylist!)!.id
             }
             .contextMenu {
-                ForEach(model.all) { playlist in
+                ForEach(editablePlaylists) { playlist in
                     Button(playlist.title) {
                         selectedPlaylistID = playlist.id
                     }
