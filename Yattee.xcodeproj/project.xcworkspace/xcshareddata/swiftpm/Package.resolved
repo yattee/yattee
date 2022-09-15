@@ -87,7 +87,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "3e48cb68d8e668d146dc59c73fb98cb628616236"
+        "revision" : "484bc774e1091f622c4856e576ff957b29403676"
       }
     },
     {
@@ -102,10 +102,10 @@
     {
       "identity" : "sdwebimageswiftui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/garrettrayj/SDWebImageSwiftUI.git",
+      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
       "state" : {
-        "branch" : "ios16-undefined-behavior",
-        "revision" : "d9feae51080fac94691e4d43b2252de1e0171391"
+        "revision" : "ed288667c909c89127ab1b690113a3e397af3098",
+        "version" : "2.2.1"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "8a0c5e1ae08ed763739262b9dcef64cfb241c14b",
-        "version" : "0.9.0"
+        "revision" : "4416805045174938b11edb69a86e9f7dd0699952",
+        "version" : "0.9.1"
       }
     },
     {
