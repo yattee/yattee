@@ -428,9 +428,6 @@
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */; };
-		376FF6CA28CE6D6900260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */; };
-		376FF6CC28CE6D8200260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */; };
-		376FF6CE28CE6D8B00260DD6 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */; };
 		3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003227E8EEA100CB2475 /* AudioToolbox.framework */; };
 		3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003427E8EEA100CB2475 /* AVFoundation.framework */; };
 		3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003527E8EEA100CB2475 /* CoreMedia.framework */; };
@@ -549,6 +546,9 @@
 		378FFBC92866018A009E3FBE /* URLParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC82866018A009E3FBE /* URLParserTests.swift */; };
 		3795593627B08538007FF8F4 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
 		3795593727B08538007FF8F4 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
+		3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104828D3D10600D5F53C /* SDWebImageSwiftUI */; };
+		3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */; };
+		3797104D28D3D19100D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */; };
 		3797757D268922D100DD52A8 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3797757C268922D100DD52A8 /* Siesta */; };
 		37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
 		37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
@@ -1374,7 +1374,7 @@
 				3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
 				3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
-				376FF6CA28CE6D6900260DD6 /* SDWebImageSwiftUI in Frameworks */,
+				3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
 				3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
@@ -1407,7 +1407,7 @@
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
 				370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */,
-				376FF6CC28CE6D8200260DD6 /* SDWebImageSwiftUI in Frameworks */,
+				3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */,
 				370F4FDD27CC16CB001B35DC /* liblcms2.2.dylib in Frameworks */,
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
@@ -1458,7 +1458,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				376FF6CE28CE6D8B00260DD6 /* SDWebImageSwiftUI in Frameworks */,
+				3797104D28D3D19100D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				3772003C27E8EED000CB2475 /* libz.tbd in Frameworks */,
 				3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
 				3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
@@ -2352,7 +2352,7 @@
 				37EE6DC428A305AD00BFD632 /* Reachability */,
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
-				376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */,
+				3797104828D3D10600D5F53C /* SDWebImageSwiftUI */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2389,7 +2389,7 @@
 				37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */,
 				372AA413286D06A10000B1DC /* Repeat */,
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
-				376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */,
+				3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2466,7 +2466,7 @@
 				372AA411286D06950000B1DC /* Repeat */,
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
-				376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */,
+				3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2566,7 +2566,7 @@
 				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4434,12 +4434,12 @@
 				kind = branch;
 			};
 		};
-		376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+		3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/garrettrayj/SDWebImageSwiftUI.git";
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
 			requirement = {
-				branch = "ios16-undefined-behavior";
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
 			};
 		};
 		3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */ = {
@@ -4618,21 +4618,6 @@
 			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
 			productName = PINCache;
 		};
-		376FF6C928CE6D6900260DD6 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
-		376FF6CB28CE6D8200260DD6 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
-		376FF6CD28CE6D8B00260DD6 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 376FF6C828CE6D6900260DD6 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
 		3774127327387E8500423605 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
@@ -4667,6 +4652,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
+		};
+		3797104828D3D10600D5F53C /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+		3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 		3797757C268922D100DD52A8 /* Siesta */ = {
 			isa = XCSwiftPackageProductDependency;
