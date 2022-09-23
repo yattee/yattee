@@ -714,6 +714,11 @@ final class PlayerModel: ObservableObject {
             remoteCommandCenterConfigured = true
 
             #if !os(macOS)
+                try? AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .moviePlayback
+                )
+
                 UIApplication.shared.beginReceivingRemoteControlEvents()
             #endif
 
