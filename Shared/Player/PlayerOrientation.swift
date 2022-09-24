@@ -8,7 +8,9 @@ extension VideoPlayerView {
         if currentOrientation.isLandscape,
            Defaults[.enterFullscreenInLandscape],
            !player.playingFullScreen,
-           !player.playingInPictureInPicture
+           !player.playingInPictureInPicture,
+           !player.currentItem.isNil,
+           player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape)
         {
             guard player.presentingPlayer else { return }
 
@@ -27,8 +29,7 @@ extension VideoPlayerView {
             object: nil,
             queue: .main
         ) { _ in
-            guard !Defaults[.honorSystemOrientationLock],
-                  player.presentingPlayer,
+            guard player.presentingPlayer,
                   !player.playingInPictureInPicture,
                   player.lockedOrientation.isNil
             else {
