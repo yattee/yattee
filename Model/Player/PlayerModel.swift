@@ -901,7 +901,7 @@ final class PlayerModel: ObservableObject {
         #if os(iOS)
             if !playingFullScreen {
                 playingFullScreen = true
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                Orientation.lockOrientation(.allButUpsideDown)
             } else {
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
