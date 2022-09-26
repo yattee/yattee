@@ -1,443 +1,164 @@
-/* No comment provided by engineer. */
 " subscribers" = " subskrybentów";
-
-/* No comment provided by engineer. */
 "#" = "#";
-
-/* No comment provided by engineer. */
 "%@" = "%@";
-
-/* No comment provided by engineer. */
 "%@ %@" = "%@ %@";
-
-/* No comment provided by engineer. */
 "%@ Channel" = "Kanał %@";
-
-/* No comment provided by engineer. */
 "%@ Playlist" = "Playlista %@";
-
-/* No comment provided by engineer. */
 "%@ subscribers" = "%@ subskrybentów";
-
-/* No comment provided by engineer. */
 "%lld" = "%lld";
-
-/* No comment provided by engineer. */
 "%lld videos" = "%lld wideo";
-
-/* No comment provided by engineer. */
 "%lld%%" = "%lld%%";
-
-/* No comment provided by engineer. */
 "1 century ago" = "Dawno temu";
-
-/* No comment provided by engineer. */
 "1,234M" = "1,234M";
-
-/* No comment provided by engineer. */
 "10 seconds forwards/backwards" = "Przewijanie o 10 sekund";
-
-/* No comment provided by engineer. */
 "1234" = "1234";
-
-/* No comment provided by engineer. */
 "a" = "a";
-
-/* No comment provided by engineer. */
 "A" = "A";
-
-/* No comment provided by engineer. */
 "Accounts" = "Konta";
-
-/* No comment provided by engineer. */
 "Accounts are not supported for the application of this instance" = "Konta nie są obsługiwane dla tej instancji";
-
-/* No comment provided by engineer. */
 "Add Account" = "Dodaj konto";
-
-/* No comment provided by engineer. */
 "Add Account..." = "Dodaj konto…";
-
-/* No comment provided by engineer. */
 "Add Location" = "Dodaj lokalizację";
-
-/* No comment provided by engineer. */
 "Add Location..." = "Dodaj lokalizację…";
-
-/* No comment provided by engineer. */
 "Add profile..." = "Dodaj profil…";
-
-/* No comment provided by engineer. */
 "Add Quality Profile" = "Dodaj profil jakości";
-
-/* No comment provided by engineer. */
 "Add to %@" = "Dodaj do %@";
-
-/* No comment provided by engineer. */
 "Add to Favorites" = "Dodaj do ulubionych";
-
-/* No comment provided by engineer. */
 "Add to Playlist" = "Dodaj do playlisty";
-
-/* No comment provided by engineer. */
 "Add to Playlist..." = "Dodaj do playlisty...";
-
-/* No comment provided by engineer. */
 "Advanced" = "Zaawansowane";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Wszystkie";
-
-/* No comment provided by engineer. */
 "Always use AVPlayer for live videos" = "Zawsze używaj AVPlayera z filmami na żywo";
-
-/* No comment provided by engineer. */
 "Anonymous" = "Anonim";
 
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "Dowolna";
-
-/* No comment provided by engineer. */
 "Apply to all" = "Zastosuj do wszystkich";
-
-/* No comment provided by engineer. */
 "Are you sure you want to clear history of watched videos?" = "Czy na pewno usunąć historię oglądania filmów?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to clear search history?" = "Czy na pewno usunąć historię wyszukiwania?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to delete playlist?" = "Czy na pewno usunąć playlistę?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to restore default quality profiles?" = "Czy na pewno przywrócić domyślne profile jakości?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to unsubscribe from %@?" = "Czy na pewno chcesz przestać subskrybować kanał %@?";
-
-/* No comment provided by engineer. */
 "Automatic" = "Automatyczny";
-
-/* No comment provided by engineer. */
 "Autoplaying Next" = "Wybrany do kolejki";
-
-/* No comment provided by engineer. */
 "Backend" = "Silnik";
-
-/* No comment provided by engineer. */
 "Badge" = "Znaczek";
-
-/* No comment provided by engineer. */
 "Badge & Decreased opacity" = "Znaczek i przezroczystość";
-
-/* No comment provided by engineer. */
 "Badge color" = "Kolor znaczka";
-
-/* No comment provided by engineer. */
 "Based on system color scheme" = "Schemat kolorów systemu";
-
-/* No comment provided by engineer. */
 "Battery" = "Bateria";
-
-/* No comment provided by engineer. */
 "Blue" = "Niebieski";
-
-/* No comment provided by engineer. */
 "Browsing" = "Przeglądanie";
-
-/* No comment provided by engineer. */
 "Buffering stream..." = "Buforowanie strumienia…";
-
-/* No comment provided by engineer. */
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Błędy i wspaniałe pomysły na nowe funkcje wyślij na GitHub Issues ";
-
-/* No comment provided by engineer. */
 "Button" = "Przycisk";
-
-/* No comment provided by engineer. */
 "cache-pause-wait" = "cache-pause-wait";
-
-/* No comment provided by engineer. */
 "cache-secs" = "cache-secs";
-
-/* No comment provided by engineer. */
 "Cancel" = "Anuluj";
-
-/* No comment provided by engineer. */
 "Captions" = "Napisy";
-
-/* No comment provided by engineer. */
 "Categories to Skip" = "Kategorie do pomijania";
-
-/* No comment provided by engineer. */
 "Category" = "Kategoria";
-
-/* No comment provided by engineer. */
 "Cellular" = "Sieć komórkowa";
-
-/* No comment provided by engineer. */
 "Chapters" = "Rozdziały";
-
-/* No comment provided by engineer. */
 "Charging" = "Ładowanie";
-
-/* No comment provided by engineer. */
 "Clear" = "Wyczyść";
-
-/* No comment provided by engineer. */
 "Clear All" = "Wyczyść wszystko";
-
-/* No comment provided by engineer. */
 "Clear All Recents" = "Wyczyść ostatnie";
-
-/* No comment provided by engineer. */
 "Clear History" = "Wyczyść historię";
-
-/* No comment provided by engineer. */
 "Clear Search History" = "Wyczyść historię wyszukiwania";
-
-/* No comment provided by engineer. */
 "Clear Search History..." = "Wyczyść historię wyszukiwania...";
-
-/* No comment provided by engineer. */
 "Clear the queue" = "Wyczyść kolejkę";
-
-/* No comment provided by engineer. */
 "Close" = "Zamknij";
-
-/* No comment provided by engineer. */
 "Close PiP and open player when application enters foreground" = "Zamknij PiP i otwórz odtwarzacz przy wejściu na pierwszy plan";
-
-/* No comment provided by engineer. */
 "Close PiP when player is opened" = "Zamknij PiP przy otwarciu odtwarzacza";
-
-/* No comment provided by engineer. */
 "Close PiP when starting playing other video" = "Zamknij PiP przy rozpoczęciu odtwarzania innego filmu";
-
-/* No comment provided by engineer. */
 "Close player when closing video" = "Zamknij odtwarzacz przy zamknięciu wideo";
-
-/* No comment provided by engineer. */
 "Close player when starting PiP" = "Zamknij odtwarzacz przy uruchomieniu PiP";
-
-/* No comment provided by engineer. */
 "Close Video" = "Zamknij wideo";
-
-/* No comment provided by engineer. */
 "Close video after playing last in the queue" = "Zamknij wideo po odtworzeniu ostatniego w kolejce";
-
-/* No comment provided by engineer. */
 "Comments" = "Komentarze";
-
-/* No comment provided by engineer. */
 "Connected successfully (%@)" = "Połączono (%@)";
-
-/* No comment provided by engineer. */
 "Connection failed" = "Błąd połączenia";
-
-/* No comment provided by engineer. */
 "Contact" = "Kontakt";
-
-/* No comment provided by engineer. */
 "Continue" = "Kontynuuj";
-
-/* No comment provided by engineer. */
 "Continue from %@" = "Kontynuuj od %@";
-
-/* No comment provided by engineer. */
 "Contributing" = "Współpraca nad rozwojem";
-
-/* No comment provided by engineer. */
 "Controls" = "Kontrolki";
-
-/* No comment provided by engineer. */
 "Copy %@ link" = "Kopiuj link do %@";
-
-/* No comment provided by engineer. */
 "Copy %@ link with time" = "Kopiuj link do %@ wraz z czasem";
-
-/* No comment provided by engineer. */
 "Could not load locations manifest" = "Nie można wczytać publicznej listy instancji";
-
-/* No comment provided by engineer. */
 "Country" = "Kraj";
-
-/* No comment provided by engineer. */
 "Country Name or Code" = "Nazwa kraju lub kod";
-
-/* No comment provided by engineer. */
 "Create Playlist" = "Dodaj playlistę";
-
-/* No comment provided by engineer. */
 "Current: %@\n%@" = "Aktualnie: %@\n%@";
 
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Własna";
-
-/* No comment provided by engineer. */
 "Custom Locations" = "Własne lokalizacje";
 
 /* Video sort order in search */
 "Date" = "Data";
-
-/* No comment provided by engineer. */
 "Decrease rate" = "Zmniejsz prędkość odtwarzania";
-
-/* No comment provided by engineer. */
 "Decreased opacity" = "Zwiększona przezroczystość";
-
-/* No comment provided by engineer. */
 "Delete" = "Usuń";
-
-/* No comment provided by engineer. */
 "Disabled" = "Wyłączone";
-
-/* No comment provided by engineer. */
 "Discord Server" = "Serwer Discorda";
-
-/* No comment provided by engineer. */
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Dysktujemy na Discordzie i Matrixie. To dobre miejsca na ogólne pytania.";
-
-/* No comment provided by engineer. */
 "Don't use public locations" = "Nie używaj publicznych lokalizacji";
-
-/* No comment provided by engineer. */
 "Donations" = "Wsparcie";
-
-/* No comment provided by engineer. */
 "Done" = "Gotowe";
-
-/* No comment provided by engineer. */
 "Duration" = "Długość";
-
-/* No comment provided by engineer. */
 "Edit" = "Edytuj";
-
-/* No comment provided by engineer. */
 "Edit Playlist" = "Edytuj playlistę";
-
-/* No comment provided by engineer. */
 "Edit Quality Profile" = "Edytuj profil jakości";
-
-/* No comment provided by engineer. */
 "Edit..." = "Edytuj...";
-
-/* No comment provided by engineer. */
 "Enable logging" = "Włącz logowanie";
-
-/* No comment provided by engineer. */
 "Enable Return YouTube Dislike" = "Włącz łapki w dół (Return YouTube Dislike)";
-
-/* No comment provided by engineer. */
 "Enter fullscreen in landscape" = "W poziomej orientacji uruchom tryb pełnoekranowy";
-
-/* No comment provided by engineer. */
 "Error" = "Błąd";
-
-/* No comment provided by engineer. */
 "Error when accessing playlist" = "Błąd podczas pobierania playlisty";
-
-/* No comment provided by engineer. */
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Wyraźne przypomnienia, aby polubić, zasubskrybować lub wejść w interakcję z nimi na jakiejkolwiek płatnej lub bezpłatnej platformie (np. kliknąć na wideo).";
-
-/* No comment provided by engineer. */
 "Favorites" = "Ulubione";
-
-/* No comment provided by engineer. */
 "Filter" = "Filtr";
-
-/* No comment provided by engineer. */
 "Filter: active" = "Filtr: aktywny";
-
-/* No comment provided by engineer. */
 "Find Other" = "Znajdź coś innego";
-
-/* No comment provided by engineer. */
 "Finding something to play..." = "Szukanie następnego filmu...";
-
-/* No comment provided by engineer. */
 "For videos which feature music as the primary content." = "Dla filmów, których główną treścią jest muzyka.";
-
-/* No comment provided by engineer. */
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formaty będą wybierane w kolejności tak jak wyżej.\nHLS to format adaptacyjny (ustawienie rozdzielczości nie ma zastosowania).";
-
-/* No comment provided by engineer. */
 "Frontend URL" = "Adres frontendu";
-
-/* No comment provided by engineer. */
 "Fullscreen size" = "Rozmiar pełnoekranowy";
-
-/* No comment provided by engineer. */
 "Fullscreen Size" = "Pełen ekran";
-
-/* No comment provided by engineer. */
 "Gaming" = "Gry";
-
-/* No comment provided by engineer. */
 "Help" = "Pomoc";
-
-/* No comment provided by engineer. */
 "Hide sidebar" = "Ukryj pasek boczny";
-
-/* No comment provided by engineer. */
 "High" = "Wysoka";
-
-/* No comment provided by engineer. */
 "Highest" = "Najwyższa";
-
-/* No comment provided by engineer. */
 "Highest quality" = "Najwyższa jakość";
-
-/* No comment provided by engineer. */
 "History" = "Historia";
-
-/* No comment provided by engineer. */
 "Honor orientation lock" = "Honoruj blokadę orientacji systemu";
 
 /* Video date filter in search */
 "Hour" = "Godzina";
-
-/* No comment provided by engineer. */
 "I am lost" = "Nic tu nie ogarniam";
-
-/* No comment provided by engineer. */
 "I found a bug /" = "Znalazłem błąd /";
-
-/* No comment provided by engineer. */
 "I have a feature request" = "Mam prośbę o dodanie funkcji";
-
-/* No comment provided by engineer. */
 "I like this app!" = "Podoba mi się ta aplikacja!";
-
-/* No comment provided by engineer. */
 "I want to ask a question" = "Chcę zadać pytanie";
-
-/* No comment provided by engineer. */
 "If you are interested what's coming in future updates, you can track project Milestones." = "Jeśli interesuje Cię przyszłość projektu, śledź GitHubowe Milestone'y.";
-
-/* No comment provided by engineer. */
 "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Jeśli zgłaszasz błąd, dołącz potrzebne informacje (takie jak: wersja aplikacji, rodzaj urządzenia i jego wersja systemu, lista kroków do zreprodukowania).";
-
-/* No comment provided by engineer. */
 "Increase rate" = "Zwiększ prędkość";
-
-/* No comment provided by engineer. */
 "Info" = "Info";
-
-/* No comment provided by engineer. */
 "Instance of current account" = "Instancja aktualnie wybranego konta";
 
 /* SponsorBlock category name */
 "Interaction" = "Interakcja";
-
-/* No comment provided by engineer. */
 "Interface" = "Interfejs";
 
 /* SponsorBlock category name */
 "Intro" = "Wprowadzenie";
-
-/* No comment provided by engineer. */
 "Issues Tracker" = "Śledzenie błędów";
 
 /* Selected video has just finished playing */
@@ -445,383 +166,153 @@
 
 /* Player controls layout size */
 "Large" = "Duży";
-
-/* No comment provided by engineer. */
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Duże rozmiary nie są przeznaczone dla wszystkich urządzeń, użycie ich może spowodować że przyciski nie będą mieścić się na ekranie.";
-
-/* No comment provided by engineer. */
 "LIVE" = "LIVE";
 
 /* Loading stream OSD */
 "Loading streams..." = "Ładowanie strumieni...";
-
-/* No comment provided by engineer. */
 "Loading..." = "Ładowanie…";
-
-/* No comment provided by engineer. */
 "Locations" = "Lokalizacje";
-
-/* No comment provided by engineer. */
 "Lock portrait mode" = "Zablokuj tryb portretowy";
 
 /* Video duration filter in search */
 "Long" = "Długie";
-
-/* No comment provided by engineer. */
 "Low" = "Niska";
-
-/* No comment provided by engineer. */
 "Low quality" = "Niska jakość";
-
-/* No comment provided by engineer. */
 "Lowest" = "Najniższa";
-
-/* No comment provided by engineer. */
 "Mark as watched" = "Oznacz jako obejrzane";
-
-/* No comment provided by engineer. */
 "Mark video as watched after playing" = "Oznacz jako obejrzane po odtworzeniu";
-
-/* No comment provided by engineer. */
 "Mark watched videos with" = "Oznacz obejrzane wideo";
-
-/* No comment provided by engineer. */
 "Matrix Channel" = "Kanał Matrix";
-
-/* No comment provided by engineer. */
 "Matrix Chat" = "Chat Matrix";
 
 /* Player controls layout size */
 "Medium" = "Średni";
-
-/* No comment provided by engineer. */
 "Medium quality" = "Średnia jakość";
-
-/* No comment provided by engineer. */
 "Milestones" = "Kamienie milowe";
 
 /* Video date filter in search */
 "Month" = "Miesiąc";
-
-/* No comment provided by engineer. */
 "More info can be found in:" = "Więcej informacji można znaleźć tutaj:";
-
-/* No comment provided by engineer. */
 "Movies" = "Filmy";
-
-/* No comment provided by engineer. */
 "MPV Documentation" = "Dokumentacja MPV";
-
-/* No comment provided by engineer. */
 "Music" = "Muzyka";
-
-/* No comment provided by engineer. */
 "Name" = "Nazwa";
-
-/* No comment provided by engineer. */
 "New Playlist" = "Nowa playlista";
-
-/* No comment provided by engineer. */
 "Next" = "Następny";
-
-/* No comment provided by engineer. */
 "No description" = "Brak opisu";
-
-/* No comment provided by engineer. */
 "No Playlists" = "Brak playlist";
-
-/* No comment provided by engineer. */
 "No results" = "Brak wyników";
-
-/* No comment provided by engineer. */
 "Normal" = "Normalna";
-
-/* No comment provided by engineer. */
 "Not available" = "Niedostępne";
-
-/* No comment provided by engineer. */
 "Not Playing" = "Nie odtwarza";
-
-/* No comment provided by engineer. */
 "Nothing" = "Nic";
 
 /* SponsorBlock category name */
 "Offtopic in Music Videos" = "Offtopic w teledyskach";
-
-/* No comment provided by engineer. */
 "Only when signed in" = "Tylko gdy zalogowany";
-
-/* No comment provided by engineer. */
 "Open \"Playlists\" tab to create new one" = "Otwórz \"Playlisty\" aby stworzyć nową";
-
-/* No comment provided by engineer. */
 "Open Settings" = "Otwórz Ustawienia";
 
 /* Loading stream OSD */
 "Opening %@ stream..." = "Otwieranie strumienia %@…";
-
-/* No comment provided by engineer. */
 "Opening audio stream..." = "Otwieranie strumienia audio...";
-
-/* No comment provided by engineer. */
 "Orientation" = "Orientacja";
 
 /* SponsorBlock category name */
 "Outro" = "Outro";
-
-/* No comment provided by engineer. */
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Część filmu promująca produkt lub usługę niezwiązaną bezpośrednio z twórcą. Twórca otrzyma zapłatę lub rekompensatę w postaci pieniędzy lub darmowych produktów.";
-
-/* No comment provided by engineer. */
 "Password" = "Hasło";
-
-/* No comment provided by engineer. */
 "Pause" = "Pauza";
-
-/* No comment provided by engineer. */
 "Pause when entering background" = "Zatrzymaj w tle";
-
-/* No comment provided by engineer. */
 "Pause when player is closed" = "Zatrzymaj przy zamykaniu odtwarzacza";
-
-/* No comment provided by engineer. */
 "Picture in Picture" = "Obraz w obrazie";
-
-/* No comment provided by engineer. */
 "Play" = "Odtwarzaj";
-
-/* No comment provided by engineer. */
 "Play All" = "Odtwórz wszystkie";
-
-/* No comment provided by engineer. */
 "Play in PiP" = "Otwórz w PiP";
-
-/* No comment provided by engineer. */
 "Play Last" = "Odtwórz jako ostatni";
-
-/* No comment provided by engineer. */
 "Play Music" = "Odtwarzaj muzykę";
-
-/* No comment provided by engineer. */
 "Play Next" = "Odtwarzaj następne";
-
-/* No comment provided by engineer. */
 "Play Now" = "Odtwórz teraz";
-
-/* No comment provided by engineer. */
 "Playback" = "Odtwarzanie";
-
-/* No comment provided by engineer. */
 "Player" = "Odtwarzacz";
-
-/* No comment provided by engineer. */
 "Playlist" = "Playlista";
-
-/* No comment provided by engineer. */
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Playlista \"%@\" zostanie usunięta.\nNie można tego cofnąć.";
-
-/* No comment provided by engineer. */
 "Playlists" = "Playlisty";
-
-/* No comment provided by engineer. */
 "Popular" = "Popularne";
-
-/* No comment provided by engineer. */
 "Preferred Formats" = "Preferowane formaty";
-
-/* No comment provided by engineer. */
 "Profiles" = "Profile";
-
-/* No comment provided by engineer. */
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promowanie produktu lub usługi bezpośrednio związanej z samym twórcą. Zwykle obejmuje to towary lub promocję platform, na których można zarabiać.";
-
-/* No comment provided by engineer. */
 "Proxy videos" = "Używaj proxy do odtwarzania wideo";
-
-/* No comment provided by engineer. */
 "Public Locations" = "Publiczne lokalizacje";
-
-/* No comment provided by engineer. */
 "Public Manifest" = "Manifest publiczny";
-
-/* No comment provided by engineer. */
 "Quality" = "Jakość";
-
-/* No comment provided by engineer. */
 "Quality Profile" = "Profil jakości";
-
-/* No comment provided by engineer. */
 "Queue" = "Kolejka";
-
-/* No comment provided by engineer. */
 "Queue is empty" = "Kolejka jest pusta";
-
-/* No comment provided by engineer. */
 "Rate" = "Prędkość";
 
 /* Video sort order in search */
 "Rating" = "Ocena";
-
-/* No comment provided by engineer. */
 "Recents" = "Ostatnie";
-
-/* No comment provided by engineer. */
 "Red" = "Czerwony";
-
-/* No comment provided by engineer. */
 "Refresh" = "Odśwież";
-
-/* No comment provided by engineer. */
 "Regular size" = "Regularny rozmiar";
-
-/* No comment provided by engineer. */
 "Regular Size" = "Zwykły rozmiar";
-
-/* No comment provided by engineer. */
 "Related" = "Powiązane";
 
 /* Video sort order in search */
 "Relevance" = "Dopasowanie";
-
-/* No comment provided by engineer. */
 "Remove" = "Usuń";
-
-/* No comment provided by engineer. */
 "Remove from Favorites" = "Usuń z ulubionych";
-
-/* No comment provided by engineer. */
 "Remove from history" = "Usuń z historii";
-
-/* No comment provided by engineer. */
 "Remove from Playlist" = "Usuń z playlisty";
-
-/* No comment provided by engineer. */
 "Remove from the queue" = "Usuń z kolejki";
-
-/* No comment provided by engineer. */
 "Replies" = "Odpowiedzi";
-
-/* No comment provided by engineer. */
 "Reset" = "Zresetuj";
-
-/* No comment provided by engineer. */
 "Reset search filters" = "Zresetuj filtry";
-
-/* No comment provided by engineer. */
 "Reset watched status when playing again" = "Resetuj status odtwarzania za każdym odtworzeniem";
-
-/* No comment provided by engineer. */
 "Resolution" = "Rozdzielczość";
-
-/* No comment provided by engineer. */
 "Restart" = "Od początku";
-
-/* No comment provided by engineer. */
 "Restart the app to apply the settings above." = "Zrestartuj aplikację aby zastosować powyższe ustawienia.";
-
-/* No comment provided by engineer. */
 "Restart/Play next" = "Od początku/Następny";
-
-/* No comment provided by engineer. */
 "Restore default profiles..." = "Przywróć domyślne profile…";
-
-/* No comment provided by engineer. */
 "Rotate to portrait when exiting fullscreen" = "Obróć do trybu portretowego przy zamykaniu pełnego ekranu";
-
-/* No comment provided by engineer. */
 "Round corners" = "Zaokrąglaj rogi";
-
-/* No comment provided by engineer. */
 "Save" = "Zapisz";
-
-/* No comment provided by engineer. */
 "Save history of played videos" = "Zapisuj historię oglądania";
-
-/* No comment provided by engineer. */
 "Save history of searches, channels and playlists" = "Zapisuj historię wyszukiwania, kanały i playlisty";
-
-/* No comment provided by engineer. */
 "Search" = "Szukaj";
-
-/* No comment provided by engineer. */
 "Search history is empty" = "Historia wyszukiwania jest pusta";
-
-/* No comment provided by engineer. */
 "Search..." = "Szukaj…";
-
-/* No comment provided by engineer. */
 "Sections" = "Sekcje";
-
-/* No comment provided by engineer. */
 "Seek gesture sensitivity" = "Czułość gestu przewijania";
-
-/* No comment provided by engineer. */
 "Seek gesture speed" = "Prędkość gestu przewijania";
-
-/* No comment provided by engineer. */
 "Seek with horizontal swipe on video" = "Przewijaj wideo gestem poziomym";
-
-/* No comment provided by engineer. */
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmenty, które zwykle znajdują się na początku filmu, zawierają animację, nieruchomą klatkę lub klip, które są również widoczne w innych filmach tego samego twórcy.";
-
-/* No comment provided by engineer. */
 "Select location closest to you:" = "Wybierz najbliższą lokalizację:";
 
 /* SponsorBlock category name */
 "Self-promotion" = "Autopromocja";
-
-/* No comment provided by engineer. */
 "Settings" = "Ustawienia";
-
-/* No comment provided by engineer. */
 "Share %@ link" = "Udostępnij link do %@";
-
-/* No comment provided by engineer. */
 "Share %@ link with time" = "Udostępnij link do %@ wraz z czasem";
-
-/* No comment provided by engineer. */
 "Share..." = "Udostępnij…";
 
 /* Video duration filter in search */
 "Short" = "Krótkie";
-
-/* No comment provided by engineer. */
 "Show account username" = "Pokaż nazwę konta";
-
-/* No comment provided by engineer. */
 "Show anonymous accounts" = "Pokaż anonimowe konta";
-
-/* No comment provided by engineer. */
 "Show channel name" = "Pokaż nazwę kanału";
-
-/* No comment provided by engineer. */
 "Show history" = "Pokaż historię";
-
-/* No comment provided by engineer. */
 "Show keywords" = "Pokaż słowa kluczowe";
-
-/* No comment provided by engineer. */
 "Show playback statistics" = "Pokaż statystyki odtwarzania";
-
-/* No comment provided by engineer. */
 "Show progress of watching on thumbnails" = "Pokazuj postęp odtwarzania na miniaturkach";
-
-/* No comment provided by engineer. */
 "Show sidebar when space permits" = "Pokazuj pasek boczny gdy jest na to miejsce";
-
-/* No comment provided by engineer. */
 "Show video length" = "Pokaż długość wideo";
-
-/* No comment provided by engineer. */
 "Shuffle" = "Mieszaj";
-
-/* No comment provided by engineer. */
 "Shuffle All" = "Mieszaj wszystkie";
-
-/* No comment provided by engineer. */
 "Sidebar" = "Pasek boczny";
-
-/* No comment provided by engineer. */
 "Sign In Required" = "Wymagane logowanie";
 
 /* Player controls layout size */
@@ -829,101 +320,49 @@
 
 /* Player controls layout size */
 "Smaller" = "Mniejszy";
-
-/* No comment provided by engineer. */
 "Sort" = "Sortuj";
-
-/* No comment provided by engineer. */
 "Sort: %@" = "Sortowanie: %@";
-
-/* No comment provided by engineer. */
 "Source" = "Źródło";
 
 /* SponsorBlock category name */
 "Sponsor" = "Sponsor";
-
-/* No comment provided by engineer. */
 "SponsorBlock" = "SponsorBlock";
-
-/* No comment provided by engineer. */
 "SponsorBlock API Instance" = "Instancja SponsorBlock";
-
-/* No comment provided by engineer. */
 "Subscribe" = "Subskrybuj";
 
 /* Subscriptions title */
 "Subscriptions" = "Subskrybcje";
-
-/* No comment provided by engineer. */
 "Switch to other public location" = "Przełącz publiczną lokalizację na inną";
-
-/* No comment provided by engineer. */
 "Switch to public locations" = "Przełącz na publiczne lokalizacje";
-
-/* No comment provided by engineer. */
 "System controls buttons" = "Przyciski w systemowych kontrolkach";
-
-/* No comment provided by engineer. */
 "System controls show buttons for %@" = "Kontrolki systemu pokazują przyciski: %@";
-
-/* No comment provided by engineer. */
 "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Miło to słyszeć. Fajnie jest dostarczać aplikacje, których inni ludzie chcą używać. Możesz rozważyć przekazanie darowizny na rzecz projektu lub pomóc poprzez przyczynienie się do rozwoju nowych funkcji.";
-
-/* No comment provided by engineer. */
 "This cannot be reverted" = "Nie można tego cofnąć";
-
-/* No comment provided by engineer. */
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Nie można tego cofnąć. Ponowne uruchomienie aplikacji może być wymagane aby zobaczyć zmiany.";
-
-/* No comment provided by engineer. */
-"This information will be processed only on your device and used to connect you to the server in the specified country." = "Ta informacja będzie przetwarzana tylko na tym urządzeniu aby połączyć się z serwerem najbliższym do podnego kraju. ";
-
-/* No comment provided by engineer. */
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Ta informacja będzie przetwarzana tylko na tym urządzeniu aby połączyć cię z najbliższym serwerem.";
 "This will remove all your custom profiles and return their default values. This cannot be reverted." = "Twoje profile zostaną usunięte i przywrócone zostaną domyślne. Nie można tego cofnąć.";
-
-/* No comment provided by engineer. */
 "Thumbnails" = "Miniaturki";
 
 /* Video date filter in search */
 "Today" = "Dziś";
-
-/* No comment provided by engineer. */
 "Trending" = "Na czasie";
 
 /* Player controls layout size for TV */
 "TV" = "TV";
-
-/* No comment provided by engineer. */
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Zazwyczaj w pobliżu lub na końcu filmu, gdy pojawiają się napisy i/lub karty końcowe.";
-
-/* No comment provided by engineer. */
 "unknown" = "nieznany";
-
-/* No comment provided by engineer. */
 "Unsubscribe" = "Odsubskrybuj";
-
-/* No comment provided by engineer. */
 "Upload date" = "Data dodania";
-
-/* No comment provided by engineer. */
 "URL" = "Adres";
-
-/* No comment provided by engineer. */
 "Used to create links from videos, channels and playlists" = "Do tworzenia linków wideo, kanałów i playlist";
-
-/* No comment provided by engineer. */
 "Username" = "Nazwa użytkownika";
 
 /* Player controls layout size */
 "Very Large" = "Bardzo duży";
-
-/* No comment provided by engineer. */
 "Videos" = "Wideo";
 
 /* Video sort order in search */
 "Views" = "Wyświetlenia";
-
-/* No comment provided by engineer. */
 "Watched" = "Obejrzane";
 
 /* Selected video was played on given date */
@@ -934,43 +373,20 @@
 
 /* Video date filter in search */
 "Week" = "Tydzień";
-
-/* No comment provided by engineer. */
 "Welcome" = "Witaj";
-
-/* No comment provided by engineer. */
 "When partially watched video is played" = "Gdy odtwarzane jest poprzednio widziane wideo";
-
-/* No comment provided by engineer. */
 "Wi-Fi" = "Wi-Fi";
-
-/* No comment provided by engineer. */
 "Wiki" = "Wiki";
-
-/* No comment provided by engineer. */
 "Yattee" = "Yattee";
-
-/* No comment provided by engineer. */
 "Yattee %@ (build %@)" = "Yattee %@ (build %@)";
 
 /* Video date filter in search */
 "Year" = "Rok";
-
-/* No comment provided by engineer. */
 "You can find information about using Yattee in the Wiki pages." = "Trochę informacji jak używać Yattee możesz znaleźć w Wiki.";
-
-/* No comment provided by engineer. */
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Możesz używać automatycznego wybierania profilu albo wybrać inny z ustawień odtwarzania wideo.";
-
-/* No comment provided by engineer. */
 "You have no Playlists" = "Nie masz żadnych playlist";
-
-/* No comment provided by engineer. */
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "Nie masz żadnych list odtwarzania\n\nStuknij w \"Nowa lista odtwarzania\", aby ją stworzyć";
-
-/* No comment provided by engineer. */
 "You need to create an instance and accounts\nto access %@ section" = "Musisz dodać instancję i konto\naby otworzyć sekcję: %@";
-
-/* No comment provided by engineer. */
 "You need to select an account\nto access %@ section" = "Musisz wybrać konto\naby otworzyć sekcję: %@";
+
 
