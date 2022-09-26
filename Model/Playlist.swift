@@ -10,7 +10,7 @@ struct Playlist: Identifiable, Equatable, Hashable {
         }
 
         var name: String {
-            rawValue.capitalized
+            rawValue.capitalized.localized()
         }
     }
 
