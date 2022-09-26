@@ -142,3 +142,11 @@
 "Date" = "Datum";
 "Gaming" = "Spielen";
 "Are you sure you want to restore default quality profiles?" = "Möchten Sie die Standardqualitätsprofile wirklich wiederherstellen?";
+"Autoplaying Next" = "Nächstes Element automatisch abspielen";
+"Based on system color scheme" = "Basierend auf System Farbschema";
+"Buffering stream..." = "Lade stream…";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Fehler und Vorschläge für gute Ideen können bei GitHub eingetragen werden. ";
+"cache-secs" = "Cache-sek‘s";
+"Categories to Skip" = "Kategorien zum überspringen";
+"Close PiP and open player when application enters foreground" = "Schließe PiP und öffne den Player wenn die App in den Vordergrund geholt wird";
+"Close PiP when player is opened" = "Schließe PiP wenn Player geöffnet wird";
