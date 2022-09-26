@@ -56,7 +56,7 @@ struct NowPlayingView: View {
                 if sections.contains(.playingNext) {
                     Section(header: Text("Playing Next")) {
                         if player.queue.isEmpty {
-                            Text("Playback queue is empty")
+                            Text("Queue is empty")
                                 .padding([.vertical, .leading], 40)
                                 .foregroundColor(.secondary)
                         }
