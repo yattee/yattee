@@ -390,3 +390,17 @@
 "You need to select an account\nto access %@ section" = "Musisz wybrać konto\naby otworzyć sekcję: %@";
 
 
+
+
+
+"Public" = "Publiczna";
+"Unlisted" = "Nielistowana";
+"Add Channels, Playlists and Searches to Favorites using" = "Dodawaj kanały, playlisty i wyszukiwania używając";
+"Now Playing" = "Odtwarzane";
+"Current Location" = "Aktualna lokalizacja";
+"Private" = "Prywatna";
+"Playback queue is empty" = "Kolejka odtwarzania jest pusta";
+"Playing Next" = "W kolejce";
+"You can switch between profiles in playback settings controls." = "Możesz przełączać profile w ustawieniach odtwarzania.";
+"Make default" = "Ustaw jako domyślny";
+"Visibility" = "Widoczność";

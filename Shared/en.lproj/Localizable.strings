@@ -1,443 +1,164 @@
-/* No comment provided by engineer. */
 " subscribers" = " subscribers";
-
-/* No comment provided by engineer. */
 "#" = "#";
-
-/* No comment provided by engineer. */
 "%@" = "%@";
-
-/* No comment provided by engineer. */
 "%@ %@" = "%@ %@";
-
-/* No comment provided by engineer. */
 "%@ Channel" = "%@ Channel";
-
-/* No comment provided by engineer. */
 "%@ Playlist" = "%@ Playlist";
-
-/* No comment provided by engineer. */
 "%@ subscribers" = "%@ subscribers";
-
-/* No comment provided by engineer. */
 "%lld" = "%lld";
-
-/* No comment provided by engineer. */
 "%lld videos" = "%lld videos";
-
-/* No comment provided by engineer. */
 "%lld%%" = "%lld%%";
-
-/* No comment provided by engineer. */
 "1 century ago" = "1 century ago";
-
-/* No comment provided by engineer. */
 "1,234M" = "1,234M";
-
-/* No comment provided by engineer. */
 "10 seconds forwards/backwards" = "10 seconds forwards/backwards";
-
-/* No comment provided by engineer. */
 "1234" = "1234";
-
-/* No comment provided by engineer. */
 "a" = "a";
-
-/* No comment provided by engineer. */
 "A" = "A";
-
-/* No comment provided by engineer. */
 "Accounts" = "Accounts";
-
-/* No comment provided by engineer. */
 "Accounts are not supported for the application of this instance" = "Accounts are not supported for the application of this instance";
-
-/* No comment provided by engineer. */
 "Add Account" = "Add Account";
-
-/* No comment provided by engineer. */
 "Add Account..." = "Add Account...";
-
-/* No comment provided by engineer. */
 "Add Location" = "Add Location";
-
-/* No comment provided by engineer. */
 "Add Location..." = "Add Location...";
-
-/* No comment provided by engineer. */
 "Add profile..." = "Add profile...";
-
-/* No comment provided by engineer. */
 "Add Quality Profile" = "Add Quality Profile";
-
-/* No comment provided by engineer. */
 "Add to %@" = "Add to %@";
-
-/* No comment provided by engineer. */
 "Add to Favorites" = "Add to Favorites";
-
-/* No comment provided by engineer. */
 "Add to Playlist" = "Add to Playlist";
-
-/* No comment provided by engineer. */
 "Add to Playlist..." = "Add to Playlist...";
-
-/* No comment provided by engineer. */
 "Advanced" = "Advanced";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "All";
-
-/* No comment provided by engineer. */
 "Always use AVPlayer for live videos" = "Always use AVPlayer for live videos";
-
-/* No comment provided by engineer. */
 "Anonymous" = "Anonymous";
 
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "Any";
-
-/* No comment provided by engineer. */
 "Apply to all" = "Apply to all";
-
-/* No comment provided by engineer. */
 "Are you sure you want to clear history of watched videos?" = "Are you sure you want to clear history of watched videos?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to clear search history?" = "Are you sure you want to clear search history?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to delete playlist?" = "Are you sure you want to delete playlist?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to restore default quality profiles?" = "Are you sure you want to restore default quality profiles?";
-
-/* No comment provided by engineer. */
 "Are you sure you want to unsubscribe from %@?" = "Are you sure you want to unsubscribe from %@?";
-
-/* No comment provided by engineer. */
 "Automatic" = "Automatic";
-
-/* No comment provided by engineer. */
 "Autoplaying Next" = "Autoplaying Next";
-
-/* No comment provided by engineer. */
 "Backend" = "Backend";
-
-/* No comment provided by engineer. */
 "Badge" = "Badge";
-
-/* No comment provided by engineer. */
 "Badge & Decreased opacity" = "Badge & Decreased opacity";
-
-/* No comment provided by engineer. */
 "Badge color" = "Badge color";
-
-/* No comment provided by engineer. */
 "Based on system color scheme" = "Based on system color scheme";
-
-/* No comment provided by engineer. */
 "Battery" = "Battery";
-
-/* No comment provided by engineer. */
 "Blue" = "Blue";
-
-/* No comment provided by engineer. */
 "Browsing" = "Browsing";
-
-/* No comment provided by engineer. */
 "Buffering stream..." = "Buffering stream...";
-
-/* No comment provided by engineer. */
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bugs and great feature ideas can be sent to the GitHub issues tracker. ";
-
-/* No comment provided by engineer. */
 "Button" = "Button";
-
-/* No comment provided by engineer. */
 "cache-pause-wait" = "cache-pause-wait";
-
-/* No comment provided by engineer. */
 "cache-secs" = "cache-secs";
-
-/* No comment provided by engineer. */
 "Cancel" = "Cancel";
-
-/* No comment provided by engineer. */
 "Captions" = "Captions";
-
-/* No comment provided by engineer. */
 "Categories to Skip" = "Categories to Skip";
-
-/* No comment provided by engineer. */
 "Category" = "Category";
-
-/* No comment provided by engineer. */
 "Cellular" = "Cellular";
-
-/* No comment provided by engineer. */
 "Chapters" = "Chapters";
-
-/* No comment provided by engineer. */
 "Charging" = "Charging";
-
-/* No comment provided by engineer. */
 "Clear" = "Clear";
-
-/* No comment provided by engineer. */
 "Clear All" = "Clear All";
-
-/* No comment provided by engineer. */
 "Clear All Recents" = "Clear All Recents";
-
-/* No comment provided by engineer. */
 "Clear History" = "Clear History";
-
-/* No comment provided by engineer. */
 "Clear Search History" = "Clear Search History";
-
-/* No comment provided by engineer. */
 "Clear Search History..." = "Clear Search History...";
-
-/* No comment provided by engineer. */
 "Clear the queue" = "Clear the queue";
-
-/* No comment provided by engineer. */
 "Close" = "Close";
-
-/* No comment provided by engineer. */
 "Close PiP and open player when application enters foreground" = "Close PiP and open player when application enters foreground";
-
-/* No comment provided by engineer. */
 "Close PiP when player is opened" = "Close PiP when player is opened";
-
-/* No comment provided by engineer. */
 "Close PiP when starting playing other video" = "Close PiP when starting playing other video";
-
-/* No comment provided by engineer. */
 "Close player when closing video" = "Close player when closing video";
-
-/* No comment provided by engineer. */
 "Close player when starting PiP" = "Close player when starting PiP";
-
-/* No comment provided by engineer. */
 "Close Video" = "Close Video";
-
-/* No comment provided by engineer. */
 "Close video after playing last in the queue" = "Close video after playing last in the queue";
-
-/* No comment provided by engineer. */
 "Comments" = "Comments";
-
-/* No comment provided by engineer. */
 "Connected successfully (%@)" = "Connected successfully (%@)";
-
-/* No comment provided by engineer. */
 "Connection failed" = "Connection failed";
-
-/* No comment provided by engineer. */
 "Contact" = "Contact";
-
-/* No comment provided by engineer. */
 "Continue" = "Continue";
-
-/* No comment provided by engineer. */
 "Continue from %@" = "Continue from %@";
-
-/* No comment provided by engineer. */
 "Contributing" = "Contributing";
-
-/* No comment provided by engineer. */
 "Controls" = "Controls";
-
-/* No comment provided by engineer. */
 "Copy %@ link" = "Copy %@ link";
-
-/* No comment provided by engineer. */
 "Copy %@ link with time" = "Copy %@ link with time";
-
-/* No comment provided by engineer. */
 "Could not load locations manifest" = "Could not load locations manifest";
-
-/* No comment provided by engineer. */
 "Country" = "Country";
-
-/* No comment provided by engineer. */
 "Country Name or Code" = "Country Name or Code";
-
-/* No comment provided by engineer. */
 "Create Playlist" = "Create Playlist";
-
-/* No comment provided by engineer. */
 "Current: %@\n%@" = "Current: %@\n%@";
 
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Custom";
-
-/* No comment provided by engineer. */
 "Custom Locations" = "Custom Locations";
 
 /* Video sort order in search */
 "Date" = "Date";
-
-/* No comment provided by engineer. */
 "Decrease rate" = "Decrease rate";
-
-/* No comment provided by engineer. */
 "Decreased opacity" = "Decreased opacity";
-
-/* No comment provided by engineer. */
 "Delete" = "Delete";
-
-/* No comment provided by engineer. */
 "Disabled" = "Disabled";
-
-/* No comment provided by engineer. */
 "Discord Server" = "Discord Server";
-
-/* No comment provided by engineer. */
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discussions take place in Discord and Matrix. It's a good spot for general questions.";
-
-/* No comment provided by engineer. */
 "Don't use public locations" = "Don't use public locations";
-
-/* No comment provided by engineer. */
 "Donations" = "Donations";
-
-/* No comment provided by engineer. */
 "Done" = "Done";
-
-/* No comment provided by engineer. */
 "Duration" = "Duration";
-
-/* No comment provided by engineer. */
 "Edit" = "Edit";
-
-/* No comment provided by engineer. */
 "Edit Playlist" = "Edit Playlist";
-
-/* No comment provided by engineer. */
 "Edit Quality Profile" = "Edit Quality Profile";
-
-/* No comment provided by engineer. */
 "Edit..." = "Edit...";
-
-/* No comment provided by engineer. */
 "Enable logging" = "Enable logging";
-
-/* No comment provided by engineer. */
 "Enable Return YouTube Dislike" = "Enable Return YouTube Dislike";
-
-/* No comment provided by engineer. */
 "Enter fullscreen in landscape" = "Enter fullscreen in landscape";
-
-/* No comment provided by engineer. */
 "Error" = "Error";
-
-/* No comment provided by engineer. */
 "Error when accessing playlist" = "Error when accessing playlist";
-
-/* No comment provided by engineer. */
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).";
-
-/* No comment provided by engineer. */
 "Favorites" = "Favorites";
-
-/* No comment provided by engineer. */
 "Filter" = "Filter";
-
-/* No comment provided by engineer. */
 "Filter: active" = "Filter: active";
-
-/* No comment provided by engineer. */
 "Find Other" = "Find Other";
-
-/* No comment provided by engineer. */
 "Finding something to play..." = "Finding something to play...";
-
-/* No comment provided by engineer. */
 "For videos which feature music as the primary content." = "For videos which feature music as the primary content.";
-
-/* No comment provided by engineer. */
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply).";
-
-/* No comment provided by engineer. */
 "Frontend URL" = "Frontend URL";
-
-/* No comment provided by engineer. */
 "Fullscreen size" = "Fullscreen size";
-
-/* No comment provided by engineer. */
 "Fullscreen Size" = "Fullscreen Size";
-
-/* No comment provided by engineer. */
 "Gaming" = "Gaming";
-
-/* No comment provided by engineer. */
 "Help" = "Help";
-
-/* No comment provided by engineer. */
 "Hide sidebar" = "Hide sidebar";
-
-/* No comment provided by engineer. */
 "High" = "High";
-
-/* No comment provided by engineer. */
 "Highest" = "Highest";
-
-/* No comment provided by engineer. */
 "Highest quality" = "Highest quality";
-
-/* No comment provided by engineer. */
 "History" = "History";
-
-/* No comment provided by engineer. */
 "Honor orientation lock" = "Honor orientation lock";
 
 /* Video date filter in search */
 "Hour" = "Hour";
-
-/* No comment provided by engineer. */
 "I am lost" = "I am lost";
-
-/* No comment provided by engineer. */
 "I found a bug /" = "I found a bug /";
-
-/* No comment provided by engineer. */
 "I have a feature request" = "I have a feature request";
-
-/* No comment provided by engineer. */
 "I like this app!" = "I like this app!";
-
-/* No comment provided by engineer. */
 "I want to ask a question" = "I want to ask a question";
-
-/* No comment provided by engineer. */
 "If you are interested what's coming in future updates, you can track project Milestones." = "If you are interested what's coming in future updates, you can track project Milestones.";
-
-/* No comment provided by engineer. */
 "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce).";
-
-/* No comment provided by engineer. */
 "Increase rate" = "Increase rate";
-
-/* No comment provided by engineer. */
 "Info" = "Info";
-
-/* No comment provided by engineer. */
 "Instance of current account" = "Instance of current account";
 
 /* SponsorBlock category name */
 "Interaction" = "Interaction";
-
-/* No comment provided by engineer. */
 "Interface" = "Interface";
 
 /* SponsorBlock category name */
 "Intro" = "Intro";
-
-/* No comment provided by engineer. */
 "Issues Tracker" = "Issues Tracker";
 
 /* Selected video has just finished playing */
@@ -445,383 +166,153 @@
 
 /* Player controls layout size */
 "Large" = "Large";
-
-/* No comment provided by engineer. */
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen.";
-
-/* No comment provided by engineer. */
 "LIVE" = "LIVE";
 
 /* Loading stream OSD */
 "Loading streams..." = "Loading streams...";
-
-/* No comment provided by engineer. */
 "Loading..." = "Loading...";
-
-/* No comment provided by engineer. */
 "Locations" = "Locations";
-
-/* No comment provided by engineer. */
 "Lock portrait mode" = "Lock portrait mode";
 
 /* Video duration filter in search */
 "Long" = "Long";
-
-/* No comment provided by engineer. */
 "Low" = "Low";
-
-/* No comment provided by engineer. */
 "Low quality" = "Low quality";
-
-/* No comment provided by engineer. */
 "Lowest" = "Lowest";
-
-/* No comment provided by engineer. */
 "Mark as watched" = "Mark as watched";
-
-/* No comment provided by engineer. */
 "Mark video as watched after playing" = "Mark video as watched after playing";
-
-/* No comment provided by engineer. */
 "Mark watched videos with" = "Mark watched videos with";
-
-/* No comment provided by engineer. */
 "Matrix Channel" = "Matrix Channel";
-
-/* No comment provided by engineer. */
 "Matrix Chat" = "Matrix Chat";
 
 /* Player controls layout size */
 "Medium" = "Medium";
-
-/* No comment provided by engineer. */
 "Medium quality" = "Medium quality";
-
-/* No comment provided by engineer. */
 "Milestones" = "Milestones";
 
 /* Video date filter in search */
 "Month" = "Month";
-
-/* No comment provided by engineer. */
 "More info can be found in:" = "More info can be found in:";
-
-/* No comment provided by engineer. */
 "Movies" = "Movies";
-
-/* No comment provided by engineer. */
 "MPV Documentation" = "MPV Documentation";
-
-/* No comment provided by engineer. */
 "Music" = "Music";
-
-/* No comment provided by engineer. */
 "Name" = "Name";
-
-/* No comment provided by engineer. */
 "New Playlist" = "New Playlist";
-
-/* No comment provided by engineer. */
 "Next" = "Next";
-
-/* No comment provided by engineer. */
 "No description" = "No description";
-
-/* No comment provided by engineer. */
 "No Playlists" = "No Playlists";
-
-/* No comment provided by engineer. */
 "No results" = "No results";
-
-/* No comment provided by engineer. */
 "Normal" = "Normal";
-
-/* No comment provided by engineer. */
 "Not available" = "Not available";
-
-/* No comment provided by engineer. */
 "Not Playing" = "Not Playing";
-
-/* No comment provided by engineer. */
 "Nothing" = "Nothing";
 
 /* SponsorBlock category name */
 "Offtopic in Music Videos" = "Offtopic in Music Videos";
-
-/* No comment provided by engineer. */
 "Only when signed in" = "Only when signed in";
-
-/* No comment provided by engineer. */
 "Open \"Playlists\" tab to create new one" = "Open \"Playlists\" tab to create new one";
-
-/* No comment provided by engineer. */
 "Open Settings" = "Open Settings";
 
 /* Loading stream OSD */
 "Opening %@ stream..." = "Opening %@ stream...";
-
-/* No comment provided by engineer. */
 "Opening audio stream..." = "Opening audio stream...";
-
-/* No comment provided by engineer. */
 "Orientation" = "Orientation";
 
 /* SponsorBlock category name */
 "Outro" = "Outro";
-
-/* No comment provided by engineer. */
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products.";
-
-/* No comment provided by engineer. */
 "Password" = "Password";
-
-/* No comment provided by engineer. */
 "Pause" = "Pause";
-
-/* No comment provided by engineer. */
 "Pause when entering background" = "Pause when entering background";
-
-/* No comment provided by engineer. */
 "Pause when player is closed" = "Pause when player is closed";
-
-/* No comment provided by engineer. */
 "Picture in Picture" = "Picture in Picture";
-
-/* No comment provided by engineer. */
 "Play" = "Play";
-
-/* No comment provided by engineer. */
 "Play All" = "Play All";
-
-/* No comment provided by engineer. */
 "Play in PiP" = "Play in PiP";
-
-/* No comment provided by engineer. */
 "Play Last" = "Play Last";
-
-/* No comment provided by engineer. */
 "Play Music" = "Play Music";
-
-/* No comment provided by engineer. */
 "Play Next" = "Play Next";
-
-/* No comment provided by engineer. */
 "Play Now" = "Play Now";
-
-/* No comment provided by engineer. */
 "Playback" = "Playback";
-
-/* No comment provided by engineer. */
 "Player" = "Player";
-
-/* No comment provided by engineer. */
 "Playlist" = "Playlist";
-
-/* No comment provided by engineer. */
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Playlist \"%@\" will be deleted.\nIt cannot be reverted.";
-
-/* No comment provided by engineer. */
 "Playlists" = "Playlists";
-
-/* No comment provided by engineer. */
 "Popular" = "Popular";
-
-/* No comment provided by engineer. */
 "Preferred Formats" = "Preferred Formats";
-
-/* No comment provided by engineer. */
 "Profiles" = "Profiles";
-
-/* No comment provided by engineer. */
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms.";
-
-/* No comment provided by engineer. */
 "Proxy videos" = "Proxy videos";
-
-/* No comment provided by engineer. */
 "Public Locations" = "Public Locations";
-
-/* No comment provided by engineer. */
 "Public Manifest" = "Public Manifest";
-
-/* No comment provided by engineer. */
 "Quality" = "Quality";
-
-/* No comment provided by engineer. */
 "Quality Profile" = "Quality Profile";
-
-/* No comment provided by engineer. */
 "Queue" = "Queue";
-
-/* No comment provided by engineer. */
 "Queue is empty" = "Queue is empty";
-
-/* No comment provided by engineer. */
 "Rate" = "Rate";
 
 /* Video sort order in search */
 "Rating" = "Rating";
-
-/* No comment provided by engineer. */
 "Recents" = "Recents";
-
-/* No comment provided by engineer. */
 "Red" = "Red";
-
-/* No comment provided by engineer. */
 "Refresh" = "Refresh";
-
-/* No comment provided by engineer. */
 "Regular size" = "Regular size";
-
-/* No comment provided by engineer. */
 "Regular Size" = "Regular Size";
-
-/* No comment provided by engineer. */
 "Related" = "Related";
 
 /* Video sort order in search */
 "Relevance" = "Relevance";
-
-/* No comment provided by engineer. */
 "Remove" = "Remove";
-
-/* No comment provided by engineer. */
 "Remove from Favorites" = "Remove from Favorites";
-
-/* No comment provided by engineer. */
 "Remove from history" = "Remove from history";
-
-/* No comment provided by engineer. */
 "Remove from Playlist" = "Remove from Playlist";
-
-/* No comment provided by engineer. */
 "Remove from the queue" = "Remove from the queue";
-
-/* No comment provided by engineer. */
 "Replies" = "Replies";
-
-/* No comment provided by engineer. */
 "Reset" = "Reset";
-
-/* No comment provided by engineer. */
 "Reset search filters" = "Reset search filters";
-
-/* No comment provided by engineer. */
 "Reset watched status when playing again" = "Reset watched status when playing again";
-
-/* No comment provided by engineer. */
 "Resolution" = "Resolution";
-
-/* No comment provided by engineer. */
 "Restart" = "Restart";
-
-/* No comment provided by engineer. */
 "Restart the app to apply the settings above." = "Restart the app to apply the settings above.";
-
-/* No comment provided by engineer. */
 "Restart/Play next" = "Restart/Play next";
-
-/* No comment provided by engineer. */
 "Restore default profiles..." = "Restore default profiles...";
-
-/* No comment provided by engineer. */
 "Rotate to portrait when exiting fullscreen" = "Rotate to portrait when exiting fullscreen";
-
-/* No comment provided by engineer. */
 "Round corners" = "Round corners";
-
-/* No comment provided by engineer. */
 "Save" = "Save";
-
-/* No comment provided by engineer. */
 "Save history of played videos" = "Save history of played videos";
-
-/* No comment provided by engineer. */
 "Save history of searches, channels and playlists" = "Save history of searches, channels and playlists";
-
-/* No comment provided by engineer. */
 "Search" = "Search";
-
-/* No comment provided by engineer. */
 "Search history is empty" = "Search history is empty";
-
-/* No comment provided by engineer. */
 "Search..." = "Search...";
-
-/* No comment provided by engineer. */
 "Sections" = "Sections";
-
-/* No comment provided by engineer. */
 "Seek gesture sensitivity" = "Seek gesture sensitivity";
-
-/* No comment provided by engineer. */
 "Seek gesture speed" = "Seek gesture speed";
-
-/* No comment provided by engineer. */
 "Seek with horizontal swipe on video" = "Seek with horizontal swipe on video";
-
-/* No comment provided by engineer. */
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator.";
-
-/* No comment provided by engineer. */
 "Select location closest to you:" = "Select location closest to you:";
 
 /* SponsorBlock category name */
 "Self-promotion" = "Self-promotion";
-
-/* No comment provided by engineer. */
 "Settings" = "Settings";
-
-/* No comment provided by engineer. */
 "Share %@ link" = "Share %@ link";
-
-/* No comment provided by engineer. */
 "Share %@ link with time" = "Share %@ link with time";
-
-/* No comment provided by engineer. */
 "Share..." = "Share...";
 
 /* Video duration filter in search */
 "Short" = "Short";
-
-/* No comment provided by engineer. */
 "Show account username" = "Show account username";
-
-/* No comment provided by engineer. */
 "Show anonymous accounts" = "Show anonymous accounts";
-
-/* No comment provided by engineer. */
 "Show channel name" = "Show channel name";
-
-/* No comment provided by engineer. */
 "Show history" = "Show history";
-
-/* No comment provided by engineer. */
 "Show keywords" = "Show keywords";
-
-/* No comment provided by engineer. */
 "Show playback statistics" = "Show playback statistics";
-
-/* No comment provided by engineer. */
 "Show progress of watching on thumbnails" = "Show progress of watching on thumbnails";
-
-/* No comment provided by engineer. */
 "Show sidebar when space permits" = "Show sidebar when space permits";
-
-/* No comment provided by engineer. */
 "Show video length" = "Show video length";
-
-/* No comment provided by engineer. */
 "Shuffle" = "Shuffle";
-
-/* No comment provided by engineer. */
 "Shuffle All" = "Shuffle All";
-
-/* No comment provided by engineer. */
 "Sidebar" = "Sidebar";
-
-/* No comment provided by engineer. */
 "Sign In Required" = "Sign In Required";
 
 /* Player controls layout size */
@@ -829,101 +320,49 @@
 
 /* Player controls layout size */
 "Smaller" = "Smaller";
-
-/* No comment provided by engineer. */
 "Sort" = "Sort";
-
-/* No comment provided by engineer. */
 "Sort: %@" = "Sort: %@";
-
-/* No comment provided by engineer. */
 "Source" = "Source";
 
 /* SponsorBlock category name */
 "Sponsor" = "Sponsor";
-
-/* No comment provided by engineer. */
 "SponsorBlock" = "SponsorBlock";
-
-/* No comment provided by engineer. */
 "SponsorBlock API Instance" = "SponsorBlock API Instance";
-
-/* No comment provided by engineer. */
 "Subscribe" = "Subscribe";
 
 /* Subscriptions title */
 "Subscriptions" = "Subscriptions";
-
-/* No comment provided by engineer. */
 "Switch to other public location" = "Switch to other public location";
-
-/* No comment provided by engineer. */
 "Switch to public locations" = "Switch to public locations";
-
-/* No comment provided by engineer. */
 "System controls buttons" = "System controls buttons";
-
-/* No comment provided by engineer. */
 "System controls show buttons for %@" = "System controls show buttons for %@";
-
-/* No comment provided by engineer. */
 "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development.";
-
-/* No comment provided by engineer. */
 "This cannot be reverted" = "This cannot be reverted";
-
-/* No comment provided by engineer. */
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "This cannot be reverted. You might need to switch between views or restart the app to see changes.";
-
-/* No comment provided by engineer. */
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "This information will be processed only on your device and used to connect you to the server in the specified country.";
-
-/* No comment provided by engineer. */
 "This will remove all your custom profiles and return their default values. This cannot be reverted." = "This will remove all your custom profiles and return their default values. This cannot be reverted.";
-
-/* No comment provided by engineer. */
 "Thumbnails" = "Thumbnails";
 
 /* Video date filter in search */
 "Today" = "Today";
-
-/* No comment provided by engineer. */
 "Trending" = "Trending";
 
 /* Player controls layout size for TV */
 "TV" = "TV";
-
-/* No comment provided by engineer. */
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Typically near or at the end of the video when the credits pop up and/or endcards are shown.";
-
-/* No comment provided by engineer. */
 "unknown" = "unknown";
-
-/* No comment provided by engineer. */
 "Unsubscribe" = "Unsubscribe";
-
-/* No comment provided by engineer. */
 "Upload date" = "Upload date";
-
-/* No comment provided by engineer. */
 "URL" = "URL";
-
-/* No comment provided by engineer. */
 "Used to create links from videos, channels and playlists" = "Used to create links from videos, channels and playlists";
-
-/* No comment provided by engineer. */
 "Username" = "Username";
 
 /* Player controls layout size */
 "Very Large" = "Very Large";
-
-/* No comment provided by engineer. */
 "Videos" = "Videos";
 
 /* Video sort order in search */
 "Views" = "Views";
-
-/* No comment provided by engineer. */
 "Watched" = "Watched";
 
 /* Selected video was played on given date */
@@ -934,43 +373,31 @@
 
 /* Video date filter in search */
 "Week" = "Week";
-
-/* No comment provided by engineer. */
 "Welcome" = "Welcome";
-
-/* No comment provided by engineer. */
 "When partially watched video is played" = "When partially watched video is played";
-
-/* No comment provided by engineer. */
 "Wi-Fi" = "Wi-Fi";
-
-/* No comment provided by engineer. */
 "Wiki" = "Wiki";
-
-/* No comment provided by engineer. */
 "Yattee" = "Yattee";
-
-/* No comment provided by engineer. */
 "Yattee %@ (build %@)" = "Yattee %@ (build %@)";
 
 /* Video date filter in search */
 "Year" = "Year";
-
-/* No comment provided by engineer. */
 "You can find information about using Yattee in the Wiki pages." = "You can find information about using Yattee in the Wiki pages.";
-
-/* No comment provided by engineer. */
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "You can use automatic profile selection based on current device status or switch it in video playback settings controls.";
-
-/* No comment provided by engineer. */
 "You have no Playlists" = "You have no Playlists";
-
-/* No comment provided by engineer. */
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "You have no playlists\n\nTap on \"New Playlist\" to create one";
-
-/* No comment provided by engineer. */
 "You need to create an instance and accounts\nto access %@ section" = "You need to create an instance and accounts\nto access %@ section";
-
-/* No comment provided by engineer. */
 "You need to select an account\nto access %@ section" = "You need to select an account\nto access %@ section";
 
+
+"Public" = "Public";
+"Unlisted" = "Unlisted";
+"Now Playing" = "Now Playing";
+"Current Location" = "Current Location";
+"Private" = "Private";
+"Playback queue is empty" = "Playback queue is empty";
+"Playing Next" = "Playing Next";
+"You can switch between profiles in playback settings controls." = "You can switch between profiles in playback settings controls.";
+"Add Channels, Playlists and Searches to Favorites using" = "Add Channels, Playlists and Searches to Favorites using";
+"Make default" = "Make default";
+"Visibility" = "Visibility";
