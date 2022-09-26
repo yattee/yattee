@@ -116,4 +116,29 @@
 "Playlist" = "Playlist";
 "Popular" = "Beliebt";
 "10 seconds forwards/backwards" = "10 Sekunden vorwärts/rückwärts";
-"Add to %@" = "zum %@ hinzufügen";
+"Add to %@" = "zu %@ hinzufügen";
+"Accounts are not supported for the application of this instance" = "Konten werden für die Anwendung dieser Instanz nicht unterstützt";
+"Advanced" = "Erweitert";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Alle";
+"Always use AVPlayer for live videos" = "Verwenden Sie immer AVPlayer für Live-Videos";
+"Anonymous" = "Anonym";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Jede";
+"Apply to all" = "Auf alle anwenden";
+"Are you sure you want to clear history of watched videos?" = "Möchten Sie den Verlauf der angesehenen Videos wirklich löschen?";
+"Are you sure you want to clear search history?" = "Möchten Sie den Suchverlauf wirklich löschen?";
+"Are you sure you want to delete playlist?" = "Möchten Sie die Playlist wirklich löschen?";
+"Are you sure you want to unsubscribe from %@?" = "Möchten Sie das Abonnement von %@ wirklich abbestellen?";
+"Battery" = "Akku";
+"Comments" = "Kommentare";
+"Country Name or Code" = "Ländername oder Landeskennung";
+"Donations" = "Spenden";
+
+/* Video sort order in search */
+"Date" = "Datum";
+"Gaming" = "Spielen";
+"Are you sure you want to restore default quality profiles?" = "Möchten Sie die Standardqualitätsprofile wirklich wiederherstellen?";
