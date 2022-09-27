@@ -213,7 +213,7 @@
 "%@ subscribers" = "%@ abonnenter";
 "1 century ago" = "100 år siden";
 "1234" = "1234";
-"a" = "";
+"a" = "a";
 "Anonymous" = "Anonym";
 "Done" = "Ferdig";
 "Battery" = "Batteri";
@@ -262,3 +262,20 @@
 "Visibility" = "Synlighet";
 "Statistics" = "Statistikk";
 "Hardware decoder" = "Maskinvaredekoder";
+"A" = "A";
+"Accounts are not supported for the application of this instance" = "Kontoer støttes ikke for denne instansen";
+"Backend" = "Bakende";
+"Badge" = "Skilt";
+"Controls" = "Kontroller";
+"Decreased opacity" = "Redusert dekkevne";
+"Enable logging" = "Skru på loggføring";
+"Honor orientation lock" = "Ta hensyn til sideretningslås";
+"I have a feature request" = "Jeg har en funksjonsforespørsel";
+"Issues Tracker" = "Feilsporer";
+"Lock portrait mode" = "Lås stående sideretning";
+"Mark video as watched after playing" = "Marker videoer som sett etter avspilling";
+"Mark watched videos with" = "Marker sette videoer med";
+
+/* SponsorBlock category name */
+"Outro" = "Sluttsekvens";
+"Play Last" = "Spill siste";
