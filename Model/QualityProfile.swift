@@ -66,7 +66,7 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
             return formats.map(\.description).joined(separator: ", ")
         }
 
-        return String(format: "%@ formats".localized(), formats.count)
+        return String(format: "%@ formats".localized(), String(formats.count))
     }
 
     func isPreferred(_ stream: Stream) -> Bool {
