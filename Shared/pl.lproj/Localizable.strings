@@ -384,7 +384,7 @@
 "You can find information about using Yattee in the Wiki pages." = "Trochę informacji jak używać Yattee możesz znaleźć w Wiki.";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Możesz używać automatycznego wybierania profilu albo wybrać inny z ustawień odtwarzania wideo.";
 "You have no Playlists" = "Nie masz żadnych playlist";
-"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Nie masz żadnych list odtwarzania\n\nStuknij w \"Nowa lista odtwarzania\", aby ją stworzyć";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Nie masz żadnych list odtwarzania\n\nStuknij w \"Nowa lista odtwarzania\",\naby ją stworzyć";
 "You need to create an instance and accounts\nto access %@ section" = "Musisz dodać instancję i konto\naby otworzyć sekcję: %@";
 "You need to select an account\nto access %@ section" = "Musisz wybrać konto\naby otworzyć sekcję: %@";
 
@@ -414,3 +414,4 @@
 "Any format" = "Dowolny format";
 "%@ formats" = "Format(ów): %@";
 "Keep last played video in the queue after restart" = "Pozostaw w kolejce ostatnio odtwarzane wideo po restarcie";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Lista odtwarzania jest pusta\\n\\nStuknij i przytrzymaj na filmie, a następnie \"Dodaj do playlisty\"";
