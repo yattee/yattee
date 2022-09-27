@@ -401,3 +401,10 @@
 "Make default" = "Make default";
 "Visibility" = "Visibility";
 "Current Playlist" = "Current Playlist";
+"Stream & Player" = "Stream & Player";
+"Statistics" = "Statistics";
+"Hardware decoder" = "Hardware decoder";
+"Stream FPS" = "Stream FPS";
+"Cached time" = "Cached time";
+"Rate & Captions" = "Rate & Captions";
+"Dropped frames" = "Dropped frames";
