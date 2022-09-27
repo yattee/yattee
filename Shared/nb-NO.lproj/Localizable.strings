@@ -279,3 +279,5 @@
 /* SponsorBlock category name */
 "Outro" = "Sluttsekvens";
 "Play Last" = "Spill siste";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Spillelisten «%@» vil bli slettet.\nDette kan ikke angres.";
+"Popular" = "Populært";
