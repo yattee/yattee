@@ -61,12 +61,12 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
 
     var formatsDescription: String {
         if formats.count == Format.allCases.count {
-            return "Any format"
+            return "Any format".localized()
         } else if formats.count <= 3 {
             return formats.map(\.description).joined(separator: ", ")
         }
 
-        return "\(formats.count) formats"
+        return String(format: "%@ formats".localized(), formats.count)
     }
 
     func isPreferred(_ stream: Stream) -> Bool {
