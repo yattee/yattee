@@ -239,3 +239,25 @@
 "I want to ask a question" = "Ich möchte eine Frage stellen";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Wenn Sie sich für künftige Updates interessieren, können Sie die Meilensteine des Projekts verfolgen.";
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
+"Opening audio stream..." = "Audiostream wird geöffnet...";
+"Orientation" = "Ausrichtung";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Playlist \"Neu\" wird gelöscht.\nEs kann nicht rückgängig gemacht werden.";
+"Preferred Formats" = "Bevorzugte Formate";
+"Profiles" = "Profile";
+"Proxy videos" = "Proxy-Videos";
+"Public Locations" = "Öffentliche Standorte";
+"Public Manifest" = "Öffentliches Manifest";
+"Reset" = "Reset";
+"Restart" = "Neustart";
+"Save" = "Speichern";
+
+/* SponsorBlock category name */
+"Outro" = "Outro";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Ersteller in Verbindung steht. Der Ersteller erhält eine Bezahlung oder Entschädigung in Form von Geld oder kostenlosen Produkten.";
+"Picture in Picture" = "Bild-im-Bild";
+"Regular size" = "Normalgröße";
+
+/* Video sort order in search */
+"Rating" = "Bewertung";
+"Settings" = "Einstellungen";
+"Share..." = "Teilen...";
