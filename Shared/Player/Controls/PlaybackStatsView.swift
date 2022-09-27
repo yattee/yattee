@@ -7,10 +7,10 @@ struct PlaybackStatsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            mpvPlaybackStatRow("Hardware decoder", player.mpvBackend.hwDecoder)
-            mpvPlaybackStatRow("Dropped frames", String(player.mpvBackend.frameDropCount))
-            mpvPlaybackStatRow("Stream FPS", String(format: "%.2ffps", player.mpvBackend.outputFps))
-            mpvPlaybackStatRow("Cached time", String(format: "%.2fs", player.mpvBackend.cacheDuration))
+            mpvPlaybackStatRow("Hardware decoder".localized(), player.mpvBackend.hwDecoder)
+            mpvPlaybackStatRow("Dropped frames".localized(), String(player.mpvBackend.frameDropCount))
+            mpvPlaybackStatRow("Stream FPS".localized(), String(format: "%.2ffps", player.mpvBackend.outputFps))
+            mpvPlaybackStatRow("Cached time".localized(), String(format: "%.2fs", player.mpvBackend.cacheDuration))
         }
         .padding(.top, 2)
         #if os(tvOS)
