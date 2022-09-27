@@ -1,1 +1,47 @@
 
+
+" subscribers" = " abonnés";
+"%lld" = "%lld";
+"a" = "a";
+"Add Location..." = "Ajouter un emplacement…";
+"Add profile..." = "Ajouter un profil…";
+"Add Quality Profile" = "Ajouter un profil de qualité";
+"Delete" = "Supprimer";
+"1,234M" = "1,234 M";
+"%@" = "%@";
+"%@ %@" = "%@ %@";
+"%@ Playlist" = "%@ liste de lecture";
+"%@ subscribers" = "%@ abonnés";
+"%lld%%" = "%lld%%";
+"1234" = "1234";
+"A" = "A";
+"#" = "#";
+"%@ Channel" = "%@ chaîne";
+"1 century ago" = "il y a un siècle";
+"10 seconds forwards/backwards" = "10 secondes en avant/en arrière";
+"Accounts" = "Comptes";
+"%lld videos" = "%lld vidéos";
+"Accounts are not supported for the application of this instance" = "Les comptes ne sont pas pris en charge pour l'application de cette instance";
+"Add to Playlist" = "Ajouter à la liste de lecture";
+"Add to Favorites" = "Ajouter aux Favoris";
+"Add Account" = "Ajouter un compte";
+"Add to %@" = "Ajouter à %@";
+"Are you sure you want to clear search history?" = "Êtes-vous sûr·e de vouloir effacer l'historique des recherches ?";
+"Add Location" = "Ajouter un emplacement";
+"Add to Playlist..." = "Ajouter à la liste de lecture…";
+"Add Account..." = "Ajouter un compte…";
+"Advanced" = "Avancé";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Tout";
+"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr·e de vouloir effacer l'historique des vidéos regardées ?";
+"Are you sure you want to delete playlist?" = "Êtes-vous sûr·e de vouloir supprimer la liste de lecture ?";
+"Are you sure you want to restore default quality profiles?" = "Êtes-vous sûr·e de vouloir restaurer les profils de qualité par défaut ?";
+"Are you sure you want to unsubscribe from %@?" = "Êtes-vous sûr·e de vouloir vous désabonner de %@ ?";
+"Automatic" = "Automatique";
+"Badge" = "Badge";
+"Badge & Decreased opacity" = "Badge et opacité réduite";
+"Badge color" = "Couleur du badge";
+"Cancel" = "Annuler";
+"Captions" = "Sous-titres";
+"Categories to Skip" = "Catégories à ignorer";
