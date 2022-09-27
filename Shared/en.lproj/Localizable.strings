@@ -411,5 +411,5 @@
 "Any format" = "Any format";
 "%@ formats" = "%@ formats";
 "Keep last played video in the queue after restart" = "Keep last played video in the queue after restart";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Playlist is empty\\n\\nTap and hold on a video and then \\n\"Add to Playlist\"";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Playlist is empty\n\nTap and hold on a video and then\n\"Add to Playlist\"";
 "It can be changed later in settings. You can use your own locations too." = "It can be changed later in settings. You can use your own locations too.";
