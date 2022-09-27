@@ -219,7 +219,7 @@
 "Orientation" = "Orientacja";
 
 /* SponsorBlock category name */
-"Outro" = "Outro";
+"Outro" = "Zakończenie";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Część filmu promująca produkt lub usługę niezwiązaną bezpośrednio z twórcą. Twórca otrzyma zapłatę lub rekompensatę w postaci pieniędzy lub darmowych produktów.";
 "Password" = "Hasło";
 "Pause" = "Pauza";
@@ -228,10 +228,10 @@
 "Picture in Picture" = "Obraz w obrazie";
 "Play" = "Odtwarzaj";
 "Play All" = "Odtwórz wszystkie";
-"Play in PiP" = "Otwórz w PiP";
+"Play in PiP" = "Odtwórz w PiP";
 "Play Last" = "Odtwórz jako ostatni";
-"Play Music" = "Odtwarzaj muzykę";
-"Play Next" = "Odtwarzaj następne";
+"Play Music" = "Odtwórz muzykę";
+"Play Next" = "Odtwórz jako następne";
 "Play Now" = "Odtwórz teraz";
 "Playback" = "Odtwarzanie";
 "Player" = "Odtwarzacz";
@@ -270,7 +270,7 @@
 "Replies" = "Odpowiedzi";
 "Reset" = "Zresetuj";
 "Reset search filters" = "Zresetuj filtry";
-"Reset watched status when playing again" = "Resetuj status odtwarzania za każdym odtworzeniem";
+"Reset watched status when playing again" = "Resetuj status odtwarzania za każdym razem";
 "Resolution" = "Rozdzielczość";
 "Restart" = "Od początku";
 "Restart the app to apply the settings above." = "Zrestartuj aplikację aby zastosować powyższe ustawienia.";
@@ -413,3 +413,4 @@
 "Dropped frames" = "Opuszczone ramki";
 "Any format" = "Dowolny format";
 "%@ formats" = "Format(ów): %@";
+"Keep last played video in the queue after restart" = "Pozostaw w kolejce ostatnio odtwarzane wideo po restarcie";
