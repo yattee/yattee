@@ -411,3 +411,5 @@
 "Cached time" = "Czas buforowany";
 "Rate & Captions" = "Prędkość i napisy";
 "Dropped frames" = "Opuszczone ramki";
+"Any format" = "Dowolny format";
+"%@ formats" = "Format(ów): %@";
