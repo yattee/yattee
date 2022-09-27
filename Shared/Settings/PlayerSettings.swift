@@ -209,7 +209,7 @@ struct PlayerSettings: View {
     }
 
     private var fullScreenPlayerControlsLayoutPicker: some View {
-        Picker("Fullscreen Size", selection: $fullScreenPlayerControlsLayout) {
+        Picker("Fullscreen size", selection: $fullScreenPlayerControlsLayout) {
             ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
                 Text(layout.description).tag(layout.rawValue)
             }

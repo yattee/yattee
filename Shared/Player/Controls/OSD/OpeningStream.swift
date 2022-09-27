@@ -14,7 +14,7 @@ struct OpeningStream: View {
     }
 
     var reason: String {
-        guard player.videoBeingOpened != nil else {
+        guard player.videoBeingOpened == nil else {
             return "Loading streams...".localized()
         }
 
@@ -22,18 +22,11 @@ struct OpeningStream: View {
             return "Opening audio stream...".localized()
         }
 
-        return String(format: "Opening %@ stream...".localized(), streamQuality)
+        return String(format: "Opening %@ stream...".localized(), player.streamSelection?.shortQuality ?? "")
     }
 
     var state: String? {
         player.videoBeingOpened.isNil ? model.bufferingStateText : nil
-    }
-
-    var streamQuality: String {
-        guard let stream = player.streamSelection else { return " " }
-        guard !player.musicMode else { return " audio " }
-
-        return " \(stream.shortQuality) "
     }
 }
 
