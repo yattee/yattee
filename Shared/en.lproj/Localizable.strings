@@ -410,3 +410,4 @@
 "Dropped frames" = "Dropped frames";
 "Any format" = "Any format";
 "%@ formats" = "%@ formats";
+"Keep last played video in the queue after restart" = "Keep last played video in the queue after restart";
