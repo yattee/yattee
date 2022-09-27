@@ -130,7 +130,6 @@
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply).";
 "Frontend URL" = "Frontend URL";
 "Fullscreen size" = "Fullscreen size";
-"Fullscreen Size" = "Fullscreen Size";
 "Gaming" = "Gaming";
 "Help" = "Help";
 "Hide sidebar" = "Hide sidebar";
@@ -401,3 +400,11 @@
 "Add Channels, Playlists and Searches to Favorites using" = "Add Channels, Playlists and Searches to Favorites using";
 "Make default" = "Make default";
 "Visibility" = "Visibility";
+"Current Playlist" = "Current Playlist";
+"Stream & Player" = "Stream & Player";
+"Statistics" = "Statistics";
+"Hardware decoder" = "Hardware decoder";
+"Stream FPS" = "Stream FPS";
+"Cached time" = "Cached time";
+"Rate & Captions" = "Rate & Captions";
+"Dropped frames" = "Dropped frames";

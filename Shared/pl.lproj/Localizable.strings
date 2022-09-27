@@ -130,7 +130,6 @@
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formaty będą wybierane w kolejności tak jak wyżej.\nHLS to format adaptacyjny (ustawienie rozdzielczości nie ma zastosowania).";
 "Frontend URL" = "Adres frontendu";
 "Fullscreen size" = "Rozmiar pełnoekranowy";
-"Fullscreen Size" = "Pełen ekran";
 "Gaming" = "Gry";
 "Help" = "Pomoc";
 "Hide sidebar" = "Ukryj pasek boczny";
@@ -404,3 +403,11 @@
 "You can switch between profiles in playback settings controls." = "Możesz przełączać profile w ustawieniach odtwarzania.";
 "Make default" = "Ustaw jako domyślny";
 "Visibility" = "Widoczność";
+"Current Playlist" = "Aktualna playlista";
+"Stream & Player" = "Strumień i odtwarzacz";
+"Statistics" = "Statystyki";
+"Hardware decoder" = "Dekoder sprzętowy";
+"Stream FPS" = "FPS strumienia";
+"Cached time" = "Czas buforowany";
+"Rate & Captions" = "Prędkość i napisy";
+"Dropped frames" = "Opuszczone ramki";

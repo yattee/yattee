@@ -36,7 +36,6 @@
 "Favorites" = "Favoriten";
 "Filter" = "Filter";
 "Frontend URL" = "Frontend-URL";
-"Fullscreen Size" = "Vollbildgröße";
 "Help" = "Hilfe";
 "Highest" = "Höchste";
 "History" = "Verlauf";
@@ -116,4 +115,149 @@
 "Playlist" = "Playlist";
 "Popular" = "Beliebt";
 "10 seconds forwards/backwards" = "10 Sekunden vorwärts/rückwärts";
-"Add to %@" = "zum %@ hinzufügen";
+"Add to %@" = "zu %@ hinzufügen";
+"Accounts are not supported for the application of this instance" = "Konten werden für die Anwendung dieser Instanz nicht unterstützt";
+"Advanced" = "Erweitert";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Alle";
+"Always use AVPlayer for live videos" = "Verwenden Sie immer AVPlayer für Live-Videos";
+"Anonymous" = "Anonym";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Jede";
+"Apply to all" = "Auf alle anwenden";
+"Are you sure you want to clear history of watched videos?" = "Möchten Sie den Verlauf der angesehenen Videos wirklich löschen?";
+"Are you sure you want to clear search history?" = "Möchten Sie den Suchverlauf wirklich löschen?";
+"Are you sure you want to delete playlist?" = "Möchten Sie die Playlist wirklich löschen?";
+"Are you sure you want to unsubscribe from %@?" = "Möchten Sie das Abonnement von %@ wirklich abbestellen?";
+"Battery" = "Akku";
+"Comments" = "Kommentare";
+"Country Name or Code" = "Ländername oder Landeskennung";
+"Donations" = "Spenden";
+
+/* Video sort order in search */
+"Date" = "Datum";
+"Gaming" = "Spielen";
+"Are you sure you want to restore default quality profiles?" = "Möchten Sie die Standardqualitätsprofile wirklich wiederherstellen?";
+"Autoplaying Next" = "Nächstes Element automatisch abspielen";
+"Based on system color scheme" = "Basierend auf System Farbschema";
+"Buffering stream..." = "Lade stream…";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Fehler und Vorschläge für gute Ideen können bei GitHub eingetragen werden. ";
+"cache-secs" = "Cache-sek‘s";
+"Categories to Skip" = "Kategorien zum Überspringen";
+"Close PiP and open player when application enters foreground" = "Schließe PiP und öffne den Player wenn die App in den Vordergrund geholt wird";
+"Close PiP when player is opened" = "Schließe PiP wenn Player geöffnet wird";
+"Badge & Decreased opacity" = "Abzeichen & verringerte Opazität";
+"cache-pause-wait" = "cache-pause-wart";
+"Close PiP when starting playing other video" = "PiP schließen, wenn ein anderes Video abgespielt wird";
+"Close player when closing video" = "Player beim Schließen des Videos schließen";
+"Close player when starting PiP" = "Wenn PiP beginnt, den Player schließen";
+"Close video after playing last in the queue" = "Schließen nach dem letzten Video in der Warteschlange";
+"Connected successfully (%@)" = "Erfolgreich verbunden (%@)";
+"Could not load locations manifest" = "Standortmanifest konnte nicht geladen werden";
+"Current: %@\n%@" = "Aktuell: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Benutzerdefiniert";
+"Custom Locations" = "Benutzerdefinierte Standorte";
+"Decreased opacity" = "Verringerte Opazität";
+"Disabled" = "Deaktiviert";
+"Decrease rate" = "Abnahmerate";
+"High" = "Hoch";
+"Highest quality" = "Höchste Qualität";
+"Info" = "Infos";
+"Instance of current account" = "Instanz des Girokonto";
+
+/* SponsorBlock category name */
+"Interaction" = "Interaktion";
+"Interface" = "Schnittstelle";
+
+/* SponsorBlock category name */
+"Intro" = "Intro";
+"Issues Tracker" = "Issues Tracker";
+"Enter fullscreen in landscape" = "Vollbild im Querformat aufrufen";
+"Error when accessing playlist" = "Fehler beim Zugriff auf die Playlist";
+"Finding something to play..." = "Etwas zu spielen finden...";
+"Fullscreen size" = "Vollbildgröße";
+
+/* Video date filter in search */
+"Hour" = "Stunde";
+"Honor orientation lock" = "Orientierungssperre ehren";
+"For videos which feature music as the primary content." = "Für Videos, deren Hauptinhalt Musik ist.";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Die Formate werden in der Reihenfolge der Auflistung ausgewählt.\nHLS ist ein adaptives Format (die Auflösungseinstellung gilt nicht).";
+"Increase rate" = "Erhöhungsrate";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Wenn Sie einen Fehler melden, sollten Sie alle relevanten Details angeben (insbesondere: App-Version, verwendetes Gerät und Systemversion, Schritt zur Reproduktion).";
+
+/* Player controls layout size */
+"Large" = "Groß";
+
+/* Loading stream OSD */
+"Loading streams..." = "Streams werden geladen...";
+
+/* Video duration filter in search */
+"Long" = "Lang";
+"Low quality" = "Niedrige Qualität";
+"Matrix Channel" = "Matrix-Kanal";
+
+/* Player controls layout size */
+"Medium" = "Mittel";
+"Medium quality" = "Mittlere Qualität";
+"Milestones" = "Meilensteine";
+
+/* Video date filter in search */
+"Month" = "Monat";
+"More info can be found in:" = "Weitere Informationen finden Sie in:";
+"Movies" = "Filme";
+"Music" = "Musik";
+"Loading..." = "Laden...";
+"Lock portrait mode" = "Hochformatmodus sperren";
+"Mark as watched" = "Als gesehen markieren";
+"Mark video as watched after playing" = "Video nach dem Abspielen als angesehen markieren";
+"Mark watched videos with" = "Mark sah sich Videos mit";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Offtopic bei Musikvideos";
+"Only when signed in" = "Nur wenn Sie eingeloggt sind";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "%@-stream wird geöffnet...";
+"Connection failed" = "Verbindung fehlgeschlagen";
+"Continue from %@" = "Ab %@ fortfahren";
+"Contributing" = "Beitragend";
+"Controls" = "Steuerung";
+"Copy %@ link" = "%@-Link kopieren";
+"Copy %@ link with time" = "%@-Link kopieren mit Zeit";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Die Diskussionen finden in Discord und Matrix statt. Dies ist ein guter Ort für allgemeine Fragen.";
+"Don't use public locations" = "Keine öffentlichen Orte nutzen";
+"I like this app!" = "Ich mag diese App!";
+"Hide sidebar" = "Seitenleiste ausblenden";
+"I am lost" = "Ich bin verloren";
+"I found a bug /" = "Ich fand einen Fehler /";
+"I have a feature request" = "Ich habe eine Feature-Anfrage";
+"I want to ask a question" = "Ich möchte eine Frage stellen";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Wenn Sie sich für künftige Updates interessieren, können Sie die Meilensteine des Projekts verfolgen.";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
+"Opening audio stream..." = "Audiostream wird geöffnet...";
+"Orientation" = "Ausrichtung";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Playlist \"Neu\" wird gelöscht.\nEs kann nicht rückgängig gemacht werden.";
+"Preferred Formats" = "Bevorzugte Formate";
+"Profiles" = "Profile";
+"Proxy videos" = "Proxy-Videos";
+"Public Locations" = "Öffentliche Standorte";
+"Public Manifest" = "Öffentliches Manifest";
+"Reset" = "Reset";
+"Restart" = "Neustart";
+"Save" = "Speichern";
+
+/* SponsorBlock category name */
+"Outro" = "Outro";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Ersteller in Verbindung steht. Der Ersteller erhält eine Bezahlung oder Entschädigung in Form von Geld oder kostenlosen Produkten.";
+"Picture in Picture" = "Bild-im-Bild";
+"Regular size" = "Normalgröße";
+
+/* Video sort order in search */
+"Rating" = "Bewertung";
+"Settings" = "Einstellungen";
+"Share..." = "Teilen...";

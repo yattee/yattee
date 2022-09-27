@@ -1,1 +1,242 @@
 
+
+" subscribers" = " abonnés";
+"%lld" = "%lld";
+"a" = "a";
+"Add Location..." = "Ajouter un emplacement…";
+"Add profile..." = "Ajouter un profil…";
+"Add Quality Profile" = "Ajouter un profil de qualité";
+"Delete" = "Supprimer";
+"1,234M" = "1,234 M";
+"%@" = "%@";
+"%@ %@" = "%@ %@";
+"%@ Playlist" = "%@ liste de lecture";
+"%@ subscribers" = "%@ abonnés";
+"%lld%%" = "%lld%%";
+"1234" = "1234";
+"A" = "A";
+"#" = "#";
+"%@ Channel" = "%@ chaîne";
+"1 century ago" = "il y a un siècle";
+"10 seconds forwards/backwards" = "10 secondes en avant/en arrière";
+"Accounts" = "Comptes";
+"%lld videos" = "%lld vidéos";
+"Accounts are not supported for the application of this instance" = "Les comptes ne sont pas pris en charge pour l'application de cette instance";
+"Add to Playlist" = "Ajouter à la liste de lecture";
+"Add to Favorites" = "Ajouter aux Favoris";
+"Add Account" = "Ajouter un compte";
+"Add to %@" = "Ajouter à %@";
+"Are you sure you want to clear search history?" = "Êtes-vous sûr·e de vouloir effacer l'historique des recherches ?";
+"Add Location" = "Ajouter un emplacement";
+"Add to Playlist..." = "Ajouter à la liste de lecture…";
+"Add Account..." = "Ajouter un compte…";
+"Advanced" = "Avancé";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Tout";
+"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr·e de vouloir effacer l'historique des vidéos regardées ?";
+"Are you sure you want to delete playlist?" = "Êtes-vous sûr·e de vouloir supprimer la liste de lecture ?";
+"Are you sure you want to restore default quality profiles?" = "Êtes-vous sûr·e de vouloir restaurer les profils de qualité par défaut ?";
+"Are you sure you want to unsubscribe from %@?" = "Êtes-vous sûr·e de vouloir vous désabonner de %@ ?";
+"Automatic" = "Automatique";
+"Badge" = "Badge";
+"Badge & Decreased opacity" = "Badge et opacité réduite";
+"Badge color" = "Couleur du badge";
+"Cancel" = "Annuler";
+"Captions" = "Sous-titres";
+"Categories to Skip" = "Catégories à ignorer";
+"Close Video" = "Fermer la vidéo";
+"Disabled" = "Désactivé";
+"Donations" = "Dons";
+"Fullscreen size" = "Taille du plein écran";
+"Gaming" = "Jeux vidéo";
+"Help" = "Aide";
+"Hide sidebar" = "Masquer la barre latérale";
+"High" = "Élevée";
+"Highest" = "La plus élevée";
+"Highest quality" = "Qualité la plus élevée";
+"History" = "Historique";
+
+/* Video date filter in search */
+"Hour" = "Heure";
+"I am lost" = "Je suis perdu·e";
+"I found a bug /" = "J'ai trouvé une erreur";
+"I have a feature request" = "J'ai une demande de fonctionnalité";
+"I like this app!" = "J'aime bien cette appli !";
+"I want to ask a question" = "Je veux poser une question";
+"Info" = "Infos";
+
+/* Selected video has just finished playing */
+"Just watched" = "Regardée à l'instant";
+
+/* Player controls layout size */
+"Large" = "Grand";
+"LIVE" = "DIRECT";
+"Loading..." = "Chargement…";
+"Locations" = "Emplacements";
+
+/* Video duration filter in search */
+"Long" = "Longues";
+"Medium quality" = "Qualité moyenne";
+
+/* Video date filter in search */
+"Month" = "Mois";
+"No description" = "Aucune description";
+"No Playlists" = "Aucune liste de lecture";
+"No results" = "Aucun résultat";
+"Normal" = "Normal";
+"Not available" = "Indisponible";
+"Not Playing" = "Pas en lecture";
+"Nothing" = "Rien";
+"Open \"Playlists\" tab to create new one" = "Ouvrir l'onglet « Listes de lecture » pour en créer une nouvelle";
+"Open Settings" = "Ouvrir les paramètres";
+"Play Music" = "Lire la musique";
+"Play Next" = "Lire la suivante";
+"Play Now" = "Lire maintenant";
+"Playback" = "Lecture";
+"Player" = "Lecteur";
+"Playlist" = "Liste de lecture";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "La liste de lecture « %@ » sera supprimée.\nIl n'est pas possible de revenir en arrière.";
+"Popular" = "Populaire";
+"Preferred Formats" = "Formats préférés";
+"Profiles" = "Profils";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "La promotion d'un produit ou d'un service qui est directement lié au créateur lui-même. Il s'agit généralement de marchandises ou de la promotion de plateformes monétisées.";
+"Quality" = "Qualité";
+"Rate" = "Taux";
+"Search history is empty" = "L'historique de recherche est vide";
+"Videos" = "Vidéos";
+
+/* Video date filter in search */
+"Week" = "Semaine";
+"Welcome" = "Bienvenue";
+
+/* Video date filter in search */
+"Year" = "Année";
+
+
+"Public" = "Publique";
+"Unlisted" = "Non listée";
+"Current Playlist" = "Liste de lecture actuelle";
+"Now Playing" = "En lecture";
+"Current Location" = "Emplacement actuel";
+"Private" = "Privée";
+"Playback queue is empty" = "La file d'attente de lecture est vide";
+"Playing Next" = "Lecture suivante";
+"Visibility" = "Visibilité";
+"Favorites" = "Favoris";
+"Clear History" = "Effacer l'historique";
+"Edit" = "Modifier";
+"Low quality" = "Qualité basse";
+"Mark watched videos with" = "Marquer les vidéos regardées avec";
+"Button" = "Bouton";
+"Category" = "Catégorie";
+"Chapters" = "Chapitres";
+"Charging" = "En charge";
+"Clear" = "Effacer";
+"Clear All Recents" = "Effacer tous les récents";
+"Cellular" = "Mobile";
+"Clear All" = "Tout effacer";
+"Connected successfully (%@)" = "Connexion réussie (%@)";
+"Contact" = "Contact";
+"Continue from %@" = "Continuer depuis %@";
+"Close" = "Fermer";
+"Clear Search History" = "Effacer l'historique de recherche";
+"Clear Search History..." = "Effacer l'historique des recherches…";
+"Clear the queue" = "Effacer la file d'attente";
+"Connection failed" = "La connexion a échoué";
+"Comments" = "Commentaires";
+"Continue" = "Continuer";
+"Contributing" = "Contribuer";
+"Copy %@ link with time" = "Copier le lien %@ avec le temps";
+"Country Name or Code" = "Nom ou code du pays";
+"Create Playlist" = "Créer une liste de lecture";
+"Copy %@ link" = "Copier le lien %@";
+"Edit Quality Profile" = "Modifier le profil de qualité";
+"Enable logging" = "Activer la journalisation";
+"Country" = "Pays";
+"Current: %@\n%@" = "Actuel : %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Personnalisé";
+"Done" = "Terminé";
+"Edit..." = "Modifier…";
+"Error" = "Erreur";
+"Lowest" = "La plus basse";
+"Filter" = "Filtre";
+"Find Other" = "En trouver un autre";
+"Mark as watched" = "Marquer comme regardée";
+"More info can be found in:" = "Vous trouverez plus d'informations dans :";
+"Duration" = "Durée";
+"Edit Playlist" = "Modifier la liste de lecture";
+"Filter: active" = "Filtre : actif";
+"Error when accessing playlist" = "Erreur lors de l'accès à la liste de lecture";
+"Low" = "Basse";
+"Movies" = "Films";
+"Red" = "Rouge";
+"Reset" = "Réinitialiser";
+"Username" = "Nom d'utilisateur";
+
+/* Subscriptions title */
+"Subscriptions" = "Abonnements";
+"Mark video as watched after playing" = "Marquer la vidéo comme regardée après la lecture";
+
+/* Player controls layout size */
+"Medium" = "Moyenne";
+"Music" = "Musique";
+"Next" = "Suivant";
+"Pause when entering background" = "Pause lors de l'entrée en arrière-plan";
+"Play All" = "Tout lire";
+"Quality Profile" = "Profil qualité";
+"Queue is empty" = "La file d'attente est vide";
+
+/* Video sort order in search */
+"Rating" = "Évaluation";
+"Pause" = "Pause";
+"Picture in Picture" = "Image dans l'image";
+"Play" = "Lecture";
+"Play in PiP" = "Lire en image dans l'image";
+"Play Last" = "Lire la dernière";
+"Name" = "Nom";
+"Password" = "Mot de passe";
+"Playlists" = "Listes de lecture";
+"New Playlist" = "Nouvelle liste de lecture";
+"Pause when player is closed" = "Pause lorsque le lecteur est fermé";
+"Recents" = "Récentes";
+"Search" = "Recherche";
+
+/* Selected video was played on given date */
+"Watched %@" = "Regardée %@";
+"Remove from the queue" = "Retirer de la file d'attente";
+"Queue" = "File d'attente";
+"Refresh" = "Actualiser";
+"Remove" = "Retirer";
+"Remove from history" = "Retirer de l'historique";
+"Remove from Favorites" = "Retirer des Favoris";
+"Remove from Playlist" = "Retirer de la liste de lecture";
+"Replies" = "Réponses";
+"Save" = "Enregistrer";
+"Save history of played videos" = "Enregistrer l'historique des vidéos lues";
+"Watched" = "Regardée";
+"Save history of searches, channels and playlists" = "Enregistrer l'historique des recherches, des chaînes et des listes de lecture";
+"Sections" = "Sections";
+
+/* Video date filter in search */
+"Today" = "Aujourd'hui";
+
+/* Video sort order in search */
+"Views" = "Vues";
+"Search..." = "Recherche…";
+
+/* Selected video is being played */
+"Watching now" = "En lecture";
+"Unsubscribe" = "Se désabonner";
+"Upload date" = "Date de mise en ligne";
+"Thumbnails" = "Aperçus";
+"URL" = "URL";
+"Trending" = "Tendances";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"Sort: %@" = "Trier : %@";
+"Subscribe" = "S'abonner";
+"Sort" = "Trier";
