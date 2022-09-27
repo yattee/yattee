@@ -1,0 +1,264 @@
+
+
+"%@ %@" = "%@ %@";
+" subscribers" = " abonnenter";
+"1,234M" = "1,234M";
+"Accounts" = "Kontoer";
+"Add Account" = "Legg til konto";
+"Add Account..." = "Legg til konto …";
+"Add profile..." = "Legg til profil …";
+"Add Quality Profile" = "Legg til kvalitetsprofil";
+"Add to Favorites" = "Lagt til i favoritter";
+"Add to Playlist" = "Legg til i spilleliste";
+"Add to Playlist..." = "Legg til i spilleliste …";
+"Advanced" = "Avansert";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Alle";
+"Badge & Decreased opacity" = "Skilt og redusert dekkevne";
+"Badge color" = "Skiltfarge";
+"Based on system color scheme" = "Basert på systemets draktvalg";
+"Browsing" = "Surfing";
+"Button" = "Knapp";
+"Cancel" = "Avbryt";
+"Captions" = "Undertekster";
+"Categories to Skip" = "Kategorier å hoppe over";
+"Category" = "Kategori";
+"Cellular" = "Mobilnettverk";
+"Chapters" = "Kapitler";
+"Charging" = "Lading";
+"Clear" = "Tøm";
+"Clear All" = "Tøm alle";
+"Clear All Recents" = "Tøm alle nylige";
+"Clear History" = "Tøm historikk";
+"Clear Search History" = "Tøm søkehistorikk";
+"Clear Search History..." = "Tøm søkehistorikk …";
+"Clear the queue" = "Tøm køen";
+"Close" = "Lukk";
+"Comments" = "Kommentarer";
+"Contact" = "Kontakt";
+"Continue" = "Fortsett";
+"Continue from %@" = "Fortsett fra %@";
+"Country" = "Land";
+"Country Name or Code" = "Landsnavn eller kode";
+"Create Playlist" = "Opprett spilleliste";
+"Current: %@\n%@" = "Nåværende: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Egendefinert";
+
+/* Video sort order in search */
+"Date" = "Dato";
+"Delete" = "Slett";
+"Disabled" = "Avskrudd";
+"Discord Server" = "Discord-tjener";
+"Edit Playlist" = "Rediger spilleliste";
+"Edit Quality Profile" = "Rediger kvalitetsprofil";
+"Edit..." = "Rediger …";
+"Error" = "Feil";
+"Favorites" = "Favoritter";
+"Filter" = "Filter";
+"Filter: active" = "Filter: på";
+"Find Other" = "Finn andre";
+"Finding something to play..." = "Finner noe å spille …";
+"Fullscreen size" = "Fullskjermsstørrelse";
+"Help" = "Hjelp";
+"Hide sidebar" = "Skjul sidefelt";
+"High" = "Høy";
+"History" = "Historikk";
+
+/* Video date filter in search */
+"Hour" = "Time";
+"I am lost" = "Jeg har gått meg vill";
+"I found a bug /" = "Jeg har funnet en feil /";
+"I want to ask a question" = "Jeg vil stille et spørsmål";
+"Increase rate" = "Øk takt";
+
+/* SponsorBlock category name */
+"Interaction" = "Interaksjon";
+"Interface" = "Grensesnitt";
+
+/* Selected video has just finished playing */
+"Just watched" = "Nylig sett";
+
+/* Player controls layout size */
+"Large" = "Stor";
+"LIVE" = "Direkte";
+
+/* Loading stream OSD */
+"Loading streams..." = "Laster inn strømmer …";
+
+/* Video duration filter in search */
+"Long" = "Lang";
+"Low" = "Lav";
+"Low quality" = "Lav kvalitet";
+"Lowest" = "Lavest";
+"Mark as watched" = "Marker som sett";
+"Matrix Channel" = "Matrix-kanal";
+"Matrix Chat" = "Matrix-sludring";
+
+/* Player controls layout size */
+"Medium" = "Middels";
+"Medium quality" = "Middels kvalitet";
+"Milestones" = "Milepæler";
+
+/* Video date filter in search */
+"Month" = "Måned";
+"More info can be found in:" = "Mer info er å finne i:";
+"Movies" = "Filmer";
+"MPV Documentation" = "MPV-dokumentasjon";
+"Music" = "Musikk";
+"Name" = "Navn";
+"New Playlist" = "Ny spilleliste";
+"Next" = "Neste";
+"No description" = "Ingen beskrivelse";
+"No Playlists" = "Ingen spillelister";
+"No results" = "Resultatløst";
+"Normal" = "Normal";
+"Not available" = "Ikke tilgjengelig";
+"Only when signed in" = "Kun når innlogget";
+"Pause" = "Pause";
+"Pause when player is closed" = "Pause når spilleren lukkes";
+"Play Music" = "Spill musikk";
+"Play Next" = "Spill neste";
+"Play Now" = "Spill nå";
+"Playback" = "Avspilling";
+"Player" = "Avspiller";
+"Playlist" = "Spilleliste";
+"Playlists" = "Spillelister";
+"Preferred Formats" = "Foretrukne formater";
+"Profiles" = "Profiler";
+"Proxy videos" = "Mellomtjen videoer";
+"Quality" = "Kvalitet";
+"Quality Profile" = "Kvalitetsprofil";
+"Queue" = "Kø";
+
+/* Video sort order in search */
+"Rating" = "Vurdering";
+"Recents" = "Nylige";
+"Refresh" = "Gjenoppfrisk";
+"Regular size" = "Vanlig størrelse";
+"Regular Size" = "Vanlig størrelse";
+
+/* Video sort order in search */
+"Relevance" = "Relevans";
+"Remove" = "Fjern";
+"Reset" = "Tilbakestill";
+"Reset search filters" = "Tilbakestill søkefiltre";
+"Resolution" = "Oppløsning";
+"Restart/Play next" = "Start på ny/spill neste";
+"Round corners" = "Avrundede hjørner";
+"Save" = "Lagre";
+"Search" = "Søk";
+"Search history is empty" = "Søkehistorikken er tom";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Selvpromo";
+"Settings" = "Innstillinger";
+"Show anonymous accounts" = "Vis anonyme kontoer";
+"Show channel name" = "Vis kanalnavn";
+"Show history" = "Vis historikk";
+"Show keywords" = "Vis nøkkelord";
+"Show video length" = "Vis videolengde";
+"Sidebar" = "Sidefelt";
+"Sign In Required" = "Innlogging kreves";
+"Source" = "Kilde";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"SponsorBlock" = "SponsorBlock";
+"SponsorBlock API Instance" = "API-instans for SponsorBlock";
+"Subscribe" = "Abonner";
+
+/* Subscriptions title */
+"Subscriptions" = "Abonnementer";
+"This cannot be reverted" = "Dette kan ikke angres";
+"Thumbnails" = "Miniatyrbilder";
+
+/* Video date filter in search */
+"Today" = "I dag";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"unknown" = "ukjent";
+
+/* Player controls layout size */
+"Very Large" = "Veldig stort";
+"Videos" = "Videoer";
+
+/* Video sort order in search */
+"Views" = "Visninger";
+"Welcome" = "Velkommen";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+
+/* Video date filter in search */
+"Year" = "År";
+"Now Playing" = "Spilles nå";
+"Private" = "Privat";
+"Playback queue is empty" = "Avspillingskøen er tom";
+"#" = "#";
+"%@" = "%@";
+"10 seconds forwards/backwards" = "10 sekunder fram/tilbake";
+"%@ Channel" = "%@ kanal";
+"%lld" = "%lld";
+"%lld%%" = "%lld%%";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Alle";
+"%@ Playlist" = "%@ spilleliste";
+"%lld videos" = "%lld videoer";
+"%@ subscribers" = "%@ abonnenter";
+"1 century ago" = "100 år siden";
+"1234" = "1234";
+"a" = "";
+"Anonymous" = "Anonym";
+"Done" = "Ferdig";
+"Battery" = "Batteri";
+"Connected successfully (%@)" = "Tilkoblet (%@)";
+"Donations" = "Donasjoner";
+"Duration" = "Varighet";
+"Edit" = "Rediger";
+"Highest" = "Høyeste";
+"Highest quality" = "Høyeste kvalitet";
+"Info" = "Info";
+"Orientation" = "Sideretning";
+"I like this app!" = "Jeg liker dette programmet";
+
+/* SponsorBlock category name */
+"Intro" = "Intro";
+"Open Settings" = "Åpne innstillingene";
+"Loading..." = "Laster inn …";
+"Rate" = "Takt";
+"Not Playing" = "Spiller ikke";
+"Open \"Playlists\" tab to create new one" = "Åpne «Spillelister»-fanen for å opprette ny";
+"Opening audio stream..." = "Åpner lydstrøm …";
+"Password" = "Passord";
+"Nothing" = "Ingenting";
+"Picture in Picture" = "Bilde-i-bilde";
+"Play" = "Spill";
+"Play All" = "Spill alle";
+"Remove from Favorites" = "Fjern fra favoritter";
+"Queue is empty" = "Køen er tom";
+"Remove from history" = "Fjern fra historikk";
+"Remove from Playlist" = "Fjern fra spilleliste";
+"Remove from the queue" = "Fjern fra køen";
+"Replies" = "Svar";
+"Search..." = "Søk …";
+"Share..." = "Del …";
+"URL" = "Nettadresse";
+"Show account username" = "Vis kontobrukernavn";
+"Show playback statistics" = "Vis avspillingsstatistikk";
+"Unsubscribe" = "Opphev abonnement";
+"Username" = "Brukernavn";
+
+
+"Public" = "Offentlig";
+"You have no Playlists" = "Du har ingen spillelister";
+"Current Playlist" = "Nåværende spilleliste";
+"Make default" = "Gjør til forvalg";
+"Visibility" = "Synlighet";
+"Statistics" = "Statistikk";
+"Hardware decoder" = "Maskinvaredekoder";

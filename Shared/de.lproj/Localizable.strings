@@ -261,3 +261,81 @@
 "Rating" = "Bewertung";
 "Settings" = "Einstellungen";
 "Share..." = "Teilen...";
+"Remove from Playlist" = "Aus Playlist entfernen";
+"Remove from the queue" = "Aus der Warteschlange entfernen";
+"Replies" = "Antworten";
+"Reset search filters" = "Suchfilter zurücksetzen";
+"Reset watched status when playing again" = "Zurücksetzen des Überwachungsstatus beim erneuten Spielen";
+"Resolution" = "Auflösung";
+"Restart the app to apply the settings above." = "Starten Sie die App neu, um die Einstellungen zu übernehmen.";
+"Restart/Play next" = "Neustart/Nächstes spielen";
+"Restore default profiles..." = "Standardprofile wiederherstellen...";
+"Rotate to portrait when exiting fullscreen" = "Auf Hochformat drehen, wenn der Vollbildmodus beendet wird";
+"Round corners" = "Runde Ecken";
+"Switch to public locations" = "Zu öffentlichen Orten wechseln";
+"Switch to other public location" = "Zu einem anderen öffentlichen Ort wechseln";
+"Welcome" = "Willkommen";
+"Username" = "Benutzername";
+
+/* Player controls layout size */
+"Very Large" = "Sehr groß";
+"Videos" = "Videos";
+
+/* Video sort order in search */
+"Views" = "Aufrufe";
+"Watched" = "Beobachtet";
+
+/* Selected video was played on given date */
+"Watched %@" = "Beobachtet %@";
+
+/* Selected video is being played */
+"Watching now" = "Jetzt anschauen";
+
+/* Video date filter in search */
+"Week" = "Woche";
+"Pause when entering background" = "Pause bei Eintritt in den Hintergrund";
+"Pause when player is closed" = "Pause, wenn der Player geschlossen wird";
+
+/* Video sort order in search */
+"Relevance" = "Relevanz";
+"Remove from Favorites" = "Aus Favoriten entfernen";
+"Remove from history" = "Aus dem Verlauf entfernen";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Eigenwerbung";
+"Show account username" = "Konto-Benutzername anzeigen";
+"Show keywords" = "Schlüsselwörter anzeigen";
+"Show playback statistics" = "Wiedergabestatistiken anzeigen";
+"SponsorBlock" = "SponsorBlock";
+"Subscribe" = "Abonnieren";
+
+/* Subscriptions title */
+"Subscriptions" = "Abonnements";
+"System controls buttons" = "Systemsteuerungstasten";
+"Thumbnails" = "Vorschaubilder";
+
+/* Video date filter in search */
+"Today" = "Heute";
+"Trending" = "Trends";
+
+/* Player controls layout size for TV */
+"TV" = "Fernsehen";
+"unknown" = "unbekannt";
+"Unsubscribe" = "Abbestellen";
+"Upload date" = "Uploaddatum";
+"URL" = "URL";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+"Yattee %@ (build %@)" = "Yattee %@ (build %@)";
+
+/* Video date filter in search */
+"Year" = "Jahr";
+"SponsorBlock API Instance" = "SponsorBlock API-Instanz";
+"Show history" = "Verlauf anzeigen";
+"Show anonymous accounts" = "Anonyme Konten anzeigen";
+"Source" = "Quelle";
+"Show channel name" = "Kanalnamen anzeigen";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
