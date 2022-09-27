@@ -281,3 +281,137 @@
 "Play Last" = "Spill siste";
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Spillelisten «%@» vil bli slettet.\nDette kan ikke angres.";
 "Popular" = "Populært";
+"Connection failed" = "Kunne ikke koble til";
+"Add Location" = "Legg til sted";
+"Always use AVPlayer for live videos" = "AVPlayer for direkte-videoer";
+"Apply to all" = "Bruk for alle";
+"Automatic" = "Automatisk";
+"Autoplaying Next" = "Spiller neste også";
+"Blue" = "Blå";
+"Are you sure you want to unsubscribe from %@?" = "Opphev abonnement på %@?";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Feil og flotte funksjonsidéer kan sendes til feilsporeren på GitHub. ";
+"cache-pause-wait" = "cache-pause-wait";
+"cache-secs" = "cache-secs";
+"Close PiP and open player when application enters foreground" = "Lukk bilde-i-bilde og åpne avspiller når programmet er fokusert";
+"Close PiP when player is opened" = "Lukk bilde-i-bilde når spilleren åpnes";
+"Close PiP when starting playing other video" = "Lukk bilde-i-bilde ved start av en annen video";
+"Close player when closing video" = "Lukk spiller når video lukkes";
+"Contributing" = "Bidragsytere";
+"Could not load locations manifest" = "Kunne ikke laste inn manifest for steder";
+"Custom Locations" = "Egendefinerte steder";
+"Decrease rate" = "Reduser takt";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Diskusjoner finner sted på Discord og Matrix. Der kan du også stille generelle spørsmål.";
+"Enable Return YouTube Dislike" = "Visning av tommel ned";
+"Enter fullscreen in landscape" = "Gå inn i fullskjerm i liggende modus";
+"Error when accessing playlist" = "Fikk ikke tilgang til spillelisten";
+"For videos which feature music as the primary content." = "For videoer som har musikk som hovedinnhold.";
+"Frontend URL" = "Grenseflate-nettadresse";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatet vil velges i den rekkefølgen de er opplistet.\nHLS er et adaptivt format (oppløsningsinnstillinger har ingen innvirkning).";
+"Gaming" = "Spilling";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Følg med på milepælene for å finne ut hva som kommer.";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Inkluder all relevant info når du rapproterer feil. (Spesielt programversjon, anvendt enhet og systemversjon, og trinnvis reproduksjonsinstruks.)";
+"Locations" = "Steder";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Stor visning fungerer ikke på alle enheter, fordi kontrollene ikke får plass på skjermen.";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Urelaterte ting i musikkvideoer";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Åpner %@-strøm …";
+"Play in PiP" = "Bilde-i-bilde";
+"Pause when entering background" = "Pause ved forsendelse til bakgrunnen";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promoterer noe som har å gjøre med skaperen direkte. Vanligvis effekter eller betalte plattformer.";
+"Red" = "Rød";
+"Related" = "Lignende";
+"Public Locations" = "Offentlige steder";
+"Public Manifest" = "Offentlig manifest";
+"Restart" = "Start på ny";
+"Restart the app to apply the settings above." = "Start programmet på ny for å ta i bruk innstillingene ovenfor.";
+"Restore default profiles..." = "Gjenopprett forvalgte profiler …";
+"Reset watched status when playing again" = "Tilbakestill visningsstatus når avspilt igjen";
+"Rotate to portrait when exiting fullscreen" = "Roter til stående sideretning ved avslutning av fullskjermsvisning";
+"Save history of played videos" = "Lagre visningshistorikk";
+"Save history of searches, channels and playlists" = "Lagre historikk for søk, kanaler, og spillelister";
+"Sections" = "Deler";
+"Select location closest to you:" = "Velg sted nærmest deg:";
+"Share %@ link" = "Del %@-lenke";
+
+/* Video duration filter in search */
+"Short" = "Kort";
+"Show sidebar when space permits" = "Vis sidefelt når det er plass til det";
+"Show progress of watching on thumbnails" = "Visningsframdrift i miniatyrbilder";
+"Shuffle" = "Tilfeldig rekkefølge";
+"Shuffle All" = "Tilfeldig rekkefølge for alt";
+
+/* Player controls layout size */
+"Small" = "Liten";
+
+/* Player controls layout size */
+"Smaller" = "Mindre";
+"Sort" = "Sortering";
+"Switch to other public location" = "Bytt til annet offentlig sted";
+"Switch to public locations" = "Bytt til offentlige steder";
+"System controls buttons" = "Knapper for systemkontroll";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Denne infoen behandles kun på din enhet og brukes for å koble deg til tjeneren i angitt land.";
+"Trending" = "På vei opp";
+"Upload date" = "Opplastingsdato";
+
+/* Video date filter in search */
+"Week" = "Uke";
+"Yattee %@ (build %@)" = "Yattee %@ (bygg %@)";
+"You can find information about using Yattee in the Wiki pages." = "Du finner info om bruk av Yattee på wiki-sidene.";
+"Watched" = "Sett";
+
+/* Selected video was played on given date */
+"Watched %@" = "Sett %@";
+
+/* Selected video is being played */
+"Watching now" = "Spiller nå";
+"When partially watched video is played" = "Når halvspilt video spilles";
+"Unlisted" = "Ikke offentlig";
+"Current Location" = "Nåværende sted";
+"Playing Next" = "Spilles etterpå";
+"Stream & Player" = "Strøm og avspiller";
+"Stream FPS" = "Bilder per sekund for strøm";
+"Any format" = "Alle formater";
+"%@ formats" = "%@-formater";
+"Keep last played video in the queue after restart" = "Behold sist spilte video i kø etter omstart";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Spillelisten er tom\n\nTrykk og hold på en video og så\n«Legg til i spilleliste».";
+"Buffering stream..." = "Mellomlagrer strøm …";
+"Sort: %@" = "Soertering: %@";
+"Add to %@" = "Legg til i %@";
+"Are you sure you want to clear history of watched videos?" = "Tøm visningshistorikk?";
+"Add Location..." = "Legg til sted …";
+"Are you sure you want to restore default quality profiles?" = "Gjenopprett forvalgte kvalitetsprofiler?";
+"Are you sure you want to clear search history?" = "Tøm søkehistorikk?";
+"Are you sure you want to delete playlist?" = "Slett spillelisten?";
+"Close player when starting PiP" = "Lukk spiller når bilde-i-bilde åpnes";
+"Don't use public locations" = "Ikke bruk offentlige steder";
+"Close Video" = "Lukk video";
+"Close video after playing last in the queue" = "Lukk video etter å ha spilt siste i køen";
+"Copy %@ link" = "Kopier %@-lenke";
+"Copy %@ link with time" = "Kopier %@-lenke med tid";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Påminnelser om å like, abonnere, eller interaksjon på plattformer. (F.eks. klikke på en video.)";
+"Instance of current account" = "Instans for nåværende konto";
+"Seek gesture sensitivity" = "Sensitivitet for blafringshåndvendinger";
+"Seek gesture speed" = "Hastighet for blafringshåndvending";
+"Seek with horizontal swipe on video" = "Blafre med vannrett dragning på video";
+"System controls show buttons for %@" = "Systemkontroller viser knapper for %@";
+"Share %@ link with time" = "Del %@-lenke med tid";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Godt å høre. Det er gøy å lage programmer folk vil bruke. Støtt prosjektet med penger eller innsats.";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Dette kan ikke angres. Det kan hende du må bytte mellom visninger eller starte programmet på ny for å iføre endringene.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Dette fjerner alle dine egendefinerte profiler og tilbakestiller dem til sine forvalg. Dette kan ikke angres.";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Typisk nær slutten av videoen når rulleteksten vises, eller sluttinfo.";
+"Used to create links from videos, channels and playlists" = "Brukt til å opprette lenker fra videoer, kanaler, og spillelister";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Du kan bruke automatisk profilvalg basert på enhetsstatus eller bytte til det i innstillingene for videoavspilling.";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Du har ingen spillelister.\n\nTrykk på «Ny spilleliste» for å opprette en.";
+"You need to create an instance and accounts\nto access %@ section" = "Du må opprette en instans og kontoer\nfor å få tilgang til %@-delen";
+"You need to select an account\nto access %@ section" = "Du må velge en konto for å\nfå tilgang til %@-delen.";
+"You can switch between profiles in playback settings controls." = "Du kan bytte mellom profiler i kontrollene for avspilling.";
+"Add Channels, Playlists and Searches to Favorites using" = "Legg til kanaler, spillelister, og søk til i favoritter ved bruk av";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Animasjoner, stillbilder, eller klipp som også er å finne i skaperens andre videoer.";
+"Rate & Captions" = "Vurdering og undertekster";
+"Dropped frames" = "Forkastede rammer";
+"It can be changed later in settings. You can use your own locations too." = "Det kan endres senere i innstillingene. Du kan bruke egne steder også.";
+"Cached time" = "Hurtiglagret tid";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Promo av noe som ikke er direkte tilknyttet skaperen. Skaperen får betaling i form av gratis produkter eller penger.";
