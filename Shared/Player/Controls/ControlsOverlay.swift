@@ -251,7 +251,7 @@ struct ControlsOverlay: View {
             Menu {
                 qualityProfilePicker
             } label: {
-                Text(player.qualityProfileSelection?.description ?? "Automatic")
+                Text(player.qualityProfileSelection?.description ?? "Automatic".localized())
                     .frame(maxWidth: 240)
             }
             .transaction { t in t.animation = .none }
@@ -263,7 +263,7 @@ struct ControlsOverlay: View {
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
             ControlsOverlayButton(focusedField: $focusedField, field: .qualityProfile) {
-                Text(player.qualityProfileSelection?.description ?? "Automatic")
+                Text(player.qualityProfileSelection?.description ?? "Automatic".localized())
                     .lineLimit(1)
                     .frame(maxWidth: 320)
             }
