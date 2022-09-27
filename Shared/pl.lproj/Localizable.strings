@@ -404,3 +404,10 @@
 "Make default" = "Ustaw jako domyślny";
 "Visibility" = "Widoczność";
 "Current Playlist" = "Aktualna playlista";
+"Stream & Player" = "Strumień i odtwarzacz";
+"Statistics" = "Statystyki";
+"Hardware decoder" = "Dekoder sprzętowy";
+"Stream FPS" = "FPS strumienia";
+"Cached time" = "Czas buforowany";
+"Rate & Captions" = "Prędkość i napisy";
+"Dropped frames" = "Opuszczone ramki";
