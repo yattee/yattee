@@ -231,7 +231,7 @@ struct SettingsView: View {
             case .quality:
                 return 420
             case .history:
-                return 480
+                return 500
             case .sponsorBlock:
                 return 660
             case .locations:
