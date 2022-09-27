@@ -187,8 +187,8 @@ extension Defaults.Keys {
     static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
-    static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "20")
-    static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "2")
+    static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
+    static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
 }
 
