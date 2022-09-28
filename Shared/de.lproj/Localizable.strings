@@ -9,7 +9,7 @@
 "Add Account" = "Konto hinzufügen";
 "Add Location" = "Ort hinzufügen";
 "Add Location..." = "Ort hinzufügen...";
-"Add to Playlist" = "Zur Playlist hinzufügen";
+"Add to Playlist" = "Zur Wiedergabeliste hinzufügen";
 "Backend" = "Backend";
 "Badge color" = "Abzeichen Farbe";
 "Button" = "Taste";
@@ -24,13 +24,13 @@
 "Close Video" = "Video schließen";
 "Contact" = "Kontakt";
 "Country" = "Land";
-"Create Playlist" = "Playlist erstellen";
+"Create Playlist" = "Wiedergabeliste erstellen";
 "Delete" = "Entfernen";
 "Discord Server" = "Discord-Server";
 "Done" = "Fertig";
 "Duration" = "Laufzeit";
 "Edit" = "Bearbeiten";
-"Edit Playlist" = "Playlist bearbeiten";
+"Edit Playlist" = "Wiedergabeliste bearbeiten";
 "Enable Return YouTube Dislike" = "Return YouTube Dislike freigeben";
 "Error" = "Fehler";
 "Favorites" = "Favoriten";
@@ -45,10 +45,10 @@
 "Matrix Chat" = "Matrix-Chat";
 "MPV Documentation" = "MPV Dokumentation";
 "Name" = "Name";
-"New Playlist" = "Neue Playlist";
+"New Playlist" = "Neue Wiedergabeliste";
 "Next" = "Nächste";
 "No description" = "Keine Beschreibung";
-"No Playlists" = "Keine Playlists";
+"No Playlists" = "Keine Wiedergabelisten";
 "No results" = "Keine Ergebnisse";
 "Normal" = "Normal";
 "Not available" = "Nicht verfügbar";
@@ -79,7 +79,7 @@
 "%@ subscribers" = "%@ Abonnenten";
 " subscribers" = " Abonnenten";
 "%@" = "%@";
-"%@ Playlist" = "%@ Playlist";
+"%@ Playlist" = "%@ Wiedergabeliste";
 "%lld" = "%lld";
 "%lld%%" = "%lld%%";
 "1 century ago" = "vor 1 Jahrhundert";
@@ -91,7 +91,7 @@
 "Automatic" = "Automatisch";
 "Clear Search History" = "Suchverlauf löschen";
 "Continue" = "Fortsetzen";
-"Playlists" = "Playlists";
+"Playlists" = "Wiedergabelisten";
 "Badge" = "Abzeichen";
 "Blue" = "Blau";
 "Browsing" = "Surfen";
@@ -112,7 +112,7 @@
 "Just watched" = "Gerade angesehen";
 "LIVE" = "LIVE";
 "Play Now" = "Jetzt abspielen";
-"Playlist" = "Playlist";
+"Playlist" = "Wiedergabeliste";
 "Popular" = "Beliebt";
 "10 seconds forwards/backwards" = "10 Sekunden vorwärts/rückwärts";
 "Add to %@" = "zu %@ hinzufügen";
@@ -130,7 +130,7 @@
 "Apply to all" = "Auf alle anwenden";
 "Are you sure you want to clear history of watched videos?" = "Möchten Sie den Verlauf der angesehenen Videos wirklich löschen?";
 "Are you sure you want to clear search history?" = "Möchten Sie den Suchverlauf wirklich löschen?";
-"Are you sure you want to delete playlist?" = "Möchten Sie die Playlist wirklich löschen?";
+"Are you sure you want to delete playlist?" = "Möchten Sie die Wiedergabeliste wirklich löschen?";
 "Are you sure you want to unsubscribe from %@?" = "Möchten Sie das Abonnement von %@ wirklich abbestellen?";
 "Battery" = "Akku";
 "Comments" = "Kommentare";
@@ -178,7 +178,7 @@
 "Intro" = "Intro";
 "Issues Tracker" = "Issues Tracker";
 "Enter fullscreen in landscape" = "Vollbild im Querformat aufrufen";
-"Error when accessing playlist" = "Fehler beim Zugriff auf die Playlist";
+"Error when accessing playlist" = "Fehler beim Zugriff auf Wiedergabeliste";
 "Finding something to play..." = "Etwas zu spielen finden...";
 "Fullscreen size" = "Vollbildgröße";
 
@@ -241,7 +241,7 @@
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
 "Opening audio stream..." = "Audiostream wird geöffnet...";
 "Orientation" = "Ausrichtung";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Playlist \"Neu\" wird gelöscht.\nEs kann nicht rückgängig gemacht werden.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Wiedergabeliste \"Neu\" wird gelöscht.\nEs kann nicht rückgängig gemacht werden.";
 "Preferred Formats" = "Bevorzugte Formate";
 "Profiles" = "Profile";
 "Proxy videos" = "Proxy-Videos";
@@ -253,15 +253,15 @@
 
 /* SponsorBlock category name */
 "Outro" = "Outro";
-"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Ersteller in Verbindung steht. Der Ersteller erhält eine Bezahlung oder Entschädigung in Form von Geld oder kostenlosen Produkten.";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Schöpfer in Verbindung steht. Der Schöpfer erhält eine Bezahlung oder Entschädigung in Form von Geld oder kostenlosen Produkten.";
 "Picture in Picture" = "Bild-im-Bild";
 "Regular size" = "Normalgröße";
 
 /* Video sort order in search */
-"Rating" = "Bewertung";
+"Rating" = "Rating";
 "Settings" = "Einstellungen";
 "Share..." = "Teilen...";
-"Remove from Playlist" = "Aus Playlist entfernen";
+"Remove from Playlist" = "Aus Wiedergabeliste entfernen";
 "Remove from the queue" = "Aus der Warteschlange entfernen";
 "Replies" = "Antworten";
 "Reset search filters" = "Suchfilter zurücksetzen";
@@ -339,3 +339,80 @@
 
 /* SponsorBlock category name */
 "Sponsor" = "Sponsor";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Explizite Aufforderungen, ihnen zu gefallen, sie zu abonnieren oder mit ihnen auf einer oder mehreren kostenpflichtigen oder kostenlosen Plattformen zu interagieren (z.B. auf ein Video klicken).";
+"Open \"Playlists\" tab to create new one" = "Öffnen Sie die Registerkarte \"Wiedergabelisten\", um eine neue Liste zu erstellen";
+"Rate" = "Rate";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Werbung für ein Produkt oder eine Dienstleistung, die in direktem Zusammenhang mit dem Schöpfer selbst steht. Dazu gehören in der Regel Waren oder die Werbung für monetarisierte Plattformen.";
+"Save history of played videos" = "Verlauf der abgespielten Videos speichern";
+"Search" = "Suche";
+"Share %@ link" = "%@-Link teilen";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Diese Informationen werden nur auf Ihrem Gerät verarbeitet und dazu verwendet, Sie mit dem Server im angegebenen Land zu verbinden.";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Das ist schön zu hören. Es macht Spaß, Apps zu entwickeln, die andere Menschen nutzen wollen. Sie können in Erwägung ziehen, für das Projekt zu spenden oder bei der Weiterentwicklung neuer Funktionen mitzuhelfen.";
+"This cannot be reverted" = "Dies kann nicht zurückgenommen werden";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Dies kann nicht zurückgenommen werden. Vielleicht müssen Sie zwischen den Ansichten wechseln oder die App neu starten, um die Änderungen zu sehen.";
+"When partially watched video is played" = "Wenn ein teilweise angesehenes Video abgespielt wird";
+"You can find information about using Yattee in the Wiki pages." = "Informationen zur Verwendung von Yattee finden Sie auf den Wiki-Seiten.";
+
+
+"Public" = "Öffentlich";
+"Unlisted" = "Nicht aufgelistet";
+"Private" = "Privat";
+"Current Location" = "Aktueller Standort";
+"Playback queue is empty" = "Die Wiedergabewarteschlange ist leer";
+"Playing Next" = "Nächstes Spiel";
+"You can switch between profiles in playback settings controls." = "Sie können in den Wiedergabeeinstellungen zwischen den Profilen wechseln.";
+"Add Channels, Playlists and Searches to Favorites using" = "Hinzufügen von Kanälen, Wiedergabelisten und Suchen zu den Favoriten mit";
+"Visibility" = "Sichtbarkeit";
+"Stream & Player" = "Streamen & Player";
+"Statistics" = "Statistik";
+"Stream FPS" = "FPS-Stream";
+"Hardware decoder" = "Hardware-Decoder";
+"Save history of searches, channels and playlists" = "Verlauf von Suchen, Kanälen und Wiedergabelisten speichern";
+"Search history is empty" = "Suchverlauf ist leer";
+"Search..." = "Suche...";
+"Sections" = "Abschnitte";
+"Seek gesture sensitivity" = "Gesten-Sensibilität suchen";
+"Seek gesture speed" = "Geschwindigkeit der Suchgesten";
+"Seek with horizontal swipe on video" = "Suchen mit horizontaler Wischbewegung im Video";
+"Select location closest to you:" = "Wählen Sie den nächstgelegenen Standort:";
+"Share %@ link with time" = "Link %@ mit der Zeit teilen";
+
+/* Video duration filter in search */
+"Short" = "Kurz";
+"Show progress of watching on thumbnails" = "Anzeige des Beobachtungsverlaufs auf Miniaturbildern";
+"Show sidebar when space permits" = "Seitenleiste anzeigen, wenn Platz vorhanden";
+"Show video length" = "Videolänge anzeigen";
+"Shuffle" = "Zufallswiedergabe";
+"Shuffle All" = "Zufallswiedergabe alle";
+"Sidebar" = "Seitenleiste";
+"Sign In Required" = "Einloggen erforderlich";
+
+/* Player controls layout size */
+"Small" = "Klein";
+"Used to create links from videos, channels and playlists" = "Zum Erstellen von Links aus Videos, Kanälen und Wiedergabelisten";
+"You have no Playlists" = "Sie haben keine Wiedergabelisten";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Sie haben keine Wiedergabelisten\n\nKlicken Sie auf \"Neue Wiedergabeliste\", um eine zu erstellen";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Sie können die automatische Profilauswahl basierend auf dem aktuellen Gerätestatus verwenden oder sie in den Einstellungen für die Videowiedergabe umschalten.";
+"You need to create an instance and accounts\nto access %@ section" = "Sie müssen eine Instanz und Konten erstellen\num auf den Bereich %@ zuzugreifen";
+"You need to select an account\nto access %@ section" = "Sie müssen ein Konto auswählen\num auf den Bereich %@ zuzugreifen";
+
+/* Player controls layout size */
+"Smaller" = "Kleiner";
+"Sort" = "Sortieren";
+"Sort: %@" = "Sortieren: %@";
+"System controls show buttons for %@" = "Die Systemsteuerung zeigt Tasten für %@";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Damit werden alle Ihre benutzerdefinierten Profile entfernt und die Standardwerte wiederhergestellt. Dies kann nicht zurückgenommen werden.";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "In der Regel kurz vor oder am Ende des Videos, wenn der Abspann erscheint und/oder Endcards gezeigt werden.";
+"Current Playlist" = "Aktuelle Wiedergabeliste";
+"Make default" = "Standard machen";
+"Now Playing" = "Jetzt spielen";
+"Cached time" = "Zwischengespeicherte Zeit";
+"Rate & Captions" = "Rate & Untertitel";
+"Dropped frames" = "Ausgelassene Einzelbilder";
+"Any format" = "Jedes Format";
+"%@ formats" = "%@-Formate";
+"Keep last played video in the queue after restart" = "Zuletzt abgespieltes Video nach Neustart in der Warteschlange behalten";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Die Wiedergabeliste ist leer\n\nDrücken und halten Sie auf ein Video und dann\n\"Zur Wiedergabeliste hinzufügen\"";
+"Press and hold remote button to open captions and quality menus" = "Drücken und halten Sie die Fernbedienungstaste, um Untertitel und Qualitätsmenüs zu öffnen";
+"It can be changed later in settings. You can use your own locations too." = "Es kann später in den Einstellungen geändert werden. Sie können auch Ihre eigenen Standorte verwenden.";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmente, die typischerweise am Anfang eines Videos zu finden sind und eine Animation, ein Standbild oder einen Clip enthalten, die auch in anderen Videos desselben Urhebers zu sehen sind.";
