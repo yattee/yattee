@@ -59,7 +59,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     var shortUsername: String {
         let (username, _) = credentials
 
-        guard let username = username,
+        guard let username,
               username.count > 10
         else {
             return username ?? ""
@@ -70,7 +70,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var description: String {
-        guard let name = name, !name.isEmpty else {
+        guard let name, !name.isEmpty else {
             return shortUsername
         }
 

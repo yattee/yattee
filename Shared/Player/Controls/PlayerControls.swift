@@ -206,12 +206,12 @@ struct PlayerControls: View {
     }
 
     var detailsWidth: Double {
-        guard let player = player, player.playerSize.width.isFinite else { return 200 }
+        guard let player, player.playerSize.width.isFinite else { return 200 }
         return [player.playerSize.width, 600].min()!
     }
 
     var detailsHeight: Double {
-        guard let player = player, player.playerSize.height.isFinite else { return 200 }
+        guard let player, player.playerSize.height.isFinite else { return 200 }
         return [player.playerSize.height, 500].min()!
     }
 

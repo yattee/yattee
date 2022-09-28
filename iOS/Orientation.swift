@@ -21,7 +21,7 @@ struct Orientation {
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
         lockOrientation(orientation)
 
-        guard let rotateOrientation = rotateOrientation else {
+        guard let rotateOrientation else {
             return
         }
 

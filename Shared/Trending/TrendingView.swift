@@ -49,7 +49,7 @@ struct TrendingView: View {
                     Spacer()
                 }
 
-                if let favoriteItem = favoriteItem {
+                if let favoriteItem {
                     FavoriteButton(item: favoriteItem, labelPadding: true)
                         .id(favoriteItem.id)
                         .labelStyle(.iconOnly)
@@ -85,7 +85,7 @@ struct TrendingView: View {
         .toolbar {
             #if os(macOS)
                 ToolbarItemGroup {
-                    if let favoriteItem = favoriteItem {
+                    if let favoriteItem {
                         FavoriteButton(item: favoriteItem)
                             .id(favoriteItem.id)
                     }
@@ -179,7 +179,7 @@ struct TrendingView: View {
                 }
 
                 #if os(tvOS)
-                    if let favoriteItem = favoriteItem {
+                    if let favoriteItem {
                         FavoriteButton(item: favoriteItem)
                             .id(favoriteItem.id)
                             .labelStyle(.iconOnly)

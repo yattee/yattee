@@ -51,7 +51,7 @@ final class SeekModel: ObservableObject {
     }
 
     var gestureSeekDestinationTime: Double {
-        guard let gestureSeek = gestureSeek, let gestureStart = gestureStart else { return -1 }
+        guard let gestureSeek, let gestureStart else { return -1 }
         return min(duration.seconds, max(0, gestureStart + gestureSeek))
     }
 

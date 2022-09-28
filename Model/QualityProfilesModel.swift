@@ -99,7 +99,7 @@ struct QualityProfilesModel {
             id = Defaults[.chargingNonCellularProfile]
         #endif
 
-        guard let id = id else { return nil }
+        guard let id else { return nil }
 
         return find(id)
     }

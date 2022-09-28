@@ -58,7 +58,7 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
 
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let video = self.currentVideo else {
                 return
             }
@@ -122,7 +122,7 @@ extension PlayerModel {
 
         resetAutoplay()
 
-        if let nextItem = nextItem {
+        if let nextItem {
             advanceToItem(nextItem)
         } else {
             advancing = false
@@ -164,7 +164,7 @@ extension PlayerModel {
 
     func resetQueue() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -193,7 +193,7 @@ extension PlayerModel {
 
         if loadDetails {
             playerAPI.loadDetails(item, failureHandler: videoLoadFailureHandler) { [weak self] newItem in
-                guard let self = self else { return }
+                guard let self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
                 if play {
@@ -239,7 +239,7 @@ extension PlayerModel {
     func restoreQueue() {
         var restoredQueue = [PlayerQueueItem?]()
 
-        if let lastPlayed = lastPlayed,
+        if let lastPlayed,
            !Defaults[.queue].contains(where: { $0.videoID == lastPlayed.videoID })
         {
             restoredQueue.append(lastPlayed)

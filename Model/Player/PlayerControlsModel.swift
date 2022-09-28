@@ -35,7 +35,7 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func handlePresentationChange() {
-        guard let player = player else { return }
+        guard let player else { return }
         if presentingControls {
             DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
                 player.backend.startControlsUpdates()
@@ -82,7 +82,7 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func hide() {
-        guard let player = player,
+        guard let player,
               !player.musicMode
         else {
             return
@@ -109,7 +109,7 @@ final class PlayerControlsModel: ObservableObject {
     func resetTimer() {
         removeTimer()
 
-        guard let player = player, !player.musicMode else {
+        guard let player, !player.musicMode else {
             return
         }
 

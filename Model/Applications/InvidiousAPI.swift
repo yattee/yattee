@@ -13,7 +13,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     @Published var validInstance = true
 
     var signedIn: Bool {
-        guard let account = account else { return false }
+        guard let account else { return false }
 
         return !account.anonymous && !(account.token?.isEmpty ?? true)
     }
@@ -182,8 +182,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return
         }
 
-        guard let username = username,
-              let password = password,
+        guard let username,
+              let password,
               !username.isEmpty,
               !password.isEmpty
         else {
@@ -406,7 +406,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             resource = resource.withParam("duration", duration.rawValue)
         }
 
-        if let page = page {
+        if let page {
             resource = resource.withParam("page", page)
         }
 
@@ -420,7 +420,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     func comments(_ id: Video.ID, page: String?) -> Resource? {
         let resource = resource(baseURL: account.url, path: basePathAppending("comments/\(id)"))
-        guard let page = page else { return resource }
+        guard let page else { return resource }
 
         return resource.withParam("continuation", page)
     }

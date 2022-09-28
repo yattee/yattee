@@ -11,13 +11,13 @@ final class NetworkStateModel: ObservableObject {
     private let controlsOverlayModel = ControlOverlaysModel.shared
 
     var osdVisible: Bool {
-        guard let player = player else { return false }
+        guard let player else { return false }
         return player.isPlaying && ((player.activeBackend == .mpv && pausedForCache) || player.isSeeking) && bufferingState < 100.0
     }
 
     var fullStateText: String? {
-        guard let bufferingStateText = bufferingStateText,
-              let cacheDurationText = cacheDurationText
+        guard let bufferingStateText,
+              let cacheDurationText
         else {
             return nil
         }
@@ -36,12 +36,12 @@ final class NetworkStateModel: ObservableObject {
     }
 
     var detailsAvailable: Bool {
-        guard let player = player else { return false }
+        guard let player else { return false }
         return player.activeBackend.supportsNetworkStateBufferingDetails
     }
 
     var needsUpdates: Bool {
-        if let player = player {
+        if let player {
             return !player.currentItem.isNil && (pausedForCache || player.isSeeking || player.isLoadingVideo || controlsOverlayModel.presenting)
         }
 

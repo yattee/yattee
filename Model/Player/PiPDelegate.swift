@@ -16,7 +16,7 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     func pictureInPictureControllerWillStartPictureInPicture(_: AVPictureInPictureController) {}
 
     func pictureInPictureControllerDidStartPictureInPicture(_: AVPictureInPictureController) {
-        guard let player = player else { return }
+        guard let player else { return }
 
         player.playingInPictureInPicture = true
         player.avPlayerBackend.startPictureInPictureOnPlay = false
@@ -27,7 +27,7 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     }
 
     func pictureInPictureControllerDidStopPictureInPicture(_: AVPictureInPictureController) {
-        guard let player = player else { return }
+        guard let player else { return }
 
         player.playingInPictureInPicture = false
         player.controls.objectWillChange.send()

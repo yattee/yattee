@@ -55,7 +55,7 @@ struct URLParser {
     }
 
     var isYoutubeHost: Bool {
-        guard let urlComponents = urlComponents else { return false }
+        guard let urlComponents else { return false }
 
         return urlComponents.host == "youtube.com" || urlComponents.host == "www.youtube.com"
     }
@@ -132,7 +132,7 @@ struct URLParser {
     }
 
     private var pathWithoutForwardSlash: String {
-        guard let urlComponents = urlComponents else { return "" }
+        guard let urlComponents else { return "" }
 
         return String(urlComponents.path.dropFirst())
     }

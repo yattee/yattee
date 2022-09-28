@@ -134,7 +134,7 @@ struct InstanceForm: View {
     }
 
     func submitForm() {
-        guard isValid, let app = app else {
+        guard isValid, let app else {
             return
         }
 

@@ -117,7 +117,7 @@ struct SearchView: View {
             #endif
         }
         .onAppear {
-            if let query = query {
+            if let query {
                 state.queryText = query.query
                 state.resetQuery(query)
                 updateFavoriteItem()

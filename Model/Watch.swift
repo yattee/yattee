@@ -30,7 +30,7 @@ extension Watch {
                 watch = results?.first
             }
 
-            guard let watch = watch else { return }
+            guard let watch else { return }
 
             watch.videoDuration = duration
             watch.stoppedAt = duration
@@ -65,7 +65,7 @@ extension Watch {
     }
 
     var watchedAtString: String? {
-        guard let watchedAt = watchedAt else {
+        guard let watchedAt else {
             return nil
         }
 

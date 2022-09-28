@@ -76,7 +76,7 @@ import SwiftUI
                 let blurEffect = UIBlurEffect(style: blurStyle)
                 blurView.effect = blurEffect
 
-                if let vibrancyStyle = vibrancyStyle {
+                if let vibrancyStyle {
                     vibrancyView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)
                 } else {
                     vibrancyView.effect = nil

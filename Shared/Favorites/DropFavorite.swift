@@ -11,14 +11,14 @@ struct DropFavorite: DropDelegate {
             return
         }
 
-        guard let current = current else {
+        guard let current else {
             return
         }
 
         let from = favorites.firstIndex(of: current)
         let to = favorites.firstIndex(of: item)
 
-        guard let from = from, let to = to else {
+        guard let from, let to else {
             return
         }
 

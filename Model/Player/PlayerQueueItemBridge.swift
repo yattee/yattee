@@ -7,7 +7,7 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
     typealias Serializable = [String: String]
 
     func serialize(_ value: Value?) -> Serializable? {
-        guard let value = value else {
+        guard let value else {
             return nil
         }
 
@@ -34,7 +34,7 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
 
     func deserialize(_ object: Serializable?) -> Value? {
         guard
-            let object = object,
+            let object,
             let videoID = object["videoID"]
         else {
             return nil

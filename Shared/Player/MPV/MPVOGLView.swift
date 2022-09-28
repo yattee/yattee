@@ -36,7 +36,7 @@ final class MPVOGLView: GLKView {
     }
 
     override func draw(_: CGRect) {
-        guard needsDrawing, let mpvGL = mpvGL else {
+        guard needsDrawing, let mpvGL else {
             return
         }
 

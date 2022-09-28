@@ -143,7 +143,7 @@ struct VideoDetails: View {
 
     var publishedDateSection: some View {
         Group {
-            if let video = video {
+            if let video {
                 HStack(spacing: 4) {
                     if let published = video.publishedDate {
                         Text(published)
@@ -227,7 +227,7 @@ struct VideoDetails: View {
 
     var detailsPage: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let video = video {
+            if let video {
                 VStack(spacing: 6) {
                     videoProperties
 

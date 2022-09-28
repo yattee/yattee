@@ -25,7 +25,7 @@ final class ReturnYouTubeDislikeAPI: ObservableObject {
 
     private func requestDislikes(completionHandler: @escaping (Int) -> Void = { _ in }) {
         AF.request(votesURL).responseDecodable(of: JSON.self) { [weak self] response in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 

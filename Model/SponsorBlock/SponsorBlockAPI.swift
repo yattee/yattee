@@ -86,7 +86,7 @@ final class SponsorBlockAPI: ObservableObject {
         }
 
         AF.request(url, parameters: parameters(categories: categories)).responseDecodable(of: JSON.self) { [weak self] response in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 

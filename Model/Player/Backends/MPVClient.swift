@@ -29,7 +29,7 @@ final class MPVClient: ObservableObject {
 
     func create(frame: CGRect? = nil) {
         #if !os(macOS)
-            if let frame = frame {
+            if let frame {
                 glView = MPVOGLView(frame: frame)
             }
         #endif
@@ -134,7 +134,7 @@ final class MPVClient: ObservableObject {
         var args = [url.absoluteString]
         var options = [String]()
 
-        if let time = time {
+        if let time {
             args.append("replace")
             options.append("start=\(Int(time.seconds))")
         }
@@ -268,7 +268,7 @@ final class MPVClient: ObservableObject {
             }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self, let model = self.backend.model else { return }
+                guard let self, let model = self.backend.model else { return }
                 UIView.animate(withDuration: 0.2, animations: {
                     let aspectRatio = self.aspectRatio > 0 && self.aspectRatio < VideoPlayerView.defaultAspectRatio ? self.aspectRatio : VideoPlayerView.defaultAspectRatio
                     let height = [model.playerSize.height, model.playerSize.width / aspectRatio].min()!
