@@ -9,9 +9,9 @@ struct CommentsView: View {
     var body: some View {
         Group {
             if comments.disabled {
-                NoCommentsView(text: "Comments are disabled", systemImage: "xmark.circle.fill")
+                NoCommentsView(text: "Comments are disabled".localized(), systemImage: "xmark.circle.fill")
             } else if comments.loaded && comments.all.isEmpty {
-                NoCommentsView(text: "No comments", systemImage: "0.circle.fill")
+                NoCommentsView(text: "No comments".localized(), systemImage: "0.circle.fill")
             } else if !comments.loaded {
                 PlaceholderProgressView()
             } else {
