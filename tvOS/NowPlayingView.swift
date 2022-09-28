@@ -126,9 +126,9 @@ struct NowPlayingView: View {
 
                 if sections.contains(.comments) {
                     if comments.disabled {
-                        NoCommentsView(text: "Comments are disabled", systemImage: "xmark.circle.fill")
+                        NoCommentsView(text: "Comments are disabled".localized(), systemImage: "xmark.circle.fill")
                     } else if comments.loaded && comments.all.isEmpty {
-                        NoCommentsView(text: "No comments", systemImage: "0.circle.fill")
+                        NoCommentsView(text: "No comments".localized(), systemImage: "0.circle.fill")
                     } else if !comments.loaded {
                         VStack(alignment: .center) {
                             PlaceholderProgressView()
@@ -156,7 +156,7 @@ struct NowPlayingView: View {
                 if sections.contains(.chapters) {
                     if let video = player.currentVideo {
                         if video.chapters.isEmpty {
-                            NoCommentsView(text: "No chapters information available", systemImage: "xmark.circle.fill")
+                            NoCommentsView(text: "No chapters information available".localized(), systemImage: "xmark.circle.fill")
                         } else {
                             Section(header: Text("Chapters")) {
                                 ForEach(video.chapters) { chapter in

@@ -25,7 +25,7 @@ struct ChaptersView: View {
             .listStyle(.plain)
             #endif
         } else {
-            NoCommentsView(text: "No chapters information available", systemImage: "xmark.circle.fill")
+            NoCommentsView(text: "No chapters information available".localized(), systemImage: "xmark.circle.fill")
         }
     }
 }
