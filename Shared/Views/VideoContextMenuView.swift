@@ -39,7 +39,7 @@ struct VideoContextMenuView: View {
     @ViewBuilder var contextMenu: some View {
         if saveHistory {
             Section {
-                if let watchedAtString = watchedAtString {
+                if let watchedAtString {
                     Text(watchedAtString)
                 }
 
@@ -115,7 +115,7 @@ struct VideoContextMenuView: View {
             return "Watching now".localized()
         }
 
-        if let watch = watch, let watchedAtString = watch.watchedAtString {
+        if let watch, let watchedAtString = watch.watchedAtString {
             if watchedAtString == "in 0 seconds" {
                 return "Just watched".localized()
             }
@@ -144,7 +144,7 @@ struct VideoContextMenuView: View {
 
     var removeFromHistoryButton: some View {
         Button {
-            guard let watch = watch else {
+            guard let watch else {
                 return
             }
 

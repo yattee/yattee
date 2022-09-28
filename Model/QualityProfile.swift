@@ -55,7 +55,7 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     var formats: [Format]
 
     var description: String {
-        if let name = name, !name.isEmpty { return name }
+        if let name, !name.isEmpty { return name }
         return "\(backend.label) - \(resolution.description) - \(formatsDescription)"
     }
 
@@ -93,7 +93,7 @@ struct QualityProfileBridge: Defaults.Bridge {
     typealias Serializable = [String: String]
 
     func serialize(_ value: Value?) -> Serializable? {
-        guard let value = value else { return nil }
+        guard let value else { return nil }
 
         return [
             "id": value.id,
@@ -105,7 +105,7 @@ struct QualityProfileBridge: Defaults.Bridge {
     }
 
     func deserialize(_ object: Serializable?) -> Value? {
-        guard let object = object,
+        guard let object,
               let id = object["id"],
               let backend = PlayerBackendType(rawValue: object["backend"] ?? ""),
               let resolution = ResolutionSetting(rawValue: object["resolution"] ?? "")

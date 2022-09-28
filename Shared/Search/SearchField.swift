@@ -46,7 +46,7 @@ struct SearchTextField: View {
                     .padding(.trailing, 15)
                 #endif
 
-                if let favoriteItem = favoriteItem {
+                if let favoriteItem {
                     #if os(iOS)
                         FavoriteButton(item: favoriteItem)
                             .id(favoriteItem.id)

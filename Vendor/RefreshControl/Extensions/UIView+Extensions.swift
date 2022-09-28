@@ -11,7 +11,7 @@ import UIKit
 extension UIView {
     /// Returs frame in screen coordinates.
     var globalFrame: CGRect {
-        if let window = window {
+        if let window {
             return convert(bounds, to: window.screen.coordinateSpace)
         } else {
             return .zero

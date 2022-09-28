@@ -280,7 +280,7 @@ struct VideoCell: View {
                         }
                     }
 
-                    if let time = time, !timeOnThumbnail {
+                    if let time, !timeOnThumbnail {
                         Spacer()
 
                         HStack(spacing: 2) {
@@ -403,7 +403,7 @@ struct VideoCell: View {
 
                     if timeOnThumbnail,
                        !video.live,
-                       let time = time
+                       let time
                     {
                         DetailBadge(text: time, style: .prominent)
                     }
@@ -429,7 +429,7 @@ struct VideoCell: View {
                 }
                 .retryOnAppear(true)
                 .onFailure { _ in
-                    guard let url = url else { return }
+                    guard let url else { return }
                     thumbnails.insertUnloadable(url)
                 }
 

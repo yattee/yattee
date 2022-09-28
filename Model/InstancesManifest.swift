@@ -28,7 +28,7 @@ final class InstancesManifest: Service, ObservableObject {
     }
 
     func setPublicAccount(_ country: String?, accounts: AccountsModel, asCurrent: Bool = true) {
-        guard let country = country else {
+        guard let country else {
             accounts.publicAccount = nil
             if asCurrent {
                 accounts.configureAccount()
@@ -68,7 +68,7 @@ final class InstancesManifest: Service, ObservableObject {
                     instance = countryInstances.randomElement() ?? regionInstances.randomElement()
                 }
 
-                guard let instance = instance else {
+                guard let instance else {
                     settings.presentAlert(title: "Could not change location", message: "No locations available at the moment")
                     return
                 }

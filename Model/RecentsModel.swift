@@ -137,7 +137,7 @@ struct RecentItemBridge: Defaults.Bridge {
     typealias Serializable = [String: String]
 
     func serialize(_ value: Value?) -> Serializable? {
-        guard let value = value else {
+        guard let value else {
             return nil
         }
 
@@ -150,7 +150,7 @@ struct RecentItemBridge: Defaults.Bridge {
 
     func deserialize(_ object: Serializable?) -> Value? {
         guard
-            let object = object,
+            let object,
             let type = object["type"],
             let identifier = object["identifier"],
             let title = object["title"]

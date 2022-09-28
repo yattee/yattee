@@ -304,7 +304,7 @@ final class PlayerModel: ObservableObject {
 
     var playingLive: Bool {
         guard live,
-              let videoDuration = videoDuration,
+              let videoDuration,
               let time = backend.currentTime?.seconds else { return false }
 
         return videoDuration - time < 30
@@ -337,7 +337,7 @@ final class PlayerModel: ObservableObject {
             backend == .appleAVPlayer || !avPlayerBackend.startPictureInPictureOnPlay
         {
             changeBackendHandler = { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.changeActiveBackend(from: self.activeBackend, to: backend)
             }
         }
@@ -499,7 +499,7 @@ final class PlayerModel: ObservableObject {
             fromBackend.pause()
         }
 
-        guard var stream = stream, changingStream else {
+        guard var stream, changingStream else {
             return
         }
 
@@ -529,7 +529,7 @@ final class PlayerModel: ObservableObject {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
             self.upgradeToStream(stream, force: true)
@@ -610,7 +610,7 @@ final class PlayerModel: ObservableObject {
     var pipPossible: Bool {
         guard activeBackend == .appleAVPlayer else { return !transitioningToPiP }
 
-        guard let pipController = pipController else { return false }
+        guard let pipController else { return false }
         guard !pipController.isPictureInPictureActive else { return true }
 
         return pipController.isPictureInPicturePossible && !transitioningToPiP
@@ -644,7 +644,7 @@ final class PlayerModel: ObservableObject {
         #endif
 
         DispatchQueue.main.async(qos: .background) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             if self.saveLastPlayed {
                 self.lastPlayed = self.currentItem
             }
@@ -680,8 +680,8 @@ final class PlayerModel: ObservableObject {
         let results = try? context.fetch(watchFetchRequest)
 
         context.perform { [weak self] in
-            guard let self = self,
-                  let results = results else { return }
+            guard let self,
+                  let results else { return }
             let resultsIds = results.map(\.videoID)
 
             guard let autoplayVideo = related.filter({ !resultsIds.contains($0.videoID) }).randomElement() else {
@@ -693,7 +693,7 @@ final class PlayerModel: ObservableObject {
             self.autoplayItemSource = video
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.playerAPI.loadDetails(item, completionHandler: { newItem in
                     guard newItem.videoID == self.autoplayItem?.videoID else { return }
                     self.autoplayItem = newItem
@@ -875,7 +875,7 @@ final class PlayerModel: ObservableObject {
         }
 
         let task = URLSession.shared.dataTask(with: thumbnailURL) { [weak self] thumbnailData, _, _ in
-            guard let thumbnailData = thumbnailData else {
+            guard let thumbnailData else {
                 return
             }
 
@@ -947,7 +947,7 @@ final class PlayerModel: ObservableObject {
             guard aspectRatio != backend.aspectRatio else { return }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.aspectRatio = self.backend.aspectRatio
             }
         #endif

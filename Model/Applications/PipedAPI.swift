@@ -112,8 +112,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let (username, password) = AccountsModel.getCredentials(account)
 
         guard !account.anonymous,
-              let username = username,
-              let password = password
+              let username,
+              let password
         else {
             return
         }
@@ -196,7 +196,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     var signedIn: Bool {
-        guard let account = account else {
+        guard let account else {
             return false
         }
 

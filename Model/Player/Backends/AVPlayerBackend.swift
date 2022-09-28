@@ -211,7 +211,7 @@ final class AVPlayerBackend: PlayerBackend {
         model: PlayerModel
     ) {
         asset.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
             model.logger.info("loading \(type.rawValue) track")
@@ -285,7 +285,7 @@ final class AVPlayerBackend: PlayerBackend {
             guard let item = self.model.playerItem, self.isAutoplaying(item) else { return }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
 
@@ -361,7 +361,7 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     private func playerItem(_: Stream) -> AVPlayerItem? {
-        if let asset = asset {
+        if let asset {
             return AVPlayerItem(asset: asset)
         } else {
             return AVPlayerItem(asset: composition)
@@ -380,7 +380,7 @@ final class AVPlayerBackend: PlayerBackend {
 
             if let thumbnailURL = video.thumbnailURL(quality: .medium) {
                 let task = URLSession.shared.dataTask(with: thumbnailURL) { [weak self] thumbnailData, _, _ in
-                    guard let thumbnailData = thumbnailData else { return }
+                    guard let thumbnailData else { return }
 
                     let image = UIImage(data: thumbnailData)
                     if let pngData = image?.pngData() {
@@ -425,7 +425,7 @@ final class AVPlayerBackend: PlayerBackend {
     private func observePlayerItemStatus(_ item: AVPlayerItem) {
         statusObservation?.invalidate()
         statusObservation = item.observe(\.status, options: [.old, .new]) { [weak self] playerItem, _ in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -507,7 +507,7 @@ final class AVPlayerBackend: PlayerBackend {
             forInterval: interval,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self, self.model.activeBackend == .appleAVPlayer else {
+            guard let self, self.model.activeBackend == .appleAVPlayer else {
                 return
             }
 
@@ -551,7 +551,7 @@ final class AVPlayerBackend: PlayerBackend {
             forInterval: interval,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -567,7 +567,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     private func addPlayerTimeControlStatusObserver() {
         playerTimeControlStatusObserver = avPlayer.observe(\.timeControlStatus) { [weak self] player, _ in
-            guard let self = self,
+            guard let self,
                   self.avPlayer == player,
                   self.model.activeBackend == .appleAVPlayer
             else {

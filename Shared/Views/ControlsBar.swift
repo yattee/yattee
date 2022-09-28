@@ -48,7 +48,7 @@ struct ControlsBar: View {
         #if os(iOS)
             .background(
                 EmptyView().sheet(isPresented: $presentingShareSheet) {
-                    if let shareURL = shareURL {
+                    if let shareURL {
                         ShareSheet(activityItems: [shareURL])
                     }
                 }

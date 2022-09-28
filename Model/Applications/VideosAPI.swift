@@ -167,11 +167,11 @@ extension VideosAPI {
 
             guard var startSeconds = seconds else { return nil }
 
-            if let minutes = minutes {
+            if let minutes {
                 startSeconds += 60 * minutes
             }
 
-            if let hours = hours {
+            if let hours {
                 startSeconds += 60 * 60 * hours
             }
 

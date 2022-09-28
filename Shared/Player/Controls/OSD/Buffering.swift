@@ -32,7 +32,7 @@ struct Buffering: View {
 
             Text(reason)
                 .font(.system(size: playerControlsLayout.timeFontSize))
-            if let state = state {
+            if let state {
                 Text(state)
                     .font(.system(size: playerControlsLayout.bufferingStateFontSize).monospacedDigit())
             }

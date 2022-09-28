@@ -22,7 +22,7 @@ final class MPVBackend: PlayerBackend {
     var stream: Stream?
     var video: Video?
     var captions: Captions? { didSet {
-        guard let captions = captions else {
+        guard let captions else {
             client.removeSubs()
             return
         }
@@ -33,7 +33,7 @@ final class MPVBackend: PlayerBackend {
     var loadedVideo = false
     var isLoadingVideo = true { didSet {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -71,7 +71,7 @@ final class MPVBackend: PlayerBackend {
     var isSeeking = false {
         didSet {
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.model.isSeeking = self.isSeeking
             }
         }
@@ -187,7 +187,7 @@ final class MPVBackend: PlayerBackend {
             #endif
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
 
@@ -213,14 +213,14 @@ final class MPVBackend: PlayerBackend {
         }
 
         let replaceItem: (CMTime?) -> Void = { [weak self] time in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
             self.stop()
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
 
@@ -345,7 +345,7 @@ final class MPVBackend: PlayerBackend {
         model.updateNowPlayingInfo()
 
         handleSegmentsThrottle.execute {
-            if let currentTime = currentTime {
+            if let currentTime {
                 model.handleSegments(at: currentTime)
             }
         }
@@ -453,7 +453,7 @@ final class MPVBackend: PlayerBackend {
     }
 
     func updateNetworkState() {
-        guard let client = client, let networkState = networkState else {
+        guard let client, let networkState else {
             return
         }
 

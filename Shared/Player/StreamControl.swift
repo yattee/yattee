@@ -53,7 +53,7 @@ struct StreamControl: View {
         }
         .transaction { t in t.animation = .none }
         .onChange(of: player.streamSelection) { selection in
-            guard let selection = selection else { return }
+            guard let selection else { return }
             player.upgradeToStream(selection)
             player.controls.hideOverlays()
         }

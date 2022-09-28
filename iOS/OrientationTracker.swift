@@ -59,7 +59,7 @@ public class OrientationTracker {
     public func startDeviceOrientationTracking() {
         motionManager.startAccelerometerUpdates(to: queue) { accelerometerData, error in
             guard error == nil else { return }
-            guard let accelerometerData = accelerometerData else { return }
+            guard let accelerometerData else { return }
 
             let newDeviceOrientation = self.deviceOrientation(forAccelerometerData: accelerometerData)
             guard newDeviceOrientation != self.currentDeviceOrientation else { return }

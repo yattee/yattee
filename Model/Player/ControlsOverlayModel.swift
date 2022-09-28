@@ -15,7 +15,7 @@ final class ControlOverlaysModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
-        guard let player = player else { return }
+        guard let player else { return }
         player.backend.setNeedsNetworkStateUpdates(presenting && Defaults[.showMPVPlaybackStats])
     }
 }

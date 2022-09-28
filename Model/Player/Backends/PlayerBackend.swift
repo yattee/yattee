@@ -79,7 +79,7 @@ extension PlayerBackend {
     }
 
     func seek(relative time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
-        if let currentTime = currentTime, let duration = playerItemDuration {
+        if let currentTime, let duration = playerItemDuration {
             let seekTime = min(max(0, currentTime.seconds + time.seconds), duration.seconds)
             model.seek.registerSeek(at: .secondsInDefaultTimescale(seekTime), type: seekType, restore: currentTime)
             seek(to: seekTime, seekType: seekType, completionHandler: completionHandler)

@@ -180,7 +180,7 @@ final class NavigationModel: ObservableObject {
         let presentingPlayer = player.presentingPlayer
         player.hide()
 
-        if let searchQuery = searchQuery {
+        if let searchQuery {
             let recent = RecentItem(from: searchQuery)
             recents.add(recent)
 

@@ -37,7 +37,7 @@ extension PlayerModel {
             logger.error("segment end time is: \(segment.end) when player item duration is: \(duration.seconds)")
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
 

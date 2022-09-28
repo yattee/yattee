@@ -18,7 +18,7 @@ struct AccountValidationStatus: View {
 
             VStack(alignment: .leading) {
                 Text(isValid ? "Connected successfully (\(app?.name ?? "Unknown"))" : "Connection failed")
-                if let error = error, !isValid {
+                if let error, !isValid {
                     Text(error)
                         .font(.caption2)
                         .foregroundColor(.secondary)

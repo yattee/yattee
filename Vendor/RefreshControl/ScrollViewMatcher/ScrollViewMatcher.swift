@@ -31,7 +31,7 @@ final class ScrollViewMatcherViewController: UIViewController {
     private var scrollView: UIScrollView? {
         didSet {
             if oldValue != scrollView,
-               let scrollView = scrollView
+               let scrollView
             {
                 onMatch(scrollView)
             }
@@ -70,7 +70,7 @@ final class ScrollViewMatcherViewController: UIViewController {
     }
 
     func matchUsingGeometry() {
-        if let parent = parent {
+        if let parent {
             if let scrollViewsInHierarchy: [UIScrollView] = parent.view.viewsInHierarchy() {
                 // Return first match if only a single scroll view is found in the hierarchy.
                 if scrollViewsInHierarchy.count == 1,
