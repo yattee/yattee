@@ -150,7 +150,7 @@
 "Close PiP and open player when application enters foreground" = "Schließe PiP und öffne den Player wenn die App in den Vordergrund geholt wird";
 "Close PiP when player is opened" = "Schließe PiP wenn Player geöffnet wird";
 "Badge & Decreased opacity" = "Abzeichen & verringerte Opazität";
-"cache-pause-wait" = "cache-pause-wart";
+"cache-pause-wait" = "Cache-pause-wart";
 "Close PiP when starting playing other video" = "PiP schließen, wenn ein anderes Video abgespielt wird";
 "Close player when closing video" = "Player beim Schließen des Videos schließen";
 "Close player when starting PiP" = "Wenn PiP beginnt, den Player schließen";
@@ -416,3 +416,6 @@
 "Press and hold remote button to open captions and quality menus" = "Drücken und halten Sie die Fernbedienungstaste, um Untertitel und Qualitätsmenüs zu öffnen";
 "It can be changed later in settings. You can use your own locations too." = "Es kann später in den Einstellungen geändert werden. Sie können auch Ihre eigenen Standorte verwenden.";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmente, die typischerweise am Anfang eines Videos zu finden sind und eine Animation, ein Standbild oder einen Clip enthalten, die auch in anderen Videos desselben Urhebers zu sehen sind.";
+"No comments" = "Keine Kommentare";
+"No chapters information available" = "Keine Informationen zu den Kapiteln vorhanden";
+"Comments are disabled" = "Kommentare sind abgeschaltet";
