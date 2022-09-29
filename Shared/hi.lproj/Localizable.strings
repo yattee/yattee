@@ -7,3 +7,229 @@
 "1,234M" = "१२,३४०ला";
 " subscribers" = " सदस्य";
 "1 century ago" = "एक शताब्दी पहले";
+"10 seconds forwards/backwards" = "10 पल आगे/पीछे";
+"1234" = "१२३४";
+"a" = "अ";
+"A" = "अ";
+"Accounts" = "खातें";
+"Accounts are not supported for the application of this instance" = "इस इन्सटेंस के लिए खातों उपलब्ध नहीं हैं";
+"Add to Playlist..." = "गीतमाला में जोड़ें…";
+"Advanced" = "उन्नत";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "सभी";
+"Always use AVPlayer for live videos" = "लाइव वीडियो के लिए सदा ए.वी. प्लेयर का उपयोग करें";
+"Anonymous" = "गुप्त";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "कोई";
+"Apply to all" = "सभी पर लागू करें";
+"Are you sure you want to clear history of watched videos?" = "क्या आप निश्चित रूप से देखे गए वीडियो का इतिहास मिटाना चाहते हैं?";
+"Are you sure you want to clear search history?" = "क्या आप निश्चित रूप से खोज का इतिहास मिटाना चाहते हैं?";
+"Close PiP and open player when application enters foreground" = "PiP बंद करें और प्लेयर खोलें जब ऐप्लिकेशन मुख्यभूमी में जाता है";
+"Close PiP when player is opened" = "PiP बंद करें जब प्लेयर खुले";
+"Close PiP when starting playing other video" = "PiP बंद करें जब दूसरा वीडियो प्ले हो";
+"Close player when closing video" = "प्लेयर बंद करें जब वीडियो बंद हो";
+"Close player when starting PiP" = "प्लेयर बंद करें जब PiP चालू हो";
+"Close Video" = "वीडियो बंद करें";
+"Close video after playing last in the queue" = "कतार में आख़िरी समाप्त होने के पश्चात वीडियो बंद करें";
+"Comments" = "टिप्पणियाँ";
+"Connected successfully (%@)" = "जुड़ाव सफल";
+"Connection failed" = "जुड़ाव असफल";
+"Contact" = "संपर्क";
+"Continue" = "जारी";
+"Disabled" = "निर्योग्य";
+"Discord Server" = "डिस्कॉर्ड सर्वर";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "चर्चाएँ डिस्कॉर्ड एवं मेट्रिक्स पर होतीं हैं। यह सामान्य प्रश्नों के लिए अच्छा मंच है।";
+"Hide sidebar" = "साइडबार छिपाएँ";
+"High" = "उच्च";
+"Highest" = "उच्चतम";
+"Highest quality" = "उच्चतम गुणवत्ता";
+"History" = "इतिहास";
+"Honor orientation lock" = "ओरिएंटेशन लॉक का सम्मान करें";
+
+/* Video date filter in search */
+"Hour" = "घंटा";
+"Don't use public locations" = "सार्वजनिक स्थानों का प्रयोग न करें";
+"Donations" = "दान";
+"Done" = "पूर्ण";
+"Duration" = "अवधि";
+"Edit" = "संपादन";
+"Edit Playlist" = "गीतमाला संपादन";
+"Edit Quality Profile" = "गुणवत्ता प्रोफ़ाइल संपादन";
+"Edit..." = "संपादन…";
+"Enable logging" = "लॉगिंग सक्षम करें";
+"Enable Return YouTube Dislike" = "रिटर्न यूट्यूब डिस्लाइक सक्षम करें";
+"Enter fullscreen in landscape" = "परिदृश्य में आने पर फ़ुलस्क्रीन में प्रवेश करें";
+"Error" = "त्रुटि";
+"Error when accessing playlist" = "गीतमाला अभिगम करने में त्रुटि";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "किसी भी सशुल्क या मुफ़्त प्लेटफ़ॉर्म पर उन्हें पसंद करने, सदस्यता लेने या उनके साथ बातचीत करने के लिए स्पष्ट अनुस्मारक (जैसे किसी वीडियो पर क्लिक)।";
+"Favorites" = "पसंदीदा";
+"Filter" = "निस्पंदन";
+"Filter: active" = "निस्पंदन: चालू";
+"For videos which feature music as the primary content." = "वीडियो जिनमें गीत को प्राथमिक सामग्री के रूप में दिखाया गया।";
+"Frontend URL" = "फ्रंटएंड यूआरएल";
+"Fullscreen size" = "फ़ुलस्क्रीन आकार";
+"Gaming" = "खेल";
+"Help" = "सहायता";
+"I am lost" = "मैं खो गया";
+"I found a bug /" = "मैंने एक बग ढूँढा";
+"I have a feature request" = "मेरे पास एक सुविधा अनुरोध है";
+"I like this app!" = "मुझे यह ऐप पसंद है!";
+"I want to ask a question" = "मुझे एक प्रश्न पूछना है";
+"If you are interested what's coming in future updates, you can track project Milestones." = "यदि आप रुचि रखते हैं कि भविष्य के अपडेट में क्या आ रहा है, तो आप प्रोजेक्ट माइलस्टोन्स को ट्रैक कर सकते हैं।";
+"Lowest" = "निम्नतम";
+"Mark as watched" = "देखे गए के रूप में चिह्नित करें";
+"Mark video as watched after playing" = "वीडियो को चलाने के बाद देखा गया के रूप में चिह्नित करें";
+"Mark watched videos with" = "देखे गए वीडियो को चिह्नित करें";
+"Matrix Channel" = "मेट्रिक्स चैनल";
+"Matrix Chat" = "मेट्रिक्स चैट";
+"Open \"Playlists\" tab to create new one" = "नया बनाने के लिए \"प्लेलिस्ट\" टैब खोलें";
+"Open Settings" = "सेटिंग खोलें";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "%@ स्ट्रीम खुल रहा…";
+"Opening audio stream..." = "ऑडियो स्ट्रीम खुल रहा…";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "यदि आप किसी बग की रिपोर्ट कर रहे हैं, तो सभी प्रासंगिक विवरण शामिल करें (विशेषकर: ऐप संस्करण, प्रयुक्त डिवाइस और सिस्टम संस्करण, पुन: पेश करने के चरण)।";
+"Increase rate" = "दर बढ़ाएँ";
+"Info" = "जानकारी";
+"Instance of current account" = "वर्तमान खाते का इन्सटेंस";
+
+/* SponsorBlock category name */
+"Interaction" = "बातचीत";
+"Interface" = "इंटरफेस";
+
+/* SponsorBlock category name */
+"Intro" = "परिचय";
+"Issues Tracker" = "मुद्दे ट्रैकर";
+
+/* Selected video has just finished playing */
+"Just watched" = "अभी देखा गया";
+"LIVE" = "लाइव";
+
+/* Loading stream OSD */
+"Loading streams..." = "स्ट्रीम लोड हो रहें…";
+"Loading..." = "लोड हो रहा…";
+"Locations" = "स्थान";
+"Lock portrait mode" = "पोर्ट्रेट मोड लॉक करें";
+
+/* Video duration filter in search */
+"Long" = "लंबा";
+"Low quality" = "निम्न गुणवत्ता";
+"Low" = "निम्न";
+
+/* Player controls layout size */
+"Medium" = "मध्यम";
+"Medium quality" = "मध्यम गुणवत्ता";
+"Milestones" = "माइलस्टोन";
+
+/* Video date filter in search */
+"Month" = "महीना";
+"More info can be found in:" = "अधिक जानकारी पाई जा सकती है:";
+"Movies" = "मूवी";
+"MPV Documentation" = "MPV प्रलेखन";
+"Music" = "संगीत";
+"Name" = "नाम";
+"New Playlist" = "नया गीतमाला";
+"Next" = "अगला";
+"No description" = "को विवरण नहीं";
+"No Playlists" = "कोई प्लेलिस्ट नहीं";
+"No results" = "कोई परिणाम नहीं";
+"Normal" = "सामान्य";
+"Not available" = "उपलब्ध नहीं";
+"Not Playing" = "चल नहीं रहा";
+"Nothing" = "कुछ नहीं";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "संगीत वीडियो में ऑफटॉपिक";
+"Only when signed in" = "केवल साइन इन होने पर";
+"Orientation" = "ओरिएंटेशन";
+"Password" = "पासवर्ड";
+"Pause" = "रोकें";
+"Pause when entering background" = "पृष्ठभूमि में जाने पर रोकें";
+"Pause when player is closed" = "प्लेयर बंद होने पर रोकें";
+"Picture in Picture" = "पिक्चर इन पिक्चर";
+"Play" = "प्ले";
+"Play All" = "सभी प्ले करें";
+"Play in PiP" = "PiP में चलाएँ";
+"Play Last" = "आख़री चलाएँ";
+"Play Music" = "संगीत चलाएँ";
+"Play Next" = "अगला चलाएँ";
+"Play Now" = "अभी चलाएँ";
+"Playback" = "प्लेबैक";
+"Player" = "प्लेयर";
+"Playlist" = "प्लेलिस्ट";
+"Decreased opacity" = "पारदर्शिता घटी";
+"Continue from %@" = "%@ से जारी करें";
+"Current: %@\n%@" = "वर्तमान: %@\n%@";
+"Contributing" = "योगदान दें";
+"Controls" = "नियंत्रक";
+"Copy %@ link" = "%@ लिंक नक़ल करें";
+"Country" = "देश";
+"Country Name or Code" = "देश नाम एवं कोड";
+"Could not load locations manifest" = "लोकेशन मैनिफ़ेस्ट लोड नहीं हो पाई";
+"Custom Locations" = "कस्टम स्थान";
+"Copy %@ link with time" = "%@ लिंक समय के साथ नक़ल करें";
+"Add Account" = "खाता जोड़ें";
+"Add Account..." = "खाता जोड़ें…";
+"Add Location" = "स्थान जोड़ें";
+"Add Location..." = "स्थान जोड़ें…";
+"Add profile..." = "प्रोफ़ाइल जोड़ें…";
+"Add Quality Profile" = "गुणवत्ता प्रोफ़ाइल जोड़ें";
+"Add to Favorites" = "पसंदीदा में जोड़ें";
+"Add to Playlist" = "गीतमाला में जोड़ें";
+"Add to %@" = "%@ में जोड़ें";
+"Badge color" = "बिल्ले का रंग";
+"Category" = "श्रेणी";
+"Clear Search History..." = "खोज इतिहास साफ़ करें…";
+"Are you sure you want to restore default quality profiles?" = "क्या आप निश्चित रूप से डीफ़ॉल्ट गुणवत्ता प्रोफ़ाइल को पुनः प्राप्त करना चाहते हैं?";
+"Based on system color scheme" = "मूल तंत्र रंग प्रणाली पर निर्भर";
+"Categories to Skip" = "श्रेणियाँ जिन्हें छोड़ें";
+"Chapters" = "अध्यायें";
+"Are you sure you want to delete playlist?" = "क्या आप निश्चित रूप से इस गीतमाला को मिटाना चाहते हैं?";
+"Are you sure you want to unsubscribe from %@?" = "क्या आप निश्चित रूप से %@ की सदस्यता छोड़ना चाहते हैं?";
+"Automatic" = "स्वतः";
+"Autoplaying Next" = "अगला ऑटोप्ले हो रहा";
+"Badge" = "बिल्ला";
+"Blue" = "नीला";
+"Browsing" = "ब्राउज़ करना";
+"Buffering stream..." = "स्ट्रीम बफ़र हो रहा…";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "आप बग एवं फ़ीचर सुझाव गिटहब के इशु ट्रैकर पर भेज सकते हैं ";
+"cache-pause-wait" = "कैश-रोकें-रूकें";
+"Cancel" = "रद्द";
+"Captions" = "कैप्शन";
+"Charging" = "चार्ज हो रहा";
+"Clear" = "साफ़";
+"Clear All" = "सभी साफ़";
+"Clear All Recents" = "सभी हालिया साफ़ करें";
+"Clear History" = "इतिहास साफ़ करें";
+"Clear Search History" = "खोज इतिहास साफ़ करें";
+"Clear the queue" = "क़तार साफ़ करें";
+"Close" = "बंद";
+"Backend" = "बैकऐंड";
+"Badge & Decreased opacity" = "बिल्ला एवं पारदर्शिता में कमी";
+"Battery" = "बैटरी";
+"Button" = "बटन";
+"cache-secs" = "कैश-पलों";
+"Cellular" = "मोबाइल डाटा";
+"Create Playlist" = "गीतमाला बनाएँ";
+
+/* Player controls layout size */
+"Large" = "बड़ा";
+"Find Other" = "दूसरा खोजें";
+"Finding something to play..." = "चलाने के लिए कुछ ढूँढ रहें…";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "कस्टम";
+
+/* Video sort order in search */
+"Date" = "दिनांक";
+"Delete" = "मिटाएँ";
+"Decrease rate" = "घटने की गति";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "प्रारूपों का चयन सूचीबद्ध रूप से किया जाएगा।\nHLS एक अनुकूलनीय प्रारूप है(रिज़ॉल्यूशन सेटिंग लागू नहीं होती है)।";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "बड़ा लेआउट सभी उपकरणों के लिए उपयुक्त नहीं है और इसका उपयोग करने से नियंत्रण स्क्रीन पर फिट नहीं हो सकते हैं।";
+
+/* SponsorBlock category name */
+"Outro" = "ऑउट्रो";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "किसी उत्पाद या सेवा का प्रचार करने वाले वीडियो का हिस्सा सीधे निर्माता से संबंधित नहीं है। निर्माता को पैसे या मुफ्त उत्पादों के रूप में भुगतान या मुआवजा मिलेगा।";
