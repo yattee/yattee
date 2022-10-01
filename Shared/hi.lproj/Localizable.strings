@@ -233,3 +233,189 @@
 /* SponsorBlock category name */
 "Outro" = "ऑउट्रो";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "किसी उत्पाद या सेवा का प्रचार करने वाले वीडियो का हिस्सा सीधे निर्माता से संबंधित नहीं है। निर्माता को पैसे या मुफ्त उत्पादों के रूप में भुगतान या मुआवजा मिलेगा।";
+"Username" = "यूज़रनाम";
+
+/* Player controls layout size */
+"Very Large" = "बहुत बड़ा";
+"Add Channels, Playlists and Searches to Favorites using" = "चैनल, प्लेलिस्ट और खोजों को पसंदीदा में जोड़ें उपयोग करके";
+"unknown" = "अज्ञात";
+"Unsubscribe" = "सदस्यता छोड़ें";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "आप वर्तमान डिवाइस स्थिति के आधार पर स्वचालित प्रोफ़ाइल चयन का उपयोग कर सकते हैं या इसे वीडियो प्लेबैक सेटिंग नियंत्रण में बदल कर सकते हैं।";
+"Now Playing" = "अभी चल रहा";
+"Current Location" = "वर्तमान स्थान";
+"You can switch between profiles in playback settings controls." = "आप प्लेबैक सेटिंग नियंत्रण में प्रोफ़ाइल के बीच स्विच कर सकते हैं।";
+"%@" = "%@";
+"%@ %@" = "%@ %@";
+"%lld" = "%lld";
+"#" = "#";
+"%lld%%" = "%lld%%";
+"Red" = "लाल";
+"Refresh" = "ताज़ा";
+"Regular size" = "सामान्य आकार";
+"Regular Size" = "सामान्य आकार";
+"Related" = "सम्बंधित";
+
+/* Video sort order in search */
+"Relevance" = "प्रासंगिकता";
+"Remove" = "हटाएँ";
+"Remove from Favorites" = "पसंदीदा से हटाएँ";
+"Replies" = "जवाब";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "आमतौर पर वीडियो की शुरुआत में पाए जाने वाले सेगमेंट में एनिमेशन, स्टिल फ्रेम या क्लिप शामिल होते हैं, जिन्हें उसी निर्माता द्वारा अन्य वीडियो में भी देखा जाता है।";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "इसे वापस नहीं किया जा सकता है। परिवर्तनों को देखने के लिए आपको दृश्यों के बीच स्विच करने या ऐप को पुनरारंभ करने की आवश्यकता हो सकती है।";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "यह जानकारी केवल आपके डिवाइस पर संसाधित की जाएगी और आपको निर्दिष्ट देश में सर्वर से कनेक्ट करने के लिए उपयोग की जाएगी।";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "यह आपकी सभी कस्टम प्रोफ़ाइल को हटा देगा और उनके डिफ़ॉल्ट मान लौटा देगा। इसे वापस नहीं किया जा सकता है।";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "यह सुनकर अच्छा लगा। अन्य लोगों द्वारा उपयोग किए जाने वाले ऐप्स डिलीवर करना मज़ेदार है। आप नई सुविधाओं के विकास में योगदान करके परियोजना को दान करने या सहायता करने पर विचार कर सकते हैं।";
+"This cannot be reverted" = "यह वापस नहीं लिया जा सकता है";
+"Trending" = "चर्चित";
+"URL" = "यू॰आर॰एल॰";
+"Watched" = "देखा गया";
+
+
+"Public" = "सार्वजनिक";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "कोई प्लेलिस्ट नहीं\n\nएक बनाने के लिए \"नई प्लेलिस्ट\" पर टैप करें";
+"Private" = "निजी";
+"Playback queue is empty" = "प्लेबैक क़तार खाली है";
+"Stream & Player" = "स्ट्रीम और प्लेयर";
+"Statistics" = "आँकड़े";
+"Hardware decoder" = "हार्डवेयर डीकोडर";
+"Stream FPS" = "स्ट्रीम FPS";
+"Playlists" = "प्लेलिस्टस्";
+"Popular" = "लोकप्रिय";
+"Preferred Formats" = "पसंदीदा प्रारूप";
+"Profiles" = "प्रोफ़ाइल";
+"Proxy videos" = "प्रॉक्सी वीडियो";
+"Public Locations" = "सार्वजनिक स्थान";
+"Public Manifest" = "सार्वजनिक मैनिफ़ेस्ट";
+"Quality" = "गुणवत्ता";
+"Quality Profile" = "गुणवत्ता प्रोफ़ाइल";
+"Queue" = "क़तार";
+"Rate" = "दर";
+
+/* Video sort order in search */
+"Rating" = "रेटिंग";
+"Recents" = "हालिया";
+"Remove from history" = "इतिहास से हटाएँ";
+"Remove from Playlist" = "प्लेलिस्ट से हटाएँ";
+"Remove from the queue" = "क़तार से हटाएँ";
+"Reset" = "रीसेट";
+"Reset search filters" = "खोज फ़िल्टर रीसेट करें";
+"Reset watched status when playing again" = "दोबारा चलाते समय देखी गई स्थिति को रीसेट करें";
+"Resolution" = "गुणवत्ता";
+"Restart the app to apply the settings above." = "सेटिंग लागू करने के लिए ऐप को पुनरारंभ करें।";
+"Restart/Play next" = "पुनःचलाएँ/अगला चलाएँ";
+"Restore default profiles..." = "डिफ़ॉल्ट प्रोफ़ाइल पुनर्स्थापित करें...";
+"Rotate to portrait when exiting fullscreen" = "फ़ुलस्क्रीन से बाहर निकलने पर पोर्ट्रेट में घुमाएँ";
+"Round corners" = "गोल कोने";
+"Save" = "सहजें";
+"Save history of played videos" = "देखे गए वीडियो के इतिहास को सहजे";
+"Search history is empty" = "खोज इतिहास ख़ाली है";
+"Search..." = "खोज…";
+"Sections" = "खंड";
+"Seek gesture sensitivity" = "जेस्चर संवेदनशीलता को झांके";
+"Seek gesture speed" = "जेस्चर गति को झांके";
+"Seek with horizontal swipe on video" = "वीडियो पर क्षैतिज स्वाइप के साथ झांके";
+"Select location closest to you:" = "सबसे समीप स्थान को चुनें:";
+
+/* SponsorBlock category name */
+"Self-promotion" = "आत्म-बढ़ावा";
+"Share %@ link" = "%@ लिंक साझें";
+"Share..." = "साझें…";
+
+/* Video duration filter in search */
+"Short" = "छोटा";
+"Show account username" = "खाता यूज़रनाम दिखाएँ";
+"Show anonymous accounts" = "गुप्त खातें दिखाएँ";
+"Show channel name" = "चैनल नाम दिखाएँ";
+"Show history" = "खोज इतिहास दिखाएँ";
+"Show keywords" = "कीवर्ड दिखाएँ";
+"Show playback statistics" = "प्लेबैक आँकड़े दिखाएँ";
+"Shuffle All" = "सभी फेंटें";
+"Show video length" = "वीडियो अंतराल दिखाएँ";
+"Shuffle" = "फेंटें";
+"Sidebar" = "साइडबार";
+"Sign In Required" = "साइन इन आवश्यक";
+
+/* Player controls layout size */
+"Small" = "छोटा";
+
+/* Player controls layout size */
+"Smaller" = "लघु";
+"Sort" = "छाँटे";
+"Sort: %@" = "छाँटे: %@";
+"Source" = "स्रोत";
+
+/* SponsorBlock category name */
+"Sponsor" = "प्रायोजक";
+"SponsorBlock" = "SponsorBlock";
+"SponsorBlock API Instance" = "SponsorBlock API इन्सटेंस";
+"Subscribe" = "सदस्य बनें";
+"Switch to other public location" = "दूसरे सार्वजनिक स्थान पर बदलें";
+"Switch to public locations" = "सार्वजनिक स्थान पर बदलें";
+"System controls buttons" = "सिस्टम नियंत्रण बटन";
+"System controls show buttons for %@" = "%@ के लिए सिस्टम नियंत्रण बटन दिखाएँ";
+"Thumbnails" = "थंबनेल";
+
+/* Video date filter in search */
+"Today" = "आज";
+
+/* Player controls layout size for TV */
+"TV" = "टी॰वी॰";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "आमतौर पर वीडियो के पास या अंत में जब क्रेडिट पॉप अप और/या एंडकार्ड दिखाए जाते हैं।";
+"Upload date" = "अपलोड दिनांक";
+"Used to create links from videos, channels and playlists" = "वीडियो, चैनल और प्लेलिस्ट से लिंक बनाने के लिए उपयोग किया जाता है";
+"Videos" = "वीडियों";
+
+/* Video sort order in search */
+"Views" = "दृश्य";
+
+/* Selected video was played on given date */
+"Watched %@" = "%@ देखा गया";
+
+/* Selected video is being played */
+"Watching now" = "देख रहे हैं";
+
+/* Video date filter in search */
+"Week" = "सप्ताह";
+"Welcome" = "स्वागत";
+"When partially watched video is played" = "जब आंशिक रूप से देखा गया वीडियो चलाया जाता है";
+"Wi-Fi" = "वाईफ़ाई";
+"Wiki" = "विकि";
+"Yattee" = "याटी";
+"Yattee %@ (build %@)" = "याटी %@ (बिल्ड %@)";
+
+/* Video date filter in search */
+"Year" = "साल";
+"You can find information about using Yattee in the Wiki pages." = "आप विकि पृष्ठों में याटी का उपयोग करने के बारे में जानकारी प्राप्त कर सकते हैं।";
+"You have no Playlists" = "कोई प्लेलिस्ट नहीं";
+"You need to create an instance and accounts\nto access %@ section" = "आपको एक इन्सटैंस और खाते बनाने की आवश्यकता है %@\nअनुभाग तक पहुँचने के लिए";
+"You need to select an account\nto access %@ section" = "आपको एक खाता चुनना होगा %@\nअनुभाग तक पहुँचने के लिए";
+"Unlisted" = "गैर-सूचीबद्ध";
+"Playing Next" = "अगला चल रहा";
+"Make default" = "डिफ़ॉल्ट बनाएँ";
+"Visibility" = "दृश्यता";
+"Current Playlist" = "वर्तमान प्लेलिस्ट";
+"Cached time" = "कैश समय";
+"Rate & Captions" = "दर एवं कैप्शन";
+"Dropped frames" = "गिराए गए फ्रेम";
+"It can be changed later in settings. You can use your own locations too." = "इसे बाद में सेटिंग्स में बदला जा सकता है। आप अपने स्वयं के स्थानों का भी उपयोग कर सकते हैं।";
+"Any format" = "कोई प्रारूप";
+"%@ formats" = "%@ प्रारूप";
+"Keep last played video in the queue after restart" = "अंतिम बार चलाए गए वीडियो को पुनः आरंभ करने के बाद कतार में रखें";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "प्लेलिस्ट ख़ाली है\n\nकिसी वीडियो पर टैप करके रखें और फिर\n\"प्लेलिस्ट में जोड़ें\"";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "“%@” प्लेलिस्ट मिट जाएगा।\nइसे वापस नहीं किया जा सकता।";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "किसी ऐसे उत्पाद या सेवा का प्रचार करना जो स्वयं निर्माता से सीधे संबंधित हो। इसमें आमतौर पर मर्चेंडाइज़ या मुद्रीकृत प्लेटफ़ॉर्म का प्रचार शामिल होता है।";
+"Queue is empty" = "क़तार ख़ाली है";
+"Restart" = "पुनरारंभ";
+"Save history of searches, channels and playlists" = "खोज, चैनलों एवं प्लेलिस्ट के इतिहास को सहजे";
+"Search" = "खोज";
+"Settings" = "सेटिंग";
+"Show sidebar when space permits" = "जगह होने पर साइडबार दिखाएँ";
+"Share %@ link with time" = "%@ लिंक समय के साथ साझें";
+"Show progress of watching on thumbnails" = "थंबनेल पर देखने की प्रगति दिखाएँ";
+
+/* Subscriptions title */
+"Subscriptions" = "सदस्यताएँ";
+"Press and hold remote button to open captions and quality menus" = "कैप्शन और गुणवत्ता मेनू खोलने के लिए रिमोट बटन को दबाकर रखें";
+"No comments" = "कोई टिप्पणी नहीं";
+"No chapters information available" = "कोई अध्याय जानकारी उपलब्ध नहीं";
+"Comments are disabled" = "टिप्पणियाँ अक्षम हैं";
