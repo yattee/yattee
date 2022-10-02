@@ -241,3 +241,64 @@
 "Subscribe" = "S'abonner";
 "Sort" = "Trier";
 "It can be changed later in settings. You can use your own locations too." = "Peut être modifié ultérieurement dans les paramètres. Vous pouvez également utiliser vos propres emplacements.";
+"For videos which feature music as the primary content." = "Pour les vidéos qui n'utilisent que la musique comme contenu principal.";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Les formats seront sélectionnés dans l'ordre de la liste.\nL'HLS est un format adaptatif (le paramètre de résolution ne s'applique pas).";
+"MPV Documentation" = "Documentation de MPV";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Musique : Segment non musical";
+"Always use AVPlayer for live videos" = "Toujours utiliser AVPlayer pour les vidéos en direct";
+"Anonymous" = "Anonyme";
+"Apply to all" = "Appliquer à tous";
+"Based on system color scheme" = "Basé sur le thème système";
+"Battery" = "Batterie";
+"Blue" = "Bleu";
+"Browsing" = "Naviguer";
+"Buffering stream..." = "Mise en tampon du flux...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Les bugs et les idées de fonctionnalités peuvent être envoyés sur GitHub. ";
+"Close PiP and open player when application enters foreground" = "Ferme l'IDI et ouvre le lecteur vidéo lorsque l'application passe au premier plan";
+"Close PiP when player is opened" = "Ferme l'IDI can le lecteur vidéo est ouvert";
+"Close PiP when starting playing other video" = "Ferme l'IDI quand une autre vidéo est commencée";
+"Close player when closing video" = "Ferme le lecteur quand une vidéo est arrêtée";
+"Close player when starting PiP" = "Ferme le lecteur lors que le mode IDI est lancé";
+"Close video after playing last in the queue" = "Ferme la vidéo après avoir lu la dernière présente dans la liste";
+"Controls" = "Contrôles";
+"Could not load locations manifest" = "Impossible de charger le manifeste des instances";
+"Custom Locations" = "Instances personalisées";
+
+/* Video sort order in search */
+"Date" = "Date";
+"Decreased opacity" = "Opacité diminuée";
+"Discord Server" = "Serveur Discord";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. C'est le bon endroit pour poser des questions.";
+"Don't use public locations" = "Ne pas utiliser d'instances publiques";
+"Enable Return YouTube Dislike" = "Active Return Youtube Dislike";
+"Enter fullscreen in landscape" = "Entre en mode plein écran lors de la rotation en mode paysage";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Bref rappel d'aimer la vidéo ou de s'abonner à la chaîne au milieu de la vidéo.";
+"Frontend URL" = "URL de l'interface web";
+"Public Locations" = "Instances publiques";
+"Public Manifest" = "Manifeste publique";
+"Honor orientation lock" = "Respecter le verrouillage de l'orientation";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Si vous êtes intéressé par ce qui est prévu dans les futures mises à jour, vous pouvez suivre les étapes du projet.";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Si vous signalez un bug, incluez tous les détails pertinents (notamment : la version de l'application, la version de l'appareil et du système utilisés, les étapes pour reproduire celui-ci).";
+"Instance of current account" = "Instance du compte actif";
+
+/* SponsorBlock category name */
+"Interaction" = "Rappel d’interaction (abonnement)";
+"Interface" = "Interface";
+
+/* SponsorBlock category name */
+"Intro" = "Entracte/Animation d'intro";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Le format Large pour la disposition des boutons n'est pas adapté à tous les appareils et son utilisation peut empêcher les contrôles de s'afficher à l'écran.";
+
+/* Loading stream OSD */
+"Loading streams..." = "Chargement des flux...";
+"Lock portrait mode" = "Verrouille l'orientation portrait";
+"Matrix Channel" = "Salon Matrix";
+"Only when signed in" = "Uniquement lorsque vous êtes connecté";
+"Opening audio stream..." = "Ouverture du flux audio";
+"Orientation" = "Orientation";
+
+/* SponsorBlock category name */
+"Outro" = "Générique de fin";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Promotion rémunérée, parrainage rémunéré et publicité directe qui n'est pas directement relié au créateur";
