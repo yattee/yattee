@@ -4,7 +4,7 @@
 "%@ Playlist" = "%@ प्लेलिस्ट";
 "%@ subscribers" = "%@ सदस्य";
 "%lld videos" = "%lld वीडियों";
-"1,234M" = "१२,३४०ला";
+"1,234M" = "१,२३४मि";
 " subscribers" = " सदस्य";
 "1 century ago" = "एक शताब्दी पहले";
 "10 seconds forwards/backwards" = "10 पल आगे/पीछे";
@@ -150,8 +150,8 @@
 "Pause when entering background" = "पृष्ठभूमि में जाने पर रोकें";
 "Pause when player is closed" = "प्लेयर बंद होने पर रोकें";
 "Picture in Picture" = "पिक्चर इन पिक्चर";
-"Play" = "प्ले";
-"Play All" = "सभी प्ले करें";
+"Play" = "चलाएँ";
+"Play All" = "सभी चलाएँ";
 "Play in PiP" = "PiP में चलाएँ";
 "Play Last" = "आख़री चलाएँ";
 "Play Music" = "संगीत चलाएँ";
@@ -279,7 +279,7 @@
 "Statistics" = "आँकड़े";
 "Hardware decoder" = "हार्डवेयर डीकोडर";
 "Stream FPS" = "स्ट्रीम FPS";
-"Playlists" = "प्लेलिस्टस्";
+"Playlists" = "प्लेलिस्ट";
 "Popular" = "लोकप्रिय";
 "Preferred Formats" = "पसंदीदा प्रारूप";
 "Profiles" = "प्रोफ़ाइल";
