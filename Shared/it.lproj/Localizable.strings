@@ -7,7 +7,6 @@
 "Blue" = "Blu";
 "Category" = "Categoria";
 "Cancel" = "Annulla";
-"cache-secs" = "cache-secs";
 "Autoplaying Next" = "Riproduzione automatica del video successivo";
 "Buffering stream..." = "Preparazione stream...";
 "%lld" = "%lld";
@@ -22,7 +21,6 @@
 "Chapters" = "Capitoli";
 "Badge & Decreased opacity" = "Indicatore e trasparenza";
 "Badge color" = "Colore dell'indicatore";
-"cache-pause-wait" = "cache-pause-wait";
 "Browsing" = "Navigazione";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Errori e suggerimenti possono essere inviati su GitHub. ";
 "Captions" = "Sottotitoli";
