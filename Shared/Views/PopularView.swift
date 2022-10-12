@@ -45,7 +45,7 @@ struct PopularView: View {
                 refreshControl.endRefreshing()
             }
             .onFailure { error in
-                NavigationModel.shared.presentAlert(title: "Could not refresh Trending", message: error.userMessage)
+                NavigationModel.shared.presentAlert(title: "Could not refresh Popular", message: error.userMessage)
             }
         }
         .backport
