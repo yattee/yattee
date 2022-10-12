@@ -290,7 +290,6 @@
 "Blue" = "Blå";
 "Are you sure you want to unsubscribe from %@?" = "Opphev abonnement på %@?";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Feil og flotte funksjonsidéer kan sendes til feilsporeren på GitHub. ";
-"cache-pause-wait" = "cache-pause-wait";
 "Close PiP and open player when application enters foreground" = "Lukk bilde-i-bilde og åpne avspiller når programmet er fokusert";
 "Close PiP when player is opened" = "Lukk bilde-i-bilde når spilleren åpnes";
 "Close PiP when starting playing other video" = "Lukk bilde-i-bilde ved start av en annen video";
