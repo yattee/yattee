@@ -149,7 +149,6 @@
 "Close PiP and open player when application enters foreground" = "Schließe PiP und öffne den Player wenn die App in den Vordergrund geholt wird";
 "Close PiP when player is opened" = "Schließe PiP wenn Player geöffnet wird";
 "Badge & Decreased opacity" = "Abzeichen & verringerte Opazität";
-"cache-pause-wait" = "Cache-pause-wart";
 "Close PiP when starting playing other video" = "PiP schließen, wenn ein anderes Video abgespielt wird";
 "Close player when closing video" = "Player beim Schließen des Videos schließen";
 "Close player when starting PiP" = "Wenn PiP beginnt, den Player schließen";
