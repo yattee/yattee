@@ -216,19 +216,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 guard let sidRegex = try? NSRegularExpression(pattern: sidRegex),
                       let match = sidRegex.matches(in: cookies, range: NSRange(cookies.startIndex..., in: cookies)).first
                 else {
-                    presentTokenUpdateFailedAlert(nil, "Could not extract SID from received cookies: \(cookies)")
+                    presentTokenUpdateFailedAlert(nil, String(format: "Could not extract SID from received cookies: %@".localized(), cookies))
                     return
                 }
 
                 let matchRange = match.range(withName: "sid")
 
                 if let substringRange = Range(matchRange, in: cookies) {
-                    print("updating invidious token")
                     let sid = String(cookies[substringRange])
                     AccountsModel.setToken(self.account, sid)
                     self.objectWillChange.send()
                 } else {
-                    presentTokenUpdateFailedAlert(nil, "Could not extract SID from received cookies: \(cookies)")
+                    presentTokenUpdateFailedAlert(nil, String(format: "Could not extract SID from received cookies: %@".localized(), cookies))
                 }
 
                 self.configure()

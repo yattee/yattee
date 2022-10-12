@@ -46,9 +46,9 @@ struct AdvancedSettings: View {
             #endif
         } label: {
             #if os(macOS)
-                let labelText = "Open logs in Finder"
+                let labelText = "Open logs in Finder".localized()
             #else
-                let labelText = "Share Logs..."
+                let labelText = "Share Logs...".localized()
             #endif
             Text(labelText)
         }
