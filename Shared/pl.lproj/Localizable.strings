@@ -440,3 +440,5 @@
 "This URL could not be opened" = "Nie można otworzyć tego adresu URL";
 "Could not extract SID from received cookies: %@" = "Nie udało się wyodrębnić ciasteczka SID z otrzymanych ciasteczek: %@";
 "Could not update your token." = "Nie można było zaktualizować twojego tokena.";
+"If you want this app to be available in your language, join translation project." = "Jeśli chcesz, aby ta aplikacja była dostępna w Twoim języku, dołącz do projektu tłumaczenia.";
+"Translations" = "Tłumaczenia";
