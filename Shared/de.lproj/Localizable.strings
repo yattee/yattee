@@ -31,7 +31,7 @@
 "Duration" = "Laufzeit";
 "Edit" = "Bearbeiten";
 "Edit Playlist" = "Wiedergabeliste bearbeiten";
-"Enable Return YouTube Dislike" = "Return YouTube Dislike freigeben";
+"Enable Return YouTube Dislike" = "Return YouTube Dislike aktivieren";
 "Error" = "Fehler";
 "Favorites" = "Favoriten";
 "Filter" = "Filter";
@@ -98,7 +98,7 @@
 "Category" = "Kategorie";
 "Clear History" = "Verlauf löschen";
 "Edit Quality Profile" = "Qualitätsprofil bearbeiten";
-"Enable logging" = "Aufzeichnung freigeben";
+"Enable logging" = "Logging aktivieren";
 "Playback" = "Wiedergabe";
 "Player" = "Player";
 "Charging" = "Aufladen";
@@ -121,7 +121,7 @@
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Alle";
-"Always use AVPlayer for live videos" = "Verwenden Sie immer AVPlayer für Live-Videos";
+"Always use AVPlayer for live videos" = "Verwende immer AVPlayer für Live-Videos";
 "Anonymous" = "Anonym";
 
 /* Video date filter in search
@@ -131,7 +131,7 @@
 "Are you sure you want to clear history of watched videos?" = "Möchten Sie den Verlauf der angesehenen Videos wirklich löschen?";
 "Are you sure you want to clear search history?" = "Möchten Sie den Suchverlauf wirklich löschen?";
 "Are you sure you want to delete playlist?" = "Möchten Sie die Wiedergabeliste wirklich löschen?";
-"Are you sure you want to unsubscribe from %@?" = "Möchten Sie das Abonnement von %@ wirklich abbestellen?";
+"Are you sure you want to unsubscribe from %@?" = "Möchten Sie %@ wirklich deabonnieren?";
 "Battery" = "Akku";
 "Comments" = "Kommentare";
 "Country Name or Code" = "Ländername oder Landeskennung";
@@ -143,8 +143,8 @@
 "Are you sure you want to restore default quality profiles?" = "Möchten Sie die Standardqualitätsprofile wirklich wiederherstellen?";
 "Autoplaying Next" = "Nächstes Element automatisch abspielen";
 "Based on system color scheme" = "Basierend auf System Farbschema";
-"Buffering stream..." = "Lade stream…";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Fehler und Vorschläge für gute Ideen können bei GitHub eingetragen werden. ";
+"Buffering stream..." = "Lade Stream…";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Fehler und tolle Ideen für Funktionen können an den Github Issue Tracker gesendet werden. ";
 "Categories to Skip" = "Kategorien zum Überspringen";
 "Close PiP and open player when application enters foreground" = "Schließe PiP und öffne den Player wenn die App in den Vordergrund geholt wird";
 "Close PiP when player is opened" = "Schließe PiP wenn Player geöffnet wird";
@@ -152,7 +152,7 @@
 "Close PiP when starting playing other video" = "PiP schließen, wenn ein anderes Video abgespielt wird";
 "Close player when closing video" = "Player beim Schließen des Videos schließen";
 "Close player when starting PiP" = "Wenn PiP beginnt, den Player schließen";
-"Close video after playing last in the queue" = "Schließen nach dem letzten Video in der Warteschlange";
+"Close video after playing last in the queue" = "Schließe das Video, nachdem das Letzte in der Warteschlange abgespielt wurde";
 "Connected successfully (%@)" = "Erfolgreich verbunden (%@)";
 "Could not load locations manifest" = "Standortmanifest konnte nicht geladen werden";
 "Current: %@\n%@" = "Aktuell: %@\n%@";
@@ -160,13 +160,13 @@
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Benutzerdefiniert";
 "Custom Locations" = "Benutzerdefinierte Standorte";
-"Decreased opacity" = "Verringerte Opazität";
+"Decreased opacity" = "Verringerte Deckkraft";
 "Disabled" = "Deaktiviert";
 "Decrease rate" = "Abnahmerate";
 "High" = "Hoch";
 "Highest quality" = "Höchste Qualität";
 "Info" = "Infos";
-"Instance of current account" = "Instanz des Girokonto";
+"Instance of current account" = "Instanz des derzeitigen Accounts";
 
 /* SponsorBlock category name */
 "Interaction" = "Interaktion";
@@ -185,7 +185,7 @@
 "Honor orientation lock" = "Orientierungssperre ehren";
 "For videos which feature music as the primary content." = "Für Videos, deren Hauptinhalt Musik ist.";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Die Formate werden in der Reihenfolge der Auflistung ausgewählt.\nHLS ist ein adaptives Format (die Auflösungseinstellung gilt nicht).";
-"Increase rate" = "Erhöhungsrate";
+"Increase rate" = "Rate erhöhen";
 "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Wenn Sie einen Fehler melden, sollten Sie alle relevanten Details angeben (insbesondere: App-Version, verwendetes Gerät und Systemversion, Schritt zur Reproduktion).";
 
 /* Player controls layout size */
@@ -213,7 +213,7 @@
 "Lock portrait mode" = "Hochformatmodus sperren";
 "Mark as watched" = "Als gesehen markieren";
 "Mark video as watched after playing" = "Video nach dem Abspielen als angesehen markieren";
-"Mark watched videos with" = "Mark sah sich Videos mit";
+"Mark watched videos with" = "Markiere angeschaute Videos mit";
 
 /* SponsorBlock category name */
 "Offtopic in Music Videos" = "Offtopic bei Musikvideos";
@@ -239,10 +239,10 @@
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
 "Opening audio stream..." = "Audiostream wird geöffnet...";
 "Orientation" = "Ausrichtung";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Wiedergabeliste \"Neu\" wird gelöscht.\nEs kann nicht rückgängig gemacht werden.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Wiedergabeliste \"%@\" wird gelöscht.\nDies kann nicht rückgängig gemacht werden.";
 "Preferred Formats" = "Bevorzugte Formate";
 "Profiles" = "Profile";
-"Proxy videos" = "Proxy-Videos";
+"Proxy videos" = "Videos über Proxy abspielen";
 "Public Locations" = "Öffentliche Standorte";
 "Public Manifest" = "Öffentliches Manifest";
 "Reset" = "Reset";
@@ -251,7 +251,7 @@
 
 /* SponsorBlock category name */
 "Outro" = "Outro";
-"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Schöpfer in Verbindung steht. Der Schöpfer erhält eine Bezahlung oder Entschädigung in Form von Geld oder kostenlosen Produkten.";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Teil eines Videos, in dem für ein Produkt oder eine Dienstleistung geworben wird, die nicht direkt mit dem Ersteller in Verbindung steht. Der Ersteller erhält eine Bezahlung oder Vergütung in Form von Geld oder kostenlosen Produkten.";
 "Picture in Picture" = "Bild-im-Bild";
 "Regular size" = "Normalgröße";
 
@@ -263,7 +263,7 @@
 "Remove from the queue" = "Aus der Warteschlange entfernen";
 "Replies" = "Antworten";
 "Reset search filters" = "Suchfilter zurücksetzen";
-"Reset watched status when playing again" = "Zurücksetzen des Überwachungsstatus beim erneuten Spielen";
+"Reset watched status when playing again" = "Setze den Fortschritt des angeschauten Teils zurück, wenn das Video nochmal abgespielt wird";
 "Resolution" = "Auflösung";
 "Restart the app to apply the settings above." = "Starten Sie die App neu, um die Einstellungen zu übernehmen.";
 "Restart/Play next" = "Neustart/Nächstes spielen";
@@ -292,7 +292,7 @@
 /* Video date filter in search */
 "Week" = "Woche";
 "Pause when entering background" = "Pause bei Eintritt in den Hintergrund";
-"Pause when player is closed" = "Pause, wenn der Player geschlossen wird";
+"Pause when player is closed" = "Pausiere, wenn der Player geschlossen wird";
 
 /* Video sort order in search */
 "Relevance" = "Relevanz";
@@ -301,14 +301,14 @@
 
 /* SponsorBlock category name */
 "Self-promotion" = "Eigenwerbung";
-"Show account username" = "Konto-Benutzername anzeigen";
+"Show account username" = "Account-Benutzername anzeigen";
 "Show keywords" = "Schlüsselwörter anzeigen";
 "Show playback statistics" = "Wiedergabestatistiken anzeigen";
 "SponsorBlock" = "SponsorBlock";
 "Subscribe" = "Abonnieren";
 
 /* Subscriptions title */
-"Subscriptions" = "Abonnements";
+"Subscriptions" = "Abonnenten";
 "System controls buttons" = "Systemsteuerungstasten";
 "Thumbnails" = "Vorschaubilder";
 
@@ -319,7 +319,7 @@
 /* Player controls layout size for TV */
 "TV" = "Fernsehen";
 "unknown" = "unbekannt";
-"Unsubscribe" = "Abbestellen";
+"Unsubscribe" = "Deabonnieren";
 "Upload date" = "Uploaddatum";
 "URL" = "URL";
 "Wi-Fi" = "Wi-Fi";
@@ -337,17 +337,17 @@
 
 /* SponsorBlock category name */
 "Sponsor" = "Sponsor";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Explizite Aufforderungen, ihnen zu gefallen, sie zu abonnieren oder mit ihnen auf einer oder mehreren kostenpflichtigen oder kostenlosen Plattformen zu interagieren (z.B. auf ein Video klicken).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Explizite Aufforderungen, einen Like zu geben, sie zu abonnieren oder mit ihnen auf einer oder mehreren kostenpflichtigen oder kostenlosen Plattformen zu interagieren (z.B. auf ein Video klicken).";
 "Open \"Playlists\" tab to create new one" = "Öffnen Sie die Registerkarte \"Wiedergabelisten\", um eine neue Liste zu erstellen";
 "Rate" = "Rate";
-"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Werbung für ein Produkt oder eine Dienstleistung, die in direktem Zusammenhang mit dem Schöpfer selbst steht. Dazu gehören in der Regel Waren oder die Werbung für monetarisierte Plattformen.";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Werbung für ein Produkt oder eine Dienstleistung, die in direktem Zusammenhang mit dem Ersteller selbst steht. Dazu gehören in der Regel Waren oder die Werbung für monetarisierte Plattformen.";
 "Save history of played videos" = "Verlauf der abgespielten Videos speichern";
 "Search" = "Suche";
 "Share %@ link" = "%@-Link teilen";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "Diese Informationen werden nur auf Ihrem Gerät verarbeitet und dazu verwendet, Sie mit dem Server im angegebenen Land zu verbinden.";
 "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Das ist schön zu hören. Es macht Spaß, Apps zu entwickeln, die andere Menschen nutzen wollen. Sie können in Erwägung ziehen, für das Projekt zu spenden oder bei der Weiterentwicklung neuer Funktionen mitzuhelfen.";
 "This cannot be reverted" = "Dies kann nicht zurückgenommen werden";
-"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Dies kann nicht zurückgenommen werden. Vielleicht müssen Sie zwischen den Ansichten wechseln oder die App neu starten, um die Änderungen zu sehen.";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Dies ist unwiderruflich. Eventuell müssen Sie zwischen den Ansichten wechseln oder die App neu starten, um die Änderungen zu sehen.";
 "When partially watched video is played" = "Wenn ein teilweise angesehenes Video abgespielt wird";
 "You can find information about using Yattee in the Wiki pages." = "Informationen zur Verwendung von Yattee finden Sie auf den Wiki-Seiten.";
 
@@ -383,7 +383,7 @@
 "Shuffle" = "Zufallswiedergabe";
 "Shuffle All" = "Zufallswiedergabe alle";
 "Sidebar" = "Seitenleiste";
-"Sign In Required" = "Einloggen erforderlich";
+"Sign In Required" = "Anmeldung erforderlich";
 
 /* Player controls layout size */
 "Small" = "Klein";
@@ -399,7 +399,7 @@
 "Sort" = "Sortieren";
 "Sort: %@" = "Sortieren: %@";
 "System controls show buttons for %@" = "Die Systemsteuerung zeigt Tasten für %@";
-"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Damit werden alle Ihre benutzerdefinierten Profile entfernt und die Standardwerte wiederhergestellt. Dies kann nicht zurückgenommen werden.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Damit werden alle Ihre benutzerdefinierten Profile entfernt und die Standardwerte wiederhergestellt. Dies ist unwiderruflich.";
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "In der Regel kurz vor oder am Ende des Videos, wenn der Abspann erscheint und/oder Endcards gezeigt werden.";
 "Current Playlist" = "Aktuelle Wiedergabeliste";
 "Make default" = "Standard machen";
@@ -417,3 +417,27 @@
 "No comments" = "Keine Kommentare";
 "No chapters information available" = "Keine Informationen zu den Kapiteln vorhanden";
 "Comments are disabled" = "Kommentare sind abgeschaltet";
+"Could not open video" = "Das Video kann nicht geöffnet werden";
+"Could not update your token." = "Ihr Token kann nicht aktualisiert werden.";
+"Open logs in Finder" = "Logs im Finder öffnen";
+"Could not load streams" = "Konnte keine Streams laden";
+"Could not extract channel information" = "Kanalinformationen konnten nicht entnommen werden";
+"Could not extract SID from received cookies: %@" = "SID konnte nicht aus empfangenen Cookies entpackt werden: %@";
+"For custom locations you can configure Frontend URL in Locations settings" = "Für benutzerdefinierte Standorte können Sie die Frontend-URL in den Standorteinstellungen konfigurieren";
+"Could not extract video ID" = "Die Video-ID konnte nicht entpackt werden";
+"Could not extract playlist ID" = "Wiedergabelisten-ID kann nicht entpackt werden";
+"Could not load video" = "Das Video kann nicht geladen werden";
+"Translations" = "Übersetzungen";
+"Could not refresh Popular" = "Beliebtes kann nicht aktualisiert werden";
+"Could not create share link" = "Freigabelink kann nicht erstellt werden";
+"Could not open playlist" = "Kann Wiedergabeliste nicht öffnen";
+"This video could not be opened" = "Dieses Video kann nicht geöffnet werden";
+"No locations available at the moment" = "Derzeit keine Standorte verfügbar";
+"Could not refresh Playlists" = "Wiedergabelisten können nicht aktualisiert werden";
+"Could not refresh Trending" = "Trends kann nicht aktualisiert werden";
+"Could not open channel" = "Kanal kann nicht geöffnet werden";
+"This URL could not be opened" = "Diese URL kann nicht geöffnet werden";
+"Share Logs..." = "Logs teilen…";
+"Channel could not be found" = "Der Kanal konnte nicht gefunden werden";
+"Could not refresh Subscriptions" = "Abonnements konnten nicht aktualisiert werden";
+"If you want this app to be available in your language, join translation project." = "Wenn Sie wünschen, dass diese App auch in Ihrer Sprache verfügbar ist, nehmen Sie am Übersetzungsprojekt teil.";
