@@ -124,3 +124,102 @@
 "Don't use public locations" = "Non usare posizioni pubbliche";
 "Donations" = "Donazioni";
 "Edit Playlist" = "Modifica playlist";
+
+/* SponsorBlock category name */
+"Intro" = "Introduzione";
+"Issues Tracker" = "Issue tracker";
+
+/* Video duration filter in search */
+"Long" = "Lungo";
+"Lowest" = "Peggiore";
+"Low" = "Bassa";
+"Not available" = "Non disponibile";
+"Not Playing" = "Nessun video aperto";
+"Music" = "Musica";
+"Only when signed in" = "Solo se l'accesso è effettuato";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Se stai segnalando un bug, includi tutti i dettagli rilevanti (in particolare: versione dell'app, versione del dispositivo e del sistema operativo, come riprodurre il bug).";
+"Increase rate" = "Aumenta velocità";
+"Instance of current account" = "Istanza dell'account attuale";
+
+/* SponsorBlock category name */
+"Interaction" = "Interazione";
+"Interface" = "Interfaccia";
+
+/* Selected video has just finished playing */
+"Just watched" = "Appena guardato";
+
+/* Player controls layout size */
+"Large" = "Grandi";
+"Lock portrait mode" = "Modalità blocco orientamento orizzontale";
+"Mark as watched" = "Segna come guardato";
+"Mark video as watched after playing" = "Segna il video come guardato dopo la riproduzione";
+"Mark watched videos with" = "Segna come guardati i video con";
+"Matrix Channel" = "Canale Matrix";
+"Matrix Chat" = "Chat Matrix";
+"Medium quality" = "Qualità media";
+"Milestones" = "Traguardi";
+"Movies" = "Film";
+"MPV Documentation" = "Documentazione di MPV";
+"Nothing" = "Niente";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Sezione non-musicale nei video musicali";
+"Open \"Playlists\" tab to create new one" = "Apri la sezione \"Playlist\" per crearne una nuova";
+"Open Settings" = "Apri le impostazioni";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Apertura del flusso %@...";
+"Opening audio stream..." = "Apertura del flusso audio...";
+"Orientation" = "Orientamento";
+
+/* SponsorBlock category name */
+"Outro" = "Conclusioni";
+"Password" = "Password";
+"Pause" = "Pausa";
+"Info" = "Info";
+"LIVE" = "DAL VIVO";
+
+/* Loading stream OSD */
+"Loading streams..." = "Caricamento flussi...";
+"Loading..." = "Caricamento...";
+"Locations" = "Posizioni";
+"Low quality" = "Qualità bassa";
+
+/* Video date filter in search */
+"Month" = "Mese";
+"More info can be found in:" = "Ulteriori informazioni possono essere trovate qui:";
+"Next" = "Successivo";
+"No description" = "Nessuna descrizione";
+"No Playlists" = "Nessuna playlist";
+"No results" = "Nessun risultato";
+"Normal" = "Normale";
+"For videos which feature music as the primary content." = "Per video che hanno la musica come argomento principale.";
+"Finding something to play..." = "Trova qualcosa da guardare...";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "I formati saranno selezionati in ordine come elencato. \nHLS è un formato adattivo (le impostazioni di risoluzione non sono applicabili).";
+"Name" = "Nome";
+"I want to ask a question" = "Voglio fare una domanda";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Il layout grande non è adatto a tutti i dispositivi e selezionarlo potrebbe rendere i controlli più grandi dello schermo.";
+"New Playlist" = "Nuova playlist";
+
+/* Player controls layout size */
+"Medium" = "Medi";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Parte del video che promuove un prodotto o servizio non direttamente collegato al canale. Il canale riceve soldi o prodotti gratuiti in compenso.";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Se vuoi sapere cosa arriverà negli aggiornamenti futuri, tieni d'occhio i traguardi del progetto.";
+"Find Other" = "Trova altri";
+"Frontend URL" = "URL frontend";
+"Fullscreen size" = "Dimensione schermo intero";
+"Gaming" = "Gaming";
+"Help" = "Aiuto";
+"Hide sidebar" = "Nascondi barra laterale";
+"High" = "Alta";
+"Highest" = "Massima";
+"Highest quality" = "Qualità massima";
+"History" = "Cronologia";
+"Honor orientation lock" = "Priorità blocco orientamento";
+
+/* Video date filter in search */
+"Hour" = "Ora";
+"I am lost" = "Sono perso";
+"I found a bug /" = "Ho trovato un bug /";
+"I have a feature request" = "Voglio richiedere una funzionalità";
+"I like this app!" = "Mi piace quest'app!";
