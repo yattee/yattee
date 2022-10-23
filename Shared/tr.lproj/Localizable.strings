@@ -1,1 +1,9 @@
 
+
+"You can switch between profiles in playback settings controls." = "Oynatma ayarları kontrollerinde profiller arasında geçiş yapabilirsiniz.";
+"It can be changed later in settings. You can use your own locations too." = "Daha sonra ayarlardan değiştirilebilir. Kendi konumlarınızı da kullanabilirsiniz.";
+"For custom locations you can configure Frontend URL in Locations settings" = "Özel konumlar için Konumlar ayarlarında Ön Uç URL'sini yapılandırabilirsiniz";
+"Open Settings" = "Ayarları Aç";
+"Restart the app to apply the settings above." = "Yukarıdaki ayarları uygulamak için uygulamayı yeniden başlatın.";
+"Settings" = "Ayarlar";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Geçerli cihaz durumuna göre otomatik profil seçimini kullanabilir veya video oynatma ayarları kontrollerinde değiştirebilirsiniz.";
