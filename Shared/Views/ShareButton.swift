@@ -15,7 +15,9 @@ struct ShareButton: View {
         Menu {
             instanceActions
             Divider()
-            youtubeActions
+            if !accounts.isDemo {
+                youtubeActions
+            }
         } label: {
             Label("Share...", systemImage: "square.and.arrow.up")
         }

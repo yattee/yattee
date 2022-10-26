@@ -9,7 +9,7 @@ extension Defaults.Keys {
     static let instancesManifest = Key<String>("instancesManifest", default: "")
     static let countryOfPublicInstances = Key<String?>("countryOfPublicInstances")
 
-    static let instances = Key<[Instance]>("instances", default: [])
+    static let instances = Key<[Instance]>("instances", default: [.init(app: .demoApp, name: "Demo", apiURL: "")])
     static let accounts = Key<[Account]>("accounts", default: [])
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")
@@ -21,9 +21,7 @@ extension Defaults.Keys {
 
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
-    static let favorites = Key<[FavoriteItem]>("favorites", default: [
-        .init(section: .channel("UCE_M8A5yxnLfW0KghEeajjw", "Apple"))
-    ])
+    static let favorites = Key<[FavoriteItem]>("favorites", default: [])
 
     #if !os(tvOS)
         #if os(macOS)

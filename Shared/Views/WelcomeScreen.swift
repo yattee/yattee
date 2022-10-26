@@ -67,7 +67,7 @@ struct WelcomeScreen: View {
                 .foregroundColor(.secondary)
         }
         .onAppear {
-            resource.load().onSuccess { response in
+            resource?.load().onSuccess { response in
                 if let instances: [ManifestedInstance] = response.typedContent() {
                     store = instances
                 }
@@ -85,7 +85,7 @@ struct WelcomeScreen: View {
         store.first { $0.country == country }?.flag
     }
 
-    var resource: Resource {
+    var resource: Resource? {
         InstancesManifest.shared.instancesList
     }
 }

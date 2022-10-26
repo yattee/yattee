@@ -7,6 +7,7 @@ final class AccountsModel: ObservableObject {
 
     @Published private var invidious = InvidiousAPI()
     @Published private var piped = PipedAPI()
+    @Published private var demo = DemoAppAPI()
 
     @Published var publicAccount: Account?
 
@@ -33,7 +34,14 @@ final class AccountsModel: ObservableObject {
     }
 
     var api: VideosAPI {
-        app == .piped ? piped : invidious
+        switch app {
+        case .piped:
+            return piped
+        case .invidious:
+            return invidious
+        case .demoApp:
+            return demo
+        }
     }
 
     var isEmpty: Bool {
@@ -42,6 +50,10 @@ final class AccountsModel: ObservableObject {
 
     var signedIn: Bool {
         !isEmpty && !current.anonymous && api.signedIn
+    }
+
+    var isDemo: Bool {
+        current?.app == .demoApp
     }
 
     init() {
@@ -79,6 +91,8 @@ final class AccountsModel: ObservableObject {
             invidious.setAccount(account)
         case .piped:
             piped.setAccount(account)
+        case .demoApp:
+            break
         }
 
         Defaults[.lastAccountIsPublic] = account.isPublic
