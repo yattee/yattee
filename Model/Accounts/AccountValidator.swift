@@ -55,6 +55,9 @@ final class AccountValidator: Service {
 
         case .piped:
             return resource("/streams/dQw4w9WgXcQ")
+
+        case .demoApp:
+            return resource("/")
         }
     }
 

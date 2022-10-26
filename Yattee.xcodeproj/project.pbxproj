@@ -434,6 +434,9 @@
 		376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376CD21526FBE18D001E1AC1 /* Instance+Fixtures.swift */; };
 		376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */; };
+		3771429829087DFC00306CEA /* DemoAppAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3771429729087DFC00306CEA /* DemoAppAPI.swift */; };
+		3771429929087DFC00306CEA /* DemoAppAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3771429729087DFC00306CEA /* DemoAppAPI.swift */; };
+		3771429A29087DFC00306CEA /* DemoAppAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3771429729087DFC00306CEA /* DemoAppAPI.swift */; };
 		3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003227E8EEA100CB2475 /* AudioToolbox.framework */; };
 		3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003427E8EEA100CB2475 /* AVFoundation.framework */; };
 		3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3772003527E8EEA100CB2475 /* CoreMedia.framework */; };
@@ -1151,6 +1154,7 @@
 		376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollDismissesKeyboard+Backport.swift"; sourceTree = "<group>"; };
 		3771429529087BE100306CEA /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3771429629087BF000306CEA /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/Localizable.strings; sourceTree = "<group>"; };
+		3771429729087DFC00306CEA /* DemoAppAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAppAPI.swift; sourceTree = "<group>"; };
 		3772002527E8ED2600CB2475 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		3772003127E8EEA100CB2475 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		3772003227E8EEA100CB2475 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS15.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
@@ -1739,6 +1743,7 @@
 				3700155A271B0D4D0049C794 /* PipedAPI.swift */,
 				37D526DD2720AC4400ED2F5E /* VideosAPI.swift */,
 				376A33DF2720CAD6000C1D6B /* VideosApp.swift */,
+				3771429729087DFC00306CEA /* DemoAppAPI.swift */,
 			);
 			path = Applications;
 			sourceTree = "<group>";
@@ -2884,6 +2889,7 @@
 				3711403F26B206A6005B3555 /* SearchModel.swift in Sources */,
 				3729037E2739E47400EA99F6 /* MenuCommands.swift in Sources */,
 				37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
+				3771429829087DFC00306CEA /* DemoAppAPI.swift in Sources */,
 				37EBD8C427AF0DA800F1C24B /* PlayerBackend.swift in Sources */,
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
 				374AB3DB28BCAF7E00DF56FB /* SeekType.swift in Sources */,
@@ -3274,6 +3280,7 @@
 				373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				3763495226DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
 				370015AA28BBAE7F000149FD /* ProgressBar.swift in Sources */,
+				3771429929087DFC00306CEA /* DemoAppAPI.swift in Sources */,
 				371B7E672759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				37BA794426DBA973002A0235 /* PlaylistsModel.swift in Sources */,
@@ -3418,6 +3425,7 @@
 				3752069B285E8DD300CA655F /* Chapter.swift in Sources */,
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,
+				3771429A29087DFC00306CEA /* DemoAppAPI.swift in Sources */,
 				37E80F47287B7B9400561799 /* VideoDetailsOverlay.swift in Sources */,
 				37E80F44287B7AB400561799 /* VideoDetails.swift in Sources */,
 				3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,

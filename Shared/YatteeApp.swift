@@ -174,13 +174,8 @@ struct YatteeApp: App {
             accounts.configureAccount()
         }
 
-        let countryOfPublicInstances = Defaults[.countryOfPublicInstances]
-        if accounts.current.isNil, countryOfPublicInstances.isNil {
-            navigation.presentingWelcomeScreen = true
-        }
-
-        if !countryOfPublicInstances.isNil {
-            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances!, accounts: accounts, asCurrent: accounts.current.isNil)
+        if let countryOfPublicInstances = Defaults[.countryOfPublicInstances] {
+            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances, accounts: accounts, asCurrent: accounts.current.isNil)
         }
 
         playlists.accounts = accounts

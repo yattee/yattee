@@ -54,7 +54,7 @@ struct FavoriteItemView: View {
                 #endif
                     .onAppear {
                         resource?.addObserver(store)
-                        resource?.load()
+                        resource?.loadIfNeeded()
                     }
                 #if !os(tvOS)
                     .onDrag {

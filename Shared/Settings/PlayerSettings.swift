@@ -31,6 +31,7 @@ struct PlayerSettings: View {
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.systemControlsCommands) private var systemControlsCommands
 
+    @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlayerModel> private var player
 
     #if os(iOS)
@@ -99,7 +100,10 @@ struct PlayerSettings: View {
 
                 keywordsToggle
                 showHistoryToggle
-                returnYouTubeDislikeToggle
+
+                if !accounts.isDemo {
+                    returnYouTubeDislikeToggle
+                }
             }
 
             #if os(iOS)

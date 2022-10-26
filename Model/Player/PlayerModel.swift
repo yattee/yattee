@@ -146,7 +146,7 @@ final class PlayerModel: ObservableObject {
 
     var playerError: Error? { didSet {
         if let error = playerError {
-            navigation.presentAlert(title: "Failed loading video", message: error.localizedDescription)
+            navigation.presentAlert(title: "Failed loading video".localized(), message: error.localizedDescription)
         }
     }}
 

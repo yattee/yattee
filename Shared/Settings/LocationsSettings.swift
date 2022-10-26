@@ -41,28 +41,30 @@ struct LocationsSettings: View {
     }
 
     @ViewBuilder var settings: some View {
-        Section(header: SettingsHeader(text: "Public Locations".localized()), footer: countryFooter) {
-            Picker("Country", selection: $countryOfPublicInstances) {
-                Text("Don't use public locations").tag(String?.none)
-                ForEach(countries, id: \.self) { country in
-                    Text(country).tag(Optional(country))
+        if !InstancesManifest.shared.manifestURL.isNil {
+            Section(header: SettingsHeader(text: "Public Locations".localized()), footer: countryFooter) {
+                Picker("Country", selection: $countryOfPublicInstances) {
+                    Text("Don't use public locations").tag(String?.none)
+                    ForEach(countries, id: \.self) { country in
+                        Text(country).tag(Optional(country))
+                    }
                 }
-            }
-            #if os(tvOS)
-            .pickerStyle(.inline)
-            #endif
-            .disabled(countries.isEmpty)
+                #if os(tvOS)
+                .pickerStyle(.inline)
+                #endif
+                .disabled(countries.isEmpty)
 
-            Button {
-                InstancesManifest.shared.changePublicAccount(accounts, settings: model)
-            } label: {
-                if let account = accounts.current, account.isPublic {
-                    Text("Switch to other public location")
-                } else {
-                    Text("Switch to public locations")
+                Button {
+                    InstancesManifest.shared.changePublicAccount(accounts, settings: model)
+                } label: {
+                    if let account = accounts.current, account.isPublic {
+                        Text("Switch to other public location")
+                    } else {
+                        Text("Switch to public locations")
+                    }
                 }
+                .disabled(countryOfPublicInstances.isNil)
             }
-            .disabled(countryOfPublicInstances.isNil)
         }
 
         Section(header: SettingsHeader(text: "Custom Locations".localized())) {
@@ -92,7 +94,8 @@ struct LocationsSettings: View {
     }
 
     func loadCountries() {
-        InstancesManifest.shared.instancesList.load()
+        InstancesManifest.shared.configure()
+        InstancesManifest.shared.instancesList?.load()
             .onSuccess { response in
                 if let instances: [ManifestedInstance] = response.typedContent() {
                     self.countries = instances.map(\.country).unique().sorted()

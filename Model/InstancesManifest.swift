@@ -4,7 +4,6 @@ import Siesta
 import SwiftyJSON
 
 final class InstancesManifest: Service, ObservableObject {
-    static let builtinManifestUrl = "https://r.yattee.stream/manifest.json"
     static let shared = InstancesManifest()
 
     @Published var instances = [ManifestedInstance]()
@@ -12,18 +11,26 @@ final class InstancesManifest: Service, ObservableObject {
     init() {
         super.init()
 
+        configure()
+    }
+
+    func configure() {
+        invalidateConfiguration()
+
         configure {
             $0.pipeline[.parsing].add(SwiftyJSONTransformer, contentTypes: ["*/json"])
         }
 
-        configureTransformer(
-            manifestURL,
-            requestMethods: [.get]
-        ) { (content: Entity<JSON>
-        ) -> [ManifestedInstance] in
-            guard let instances = content.json.dictionaryValue["instances"] else { return [] }
+        if let manifestURL {
+            configureTransformer(
+                manifestURL,
+                requestMethods: [.get]
+            ) { (content: Entity<JSON>
+            ) -> [ManifestedInstance] in
+                guard let instances = content.json.dictionaryValue["instances"] else { return [] }
 
-            return instances.arrayValue.compactMap(self.extractInstance)
+                return instances.arrayValue.compactMap(self.extractInstance)
+            }
         }
     }
 
@@ -36,7 +43,7 @@ final class InstancesManifest: Service, ObservableObject {
             return
         }
 
-        instancesList.load().onSuccess { response in
+        instancesList?.load().onSuccess { response in
             if let instances: [ManifestedInstance] = response.typedContent() {
                 guard let instance = instances.filter { $0.country == country }.randomElement() else { return }
                 let account = instance.anonymousAccount
@@ -49,7 +56,7 @@ final class InstancesManifest: Service, ObservableObject {
     }
 
     func changePublicAccount(_ accounts: AccountsModel, settings: SettingsModel) {
-        instancesList.load().onSuccess { response in
+        instancesList?.load().onSuccess { response in
             if let instances: [ManifestedInstance] = response.typedContent() {
                 var countryInstances = instances.filter { $0.country == Defaults[.countryOfPublicInstances] }
                 let region = countryInstances.first?.region ?? "Europe"
@@ -97,17 +104,12 @@ final class InstancesManifest: Service, ObservableObject {
         )
     }
 
-    var manifestURL: String {
-        var url = Defaults[.instancesManifest]
-
-        if url.isEmpty {
-            url = Self.builtinManifestUrl
-        }
-
-        return url
+    var manifestURL: String? {
+        Defaults[.instancesManifest].isEmpty ? nil : Defaults[.instancesManifest]
     }
 
-    var instancesList: Resource {
-        resource(absoluteURL: manifestURL)
+    var instancesList: Resource? {
+        guard let manifestURL else { return nil }
+        return resource(absoluteURL: manifestURL)
     }
 }
