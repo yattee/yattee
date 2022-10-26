@@ -7,7 +7,6 @@ struct Help: View {
     static let discordURL = URL(string: "https://yattee.stream/discord")!
     static let issuesURL = URL(string: "https://github.com/yattee/yattee/issues")!
     static let milestonesURL = URL(string: "https://github.com/yattee/yattee/milestones")!
-    static let donationsURL = URL(string: "https://github.com/yattee/yattee/wiki/Donations")!
     static let contributingURL = URL(string: "https://github.com/yattee/yattee/wiki/Contributing")!
     static let translationsURL = URL(string: "https://hosted.weblate.org/engage/yattee/")!
 
@@ -69,7 +68,6 @@ struct Help: View {
                             .padding(.bottom, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            helpItemLink("Donations".localized(), url: Self.donationsURL, systemImage: "dollarsign.circle")
                             helpItemLink("Contributing".localized(), url: Self.contributingURL, systemImage: "hammer")
                             helpItemLink("Translations".localized(), url: Self.translationsURL, systemImage: "flag")
                         }
