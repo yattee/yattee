@@ -1,32 +1,29 @@
 <div align="center">
   <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
   <h1>Yattee</h1>
-  <p>Alternative YouTube frontend for iOS, tvOS and macOS<br />built with <a href="https://github.com/iv-org/invidious">Invidious</a> and <a href="https://github.com/TeamPiped/Piped">Piped</a></p>
+  <p>Privacy oriented video player for iOS, tvOS and macOS<br /></p>
+
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/yattee)](https://github.com/yattee/yattee/pulls)
 [![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#Yattee:matrix.org)
 
-Now on **Discord**:
+[![Dark theme preview](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
 
-[![Discord](https://img.shields.io/discord/992481375817052251?style=for-the-badge)](https://yattee.stream/discord)
+<h3><strong>🎉 Now available on the App Store 🎉</strong></h3>
+  <a href="https://apps.apple.com/us/app/yattee/id1595136629?itsct=apps_box_badge&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1666742400&h=eda3695f90de92150bc4ec7505362a1a" alt="Download on the App Store" style="border-radius: 13px; width: 150px; height: 83px;"></a>
+<hr />
 
 ![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
 </div>
 
 ## Features
 * Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/) with customization settings
-* Multiple instances and accounts, fast switching
 * [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 * Player queue and history
-* Fullscreen playback, Picture in Picture and AirPlay support
-* Stream quality selection
-
-### Features in development
-* New player component with custom controls, gestures and support for 4K playback
-
-You can leave your feedback in [discussions](https://github.com/yattee/yattee/discussions) or join  [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#Yattee:matrix.org) for a chat. Thanks!
+* Player component with custom controls, gestures and support for 4K playback
+* Fullscreen, Picture in Picture and background audio playback
 
 ### Availability
 || Invidious | Piped |
@@ -72,11 +69,3 @@ Localization service and hosting is provided by [Weblate](https://weblate.org/en
 
 ## License
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
-
-
-## Disclaimer
-The Yattee project and its contents are not affiliated with, funded, authorized, endorsed by, or in any way accociated with YouTube, Google LLC or any of its affiliates and subsidaries. The official YouTube website can be found at www.youtube.com.
-
-Any trademark, service mark, trade name, or other intellectual property rights used in the Yattee project are owned by the respective owners.
-
-This tool is an open source software built for learning and research purposes.
