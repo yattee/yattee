@@ -51,7 +51,7 @@
       "location" : "https://github.com/pinterest/PINCache",
       "state" : {
         "branch" : "master",
-        "revision" : "9ca06045b5aff12ee8c0ef5880aa8469c4896144"
+        "revision" : "97a5dbd3f1e69605bcd4103fdb32ca855887c47a"
       }
     },
     {
@@ -87,7 +87,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "484bc774e1091f622c4856e576ff957b29403676"
+        "revision" : "9248fe561a2a153916fb9597e3af4434784c6d32"
       }
     },
     {
