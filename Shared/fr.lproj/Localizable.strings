@@ -26,7 +26,7 @@
 "Add to Favorites" = "Ajouter aux Favoris";
 "Add Account" = "Ajouter un compte";
 "Add to %@" = "Ajouter à %@";
-"Are you sure you want to clear search history?" = "Êtes-vous sûr·e de vouloir effacer l'historique des recherches ?";
+"Are you sure you want to clear search history?" = "Êtes-vous sûr de vouloir effacer l'historique des recherches ?";
 "Add Location" = "Ajouter un emplacement";
 "Add to Playlist..." = "Ajouter à la liste de lecture…";
 "Add Account..." = "Ajouter un compte…";
@@ -34,10 +34,10 @@
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Tout";
-"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr·e de vouloir effacer l'historique des vidéos regardées ?";
-"Are you sure you want to delete playlist?" = "Êtes-vous sûr·e de vouloir supprimer la liste de lecture ?";
-"Are you sure you want to restore default quality profiles?" = "Êtes-vous sûr·e de vouloir restaurer les profils de qualité par défaut ?";
-"Are you sure you want to unsubscribe from %@?" = "Êtes-vous sûr·e de vouloir vous désabonner de %@ ?";
+"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr de vouloir effacer l'historique des vidéos regardées ?";
+"Are you sure you want to delete playlist?" = "Êtes-vous sûr de vouloir supprimer la liste de lecture ?";
+"Are you sure you want to restore default quality profiles?" = "Êtes-vous sûr de vouloir restaurer les profils de qualité par défaut ?";
+"Are you sure you want to unsubscribe from %@?" = "Êtes-vous sûr de vouloir vous désabonner de %@ ?";
 "Automatic" = "Automatique";
 "Badge" = "Badge";
 "Badge & Decreased opacity" = "Badge et opacité réduite";
@@ -59,7 +59,7 @@
 
 /* Video date filter in search */
 "Hour" = "Heure";
-"I am lost" = "Je suis perdu·e";
+"I am lost" = "Je suis perdu";
 "I found a bug /" = "J'ai trouvé une erreur";
 "I have a feature request" = "J'ai une demande de fonctionnalité";
 "I like this app!" = "J'aime bien cette appli !";
@@ -272,8 +272,8 @@
 "Discord Server" = "Serveur Discord";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. C'est le bon endroit pour poser des questions.";
 "Don't use public locations" = "Ne pas utiliser d'instances publiques";
-"Enable Return YouTube Dislike" = "Active Return Youtube Dislike";
-"Enter fullscreen in landscape" = "Entre en mode plein écran lors de la rotation en mode paysage";
+"Enable Return YouTube Dislike" = "Activer le retour du bouton DisLike de Youtube";
+"Enter fullscreen in landscape" = "Entrer en mode plein écran lors de la rotation en mode paysage";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Bref rappel d'aimer la vidéo ou de s'abonner à la chaîne au milieu de la vidéo.";
 "Frontend URL" = "URL de l'interface web";
 "Public Locations" = "Instances publiques";
@@ -302,3 +302,55 @@
 /* SponsorBlock category name */
 "Outro" = "Générique de fin";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Promotion rémunérée, parrainage rémunéré et publicité directe qui n'est pas directement relié au créateur";
+"Reset search filters" = "Réinitialiser les filtres de recherche";
+"Resolution" = "Résolution";
+"Restart" = "Redémarrer";
+"Restart the app to apply the settings above." = "Redémarrer l'application pour appliquer les paramètres ci-dessus.";
+"Select location closest to you:" = "Sélectionner la localisation la plus proche de vous :";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Auto-promotion";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"SponsorBlock" = "SponsorBlock";
+"SponsorBlock API Instance" = "SponsorBlock exemple d'API";
+"This cannot be reverted" = "Vous ne pourrez pas revenir en arrière";
+"Switch to public locations" = "Passer à une localisation publique";
+"System controls buttons" = "Boutons de contrôle système";
+"System controls show buttons for %@" = "Montrer les boutons du contrôle système pour %@";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Vous ne pourrez pas revenir en arrière. Vous devrez changer de vue ou redémarrer l'application pour voir les changements.";
+"unknown" = "inconnu";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Ces informations sont traitées uniquement sur votre appareil et utilisées pour vous connecter au serveur dans un pays spécifique.";
+"Share..." = "Partager…";
+"Restore default profiles..." = "Restaurer le profile par défaut…";
+"Reset watched status when playing again" = "Réinitialiser le status de visionnage lors d'une nouvelle lecture";
+"Share %@ link" = "Partager %@ lien";
+"Show anonymous accounts" = "Afficher les comptes anonymes";
+"Show channel name" = "Afficher le nom de la chaine";
+"Show history" = "Afficher l'historique";
+"Show progress of watching on thumbnails" = "Afficher la progression de l'avancement dans les miniatures";
+"Switch to other public location" = "Passer à une autre localisation publique";
+"Show keywords" = "Afficher le clavier";
+"Show playback statistics" = "Afficher les statistiques de lecture";
+"Sidebar" = "Barre du côté";
+"Sign In Required" = "Authentification requise";
+
+/* Player controls layout size */
+"Small" = "Petit";
+
+/* Player controls layout size */
+"Smaller" = "Le plus petit";
+"Source" = "Source";
+"Used to create links from videos, channels and playlists" = "Utilisé pour créer des liens depuis les vidéos, les chaînes et playlists";
+"Restart/Play next" = "Redémarrer/Lire la suivante";
+"Rotate to portrait when exiting fullscreen" = "Revenir au mode portrait quand le mode plein écran est quitté";
+"Round corners" = "Coins arrondis";
+"Seek with horizontal swipe on video" = "Rechercher avec un glissement horizontal sur la vidéo";
+"Settings" = "Paramètres";
+"Share %@ link with time" = "Partager %@ lien avec le temps";
+"Show account username" = "Afficher le nom d'utilisateur";
+"Show sidebar when space permits" = "Afficher la barre du côté quand l'espace le permet";
+"Show video length" = "Afficher la durée de la vidéo";
+"Shuffle" = "Aléatoire";
+"Shuffle All" = "Tout en aléatoire";
