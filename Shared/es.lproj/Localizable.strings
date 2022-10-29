@@ -1,1 +1,83 @@
 
+
+"Add to Favorites" = "Añadir a favoritos";
+"Badge color" = "Color de la insignia";
+"1234" = "1234";
+"Accounts" = "Cuentas";
+"Accounts are not supported for the application of this instance" = "El uso de cuentas no está disponible en esta instancia";
+"Add Account" = "Añadir cuenta";
+"Add Account..." = "Añadir cuenta...";
+"Add profile..." = "Añadir perfil...";
+"Add Quality Profile" = "Añadir perfil de calidad";
+"Add to %@" = "Añadir a %@";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Cualquiera";
+"Apply to all" = "Aplicar a todo";
+"Are you sure you want to clear history of watched videos?" = "¿Estás seguro de que quieres borrar el historial de vídeos vistos?";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Si descubres un error o tienes ideas, puedes enviarlas a través de los issues de GitHub. ";
+"Captions" = "Subtítulos";
+"Categories to Skip" = "Categorías a omitir";
+"Chapters" = "Capítulos";
+"Charging" = "Cargando";
+"Clear" = "Limpiar";
+"Clear All" = "Limpiar todo";
+"Clear All Recents" = "Limpiar todo lo reciente";
+"Clear Search History" = "Limpiar el historial de búsqueda";
+"Clear the queue" = "Limpiar la cola";
+"Close PiP and open player when application enters foreground" = "Cerrar el modo Picture in Picture y abrir el reproductor cuando la aplicación entra en primer plano";
+"Close PiP when player is opened" = "Cerrar el modo Picture in Picture cuando se abra el reproductor";
+"Connection failed" = "Conexión fallida";
+"Contact" = "Contacto";
+"Continue" = "Continuar";
+"Continue from %@" = "Continuar desde %@";
+"Contributing" = "Contribuir";
+"Copy %@ link" = "Copiar %@ link";
+"Could not load locations manifest" = "No se pudo cargar el manifiesto de las ubicaciones";
+"Country Name or Code" = "Nombre o código del país";
+"Create Playlist" = "Crear lista de reproducción";
+"10 seconds forwards/backwards" = "10 segundos hacia detrás/hacia delante";
+"Add to Playlist" = "Añadir a playlist";
+"Add to Playlist..." = "Añadir a playlist...";
+"Advanced" = "Avanzado";
+"Always use AVPlayer for live videos" = "Siempre usar AVPlayer para vídeos en directo";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Todo";
+"Anonymous" = "Anónimo";
+"Backend" = "Backend";
+"Are you sure you want to delete playlist?" = "¿Estás seguro de que quieres eliminar esta lista de reproducción?";
+"Automatic" = "Automático";
+"Badge" = "Insignia";
+"Are you sure you want to clear search history?" = "¿Estás seguro de que quieres eliminar tu historial de búsqueda?";
+"Are you sure you want to restore default quality profiles?" = "¿Estás seguro de que quieres restablecer los ajustes por defecto de los perfiles de calidad?";
+"Are you sure you want to unsubscribe from %@?" = "¿Estás seguro de que quieres dejar de estar suscrito a %@?";
+"Cancel" = "Cancelar";
+"Autoplaying Next" = "Autorreproducir el siguiente";
+"Based on system color scheme" = "Basado en el tema del sistema";
+"Clear Search History..." = "Limpiar el historial de búsqueda...";
+"Battery" = "Batería";
+"Blue" = "Azul";
+"Category" = "Categoría";
+"Button" = "Botón";
+"Clear History" = "Limpiar el historial";
+"Close" = "Cerrar";
+"Close PiP when starting playing other video" = "Cerrar el modo Picture in Picture cuando se empiece a reproducir otro vídeo";
+"Close video after playing last in the queue" = "Cerrar el vídeo después de reproducir el último de la cola";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Personalizada";
+"Current: %@\n%@" = "Actual: %@ \n%@";
+"Custom Locations" = "Localización personalizada";
+"Close player when closing video" = "Cerrar el reproductor cuando se cierre el vídeo";
+"Comments" = "Comentarios";
+"Close player when starting PiP" = "Cerrar el reproductor cuando empiece el modo Picture in Picture";
+"Controls" = "Controles";
+"Country" = "País";
+"Close Video" = "Cerrar vídeo";
+"Connected successfully (%@)" = "Conectado con éxito (%@)";
+"Copy %@ link with time" = "Copiar el enlace %@ con la marca de tiempo";
+
+/* Video sort order in search */
+"Date" = "Fecha";
