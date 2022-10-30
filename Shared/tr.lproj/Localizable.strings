@@ -56,3 +56,25 @@
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Hatalar ve harika fikirler GitHub sorun izleyicisine gönderilebilir. ";
 "Button" = "Buton";
 "Clear" = "Temizle";
+"Add Quality Profile" = "Kalite Profili Ekle";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Herhangi";
+"Apply to all" = "Hepsine uygula";
+"Are you sure you want to restore default quality profiles?" = "Varsayılan kalite profillerini geri yüklemek istediğinizden emin misiniz?";
+"Backend" = "Arka uç";
+"Buffering stream..." = "Akış arabelleğe alınıyor...";
+"Categories to Skip" = "Atlanacak Kategoriler";
+"Clear Search History..." = "Arama Geçmişini Temizle...";
+"Autoplaying Next" = "Sonraki Otomatik Oynatılıyor";
+"Badge & Decreased opacity" = "Rozet ve Azaltılmış opaklık";
+"Close" = "Kapat";
+"Clear All" = "Tümünü Temizle";
+"Based on system color scheme" = "Sistem renk şemasına göre";
+"Clear History" = "Geçmişi Temizle";
+"Clear All Recents" = "Tüm Son Kullanılanları Temizle";
+"Clear Search History" = "Arama Geçmişini Temizle";
+"Close PiP and open player when application enters foreground" = "Uygulama ön plana geldiğinde Resim içinde Resim modunu kapatın ve oynatıcıyı açın";
+"Close PiP when player is opened" = "Oynatıcı açıldığında Resim içinde Resim modunu kapat";
+"Clear the queue" = "Kuyruğu temizle";
