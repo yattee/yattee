@@ -64,7 +64,7 @@
 "Country" = "Країна";
 "For videos which feature music as the primary content." = "Для відеороликів, основним змістом яких є музика.";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Формати будуть вибиратися в порядку, як зазначено в списку. \nHLS - адаптивний формат (налаштування роздільної здатності не застосовується).";
-"Frontend URL" = "Frontend URL";
+"Frontend URL" = "URL-адреса інтерфейсу";
 "Hide sidebar" = "Сховати сайдбар";
 "High" = "Висока";
 "Highest" = "Найвища";
@@ -437,3 +437,7 @@
 "Could not refresh Popular" = "Не вдалося оновити популярне";
 "Could not extract playlist ID" = "Не вдалося отримати ID плейлиста";
 "This video could not be opened" = "Не вдалося відкрити відео";
+"Could not load video" = "Не вдалося завантажити відео";
+"No locations available at the moment" = "Зараз немає доступних API (локацій)";
+"Could not refresh Playlists" = "Не вдалося поновити плейлисти";
+"If you want this app to be available in your language, join translation project." = "Ви можете змінити або створити свій переклад на сторінці проекту.";
