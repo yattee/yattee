@@ -225,3 +225,213 @@
 "Statistics" = "Статистика";
 "Could not create share link" = "Не вдалося створити посилання";
 "Dropped frames" = "Втрата кадрів";
+"Badge" = "Значок";
+"Badge & Decreased opacity" = "Значок та зменшення непрозорості";
+"Categories to Skip" = "Категорії для пропуску";
+"Category" = "Категорія";
+"Cellular" = "Сотовий звязок";
+"Chapters" = "Розділи";
+"Charging" = "Зарядка";
+"Clear" = "Очистити";
+"Clear All" = "Очистити все";
+"Clear All Recents" = "Очистити всі недавні";
+"Clear History" = "Очистити історію";
+"Clear Search History" = "Очистити історію пошуку";
+"Clear Search History..." = "Очистити історію пошуку...";
+"Clear the queue" = "Очистити чергу";
+"Close PiP and open player when application enters foreground" = "Закрийте PiP і відкрийте плеєр, коли програма відкриється";
+"Close player when closing video" = "Закрийте плеєр, коли зупините відео";
+"Close player when starting PiP" = "Закрийте плеєр при старті PiP";
+"Close Video" = "Закрити відео";
+"Close video after playing last in the queue" = "Закрити відео після завершення останнього відео в черзі";
+"Comments" = "Коментарі";
+"Contact" = "Контакт";
+"Error when accessing playlist" = "Помилка при доступі до плейлиста";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Прямі нагадування залишити лайк, підписатися або взаємодіяти з ними на будь-якій платній або безкоштовній платформі (наприклад, натиснути на відео).";
+"Favorites" = "Улюблене";
+"Filter" = "ФІльтер";
+"Filter: active" = "Фільтер: активний";
+"Find Other" = "Найти інше";
+"Finding something to play..." = "Знайти, у що пограти...";
+
+/* SponsorBlock category name */
+"Interaction" = "Взаємодія";
+
+/* SponsorBlock category name */
+"Intro" = "Вступ";
+"Issues Tracker" = "Трекер проблем";
+
+/* Selected video has just finished playing */
+"Just watched" = "Щойно переглянуто";
+
+/* Player controls layout size */
+"Large" = "Великий";
+"LIVE" = "В ЕФІРІ";
+
+/* Loading stream OSD */
+"Loading streams..." = "Завантаження трансляції...";
+"Loading..." = "Завантаження...";
+"Locations" = "Локації";
+"Lock portrait mode" = "Заблокувати портретний режим";
+"Low" = "Низькі";
+"Low quality" = "Низька якість";
+"Lowest" = "Найнища";
+"Mark as watched" = "Позначити як переглянуте";
+"Mark video as watched after playing" = "Помітити відео як переглянуте після перегляду";
+"Mark watched videos with" = "Відмітити переглянуті відео з";
+"Matrix Channel" = "Канал Matrix";
+"Matrix Chat" = "Чат Matrix";
+"Medium quality" = "Середня якість";
+"Milestones" = "Етапи";
+
+/* Video date filter in search */
+"Month" = "Місяці";
+"More info can be found in:" = "Більше інформації можна знайти за посиланням:";
+"Movies" = "Фільми";
+"MPV Documentation" = "Документація MPV";
+"Music" = "Музика";
+"Name" = "Імʼя";
+"New Playlist" = "Новий плейлист";
+"Next" = "Наступне";
+"No description" = "Без опису";
+"No Playlists" = "Нема плейлистів";
+"No results" = "Без результатів";
+"Normal" = "Звичайний";
+"Not available" = "Недоступно";
+"Not Playing" = "Не програється";
+"Nothing" = "Нічого";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Офтоп в музичних кліпах";
+"Only when signed in" = "Тільки після авторизації";
+"Open \"Playlists\" tab to create new one" = "Відкрийте розділ \"Плейлисти\" для створення нового";
+"Open Settings" = "Відрити налаштування";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Запуск трансляції %@...";
+"Opening audio stream..." = "Запуск аудіо трансляції...";
+"Orientation" = "Орієнтація";
+
+/* SponsorBlock category name */
+"Outro" = "Кінцівка";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Частина відеоролика, що рекламує товар або послугу, не пов'язану безпосередньо з каналом. Власник каналу отримає оплату або безкоштовної продукції.";
+"Password" = "Пароль";
+"Pause" = "Пауза";
+"Pause when entering background" = "Пауза при переключенні на фоновий режим";
+"Pause when player is closed" = "Пауза, коли плеєр закритий";
+"Reset" = "Скинути";
+"Reset search filters" = "Скинути пошукові фільтри";
+"Resolution" = "Роздільна здатність";
+"Restart" = "Перезавантажити";
+"Restart/Play next" = "Перезапустити/Відтворити далі";
+"Restore default profiles..." = "Відновити стандартні профілі...";
+"Rotate to portrait when exiting fullscreen" = "Перехід до портретного режиму при виході з полноекранного режиму";
+"Round corners" = "Закруглення кутів";
+"Save" = "Зберегти";
+"Save history of played videos" = "Зберегти історію переглянутих відео";
+"Save history of searches, channels and playlists" = "Зберегти історію пошуку, каналів та плейлістів";
+"Search" = "Пошук";
+"Search history is empty" = "Історія пошуку порожня";
+"Search..." = "Пошук...";
+"Sections" = "Розділи";
+"Seek gesture sensitivity" = "Чутливість жестів";
+"Seek gesture speed" = "Швидкість жестів";
+"Seek with horizontal swipe on video" = "Пошук за допомогою горизонтального свайпу на відео";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Сегменти, які зазвичай знаходяться на початку відео, що включають анімацію, стоп-кадр або кліп, які також можна побачити в інших відео того ж каналу.";
+"Select location closest to you:" = "Виберіть найблищу локацію:";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Самореклама";
+"Settings" = "Налаштування";
+"Share %@ link" = "Поділитися посиланням %@";
+"Share..." = "Поділитися...";
+
+/* Video duration filter in search */
+"Short" = "Короткі";
+"Show history" = "Показувати історію";
+"Show keywords" = "Показувати ключові слова";
+"Show playback statistics" = "Показувати статистику переглядів";
+"Show progress of watching on thumbnails" = "Показувати прогрес перегляду на мініатюрі";
+"Show sidebar when space permits" = "Показувати бокову панель, якщо вистачає простору";
+"Show video length" = "Показувати тривалість відео";
+"Shuffle" = "Вперемішку";
+"Shuffle All" = "Перемішати все";
+"Sidebar" = "Бокова панель";
+
+/* Player controls layout size */
+"Small" = "Маленький";
+
+/* Player controls layout size */
+"Smaller" = "Меньший";
+"Sort" = "Сортувати";
+"Sort: %@" = "Сортування: %@";
+"Source" = "Джерело";
+
+/* SponsorBlock category name */
+"Sponsor" = "Спонсор";
+"SponsorBlock" = "SponsorBlock";
+"SponsorBlock API Instance" = "Екземпляр API SponsorBlock";
+"Subscribe" = "Підписатися";
+
+/* Subscriptions title */
+"Subscriptions" = "Підписки";
+"Switch to other public location" = "Переключитися на іншу публічну локацію";
+"Switch to public locations" = "Переключитися на публічні локації";
+"System controls show buttons for %@" = "На елементах керування системою відображаються кнопки %@";
+"This cannot be reverted" = "Це не можна буде скасувати";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Ця інформація буде оброблятися тільки на вашому пристрої і буде використовуватися для з'єднання вас з сервером в зазначеній країні.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Це призведе до видалення всіх ваших користувацьких профілів і повернення їхніх значень до стандартних. Це не може бути скасовано.";
+"Cached time" = "Час кешування";
+"Any format" = "Будь-який формат";
+"%@ formats" = "%@ формати";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Плейлист порожній\n\nНатисніть і утримуйте кнопку на відео, а потім натисніть на\n\"Додати до плейлиста\"";
+"Press and hold remote button to open captions and quality menus" = "Натисніть і утримуйте кнопку пульта, щоб відкрити меню субтитрів і якості";
+"Comments are disabled" = "Коментування вимкнуто";
+"No comments" = "Коментарі відсутні";
+"No chapters information available" = "Інформація про епізоди відсутня";
+"Share Logs..." = "Поділитися логами…";
+"Open logs in Finder" = "Вікрити логи в Finder";
+"Could not refresh Subscriptions" = "Не вдалося оновити підписки";
+"Channel could not be found" = "Канал не знайдено";
+"Could not extract channel information" = "Не вдалося отримати інформації про канал";
+"Could not extract SID from received cookies: %@" = "Не вдалося дістати SID з отриманих кукі: %@";
+"Could not update your token." = "Не вдалося оновити ваш токен.";
+"Could not refresh Trending" = "Не вдалося оновити тренди";
+"For custom locations you can configure Frontend URL in Locations settings" = "Для користувацьких локацій ви можете налаштувати Frontend URL в налаштуваннях локацій";
+"Connected successfully (%@)" = "Успішно підключено (%@)";
+"Close PiP when player is opened" = "Закрийте PiP, поки плеєр відкритий";
+"Close PiP when starting playing other video" = "Закрийте PiP, коли починаєте перегляд іншого відео";
+"Connection failed" = "Помилка при підключенні";
+"Enable logging" = "Ввімкнути запис логів";
+"Edit" = "Редагувати";
+"Edit Playlist" = "Редагувати плейліст";
+"Edit Quality Profile" = "Редагувати профіль якості";
+"Edit..." = "Редагувати...";
+"Error" = "Помилка";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Великий розмір підходить не для всіх пристроїв і його використання може призвести до того, що елементи керування не будуть поміщатися на екрані.";
+"Enable Return YouTube Dislike" = "Ввімкнути повернення дизлайку YouTube";
+"Enter fullscreen in landscape" = "Увімкнути повноекранний режим в горизонтальному положенні";
+"Interface" = "Інтерфейс";
+
+/* Video duration filter in search */
+"Long" = "Довгі";
+
+/* Player controls layout size */
+"Medium" = "Середній";
+"Share %@ link with time" = "Поділитися посиланням %@ з часом";
+"Reset watched status when playing again" = "Скинути статус перегляду при повторному відкритті";
+"Show account username" = "Відображати імʼя акаунту";
+"Restart the app to apply the settings above." = "Перезапустіть додаток, щоб застосувати нові налаштування.";
+"Show anonymous accounts" = "Показувати анонімні акаунти";
+"Show channel name" = "Показувати назву каналу";
+"Sign In Required" = "Необхідно увійти в систему";
+"It can be changed later in settings. You can use your own locations too." = "Пізніше це можна змінити в налаштуваннях. Ви також можете використовувати власні локації.";
+"System controls buttons" = "Кнопки керування системою";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приємно це чути. Створювати додатки, якими хочуть користуватися інші люди, дуже приємно. Ви можете розглянути можливість пожертвувати кошти на проект або допомогти, взявши участь у розробці нових функцій.";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Це не можна буде скасувати. Можливо, вам доведеться переключитися між режимами перегляду або перезапустити програму, щоб побачити зміни.";
+"Keep last played video in the queue after restart" = "Залишати останнє проглянуте відео в черзі після перезапуску";
+"Could not load streams" = "Не вдалося загрузити трансляції";
+"Could not open video" = "Не вдалося відкрити відео";
+"This URL could not be opened" = "Не вдалося відкрити посилання";
+"Could not open channel" = "Не вдалося відкрити канал";
+"Could not refresh Popular" = "Не вдалося оновити популярне";
