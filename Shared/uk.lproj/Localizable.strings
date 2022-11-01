@@ -31,8 +31,8 @@
 "Add Quality Profile" = "Додати профіль якості";
 "Add to %@" = "Додати до %@";
 "Add to Favorites" = "Додати в обране";
-"Add to Playlist" = "Додати в плейліст";
-"Add to Playlist..." = "Додати в плейліст...";
+"Add to Playlist" = "Додати в плейлист";
+"Add to Playlist..." = "Додати в плейлист...";
 "Advanced" = "Розширені";
 
 /* Trending category, section containing all kinds of videos */
@@ -44,7 +44,7 @@
 "Any" = "Будь-яка";
 "Apply to all" = "Застосувати для всіх";
 "Are you sure you want to clear search history?" = "Ви впевнені, що хочете видалити історію пошуку?";
-"Are you sure you want to delete playlist?" = "Ви впевнені, що хочете видалити плейліст?";
+"Are you sure you want to delete playlist?" = "Ви впевнені, що хочете видалити плейлист?";
 "Are you sure you want to restore default quality profiles?" = "Ви впевнені, що бажаєте відновити стандартні профілі якості?";
 "Automatic" = "Автоматично";
 "Autoplaying Next" = "Автовідтворення наступного";
@@ -92,9 +92,9 @@
 "Play Now" = "Грати зараз";
 "Playback" = "Відтворення";
 "Player" = "Плеєр";
-"Playlist" = "Плейліст";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Плейліст \"%@\" буде видалений. \nЦю дію не можна відмінити.";
-"Playlists" = "Плейлісти";
+"Playlist" = "Плейлист";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Плейлист \"%@\" буде видалений. \nЦе не можна буде скасувати.";
+"Playlists" = "Плейлисти";
 "Popular" = "Популярне";
 "Preferred Formats" = "Пріорітетні формати";
 "Profiles" = "Профілі";
@@ -155,7 +155,7 @@
 "Wiki" = "Вікі";
 "Yattee %@ (build %@)" = "Yattee %@ (збірка %@)";
 "You have no Playlists" = "У вас немає плейлистів";
-"You have no playlists\n\nTap on \"New Playlist\" to create one" = "У вас немає плейлістів\n\nНатісніть \"Новий плейлист\" для створення";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "У вас немає плейлистів\n\nНатісніть \"Новий плейлист\" для створення";
 "You need to create an instance and accounts\nto access %@ section" = "Необхідно створити екземляри і аккаунти\nдля доступу до %@";
 "You need to select an account\nto access %@ section" = "Потрібно вибрати аккаунт\nдля доступу до %@";
 
@@ -190,7 +190,7 @@
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Баги та ідеї можна надсилати на GitHub Issues. ";
 "Controls" = "Управління";
 "Done" = "Готово";
-"Create Playlist" = "Створити плейліст";
+"Create Playlist" = "Створити плейлист";
 "Current: %@\n%@" = "Зараз: %@\n%@";
 "Custom Locations" = "Свої локації";
 "Copy %@ link with time" = "Копіювати %@ посилання з часом";
@@ -329,7 +329,7 @@
 "Round corners" = "Закруглення кутів";
 "Save" = "Зберегти";
 "Save history of played videos" = "Зберегти історію переглянутих відео";
-"Save history of searches, channels and playlists" = "Зберегти історію пошуку, каналів та плейлістів";
+"Save history of searches, channels and playlists" = "Зберегти історію пошуку, каналів та плейлистів";
 "Search" = "Пошук";
 "Search history is empty" = "Історія пошуку порожня";
 "Search..." = "Пошук...";
@@ -404,7 +404,7 @@
 "Connection failed" = "Помилка при підключенні";
 "Enable logging" = "Ввімкнути запис логів";
 "Edit" = "Редагувати";
-"Edit Playlist" = "Редагувати плейліст";
+"Edit Playlist" = "Редагувати плейлист";
 "Edit Quality Profile" = "Редагувати профіль якості";
 "Edit..." = "Редагувати...";
 "Error" = "Помилка";
