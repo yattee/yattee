@@ -435,3 +435,5 @@
 "This URL could not be opened" = "Не вдалося відкрити посилання";
 "Could not open channel" = "Не вдалося відкрити канал";
 "Could not refresh Popular" = "Не вдалося оновити популярне";
+"Could not extract playlist ID" = "Не вдалося отримати ID плейлиста";
+"This video could not be opened" = "Не вдалося відкрити відео";
