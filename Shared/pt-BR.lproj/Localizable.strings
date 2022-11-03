@@ -1,1 +1,443 @@
 
+
+"Shuffle All" = "Randomizar tudo";
+"Regular Size" = "Tamanho Normal";
+"%@ subscribers" = "%@ inscritos";
+" subscribers" = " inscritos";
+"10 seconds forwards/backwards" = "10 segundos para frente/para trás";
+"1 century ago" = "Há um século";
+"Accounts" = "Contas";
+"Add Account" = "Adicionar Conta";
+"Apply to all" = "Aplicar a todos";
+"Are you sure you want to clear history of watched videos?" = "Tem certeza que deseja limpar histórico dos vídeos assistidos?";
+"Are you sure you want to clear search history?" = "Tem certeza que deseja limpar histórico de busca?";
+"Are you sure you want to delete playlist?" = "Tem certeza que deseja deletar playlist?";
+"Are you sure you want to restore default quality profiles?" = "Tem certeza que deseja restaurar os perfis padrão de qualidade?";
+"Automatic" = "Automático";
+"Autoplaying Next" = "Tocando Automaticamente Próximo";
+"Add to Playlist" = "Adicionar à Playlist";
+"Add to Playlist..." = "Adicionar à Playlist…";
+"Advanced" = "Avançado";
+"Add Quality Profile" = "Adicionar Perfil de Qualidade";
+"Add to %@" = "Adicionar a %@";
+"Add to Favorites" = "Adicionar aos Favoritos";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Tudo";
+"Badge" = "Ícone";
+"Badge & Decreased opacity" = "Ícone & Opacidade Reduzida";
+"%@ Channel" = "Canal %@";
+"%@ Playlist" = "Playlist %@";
+"%lld videos" = "%lld vídeos";
+"Accounts are not supported for the application of this instance" = "Contas não são suportadas para o aplicativo nessa instância";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Qualquer uma";
+"#" = "#";
+"%@" = "%@";
+"%@ %@" = "%@ %@";
+"%lld" = "%lld";
+"%lld%%" = "%lld%%";
+"1,234M" = "1,234M";
+"1234" = "1234";
+"Backend" = "Backend";
+"a" = "a";
+"A" = "A";
+"Blue" = "Azul";
+"Battery" = "Bateria";
+"Buffering stream..." = "Fazendo buffer do stream…";
+"Browsing" = "Navegação";
+"Done" = "Feito";
+
+/* Video sort order in search */
+"Date" = "Data";
+"Donations" = "Doações";
+"Category" = "Categoria";
+"Cellular" = "Dados Móveis";
+"Chapters" = "Capítulos";
+"Contact" = "Contato";
+"Continue" = "Continuar";
+"Continue from %@" = "Continuar de %@";
+"Contributing" = "Contribuir";
+"Controls" = "Controles";
+"Copy %@ link" = "Copiar link %@";
+"Copy %@ link with time" = "Copiar link %@ com tempo";
+"Could not load locations manifest" = "Não pôde carregar o manifesto de localizações";
+"Current: %@\n%@" = "Atual: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Customizado";
+"Custom Locations" = "Localizações customizadas";
+"Decreased opacity" = "Opacidade reduzida";
+"Delete" = "Deletar";
+"Disabled" = "Desativado";
+"Discord Server" = "Servidor Discord";
+"Charging" = "Carregando";
+"Decrease rate" = "Diminuir taxa";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Se você estiver denunciando um bug, inclua todos os detalhes relevantes (especialmente: versão do app, dispositivo usado e versão do sistema, passos para reproduzir).";
+"I like this app!" = "Eu gosto deste app!";
+"I want to ask a question" = "Eu quero fazer uma pergunta";
+"Instance of current account" = "Instância da conta atual";
+
+/* SponsorBlock category name */
+"Interaction" = "Interação";
+"I am lost" = "Eu estou perdido";
+"Edit..." = "Editar…";
+"Issues Tracker" = "Rastreador de Problemas";
+"High" = "Alto";
+"Highest" = "Mais Alto";
+"Highest quality" = "Qualidade mais alta";
+"History" = "Histórico";
+"Honor orientation lock" = "Honrar bloqueio de orientação";
+"I have a feature request" = "Eu tenho um pedido de funcionalidade";
+"Enable logging" = "Ativar logs";
+"Enable Return YouTube Dislike" = "Ativar o Retorno do Dislike do YouTube";
+"Enter fullscreen in landscape" = "Entrar em tela cheia em modo paisagem";
+"Finding something to play..." = "Achando algo para tocar…";
+"Find Other" = "Encontrar Outro";
+"Increase rate" = "Aumentar taxa";
+"Info" = "Informações";
+
+/* SponsorBlock category name */
+"Intro" = "Introdução";
+"Interface" = "Interface";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Se você estiver interessado no que está por vir nas atualizações futuras, você pode rastrear os Marcos do projeto.";
+"Loading..." = "Carregando…";
+"Mark as watched" = "Marcar como assistido";
+"Mark video as watched after playing" = "Marcar vídeo como assistido depois de tocar";
+"Mark watched videos with" = "Marcar vídeos assistidos com";
+
+/* Selected video has just finished playing */
+"Just watched" = "Acabou de assistir";
+
+/* Loading stream OSD */
+"Loading streams..." = "Carregando streams…";
+"Medium quality" = "Qualidade média";
+"No description" = "Sem descrição";
+"No Playlists" = "Sem playlists";
+"No results" = "Sem resultados";
+"Not available" = "Indisponível";
+"Not Playing" = "Não Tocando";
+"Nothing" = "Nada";
+"Open \"Playlists\" tab to create new one" = "Abrir aba “Playlists” para criar uma nova";
+"Open Settings" = "Abrir Ajustes";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Abrindo stream %@…";
+"Opening audio stream..." = "Abrindo stream de áudio…";
+"Orientation" = "Orientação";
+
+/* SponsorBlock category name */
+"Outro" = "Encerramento";
+"Only when signed in" = "Apenas quando logado";
+"Movies" = "Filmes";
+"MPV Documentation" = "Documentação MPV";
+"Music" = "Música";
+"Name" = "Nome";
+"New Playlist" = "Nova Playlist";
+
+/* Video date filter in search */
+"Month" = "Mês";
+"More info can be found in:" = "Mais informações podem ser encontradas em:";
+
+/* Player controls layout size */
+"Medium" = "Médio";
+
+/* Video duration filter in search */
+"Long" = "Longo";
+"Low" = "Baixo";
+"Lock portrait mode" = "Travar modo retrato";
+"Matrix Channel" = "Canal Matrix";
+"Matrix Chat" = "Chat Matrix";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Irrelevante em Videoclipes";
+"Normal" = "Normal";
+"Milestones" = "Marcos";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promover um produto ou serviço que está diretamente relacionado ao criador. Isso geralmente inclui merchandising e promoção de plataformas monetizadas.";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Parte de um vídeo promovendo um produto ou serviço não diretamente relacionado ao criador. O criador receberá pagamento ou compensação na forma de dinheiro ou produtos grátis.";
+"Password" = "Senha";
+"Pause when entering background" = "Pausar quando entrar em plano de fundo";
+"Pause when player is closed" = "Pausar quando o player é fechado";
+"Play" = "Tocar";
+"Play All" = "Tocar Tudo";
+"Play in PiP" = "Tocar em PiP";
+"Play Last" = "Tocar por Último";
+"Play Music" = "Tocar Música";
+"Play Next" = "Tocar Depois";
+"Play Now" = "Tocar Agora";
+"Preferred Formats" = "Formatos preferidos";
+"Profiles" = "Perfis";
+"Pause" = "Pausar";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "A playlist “%@” será deletada. \nIsso não pode ser revertido.";
+"Picture in Picture" = "Picture in Picture";
+"Playback" = "Playback";
+"Player" = "Player";
+"Playlist" = "Playlist";
+"Playlists" = "Playlists";
+"Popular" = "Popular";
+"Regular size" = "Tamanho normal";
+"Remove from Favorites" = "Remover dos Favoritos";
+"Remove from history" = "Remover do histórico";
+"Remove from Playlist" = "Remover da playlist";
+"Replies" = "Respostas";
+"Reset" = "Resetar";
+"Reset search filters" = "Resetar filtros de busca";
+"Reset watched status when playing again" = "Resetar status de assistido quando tocando novamente";
+"Resolution" = "Resolução";
+"Restart" = "Reiniciar";
+"Save history of played videos" = "Salvar histórico de vídeos tocados";
+"Save history of searches, channels and playlists" = "Salvar histórico de buscas, canais e playlists";
+"Search" = "Buscar";
+"Search history is empty" = "Histórico de busca está vazio";
+"Public Locations" = "Localizações Públicas";
+"Public Manifest" = "Manifesto Público";
+"Quality" = "Qualidade";
+"Quality Profile" = "Perfil de Qualidade";
+"Queue" = "Fila";
+"Restore default profiles..." = "Restaurar perfis padrão…";
+"Rotate to portrait when exiting fullscreen" = "Virar para retrato quando sair da tela cheia";
+"Round corners" = "Bordas arredondadas";
+"Save" = "Salvar";
+"Restart/Play next" = "Reiniciar/Tocar próximo";
+"Seek gesture sensitivity" = "Sensitividade do gesto de busca";
+"Seek gesture speed" = "Velocidade do gesto de busca";
+"Seek with horizontal swipe on video" = "Buscar com deslize horizontal no vídeo";
+"Proxy videos" = "Proxy de vídeos";
+"Rate" = "Taxa";
+
+/* Video sort order in search */
+"Rating" = "Avaliação";
+"Remove from the queue" = "Remover da fila";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Autopromoção";
+"Settings" = "Ajustes";
+"Share %@ link" = "Compartilhar link %@";
+"Share %@ link with time" = "Compartilhar link %@ com tempo";
+"Share..." = "Compartilhar…";
+"Show account username" = "Mostrar nome de usuário da conta";
+"Show anonymous accounts" = "Mostrar contas anônimas";
+"Show channel name" = "Mostrar nome do canal";
+"Show history" = "Mostrar histórico";
+"Show keywords" = "Mostrar palavras-chave";
+"Show playback statistics" = "Mostrar estatísticas da playlist";
+"Show progress of watching on thumbnails" = "Mostrar progresso de assistir nas miniaturas";
+
+/* SponsorBlock category name */
+"Sponsor" = "Patrocínio";
+"Source" = "Fonte";
+"Sign In Required" = "Registro necessário";
+
+/* Video duration filter in search */
+"Short" = "Curto";
+"Select location closest to you:" = "Selecione a localização mais próxima de você:";
+"SponsorBlock API Instance" = "Instância da API do SponsorBlock";
+"SponsorBlock" = "SponsorBlock";
+"Yattee %@ (build %@)" = "Yattee %@ (compilação %@)";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Isso é bom de ouvir. É divertido fazer apps que outras pessoas querem usar. Você pode considerar doar para o projeto ou ajudar contribuindo com o desenvolvimento de novas funcionalidades.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Esta informação será processada apenas no seu dispositivo e será usada para conecta-lo ao servidor no país especificado.";
+
+/* Subscriptions title */
+"Subscriptions" = "Inscrições";
+"Switch to other public location" = "Mudar para outra localização pública";
+"Switch to public locations" = "Mudar para localizações públicas";
+
+/* Video date filter in search */
+"Today" = "Hoje";
+"Trending" = "Em Alta";
+"Unsubscribe" = "Desinscrever";
+"Upload date" = "Data de upload";
+
+/* Video date filter in search */
+"Week" = "Semana";
+"Subscribe" = "Inscrever";
+"Thumbnails" = "Miniaturas";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Geralmente perto do final ou final do vídeo quando os créditos aparecem e/ou os cartões finais são exibidos.";
+"unknown" = "desconhecido";
+
+/* Selected video is being played */
+"Watching now" = "Assistindo agora";
+"This cannot be reverted" = "Isso não pode ser revertido";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Isso não pode ser revertido. Talvez você precise mudar de visualização ou reiniciar o app para ver mudanças.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Isso removerá todos os perfis customizados e retornará aos valores padrão. Isso não pode ser revertido.";
+"System controls buttons" = "Botões de controle do sistema";
+"System controls show buttons for %@" = "Controles do sistema mostram botões para %@";
+
+/* Selected video was played on given date */
+"Watched %@" = "Assistido %@";
+"Welcome" = "Boas-vindas";
+"Watched" = "Assistido";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Você pode usar a seleção automática de perfil baseado no status do dispositivo atual ou mudar nós controles dos ajustes de playback de vídeo.";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"URL" = "URL";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+"Make default" = "Tornar padrão";
+"Visibility" = "Visibilidade";
+"Current Playlist" = "Playlist atual";
+"Statistics" = "Estatísticas";
+"It can be changed later in settings. You can use your own locations too." = "Isso pode ser mudado depois nos ajustes. Você pode usar suas próprias localizações também.";
+
+
+"Public" = "Público";
+"Unlisted" = "Não listado";
+"Now Playing" = "Tocando Agora";
+"Current Location" = "Localização atual";
+"Private" = "Privado";
+"Playback queue is empty" = "Fila de playback está vazia";
+"Playing Next" = "Tocando Depois";
+"Keep last played video in the queue after restart" = "Manter último vídeo tocado na fila depois de reiniciar";
+"Comments are disabled" = "Comentários estão desativados";
+"No comments" = "Sem comentários";
+"No chapters information available" = "Nenhuma informação de capítulos disponível";
+"Share Logs..." = "Compartilhar logs…";
+"Open logs in Finder" = "Abrir logs no Finder";
+"Could not refresh Subscriptions" = "Não pôde atualizar inscrições";
+"Could not load streams" = "Não pôde carregar streams";
+"Could not open video" = "Não pôde abrir vídeo";
+"Channel could not be found" = "Canal não pôde ser encontrado";
+"Any format" = "Qualquer formato";
+"%@ formats" = "%@ formatos";
+"Cached time" = "Tempo em cache";
+"Add Channels, Playlists and Searches to Favorites using" = "Adicionar Canais, Playlists e Buscas aos Favoritos usando";
+"Could not extract SID from received cookies: %@" = "Não pôde extrair SID dos cookies recebidos: %@";
+"Hardware decoder" = "Decoder de hardware";
+"Press and hold remote button to open captions and quality menus" = "Aperte e segure o botão de controle remoto para abrir legendas e menus de qualidade";
+"Dropped frames" = "Frames perdidos";
+"You need to select an account\nto access %@ section" = "Você precisa selecionar uma conta \npara acessar a seção %@";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Playlist está vazia \n\nToque e segure em um vídeo e então em \n“Adicionar à playlist”";
+"Stream & Player" = "Stream & Player";
+"Stream FPS" = "FPS do stream";
+"Rate & Captions" = "Taxa & Legendas";
+
+/* Player controls layout size */
+"Smaller" = "Menor";
+"Translations" = "Traduções";
+"This URL could not be opened" = "Esta URL não pôde ser aberta";
+"Could not open channel" = "Não pôde abrir canal";
+"Could not refresh Popular" = "Não pôde atualizar Popular";
+"Could not create share link" = "Não pôde criar link de compartilhamento";
+"Could not open playlist" = "Não pôde abrir playlist";
+"Could not extract video ID" = "Não pôde extrair ID do vídeo";
+"This video could not be opened" = "Este vídeo não pôde ser aberto";
+"Could not extract playlist ID" = "Não pôde extrair ID da playlist";
+"Could not load video" = "Não pôde carregar vídeo";
+"No locations available at the moment" = "Nenhuma localização disponível no momento";
+"Could not refresh Playlists" = "Não pôde atualizar playlists";
+"If you want this app to be available in your language, join translation project." = "Se quiser que este app esteja disponível no seu idioma, entre no projeto de tradução.";
+"Could not update your token." = "Não pôde atualizar seu token.";
+
+/* Player controls layout size */
+"Small" = "Pequeno";
+
+/* Video date filter in search */
+"Year" = "Ano";
+"You can find information about using Yattee in the Wiki pages." = "Você pode encontrar informações sobre como usar o Yatte nas páginas da Wiki.";
+"You have no Playlists" = "Você não tem playlists";
+"Videos" = "Vídeos";
+
+/* Player controls layout size */
+"Very Large" = "Muito grande";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Você não tem playlists\n\nToque em “Nova Playlist” para criar uma";
+"You need to create an instance and accounts\nto access %@ section" = "Você precisa criar uma instância e conta \npara acessar a seção %@";
+"Sort" = "Organizar";
+"When partially watched video is played" = "Quando um vídeo parcialmente assistido é tocado";
+"Used to create links from videos, channels and playlists" = "Usado para criar links de vídeos, canais e playlists";
+
+/* Video sort order in search */
+"Views" = "Visualizações";
+"Username" = "Nome de usuário";
+
+/* Video sort order in search */
+"Relevance" = "Relevância";
+"Remove" = "Remover";
+"Search..." = "Buscar…";
+"Sections" = "Seções";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmentos geralmente encontrados no começo de um vídeo que incluem uma animação, quadro estático ou clipe que também são vistos em outros vídeos do mesmo criador.";
+"Show sidebar when space permits" = "Mostrar barra lateral quando o espaço permitir";
+"Show video length" = "Mostrar tamanho do vídeo";
+"Sort: %@" = "Organizar: %@";
+"Could not extract channel information" = "Não pôde extrair informação do canal";
+"For custom locations you can configure Frontend URL in Locations settings" = "Para localizações customizadas você pode configurar URL do frontend nas configurações de localização";
+"Add Location" = "Adicionar Localização";
+"Add Location..." = "Adicionar Localização…";
+"For videos which feature music as the primary content." = "Para vídeos que têm música como conteúdo principal.";
+"Close video after playing last in the queue" = "Fechar vídeo depois de tocar o último na fila";
+"Clear Search History" = "Limpar Histórico de Busca";
+"Close PiP when starting playing other video" = "Fechar PiP quando começar a tocar outro vídeo";
+"Close player when starting PiP" = "Fechar player quando começar PiP";
+"Categories to Skip" = "Categorias para Pular";
+"Restart the app to apply the settings above." = "Reinicie o app para aplicar os ajustes acima.";
+"Related" = "Relacionados";
+"Shuffle" = "Randomizar";
+"Could not refresh Trending" = "Não pôde atualizar Em Alta";
+"Add Account..." = "Adicionar Conta…";
+"Add profile..." = "Adicionar perfil…";
+"Sidebar" = "Barra lateral";
+"Always use AVPlayer for live videos" = "Sempre usar AVPlayer para vídeos ao vivo";
+"Anonymous" = "Anônimo";
+
+/* Player controls layout size */
+"Large" = "Grande";
+"Low quality" = "Qualidade baixa";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "O layout Grande não é ideal para todos os dispositivos e usá-lo pode causar os controles não caberem na tela.";
+"Lowest" = "Menor";
+"I found a bug /" = "Eu encontrei um bug /";
+"LIVE" = "AO VIVO";
+
+/* Video date filter in search */
+"Hour" = "Hora";
+"Locations" = "Localizações";
+"Next" = "Próximo";
+"Clear the queue" = "Limpar a fila";
+"Close player when closing video" = "Fechar player quando fechar vídeo";
+"Cancel" = "Cancelar";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatos serão selecionados na ordem em que forem listados.\nHLS é um formato adaptativo (ajuste de resolução não se aplica).";
+"Frontend URL" = "URL do frontend";
+"Fullscreen size" = "Tela cheia";
+"Gaming" = "Jogos";
+"Edit Playlist" = "Editar playlist";
+"Country Name or Code" = "Nome do País ou Código";
+"Clear History" = "Limpar Histórico";
+"Red" = "Vermelho";
+"Help" = "Ajuda";
+"Hide sidebar" = "Esconder barra lateral";
+"Error when accessing playlist" = "Erro ao acessar playlist";
+"Error" = "Erro";
+"Favorites" = "Favoritos";
+"Filter" = "Filtro";
+"Filter: active" = "Filtro: ativo";
+"Edit" = "Editar";
+"Country" = "País";
+"Clear All" = "Limpar Tudo";
+"Clear All Recents" = "Limpar Todos os Recentes";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de dar like, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clique em um vídeo).";
+"Duration" = "Duração";
+"Edit Quality Profile" = "Editar Perfil de Qualidade";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discussões acontecem no Discord e no Matrix. É um bom lugar para perguntas gerais.";
+"Don't use public locations" = "Não usar localizações públicas";
+"Create Playlist" = "Criar playlist";
+"Comments" = "Comentários";
+"Connection failed" = "Conexão falhou";
+"Clear" = "Limpar";
+"Are you sure you want to unsubscribe from %@?" = "Tem certeza que deseja se desinscrever de %@?";
+"Connected successfully (%@)" = "Conectado com sucesso (%@)";
+"Clear Search History..." = "Limpar Histórico de Busca…";
+"Close" = "Fechar";
+"Close PiP and open player when application enters foreground" = "Fechar PiP e abrir player quando o aplicativo entrar em primeiro plano";
+"Close PiP when player is opened" = "Fechar PiP quando player for aberto";
+"Close Video" = "Fechar Vídeo";
+"Badge color" = "Cor do ícone";
+"Based on system color scheme" = "Baseado no esquema de cor do sistema";
+"Button" = "Botão";
+"Captions" = "Legendas";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bugs e ideias para funcionalidades podem ser enviadas ao rastreador de problemas do GitHub. ";
+"Queue is empty" = "Fila está vazia";
+"Recents" = "Recentes";
+"Refresh" = "Atualizar";
+"You can switch between profiles in playback settings controls." = "Você pode mudar entre perfis nos controles dos ajustes de playback.";
