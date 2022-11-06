@@ -7,7 +7,7 @@
 "Add profile..." = "Ajouter un profil…";
 "Add Quality Profile" = "Ajouter un profil de qualité";
 "Delete" = "Supprimer";
-"1,234M" = "1,234 M";
+"1,234M" = "1,234M";
 "%@" = "%@";
 "%@ %@" = "%@ %@";
 "%@ Playlist" = "%@ liste de lecture";
@@ -255,13 +255,13 @@
 "Blue" = "Bleu";
 "Browsing" = "Naviguer";
 "Buffering stream..." = "Mise en tampon du flux...";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Les bugs et les idées de fonctionnalités peuvent être envoyés sur GitHub. ";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Les bugs ainsi que des idées de fonctionnalités peuvent être envoyés sur GitHub. ";
 "Close PiP and open player when application enters foreground" = "Ferme l'IDI et ouvre le lecteur vidéo lorsque l'application passe au premier plan";
 "Close PiP when player is opened" = "Ferme l'IDI can le lecteur vidéo est ouvert";
 "Close PiP when starting playing other video" = "Ferme l'IDI quand une autre vidéo est commencée";
-"Close player when closing video" = "Ferme le lecteur quand une vidéo est arrêtée";
-"Close player when starting PiP" = "Ferme le lecteur lors que le mode IDI est lancé";
-"Close video after playing last in the queue" = "Ferme la vidéo après avoir lu la dernière présente dans la liste";
+"Close player when closing video" = "Ferme le lecteur quand la vidéo est arrêtée";
+"Close player when starting PiP" = "Ferme le lecteur lors que le mode PiP est lancé";
+"Close video after playing last in the queue" = "Ferme la vidéo après avoir lu la dernière de la file d'attente";
 "Controls" = "Contrôles";
 "Could not load locations manifest" = "Impossible de charger le manifeste des instances";
 "Custom Locations" = "Instances personalisées";
@@ -270,12 +270,12 @@
 "Date" = "Date";
 "Decreased opacity" = "Opacité diminuée";
 "Discord Server" = "Serveur Discord";
-"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. C'est le bon endroit pour poser des questions.";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. Ce sont de bons endroits pour poser des questions généraliste.";
 "Don't use public locations" = "Ne pas utiliser d'instances publiques";
 "Enable Return YouTube Dislike" = "Activer le retour du bouton DisLike de Youtube";
 "Enter fullscreen in landscape" = "Entrer en mode plein écran lors de la rotation en mode paysage";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Bref rappel d'aimer la vidéo ou de s'abonner à la chaîne au milieu de la vidéo.";
-"Frontend URL" = "URL de l'interface web";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Rappel d'aimer la vidéo, de s'abonner ou d'intéragir avec le créateur sur une plateforme gratuite ou payante.";
+"Frontend URL" = "URL frontale";
 "Public Locations" = "Instances publiques";
 "Public Manifest" = "Manifeste publique";
 "Honor orientation lock" = "Respecter le verrouillage de l'orientation";
@@ -289,19 +289,19 @@
 
 /* SponsorBlock category name */
 "Intro" = "Entracte/Animation d'intro";
-"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Le format Large pour la disposition des boutons n'est pas adapté à tous les appareils et son utilisation peut empêcher les contrôles de s'afficher à l'écran.";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Le format large pour la disposition des boutons n'est pas adapté à tous les appareils et son utilisation peut empêcher les contrôles de s'afficher à l'écran.";
 
 /* Loading stream OSD */
 "Loading streams..." = "Chargement des flux...";
-"Lock portrait mode" = "Verrouille l'orientation portrait";
+"Lock portrait mode" = "Verrouille l'orientation en mode portrait";
 "Matrix Channel" = "Salon Matrix";
 "Only when signed in" = "Uniquement lorsque vous êtes connecté";
-"Opening audio stream..." = "Ouverture du flux audio";
+"Opening audio stream..." = "Ouvrir le flux audio…";
 "Orientation" = "Orientation";
 
 /* SponsorBlock category name */
 "Outro" = "Générique de fin";
-"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Promotion rémunérée, parrainage rémunéré et publicité directe qui n'est pas directement relié au créateur";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Partie de la vidéo promotant un produit ou service qui n'est pas directement relié au créateur. le créateur recevra un paiement ou une compensation sous forme de monnaie ou de produits gratuits.";
 "Reset search filters" = "Réinitialiser les filtres de recherche";
 "Resolution" = "Résolution";
 "Restart" = "Redémarrer";
@@ -316,7 +316,7 @@
 "SponsorBlock" = "SponsorBlock";
 "SponsorBlock API Instance" = "SponsorBlock exemple d'API";
 "This cannot be reverted" = "Vous ne pourrez pas revenir en arrière";
-"Switch to public locations" = "Passer à une localisation publique";
+"Switch to public locations" = "Passer à une instance publique";
 "System controls buttons" = "Boutons de contrôle système";
 "System controls show buttons for %@" = "Montrer les boutons du contrôle système pour %@";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Vous ne pourrez pas revenir en arrière. Vous devrez changer de vue ou redémarrer l'application pour voir les changements.";
@@ -330,7 +330,7 @@
 "Show channel name" = "Afficher le nom de la chaine";
 "Show history" = "Afficher l'historique";
 "Show progress of watching on thumbnails" = "Afficher la progression de l'avancement dans les miniatures";
-"Switch to other public location" = "Passer à une autre localisation publique";
+"Switch to other public location" = "Passer à une autre instance publique";
 "Show keywords" = "Afficher le clavier";
 "Show playback statistics" = "Afficher les statistiques de lecture";
 "Sidebar" = "Barre du côté";
@@ -354,3 +354,90 @@
 "Show video length" = "Afficher la durée de la vidéo";
 "Shuffle" = "Aléatoire";
 "Shuffle All" = "Tout en aléatoire";
+"Could not refresh Subscriptions" = "Impossible de rafraichir les abonnements";
+"Increase rate" = "Augmenter le taux";
+"Issues Tracker" = "Suivi de problèmes";
+"You need to select an account\nto access %@ section" = "Vous avez besoin de sélectionner un compte\npour accéder à la section %@";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Vous pouvez utiliser une sélection automatique de profil basé sur le statut actuel de l'appareil ou le changer dans les paramètre de lecture vidéo.";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Vous n'avez pas de liste de lecture\n\nTaper sur \"nouvelle liste de lecture\" pour en créer une";
+"You need to create an instance and accounts\nto access %@ section" = "Vous avez besoin de créer une instance et un compte\npour accéder à la section %@";
+"Press and hold remote button to open captions and quality menus" = "Appuyez et maintenez le bouton télécommande pour ouvrir le menu des sous-titres et de la qualité vidéo";
+"Keep last played video in the queue after restart" = "Garder la dernière vidéo jouée en file d'attente après le redémarrage";
+"Proxy videos" = "Proxy vidéos";
+
+/* Video sort order in search */
+"Relevance" = "Pertinence";
+
+/* Video duration filter in search */
+"Short" = "Courtes";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Ceci va supprimer tous vos profils modifiés et les remettre à leur valeurs par défaut. Vous ne pourrez pas revenir en arrière.";
+
+/* Player controls layout size */
+"Very Large" = "Très Large";
+"Stream & Player" = "Flux et Lecteur";
+"Statistics" = "Statistiques";
+"%@ formats" = "%@ formats";
+"Open logs in Finder" = "Ouvrir les lots dans le Finder";
+"Share Logs..." = "Partager les logs…";
+"Could not load streams" = "Impossible de charger les flux";
+"Could not open video" = "Impossible d'ouvrir la vidéo";
+"Channel could not be found" = "Chaîne impossible à trouver";
+"Could not extract channel information" = "Impossible d'extraire les informations de la chaîne";
+"Could not extract SID from received cookies: %@" = "Impossible d'extraire le SID depuis les cookies reçus : %@";
+"Could not update your token." = "Impossible de mettre à jour votre jeton.";
+"Could not refresh Trending" = "Impossible de rafraîchir les tendances";
+"For custom locations you can configure Frontend URL in Locations settings" = "Pour des instances personnalisées vous pouvez configurer l'URL frontale dans les paramètres d'instance";
+"This URL could not be opened" = "Cette URL ne peut pas être ouverte";
+"Could not open channel" = "Cette chaîne ne peut pas être ouverte";
+"Could not refresh Popular" = "Populaire ne peut pas être rafraîchi";
+"Could not create share link" = "Impossible de créer un lien de partage";
+"Could not load video" = "Impossible de charger la vidéo";
+"If you want this app to be available in your language, join translation project." = "Si vous voulez que cette application soit disponible dans votre langue, rejoignez le projet de traduction.";
+"Translations" = "Traductions";
+"Decrease rate" = "Diminuer le taux";
+"Finding something to play..." = "Trouver quelque chose à jouer…";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Cela fait plaisir à entendre. C'est amusant de délivrer des apps que d'autres personnes veulent utiliser. Vous pouvez considérer faire un don au projet ou aider en contribuant au développement de nouvelles fonctionnalités.";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Typiquement proche de la fin de la vidéo, quand les crédits ou les cartes sont montré.";
+"When partially watched video is played" = "Quand une vidéo partiellement regardée est jouée";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+"Yattee %@ (build %@)" = "Yattee %@ (version %@)";
+"You can switch between profiles in playback settings controls." = "Vous pouvez changer de profil dans les paramètres de lecture.";
+"Make default" = "Mettre par défaut";
+"Hardware decoder" = "Décodeur matériel";
+"Stream FPS" = "IPS du flux";
+"Cached time" = "Temps mis en cache";
+"Dropped frames" = "Images perdus";
+"Any format" = "Tout formats";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Liste de lecture vide\n\nAppuyez et maintenez sur une vidéo et faite\n\"Ajouter à la liste de lecture\"";
+"Comments are disabled" = "Les commentaires sont désactivés";
+"No comments" = "Aucun commentaire";
+"No chapters information available" = "Aucune information de chapitrage n'est disponible";
+"Could not open playlist" = "Impossible d'ouvrir la liste de lecture";
+"Could not extract video ID" = "Impossible d'extraire l'ID de la vidéo";
+"This video could not be opened" = "Cette vidéo ne peut pas être ouverte";
+"Could not extract playlist ID" = "Impossible d'extraire l'ID de la liste de lecture";
+"No locations available at the moment" = "Aucune instances disponible pour le moment";
+"Could not refresh Playlists" = "Impossible de rafraîchir les listes de lectures";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Tous";
+"Autoplaying Next" = "Lecture automatique de la suivante";
+"Backend" = "Interne";
+"You can find information about using Yattee in the Wiki pages." = "Vous pouvez trouver des informations expliquant comment utiliser Yattee sur les pages wiki.";
+"You have no Playlists" = "Vous n’avez pas de listes de lecture";
+"Add Channels, Playlists and Searches to Favorites using" = "Ajoutez des chaînes, des listes de lecture ou des recherches à vos Favoris en utilisant";
+"Rate & Captions" = "Notation et Légendes";
+"Matrix Chat" = "Discussion Matrix";
+"Milestones" = "Étapes";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Ouvrir le flux %@ …";
+"Regular size" = "Taille normale";
+"Regular Size" = "Taille Normale";
+"Related" = "En relation";
+"Seek gesture sensitivity" = "Sensibilité du geste de recherche";
+"Seek gesture speed" = "Vitesse du geste de recherche";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Portion que l'on trouve typiquement en début de vidéo incluant une animation, un cadre fixe ou un clip qui est aussi vu dans les autres vidéos du créateur.";
