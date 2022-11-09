@@ -2,7 +2,6 @@
 "%@ Channel" = "Kanał %@";
 "%@ Playlist" = "Playlista %@";
 "%@ subscribers" = "%@ subskrybentów";
-"%lld" = "%lld";
 "%lld videos" = "%lld wideo";
 "10 seconds forwards/backwards" = "Przewijanie o 10 sekund";
 "Accounts" = "Konta";
