@@ -9,7 +9,6 @@
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Geçerli cihaz durumuna göre otomatik profil seçimini kullanabilir veya video oynatma ayarları kontrollerinde değiştirebilirsiniz.";
 "%@ Playlist" = "%@ Oynatma Listesi";
 "%@ subscribers" = "%@ Aboneler";
-"%lld" = "%lld";
 "%lld videos" = "%lld Videolar";
 "10 seconds forwards/backwards" = "10 saniye ileri/geri";
 "Are you sure you want to clear history of watched videos?" = "Oynatma geçmişini silmek istediğine emin misin?";
