@@ -78,7 +78,6 @@
 "%@ Playlist" = "Playlist %@";
 "%@ subscribers" = "%@ iscritti";
 "10 seconds forwards/backwards" = "10 secondi avanti/indietro";
-"1234" = "1234";
 "%lld videos" = "Video di %lld";
 "%lld%%" = "%lld%%";
 "Accounts" = "Account";
