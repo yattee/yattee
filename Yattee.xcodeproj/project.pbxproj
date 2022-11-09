@@ -1146,6 +1146,7 @@
 		376578902685490700D4EA09 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
 		37658ED428E1C567004BF6A2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		37666BA927023AF000F869E5 /* AccountSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSelectionView.swift; sourceTree = "<group>"; };
+		376787BA291C43CD00D356A4 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3768122C28E8D0BC0036FC8D /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderProgressView.swift; sourceTree = "<group>"; };
 		376A33DF2720CAD6000C1D6B /* VideosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosApp.swift; sourceTree = "<group>"; };
@@ -2584,6 +2585,7 @@
 				hi,
 				it,
 				az,
+				uk,
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -3604,6 +3606,7 @@
 				3768122C28E8D0BC0036FC8D /* hi */,
 				3771429529087BE100306CEA /* it */,
 				3771429629087BF000306CEA /* az */,
+				376787BA291C43CD00D356A4 /* uk */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
