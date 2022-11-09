@@ -173,7 +173,6 @@
 "Translations" = "Переклади";
 "Could not open playlist" = "Не вдалося відкрити плейлист";
 "Could not extract video ID" = "Не вдалося отримати ID відео";
-"1234" = "1234";
 "Always use AVPlayer for live videos" = "Використовуйте AVPlayer для live відео";
 "Are you sure you want to clear history of watched videos?" = "Ви впевнені, що хочете очистити історію переглядів?";
 "Country Name or Code" = "Назва або код країни";
