@@ -10,7 +10,6 @@
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "%@ subscribers" = "%@ підписників";
-"%lld" = "%lld";
 "%lld videos" = "%lld відео";
 "10 seconds forwards/backwards" = "Перемотати 10 секунд";
 "Accounts" = "Акаунти";
