@@ -40,7 +40,7 @@ struct OpenURLHandler {
             handleSearchUrlOpen(parser)
         case .favorites:
             hideViewsAboveBrowser()
-            navigation.tabSelection = .favorites
+            navigation.tabSelection = .home
             #if os(macOS)
                 focusMainWindow()
             #endif

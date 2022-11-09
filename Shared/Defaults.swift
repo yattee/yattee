@@ -168,7 +168,7 @@ extension Defaults.Keys {
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
-    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.favorites, .subscriptions, .trending, .playlists])
+    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.home])
 
     #if os(iOS)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
@@ -233,7 +233,7 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
 }
 
 enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
-    case favorites, subscriptions, popular, trending, playlists
+    case home, subscriptions, popular, trending, playlists
 
     var title: String {
         rawValue.capitalized.localized()
@@ -241,8 +241,8 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
     var tabSelection: TabSelection {
         switch self {
-        case .favorites:
-            return TabSelection.favorites
+        case .home:
+            return TabSelection.home
         case .subscriptions:
             return TabSelection.subscriptions
         case .popular:
@@ -256,7 +256,7 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
     private var sortOrder: Int {
         switch self {
-        case .favorites:
+        case .home:
             return 0
         case .subscriptions:
             return 1

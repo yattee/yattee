@@ -5,7 +5,7 @@ final class NavigationModel: ObservableObject {
     static var shared: NavigationModel!
 
     enum TabSelection: Hashable {
-        case favorites
+        case home
         case subscriptions
         case popular
         case trending
@@ -21,7 +21,7 @@ final class NavigationModel: ObservableObject {
 
         var stringValue: String {
             switch self {
-            case .favorites:
+            case .home:
                 return "favorites"
             case .subscriptions:
                 return "subscriptions"

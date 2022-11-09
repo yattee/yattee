@@ -8,7 +8,7 @@ struct FavoritesModel {
     @Default(.visibleSections) var visibleSections
 
     var isEnabled: Bool {
-        visibleSections.contains(.favorites)
+        visibleSections.contains(.home)
     }
 
     func contains(_ item: FavoriteItem) -> Bool {

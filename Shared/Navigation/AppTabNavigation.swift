@@ -19,8 +19,8 @@ struct AppTabNavigation: View {
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            if visibleSections.contains(.favorites) {
-                favoritesNavigationView
+            if visibleSections.contains(.home) {
+                homeNavigationView
             }
 
             if subscriptionsVisible {
@@ -47,16 +47,16 @@ struct AppTabNavigation: View {
         .environment(\.navigationStyle, .tab)
     }
 
-    private var favoritesNavigationView: some View {
+    private var homeNavigationView: some View {
         NavigationView {
-            LazyView(FavoritesView())
+            LazyView(HomeView())
                 .toolbar { toolbarContent }
         }
         .tabItem {
-            Label("Favorites", systemImage: "heart.fill")
-                .accessibility(label: Text("Favorites"))
+            Label("Home", systemImage: "house.fill")
+                .accessibility(label: Text("Home"))
         }
-        .tag(TabSelection.favorites)
+        .tag(TabSelection.home)
     }
 
     private var subscriptionsNavigationView: some View {

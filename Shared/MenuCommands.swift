@@ -11,8 +11,8 @@ struct MenuCommands: Commands {
 
     private var navigationMenu: some Commands {
         CommandGroup(before: .windowSize) {
-            Button("Favorites") {
-                setTabSelection(.favorites)
+            Button("Home") {
+                setTabSelection(.home)
             }
             .keyboardShortcut("1")
 

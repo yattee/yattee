@@ -3,7 +3,7 @@ import Siesta
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct FavoritesView: View {
+struct HomeView: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<PlaylistsModel> private var playlists
 
@@ -17,6 +17,8 @@ struct FavoritesView: View {
     #if !os(tvOS)
         @Default(.favorites) private var favorites
     #endif
+
+    private var navigation: NavigationModel { .shared }
 
     var body: some View {
         BrowserPlayerControls {
@@ -39,9 +41,38 @@ struct FavoritesView: View {
                             .padding(.top, item == first && RefreshControl.navigationBarTitleDisplayMode == .inline ? 10 : 0)
                             #endif
                         }
-                        Color.clear.padding(.bottom, 30)
                     #endif
                 }
+
+                VStack {
+                    Text("History")
+
+                    #if os(tvOS)
+                        .padding(.horizontal, 40)
+                    #else
+                        .padding(.horizontal, 15)
+                    #endif
+                        .font(.title3.bold())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.secondary)
+
+                    HistoryView(limit: 100)
+                }
+
+                #if os(tvOS)
+                    HStack {
+                        Button {
+                            navigation.presentingOpenVideos = true
+                        } label: {
+                            Label("Open Videos...", systemImage: "folder")
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                #else
+                    Color.clear.padding(.bottom, 60)
+                #endif
             }
             .onAppear {
                 Defaults.observe(.favorites) { _ in
@@ -56,7 +87,7 @@ struct FavoritesView: View {
                 .edgesIgnoringSafeArea(.horizontal)
             #else
                 .onDrop(of: [UTType.text], delegate: DropFavoriteOutside(current: $dragging))
-                .navigationTitle("Favorites")
+                .navigationTitle("Home")
             #endif
             #if os(macOS)
             .background(Color.secondaryBackground)
@@ -77,11 +108,11 @@ struct FavoritesView: View {
 struct Favorites_Previews: PreviewProvider {
     static var previews: some View {
         TabView {
-            FavoritesView()
-                .overlay(VideoPlayerView().injectFixtureEnvironmentObjects())
+            HomeView()
+//                .overlay(VideoPlayerView().injectFixtureEnvironmentObjects())
                 .injectFixtureEnvironmentObjects()
                 .tabItem {
-                    Label("a", systemImage: "")
+                    Label("Home", systemImage: "house")
                 }
         }
     }

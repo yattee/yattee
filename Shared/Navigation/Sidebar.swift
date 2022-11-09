@@ -40,10 +40,10 @@ struct Sidebar: View {
 
     var mainNavigationLinks: some View {
         Section(header: Text("Videos")) {
-            if visibleSections.contains(.favorites) {
-                NavigationLink(destination: LazyView(FavoritesView()), tag: TabSelection.favorites, selection: $navigation.tabSelection) {
-                    Label("Favorites", systemImage: "heart")
-                        .accessibility(label: Text("Favorites"))
+            if visibleSections.contains(.home) {
+                NavigationLink(destination: LazyView(HomeView()), tag: TabSelection.home, selection: $navigation.tabSelection) {
+                    Label("Home", systemImage: "house")
+                        .accessibility(label: Text("Home"))
                 }
                 .id("favorites")
             }

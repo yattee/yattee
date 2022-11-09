@@ -209,7 +209,7 @@ struct SearchView: View {
             visibleSections.append(.playlists)
         }
 
-        [VisibleSection.favorites, .trending].forEach { section in
+        [VisibleSection.home, .trending].forEach { section in
             if preferred.contains(section) {
                 visibleSections.append(section)
             }
