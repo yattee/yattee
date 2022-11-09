@@ -8,7 +8,6 @@
 "Add Quality Profile" = "Ajouter un profil de qualité";
 "Delete" = "Supprimer";
 "1,234M" = "1,234M";
-"%@ %@" = "%@ %@";
 "%@ Playlist" = "%@ liste de lecture";
 "%@ subscribers" = "%@ abonnés";
 "%lld%%" = "%lld%%";
