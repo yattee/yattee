@@ -196,7 +196,6 @@
 "Playback queue is empty" = "Avspillingskøen er tom";
 "10 seconds forwards/backwards" = "10 sekunder fram/tilbake";
 "%@ Channel" = "%@ kanal";
-"%lld" = "%lld";
 
 /* Video date filter in search
    Video duration filter in search */
