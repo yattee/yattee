@@ -77,7 +77,6 @@
 "%@ subscribers" = "%@ iscritti";
 "10 seconds forwards/backwards" = "10 secondi avanti/indietro";
 "%lld videos" = "Video di %lld";
-"%lld%%" = "%lld%%";
 "Accounts" = "Account";
 "Accounts are not supported for the application of this instance" = "Gli account non sono supportati in questa istanza";
 "Add Account" = "Aggiungi account";
