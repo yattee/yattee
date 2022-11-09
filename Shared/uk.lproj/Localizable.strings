@@ -7,7 +7,6 @@
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Своє";
 " subscribers" = " підписники";
-"%@" = "%@";
 "%@ %@" = "%@ %@";
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
