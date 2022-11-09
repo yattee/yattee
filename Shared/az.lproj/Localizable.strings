@@ -1,15 +1,10 @@
 
 
 "Translations" = "Tərcümələr";
-"#" = "#";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
 "%@ Channel" = "%@ Kanal";
 "%@ Playlist" = "%@ Pleylist";
 "%@ subscribers" = "%@ abunəçisi";
 "10 seconds forwards/backwards" = "10 saniyə irəli/geri";
-"1234" = "1234";
-"a" = "a";
 "Accounts" = "Hesablar";
 "Add Account" = "Hesab əlavə edin";
 "Add Account..." = "Hesab əlavə edin...";
@@ -200,12 +195,7 @@
 "Are you sure you want to restore default quality profiles?" = "Defolt keyfiyyət profillərini bərpa etmək istədiyinizə əminsiniz?";
 "Are you sure you want to delete playlist?" = "Pleylisti silmək istədiyinizə əminsiniz?";
 " subscribers" = " abunəçi";
-"1,234M" = "1,234M";
-"A" = "A";
-"%lld" = "%lld";
 "%lld videos" = "%lld video";
-"%lld%%" = "%lld%%";
-"1 century ago" = "1 əsr əvvəl";
 "Accounts are not supported for the application of this instance" = "Bu nümunənin tətbiqi üçün hesablar dəstəklənmir";
 
 /* Trending category, section containing all kinds of videos */

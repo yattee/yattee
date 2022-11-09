@@ -7,17 +7,10 @@
 "Restart the app to apply the settings above." = "Yukarıdaki ayarları uygulamak için uygulamayı yeniden başlatın.";
 "Settings" = "Ayarlar";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Geçerli cihaz durumuna göre otomatik profil seçimini kullanabilir veya video oynatma ayarları kontrollerinde değiştirebilirsiniz.";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
 "%@ Playlist" = "%@ Oynatma Listesi";
 "%@ subscribers" = "%@ Aboneler";
-"%lld" = "%lld";
 "%lld videos" = "%lld Videolar";
-"%lld%%" = "%lld%%";
-"1,234M" = "1,234M";
 "10 seconds forwards/backwards" = "10 saniye ileri/geri";
-"1234" = "1234";
-"a" = "a";
 "Are you sure you want to clear history of watched videos?" = "Oynatma geçmişini silmek istediğine emin misin?";
 "Are you sure you want to clear search history?" = "Arama geçmişini silmek istediğine emin misin?";
 "Automatic" = "Otomatik";
@@ -28,7 +21,6 @@
 "Cellular" = "Mobil veri";
 "Chapters" = "Bölümler";
 "%@ Channel" = "%@ Kanal";
-"#" = "#";
 "Add Location" = "Konum Ekle";
 "Add profile..." = "Profil ekle...";
 "Add to Favorites" = "Favorilere Ekle";
@@ -39,8 +31,6 @@
 " subscribers" = " .abonelikler";
 "Add Account..." = "Hesap Ekle...";
 "Add to %@" = "Ekle %@";
-"1 century ago" = "1 yüzyıl önce";
-"A" = "A";
 "Advanced" = "Gelişmiş";
 "Always use AVPlayer for live videos" = "Canlı yayınlar için AVPlayer kullan";
 "Anonymous" = "Anonim";

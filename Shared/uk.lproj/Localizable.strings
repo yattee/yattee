@@ -7,20 +7,11 @@
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Своє";
 " subscribers" = " підписники";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "%@ subscribers" = "%@ підписників";
-"%lld" = "%lld";
 "%lld videos" = "%lld відео";
-"%lld%%" = "%lld%%";
-"#" = "#";
-"1 century ago" = "Дуже давно";
-"1,234M" = "1,234М";
 "10 seconds forwards/backwards" = "Перемотати 10 секунд";
-"a" = "а";
-"A" = "А";
 "Accounts" = "Акаунти";
 "Accounts are not supported for the application of this instance" = "Акаунти не підтримуються для цього екземпляру";
 "Add Account" = "Додати акаунт";
@@ -178,7 +169,6 @@
 "Translations" = "Переклади";
 "Could not open playlist" = "Не вдалося відкрити плейлист";
 "Could not extract video ID" = "Не вдалося отримати ID відео";
-"1234" = "1234";
 "Always use AVPlayer for live videos" = "Використовуйте AVPlayer для live відео";
 "Are you sure you want to clear history of watched videos?" = "Ви впевнені, що хочете очистити історію переглядів?";
 "Country Name or Code" = "Назва або код країни";

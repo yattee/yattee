@@ -1,8 +1,4 @@
-
-
-"%@ %@" = "%@ %@";
 " subscribers" = " abonnenter";
-"1,234M" = "1,234M";
 "Accounts" = "Kontoer";
 "Add Account" = "Legg til konto";
 "Add Account..." = "Legg til konto …";
@@ -198,12 +194,8 @@
 "Now Playing" = "Spilles nå";
 "Private" = "Privat";
 "Playback queue is empty" = "Avspillingskøen er tom";
-"#" = "#";
-"%@" = "%@";
 "10 seconds forwards/backwards" = "10 sekunder fram/tilbake";
 "%@ Channel" = "%@ kanal";
-"%lld" = "%lld";
-"%lld%%" = "%lld%%";
 
 /* Video date filter in search
    Video duration filter in search */
@@ -211,9 +203,6 @@
 "%@ Playlist" = "%@ spilleliste";
 "%lld videos" = "%lld videoer";
 "%@ subscribers" = "%@ abonnenter";
-"1 century ago" = "100 år siden";
-"1234" = "1234";
-"a" = "a";
 "Anonymous" = "Anonym";
 "Done" = "Ferdig";
 "Battery" = "Batteri";
@@ -262,7 +251,6 @@
 "Visibility" = "Synlighet";
 "Statistics" = "Statistikk";
 "Hardware decoder" = "Maskinvaredekoder";
-"A" = "A";
 "Accounts are not supported for the application of this instance" = "Kontoer støttes ikke for denne instansen";
 "Backend" = "Bakende";
 "Badge" = "Skilt";

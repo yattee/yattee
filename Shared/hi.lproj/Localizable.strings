@@ -4,13 +4,8 @@
 "%@ Playlist" = "%@ प्लेलिस्ट";
 "%@ subscribers" = "%@ सदस्य";
 "%lld videos" = "%lld वीडियों";
-"1,234M" = "१,२३४मि";
 " subscribers" = " सदस्य";
-"1 century ago" = "एक शताब्दी पहले";
 "10 seconds forwards/backwards" = "10 पल आगे/पीछे";
-"1234" = "१२३४";
-"a" = "अ";
-"A" = "अ";
 "Accounts" = "खातें";
 "Accounts are not supported for the application of this instance" = "इस इन्सटेंस के लिए खातों उपलब्ध नहीं हैं";
 "Add to Playlist..." = "गीतमाला में जोड़ें…";
@@ -242,11 +237,6 @@
 "Now Playing" = "अभी चल रहा";
 "Current Location" = "वर्तमान स्थान";
 "You can switch between profiles in playback settings controls." = "आप प्लेबैक सेटिंग नियंत्रण में प्रोफ़ाइल के बीच स्विच कर सकते हैं।";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
-"%lld" = "%lld";
-"#" = "#";
-"%lld%%" = "%lld%%";
 "Red" = "लाल";
 "Refresh" = "ताज़ा";
 "Regular size" = "सामान्य आकार";

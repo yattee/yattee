@@ -9,11 +9,8 @@
 "Cancel" = "Annulla";
 "Autoplaying Next" = "Riproduzione automatica del video successivo";
 "Buffering stream..." = "Preparazione stream...";
-"%lld" = "%lld";
 "Are you sure you want to delete playlist?" = "Vuoi eliminare la playlist?";
-"a" = "a";
 "Badge" = "Indicatore";
-"A" = "A";
 "Are you sure you want to unsubscribe from %@?" = "Vuoi cancellare l'iscrizione a %@?";
 "Backend" = "Backend";
 "Are you sure you want to restore default quality profiles?" = "Vuoi ripristinare i profili di qualità predefiniti?";
@@ -78,9 +75,7 @@
 "%@ Playlist" = "Playlist %@";
 "%@ subscribers" = "%@ iscritti";
 "10 seconds forwards/backwards" = "10 secondi avanti/indietro";
-"1234" = "1234";
 "%lld videos" = "Video di %lld";
-"%lld%%" = "%lld%%";
 "Accounts" = "Account";
 "Accounts are not supported for the application of this instance" = "Gli account non sono supportati in questa istanza";
 "Add Account" = "Aggiungi account";
@@ -110,13 +105,8 @@
 "Close video after playing last in the queue" = "Chiudi il video dopo aver riprodotto l'ultimo elemento della coda";
 "Error when accessing playlist" = "Impossibile accedere alla playlist";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Esortazioni a mettere like, iscriversi o interagire su qualsiasi piattaforma, a pagamento o gratuita (es. aprire un video).";
-"#" = "#";
-"%@" = "%@";
 " subscribers" = " iscritti";
-"%@ %@" = "%@ %@";
 "%@ Channel" = "Canale di %@";
-"1 century ago" = "1 secolo fa";
-"1,234M" = "1,234M";
 "Add to Favorites" = "Aggiungi ai preferiti";
 "Battery" = "Batteria";
 "Categories to Skip" = "Categorie da saltare";

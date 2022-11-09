@@ -1,10 +1,6 @@
 
 
 "%lld videos" = "%lld Videos";
-"1,234M" = "1,234M";
-"1234" = "1234";
-"a" = "a";
-"A" = "A";
 "Accounts" = "Konten";
 "Add Account" = "Konto hinzufügen";
 "Add Location" = "Ort hinzufügen";
@@ -73,16 +69,10 @@
 "Regular Size" = "Normale Größe";
 "Related" = "Verbunden";
 "Remove" = "Entfernen";
-"#" = "#";
-"%@ %@" = "%@ %@";
 "%@ Channel" = "%@ Kanal";
 "%@ subscribers" = "%@ Abonnenten";
 " subscribers" = " Abonnenten";
-"%@" = "%@";
 "%@ Playlist" = "%@ Wiedergabeliste";
-"%lld" = "%lld";
-"%lld%%" = "%lld%%";
-"1 century ago" = "vor 1 Jahrhundert";
 "Add Account..." = "Konto hinzufügen...";
 "Add profile..." = "Profil hinzufügen...";
 "Add to Favorites" = "Zu den Favoriten hinzufügen";

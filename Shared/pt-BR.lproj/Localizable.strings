@@ -5,7 +5,6 @@
 "%@ subscribers" = "%@ inscritos";
 " subscribers" = " inscritos";
 "10 seconds forwards/backwards" = "10 segundos para frente/para trás";
-"1 century ago" = "Há um século";
 "Accounts" = "Contas";
 "Add Account" = "Adicionar Conta";
 "Apply to all" = "Aplicar a todos";
@@ -34,16 +33,7 @@
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "Qualquer uma";
-"#" = "#";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
-"%lld" = "%lld";
-"%lld%%" = "%lld%%";
-"1,234M" = "1,234M";
-"1234" = "1234";
 "Backend" = "Backend";
-"a" = "a";
-"A" = "A";
 "Blue" = "Azul";
 "Battery" = "Bateria";
 "Buffering stream..." = "Fazendo buffer do stream…";

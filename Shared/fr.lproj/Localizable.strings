@@ -1,23 +1,13 @@
 
 
 " subscribers" = " abonnés";
-"%lld" = "%lld";
-"a" = "a";
 "Add Location..." = "Ajouter un emplacement…";
 "Add profile..." = "Ajouter un profil…";
 "Add Quality Profile" = "Ajouter un profil de qualité";
 "Delete" = "Supprimer";
-"1,234M" = "1,234M";
-"%@" = "%@";
-"%@ %@" = "%@ %@";
 "%@ Playlist" = "%@ liste de lecture";
 "%@ subscribers" = "%@ abonnés";
-"%lld%%" = "%lld%%";
-"1234" = "1234";
-"A" = "A";
-"#" = "#";
 "%@ Channel" = "%@ chaîne";
-"1 century ago" = "il y a un siècle";
 "10 seconds forwards/backwards" = "10 secondes en avant/en arrière";
 "Accounts" = "Comptes";
 "%lld videos" = "%lld vidéos";
