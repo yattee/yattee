@@ -77,7 +77,6 @@
 "%@ Channel" = "%@ Kanal";
 "%@ subscribers" = "%@ Abonnenten";
 " subscribers" = " Abonnenten";
-"%@" = "%@";
 "%@ Playlist" = "%@ Wiedergabeliste";
 "%lld" = "%lld";
 "%lld%%" = "%lld%%";
