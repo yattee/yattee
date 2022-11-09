@@ -197,7 +197,6 @@
 " subscribers" = " abunəçi";
 "%lld" = "%lld";
 "%lld videos" = "%lld video";
-"%lld%%" = "%lld%%";
 "Accounts are not supported for the application of this instance" = "Bu nümunənin tətbiqi üçün hesablar dəstəklənmir";
 
 /* Trending category, section containing all kinds of videos */
