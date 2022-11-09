@@ -110,7 +110,6 @@
 "Close video after playing last in the queue" = "Chiudi il video dopo aver riprodotto l'ultimo elemento della coda";
 "Error when accessing playlist" = "Impossibile accedere alla playlist";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Esortazioni a mettere like, iscriversi o interagire su qualsiasi piattaforma, a pagamento o gratuita (es. aprire un video).";
-"%@" = "%@";
 " subscribers" = " iscritti";
 "%@ %@" = "%@ %@";
 "%@ Channel" = "Canale di %@";
