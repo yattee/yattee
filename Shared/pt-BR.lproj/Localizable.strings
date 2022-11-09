@@ -36,7 +36,6 @@
 "%lld" = "%lld";
 "%lld%%" = "%lld%%";
 "Backend" = "Backend";
-"A" = "A";
 "Blue" = "Azul";
 "Battery" = "Bateria";
 "Buffering stream..." = "Fazendo buffer do stream…";
