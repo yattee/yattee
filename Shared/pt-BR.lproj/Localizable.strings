@@ -33,7 +33,6 @@
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "Qualquer uma";
-"%lld" = "%lld";
 "Backend" = "Backend";
 "Blue" = "Azul";
 "Battery" = "Bateria";
