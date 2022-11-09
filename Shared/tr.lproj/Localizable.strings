@@ -7,7 +7,6 @@
 "Restart the app to apply the settings above." = "Yukarıdaki ayarları uygulamak için uygulamayı yeniden başlatın.";
 "Settings" = "Ayarlar";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Geçerli cihaz durumuna göre otomatik profil seçimini kullanabilir veya video oynatma ayarları kontrollerinde değiştirebilirsiniz.";
-"%@" = "%@";
 "%@ %@" = "%@ %@";
 "%@ Playlist" = "%@ Oynatma Listesi";
 "%@ subscribers" = "%@ Aboneler";
