@@ -11,7 +11,6 @@
 "%@ subscribers" = "%@ Aboneler";
 "%lld" = "%lld";
 "%lld videos" = "%lld Videolar";
-"%lld%%" = "%lld%%";
 "10 seconds forwards/backwards" = "10 saniye ileri/geri";
 "Are you sure you want to clear history of watched videos?" = "Oynatma geçmişini silmek istediğine emin misin?";
 "Are you sure you want to clear search history?" = "Arama geçmişini silmek istediğine emin misin?";
