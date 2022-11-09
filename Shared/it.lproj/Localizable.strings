@@ -9,7 +9,6 @@
 "Cancel" = "Annulla";
 "Autoplaying Next" = "Riproduzione automatica del video successivo";
 "Buffering stream..." = "Preparazione stream...";
-"%lld" = "%lld";
 "Are you sure you want to delete playlist?" = "Vuoi eliminare la playlist?";
 "Badge" = "Indicatore";
 "Are you sure you want to unsubscribe from %@?" = "Vuoi cancellare l'iscrizione a %@?";
