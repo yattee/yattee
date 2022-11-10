@@ -74,44 +74,16 @@ struct OpenVideosView: View {
 
             HStack {
                 Group {
-                    Button {
-                        openURLs(urlsToOpenFromText)
-                    } label: {
-                        HStack {
-                            Image(systemName: "network")
-                            Text("Open URLs")
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                        }
-                        .padding(.horizontal, 20)
-                    }
-                    .disabled(urlsToOpenFromText.isEmpty)
-                    #if !os(tvOS)
-                        .keyboardShortcut(.defaultAction)
-                    #endif
+                    openURLsButton
 
                     Spacer()
 
-                    Button {
-                        presentingFileImporter = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "folder")
-                            Text("Open Files")
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                        }
-                        .padding(.horizontal, 20)
-                    }
+                    openFromClipboardButton
                 }
-                .foregroundColor(.accentColor)
-
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .foregroundColor(Color.accentColor.opacity(0.33))
-                )
             }
-            .buttonStyle(.plain)
+            .padding(.bottom, 10)
+
+            openFilesButton
 
             Spacer()
         }
@@ -146,8 +118,76 @@ struct OpenVideosView: View {
         #endif
     }
 
+    var openURLsButton: some View {
+        Button {
+            openURLs(urlsToOpenFromText)
+        } label: {
+            HStack {
+                Image(systemName: "network")
+                Text("Open URLs")
+                    .fontWeight(.bold)
+                    .padding(.vertical, 10)
+            }
+            .padding(.horizontal, 20)
+        }
+        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+        .background(buttonBackground)
+        .disabled(urlsToOpenFromText.isEmpty)
+        #if !os(tvOS)
+            .keyboardShortcut(.defaultAction)
+        #endif
+    }
+
+    var openFromClipboardButton: some View {
+        Button {
+            OpenVideosModel.shared.openURLsFromClipboard(
+                removeQueueItems: removeQueueItems,
+                playbackMode: playbackMode
+            )
+        } label: {
+            HStack {
+                Image(systemName: "doc.on.clipboard.fill")
+                Text("Clipboard")
+                    .fontWeight(.bold)
+                    .padding(.vertical, 10)
+            }
+            .padding(.horizontal, 20)
+        }
+        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+        .background(buttonBackground)
+        #if !os(tvOS)
+            .keyboardShortcut(.defaultAction)
+        #endif
+    }
+
+    var openFilesButton: some View {
+        Button {
+            presentingFileImporter = true
+        } label: {
+            HStack {
+                Image(systemName: "folder")
+                Text("Open Files")
+
+                    .fontWeight(.bold)
+                    .padding(.vertical, 10)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+        }
+        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+        .background(buttonBackground)
+    }
+
+    var buttonBackground: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .foregroundColor(Color.accentColor.opacity(0.33))
+    }
+
     var urlsToOpenFromText: [URL] {
-        urlsToOpenText.split(whereSeparator: \.isNewline).compactMap { URL(string: String($0)) }
+        OpenVideosModel.shared.urlsFrom(urlsToOpenText)
     }
 
     func openURLs(_ urls: [URL]) {

@@ -1,5 +1,11 @@
+#if canImport(AppKit)
+    import AppKit
+#endif
 import Foundation
 import Logging
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 struct OpenVideosModel {
     enum PlaybackMode: String, CaseIterable {
@@ -40,6 +46,24 @@ struct OpenVideosModel {
 
             player.play([video], shuffling: false)
         }
+    }
+
+    var urlsFromClipboard: [URL] {
+        #if os(iOS)
+            if let pasteboard = UIPasteboard.general.string {
+                return urlsFrom(pasteboard)
+            }
+        #elseif os(macOS)
+            if let pasteboard = NSPasteboard.general.string(forType: .string) {
+                return urlsFrom(pasteboard)
+            }
+        #endif
+
+        return []
+    }
+
+    func openURLsFromClipboard(removeQueueItems: Bool = false, playbackMode: OpenVideosModel.PlaybackMode) {
+        openURLs(urlsFromClipboard, removeQueueItems: removeQueueItems, playbackMode: playbackMode)
     }
 
     func openURLs(_ urls: [URL], removeQueueItems: Bool, playbackMode: OpenVideosModel.PlaybackMode) {
@@ -100,6 +124,10 @@ struct OpenVideosModel {
         videos.forEach { video in
             player.enqueueVideo(video, play: false, prepending: prepending, loadDetails: false)
         }
+    }
+
+    func urlsFrom(_ string: String) -> [URL] {
+        string.split(whereSeparator: \.isNewline).compactMap { URL(string: String($0)) }
     }
 
     var canOpenVideosByID: Bool {

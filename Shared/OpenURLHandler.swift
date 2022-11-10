@@ -82,6 +82,7 @@ struct OpenURLHandler {
         player.hide()
         navigation.presentingChannel = false
         navigation.presentingPlaylist = false
+        navigation.presentingOpenVideos = false
     }
 
     private func urlByReplacingYatteeProtocol(_ url: URL, with urlProtocol: String = "https") -> URL! {
