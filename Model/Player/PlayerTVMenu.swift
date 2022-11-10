@@ -60,7 +60,7 @@ extension PlayerModel {
 
         private var rateMenuActions: [UIAction] {
             PlayerModel.availableRates.map { rate in
-                let image = currentRate == Float(rate) ? UIImage(systemName: "checkmark") : nil
+                let image = currentRate == rate ? UIImage(systemName: "checkmark") : nil
 
                 return UIAction(title: rateLabel(rate), image: image) { _ in
                     DispatchQueue.main.async {

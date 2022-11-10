@@ -177,8 +177,8 @@ final class AVPlayerBackend: PlayerBackend {
         )
     }
 
-    func setRate(_ rate: Float) {
-        avPlayer.rate = rate
+    func setRate(_ rate: Double) {
+        avPlayer.rate = Float(rate)
     }
 
     func closeItem() {
@@ -616,8 +616,8 @@ final class AVPlayerBackend: PlayerBackend {
 
             if player.timeControlStatus == .playing {
                 self.model.objectWillChange.send()
-                if player.rate != self.model.currentRate {
-                    player.rate = self.model.currentRate
+                if player.rate != Float(self.model.currentRate) {
+                    player.rate = Float(self.model.currentRate)
                 }
             }
 

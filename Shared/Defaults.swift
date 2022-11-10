@@ -87,6 +87,7 @@ extension Defaults.Keys {
         static let chargingCellularProfileDefault = hd1080pMPVProfile.id
         static let chargingNonCellularProfileDefault = hd1080pMPVProfile.id
     #endif
+    static let playerRate = Key<Double>("playerRate", default: 1.0)
     static let qualityProfiles = Key<[QualityProfile]>("qualityProfiles", default: qualityProfilesDefault)
     static let batteryCellularProfile = Key<QualityProfile.ID>("batteryCellularProfile", default: batteryCellularProfileDefault)
     static let batteryNonCellularProfile = Key<QualityProfile.ID>("batteryNonCellularProfile", default: batteryNonCellularProfileDefault)

@@ -47,7 +47,7 @@ protocol PlayerBackend {
     func seek(to time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)?)
     func seek(to seconds: Double, seekType: SeekType, completionHandler: ((Bool) -> Void)?)
 
-    func setRate(_ rate: Float)
+    func setRate(_ rate: Double)
 
     func closeItem()
 

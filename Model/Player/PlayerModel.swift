@@ -47,7 +47,7 @@ final class PlayerModel: ObservableObject {
 
     static var shared: PlayerModel!
 
-    static let availableRates: [Float] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
+    static let availableRates: [Double] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
     let logger = Logger(label: "stream.yattee.app")
 
     var avPlayerView = AppleAVPlayerView()
@@ -86,7 +86,7 @@ final class PlayerModel: ObservableObject {
     }}
     @Published var aspectRatio = VideoPlayerView.defaultAspectRatio
     @Published var stream: Stream?
-    @Published var currentRate: Float = 1.0 { didSet { backend.setRate(currentRate) } }
+    @Published var currentRate: Double = 1.0 { didSet { handleCurrentRateChange() } }
 
     @Published var qualityProfileSelection: QualityProfile? { didSet { handleQualityProfileChange() } }
 
@@ -162,6 +162,7 @@ final class PlayerModel: ObservableObject {
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
     @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
+    @Default(.playerRate) var playerRate
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
@@ -197,6 +198,7 @@ final class PlayerModel: ObservableObject {
 
         self.pipDelegate = pipDelegate
         pipController?.delegate = pipDelegate
+        currentRate = playerRate
     }
 
     func show() {
@@ -540,6 +542,11 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    func handleCurrentRateChange() {
+        backend.setRate(currentRate)
+        playerRate = currentRate
+    }
+
     func handleQualityProfileChange() {
         guard let profile = qualityProfile else { return }
 
@@ -552,7 +559,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func rateLabel(_ rate: Float) -> String {
+    func rateLabel(_ rate: Double) -> String {
         let formatter = NumberFormatter()
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 2
