@@ -10,9 +10,9 @@ struct Sidebar: View {
     var body: some View {
         ScrollViewReader { scrollView in
             List {
-                if !accounts.isEmpty {
-                    mainNavigationLinks
+                mainNavigationLinks
 
+                if !accounts.isEmpty {
                     AppSidebarRecents()
                         .id("recentlyOpened")
 
