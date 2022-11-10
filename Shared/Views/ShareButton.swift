@@ -11,20 +11,26 @@ struct ShareButton: View {
         self.contentItem = contentItem
     }
 
-    var body: some View {
-        Menu {
-            instanceActions
-            Divider()
-            if !accounts.isDemo {
-                youtubeActions
+    @ViewBuilder var body: some View {
+        if let video = contentItem.video, !video.localStreamIsFile {
+            Menu {
+                if video.localStreamIsRemoteURL {
+                    remoteURLAction
+                } else {
+                    instanceActions
+                    Divider()
+                    if !accounts.isDemo {
+                        youtubeActions
+                    }
+                }
+            } label: {
+                Label("Share...", systemImage: "square.and.arrow.up")
             }
-        } label: {
-            Label("Share...", systemImage: "square.and.arrow.up")
+            .menuStyle(.borderlessButton)
+            #if os(macOS)
+                .frame(maxWidth: 35)
+            #endif
         }
-        .menuStyle(.borderlessButton)
-        #if os(macOS)
-            .frame(maxWidth: 35)
-        #endif
     }
 
     private var instanceActions: some View {
@@ -79,6 +85,14 @@ struct ShareButton: View {
         contentItem.contentType == .video && contentItem.video?.videoID == player.currentVideo?.videoID
     }
 
+    @ViewBuilder private var remoteURLAction: some View {
+        if let url = contentItem.video.localStream?.localURL {
+            Button(labelForShareURL()) {
+                shareAction(url)
+            }
+        }
+    }
+
     private func shareAction(_ url: URL) {
         #if os(macOS)
             NSPasteboard.general.clearContents()
@@ -90,18 +104,18 @@ struct ShareButton: View {
         #endif
     }
 
-    private func labelForShareURL(_ app: String, withTime: Bool = false) -> String {
+    private func labelForShareURL(_ app: String? = nil, withTime: Bool = false) -> String {
         if withTime {
             #if os(macOS)
-                return String(format: "Copy %@ link with time".localized(), app)
+                return String(format: "Copy %@ link with time".localized(), app ?? "")
             #else
-                return String(format: "Share %@ link with time".localized(), app)
+                return String(format: "Share %@ link with time".localized(), app ?? "")
             #endif
         } else {
             #if os(macOS)
-                return String(format: "Copy %@ link".localized(), app)
+                return String(format: "Copy%@link".localized(), app == nil ? " " : " \(app!) ")
             #else
-                return String(format: "Share %@ link".localized(), app)
+                return String(format: "Share%@link".localized(), app == nil ? " " : " \(app!) ")
             #endif
         }
     }

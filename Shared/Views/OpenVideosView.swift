@@ -128,6 +128,8 @@ struct OpenVideosView: View {
                     .fontWeight(.bold)
                     .padding(.vertical, 10)
             }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
             .padding(.horizontal, 20)
         }
         .foregroundColor(.accentColor)
@@ -152,6 +154,8 @@ struct OpenVideosView: View {
                     .fontWeight(.bold)
                     .padding(.vertical, 10)
             }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
             .padding(.horizontal, 20)
         }
         .foregroundColor(.accentColor)
@@ -174,6 +178,7 @@ struct OpenVideosView: View {
                     .padding(.vertical, 10)
             }
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
             .padding(.horizontal, 20)
         }
         .foregroundColor(.accentColor)
