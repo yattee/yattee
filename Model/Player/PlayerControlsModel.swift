@@ -88,7 +88,7 @@ final class PlayerControlsModel: ObservableObject {
             return
         }
 
-        player.backend.stopControlsUpdates()
+        player.backend?.stopControlsUpdates()
 
         guard !player.currentItem.isNil else {
             return
