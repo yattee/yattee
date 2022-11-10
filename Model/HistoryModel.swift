@@ -28,24 +28,26 @@ extension PlayerModel {
             return
         }
 
-        playerAPI.video(id).load().onSuccess { [weak self] response in
-            guard let self else { return }
+        playerAPI.video(id).load()
+            .onSuccess { [weak self] response in
+                guard let self else { return }
 
-            if let video: Video = response.typedContent() {
-                self.historyVideos.append(video)
+                if let video: Video = response.typedContent() {
+                    self.historyVideos.append(video)
+                }
             }
-        }.onCompletion { _ in
-            self.logger.info("LOADED history details: \(id)")
+            .onCompletion { _ in
+                self.logger.info("LOADED history details: \(id)")
 
-            if self.historyItemBeingLoaded == id {
-                self.logger.info("setting no history loaded")
-                self.historyItemBeingLoaded = nil
-            }
+                if self.historyItemBeingLoaded == id {
+                    self.logger.info("setting no history loaded")
+                    self.historyItemBeingLoaded = nil
+                }
 
-            if let id = self.historyItemsToLoad.popLast() {
-                self.loadHistoryVideoDetails(id)
+                if let id = self.historyItemsToLoad.popLast() {
+                    self.loadHistoryVideoDetails(id)
+                }
             }
-        }
     }
 
     func updateWatch(finished: Bool = false) {

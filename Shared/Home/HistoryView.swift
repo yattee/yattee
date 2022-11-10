@@ -19,7 +19,7 @@ struct HistoryView: View {
                     player.loadHistoryVideoDetails(watch.videoID)
                 }
                 .contextMenu {
-                    VideoContextMenuView(video: watch.video)
+                    VideoContextMenuView(video: player.historyVideo(watch.videoID) ?? watch.video)
                 }
             }
             #if os(tvOS)
