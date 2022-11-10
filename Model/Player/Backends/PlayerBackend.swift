@@ -6,6 +6,7 @@ import Foundation
 #endif
 
 protocol PlayerBackend {
+    var suggestedPlaybackRates: [Double] { get }
     var model: PlayerModel! { get }
     var controls: PlayerControlsModel! { get }
     var playerTime: PlayerTimeModel! { get }
@@ -30,6 +31,7 @@ protocol PlayerBackend {
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
     func canPlay(_ stream: Stream) -> Bool
+    func canPlayAtRate(_ rate: Double) -> Bool
 
     func playStream(
         _ stream: Stream,

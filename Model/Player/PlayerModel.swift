@@ -47,7 +47,6 @@ final class PlayerModel: ObservableObject {
 
     static var shared: PlayerModel!
 
-    static let availableRates: [Double] = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2]
     let logger = Logger(label: "stream.yattee.app")
 
     var avPlayerView = AppleAVPlayerView()
@@ -499,6 +498,9 @@ final class PlayerModel: ObservableObject {
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
 
+        if !self.backend.canPlayAtRate(currentRate) {
+            currentRate = self.backend.suggestedPlaybackRates.last { $0 < currentRate } ?? 1.0
+        }
         self.backend.didChangeTo()
 
         if wasPlaying {

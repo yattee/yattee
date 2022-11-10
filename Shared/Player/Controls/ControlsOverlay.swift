@@ -180,7 +180,7 @@ struct ControlsOverlay: View {
 
     var ratePicker: some View {
         Picker("Rate", selection: $player.currentRate) {
-            ForEach(PlayerModel.availableRates, id: \.self) { rate in
+            ForEach(player.backend.suggestedPlaybackRates, id: \.self) { rate in
                 Text(player.rateLabel(rate)).tag(rate)
             }
         }
@@ -188,7 +188,7 @@ struct ControlsOverlay: View {
     }
 
     private var increaseRateButton: some View {
-        let increasedRate = PlayerModel.availableRates.first { $0 > player.currentRate }
+        let increasedRate = player.backend.suggestedPlaybackRates.first { $0 > player.currentRate }
         return Button {
             if let rate = increasedRate {
                 player.currentRate = rate
@@ -211,7 +211,7 @@ struct ControlsOverlay: View {
     }
 
     private var decreaseRateButton: some View {
-        let decreasedRate = PlayerModel.availableRates.last { $0 < player.currentRate }
+        let decreasedRate = player.backend.suggestedPlaybackRates.last { $0 < player.currentRate }
 
         return Button {
             if let rate = decreasedRate {
