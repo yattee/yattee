@@ -76,14 +76,18 @@ struct OpenVideosView: View {
                 Group {
                     openURLsButton
 
-                    Spacer()
+                    #if !os(tvOS)
+                        Spacer()
 
-                    openFromClipboardButton
+                        openFromClipboardButton
+                    #endif
                 }
             }
             .padding(.bottom, 10)
 
-            openFilesButton
+            #if !os(tvOS)
+                openFilesButton
+            #endif
 
             Spacer()
         }
