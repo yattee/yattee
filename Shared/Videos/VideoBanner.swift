@@ -95,12 +95,8 @@ struct VideoBanner: View {
         Group {
             if let video {
                 if let thumbnail = video.thumbnailURL(quality: .medium) {
-                    WebImage(url: thumbnail)
+                    WebImage(url: thumbnail, options: [.lowPriority])
                         .resizable()
-                        .placeholder {
-                            ProgressView()
-                        }
-                        .indicator(.activity)
                 } else if video.localStreamIsFile {
                     Image(systemName: "folder")
                 } else if video.localStreamIsRemoteURL {

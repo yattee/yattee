@@ -31,7 +31,7 @@ struct ChapterView: View {
     }
 
     @ViewBuilder func smallImage(_ chapter: Chapter) -> some View {
-        WebImage(url: chapter.image)
+        WebImage(url: chapter.image, options: [.lowPriority])
             .resizable()
             .placeholder {
                 ProgressView()

@@ -422,7 +422,7 @@ struct VideoCell: View {
         Group {
             let url = thumbnails.best(video)
 
-            WebImage(url: url)
+            WebImage(url: url, options: [.lowPriority])
                 .resizable()
                 .placeholder {
                     Rectangle().foregroundColor(Color("PlaceholderColor"))

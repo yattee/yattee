@@ -37,7 +37,7 @@ struct ChannelPlaylistCell: View {
             }
             .foregroundColor(.secondary)
 
-            WebImage(url: playlist.thumbnailURL)
+            WebImage(url: playlist.thumbnailURL, options: [.lowPriority])
                 .resizable()
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))

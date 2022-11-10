@@ -38,7 +38,7 @@ struct ChannelCell: View {
             }
             .foregroundColor(.secondary)
 
-            WebImage(url: channel.thumbnailURL)
+            WebImage(url: channel.thumbnailURL, options: [.lowPriority])
                 .resizable()
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))

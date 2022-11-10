@@ -221,7 +221,7 @@ struct PlayerControls: View {
            let video = item.video,
            let url = thumbnails.best(video)
         {
-            WebImage(url: url)
+            WebImage(url: url, options: [.lowPriority])
                 .resizable()
                 .placeholder {
                     Rectangle().fill(Color("PlaceholderColor"))

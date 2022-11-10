@@ -103,7 +103,7 @@ struct CommentView: View {
     }
 
     private var authorAvatar: some View {
-        WebImage(url: URL(string: comment.authorAvatarURL)!)
+        WebImage(url: URL(string: comment.authorAvatarURL)!, options: [.lowPriority])
             .resizable()
             .placeholder {
                 Rectangle().fill(Color("PlaceholderColor"))

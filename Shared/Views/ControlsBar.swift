@@ -274,7 +274,7 @@ struct ControlsBar: View {
     private var authorAvatar: some View {
         Group {
             if let url = model.currentItem?.video?.channel.thumbnailURL {
-                WebImage(url: url)
+                WebImage(url: url, options: [.lowPriority])
                     .resizable()
                     .placeholder {
                         Rectangle().fill(Color("PlaceholderColor"))
