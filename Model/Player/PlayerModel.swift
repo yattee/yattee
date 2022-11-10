@@ -97,6 +97,10 @@ final class PlayerModel: ObservableObject {
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
     @Published var videoBeingOpened: Video? { didSet { seek.reset() } }
     @Published var historyVideos = [Video]()
+    @Published var queueItemBeingLoaded: PlayerQueueItem?
+    @Published var queueItemsToLoad = [PlayerQueueItem]()
+    @Published var historyItemBeingLoaded: Video.ID?
+    @Published var historyItemsToLoad = [Video.ID]()
 
     @Published var preservedTime: CMTime?
 
@@ -373,7 +377,7 @@ final class PlayerModel: ObservableObject {
         withBackend: PlayerBackend? = nil
     ) {
         playerError = nil
-        if !upgrading {
+        if !upgrading, !video.isLocal {
             resetSegments()
 
             DispatchQueue.main.async { [weak self] in
@@ -440,7 +444,7 @@ final class PlayerModel: ObservableObject {
             changeActiveBackend(from: activeBackend, to: backend)
         }
 
-        guard let stream = streamByQualityProfile else {
+        guard let stream = ((availableStreams.count == 1 && availableStreams.first!.isLocal) ? availableStreams.first : nil) ?? streamByQualityProfile else {
             return
         }
 
@@ -842,8 +846,8 @@ final class PlayerModel: ObservableObject {
 
         let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
         var nowPlayingInfo: [String: AnyObject] = [
-            MPMediaItemPropertyTitle: video.title as AnyObject,
-            MPMediaItemPropertyArtist: video.author as AnyObject,
+            MPMediaItemPropertyTitle: video.displayTitle as AnyObject,
+            MPMediaItemPropertyArtist: video.displayAuthor as AnyObject,
             MPNowPlayingInfoPropertyIsLiveStream: live as AnyObject,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
@@ -951,5 +955,10 @@ final class PlayerModel: ObservableObject {
                 self.aspectRatio = self.backend.aspectRatio
             }
         #endif
+    }
+
+    var formattedSize: String {
+        guard let videoWidth = backend?.videoWidth, let videoHeight = backend?.videoHeight else { return "unknown" }
+        return "\(String(format: "%.2f", videoWidth))\u{d7}\(String(format: "%.2f", videoHeight))"
     }
 }

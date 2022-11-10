@@ -27,6 +27,11 @@ struct OpenURLHandler {
             }
         #endif
 
+        if url.isFileURL {
+            OpenVideosModel.shared.open(url)
+            return
+        }
+
         let parser = URLParser(url: urlByReplacingYatteeProtocol(url))
 
         switch parser.destination {

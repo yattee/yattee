@@ -157,7 +157,7 @@ struct ControlsBar: View {
                     if let video = model.currentVideo {
                         Group {
                             Section {
-                                if accounts.app.supportsUserPlaylists && accounts.signedIn {
+                                if accounts.app.supportsUserPlaylists && accounts.signedIn, !video.isLocal {
                                     Section {
                                         Button {
                                             navigation.presentAddToPlaylist(video)
@@ -180,36 +180,38 @@ struct ControlsBar: View {
                                 #endif
 
                                 Section {
-                                    Button {
-                                        NavigationModel.openChannel(
-                                            video.channel,
-                                            player: model,
-                                            recents: recents,
-                                            navigation: navigation,
-                                            navigationStyle: navigationStyle
-                                        )
-                                    } label: {
-                                        Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
-                                    }
+                                    if !video.isLocal {
+                                        Button {
+                                            NavigationModel.openChannel(
+                                                video.channel,
+                                                player: model,
+                                                recents: recents,
+                                                navigation: navigation,
+                                                navigationStyle: navigationStyle
+                                            )
+                                        } label: {
+                                            Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
+                                        }
 
-                                    if accounts.app.supportsSubscriptions, accounts.signedIn {
-                                        if subscriptions.isSubscribing(video.channel.id) {
-                                            Button {
-                                                #if os(tvOS)
-                                                    subscriptions.unsubscribe(video.channel.id)
-                                                #else
-                                                    navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
-                                                #endif
-                                            } label: {
-                                                Label("Unsubscribe", systemImage: "xmark.circle")
-                                            }
-                                        } else {
-                                            Button {
-                                                subscriptions.subscribe(video.channel.id) {
-                                                    navigation.sidebarSectionChanged.toggle()
+                                        if accounts.app.supportsSubscriptions, accounts.signedIn {
+                                            if subscriptions.isSubscribing(video.channel.id) {
+                                                Button {
+                                                    #if os(tvOS)
+                                                        subscriptions.unsubscribe(video.channel.id)
+                                                    #else
+                                                        navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
+                                                    #endif
+                                                } label: {
+                                                    Label("Unsubscribe", systemImage: "xmark.circle")
                                                 }
-                                            } label: {
-                                                Label("Subscribe", systemImage: "star.circle")
+                                            } else {
+                                                Button {
+                                                    subscriptions.subscribe(video.channel.id) {
+                                                        navigation.sidebarSectionChanged.toggle()
+                                                    }
+                                                } label: {
+                                                    Label("Subscribe", systemImage: "star.circle")
+                                                }
                                             }
                                         }
                                     }
@@ -228,7 +230,7 @@ struct ControlsBar: View {
 
                 VStack(alignment: .leading, spacing: 0) {
                     let notPlaying = "Not Playing".localized()
-                    Text(model.currentVideo?.title ?? notPlaying)
+                    Text(model.currentVideo?.displayTitle ?? notPlaying)
                         .font(.system(size: 14))
                         .fontWeight(.semibold)
                         .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
@@ -236,12 +238,12 @@ struct ControlsBar: View {
                         .lineLimit(titleLineLimit)
                         .multilineTextAlignment(.leading)
 
-                    if let video = model.currentVideo {
+                    if let video = model.currentVideo, !video.localStreamIsFile {
                         HStack(spacing: 2) {
-                            Text(video.author)
+                            Text(video.displayAuthor)
                                 .font(.system(size: 12))
 
-                            if !presentingControls {
+                            if !presentingControls && !video.isLocal {
                                 HStack(spacing: 2) {
                                     Image(systemName: "person.2.fill")
 
@@ -271,7 +273,7 @@ struct ControlsBar: View {
 
     private var authorAvatar: some View {
         Group {
-            if let video = model.currentItem?.video, let url = video.channel.thumbnailURL {
+            if let url = model.currentItem?.video?.channel.thumbnailURL {
                 WebImage(url: url)
                     .resizable()
                     .placeholder {
@@ -284,10 +286,20 @@ struct ControlsBar: View {
                     Color(white: 0.6)
                         .opacity(0.5)
 
-                    Image(systemName: "play.rectangle")
-                        .foregroundColor(.accentColor)
-                        .font(.system(size: 20))
-                        .contentShape(Rectangle())
+                    Group {
+                        if let video = model.currentItem?.video, video.isLocal {
+                            if video.localStreamIsFile {
+                                Image(systemName: "folder")
+                            } else if video.localStreamIsRemoteURL {
+                                Image(systemName: "globe")
+                            }
+                        } else {
+                            Image(systemName: "play.rectangle")
+                        }
+                    }
+                    .foregroundColor(.accentColor)
+                    .font(.system(size: 20))
+                    .contentShape(Rectangle())
                 }
             }
         }

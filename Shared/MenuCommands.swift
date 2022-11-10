@@ -5,8 +5,16 @@ struct MenuCommands: Commands {
     @Binding var model: MenuModel
 
     var body: some Commands {
+        openVideosMenu
         navigationMenu
         playbackMenu
+    }
+
+    private var openVideosMenu: some Commands {
+        CommandGroup(after: .newItem) {
+            Button("Open Videos...") { model.navigation?.presentingOpenVideos = true }
+                .keyboardShortcut("t")
+        }
     }
 
     private var navigationMenu: some Commands {

@@ -25,6 +25,9 @@ protocol PlayerBackend {
     var aspectRatio: Double { get }
     var controlsUpdates: Bool { get }
 
+    var videoWidth: Double? { get }
+    var videoHeight: Double? { get }
+
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
     func canPlay(_ stream: Stream) -> Bool
 

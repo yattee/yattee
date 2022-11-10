@@ -139,6 +139,9 @@ struct AppTabNavigation: View {
                 }
 
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button(action: { navigation.presentingOpenVideos = true }) {
+                        Label("Open Videos", systemImage: "play.circle.fill")
+                    }
                     AccountsMenuView()
                 }
             }

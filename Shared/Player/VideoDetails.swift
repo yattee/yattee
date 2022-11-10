@@ -74,18 +74,20 @@ struct VideoDetails: View {
                     "Info".localized(),
                     "info.circle", .info, !video.isNil
                 )
-                pageButton(
-                    "Chapters".localized(),
-                    "bookmark", .chapters, !(video?.chapters.isEmpty ?? true)
-                )
-                pageButton(
-                    "Comments".localized(),
-                    "text.bubble", .comments, !video.isNil
-                ) { comments.load() }
-                pageButton(
-                    "Related".localized(),
-                    "rectangle.stack.fill", .related, !video.isNil
-                )
+                if let video, !video.isLocal {
+                    pageButton(
+                        "Chapters".localized(),
+                        "bookmark", .chapters, !video.chapters.isEmpty && !video.isLocal
+                    )
+                    pageButton(
+                        "Comments".localized(),
+                        "text.bubble", .comments, !video.isLocal
+                    ) { comments.load() }
+                    pageButton(
+                        "Related".localized(),
+                        "rectangle.stack.fill", .related, !video.isLocal
+                    )
+                }
                 pageButton(
                     "Queue".localized(),
                     "list.number", .queue, !player.queue.isEmpty
@@ -100,6 +102,11 @@ struct VideoDetails: View {
             Pager(page: page, data: DetailsPage.allCases, id: \.self) {
                 if !player.currentItem.isNil || page.index == DetailsPage.queue.index {
                     detailsByPage($0)
+                    #if os(iOS)
+                        .padding(.bottom, SafeArea.insets.bottom)
+                    #else
+                        .padding(.bottom, 6)
+                    #endif
                 } else {
                     VStack {}
                 }
@@ -156,7 +163,7 @@ struct VideoDetails: View {
     }
 
     private var contentItem: ContentItem {
-        ContentItem(video: player.currentVideo!)
+        ContentItem(video: player.currentVideo)
     }
 
     func pageButton(
@@ -228,12 +235,14 @@ struct VideoDetails: View {
     var detailsPage: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let video {
-                VStack(spacing: 6) {
-                    videoProperties
+                if !video.isLocal {
+                    VStack(spacing: 6) {
+                        videoProperties
 
-                    Divider()
+                        Divider()
+                    }
+                    .padding(.bottom, 6)
                 }
-                .padding(.bottom, 6)
 
                 VStack(alignment: .leading, spacing: 10) {
                     if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
@@ -248,14 +257,80 @@ struct VideoDetails: View {
                         #if os(iOS)
                             .padding(.bottom, player.playingFullScreen ? 10 : SafeArea.insets.bottom)
                         #endif
-                    } else {
+                    } else if !video.isLocal {
                         Text("No description")
                             .foregroundColor(.secondary)
                     }
                 }
+
+                VStack(spacing: 4) {
+                    Group {
+                        if player.activeBackend == .mpv, player.mpvBackend.videoFormat != "unknown" {
+                            videoDetailGroupHeading("Video")
+
+                            videoDetailRow("Format", value: player.mpvBackend.videoFormat)
+                            videoDetailRow("Codec", value: player.mpvBackend.videoCodec)
+                            videoDetailRow("Hardware Decoder", value: player.mpvBackend.hwDecoder)
+                            videoDetailRow("Driver", value: player.mpvBackend.currentVo)
+                            videoDetailRow("Size", value: player.formattedSize)
+                            videoDetailRow("FPS", value: player.mpvBackend.formattedOutputFps)
+                        } else if player.activeBackend == .appleAVPlayer, let width = player.backend.videoWidth, width > 0 {
+                            videoDetailGroupHeading("Video")
+                            videoDetailRow("Size", value: player.formattedSize)
+                        }
+                    }
+
+                    if player.activeBackend == .mpv, player.mpvBackend.audioFormat != "unknown" {
+                        Group {
+                            videoDetailGroupHeading("Audio")
+                            videoDetailRow("Format", value: player.mpvBackend.audioFormat)
+                            videoDetailRow("Codec", value: player.mpvBackend.audioCodec)
+                            videoDetailRow("Driver", value: player.mpvBackend.currentAo)
+                            videoDetailRow("Channels", value: player.mpvBackend.audioChannels)
+                            videoDetailRow("Sample Rate", value: player.mpvBackend.audioSampleRate)
+                        }
+                    }
+
+                    if video.localStream != nil || video.localStreamFileExtension != nil {
+                        videoDetailGroupHeading("File")
+                    }
+
+                    if let fileExtension = video.localStreamFileExtension {
+                        videoDetailRow("File Extension", value: fileExtension)
+                    }
+
+                    if let url = video.localStream?.localURL, video.localStreamIsRemoteURL {
+                        videoDetailRow("URL", value: url.absoluteString)
+                    }
+                }
+                .padding(.bottom, 6)
             }
         }
         .padding(.horizontal)
+    }
+
+    @ViewBuilder func videoDetailGroupHeading(_ heading: String) -> some View {
+        Text(heading.uppercased())
+            .font(.footnote)
+            .foregroundColor(.secondary)
+    }
+
+    @ViewBuilder func videoDetailRow(_ detail: String, value: String) -> some View {
+        HStack {
+            Text(detail)
+                .foregroundColor(.secondary)
+            Spacer()
+            let value = Text(value)
+            if #available(iOS 15.0, macOS 12.0, *) {
+                value
+                #if !os(tvOS)
+                .textSelection(.enabled)
+                #endif
+            } else {
+                value
+            }
+        }
+        .font(.caption)
     }
 
     @ViewBuilder var videoProperties: some View {

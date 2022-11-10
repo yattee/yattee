@@ -141,6 +141,7 @@ class Stream: Equatable, Hashable, Identifiable {
     var audioAsset: AVURLAsset!
     var videoAsset: AVURLAsset!
     var hlsURL: URL!
+    var localURL: URL!
 
     var resolution: Resolution!
     var kind: Kind!
@@ -154,6 +155,7 @@ class Stream: Equatable, Hashable, Identifiable {
         audioAsset: AVURLAsset? = nil,
         videoAsset: AVURLAsset? = nil,
         hlsURL: URL? = nil,
+        localURL: URL? = nil,
         resolution: Resolution? = nil,
         kind: Kind = .hls,
         encoding: String? = nil,
@@ -163,17 +165,25 @@ class Stream: Equatable, Hashable, Identifiable {
         self.audioAsset = audioAsset
         self.videoAsset = videoAsset
         self.hlsURL = hlsURL
+        self.localURL = localURL
         self.resolution = resolution
         self.kind = kind
         self.encoding = encoding
         format = .from(videoFormat ?? "")
     }
 
+    var isLocal: Bool {
+        localURL != nil
+    }
+
     var quality: String {
-        kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
+        guard localURL.isNil else { return "Opened File" }
+        return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
     }
 
     var shortQuality: String {
+        guard localURL.isNil else { return "File" }
+
         if kind == .hls {
             return "HLS"
         } else {
@@ -182,6 +192,7 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var description: String {
+        guard localURL.isNil else { return resolutionAndFormat }
         let instanceString = instance.isNil ? "" : " - (\(instance!.description))"
         return "\(resolutionAndFormat)\(instanceString)"
     }
@@ -200,6 +211,10 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     var singleAssetURL: URL? {
+        guard localURL.isNil else {
+            return URLBookmarkModel.shared.loadBookmark(localURL) ?? localURL
+        }
+
         if kind == .hls {
             return hlsURL
         } else if videoAssetContainsAudio {

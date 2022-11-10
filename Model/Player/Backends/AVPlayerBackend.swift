@@ -37,9 +37,24 @@ final class AVPlayerBackend: PlayerBackend {
         avPlayer.timeControlStatus == .playing
     }
 
+    var videoWidth: Double? {
+        if let width = avPlayer.currentItem?.presentationSize.width {
+            return Double(width)
+        }
+        return nil
+    }
+
+    var videoHeight: Double? {
+        if let height = avPlayer.currentItem?.presentationSize.height {
+            return Double(height)
+        }
+
+        return nil
+    }
+
     var aspectRatio: Double {
         #if os(iOS)
-            playerLayer.videoRect.width / playerLayer.videoRect.height
+            videoWidth! / videoHeight!
         #else
             VideoPlayerView.defaultAspectRatio
         #endif
@@ -104,8 +119,17 @@ final class AVPlayerBackend: PlayerBackend {
         preservingTime: Bool,
         upgrading _: Bool
     ) {
-        if let url = stream.singleAssetURL {
+        if var url = stream.singleAssetURL {
             model.logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
+
+            if video.isLocal, video.localStreamIsFile, let localURL = video.localStream?.localURL {
+                guard localURL.startAccessingSecurityScopedResource() else {
+                    model.navigation.presentAlert(title: "Could not open file")
+                    return
+                }
+                url = localURL
+            }
+
             loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime)
         } else {
             model.logger.info("playing stream with many assets:")
@@ -317,6 +341,7 @@ final class AVPlayerBackend: PlayerBackend {
             guard video == self.model.currentVideo else {
                 return
             }
+
             self.avPlayer.replaceCurrentItem(with: self.model.playerItem)
             self.seekToPreservedTime { finished in
                 guard finished else {
@@ -373,7 +398,8 @@ final class AVPlayerBackend: PlayerBackend {
 
         #if !os(macOS)
             var externalMetadata = [
-                makeMetadataItem(.commonIdentifierTitle, value: video.title),
+                makeMetadataItem(.commonIdentifierTitle, value: video.displayTitle),
+                makeMetadataItem(.commonIdentifierArtist, value: video.displayAuthor),
                 makeMetadataItem(.quickTimeMetadataGenre, value: video.genre ?? ""),
                 makeMetadataItem(.commonIdentifierDescription, value: video.description ?? "")
             ]

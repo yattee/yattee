@@ -79,9 +79,10 @@ extension Watch {
     }
 
     var video: Video {
-        Video(
-            videoID: videoID, title: "", author: "",
-            length: 0, published: "", views: -1, channel: Channel(id: "", name: "")
-        )
+        if !Video.VideoID.isValid(videoID), let url = URL(string: videoID) {
+            return .local(url)
+        }
+
+        return Video(videoID: videoID)
     }
 }

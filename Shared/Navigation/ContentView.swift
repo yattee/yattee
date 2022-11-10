@@ -119,6 +119,11 @@ struct ContentView: View {
                 }
             )
         #endif
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingOpenVideos) {
+                    OpenVideosView()
+                }
+            )
             .background(playerViewInitialize)
             .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }

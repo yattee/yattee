@@ -198,6 +198,50 @@ final class MPVClient: ObservableObject {
         mpv.isNil ? 0.0 : getDouble("demuxer-cache-duration")
     }
 
+    var videoFormat: String {
+        stringOrUnknown("video-format")
+    }
+
+    var videoCodec: String {
+        stringOrUnknown("video-codec")
+    }
+
+    var currentVo: String {
+        stringOrUnknown("current-vo")
+    }
+
+    var width: String {
+        stringOrUnknown("width")
+    }
+
+    var height: String {
+        stringOrUnknown("height")
+    }
+
+    var videoBitrate: Double {
+        mpv.isNil ? 0.0 : getDouble("video-bitrate")
+    }
+
+    var audioFormat: String {
+        stringOrUnknown("audio-params/format")
+    }
+
+    var audioCodec: String {
+        stringOrUnknown("audio-codec")
+    }
+
+    var currentAo: String {
+        stringOrUnknown("current-ao")
+    }
+
+    var audioChannels: String {
+        stringOrUnknown("audio-params/channels")
+    }
+
+    var audioSampleRate: String {
+        stringOrUnknown("audio-params/samplerate")
+    }
+
     var aspectRatio: Double {
         guard !mpv.isNil else { return VideoPlayerView.defaultAspectRatio }
         let aspect = getDouble("video-params/aspect")
@@ -405,6 +449,10 @@ final class MPVClient: ObservableObject {
         if status < 0 {
             logger.error(.init(stringLiteral: "MPV API error: \(String(cString: mpv_error_string(status)))\n"))
         }
+    }
+
+    private func stringOrUnknown(_ name: String) -> String {
+        mpv.isNil ? "unknown" : (getString(name) ?? "unknown")
     }
 
     private var machine: String {

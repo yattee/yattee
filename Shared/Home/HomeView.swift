@@ -17,6 +17,7 @@ struct HomeView: View {
     #if !os(tvOS)
         @Default(.favorites) private var favorites
     #endif
+    @Default(.homeHistoryItems) private var homeHistoryItems
 
     private var navigation: NavigationModel { .shared }
 
@@ -56,7 +57,7 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(.secondary)
 
-                    HistoryView(limit: 100)
+                    HistoryView(limit: homeHistoryItems)
                 }
 
                 #if os(tvOS)

@@ -328,7 +328,6 @@ struct VideoPlayerView: View {
                             if !fullScreenPlayer {
                                 VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
                                 #if os(iOS)
-//                                    .zIndex(-1)
                                     .ignoresSafeArea(.all, edges: .bottom)
                                 #endif
                                     .background(colorScheme == .dark ? Color.black : Color.white)

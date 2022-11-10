@@ -9,7 +9,7 @@ struct PlaybackStatsView: View {
         VStack(alignment: .leading, spacing: 6) {
             mpvPlaybackStatRow("Hardware decoder".localized(), player.mpvBackend.hwDecoder)
             mpvPlaybackStatRow("Dropped frames".localized(), String(player.mpvBackend.frameDropCount))
-            mpvPlaybackStatRow("Stream FPS".localized(), String(format: "%.2ffps", player.mpvBackend.outputFps))
+            mpvPlaybackStatRow("Stream FPS".localized(), player.mpvBackend.formattedOutputFps)
             mpvPlaybackStatRow("Cached time".localized(), String(format: "%.2fs", player.mpvBackend.cacheDuration))
         }
         .padding(.top, 2)

@@ -42,7 +42,8 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     }
 
     var hasDetailsLoaded: Bool {
-        !video.isNil
+        guard let video else { return false }
+        return !video.streams.isEmpty
     }
 
     func hash(into hasher: inout Hasher) {

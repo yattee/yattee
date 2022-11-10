@@ -21,6 +21,7 @@ extension Defaults.Keys {
 
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
+    static let homeHistoryItems = Key<Int>("homeHistoryItems", default: 30)
     static let favorites = Key<[FavoriteItem]>("favorites", default: [])
 
     #if !os(tvOS)

@@ -2,6 +2,7 @@ import CoreData
 import CoreMedia
 import Defaults
 import Foundation
+import SwiftyJSON
 
 extension PlayerModel {
     func historyVideo(_ id: String) -> Video? {
@@ -13,12 +14,37 @@ extension PlayerModel {
             return
         }
 
+        if !Video.VideoID.isValid(id), let url = URL(string: id) {
+            historyVideos.append(.local(url))
+            return
+        }
+
+        if historyItemBeingLoaded == nil {
+            logger.info("loading history details: \(id)")
+            historyItemBeingLoaded = id
+        } else {
+            logger.info("POSTPONING history load: \(id)")
+            historyItemsToLoad.append(id)
+            return
+        }
+
         playerAPI.video(id).load().onSuccess { [weak self] response in
-            guard let video: Video = response.typedContent() else {
-                return
+            guard let self else { return }
+
+            if let video: Video = response.typedContent() {
+                self.historyVideos.append(video)
+            }
+        }.onCompletion { _ in
+            self.logger.info("LOADED history details: \(id)")
+
+            if self.historyItemBeingLoaded == id {
+                self.logger.info("setting no history loaded")
+                self.historyItemBeingLoaded = nil
             }
 
-            self?.historyVideos.append(video)
+            if let id = self.historyItemsToLoad.popLast() {
+                self.loadHistoryVideoDetails(id)
+            }
         }
     }
 

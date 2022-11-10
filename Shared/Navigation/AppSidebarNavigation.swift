@@ -6,13 +6,13 @@ import SwiftUI
 
 struct AppSidebarNavigation: View {
     @EnvironmentObject<AccountsModel> private var accounts
+    @EnvironmentObject<NavigationModel> private var navigation
 
     #if os(iOS)
         @State private var didApplyPrimaryViewWorkAround = false
 
         @EnvironmentObject<CommentsModel> private var comments
         @EnvironmentObject<InstancesModel> private var instances
-        @EnvironmentObject<NavigationModel> private var navigation
         @EnvironmentObject<PlayerModel> private var player
         @EnvironmentObject<PlaylistsModel> private var playlists
         @EnvironmentObject<RecentsModel> private var recents
@@ -74,7 +74,15 @@ struct AppSidebarNavigation: View {
                 }
             #endif
 
-            ToolbarItem(placement: accountsMenuToolbarItemPlacement) {
+            ToolbarItemGroup(placement: openVideosToolbarItemPlacement) {
+                Button {
+                    navigation.presentingOpenVideos = true
+                } label: {
+                    Label("Open Videos", systemImage: "play.circle.fill")
+                }
+            }
+
+            ToolbarItemGroup(placement: accountsMenuToolbarItemPlacement) {
                 AccountsMenuView()
                     .help(
                         "Switch Instances and Accounts\n" +
@@ -94,6 +102,14 @@ struct AppSidebarNavigation: View {
                 }
             #endif
         }
+    }
+
+    var openVideosToolbarItemPlacement: ToolbarItemPlacement {
+        #if os(iOS)
+            return .navigationBarLeading
+        #else
+            return .automatic
+        #endif
     }
 
     var accountsMenuToolbarItemPlacement: ToolbarItemPlacement {

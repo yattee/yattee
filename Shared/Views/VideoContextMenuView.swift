@@ -70,7 +70,7 @@ struct VideoContextMenuView: View {
             addToQueueButton
         }
 
-        if accounts.app.supportsUserPlaylists, accounts.signedIn {
+        if accounts.app.supportsUserPlaylists, accounts.signedIn, !video.isLocal {
             Section {
                 addToPlaylistButton
                 addToLastPlaylistButton
@@ -87,7 +87,7 @@ struct VideoContextMenuView: View {
             }
         #endif
 
-        if !inChannelView, !inChannelPlaylistView {
+        if !inChannelView, !inChannelPlaylistView, !video.isLocal {
             Section {
                 openChannelButton
 

@@ -108,6 +108,10 @@ final class MPVBackend: PlayerBackend {
         client?.outputFps ?? 0
     }
 
+    var formattedOutputFps: String {
+        String(format: "%.2ffps", outputFps)
+    }
+
     var hwDecoder: String {
         client?.hwDecoder ?? "unknown"
     }
@@ -118,6 +122,54 @@ final class MPVBackend: PlayerBackend {
 
     var cacheDuration: Double {
         client?.cacheDuration ?? 0
+    }
+
+    var videoFormat: String {
+        client?.videoFormat ?? "unknown"
+    }
+
+    var videoCodec: String {
+        client?.videoCodec ?? "unknown"
+    }
+
+    var currentVo: String {
+        client?.currentVo ?? "unknown"
+    }
+
+    var videoWidth: Double? {
+        if let width = client?.width, width != "unknown" {
+            return Double(width)
+        }
+
+        return nil
+    }
+
+    var videoHeight: Double? {
+        if let height = client?.height, height != "unknown" {
+            return Double(height)
+        }
+
+        return nil
+    }
+
+    var audioFormat: String {
+        client?.audioFormat ?? "unknown"
+    }
+
+    var audioCodec: String {
+        client?.audioCodec ?? "unknown"
+    }
+
+    var currentAo: String {
+        client?.currentAo ?? "unknown"
+    }
+
+    var audioChannels: String {
+        client?.audioChannels ?? "unknown"
+    }
+
+    var audioSampleRate: String {
+        client?.audioSampleRate ?? "unknown"
     }
 
     init() {
@@ -228,6 +280,13 @@ final class MPVBackend: PlayerBackend {
                     self.onFileLoaded = {
                         updateCurrentStream()
                         startPlaying()
+                    }
+
+                    if video.isLocal, video.localStreamIsFile, let localStream = video.localStream {
+                        guard localStream.localURL.startAccessingSecurityScopedResource() else {
+                            self.model.navigation.presentAlert(title: "Could not open file")
+                            return
+                        }
                     }
 
                     self.client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in

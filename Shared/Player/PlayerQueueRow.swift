@@ -34,6 +34,7 @@ struct PlayerQueueRow: View {
             player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
             player.videoBeingOpened = item.video
+            player.show()
 
             if history {
                 player.playHistory(item, at: watchStoppedAt)
@@ -70,5 +71,13 @@ struct PlayerQueueRow: View {
         }
 
         return .secondsInDefaultTimescale(seconds)
+    }
+}
+
+struct PlayerQueueRow_Previews: PreviewProvider {
+    static var previews: some View {
+        PlayerQueueRow(item: .init(
+            .local(URL(string: "https://apple.com")!)
+        ))
     }
 }

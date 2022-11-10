@@ -80,6 +80,11 @@ extension VideosAPI {
             return
         }
 
+        if let video = item.video, video.isLocal {
+            completionHandler(item)
+            return
+        }
+
         video(item.videoID).load()
             .onSuccess { response in
                 guard let video: Video = response.typedContent() else {
@@ -87,6 +92,7 @@ extension VideosAPI {
                 }
 
                 var newItem = item
+                newItem.id = UUID()
                 newItem.video = video
 
                 completionHandler(newItem)

@@ -68,7 +68,7 @@ extension PlayerModel {
             guard let playerInstance = self.playerInstance else { return }
             let streamsInstance = video.streams.compactMap(\.instance).first
 
-            if video.streams.isEmpty || streamsInstance != playerInstance {
+            if !video.isLocal, video.streams.isEmpty || streamsInstance != playerInstance {
                 self.loadAvailableStreams(video)
             } else {
                 self.availableStreams = self.streamsWithInstance(instance: playerInstance, streams: video.streams)
@@ -203,6 +203,7 @@ extension PlayerModel {
                 }
             }
         } else {
+            videoDetailsLoadHandler(video, item)
             queue.insert(item, at: prepending ? 0 : queue.endIndex)
         }
 
@@ -210,11 +211,22 @@ extension PlayerModel {
     }
 
     func prepareCurrentItemForHistory(finished: Bool = false) {
-        if !currentItem.isNil, Defaults[.saveHistory] {
-            if let video = currentVideo, !historyVideos.contains(where: { $0 == video }) {
-                historyVideos.append(video)
+        if let currentItem {
+            if Defaults[.saveHistory] {
+                if let video = currentVideo, !historyVideos.contains(where: { $0 == video }) {
+                    historyVideos.append(video)
+                }
+                updateWatch(finished: finished)
             }
-            updateWatch(finished: finished)
+
+            if let video = currentItem.video,
+               video.isLocal,
+               video.localStreamIsFile,
+               let localURL = video.localStream?.localURL
+            {
+                logger.info("stopping security scoped resource access for \(localURL)")
+                localURL.stopAccessingSecurityScopedResource()
+            }
         }
     }
 
@@ -253,9 +265,35 @@ extension PlayerModel {
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
         guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
 
-        playerAPI.loadDetails(item, completionHandler: { newItem in
-            if let index = self.queue.firstIndex(where: { $0.id == item.id }) {
-                self.queue[index] = newItem
+        let videoID = item.video?.videoID ?? item.videoID
+
+        if queueItemBeingLoaded == nil {
+            logger.info("loading queue details: \(videoID)")
+            queueItemBeingLoaded = item
+        } else {
+            logger.info("POSTPONING details load: \(videoID)")
+            queueItemsToLoad.append(item)
+            return
+        }
+
+        playerAPI.loadDetails(item, completionHandler: { [weak self] newItem in
+            guard let self else { return }
+
+            self.queue.filter { $0.videoID == item.videoID }.forEach { item in
+                if let index = self.queue.firstIndex(of: item) {
+                    self.queue[index] = newItem
+                }
+            }
+
+            self.logger.info("LOADED queue details: \(videoID)")
+
+            if self.queueItemBeingLoaded == item {
+                self.logger.info("setting nothing loaded")
+                self.queueItemBeingLoaded = nil
+            }
+
+            if let item = self.queueItemsToLoad.popLast() {
+                self.loadQueueVideoDetails(item)
             }
         })
     }

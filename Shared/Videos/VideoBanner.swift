@@ -24,15 +24,38 @@ struct VideoBanner: View {
                 #endif
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(video?.title ?? "Loading...".localized())
-                    .truncationMode(.middle)
-                    .lineLimit(2)
-                    .font(.headline)
-                    .frame(alignment: .leading)
+                Group {
+                    if let video {
+                        HStack(alignment: .top) {
+                            Text(video.displayTitle + "\n")
+                            if video.isLocal, let fileExtension = video.localStreamFileExtension {
+                                Spacer()
+                                Text(fileExtension)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    } else {
+                        Text("Loading contents of the video, please wait")
+                            .redacted(reason: .placeholder)
+                    }
+                }
+                .truncationMode(.middle)
+                .lineLimit(2)
+                .font(.headline)
+                .frame(alignment: .leading)
 
                 HStack {
-                    Text(video?.author ?? "")
-                        .lineLimit(1)
+                    Group {
+                        if let video {
+                            if !video.isLocal || video.localStreamIsRemoteURL {
+                                Text(video.displayAuthor)
+                            }
+                        } else {
+                            Text("Video Author")
+                                .redacted(reason: .placeholder)
+                        }
+                    }
+                    .lineLimit(1)
 
                     Spacer()
 
@@ -40,10 +63,8 @@ struct VideoBanner: View {
                         progressView
                     #endif
 
-                    if let time = (videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() {
-                        Text(time)
-                            .fontWeight(.light)
-                    }
+                    Text((videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() ?? PlayerTimeModel.timePlaceholder)
+                        .fontWeight(.light)
                 }
                 .foregroundColor(.secondary)
             }
@@ -71,20 +92,30 @@ struct VideoBanner: View {
     }
 
     @ViewBuilder private var smallThumbnail: some View {
-        let url = video?.thumbnailURL(quality: .medium)
-
-        WebImage(url: url)
-            .resizable()
-            .placeholder {
-                ProgressView()
+        Group {
+            if let video {
+                if let thumbnail = video.thumbnailURL(quality: .medium) {
+                    WebImage(url: thumbnail)
+                        .resizable()
+                        .placeholder {
+                            ProgressView()
+                        }
+                        .indicator(.activity)
+                } else if video.localStreamIsFile {
+                    Image(systemName: "folder")
+                } else if video.localStreamIsRemoteURL {
+                    Image(systemName: "globe")
+                }
+            } else {
+                Image(systemName: "ellipsis")
             }
-            .indicator(.activity)
+        }
         #if os(tvOS)
-            .frame(width: thumbnailWidth, height: 140)
-            .mask(RoundedRectangle(cornerRadius: 12))
+        .frame(width: thumbnailWidth, height: thumbnailHeight)
+        .mask(RoundedRectangle(cornerRadius: 12))
         #else
-            .frame(width: thumbnailWidth, height: 60)
-            .mask(RoundedRectangle(cornerRadius: 6))
+        .frame(width: thumbnailWidth, height: thumbnailHeight)
+        .mask(RoundedRectangle(cornerRadius: 6))
         #endif
     }
 
@@ -93,6 +124,14 @@ struct VideoBanner: View {
             250
         #else
             100
+        #endif
+    }
+
+    private var thumbnailHeight: Double {
+        #if os(tvOS)
+            140
+        #else
+            60
         #endif
     }
 
@@ -120,6 +159,9 @@ struct VideoBanner_Previews: PreviewProvider {
         VStack(spacing: 20) {
             VideoBanner(video: Video.fixture, playbackTime: CMTime(seconds: 400, preferredTimescale: 10000))
             VideoBanner(video: Video.fixtureUpcomingWithoutPublishedOrViews)
+            VideoBanner(video: .local(URL(string: "https://apple.com/a/directory/of/video+that+has+very+long+title+that+will+likely.mp4")!))
+            VideoBanner(video: .local(URL(string: "file://a/b/c/d/e/f.mkv")!))
+            VideoBanner()
         }
         .frame(maxWidth: 900)
     }

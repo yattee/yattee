@@ -5,6 +5,12 @@ import SwiftUI
 import SwiftyJSON
 
 struct Video: Identifiable, Equatable, Hashable {
+    enum VideoID {
+        static func isValid(_ id: Video.ID) -> Bool {
+            id.count == 11
+        }
+    }
+
     let id: String
     let videoID: String
     var title: String
@@ -84,6 +90,33 @@ struct Video: Identifiable, Equatable, Hashable {
         self.captions = captions
     }
 
+    static func local(_ url: URL) -> Video {
+        Video(
+            videoID: url.absoluteString,
+            streams: [.init(localURL: url)]
+        )
+    }
+
+    var isLocal: Bool {
+        !VideoID.isValid(videoID)
+    }
+
+    var displayTitle: String {
+        if isLocal {
+            return localStreamFileName ?? localStream?.description ?? title
+        }
+
+        return title
+    }
+
+    var displayAuthor: String {
+        if isLocal, localStreamIsRemoteURL {
+            return remoteUrlHost ?? "Unknown"
+        }
+
+        return author
+    }
+
     var publishedDate: String? {
         (published.isEmpty || published == "0 seconds ago") ? nil : published
     }
@@ -132,5 +165,43 @@ struct Video: Identifiable, Equatable, Hashable {
             sortDescriptors: [],
             predicate: NSPredicate(format: "videoID = %@", videoID)
         )
+    }
+
+    var localStream: Stream? {
+        guard isLocal else { return nil }
+        return streams.first
+    }
+
+    var localStreamIsFile: Bool {
+        guard let localStream else { return false }
+        return localStream.localURL.isFileURL
+    }
+
+    var localStreamIsRemoteURL: Bool {
+        guard let localStream else { return false }
+        return !localStream.localURL.isFileURL
+    }
+
+    var remoteUrlHost: String? {
+        localStreamURLComponents?.host
+    }
+
+    var localStreamFileName: String? {
+        guard let path = localStream?.localURL?.lastPathComponent else { return nil }
+
+        if let localStreamFileExtension {
+            return String(path.dropLast(localStreamFileExtension.count + 1))
+        }
+        return String(path)
+    }
+
+    var localStreamFileExtension: String? {
+        guard let path = localStreamURLComponents?.path else { return nil }
+        return path.contains(".") ? path.components(separatedBy: ".").last?.uppercased() : nil
+    }
+
+    private var localStreamURLComponents: URLComponents? {
+        guard let localStream else { return nil }
+        return URLComponents(url: localStream.localURL, resolvingAgainstBaseURL: false)
     }
 }

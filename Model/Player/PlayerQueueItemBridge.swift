@@ -25,7 +25,13 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
             }
         }
 
+        var localURL = ""
+        if let video = value.video, video.isLocal {
+            localURL = video.localStream?.localURL.absoluteString ?? ""
+        }
+
         return [
+            "localURL": localURL,
             "videoID": value.videoID,
             "playbackTime": playbackTime,
             "videoDuration": videoDuration
@@ -33,12 +39,7 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
     }
 
     func deserialize(_ object: Serializable?) -> Value? {
-        guard
-            let object,
-            let videoID = object["videoID"]
-        else {
-            return nil
-        }
+        guard let object else { return nil }
 
         var playbackTime: CMTime?
         var videoDuration: TimeInterval?
@@ -55,6 +56,19 @@ struct PlayerQueueItemBridge: Defaults.Bridge {
         {
             videoDuration = TimeInterval(duration)
         }
+
+        if let localUrlString = object["localURL"],
+           !localUrlString.isEmpty,
+           let localURL = URL(string: localUrlString)
+        {
+            return PlayerQueueItem(
+                .local(localURL),
+                playbackTime: playbackTime,
+                videoDuration: videoDuration
+            )
+        }
+
+        guard let videoID = object["videoID"] else { return nil }
 
         return PlayerQueueItem(
             videoID: videoID,

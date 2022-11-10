@@ -72,6 +72,7 @@ final class NavigationModel: ObservableObject {
     @Published var presentingPlaylist = false
     @Published var sidebarSectionChanged = false
 
+    @Published var presentingOpenVideos = false
     @Published var presentingSettings = false
     @Published var presentingWelcomeScreen = false
 
