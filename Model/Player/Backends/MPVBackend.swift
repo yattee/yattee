@@ -470,7 +470,19 @@ final class MPVBackend: PlayerBackend {
             isSeeking = true
 
         case MPV_EVENT_END_FILE:
-            DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
+            let reason = event!.pointee.data.load(as: mpv_end_file_reason.self)
+
+            if reason != MPV_END_FILE_REASON_STOP {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    NavigationModel.shared.presentAlert(title: "Error while opening file")
+                    self.model.closeCurrentItem(finished: true)
+                    self.getTimeUpdates()
+                    self.eofPlaybackModeAction()
+                }
+            } else {
+                DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
+            }
 
         default:
             logger.info(.init(stringLiteral: "UNHANDLED event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))
