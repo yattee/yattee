@@ -67,6 +67,10 @@ struct OpenVideosModel {
     }
 
     func openURLs(_ urls: [URL], removeQueueItems: Bool, playbackMode: OpenVideosModel.PlaybackMode) {
+        guard !urls.isEmpty else {
+            return
+        }
+
         logger.info("opening \(urls.count) urls")
         urls.forEach { logger.info("\($0.absoluteString)") }
 

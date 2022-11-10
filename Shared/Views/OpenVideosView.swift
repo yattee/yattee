@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OpenVideosView: View {
     @State private var presentingFileImporter = false
-    @State private var urlsToOpenText = "https://r.yattee.stream/demo/mp4/1.mp4\nhttps://r.yattee.stream/demo/mp4/2.mp4\nhttps://r.yattee.stream/demo/mp4/3.mp4\nhttps://www.youtube.com/watch?v=N9WHp8DG2WY"
+    @State private var urlsToOpenText = ""
     @State private var playbackMode = OpenVideosModel.PlaybackMode.playNow
     @State private var removeQueueItems = false
 
@@ -46,7 +46,7 @@ struct OpenVideosView: View {
                     TextEditor(text: $urlsToOpenText)
                         .padding(2)
                         .border(Color(white: 0.8), width: 1)
-                        .frame(maxHeight: 200)
+                        .frame(minHeight: 100, maxHeight: 200)
                     #if !os(macOS)
                         .keyboardType(.URL)
                     #endif
