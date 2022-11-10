@@ -25,12 +25,12 @@ struct PopularView: View {
                 .navigationTitle("Popular")
             #endif
         }
+        #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 FavoriteButton(item: FavoriteItem(section: .popular))
             }
         }
-        #if !os(tvOS)
         .background(
             Button("Refresh") {
                 resource?.load()

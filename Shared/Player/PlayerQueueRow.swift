@@ -58,7 +58,11 @@ struct PlayerQueueRow: View {
         } label: {
             VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
         }
+        #if os(tvOS)
+        .buttonStyle(.card)
+        #else
         .buttonStyle(.plain)
+        #endif
     }
 
     private var watch: Watch? {

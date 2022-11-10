@@ -167,10 +167,6 @@ struct TrendingView: View {
                     }
                 }
 
-                #if os(iOS)
-                    Spacer()
-                #endif
-
                 HStack {
                     Text("Country")
                         .foregroundColor(.secondary)
@@ -178,13 +174,11 @@ struct TrendingView: View {
                     countryButton
                 }
 
-                #if os(tvOS)
-                    if let favoriteItem {
-                        FavoriteButton(item: favoriteItem)
-                            .id(favoriteItem.id)
-                            .labelStyle(.iconOnly)
-                    }
-                #endif
+                if let favoriteItem {
+                    FavoriteButton(item: favoriteItem)
+                        .id(favoriteItem.id)
+                        .labelStyle(.iconOnly)
+                }
             }
         }
     #endif

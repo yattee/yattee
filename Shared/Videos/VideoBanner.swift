@@ -71,8 +71,17 @@ struct VideoBanner: View {
             .padding(.vertical, playbackTime.isNil ? 0 : 5)
         }
         .contentShape(Rectangle())
-        .buttonStyle(.plain)
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 100, alignment: .center)
+        #if os(tvOS)
+            .buttonStyle(.card)
+
+        #else
+            .buttonStyle(.plain)
+        #endif
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 100, alignment: .center)
+        #if os(tvOS)
+            .padding(.vertical, 20)
+            .padding(.trailing, 10)
+        #endif
     }
 
     private var stackAlignment: VerticalAlignment {

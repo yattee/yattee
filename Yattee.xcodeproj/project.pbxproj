@@ -358,7 +358,6 @@
 		37599F36272B44000087F250 /* FavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F33272B44000087F250 /* FavoritesModel.swift */; };
 		37599F38272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
 		37599F39272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
-		37599F3A272B4D740087F250 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
 		375B537428DF6CBB004C1D19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 375B537828DF6CBB004C1D19 /* Localizable.strings */; };
 		375B537528DF6CBB004C1D19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 375B537828DF6CBB004C1D19 /* Localizable.strings */; };
 		375B537628DF6CBB004C1D19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 375B537828DF6CBB004C1D19 /* Localizable.strings */; };
@@ -581,6 +580,7 @@
 		379775952689365600DD52A8 /* Array+Next.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379775922689365600DD52A8 /* Array+Next.swift */; };
 		3799AC0928B03CED001376F9 /* ActiveLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 3799AC0828B03CED001376F9 /* ActiveLabel */; };
 		379B0253287A1CDF001015B5 /* OrientationTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B0252287A1CDF001015B5 /* OrientationTracker.swift */; };
+		379C0F49291DA5AB00256D07 /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37599F37272B4D740087F250 /* FavoriteButton.swift */; };
 		379DC3D128BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D228BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D328BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
@@ -3505,8 +3505,8 @@
 				370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */,
 				376A33E62720CB35000C1D6B /* Account.swift in Sources */,
 				3763C98B290C7A50004D3B5F /* OpenVideosView.swift in Sources */,
+				379C0F49291DA5AB00256D07 /* FavoriteButton.swift in Sources */,
 				375F7412289DC35A00747050 /* PlayerBackendView.swift in Sources */,
-				37599F3A272B4D740087F250 /* FavoriteButton.swift in Sources */,
 				37EF5C242739D37B00B03725 /* MenuModel.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				377ABC4E286E6A78009C986F /* LocationsSettings.swift in Sources */,
