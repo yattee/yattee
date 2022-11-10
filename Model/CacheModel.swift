@@ -22,4 +22,9 @@ struct CacheModel {
         let jsonTransformer = Transformer<JSON>(toData: toData, fromData: fromData)
         videoStorage = try? Storage<Video.ID, JSON>(diskConfig: videoStorageConfig, memoryConfig: videoStorageMemoryConfig, transformer: jsonTransformer)
     }
+
+    func removeAll() {
+        try? videoStorage?.removeAll()
+        try? urlBookmarksStorage?.removeAll()
+    }
 }

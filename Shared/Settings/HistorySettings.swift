@@ -4,9 +4,8 @@ import SwiftUI
 struct HistorySettings: View {
     static let watchedThresholds = [50, 60, 70, 80, 90, 95, 100]
 
-    @State private var presentingClearHistoryConfirmation = false
-
     @EnvironmentObject<PlayerModel> private var player
+    @EnvironmentObject<SettingsModel> private var settings
 
     @Default(.saveRecents) private var saveRecents
     @Default(.saveLastPlayed) private var saveLastPlayed
@@ -143,25 +142,26 @@ struct HistorySettings: View {
     }
 
     private var clearHistoryButton: some View {
-        Button("Clear History") {
-            presentingClearHistoryConfirmation = true
-        }
-        .alert(isPresented: $presentingClearHistoryConfirmation) {
-            Alert(
-                title: Text(
-                    "Are you sure you want to clear history of watched videos?"
-                ),
-                message: Text(
-                    "This cannot be reverted. You might need to switch between views or restart the app to see changes."
-                ),
-                primaryButton: .destructive(Text("Clear All")) {
-                    player.removeAllWatches()
-                    presentingClearHistoryConfirmation = false
-                },
-                secondaryButton: .cancel()
+        Button {
+            settings.presentAlert(
+                Alert(
+                    title: Text(
+                        "Are you sure you want to clear history of watched videos?"
+                    ),
+                    message: Text(
+                        "This cannot be reverted. You might need to switch between views or restart the app to see changes."
+                    ),
+                    primaryButton: .destructive(Text("Clear All")) {
+                        player.removeAllWatches()
+                        CacheModel.shared.removeAll()
+                    },
+                    secondaryButton: .cancel()
+                )
             )
+        } label: {
+            Text("Clear History")
+                .foregroundColor(.red)
         }
-        .foregroundColor(.red)
     }
 }
 
