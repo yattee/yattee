@@ -26,8 +26,6 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
             return InvidiousAPI(account: anonymousAccount)
         case .piped:
             return PipedAPI(account: anonymousAccount)
-        case .demoApp:
-            return DemoAppAPI()
         }
     }
 
@@ -36,9 +34,7 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var longDescription: String {
-        guard app != .demoApp else { return "Demo" }
-
-        return name.isEmpty ? "\(app.name) - \(apiURL)" : "\(app.name) - \(name) (\(apiURL))"
+        name.isEmpty ? "\(app.name) - \(apiURL)" : "\(app.name) - \(name) (\(apiURL))"
     }
 
     var shortDescription: String {

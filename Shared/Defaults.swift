@@ -9,7 +9,7 @@ extension Defaults.Keys {
     static let instancesManifest = Key<String>("instancesManifest", default: "")
     static let countryOfPublicInstances = Key<String?>("countryOfPublicInstances")
 
-    static let instances = Key<[Instance]>("instances", default: [.init(app: .demoApp, name: "Demo", apiURL: "")])
+    static let instances = Key<[Instance]>("instances", default: [])
     static let accounts = Key<[Account]>("accounts", default: [])
     static let lastAccountID = Key<Account.ID?>("lastAccountID")
     static let lastInstanceID = Key<Instance.ID?>("lastInstanceID")

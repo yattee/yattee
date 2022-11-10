@@ -8,7 +8,6 @@ struct AccountsNavigationLink: View {
         NavigationLink(instance.longDescription) {
             InstanceSettings(instance: instance)
         }
-        .disabled(instance.app == .demoApp)
         .buttonStyle(.plain)
         .contextMenu {
             removeInstanceButton(instance)

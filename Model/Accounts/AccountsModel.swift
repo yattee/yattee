@@ -7,7 +7,6 @@ final class AccountsModel: ObservableObject {
 
     @Published private var invidious = InvidiousAPI()
     @Published private var piped = PipedAPI()
-    @Published private var demo = DemoAppAPI()
 
     @Published var publicAccount: Account?
 
@@ -39,8 +38,6 @@ final class AccountsModel: ObservableObject {
             return piped
         case .invidious:
             return invidious
-        case .demoApp:
-            return demo
         }
     }
 
@@ -53,7 +50,7 @@ final class AccountsModel: ObservableObject {
     }
 
     var isDemo: Bool {
-        current?.app == .demoApp
+        false
     }
 
     init() {
@@ -91,8 +88,6 @@ final class AccountsModel: ObservableObject {
             invidious.setAccount(account)
         case .piped:
             piped.setAccount(account)
-        case .demoApp:
-            break
         }
 
         Defaults[.lastAccountIsPublic] = account.isPublic

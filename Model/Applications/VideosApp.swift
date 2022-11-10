@@ -2,7 +2,6 @@ import Foundation
 
 enum VideosApp: String, CaseIterable {
     case invidious, piped
-    case demoApp
 
     var name: String {
         rawValue.capitalized
@@ -65,6 +64,6 @@ enum VideosApp: String, CaseIterable {
     }
 
     var supportsOpeningVideosByID: Bool {
-        self != .demoApp
+        true
     }
 }
