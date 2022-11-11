@@ -10,24 +10,34 @@ struct HistoryView: View {
 
     var body: some View {
         LazyVStack {
-            ForEach(visibleWatches, id: \.videoID) { watch in
-                PlayerQueueRow(
-                    item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
-                    history: true
-                )
-                .onAppear {
-                    player.loadHistoryVideoDetails(watch.videoID)
+            if visibleWatches.isEmpty {
+                VStack(alignment: .center, spacing: 20) {
+                    HStack {
+                        Image(systemName: "clock")
+                        Text("Playback history is empty")
+
+                    }.foregroundColor(.secondary)
                 }
-                .contextMenu {
-                    VideoContextMenuView(video: player.historyVideo(watch.videoID) ?? watch.video)
+            } else {
+                ForEach(visibleWatches, id: \.videoID) { watch in
+                    PlayerQueueRow(
+                        item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
+                        history: true
+                    )
+                    .onAppear {
+                        player.loadHistoryVideoDetails(watch.videoID)
+                    }
+                    .contextMenu {
+                        VideoContextMenuView(video: player.historyVideo(watch.videoID) ?? watch.video)
+                    }
                 }
             }
-            #if os(tvOS)
-            .padding(.horizontal, 40)
-            #else
-            .padding(.horizontal, 15)
-            #endif
         }
+        #if os(tvOS)
+        .padding(.horizontal, 40)
+        #else
+        .padding(.horizontal, 15)
+        #endif
     }
 
     private var visibleWatches: [Watch] {

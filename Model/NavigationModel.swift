@@ -81,9 +81,12 @@ final class NavigationModel: ObservableObject {
 
     @Published var alert = Alert(title: Text("Error"))
     @Published var presentingAlert = false
+    @Published var presentingAlertInOpenVideos = false
     #if os(macOS)
         @Published var presentingAlertInVideoPlayer = false
     #endif
+
+    @Published var presentingFileImporter = false
 
     static func openChannel(
         _ channel: Channel,

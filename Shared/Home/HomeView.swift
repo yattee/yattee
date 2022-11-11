@@ -24,6 +24,36 @@ struct HomeView: View {
     var body: some View {
         BrowserPlayerControls {
             ScrollView(.vertical, showsIndicators: false) {
+                HStack {
+                    #if os(tvOS)
+                        OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
+                            NavigationModel.shared.presentingOpenVideos = true
+                        }
+                        .frame(maxWidth: 600)
+                    #else
+                        OpenVideosButton(text: "Files", imageSystemName: "folder") {
+                            NavigationModel.shared.presentingFileImporter = true
+                        }
+                        OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
+                            OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
+                        }
+                        OpenVideosButton(imageSystemName: "ellipsis") {
+                            NavigationModel.shared.presentingOpenVideos = true
+                        }
+                        .frame(maxWidth: 40)
+                    #endif
+                }
+                #if os(iOS)
+                .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
+                #else
+                .padding(.top, 15)
+                #endif
+                #if os(tvOS)
+                .padding(.horizontal, 40)
+                #else
+                .padding(.horizontal, 15)
+                #endif
+
                 if !accounts.current.isNil {
                     #if os(tvOS)
                         ForEach(Defaults[.favorites]) { item in
@@ -60,18 +90,7 @@ struct HomeView: View {
                     HistoryView(limit: homeHistoryItems)
                 }
 
-                #if os(tvOS)
-                    HStack {
-                        Button {
-                            navigation.presentingOpenVideos = true
-                        } label: {
-                            Label("Open Videos...", systemImage: "folder")
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                #else
+                #if !os(tvOS)
                     Color.clear.padding(.bottom, 60)
                 #endif
             }

@@ -85,6 +85,32 @@ struct ContentView: View {
                 }
             )
         #if !os(tvOS)
+            .fileImporter(
+                isPresented: $navigation.presentingFileImporter,
+                allowedContentTypes: [.audiovisualContent],
+                allowsMultipleSelection: true
+            ) { result in
+                do {
+                    let selectedFiles = try result.get()
+                    let urlsToOpen = selectedFiles.map { url in
+                        if let bookmarkURL = URLBookmarkModel.shared.loadBookmark(url) {
+                            return bookmarkURL
+                        }
+
+                        if url.startAccessingSecurityScopedResource() {
+                            URLBookmarkModel.shared.saveBookmark(url)
+                        }
+
+                        return url
+                    }
+
+                    OpenVideosModel.shared.openURLs(urlsToOpen)
+                } catch {
+                    NavigationModel.shared.presentAlert(title: "Could not open Files")
+                }
+
+                NavigationModel.shared.presentingOpenVideos = false
+            }
             .onOpenURL {
                 OpenURLHandler(
                     accounts: accounts,

@@ -18,7 +18,7 @@ struct OpenVideosView: View {
     var body: some View {
         #if os(macOS)
             openVideos
-                .frame(minWidth: 600, maxWidth: 800, minHeight: 250)
+                .frame(minWidth: 600, maxWidth: 800, minHeight: 350, maxHeight: 500)
         #else
             NavigationView {
                 openVideos
@@ -44,48 +44,45 @@ struct OpenVideosView: View {
         VStack(alignment: .leading) {
             ZStack(alignment: .topLeading) {
                 #if os(tvOS)
-                    TextField("URLs to Open", text: $urlsToOpenText)
+                    TextField("URL to Open", text: $urlsToOpenText)
                 #else
                     TextEditor(text: $urlsToOpenText)
                         .padding(2)
                         .border(Color(white: 0.8), width: 1)
-                        .frame(minHeight: 100, maxHeight: 200)
+                        .frame(minHeight: 100, maxHeight: 250)
                     #if !os(macOS)
                         .keyboardType(.URL)
                     #endif
                 #endif
             }
 
-            Text("Enter or paste URLs to open, one per line")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-
-            Menu {
-                Picker("Playback Mode", selection: $playbackMode) {
-                    ForEach(OpenVideosModel.PlaybackMode.allCases, id: \.rawValue) { mode in
-                        Text(mode.description).tag(mode)
-                    }
-                }
-            } label: {
-                Text(playbackMode.description)
+            Group {
+                #if os(tvOS)
+                    Text("Enter link to open")
+                #else
+                    Text("Enter links to open, one per line")
+                #endif
             }
-            .transaction { t in t.disablesAnimations = true }
-            .labelsHidden()
-            .padding(.bottom, 5)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .font(.caption2)
+            .foregroundColor(.secondary)
+
+            playbackModeControl
 
             Toggle(isOn: $removeQueueItems) {
-                Text("Clear queue before opening")
+                Text("Clear Queue before opening")
             }
             .disabled(!playbackMode.allowsRemovingQueueItems)
             .padding(.bottom)
 
             HStack {
                 Group {
+                    #if os(tvOS)
+                        Spacer()
+                    #endif
                     openURLsButton
+                    Spacer()
 
                     #if !os(tvOS)
-                        Spacer()
 
                         openFromClipboardButton
                     #endif
@@ -100,6 +97,7 @@ struct OpenVideosView: View {
             Spacer()
         }
         .padding()
+        .alert(isPresented: $navigation.presentingAlertInOpenVideos) { navigation.alert }
         #if !os(tvOS)
             .fileImporter(
                 isPresented: $presentingFileImporter,
@@ -122,7 +120,8 @@ struct OpenVideosView: View {
 
                     openURLs(selectedFiles)
                 } catch {
-                    NavigationModel.shared.presentAlert(title: "Could not open Files")
+                    NavigationModel.shared.alert = Alert(title: Text("Could not open Files"))
+                    NavigationModel.shared.presentingAlertInOpenVideos = true
                 }
 
                 presentationMode.wrappedValue.dismiss()
@@ -130,77 +129,64 @@ struct OpenVideosView: View {
         #endif
     }
 
-    var openURLsButton: some View {
-        Button {
-            openURLs(urlsToOpenFromText)
-        } label: {
-            HStack {
-                Image(systemName: "network")
-                Text("Open")
-                    .fontWeight(.bold)
-                    .padding(.vertical, 10)
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .padding(.horizontal, 20)
+    var playbackModeControl: some View {
+        HStack {
+            #if !os(tvOS)
+                Text("Playback Mode")
+                Spacer()
+            #endif
+            #if os(iOS)
+                Menu {
+                    playbackModePicker
+                } label: {
+                    Text(playbackMode.description)
+                }
+            #else
+                playbackModePicker
+                #if !os(tvOS)
+                .frame(maxWidth: 200)
+                #endif
+            #endif
         }
-        .foregroundColor(.accentColor)
-        .buttonStyle(.plain)
-        .background(buttonBackground)
+        .transaction { t in t.animation = .none }
+        .padding(.bottom, 5)
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    var playbackModePicker: some View {
+        Picker("Playback Mode", selection: $playbackMode) {
+            ForEach(OpenVideosModel.PlaybackMode.allCases, id: \.rawValue) { mode in
+                Text(mode.description).tag(mode)
+            }
+        }
+        .labelsHidden()
+    }
+
+    var openURLsButton: some View {
+        OpenVideosButton(text: "Open", imageSystemName: "network") {
+            openURLs(urlsToOpenFromText)
+        }
         .disabled(urlsToOpenFromText.isEmpty)
-        #if !os(tvOS)
+        #if os(tvOS)
+            .frame(maxWidth: 600)
+        #else
             .keyboardShortcut(.defaultAction)
         #endif
     }
 
     var openFromClipboardButton: some View {
-        Button {
+        OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
             OpenVideosModel.shared.openURLsFromClipboard(
                 removeQueueItems: removeQueueItems,
                 playbackMode: playbackMode
             )
-        } label: {
-            HStack {
-                Image(systemName: "doc.on.clipboard.fill")
-                Text("Paste")
-                    .fontWeight(.bold)
-                    .padding(.vertical, 10)
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .padding(.horizontal, 20)
         }
-        .foregroundColor(.accentColor)
-        .buttonStyle(.plain)
-        .background(buttonBackground)
-        #if !os(tvOS)
-            .keyboardShortcut(.defaultAction)
-        #endif
     }
 
     var openFilesButton: some View {
-        Button {
+        OpenVideosButton(text: "Open Files", imageSystemName: "folder") {
             presentingFileImporter = true
-        } label: {
-            HStack {
-                Image(systemName: "folder")
-                Text("Open Files")
-
-                    .fontWeight(.bold)
-                    .padding(.vertical, 10)
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .padding(.horizontal, 20)
         }
-        .foregroundColor(.accentColor)
-        .buttonStyle(.plain)
-        .background(buttonBackground)
-    }
-
-    var buttonBackground: some View {
-        RoundedRectangle(cornerRadius: 4)
-            .foregroundColor(Color.accentColor.opacity(0.33))
     }
 
     var urlsToOpenFromText: [URL] {
@@ -217,6 +203,7 @@ struct OpenVideosView: View {
 struct OpenVideosView_Previews: PreviewProvider {
     static var previews: some View {
         OpenVideosView()
+            .injectFixtureEnvironmentObjects()
         #if os(iOS)
             .navigationViewStyle(.stack)
         #endif

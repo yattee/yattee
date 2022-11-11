@@ -120,3 +120,10 @@ struct AppSidebarNavigation: View {
         #endif
     }
 }
+
+struct AppSidebarNavigation_Preview: PreviewProvider {
+    static var previews: some View {
+        AppSidebarNavigation()
+            .injectFixtureEnvironmentObjects()
+    }
+}
