@@ -62,7 +62,9 @@ struct PlayerSettings: View {
     private var sections: some View {
         Group {
             Section(header: SettingsHeader(text: "Playback".localized())) {
-                sourcePicker
+                if !accounts.isEmpty {
+                    sourcePicker
+                }
                 pauseOnHidingPlayerToggle
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
@@ -97,9 +99,8 @@ struct PlayerSettings: View {
                     sidebarPicker
                 #endif
 
-                keywordsToggle
-
-                if !accounts.isDemo {
+                if !accounts.isEmpty {
+                    keywordsToggle
                     returnYouTubeDislikeToggle
                 }
             }

@@ -46,6 +46,10 @@ struct AdvancedSettings: View {
             InstancesManifest.shared.setPublicAccount(newCountry, accounts: accounts, asCurrent: accounts.current?.isPublic ?? true)
         }
         .onChange(of: instancesManifest) { _ in
+            countryOfPublicInstances = nil
+            if let account = accounts.current, account.isPublic {
+                accounts.setCurrent(nil)
+            }
             countries.removeAll()
         }
         .sheet(isPresented: $presentingInstanceForm) {

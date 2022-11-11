@@ -19,7 +19,7 @@ struct ShareButton: View {
                 } else {
                     instanceActions
                     Divider()
-                    if !accounts.isDemo {
+                    if !accounts.isEmpty {
                         youtubeActions
                     }
                 }

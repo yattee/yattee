@@ -35,7 +35,7 @@ struct InstancesSettings: View {
                 Spacer()
             }
 
-            if !selectedInstance.isNil, selectedInstance.app.supportsAccounts, !accounts.isDemo {
+            if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
                 SettingsHeader(text: "Accounts".localized())
 
                 let list = List(selection: $selectedAccount) {
@@ -114,13 +114,11 @@ struct InstancesSettings: View {
 
             if selectedInstance != nil {
                 HStack {
-                    if !accounts.isDemo {
-                        Button("Add Account...") {
-                            selectedAccount = nil
-                            presentingAccountForm = true
-                        }
-                        .disabled(!selectedInstance.app.supportsAccounts)
+                    Button("Add Account...") {
+                        selectedAccount = nil
+                        presentingAccountForm = true
                     }
+                    .disabled(!selectedInstance.app.supportsAccounts)
 
                     Spacer()
 

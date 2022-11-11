@@ -47,9 +47,11 @@ struct TVNavigationView: View {
                     .tabItem { Text("Now Playing") }
                     .tag(TabSelection.nowPlaying)
 
-                LazyView(SearchView())
-                    .tabItem { Image(systemName: "magnifyingglass") }
-                    .tag(TabSelection.search)
+                if !accounts.isEmpty {
+                    LazyView(SearchView())
+                        .tabItem { Image(systemName: "magnifyingglass") }
+                        .tag(TabSelection.search)
+                }
 
                 LazyView(SettingsView())
                     .tabItem { Image(systemName: "gear") }

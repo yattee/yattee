@@ -39,7 +39,9 @@ struct AppTabNavigation: View {
                 playlistsNavigationView
             }
 
-            searchNavigationView
+            if !accounts.isEmpty {
+                searchNavigationView
+            }
         }
         .id(accounts.current?.id ?? "")
         .overlay(playlistView)

@@ -10,7 +10,7 @@ struct SettingsView: View {
             case browsing, player, quality, history, sponsorBlock, advanced, help
         }
 
-        @State private var selection = Tabs.browsing
+        @State private var selection: Tabs?
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -34,13 +34,15 @@ struct SettingsView: View {
     var settings: some View {
         #if os(macOS)
             TabView(selection: $selection) {
-                Form {
-                    BrowsingSettings()
+                if !accounts.isEmpty {
+                    Form {
+                        BrowsingSettings()
+                    }
+                    .tabItem {
+                        Label("Browsing", systemImage: "list.and.film")
+                    }
+                    .tag(Optional(Tabs.browsing))
                 }
-                .tabItem {
-                    Label("Browsing", systemImage: "list.and.film")
-                }
-                .tag(Tabs.browsing)
 
                 Form {
                     PlayerSettings()
@@ -48,7 +50,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Player", systemImage: "play.rectangle")
                 }
-                .tag(Tabs.player)
+                .tag(Optional(Tabs.player))
 
                 Form {
                     QualitySettings()
@@ -56,7 +58,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Quality", systemImage: "4k.tv")
                 }
-                .tag(Tabs.quality)
+                .tag(Optional(Tabs.quality))
 
                 Form {
                     HistorySettings()
@@ -64,15 +66,17 @@ struct SettingsView: View {
                 .tabItem {
                     Label("History", systemImage: "clock.arrow.circlepath")
                 }
-                .tag(Tabs.history)
+                .tag(Optional(Tabs.history))
 
-                Form {
-                    SponsorBlockSettings()
+                if !accounts.isEmpty {
+                    Form {
+                        SponsorBlockSettings()
+                    }
+                    .tabItem {
+                        Label("SponsorBlock", systemImage: "dollarsign.circle")
+                    }
+                    .tag(Optional(Tabs.sponsorBlock))
                 }
-                .tabItem {
-                    Label("SponsorBlock", systemImage: "dollarsign.circle")
-                }
-                .tag(Tabs.sponsorBlock)
 
                 Group {
                     AdvancedSettings()
@@ -80,7 +84,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Advanced", systemImage: "wrench.and.screwdriver")
                 }
-                .tag(Tabs.advanced)
+                .tag(Optional(Tabs.advanced))
 
                 Form {
                     Help()
@@ -88,7 +92,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Help", systemImage: "questionmark.circle")
                 }
-                .tag(Tabs.help)
+                .tag(Optional(Tabs.help))
             }
             .padding(20)
             .frame(width: 600, height: windowHeight)
@@ -106,8 +110,10 @@ struct SettingsView: View {
         var settingsList: some View {
             List {
                 #if os(tvOS)
-                    AccountSelectionView()
-                    Divider()
+                    if !accounts.isEmpty {
+                        AccountSelectionView()
+                        Divider()
+                    }
                 #endif
 
                 Section {
@@ -119,10 +125,12 @@ struct SettingsView: View {
                         }
                     #endif
 
-                    NavigationLink {
-                        BrowsingSettings()
-                    } label: {
-                        Label("Browsing", systemImage: "list.and.film")
+                    if !accounts.isEmpty {
+                        NavigationLink {
+                            BrowsingSettings()
+                        } label: {
+                            Label("Browsing", systemImage: "list.and.film")
+                        }
                     }
 
                     NavigationLink {
@@ -143,10 +151,12 @@ struct SettingsView: View {
                         Label("History", systemImage: "clock.arrow.circlepath")
                     }
 
-                    NavigationLink {
-                        SponsorBlockSettings()
-                    } label: {
-                        Label("SponsorBlock", systemImage: "dollarsign.circle")
+                    if !accounts.isEmpty {
+                        NavigationLink {
+                            SponsorBlockSettings()
+                        } label: {
+                            Label("SponsorBlock", systemImage: "dollarsign.circle")
+                        }
                     }
 
                     NavigationLink {
@@ -210,6 +220,8 @@ struct SettingsView: View {
     #if os(macOS)
         private var windowHeight: Double {
             switch selection {
+            case nil:
+                return accounts.isEmpty ? 680 : 400
             case .browsing:
                 return 400
             case .player:

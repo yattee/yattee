@@ -49,10 +49,6 @@ final class AccountsModel: ObservableObject {
         !isEmpty && !current.anonymous && api.signedIn
     }
 
-    var isDemo: Bool {
-        false
-    }
-
     init() {
         cancellables.append(
             invidious.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
@@ -80,6 +76,7 @@ final class AccountsModel: ObservableObject {
         current = account
 
         guard !account.isNil else {
+            current = nil
             return
         }
 

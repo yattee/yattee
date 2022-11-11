@@ -73,12 +73,14 @@ struct Sidebar: View {
                 .id("trending")
             }
 
-            NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
-                Label("Search", systemImage: "magnifyingglass")
-                    .accessibility(label: Text("Search"))
+            if !accounts.isEmpty {
+                NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
+                    Label("Search", systemImage: "magnifyingglass")
+                        .accessibility(label: Text("Search"))
+                }
+                .id("search")
+                .keyboardShortcut("f")
             }
-            .id("search")
-            .keyboardShortcut("f")
         }
     }
 
