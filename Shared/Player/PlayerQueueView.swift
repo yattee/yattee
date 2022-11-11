@@ -15,7 +15,6 @@ struct PlayerQueueView: View {
     @EnvironmentObject<PlayerModel> private var player
 
     @Default(.saveHistory) private var saveHistory
-    @Default(.showHistoryInPlayer) private var showHistoryInPlayer
 
     var body: some View {
         List {
@@ -26,9 +25,6 @@ struct PlayerQueueView: View {
                 playingNext
                 if sidebarQueue {
                     related
-                }
-                if saveHistory, showHistoryInPlayer {
-                    playedPreviously
                 }
             }
             .listRowBackground(Color.clear)
@@ -106,28 +102,6 @@ struct PlayerQueueView: View {
 
     private var visibleWatches: [Watch] {
         watches.filter { $0.videoID != player.currentVideo?.videoID }
-    }
-
-    var playedPreviously: some View {
-        Group {
-            if !visibleWatches.isEmpty {
-                Section(header: Text("History")) {
-                    ForEach(visibleWatches, id: \.videoID) { watch in
-                        PlayerQueueRow(
-                            item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
-                            history: true,
-                            fullScreen: $fullScreen
-                        )
-                        .onAppear {
-                            player.loadHistoryVideoDetails(watch.videoID)
-                        }
-                        .contextMenu {
-                            VideoContextMenuView(video: watch.video)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @ViewBuilder private var related: some View {

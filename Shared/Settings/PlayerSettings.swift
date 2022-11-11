@@ -6,7 +6,6 @@ struct PlayerSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
-    @Default(.showHistoryInPlayer) private var showHistory
     @Default(.playerControlsLayout) private var playerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
@@ -99,7 +98,6 @@ struct PlayerSettings: View {
                 #endif
 
                 keywordsToggle
-                showHistoryToggle
 
                 if !accounts.isDemo {
                     returnYouTubeDislikeToggle
@@ -223,10 +221,6 @@ struct PlayerSettings: View {
 
     private var keywordsToggle: some View {
         Toggle("Show keywords", isOn: $showKeywords)
-    }
-
-    private var showHistoryToggle: some View {
-        Toggle("Show history", isOn: $showHistory)
     }
 
     private var returnYouTubeDislikeToggle: some View {

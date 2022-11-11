@@ -19,7 +19,7 @@ struct LocationsSettings: View {
                 settings
                 Spacer()
             #else
-                List {
+                Group {
                     settings
                 }
                 #if os(iOS)

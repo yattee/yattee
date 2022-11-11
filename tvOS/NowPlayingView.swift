@@ -4,10 +4,10 @@ import SwiftUI
 
 struct NowPlayingView: View {
     enum ViewSection: CaseIterable {
-        case nowPlaying, playingNext, playedPreviously, related, comments, chapters
+        case nowPlaying, playingNext, related, comments, chapters
     }
 
-    var sections = [ViewSection.nowPlaying, .playingNext, .playedPreviously, .related]
+    var sections = [ViewSection.nowPlaying, .playingNext, .related]
     var inInfoViewController = false
 
     @State private var repliesID: Comment.ID?
@@ -20,7 +20,6 @@ struct NowPlayingView: View {
     @EnvironmentObject<RecentsModel> private var recents
 
     @Default(.saveHistory) private var saveHistory
-    @Default(.showHistoryInPlayer) private var showHistoryInPlayer
 
     var body: some View {
         if inInfoViewController {
@@ -94,31 +93,6 @@ struct NowPlayingView: View {
                             }
                             .contextMenu {
                                 VideoContextMenuView(video: video)
-                            }
-                        }
-                    }
-                }
-
-                if sections.contains(.playedPreviously), saveHistory, showHistoryInPlayer, !visibleWatches.isEmpty {
-                    Section(header: Text("Played Previously")) {
-                        ForEach(visibleWatches, id: \.videoID) { watch in
-                            Button {
-                                player.playHistory(
-                                    PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID))
-                                )
-                                player.show()
-                            } label: {
-                                VideoBanner(
-                                    video: player.historyVideo(watch.videoID),
-                                    playbackTime: CMTime.secondsInDefaultTimescale(watch.stoppedAt),
-                                    videoDuration: watch.videoDuration
-                                )
-                            }
-                            .onAppear {
-                                player.loadHistoryVideoDetails(watch.videoID)
-                            }
-                            .contextMenu {
-                                VideoContextMenuView(video: watch.video)
                             }
                         }
                     }

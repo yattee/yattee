@@ -49,9 +49,6 @@ final class AppleAVPlayerViewController: UIViewController {
         infoViewControllers.append(infoViewController([.comments], title: "Comments"))
 
         var queueSections = [NowPlayingView.ViewSection.playingNext]
-        if Defaults[.showHistoryInPlayer] {
-            queueSections.append(.playedPreviously)
-        }
 
         infoViewControllers.append(contentsOf: [
             infoViewController([.related], title: "Related"),

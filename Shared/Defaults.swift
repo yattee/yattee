@@ -115,7 +115,6 @@ extension Defaults.Keys {
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
     static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 20.0)
     static let showKeywords = Key<Bool>("showKeywords", default: false)
-    static let showHistoryInPlayer = Key<Bool>("showHistoryInPlayer", default: false)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
     #endif
