@@ -59,16 +59,21 @@ extension PlayerModel {
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            guard let video = self.currentVideo else {
+            guard let video = item.video else {
                 return
             }
 
             self.videoBeingOpened = nil
 
+            if video.isLocal {
+                self.availableStreams = video.streams
+                return
+            }
+
             guard let playerInstance = self.playerInstance else { return }
             let streamsInstance = video.streams.compactMap(\.instance).first
 
-            if !video.isLocal, video.streams.isEmpty || streamsInstance != playerInstance {
+            if video.streams.isEmpty || streamsInstance != playerInstance {
                 self.loadAvailableStreams(video)
             } else {
                 self.availableStreams = self.streamsWithInstance(instance: playerInstance, streams: video.streams)

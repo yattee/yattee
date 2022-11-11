@@ -111,12 +111,12 @@ struct PlayerControls: View {
 
                                 if playerControlsLayout.displaysTitleLine {
                                     VStack(alignment: .leading) {
-                                        Text(player.currentVideo?.title ?? "Not Playing")
+                                        Text(player.currentVideo?.displayTitle ?? "Not Playing")
                                             .shadow(radius: 10)
                                             .font(.system(size: playerControlsLayout.titleLineFontSize).bold())
                                             .lineLimit(1)
 
-                                        Text(player.currentVideo?.channel.name ?? "")
+                                        Text(player.currentVideo?.displayAuthor ?? "")
                                             .fontWeight(.semibold)
                                             .shadow(radius: 10)
                                             .foregroundColor(.secondary)

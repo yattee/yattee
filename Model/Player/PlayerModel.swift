@@ -806,7 +806,7 @@ final class PlayerModel: ObservableObject {
 
     #if os(macOS)
         var windowTitle: String {
-            currentVideo.isNil ? "Not Playing" : "\(currentVideo!.title) - \(currentVideo!.author)"
+            currentVideo.isNil ? "Not Playing" : "\(currentVideo!.displayTitle) - \(currentVideo!.displayAuthor)"
         }
     #else
         func handleEnterForeground() {
