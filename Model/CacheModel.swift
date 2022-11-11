@@ -1,30 +1,14 @@
-import Cache
 import Foundation
 import SwiftyJSON
 
 struct CacheModel {
     static var shared = CacheModel()
+    static let bookmarksGroup = "group.stream.yattee.app.bookmarks"
 
-    var urlBookmarksStorage: Storage<String, Data>?
-    var videoStorage: Storage<Video.ID, JSON>?
-
-    init() {
-        let urlBookmarksStorageConfig = DiskConfig(name: "URLBookmarks", expiry: .never)
-        let urlBookmarksMemoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 100)
-        urlBookmarksStorage = try? Storage(diskConfig: urlBookmarksStorageConfig, memoryConfig: urlBookmarksMemoryConfig, transformer: TransformerFactory.forData())
-
-        let videoStorageConfig = DiskConfig(name: "VideoStorage", expiry: .never)
-        let videoStorageMemoryConfig = MemoryConfig(expiry: .never, countLimit: 100, totalCostLimit: 100)
-
-        let toData: (JSON) throws -> Data = { try $0.rawData() }
-        let fromData: (Data) throws -> JSON = { try JSON(data: $0) }
-
-        let jsonTransformer = Transformer<JSON>(toData: toData, fromData: fromData)
-        videoStorage = try? Storage<Video.ID, JSON>(diskConfig: videoStorageConfig, memoryConfig: videoStorageMemoryConfig, transformer: jsonTransformer)
-    }
+    let bookmarksDefaults = UserDefaults(suiteName: Self.bookmarksGroup)
 
     func removeAll() {
-        try? videoStorage?.removeAll()
-        try? urlBookmarksStorage?.removeAll()
+        guard let bookmarksDefaults else { return }
+        bookmarksDefaults.dictionaryRepresentation().keys.forEach(bookmarksDefaults.removeObject(forKey:))
     }
 }

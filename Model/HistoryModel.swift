@@ -28,7 +28,8 @@ extension PlayerModel {
             return
         }
 
-        playerAPI.video(id).load()
+        playerAPI.video(id)
+            .load()
             .onSuccess { [weak self] response in
                 guard let self else { return }
 

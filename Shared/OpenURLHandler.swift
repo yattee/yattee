@@ -27,14 +27,15 @@ struct OpenURLHandler {
             }
         #endif
 
-        if url.isFileURL {
-            OpenVideosModel.shared.open(url)
+        guard var url = urlByReplacingYatteeProtocol(url) else {
             return
         }
 
-        let parser = URLParser(url: urlByReplacingYatteeProtocol(url))
+        let parser = URLParser(url: url)
 
         switch parser.destination {
+        case .fileURL:
+            handleFileURLOpen(parser)
         case .video:
             handleVideoUrlOpen(parser)
         case .playlist:
@@ -93,13 +94,26 @@ struct OpenURLHandler {
         }
 
         urlAbsoluteString = String(urlAbsoluteString.dropFirst(Self.yatteeProtocol.count))
+        if url.absoluteString.contains("://") {
+            return URL(string: urlAbsoluteString)
+        }
 
         return URL(string: "\(urlProtocol)://\(urlAbsoluteString)")
     }
 
+    private func handleFileURLOpen(_ parser: URLParser) {
+        guard let url = parser.fileURL else { return }
+
+        OpenVideosModel.shared.openURLs([url], removeQueueItems: false, playbackMode: .playNow)
+    }
+
     private func handleVideoUrlOpen(_ parser: URLParser) {
-        guard let id = parser.videoID, id != player.currentVideo?.id else {
+        guard let id = parser.videoID else {
             navigation.presentAlert(title: "Could not open video", message: "Could not extract video ID")
+            return
+        }
+
+        guard id != player.currentVideo?.id else {
             return
         }
 

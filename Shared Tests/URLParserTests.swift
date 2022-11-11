@@ -1,6 +1,11 @@
 import XCTest
 
 final class URLParserTests: XCTestCase {
+    private static let urls: [String] = [
+        "https://r.yattee.stream/demo/mp4/1.mp4",
+        "https://r.yattee.stream/demo/mp4/2.mp4",
+        "https://r.yattee.stream/demo/mp4/3.mp4"
+    ]
     private static let videos: [String: String] = [
         "https://www.youtube.com/watch?v=_E0PWQvW-14&list=WL&index=4&t=155s": "_E0PWQvW-14",
         "https://youtu.be/IRsc57nK8mg?t=20": "IRsc57nK8mg",
@@ -49,6 +54,15 @@ final class URLParserTests: XCTestCase {
         "/results?search_query=a+b%3Dcde": "a b=cde",
         "search?search_query=a+b%3Dcde": "a b=cde"
     ]
+
+    func testUrlsParsing() throws {
+        Self.urls.forEach { urlString in
+            let url = URL(string: urlString)!
+            let parser = URLParser(url: url)
+            XCTAssertEqual(parser.destination, .fileURL)
+            XCTAssertEqual(parser.fileURL, url)
+        }
+    }
 
     func testVideosParsing() throws {
         Self.videos.forEach { url, id in

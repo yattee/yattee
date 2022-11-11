@@ -77,6 +77,10 @@
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
+		37095E82291DC85400301883 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37095E81291DC85400301883 /* ShareViewController.swift */; };
+		37095E89291DC85400301883 /* Open in Yattee.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37095E7F291DC85400301883 /* Open in Yattee.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
+		37095E8E291DD5FE00301883 /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* CacheModel.swift */; };
 		370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79C8286279810045DB77 /* NSObject+Swizzle.swift */; };
 		370B79CC286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */; };
 		370F4FA927CC163A001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
@@ -411,9 +415,6 @@
 		3765917E27237D2A009F956E /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3765917D27237D2A009F956E /* PINCache */; };
 		37666BAA27023AF000F869E5 /* AccountSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37666BA927023AF000F869E5 /* AccountSelectionView.swift */; };
 		3766AFD2273DA97D00686348 /* Int+FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA796D26DC412E002A0235 /* Int+FormatTests.swift */; };
-		376787BC291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376787BB291C4B7B00D356A4 /* VideoCacheModel.swift */; };
-		376787BD291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376787BB291C4B7B00D356A4 /* VideoCacheModel.swift */; };
-		376787BE291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376787BB291C4B7B00D356A4 /* VideoCacheModel.swift */; };
 		3769537928A877C4005D87C3 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
 		3769C02E2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */; };
 		3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */; };
@@ -540,8 +541,6 @@
 		3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
 		3788AC2826F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
 		3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */; };
-		3788AD3E291D042D00C53C9B /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 3788AD3D291D042D00C53C9B /* Cache */; };
-		3788AD40291D043200C53C9B /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 3788AD3F291D043200C53C9B /* Cache */; };
 		378AE93A274EDFAF006A4EE1 /* Badge+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */; };
 		378AE93C274EDFB2006A4EE1 /* Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBD274DA401005EA4D6 /* Backport.swift */; };
 		378AE93D274EDFB3006A4EE1 /* Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBD274DA401005EA4D6 /* Backport.swift */; };
@@ -759,6 +758,7 @@
 		37D6025A28C17375009E8D98 /* PlaybackStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025828C17375009E8D98 /* PlaybackStatsView.swift */; };
 		37D6025B28C17375009E8D98 /* PlaybackStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025828C17375009E8D98 /* PlaybackStatsView.swift */; };
 		37D6025D28C17719009E8D98 /* ControlsOverlayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */; };
+		37DA0F20291DD6B8009B38CF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 37DA0F1F291DD6B8009B38CF /* Logging */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -852,7 +852,6 @@
 		37F4AE7226828F0900BD60EA /* VerticalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VerticalCells.swift */; };
 		37F4AE7326828F0900BD60EA /* VerticalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VerticalCells.swift */; };
 		37F4AE7426828F0900BD60EA /* VerticalCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F4AE7126828F0900BD60EA /* VerticalCells.swift */; };
-		37F5E8B4291BE97A006C15F5 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 37F5E8B3291BE97A006C15F5 /* Cache */; };
 		37F5E8B6291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
 		37F5E8B7291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
 		37F5E8B8291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
@@ -898,6 +897,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		37095E87291DC85400301883 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37095E7E291DC85400301883;
+			remoteInfo = "Open in Yattee";
+		};
 		37D4B0D52671614900C925CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 37D4B0BD2671614700C925CA /* Project object */;
@@ -965,6 +971,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				37095E89291DC85400301883 /* Open in Yattee.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -992,6 +999,9 @@
 		3703100127B0713600ECDDAA /* PlayerGestures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerGestures.swift; sourceTree = "<group>"; };
 		3705B17F267B4DFB00704544 /* TrendingCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountry.swift; sourceTree = "<group>"; };
 		3705B181267B4E4900704544 /* TrendingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCategory.swift; sourceTree = "<group>"; };
+		37095E7F291DC85400301883 /* Open in Yattee.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37095E81291DC85400301883 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		37095E86291DC85400301883 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		370B79C8286279810045DB77 /* NSObject+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+Swizzle.swift"; sourceTree = "<group>"; };
 		370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+HideHomeIndicator.swift"; sourceTree = "<group>"; };
 		370F4FAE27CC16CA001B35DC /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libssl.3.dylib; sourceTree = "<group>"; };
@@ -1137,7 +1147,6 @@
 		37658ED428E1C567004BF6A2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		37666BA927023AF000F869E5 /* AccountSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSelectionView.swift; sourceTree = "<group>"; };
 		376787BA291C43CD00D356A4 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
-		376787BB291C4B7B00D356A4 /* VideoCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCacheModel.swift; sourceTree = "<group>"; };
 		3768122C28E8D0BC0036FC8D /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderProgressView.swift; sourceTree = "<group>"; };
 		376A33DF2720CAD6000C1D6B /* VideosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosApp.swift; sourceTree = "<group>"; };
@@ -1168,6 +1177,8 @@
 		377ABC4B286E6A78009C986F /* LocationsSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsSettings.swift; sourceTree = "<group>"; };
 		377FF88A291A60310028EB0B /* OpenVideosModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosModel.swift; sourceTree = "<group>"; };
 		377FF88E291A99580028EB0B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		37824309291E58D6005DEC1C /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
+		3782430A291E5AFA005DEC1C /* Yattee (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Yattee (iOS).entitlements"; sourceTree = "<group>"; };
 		3782B94E27553A6700990149 /* SearchSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestions.swift; sourceTree = "<group>"; };
 		3782B9512755667600990149 /* String+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Format.swift"; sourceTree = "<group>"; };
 		3782B95C2755858100990149 /* NSTextField+FocusRingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSTextField+FocusRingType.swift"; sourceTree = "<group>"; };
@@ -1330,6 +1341,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		37095E7C291DC85400301883 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37DA0F20291DD6B8009B38CF /* Logging in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		371264382865FF4500D77974 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1362,7 +1381,6 @@
 				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
-				37F5E8B4291BE97A006C15F5 /* Cache in Frameworks */,
 				3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
 				3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
@@ -1402,7 +1420,6 @@
 				370F4FC927CC16CB001B35DC /* libssl.3.dylib in Frameworks */,
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
-				3788AD3E291D042D00C53C9B /* Cache in Frameworks */,
 				370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */,
 				3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */,
@@ -1464,7 +1481,6 @@
 				37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */,
 				3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
-				3788AD40291D043200C53C9B /* Cache in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
@@ -1504,6 +1520,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		37095E80291DC85400301883 /* Open in Yattee */ = {
+			isa = PBXGroup;
+			children = (
+				37824309291E58D6005DEC1C /* Open in Yattee.entitlements */,
+				37095E81291DC85400301883 /* ShareViewController.swift */,
+				37095E86291DC85400301883 /* Info.plist */,
+			);
+			path = "Open in Yattee";
+			sourceTree = "<group>";
+		};
 		370F4FAC27CC169D001B35DC /* macOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -1920,6 +1946,7 @@
 				3784B23A272894DA00B09468 /* ShareSheet.swift */,
 				3749BF9227ADA142000480FF /* BridgingHeader.h */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
+				3782430A291E5AFA005DEC1C /* Yattee (iOS).entitlements */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -1986,6 +2013,7 @@
 				37DD9DCC2785EE6F00539416 /* Vendor */,
 				3748186426A762300084E870 /* Fixtures */,
 				3712643C2865FF4500D77974 /* Shared Tests */,
+				37095E80291DC85400301883 /* Open in Yattee */,
 				377FC7D1267A080300A6BBAF /* Frameworks */,
 				37D4B0CA2671614900C925CA /* Products */,
 				37D4B174267164B000C925CA /* Tests Apple TV */,
@@ -2038,6 +2066,7 @@
 				37D4B158267164AE00C925CA /* Yattee.app */,
 				37D4B171267164B000C925CA /* Tests (tvOS).xctest */,
 				3712643B2865FF4500D77974 /* Shared Tests.xctest */,
+				37095E7F291DC85400301883 /* Open in Yattee.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2132,7 +2161,6 @@
 				37D4B19626717E1500C925CA /* Video.swift */,
 				3784CDDE27772EE40055BBF2 /* Watch.swift */,
 				37130A59277657090033018A /* Yattee.xcdatamodeld */,
-				376787BB291C4B7B00D356A4 /* VideoCacheModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2234,6 +2262,26 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		37095E7E291DC85400301883 /* Open in Yattee */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37095E8C291DC85400301883 /* Build configuration list for PBXNativeTarget "Open in Yattee" */;
+			buildPhases = (
+				37095E7B291DC85400301883 /* Sources */,
+				37095E7C291DC85400301883 /* Frameworks */,
+				37095E7D291DC85400301883 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Open in Yattee";
+			packageProductDependencies = (
+				37DA0F1F291DD6B8009B38CF /* Logging */,
+			);
+			productName = "Open in Yattee";
+			productReference = 37095E7F291DC85400301883 /* Open in Yattee.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		3712643A2865FF4500D77974 /* Shared Tests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 371264412865FF4500D77974 /* Build configuration list for PBXNativeTarget "Shared Tests" */;
@@ -2265,6 +2313,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				37095E88291DC85400301883 /* PBXTargetDependency */,
 			);
 			name = "Yattee (iOS)";
 			packageProductDependencies = (
@@ -2284,7 +2333,6 @@
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
 				3797104828D3D10600D5F53C /* SDWebImageSwiftUI */,
-				37F5E8B3291BE97A006C15F5 /* Cache */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2321,7 +2369,6 @@
 				372AA413286D06A10000B1DC /* Repeat */,
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
 				3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */,
-				3788AD3D291D042D00C53C9B /* Cache */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2399,7 +2446,6 @@
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
 				3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */,
-				3788AD3F291D043200C53C9B /* Cache */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2430,9 +2476,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
+					37095E7E291DC85400301883 = {
+						CreatedOnToolsVersion = 14.1;
+					};
 					3712643A2865FF4500D77974 = {
 						CreatedOnToolsVersion = 14.0;
 					};
@@ -2502,7 +2551,6 @@
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				37F5E8B2291BE97A006C15F5 /* XCRemoteSwiftPackageReference "Cache" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -2518,11 +2566,19 @@
 				37D4B0DD2671614900C925CA /* Tests (macOS) */,
 				37D4B170267164B000C925CA /* Tests (tvOS) */,
 				3712643A2865FF4500D77974 /* Shared Tests */,
+				37095E7E291DC85400301883 /* Open in Yattee */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		37095E7D291DC85400301883 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		371264392865FF4500D77974 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2691,6 +2747,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		37095E7B291DC85400301883 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37095E8E291DD5FE00301883 /* CacheModel.swift in Sources */,
+				37095E82291DC85400301883 /* ShareViewController.swift in Sources */,
+				37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		371264372865FF4500D77974 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2726,7 +2792,6 @@
 				3743CA52270F284F00E4D32B /* View+Borders.swift in Sources */,
 				3763495126DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
 				376CD21626FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,
-				376787BC291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */,
 				37BA793B26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
 				377FF88B291A60310028EB0B /* OpenVideosModel.swift in Sources */,
 				37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */,
@@ -3146,7 +3211,6 @@
 				3743B86927216D3600261544 /* ChannelCell.swift in Sources */,
 				3748186B26A764FB0084E870 /* Thumbnail+Fixtures.swift in Sources */,
 				3782B95E2755858100990149 /* NSTextField+FocusRingType.swift in Sources */,
-				376787BD291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */,
 				37C3A252272366440087A57A /* ChannelPlaylistView.swift in Sources */,
 				3754B01628B7F84D009717C8 /* Constants.swift in Sources */,
 				37270F1D28E06E3E00856150 /* String+Localizable.swift in Sources */,
@@ -3315,7 +3379,6 @@
 				3784CDE427772EE40055BBF2 /* Watch.swift in Sources */,
 				3730D8A02712E2B70020ED53 /* NowPlayingView.swift in Sources */,
 				37169AA42729D98A0011DE61 /* InstancesBridge.swift in Sources */,
-				376787BE291C4B7B00D356A4 /* VideoCacheModel.swift in Sources */,
 				37D4B18E26717B3800C925CA /* VideoCell.swift in Sources */,
 				375E45F627B1976B00BA7902 /* MPVOGLView.swift in Sources */,
 				375EC95B289EEB8200751258 /* QualityProfileForm.swift in Sources */,
@@ -3439,6 +3502,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		37095E88291DC85400301883 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37095E7E291DC85400301883 /* Open in Yattee */;
+			targetProxy = 37095E87291DC85400301883 /* PBXContainerItemProxy */;
+		};
 		37D4B0D62671614900C925CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 37D4B0C82671614900C925CA /* Yattee (iOS) */;
@@ -3476,6 +3544,64 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		37095E8A291DC85400301883 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 101;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		37095E8B291DC85400301883 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 101;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open in Yattee/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		3712643F2865FF4500D77974 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3652,9 +3778,11 @@
 		37D4B0ED2671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 101;
 				ENABLE_PREVIEWS = YES;
@@ -3702,8 +3830,10 @@
 		37D4B0EE2671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 101;
@@ -4090,6 +4220,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		37095E8C291DC85400301883 /* Build configuration list for PBXNativeTarget "Open in Yattee" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37095E8A291DC85400301883 /* Debug */,
+				37095E8B291DC85400301883 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		371264412865FF4500D77974 /* Build configuration list for PBXNativeTarget "Shared Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -4304,14 +4443,6 @@
 				minimumVersion = 5.1.0;
 			};
 		};
-		37F5E8B2291BE97A006C15F5 /* XCRemoteSwiftPackageReference "Cache" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hyperoslo/Cache.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
-			};
-		};
 		37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageWebPCoder.git";
@@ -4451,16 +4582,6 @@
 			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
 		};
-		3788AD3D291D042D00C53C9B /* Cache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37F5E8B2291BE97A006C15F5 /* XCRemoteSwiftPackageReference "Cache" */;
-			productName = Cache;
-		};
-		3788AD3F291D043200C53C9B /* Cache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37F5E8B2291BE97A006C15F5 /* XCRemoteSwiftPackageReference "Cache" */;
-			productName = Cache;
-		};
 		3797104828D3D10600D5F53C /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
@@ -4546,6 +4667,11 @@
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
 		};
+		37DA0F1F291DD6B8009B38CF /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
 		37E80F42287B7AAF00561799 /* SwiftUIPager */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37A5DBC2285DFF5400CA4DD1 /* XCRemoteSwiftPackageReference "SwiftUIPager" */;
@@ -4555,11 +4681,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
-		};
-		37F5E8B3291BE97A006C15F5 /* Cache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37F5E8B2291BE97A006C15F5 /* XCRemoteSwiftPackageReference "Cache" */;
-			productName = Cache;
 		};
 		37FB2848272207F000A57617 /* SDWebImageWebPCoder */ = {
 			isa = XCSwiftPackageProductDependency;

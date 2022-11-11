@@ -10,7 +10,7 @@ struct URLParser {
     ]
 
     enum Destination {
-        case video, playlist, channel, search
+        case fileURL, video, playlist, channel, search
         case favorites, subscriptions, popular, trending
     }
 
@@ -48,7 +48,7 @@ struct URLParser {
                 return .channel
             }
 
-            return nil
+            return .fileURL
         }
 
         return .video
@@ -62,6 +62,11 @@ struct URLParser {
 
     var isShortsPath: Bool {
         path.hasPrefix(Self.shortsPrefix)
+    }
+
+    var fileURL: URL? {
+        guard destination == .fileURL else { return nil }
+        return url
     }
 
     var videoID: String? {
