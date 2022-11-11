@@ -30,7 +30,7 @@ struct OpeningStream: View {
             }
         }
 
-        return ""
+        return "Loading streams...".localized()
     }
 
     var state: String? {
