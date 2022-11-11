@@ -16,6 +16,8 @@ struct InstanceForm: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
+    @EnvironmentObject<AccountsModel> private var accounts
+
     var body: some View {
         VStack(alignment: .leading) {
             Group {
@@ -138,7 +140,12 @@ struct InstanceForm: View {
             return
         }
 
-        savedInstanceID = InstancesModel.add(app: app, name: name, url: url).id
+        let savedInstance = InstancesModel.add(app: app, name: name, url: url)
+        savedInstanceID = savedInstance.id
+
+        if accounts.isEmpty {
+            accounts.setCurrent(savedInstance.anonymousAccount)
+        }
 
         presentationMode.wrappedValue.dismiss()
     }
