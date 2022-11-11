@@ -13,36 +13,48 @@ struct AppTabNavigation: View {
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
     @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
 
+    @Default(.showHome) private var showHome
+    @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.visibleSections) private var visibleSections
 
     let persistenceController = PersistenceController.shared
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            if visibleSections.contains(.home) {
-                homeNavigationView
+            let tabs = Group {
+                if showHome {
+                    homeNavigationView
+                }
+
+                if !accounts.isEmpty {
+                    if subscriptionsVisible {
+                        subscriptionsNavigationView
+                    }
+
+                    if visibleSections.contains(.popular), accounts.app.supportsPopular, visibleSections.count < 5 {
+                        popularNavigationView
+                    }
+
+                    if visibleSections.contains(.trending) {
+                        trendingNavigationView
+                    }
+
+                    if playlistsVisible {
+                        playlistsNavigationView
+                    }
+
+                    searchNavigationView
+                }
             }
 
-            if subscriptionsVisible {
-                subscriptionsNavigationView
-            }
-
-            if visibleSections.contains(.popular), accounts.app.supportsPopular, visibleSections.count < 5 {
-                popularNavigationView
-            }
-
-            if visibleSections.contains(.trending) {
-                trendingNavigationView
-            }
-
-            if playlistsVisible {
-                playlistsNavigationView
-            }
-
-            if !accounts.isEmpty {
-                searchNavigationView
+            if #available(iOS 16, tvOS 16, *) {
+                tabs
+                    .toolbar(accounts.isEmpty ? .hidden : .visible, for: .tabBar)
+            } else {
+                tabs
             }
         }
+
         .id(accounts.current?.id ?? "")
         .overlay(playlistView)
         .overlay(channelView)
@@ -141,8 +153,10 @@ struct AppTabNavigation: View {
                 }
 
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button(action: { navigation.presentingOpenVideos = true }) {
-                        Label("Open Videos", systemImage: "play.circle.fill")
+                    if showOpenActionsToolbarItem {
+                        Button(action: { navigation.presentingOpenVideos = true }) {
+                            Label("Open Videos", systemImage: "play.circle.fill")
+                        }
                     }
                     AccountsMenuView()
                 }

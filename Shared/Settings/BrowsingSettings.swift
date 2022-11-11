@@ -13,12 +13,24 @@ struct BrowsingSettings: View {
     @Default(.thumbnailsQuality) private var thumbnailsQuality
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
+    @Default(.showHome) private var showHome
+    @Default(.showFavoritesInHome) private var showFavoritesInHome
+    @Default(.showOpenActionsInHome) private var showOpenActionsInHome
+    @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
+    @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.visibleSections) private var visibleSections
+
+    @EnvironmentObject<AccountsModel> private var accounts
+
+    @State private var homeHistoryItemsText = ""
 
     var body: some View {
         Group {
             #if os(macOS)
-                sections
+                VStack(alignment: .leading) {
+                    sections
+                    Spacer()
+                }
             #else
                 List {
                     sections
@@ -38,14 +50,45 @@ struct BrowsingSettings: View {
 
     private var sections: some View {
         Group {
+            homeSettings
             interfaceSettings
-            thumbnailsSettings
-            visibleSectionsSettings
+            if !accounts.isEmpty {
+                thumbnailsSettings
+                visibleSectionsSettings
+            }
+        }
+    }
+
+    private var homeSettings: some View {
+        Section(header: SettingsHeader(text: "Home".localized())) {
+            #if !os(tvOS)
+                if !accounts.isEmpty {
+                    Toggle("Show Home", isOn: $showHome)
+                }
+            #endif
+            Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
+            if !accounts.isEmpty {
+                Toggle("Show Favorites", isOn: $showFavoritesInHome)
+            }
+            HStack {
+                TextField("Recent history items", text: $homeHistoryItemsText)
+                #if !os(macOS)
+                    .keyboardType(.URL)
+                #endif
+                    .onAppear {
+                        homeHistoryItemsText = String(homeHistoryItems)
+                    }
+                    .onChange(of: homeHistoryItemsText) { newValue in
+                        homeHistoryItems = Int(newValue) ?? 10
+                    }
+            }
+            .multilineTextAlignment(.trailing)
         }
     }
 
     private var interfaceSettings: some View {
         Section(header: SettingsHeader(text: "Interface".localized())) {
+            Toggle("Show Open Videos toolbar button", isOn: $showOpenActionsToolbarItem)
             #if os(iOS)
                 Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                     .onChange(of: lockPortraitWhenBrowsing) { lock in
@@ -57,11 +100,13 @@ struct BrowsingSettings: View {
                     }
             #endif
 
-            #if !os(tvOS)
-                Toggle("Show account username", isOn: $accountPickerDisplaysUsername)
-            #endif
+            if !accounts.isEmpty {
+                #if !os(tvOS)
+                    Toggle("Show account username", isOn: $accountPickerDisplaysUsername)
+                #endif
 
-            Toggle("Show anonymous accounts", isOn: $accountPickerDisplaysAnonymousAccounts)
+                Toggle("Show anonymous accounts", isOn: $accountPickerDisplaysAnonymousAccounts)
+            }
         }
     }
 

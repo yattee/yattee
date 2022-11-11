@@ -5,6 +5,7 @@ struct Sidebar: View {
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
 
+    @Default(.showHome) private var showHome
     @Default(.visibleSections) private var visibleSections
 
     var body: some View {
@@ -40,40 +41,40 @@ struct Sidebar: View {
 
     var mainNavigationLinks: some View {
         Section(header: Text("Videos")) {
-            if visibleSections.contains(.home) {
+            if showHome {
                 NavigationLink(destination: LazyView(HomeView()), tag: TabSelection.home, selection: $navigation.tabSelection) {
                     Label("Home", systemImage: "house")
                         .accessibility(label: Text("Home"))
                 }
                 .id("favorites")
             }
-            if visibleSections.contains(.subscriptions),
-               accounts.app.supportsSubscriptions && accounts.signedIn
-            {
-                NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
-                    Label("Subscriptions", systemImage: "star.circle")
-                        .accessibility(label: Text("Subscriptions"))
-                }
-                .id("subscriptions")
-            }
-
-            if visibleSections.contains(.popular), accounts.app.supportsPopular {
-                NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
-                    Label("Popular", systemImage: "arrow.up.right.circle")
-                        .accessibility(label: Text("Popular"))
-                }
-                .id("popular")
-            }
-
-            if visibleSections.contains(.trending) {
-                NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
-                    Label("Trending", systemImage: "chart.bar")
-                        .accessibility(label: Text("Trending"))
-                }
-                .id("trending")
-            }
-
             if !accounts.isEmpty {
+                if visibleSections.contains(.subscriptions),
+                   accounts.app.supportsSubscriptions && accounts.signedIn
+                {
+                    NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
+                        Label("Subscriptions", systemImage: "star.circle")
+                            .accessibility(label: Text("Subscriptions"))
+                    }
+                    .id("subscriptions")
+                }
+
+                if visibleSections.contains(.popular), accounts.app.supportsPopular {
+                    NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
+                        Label("Popular", systemImage: "arrow.up.right.circle")
+                            .accessibility(label: Text("Popular"))
+                    }
+                    .id("popular")
+                }
+
+                if visibleSections.contains(.trending) {
+                    NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
+                        Label("Trending", systemImage: "chart.bar")
+                            .accessibility(label: Text("Trending"))
+                    }
+                    .id("trending")
+                }
+
                 NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
                     Label("Search", systemImage: "magnifyingglass")
                         .accessibility(label: Text("Search"))

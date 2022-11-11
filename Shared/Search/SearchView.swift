@@ -29,6 +29,7 @@ struct SearchView: View {
 
     @Default(.recentlyOpened) private var recentlyOpened
     @Default(.saveRecents) private var saveRecents
+    @Default(.showHome) private var showHome
 
     private var videos = [Video]()
 
@@ -209,13 +210,11 @@ struct SearchView: View {
             visibleSections.append(.playlists)
         }
 
-        [VisibleSection.home, .trending].forEach { section in
-            if preferred.contains(section) {
-                visibleSections.append(section)
-            }
+        if preferred.contains(.trending) {
+            visibleSections.append(.trending)
         }
 
-        return !visibleSections.isEmpty
+        return !visibleSections.isEmpty || showHome
     }
 
     private var results: some View {

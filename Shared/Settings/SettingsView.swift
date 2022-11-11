@@ -34,15 +34,13 @@ struct SettingsView: View {
     var settings: some View {
         #if os(macOS)
             TabView(selection: $selection) {
-                if !accounts.isEmpty {
-                    Form {
-                        BrowsingSettings()
-                    }
-                    .tabItem {
-                        Label("Browsing", systemImage: "list.and.film")
-                    }
-                    .tag(Optional(Tabs.browsing))
+                Form {
+                    BrowsingSettings()
                 }
+                .tabItem {
+                    Label("Browsing", systemImage: "list.and.film")
+                }
+                .tag(Optional(Tabs.browsing))
 
                 Form {
                     PlayerSettings()
@@ -125,12 +123,10 @@ struct SettingsView: View {
                         }
                     #endif
 
-                    if !accounts.isEmpty {
-                        NavigationLink {
-                            BrowsingSettings()
-                        } label: {
-                            Label("Browsing", systemImage: "list.and.film")
-                        }
+                    NavigationLink {
+                        BrowsingSettings()
+                    } label: {
+                        Label("Browsing", systemImage: "list.and.film")
                     }
 
                     NavigationLink {
@@ -221,9 +217,9 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case nil:
-                return accounts.isEmpty ? 680 : 400
+                return accounts.isEmpty ? 680 : 520
             case .browsing:
-                return 400
+                return 520
             case .player:
                 return 680
             case .quality:
@@ -233,7 +229,7 @@ struct SettingsView: View {
             case .sponsorBlock:
                 return 700
             case .advanced:
-                return 650
+                return 750
             case .help:
                 return 600
             }

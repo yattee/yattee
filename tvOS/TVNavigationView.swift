@@ -13,11 +13,9 @@ struct TVNavigationView: View {
     var body: some View {
         NavigationView {
             TabView(selection: navigation.tabSelectionBinding) {
-                if visibleSections.contains(.home) {
-                    LazyView(HomeView())
-                        .tabItem { Text("Home") }
-                        .tag(TabSelection.home)
-                }
+                LazyView(HomeView())
+                    .tabItem { Text("Home") }
+                    .tag(TabSelection.home)
 
                 if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
                     LazyView(SubscriptionsView())

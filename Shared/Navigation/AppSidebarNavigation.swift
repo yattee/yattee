@@ -5,6 +5,8 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
+    @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
+
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
 
@@ -75,10 +77,12 @@ struct AppSidebarNavigation: View {
             #endif
 
             ToolbarItemGroup(placement: openVideosToolbarItemPlacement) {
-                Button {
-                    navigation.presentingOpenVideos = true
-                } label: {
-                    Label("Open Videos", systemImage: "play.circle.fill")
+                if showOpenActionsToolbarItem {
+                    Button {
+                        navigation.presentingOpenVideos = true
+                    } label: {
+                        Label("Open Videos", systemImage: "play.circle.fill")
+                    }
                 }
             }
 

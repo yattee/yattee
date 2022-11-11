@@ -21,7 +21,11 @@ extension Defaults.Keys {
 
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
-    static let homeHistoryItems = Key<Int>("homeHistoryItems", default: 30)
+    static let showHome = Key<Bool>("showHome", default: true)
+    static let showOpenActionsInHome = Key<Bool>("showOpenActionsInHome", default: true)
+    static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
+    static let showFavoritesInHome = Key<Bool>("showFavoritesInHome", default: true)
+    static let homeHistoryItems = Key<Int>("homeHistoryItems", default: 10)
     static let favorites = Key<[FavoriteItem]>("favorites", default: [])
 
     #if !os(tvOS)
@@ -169,7 +173,7 @@ extension Defaults.Keys {
     static let trendingCategory = Key<TrendingCategory>("trendingCategory", default: .default)
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
-    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.home])
+    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.subscriptions, .trending, .playlists])
 
     #if os(iOS)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
@@ -234,7 +238,7 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
 }
 
 enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
-    case home, subscriptions, popular, trending, playlists
+    case subscriptions, popular, trending, playlists
 
     var title: String {
         rawValue.capitalized.localized()
@@ -242,8 +246,6 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
     var tabSelection: TabSelection {
         switch self {
-        case .home:
-            return TabSelection.home
         case .subscriptions:
             return TabSelection.subscriptions
         case .popular:
@@ -257,16 +259,14 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
     private var sortOrder: Int {
         switch self {
-        case .home:
-            return 0
         case .subscriptions:
-            return 1
+            return 0
         case .popular:
-            return 2
+            return 1
         case .trending:
-            return 3
+            return 2
         case .playlists:
-            return 4
+            return 3
         }
     }
 

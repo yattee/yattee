@@ -203,7 +203,7 @@ struct YatteeApp: App {
             recents.clear()
         }
 
-        var section = Defaults[.visibleSections].min()?.tabSelection
+        var section = Defaults[.showHome] ? TabSelection.home : Defaults[.visibleSections].min()?.tabSelection
 
         #if os(macOS)
             if section == .playlists {

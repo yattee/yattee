@@ -4,11 +4,11 @@ import Foundation
 struct FavoritesModel {
     static let shared = FavoritesModel()
 
+    @Default(.showFavoritesInHome) var showFavoritesInHome
     @Default(.favorites) var all
-    @Default(.visibleSections) var visibleSections
 
     var isEnabled: Bool {
-        visibleSections.contains(.home)
+        showFavoritesInHome
     }
 
     func contains(_ item: FavoriteItem) -> Bool {
