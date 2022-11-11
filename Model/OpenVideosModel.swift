@@ -97,7 +97,15 @@ struct OpenVideosModel {
 
         if playbackMode == .playNow || playbackMode == .shuffleAll {
             player.show()
-            player.advanceToNextItem()
+            #if os(iOS)
+                if player.presentingPlayer {
+                    player.advanceToNextItem()
+                } else {
+                    player.onPresentPlayer.append { [weak player] in player?.advanceToNextItem() }
+                }
+            #else
+                player.advanceToNextItem()
+            #endif
         }
     }
 
