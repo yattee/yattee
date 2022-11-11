@@ -19,8 +19,8 @@ struct SponsorBlockSettings: View {
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
-        #elseif os(iOS)
-        .listStyle(.insetGrouped)
+        #else
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         #endif
         .navigationTitle("SponsorBlock")
     }
@@ -106,5 +106,6 @@ struct SponsorBlockSettings_Previews: PreviewProvider {
         VStack {
             SponsorBlockSettings()
         }
+        .frame(maxHeight: 600)
     }
 }
