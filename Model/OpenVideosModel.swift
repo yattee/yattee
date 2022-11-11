@@ -50,8 +50,8 @@ struct OpenVideosModel {
 
     var urlsFromClipboard: [URL] {
         #if os(iOS)
-            if let pasteboard = UIPasteboard.general.string {
-                return urlsFrom(pasteboard)
+            if let pasteboard = UIPasteboard.general.urls {
+                return pasteboard
             }
         #elseif os(macOS)
             if let pasteboard = NSPasteboard.general.string(forType: .string) {
