@@ -34,27 +34,40 @@ struct PlayerQueueRow: View {
             player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
             player.videoBeingOpened = item.video
-            player.show()
 
-            if history {
-                player.playHistory(item, at: watchStoppedAt)
-            } else {
-                player.advanceToItem(item, at: watchStoppedAt)
-            }
+            let playItem = {
+                if history {
+                    player.playHistory(item, at: watchStoppedAt)
+                } else {
+                    player.advanceToItem(item, at: watchStoppedAt)
+                }
 
-            if fullScreen {
-                withAnimation {
-                    fullScreen = false
+                if fullScreen {
+                    withAnimation {
+                        fullScreen = false
+                    }
+                }
+
+                if closePiPOnNavigation, player.playingInPictureInPicture {
+                    player.closePiP()
+                }
+
+                if autoplay {
+                    player.resetAutoplay()
                 }
             }
 
-            if closePiPOnNavigation, player.playingInPictureInPicture {
-                player.closePiP()
-            }
+            #if os(iOS)
+                if player.presentingPlayer {
+                    playItem()
+                } else {
+                    player.onPresentPlayer.append(playItem)
+                }
+            #else
+                playItem()
+            #endif
 
-            if autoplay {
-                player.resetAutoplay()
-            }
+            player.show()
         } label: {
             VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
         }
