@@ -33,6 +33,9 @@ struct OpenVideosView: View {
                         }
                     }
                     .navigationTitle("Open Videos")
+                #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                #endif
             }
         #endif
     }
@@ -57,11 +60,16 @@ struct OpenVideosView: View {
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
-            Picker("Playback Mode", selection: $playbackMode) {
-                ForEach(OpenVideosModel.PlaybackMode.allCases, id: \.rawValue) { mode in
-                    Text(mode.description).tag(mode)
+            Menu {
+                Picker("Playback Mode", selection: $playbackMode) {
+                    ForEach(OpenVideosModel.PlaybackMode.allCases, id: \.rawValue) { mode in
+                        Text(mode.description).tag(mode)
+                    }
                 }
+            } label: {
+                Text(playbackMode.description)
             }
+            .transaction { t in t.disablesAnimations = true }
             .labelsHidden()
             .padding(.bottom, 5)
             .frame(maxWidth: .infinity, alignment: .center)
@@ -128,7 +136,7 @@ struct OpenVideosView: View {
         } label: {
             HStack {
                 Image(systemName: "network")
-                Text("Open URLs")
+                Text("Open")
                     .fontWeight(.bold)
                     .padding(.vertical, 10)
             }
@@ -154,7 +162,7 @@ struct OpenVideosView: View {
         } label: {
             HStack {
                 Image(systemName: "doc.on.clipboard.fill")
-                Text("Clipboard")
+                Text("Paste")
                     .fontWeight(.bold)
                     .padding(.vertical, 10)
             }

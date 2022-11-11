@@ -71,6 +71,8 @@ struct OpenVideosModel {
             return
         }
 
+        NavigationModel.shared.presentingOpenVideos = false
+
         logger.info("opening \(urls.count) urls")
         urls.forEach { logger.info("\($0.absoluteString)") }
 

@@ -266,6 +266,8 @@ struct SettingsView_Previews: PreviewProvider {
             .injectFixtureEnvironmentObjects()
         #if os(macOS)
             .frame(width: 600, height: 300)
+        #else
+            .navigationViewStyle(.stack)
         #endif
     }
 }
