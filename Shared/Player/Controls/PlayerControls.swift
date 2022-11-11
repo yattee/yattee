@@ -342,7 +342,10 @@ struct PlayerControls: View {
                 if player.lockedOrientation.isNil {
                     let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
                     player.lockedOrientation = orientationMask
-                    Orientation.lockOrientation(orientationMask)
+                    let orientation = OrientationTracker.shared.currentInterfaceOrientation
+                    Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
+                    // iOS 16 workaround
+                    Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
                 } else {
                     player.lockedOrientation = nil
                     Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
