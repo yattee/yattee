@@ -22,7 +22,15 @@ struct OpeningStream: View {
             return "Opening audio stream...".localized()
         }
 
-        return String(format: "Opening %@ stream...".localized(), player.streamSelection?.shortQuality ?? "")
+        if let selection = player.streamSelection {
+            if selection.isLocal {
+                return "Opening file..."
+            } else {
+                return String(format: "Opening %@ stream...".localized(), selection.shortQuality)
+            }
+        }
+
+        return ""
     }
 
     var state: String? {
