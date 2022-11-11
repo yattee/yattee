@@ -71,9 +71,11 @@ struct BrowsingSettings: View {
                 Toggle("Show Favorites", isOn: $showFavoritesInHome)
             }
             HStack {
-                TextField("Recent history items", text: $homeHistoryItemsText)
+                Text("Recent history")
+                TextField("Recent history", text: $homeHistoryItemsText)
+                    .labelsHidden()
                 #if !os(macOS)
-                    .keyboardType(.URL)
+                    .keyboardType(.numberPad)
                 #endif
                     .onAppear {
                         homeHistoryItemsText = String(homeHistoryItems)

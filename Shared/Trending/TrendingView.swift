@@ -36,15 +36,11 @@ struct TrendingView: View {
         BrowserPlayerControls(toolbar: {
             HStack {
                 if accounts.app.supportsTrendingCategories {
-                    HStack {
-                        Text("Category")
-                            .foregroundColor(.secondary)
-
-                        categoryButton
-                            // only way to disable Menu animation is to
-                            // force redraw of the view when it changes
-                            .id(UUID())
-                    }
+                    categoryButton
+                        .layoutPriority(1)
+                        // only way to disable Menu animation is to
+                        // force redraw of the view when it changes
+                        .id(UUID())
 
                     Spacer()
                 }
@@ -57,12 +53,7 @@ struct TrendingView: View {
                     Spacer()
                 }
 
-                HStack {
-                    Text("Country")
-                        .foregroundColor(.secondary)
-
-                    countryButton
-                }
+                countryButton
             }
             .padding(.horizontal)
         }) {
