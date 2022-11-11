@@ -20,13 +20,15 @@ import SwiftUI
         func makeNSView(context _: Context) -> some NSView {
             player.mpvBackend.client = client
 
-            client.layer = layer
-            layer.client = client
-
             let view = MPVOGLView()
 
-            view.layer = client.layer
-            view.wantsLayer = true
+            if !YatteeApp.isForPreviews {
+                client.layer = layer
+                layer.client = client
+
+                view.layer = client.layer
+                view.wantsLayer = true
+            }
 
             return view
         }

@@ -7,10 +7,10 @@ struct SettingsView: View {
 
     #if os(macOS)
         private enum Tabs: Hashable {
-            case locations, browsing, player, quality, history, sponsorBlock, advanced, help
+            case browsing, player, quality, history, sponsorBlock, advanced, help
         }
 
-        @State private var selection = Tabs.locations
+        @State private var selection = Tabs.browsing
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -34,14 +34,6 @@ struct SettingsView: View {
     var settings: some View {
         #if os(macOS)
             TabView(selection: $selection) {
-                Form {
-                    LocationsSettings()
-                }
-                .tabItem {
-                    Label("Locations", systemImage: "globe")
-                }
-                .tag(Tabs.locations)
-
                 Form {
                     BrowsingSettings()
                 }
@@ -126,12 +118,6 @@ struct SettingsView: View {
                             Label("Favorites", systemImage: "heart.fill")
                         }
                     #endif
-
-                    NavigationLink {
-                        LocationsSettings()
-                    } label: {
-                        Label("Locations", systemImage: "globe")
-                    }
 
                     NavigationLink {
                         BrowsingSettings()
@@ -233,11 +219,9 @@ struct SettingsView: View {
             case .history:
                 return 500
             case .sponsorBlock:
-                return 660
-            case .locations:
-                return 480
+                return 700
             case .advanced:
-                return 340
+                return 650
             case .help:
                 return 600
             }

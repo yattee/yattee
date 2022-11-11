@@ -510,9 +510,6 @@
 		377ABC48286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
 		377ABC49286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
 		377ABC4A286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
-		377ABC4C286E6A78009C986F /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC4B286E6A78009C986F /* LocationsSettings.swift */; };
-		377ABC4D286E6A78009C986F /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC4B286E6A78009C986F /* LocationsSettings.swift */; };
-		377ABC4E286E6A78009C986F /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC4B286E6A78009C986F /* LocationsSettings.swift */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
 		377FC7DB267A080300A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7DA267A080300A6BBAF /* Logging */; };
 		377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularView.swift */; };
@@ -1178,7 +1175,6 @@
 		377ABC3F286E4AD5009C986F /* InstancesManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstancesManifest.swift; sourceTree = "<group>"; };
 		377ABC43286E4B74009C986F /* ManifestedInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestedInstance.swift; sourceTree = "<group>"; };
 		377ABC47286E5887009C986F /* Sequence+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Unique.swift"; sourceTree = "<group>"; };
-		377ABC4B286E6A78009C986F /* LocationsSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsSettings.swift; sourceTree = "<group>"; };
 		377FF88A291A60310028EB0B /* OpenVideosModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosModel.swift; sourceTree = "<group>"; };
 		377FF88E291A99580028EB0B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		37824309291E58D6005DEC1C /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
@@ -1817,7 +1813,6 @@
 				37BC50A72778A84700510953 /* HistorySettings.swift */,
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
 				37484C2C26FC844700287258 /* InstanceSettings.swift */,
-				377ABC4B286E6A78009C986F /* LocationsSettings.swift */,
 				37484C1826FC837400287258 /* PlayerSettings.swift */,
 				374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */,
 				376BE50627347B57009AD608 /* SettingsHeader.swift */,
@@ -2961,7 +2956,6 @@
 				37FEF11327EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37B2631A2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
 				3748186E26A769D60084E870 /* DetailBadge.swift in Sources */,
-				377ABC4C286E6A78009C986F /* LocationsSettings.swift in Sources */,
 				3744A96028B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */,
 				376BE50B27349108009AD608 /* BrowsingSettings.swift in Sources */,
 				3763C989290C7A50004D3B5F /* OpenVideosView.swift in Sources */,
@@ -3041,7 +3035,6 @@
 				37CEE4C22677B697005A1EFE /* Stream.swift in Sources */,
 				37F7D82D289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				3751BA8427E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
-				377ABC4D286E6A78009C986F /* LocationsSettings.swift in Sources */,
 				3782B95027553A6700990149 /* SearchSuggestions.swift in Sources */,
 				371B7E6B2759791900D21217 /* CommentsModel.swift in Sources */,
 				37192D5528B0D5D60012EEDD /* PlayerLayerView.swift in Sources */,
@@ -3409,7 +3402,6 @@
 				375F7412289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37EF5C242739D37B00B03725 /* MenuModel.swift in Sources */,
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
-				377ABC4E286E6A78009C986F /* LocationsSettings.swift in Sources */,
 				3756C2A82861131100E4B059 /* NetworkState.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,
 				377FF891291A99580028EB0B /* HistoryView.swift in Sources */,
