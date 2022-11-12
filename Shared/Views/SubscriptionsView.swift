@@ -39,11 +39,6 @@ struct SubscriptionsView: View {
         }
 
         #if !os(tvOS)
-        .toolbar {
-            ToolbarItem(placement: .automatic) {
-                FavoriteButton(item: FavoriteItem(section: .subscriptions))
-            }
-        }
         .background(
             Button("Refresh") {
                 loadResources(force: true)

@@ -23,6 +23,9 @@ struct BrowsingSettings: View {
     @EnvironmentObject<AccountsModel> private var accounts
 
     @State private var homeHistoryItemsText = ""
+    #if os(macOS)
+        @State private var presentingEditFavoritesSheet = false
+    #endif
 
     var body: some View {
         Group {
@@ -67,9 +70,6 @@ struct BrowsingSettings: View {
                 }
             #endif
             Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
-            if !accounts.isEmpty {
-                Toggle("Show Favorites", isOn: $showFavoritesInHome)
-            }
             HStack {
                 Text("Recent history")
                 TextField("Recent history", text: $homeHistoryItemsText)
@@ -85,6 +85,36 @@ struct BrowsingSettings: View {
                     }
             }
             .multilineTextAlignment(.trailing)
+            if !accounts.isEmpty {
+                Toggle("Show Favorites", isOn: $showFavoritesInHome)
+
+                Group {
+                    #if os(macOS)
+                        Button {
+                            presentingEditFavoritesSheet = true
+                        } label: {
+                            Text("Edit Favorites...")
+                        }
+                        .sheet(isPresented: $presentingEditFavoritesSheet) {
+                            VStack(alignment: .leading) {
+                                Button("Done") {
+                                    presentingEditFavoritesSheet = false
+                                }
+                                .padding()
+                                .keyboardShortcut(.cancelAction)
+
+                                EditFavorites()
+                            }
+                            .frame(width: 500, height: 300)
+                        }
+                    #else
+                        NavigationLink(destination: LazyView(EditFavorites())) {
+                            Text("Edit Favorites...")
+                        }
+                    #endif
+                }
+                .disabled(!showFavoritesInHome)
+            }
         }
     }
 

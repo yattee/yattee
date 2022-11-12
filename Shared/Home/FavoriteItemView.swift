@@ -56,16 +56,6 @@ struct FavoriteItemView: View {
                         resource?.addObserver(store)
                         resource?.loadIfNeeded()
                     }
-                #if !os(tvOS)
-                    .onDrag {
-                        dragging = item
-                        return NSItemProvider(object: item.id as NSString)
-                    }
-                    .onDrop(
-                        of: [UTType.text],
-                        delegate: DropFavorite(item: item, favorites: $favorites, current: $dragging)
-                    )
-                #endif
             }
         }
         .onChange(of: accounts.current) { _ in

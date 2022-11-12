@@ -265,6 +265,8 @@
 		373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
 		373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
 		373CFAF12697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFAEE2697A78B003CB2C6 /* AddToPlaylistView.swift */; };
+		373EBD68291F1EAF002ADB9C /* EditFavorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FADFFF272ED58000330459 /* EditFavorites.swift */; };
+		373EBD69291F252D002ADB9C /* EditFavorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FADFFF272ED58000330459 /* EditFavorites.swift */; };
 		3741A32C27E7EFFD00D266D1 /* PlayerControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37030FFE27B04DCC00ECDDAA /* PlayerControls.swift */; };
 		3743B86927216D3600261544 /* ChannelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3743B86727216D3600261544 /* ChannelCell.swift */; };
 		3743B86A27216D3600261544 /* ChannelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3743B86727216D3600261544 /* ChannelCell.swift */; };
@@ -666,10 +668,6 @@
 		37BE0BD426A1D47D0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
 		37BE0BD726A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
 		37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */; };
-		37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661B27308859008CCFB0 /* DropFavorite.swift */; };
-		37BF661D27308859008CCFB0 /* DropFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661B27308859008CCFB0 /* DropFavorite.swift */; };
-		37BF661F27308884008CCFB0 /* DropFavoriteOutside.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661E27308884008CCFB0 /* DropFavoriteOutside.swift */; };
-		37BF662027308884008CCFB0 /* DropFavoriteOutside.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF661E27308884008CCFB0 /* DropFavoriteOutside.swift */; };
 		37C069782725962F00F7F6CB /* ScreenSaverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069772725962F00F7F6CB /* ScreenSaverManager.swift */; };
 		37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */; };
 		37C0697B2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */; };
@@ -1233,8 +1231,6 @@
 		37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerViewController.swift; sourceTree = "<group>"; };
 		37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
-		37BF661B27308859008CCFB0 /* DropFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropFavorite.swift; sourceTree = "<group>"; };
-		37BF661E27308884008CCFB0 /* DropFavoriteOutside.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropFavoriteOutside.swift; sourceTree = "<group>"; };
 		37C069772725962F00F7F6CB /* ScreenSaverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSaverManager.swift; sourceTree = "<group>"; };
 		37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueItemBridge.swift; sourceTree = "<group>"; };
 		37C0697D2725C8D400F7F6CB /* CMTime+DefaultTimescale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMTime+DefaultTimescale.swift"; sourceTree = "<group>"; };
@@ -1809,6 +1805,7 @@
 				37732FEF2703A26300F04329 /* AccountValidationStatus.swift */,
 				37F0F4ED286F734400C06C2E /* AdvancedSettings.swift */,
 				376BE50A27349108009AD608 /* BrowsingSettings.swift */,
+				37FADFFF272ED58000330459 /* EditFavorites.swift */,
 				37579D5C27864F5F00FD0B98 /* Help.swift */,
 				37BC50A72778A84700510953 /* HistorySettings.swift */,
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
@@ -1927,8 +1924,6 @@
 		3788AC2126F683AB00F6BAA9 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				37BF661B27308859008CCFB0 /* DropFavorite.swift */,
-				37BF661E27308884008CCFB0 /* DropFavoriteOutside.swift */,
 				3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */,
 				37B263192735EAAB00FE0D40 /* FavoriteResourceObserver.swift */,
 				37A9965D26D6F9B9006E3224 /* HomeView.swift */,
@@ -2093,7 +2088,6 @@
 			children = (
 				37666BA927023AF000F869E5 /* AccountSelectionView.swift */,
 				37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */,
-				37FADFFF272ED58000330459 /* EditFavorites.swift */,
 				3730D89F2712E2B70020ED53 /* NowPlayingView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
 				37D4B15E267164AF00C925CA /* Assets.xcassets */,
@@ -2877,12 +2871,12 @@
 				3782B9522755667600990149 /* String+Format.swift in Sources */,
 				37F9619F27BD90BB00058149 /* PlayerBackendType.swift in Sources */,
 				373CFAEF2697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
-				37BF661F27308884008CCFB0 /* DropFavoriteOutside.swift in Sources */,
 				37EF9A76275BEB8E0043B585 /* CommentView.swift in Sources */,
 				373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */,
 				3700155B271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				373031F32838388A000CFD59 /* PlayerLayerView.swift in Sources */,
 				376E331228AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift in Sources */,
+				373EBD68291F1EAF002ADB9C /* EditFavorites.swift in Sources */,
 				37B044B726F7AB9000E1419D /* SettingsView.swift in Sources */,
 				377FC7E3267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37C3A251272366440087A57A /* ChannelPlaylistView.swift in Sources */,
@@ -2891,7 +2885,6 @@
 				37E8B0EC27B326C00024006F /* TimelineView.swift in Sources */,
 				37136CAC286273060095C0CF /* PersistentSystemOverlays+Backport.swift in Sources */,
 				374C053527242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
-				37BF661C27308859008CCFB0 /* DropFavorite.swift in Sources */,
 				376A33E42720CB35000C1D6B /* Account.swift in Sources */,
 				3756C2A62861131100E4B059 /* NetworkState.swift in Sources */,
 				37BA794326DBA973002A0235 /* PlaylistsModel.swift in Sources */,
@@ -3067,6 +3060,7 @@
 				37CC3F4D270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37B81B0026D2CA3700675966 /* VideoDetails.swift in Sources */,
 				3752069A285E8DD300CA655F /* Chapter.swift in Sources */,
+				373EBD69291F252D002ADB9C /* EditFavorites.swift in Sources */,
 				37484C1A26FC837400287258 /* PlayerSettings.swift in Sources */,
 				37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */,
 				37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */,
@@ -3112,7 +3106,6 @@
 				3782B9532755667600990149 /* String+Format.swift in Sources */,
 				37635FE5291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */,
 				37E2EEAC270656EC00170416 /* BrowserPlayerControls.swift in Sources */,
-				37BF662027308884008CCFB0 /* DropFavoriteOutside.swift in Sources */,
 				3776ADD7287381240078EBC4 /* Captions.swift in Sources */,
 				37E70924271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				37F5E8B7291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */,
@@ -3124,7 +3117,6 @@
 				37BD07BC2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */,
 				37579D5E27864F5F00FD0B98 /* Help.swift in Sources */,
 				37EF9A77275BEB8E0043B585 /* CommentView.swift in Sources */,
-				37BF661D27308859008CCFB0 /* DropFavorite.swift in Sources */,
 				3748186F26A769D60084E870 /* DetailBadge.swift in Sources */,
 				3744A96128B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */,
 				372915E72687E3B900F5A35B /* Defaults.swift in Sources */,
