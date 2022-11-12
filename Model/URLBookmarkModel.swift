@@ -52,6 +52,17 @@ struct URLBookmarkModel {
         }
     }
 
+    func removeBookmark(_ url: URL) {
+        logger.info("removing bookmark for \(url.absoluteString)")
+
+        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+            logger.error("could not open bookmarks defaults")
+            return
+        }
+
+        defaults.removeObject(forKey: url.absoluteString)
+    }
+
     var bookmarkCreationOptions: URL.BookmarkCreationOptions {
         #if os(macOS)
             return [.withSecurityScope, .securityScopeAllowOnlyReadAccess]

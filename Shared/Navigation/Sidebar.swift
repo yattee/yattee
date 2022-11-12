@@ -6,6 +6,7 @@ struct Sidebar: View {
     @EnvironmentObject<NavigationModel> private var navigation
 
     @Default(.showHome) private var showHome
+    @Default(.showDocuments) private var showDocuments
     @Default(.visibleSections) private var visibleSections
 
     var body: some View {
@@ -48,6 +49,18 @@ struct Sidebar: View {
                 }
                 .id("favorites")
             }
+
+            #if os(iOS)
+                if showDocuments {
+                    NavigationLink(destination: LazyView(DocumentsView()), tag: TabSelection.documents, selection: $navigation.tabSelection) {
+                        Label("Documents", systemImage: "folder")
+                            .accessibility(label: Text("Documents"))
+                    }
+                    .id("documents")
+                }
+            #endif
+            }
+
             if !accounts.isEmpty {
                 if visibleSections.contains(.subscriptions),
                    accounts.app.supportsSubscriptions && accounts.signedIn

@@ -172,6 +172,19 @@ struct Video: Identifiable, Equatable, Hashable {
         return streams.first
     }
 
+    var localStreamImageSystemName: String {
+        guard localStream != nil else { return "" }
+
+        if localStreamIsDirectory {
+            return "folder"
+        }
+        if localStreamIsFile {
+            return "doc"
+        }
+
+        return "globe"
+    }
+
     var localStreamIsFile: Bool {
         guard let localStream else { return false }
         return localStream.localURL.isFileURL
@@ -180,6 +193,15 @@ struct Video: Identifiable, Equatable, Hashable {
     var localStreamIsRemoteURL: Bool {
         guard let localStream else { return false }
         return !localStream.localURL.isFileURL
+    }
+
+    var localStreamIsDirectory: Bool {
+        guard let localStream else { return false }
+        #if os(iOS)
+            return DocumentsModel.shared.isDirectory(localStream.localURL)
+        #else
+            return false
+        #endif
     }
 
     var remoteUrlHost: String? {

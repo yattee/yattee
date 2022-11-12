@@ -29,6 +29,22 @@ struct PlayerQueueRow: View {
 
     var body: some View {
         Button {
+            #if os(iOS)
+                guard !item.video.localStreamIsDirectory else {
+                    if let url = item.video?.localStream?.localURL {
+                        withAnimation {
+                            DocumentsModel.shared.goToURL(url)
+                        }
+                    }
+                    return
+                }
+            #endif
+            }
+
+            if item.video.localStreamIsFile, let url = item.video.localStream?.localURL {
+                URLBookmarkModel.shared.saveBookmark(url)
+            }
+
             player.prepareCurrentItemForHistory()
 
             player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture

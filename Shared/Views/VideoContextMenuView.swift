@@ -37,53 +37,63 @@ struct VideoContextMenuView: View {
     }
 
     @ViewBuilder var contextMenu: some View {
-        if saveHistory {
-            Section {
-                if let watchedAtString {
-                    Text(watchedAtString)
-                }
+        if !video.localStreamIsDirectory {
+            if saveHistory {
+                Section {
+                    if let watchedAtString {
+                        Text(watchedAtString)
+                    }
 
-                if !watch.isNil, !watch!.finished, !watchingNow {
-                    continueButton
-                }
+                    if !watch.isNil, !watch!.finished, !watchingNow {
+                        continueButton
+                    }
 
-                if !(watch?.finished ?? false) {
-                    markAsWatchedButton
-                }
+                    if !(watch?.finished ?? false) {
+                        markAsWatchedButton
+                    }
 
-                if !watch.isNil, !watchingNow {
-                    removeFromHistoryButton
+                    if !watch.isNil, !watchingNow {
+                        removeFromHistoryButton
+                    }
                 }
             }
-        }
 
-        Section {
-            playNowButton
+            Section {
+                playNowButton
+                #if !os(tvOS)
+                    playNowInPictureInPictureButton
+                    playNowInMusicMode
+                #endif
+            }
+
+            Section {
+                playNextButton
+                addToQueueButton
+            }
+
+            if accounts.app.supportsUserPlaylists, accounts.signedIn, !video.isLocal {
+                Section {
+                    addToPlaylistButton
+                    addToLastPlaylistButton
+
+                    if let id = navigation.tabSelection?.playlistID ?? playlistID {
+                        removeFromPlaylistButton(playlistID: id)
+                    }
+                }
+            }
+
             #if !os(tvOS)
-                playNowInPictureInPictureButton
-                playNowInMusicMode
+                Section {
+                    ShareButton(contentItem: .init(video: video))
+                }
             #endif
         }
 
-        Section {
-            playNextButton
-            addToQueueButton
-        }
-
-        if accounts.app.supportsUserPlaylists, accounts.signedIn, !video.isLocal {
-            Section {
-                addToPlaylistButton
-                addToLastPlaylistButton
-
-                if let id = navigation.tabSelection?.playlistID ?? playlistID {
-                    removeFromPlaylistButton(playlistID: id)
+        #if os(iOS)
+            if video.isLocal, let url = video.localStream?.localURL, DocumentsModel.shared.isDocument(url) {
+                Section {
+                    removeDocumentButton
                 }
-            }
-        }
-
-        #if !os(tvOS)
-            Section {
-                ShareButton(contentItem: .init(video: video))
             }
         #endif
 
@@ -214,6 +224,31 @@ struct VideoContextMenuView: View {
             Label("Play Last", systemImage: "text.append")
         }
     }
+
+    #if os(iOS)
+        private var removeDocumentButton: some View {
+            Button {
+                if let url = video.localStream?.localURL {
+                    NavigationModel.shared.presentAlert(
+                        Alert(
+                            title: Text("Are you sure you want to remove this document?"),
+                            primaryButton: .destructive(Text("Remove")) {
+                                do {
+                                    try DocumentsModel.shared.removeDocument(url)
+                                } catch {
+                                    NavigationModel.shared.presentAlert(title: "Could not delete document", message: error.localizedDescription)
+                                }
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    )
+                }
+            } label: {
+                Label("Remove...", systemImage: "trash.fill")
+                    .foregroundColor(Color("AppRedColor"))
+            }
+        }
+    #endif
 
     private var openChannelButton: some View {
         Button {

@@ -22,6 +22,7 @@ extension Defaults.Keys {
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
     static let showHome = Key<Bool>("showHome", default: true)
+    static let showDocuments = Key<Bool>("showDocuments", default: true)
     static let showOpenActionsInHome = Key<Bool>("showOpenActionsInHome", default: true)
     static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
     static let showFavoritesInHome = Key<Bool>("showFavoritesInHome", default: true)

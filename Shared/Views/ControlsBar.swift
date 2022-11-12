@@ -288,11 +288,7 @@ struct ControlsBar: View {
 
                     Group {
                         if let video = model.currentItem?.video, video.isLocal {
-                            if video.localStreamIsFile {
-                                Image(systemName: "folder")
-                            } else if video.localStreamIsRemoteURL {
-                                Image(systemName: "globe")
-                            }
+                            Image(systemName: video.localStreamImageSystemName)
                         } else {
                             Image(systemName: "play.rectangle")
                         }

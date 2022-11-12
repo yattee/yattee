@@ -14,6 +14,7 @@ struct AppTabNavigation: View {
     @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
 
     @Default(.showHome) private var showHome
+    @Default(.showDocuments) private var showDocuments
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.visibleSections) private var visibleSections
 
@@ -24,6 +25,10 @@ struct AppTabNavigation: View {
             let tabs = Group {
                 if showHome {
                     homeNavigationView
+                }
+
+                if showDocuments {
+                    documentsNavigationView
                 }
 
                 if !accounts.isEmpty {
@@ -71,6 +76,18 @@ struct AppTabNavigation: View {
                 .accessibility(label: Text("Home"))
         }
         .tag(TabSelection.home)
+    }
+
+    private var documentsNavigationView: some View {
+        NavigationView {
+            LazyView(DocumentsView())
+                .toolbar { toolbarContent }
+        }
+        .tabItem {
+            Label("Documents", systemImage: "folder")
+                .accessibility(label: Text("Documents"))
+        }
+        .tag(TabSelection.documents)
     }
 
     private var subscriptionsNavigationView: some View {

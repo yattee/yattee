@@ -6,6 +6,7 @@ final class NavigationModel: ObservableObject {
 
     enum TabSelection: Hashable {
         case home
+        case documents
         case subscriptions
         case popular
         case trending

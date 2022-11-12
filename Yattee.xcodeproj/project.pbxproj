@@ -304,6 +304,8 @@
 		37484C3126FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
+		37494EA529200B14000DF176 /* DocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37494EA429200B14000DF176 /* DocumentsView.swift */; };
+		37494EA729200E0B000DF176 /* DocumentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37494EA629200E0B000DF176 /* DocumentsModel.swift */; };
 		374AB3D728BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
 		374AB3D828BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
 		374AB3D928BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
@@ -1093,6 +1095,8 @@
 		37484C2826FC83FF00287258 /* AccountForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountForm.swift; sourceTree = "<group>"; };
 		37484C2C26FC844700287258 /* InstanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceSettings.swift; sourceTree = "<group>"; };
 		37484C3026FCB8F900287258 /* AccountValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidator.swift; sourceTree = "<group>"; };
+		37494EA429200B14000DF176 /* DocumentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsView.swift; sourceTree = "<group>"; };
+		37494EA629200E0B000DF176 /* DocumentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsModel.swift; sourceTree = "<group>"; };
 		3749BF6F27ADA135000480FF /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
 		3749BF7027ADA135000480FF /* stream_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_cb.h; sourceTree = "<group>"; };
 		3749BF7127ADA135000480FF /* qthelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = qthelper.hpp; sourceTree = "<group>"; };
@@ -1821,6 +1825,14 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		37494EA329200AD4000DF176 /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				37494EA429200B14000DF176 /* DocumentsView.swift */,
+			);
+			path = Documents;
+			sourceTree = "<group>";
+		};
 		3749BF6C27ADA135000480FF /* mpv */ = {
 			isa = PBXGroup;
 			children = (
@@ -2022,6 +2034,7 @@
 		37D4B0C12671614700C925CA /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				37494EA329200AD4000DF176 /* Documents */,
 				3788AC2126F683AB00F6BAA9 /* Home */,
 				3761AC0526F0F96100AA496F /* Modifiers */,
 				371AAE2326CEB9E800901972 /* Navigation */,
@@ -2124,6 +2137,7 @@
 				373C8FE3275B955100CB5936 /* CommentsPage.swift */,
 				37FB28402721B22200A57617 /* ContentItem.swift */,
 				37141672267A8E10006CA35D /* Country.swift */,
+				37494EA629200E0B000DF176 /* DocumentsModel.swift */,
 				37599F2F272B42810087F250 /* FavoriteItem.swift */,
 				37599F33272B44000087F250 /* FavoritesModel.swift */,
 				37BC50AB2778BCBA00510953 /* HistoryModel.swift */,
@@ -2767,6 +2781,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				374710052755291C00CE0F87 /* SearchField.swift in Sources */,
+				37494EA529200B14000DF176 /* DocumentsView.swift in Sources */,
 				374DE88028BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */,
 				37ECED56289FE166002BC2C9 /* SafeArea.swift in Sources */,
 				37CEE4BD2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
@@ -2883,6 +2898,7 @@
 				37E2EEAB270656EC00170416 /* BrowserPlayerControls.swift in Sources */,
 				370B79CC286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift in Sources */,
 				37E8B0EC27B326C00024006F /* TimelineView.swift in Sources */,
+				37494EA729200E0B000DF176 /* DocumentsModel.swift in Sources */,
 				37136CAC286273060095C0CF /* PersistentSystemOverlays+Backport.swift in Sources */,
 				374C053527242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
 				376A33E42720CB35000C1D6B /* Account.swift in Sources */,

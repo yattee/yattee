@@ -14,6 +14,7 @@ struct BrowsingSettings: View {
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.showHome) private var showHome
+    @Default(.showDocuments) private var showDocuments
     @Default(.showFavoritesInHome) private var showFavoritesInHome
     @Default(.showOpenActionsInHome) private var showOpenActionsInHome
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
@@ -85,6 +86,7 @@ struct BrowsingSettings: View {
                     }
             }
             .multilineTextAlignment(.trailing)
+
             if !accounts.isEmpty {
                 Toggle("Show Favorites", isOn: $showFavoritesInHome)
 
@@ -124,6 +126,8 @@ struct BrowsingSettings: View {
                 Toggle("Show Open Videos toolbar button", isOn: $showOpenActionsToolbarItem)
             #endif
             #if os(iOS)
+                Toggle("Show Documents", isOn: $showDocuments)
+
                 Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                     .onChange(of: lockPortraitWhenBrowsing) { lock in
                         if lock {

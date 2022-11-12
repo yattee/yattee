@@ -22,7 +22,7 @@ struct VideoBanner: View {
 
     var body: some View {
         HStack(alignment: stackAlignment, spacing: 12) {
-            VStack(spacing: thumbnailStackSpacing) {
+            ZStack(alignment: .bottom) {
                 smallThumbnail
 
                 #if !os(tvOS)
@@ -55,6 +55,20 @@ struct VideoBanner: View {
                         if let video {
                             if !video.isLocal || video.localStreamIsRemoteURL {
                                 Text(video.displayAuthor)
+                            } else {
+                                #if os(iOS)
+                                    if DocumentsModel.shared.isDocument(video) {
+                                        HStack(spacing: 6) {
+                                            if let date = DocumentsModel.shared.formattedCreationDate(video) {
+                                                Text(date)
+                                            }
+                                            if let size = DocumentsModel.shared.formattedSize(video) {
+                                                Text("•")
+                                                Text(size)
+                                            }
+                                        }
+                                    }
+                                #endif
                             }
                         } else {
                             Text("Video Author")
@@ -69,8 +83,10 @@ struct VideoBanner: View {
                         progressView
                     #endif
 
-                    Text((videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() ?? PlayerTimeModel.timePlaceholder)
-                        .fontWeight(.light)
+                    if !(video?.localStreamIsDirectory ?? false) {
+                        Text(videoDurationLabel)
+                            .fontWeight(.light)
+                    }
                 }
                 .foregroundColor(.secondary)
             }
@@ -98,24 +114,15 @@ struct VideoBanner: View {
         #endif
     }
 
-    private var thumbnailStackSpacing: Double {
-        #if os(tvOS)
-            8
-        #else
-            2
-        #endif
-    }
-
     @ViewBuilder private var smallThumbnail: some View {
-        Group {
+        ZStack {
+            Color("PlaceholderColor")
             if let video {
                 if let thumbnail = video.thumbnailURL(quality: .medium) {
                     WebImage(url: thumbnail, options: [.lowPriority])
                         .resizable()
-                } else if video.localStreamIsFile {
-                    Image(systemName: "folder")
-                } else if video.localStreamIsRemoteURL {
-                    Image(systemName: "globe")
+                } else if video.isLocal {
+                    Image(systemName: video.localStreamImageSystemName)
                 }
             } else {
                 Image(systemName: "ellipsis")
@@ -146,6 +153,11 @@ struct VideoBanner: View {
         #endif
     }
 
+    private var videoDurationLabel: String {
+        guard videoDuration != 0 else { return PlayerTimeModel.timePlaceholder }
+        return (videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() ?? PlayerTimeModel.timePlaceholder
+    }
+
     private var progressView: some View {
         Group {
             if !playbackTime.isNil, !(video?.live ?? false) {
@@ -157,11 +169,13 @@ struct VideoBanner: View {
     }
 
     private var progressViewValue: Double {
-        [playbackTime?.seconds, videoDuration].compactMap { $0 }.min() ?? 0
+        guard videoDuration != 0 else { return 1 }
+        return [playbackTime?.seconds, videoDuration].compactMap { $0 }.min() ?? 0
     }
 
     private var progressViewTotal: Double {
-        videoDuration ?? video?.length ?? 1
+        guard videoDuration != 0 else { return 1 }
+        return videoDuration ?? video?.length ?? 1
     }
 }
 
