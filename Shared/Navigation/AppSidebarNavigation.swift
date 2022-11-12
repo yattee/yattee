@@ -5,8 +5,6 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
-    @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
-
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
 
@@ -22,6 +20,8 @@ struct AppSidebarNavigation: View {
         @EnvironmentObject<SubscriptionsModel> private var subscriptions
         @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
     #endif
+
+    @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
 
     var body: some View {
         #if os(iOS)

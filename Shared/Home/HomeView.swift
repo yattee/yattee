@@ -141,7 +141,6 @@ struct Favorites_Previews: PreviewProvider {
     static var previews: some View {
         TabView {
             HomeView()
-//                .overlay(VideoPlayerView().injectFixtureEnvironmentObjects())
                 .injectFixtureEnvironmentObjects()
                 .tabItem {
                     Label("Home", systemImage: "house")

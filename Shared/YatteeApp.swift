@@ -195,6 +195,14 @@ struct YatteeApp: App {
         PlayerModel.shared = player
         PlayerTimeModel.shared.player = player
 
+        #if !os(tvOS)
+            OpenURLHandler.shared.accounts = accounts
+            OpenURLHandler.shared.navigation = navigation
+            OpenURLHandler.shared.recents = recents
+            OpenURLHandler.shared.player = player
+            OpenURLHandler.shared.search = search
+        #endif
+
         if !accounts.current.isNil {
             player.restoreQueue()
         }

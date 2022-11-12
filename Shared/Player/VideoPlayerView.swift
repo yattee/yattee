@@ -57,14 +57,14 @@ struct VideoPlayerView: View {
         @State internal var orientationObserver: Any?
     #endif
 
-    @EnvironmentObject<AccountsModel> internal var accounts
-    @EnvironmentObject<NavigationModel> internal var navigation
     @EnvironmentObject<PlayerModel> internal var player
-    @EnvironmentObject<RecentsModel> internal var recents
     #if os(macOS)
+        @EnvironmentObject<NavigationModel> internal var navigation
         @EnvironmentObject<SearchModel> internal var search
     #endif
-    @EnvironmentObject<ThumbnailsModel> internal var thumbnails
+    #if os(tvOS)
+        @EnvironmentObject<ThumbnailsModel> private var thumbnails
+    #endif
 
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
     @Default(.seekGestureSpeed) var seekGestureSpeed
@@ -107,15 +107,7 @@ struct VideoPlayerView: View {
                 }
             }
             .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
-            .onOpenURL {
-                OpenURLHandler(
-                    accounts: accounts,
-                    navigation: navigation,
-                    recents: recents,
-                    player: player,
-                    search: search
-                ).handle($0)
-            }
+            .onOpenURL(perform: OpenURLHandler.shared.handle)
             .frame(minWidth: 950, minHeight: 700)
         #else
             return GeometryReader { geometry in

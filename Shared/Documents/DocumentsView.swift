@@ -39,21 +39,23 @@ struct DocumentsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation {
-                            model.goBack()
+                    if model.canGoBack {
+                        Button {
+                            withAnimation {
+                                model.goBack()
+                            }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Label("Go back", systemImage: "chevron.left")
+                            }
                         }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Label("Go back", systemImage: "chevron.left")
-                        }
+                        .transaction { t in t.animation = .none }
+                        .disabled(!model.canGoBack)
                     }
-                    .transaction { t in t.animation = .none }
-                    .disabled(!model.canGoBack)
                 }
             }
             .navigationTitle(model.directoryLabel)
-            .padding()
+            .padding(.horizontal)
             .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
             .backport
             .refreshable {

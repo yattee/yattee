@@ -47,7 +47,7 @@ struct Sidebar: View {
                     Label("Home", systemImage: "house")
                         .accessibility(label: Text("Home"))
                 }
-                .id("favorites")
+                .id("home")
             }
 
             #if os(iOS)
@@ -59,7 +59,6 @@ struct Sidebar: View {
                     .id("documents")
                 }
             #endif
-            }
 
             if !accounts.isEmpty {
                 if visibleSections.contains(.subscriptions),

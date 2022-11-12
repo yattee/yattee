@@ -226,12 +226,13 @@ struct VideoContextMenuView: View {
     }
 
     #if os(iOS)
-        private var removeDocumentButton: some View {
-            Button {
+        @ViewBuilder private var removeDocumentButton: some View {
+            let action = {
                 if let url = video.localStream?.localURL {
                     NavigationModel.shared.presentAlert(
                         Alert(
                             title: Text("Are you sure you want to remove this document?"),
+                            message: Text(String(format: "\"%@\" will be irreversibly removed from this device.", video.displayTitle)),
                             primaryButton: .destructive(Text("Remove")) {
                                 do {
                                     try DocumentsModel.shared.removeDocument(url)
@@ -243,9 +244,14 @@ struct VideoContextMenuView: View {
                         )
                     )
                 }
-            } label: {
-                Label("Remove...", systemImage: "trash.fill")
-                    .foregroundColor(Color("AppRedColor"))
+            }
+            let label = Label("Remove...", systemImage: "trash.fill")
+                .foregroundColor(Color("AppRedColor"))
+
+            if #available(iOS 15, macOS 12, *) {
+                Button(role: .destructive, action: action) { label }
+            } else {
+                Button(action: action) { label }
             }
         }
     #endif

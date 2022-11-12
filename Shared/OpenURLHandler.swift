@@ -3,16 +3,25 @@ import Foundation
 import Siesta
 
 struct OpenURLHandler {
+    static var firstHandle = true
+    static var shared = OpenURLHandler()
     static let yatteeProtocol = "yattee://"
 
-    var accounts: AccountsModel
-    var navigation: NavigationModel
-    var recents: RecentsModel
-    var player: PlayerModel
-    var search: SearchModel
+    var accounts: AccountsModel!
+    var navigation: NavigationModel!
+    var recents: RecentsModel!
+    var player: PlayerModel!
+    var search: SearchModel!
     var navigationStyle = NavigationStyle.sidebar
 
     func handle(_ url: URL) {
+        if Self.firstHandle {
+            Self.firstHandle = false
+
+            Delay.by(1) { Self.shared.handle(url) }
+            return
+        }
+
         if accounts.current.isNil {
             accounts.setCurrent(accounts.any)
         }
@@ -27,9 +36,7 @@ struct OpenURLHandler {
             }
         #endif
 
-        guard var url = urlByReplacingYatteeProtocol(url) else {
-            return
-        }
+        guard let url = urlByReplacingYatteeProtocol(url) else { return }
 
         let parser = URLParser(url: url)
 

@@ -21,18 +21,20 @@ struct OpenVideosView: View {
                 .frame(minWidth: 600, maxWidth: 800, minHeight: 350, maxHeight: 500)
         #else
             NavigationView {
-                openVideos
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                                Label("Close", systemImage: "xmark")
-                            }
-                            #if !os(tvOS)
-                            .keyboardShortcut(.cancelAction)
-                            #endif
+                ScrollView(.vertical, showsIndicators: false) {
+                    openVideos
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                            Label("Close", systemImage: "xmark")
                         }
+                        #if !os(tvOS)
+                        .keyboardShortcut(.cancelAction)
+                        #endif
                     }
-                    .navigationTitle("Open Videos")
+                }
+                .navigationTitle("Open Videos")
                 #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
                 #endif

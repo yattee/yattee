@@ -38,6 +38,10 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
             return false
         }
 
+        if duration <= 0 {
+            return false
+        }
+
         return duration - seconds <= 20
     }
 

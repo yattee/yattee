@@ -39,7 +39,6 @@ struct PlayerQueueRow: View {
                     return
                 }
             #endif
-            }
 
             if item.video.localStreamIsFile, let url = item.video.localStream?.localURL {
                 URLBookmarkModel.shared.saveBookmark(url)
