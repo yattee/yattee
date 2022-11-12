@@ -1,1 +1,433 @@
 
+
+" subscribers" = " abonați";
+"%@ Channel" = "%@ Canal";
+"%@ subscribers" = "abonați";
+"10 seconds forwards/backwards" = "10 secunde înainte/înapoi";
+"Accounts" = "Conturi";
+"Add Account" = "Adaugă cont";
+"Add Account..." = "Adaugă cont...";
+"Accounts are not supported for the application of this instance" = "Conturile nu sunt acceptate pentru aplicaţia acestei instanțe";
+"%lld videos" = "%lld videoclipuri";
+"Add Location" = "Adaugă locație";
+"Add Location..." = "Adaugă locație...";
+"Add profile..." = "Adaugă profil...";
+"Add to %@" = "Adaugă la %@";
+"Add to Playlist" = "Adaugă la playlist";
+"Add Quality Profile" = "Adăugați un profil de calitate";
+"Advanced" = "Avansat";
+"Are you sure you want to restore default quality profiles?" = "Sigur doriți să restaurați profilurile de calitate prestabilite?";
+"Are you sure you want to unsubscribe from %@?" = "Sigur doriți să vă dezabonați de la %@?";
+"Automatic" = "Automat";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Orice";
+"Apply to all" = "Aplica la toate";
+"Autoplaying Next" = "Redare automată Următorul";
+"Backend" = "Backend";
+"Badge" = "Insignă";
+"Badge & Decreased opacity" = "Insignă și opacitate redusă";
+"Browsing" = "Navigare";
+"Button" = "Buton";
+"Buffering stream..." = "Se tamponează fluxul...";
+"Cancel" = "Anulează";
+"Based on system color scheme" = "Bazat pe schema de culori a sistemului";
+"Badge color" = "Culoarea insignei";
+"Category" = "Categorie";
+"Cellular" = "Celular";
+"Chapters" = "Capitole";
+"Close player when closing video" = "Închide playerul la închiderea videoclipului";
+"Comments" = "Comentarii";
+"Contributing" = "Contribuind";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Personalizat";
+"Decrease rate" = "Scăderea ratei";
+"Clear All" = "Ștergeți toate";
+"Clear All Recents" = "Ștergeți toate cele recente";
+"Clear History" = "Ștergeți istoricul";
+"Clear Search History" = "Ștergeți istoricul căutărilor";
+"Clear Search History..." = "Ștergeți istoricul căutărilor...";
+"Close PiP when player is opened" = "Închideți PiP atunci când playerul este deschis";
+"Close player when starting PiP" = "Închideți playerul atunci când porniți PiP";
+"Close Video" = "Închideți Video";
+"Current: %@\n%@" = "Curent: %@\n%@";
+"Close PiP when starting playing other video" = "Închideți PiP atunci când începe redarea unui alt videoclip";
+"Close video after playing last in the queue" = "Închideți videoclipul după redarea ultimului din coadă";
+"Clear the queue" = "Ștergeți coada";
+"Discord Server" = "Discord Server";
+"Done" = "Terminat";
+"Duration" = "Durată";
+"Edit" = "Editați";
+"Edit Playlist" = "Editați Playlist";
+"Enter fullscreen in landscape" = "Introduceți ecranul complet în peisaj";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Mementouri explicite de a aprecia, de a vă abona sau de a interacționa cu ele pe orice platformă (platforme) plătite sau gratuite (de exemplu, faceți clic pe un videoclip).";
+"Find Other" = "Găsiți alte";
+"Finding something to play..." = "Să găsești ceva de jucat...";
+"For videos which feature music as the primary content." = "Pentru videoclipurile care includ muzica ca conținut principal.";
+"High" = "Înalt";
+"Highest quality" = "Cea mai bună calitate";
+"History" = "Istorie";
+
+/* Video date filter in search */
+"Hour" = "Oră";
+"I am lost" = "Sunt pierdut";
+"I found a bug /" = "Am găsit un bug /";
+"I have a feature request" = "Am o cerere de funcționalitate";
+"I like this app!" = "Îmi place această aplicație!";
+"I want to ask a question" = "Vreau să pun o întrebare";
+"Honor orientation lock" = "Blocarea orientării onoare";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Dacă raportați o eroare, includeți toate detaliile relevante (în special: versiunea aplicației, dispozitivul folosit și versiunea sistemului, pașii de reproducere).";
+"Increase rate" = "Creșteți rata";
+"Info" = "Informații";
+"Instance of current account" = "Instanța contului curent";
+"Issues Tracker" = "Tracker probleme";
+
+/* Selected video has just finished playing */
+"Just watched" = "Doar urmarit";
+"LIVE" = "LIVE";
+
+/* Loading stream OSD */
+"Loading streams..." = "Se încarcă fluxurile...";
+"Locations" = "Locații";
+"Mark watched videos with" = "Marcați videoclipurile vizionate cu";
+"Matrix Channel" = "Canal Matrix";
+"Matrix Chat" = "Matrix Chat";
+"Medium quality" = "Calitate medie";
+"No Playlists" = "Nu există Playlisturi";
+"No results" = "Nu există rezultate";
+"Nothing" = "Nimic";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Se deschide %@ flux...";
+"Play Last" = "Reda ultimul";
+"Player" = "Player";
+"Playlist" = "Playlist";
+"Popular" = "Popular";
+"Queue" = "Coadă";
+"Replies" = "Răspunsuri";
+"Search..." = "Căutare...";
+"Seek gesture sensitivity" = "Căutați sensibilitatea la gesturi";
+"Seek with horizontal swipe on video" = "Căutați cu glisare orizontală pe videoclip";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmentele se găsesc de obicei la începutul unui videoclip care includ o animație, un cadru static sau un clip care sunt văzute și în alte videoclipuri de către același creator.";
+"Share..." = "Distribuie...";
+"Show history" = "Arată istoricul";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"unknown" = "necunoscut";
+"Unsubscribe" = "Dezabonați-vă";
+"URL" = "URL-ul";
+"Upload date" = "Data de incarcare";
+"Videos" = "Videoclipuri";
+
+/* Video date filter in search */
+"Week" = "Săptămâna";
+"Welcome" = "Bine ați venit";
+"When partially watched video is played" = "Când este redat videoclipul vizionat parțial";
+"Wi-Fi" = "Wi-Fi";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Puteți utiliza selecția automată a profilului pe baza stării curente a dispozitivului sau o puteți comuta în controalele setărilor de redare video.";
+"You have no Playlists" = "Nu aveți Playlisturi";
+"You need to create an instance and accounts\nto access %@ section" = "Trebuie să creați o instanță și conturi\npentru a accesa secțiunea %@";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Nu aveți playlisturi\n\nAtingeți „Playlist nou” pentru a crea una";
+"You need to select an account\nto access %@ section" = "Trebuie să selectați un cont\npentru a accesa secțiunea %@";
+
+
+"Public" = "Public";
+"Playback queue is empty" = "Coada de redare este goală";
+"Make default" = "Faceți implicit";
+"This URL could not be opened" = "Această adresă URL nu a putut fi deschisă";
+"Could not extract SID from received cookies: %@" = "Nu s-a putut extrage SID-ul din cookie-urile primite: %@";
+"Always use AVPlayer for live videos" = "Utilizați întotdeauna AVPlayer pentru videoclipuri live";
+"Could not create share link" = "Nu s-a putut crea link-ul de partajare";
+"Could not open playlist" = "Nu s-a putut deschide playlist";
+"Could not extract video ID" = "Nu s-a putut extrage ID-ul videoclipului";
+"Could not extract playlist ID" = "Nu s-a putut extrage ID-ul playlistului";
+"Could not load video" = "Nu s-a putut încărca videoclipul";
+"No locations available at the moment" = "Nu există locații disponibile momentan";
+"Could not refresh Playlists" = "Nu s-au putut reîmprospăta Playlisturi";
+"Translations" = "Traduceri";
+"Charging" = "Încărcare";
+"Delete" = "Șterge";
+"%@ Playlist" = "%@ Playlist";
+"Anonymous" = "Anonim";
+"Blue" = "Albastru";
+"Connected successfully (%@)" = "Conectat cu succes (%@)";
+"Clear" = "Șterge";
+"Are you sure you want to clear history of watched videos?" = "Sigur doriți să ștergeți istoricul videoclipurilor vizionate?";
+"Close" = "Închide";
+"Are you sure you want to clear search history?" = "Sigur doriți să ștergeți istoricul căutărilor?";
+"Are you sure you want to delete playlist?" = "Sigur vrei să ștergi lista de redare?";
+"Battery" = "Baterie";
+"Captions" = "Subtitrări";
+"Categories to Skip" = "Categorii de sărit";
+"Close PiP and open player when application enters foreground" = "Închideți PiP și deschideți playerul atunci când aplicația intră în prim-plan";
+"Continue" = "Continuați";
+"Create Playlist" = "Creați o listă de redare";
+"Connection failed" = "Conexiunea a eșuat";
+"Contact" = "Contactați";
+"Continue from %@" = "Continuați de la %@";
+"Controls" = "Controale";
+"Copy %@ link with time" = "Copiați linkul %@ cu timpul";
+"Country" = "Țară";
+"Country Name or Code" = "Numele țării sau codul";
+"Favorites" = "Favorite";
+"Copy %@ link" = "Copiați link-ul %@";
+"Could not load locations manifest" = "Nu s-a putut încărca manifestul locațiilor";
+"Custom Locations" = "Locații personalizate";
+
+/* Video sort order in search */
+"Date" = "Dată";
+"Decreased opacity" = "Scăderea opacitate";
+"Disabled" = "Dezactivat";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discuțiile au loc în Discord și Matrix. Este un loc bun pentru întrebări generale.";
+"Don't use public locations" = "Nu folosiți locații publice";
+"Filter" = "Filtru";
+"Donations" = "Donații";
+"Edit Quality Profile" = "Editați profilul de calitate";
+"Enable logging" = "Activați jurnalizarea";
+"Enable Return YouTube Dislike" = "Activați Return YouTube Dislike";
+"Error" = "Eroare";
+"Filter: active" = "Filtru: activ";
+"Fullscreen size" = "Dimensiunea ecranului complet";
+"Gaming" = "Jocuri";
+"Help" = "Ajutor";
+"Frontend URL" = "URL-ul frontend-ului";
+"Edit..." = "Editați...";
+"Error when accessing playlist" = "Eroare la accesarea playlistului";
+
+/* SponsorBlock category name */
+"Interaction" = "Interacţiune";
+"Interface" = "Interfață";
+
+/* SponsorBlock category name */
+"Intro" = "Introducere";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Aspectul mare nu este potrivit pentru toate dispozitivele și utilizarea acestuia poate face ca controalele să nu se potrivească pe ecran.";
+"Loading..." = "Se încarcă...";
+"Lock portrait mode" = "Blocați modul portret";
+"Low" = "Scăzut";
+"Low quality" = "Calitate scăzută";
+"Mark as watched" = "Marcați ca urmărit";
+"Lowest" = "Cel mai scăzut";
+"MPV Documentation" = "Documentație MPV";
+
+/* Player controls layout size */
+"Medium" = "Medie";
+"More info can be found in:" = "Mai multe informații pot fi găsite în:";
+"New Playlist" = "Playlist nou";
+"Milestones" = "Etapele importante";
+
+/* Video date filter in search */
+"Month" = "Lună";
+"Movies" = "Filme";
+"Music" = "Muzică";
+"Name" = "Nume";
+"Next" = "Următor";
+"No description" = "Fără descriere";
+"Normal" = "Normal";
+"Not available" = "Nu e disponibil";
+"If you want this app to be available in your language, join translation project." = "Dacă doriți ca această aplicație să fie disponibilă în limba dvs., alăturați-vă proiectului de traducere.";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Offtopic în videoclipuri muzicale";
+"Only when signed in" = "Doar când sunteți conectat";
+"Could not update your token." = "Nu s-a putut actualiza token-ul.";
+"Could not open channel" = "Nu s-a putut deschide canalul";
+"Could not refresh Popular" = "Nu s-a putut reîmprospăta Popular";
+"For custom locations you can configure Frontend URL in Locations settings" = "Pentru locațiile personalizate, puteți configura URL-ul Frontend în setările Locații";
+"This video could not be opened" = "Acest videoclip nu a putut fi deschis";
+"Open \"Playlists\" tab to create new one" = "Deschideți fila \"Playlists\" pentru a crea una nouă";
+"Open Settings" = "Deschideți Setări";
+
+/* SponsorBlock category name */
+"Outro" = "Outro";
+"Orientation" = "Orientare";
+"Opening audio stream..." = "Se deschide fluxul audio...";
+"Password" = "Parolă";
+"Pause" = "Pauză";
+"Pause when entering background" = "Pauză când intrați în fundal";
+"Picture in Picture" = "Imagine în imagine";
+"Pause when player is closed" = "Pauză când playerul este închis";
+"Play Music" = "Redă muzică";
+"Playback" = "Redare";
+"Play Now" = "Redă acum";
+"Play All" = "Reda toate";
+"Play Next" = "Redă Următorul";
+"Playlists" = "Playlist";
+"Profiles" = "Profiluri";
+"Preferred Formats" = "Formate preferate";
+"Quality" = "Calitate";
+"Red" = "Roșu";
+"Public Locations" = "Locații publice";
+"Quality Profile" = "Profil de calitate";
+"Queue is empty" = "Coada este goală";
+"Rate" = "Rată";
+
+/* Video sort order in search */
+"Rating" = "Rating";
+"Refresh" = "Reîmprospăta";
+"Proxy videos" = "Videoclipuri Proxy";
+"Public Manifest" = "Manifest public";
+"Recents" = "Recente";
+"Regular size" = "Mărime normală";
+"Reset" = "Resetați";
+"Regular Size" = "Mărime normală";
+
+/* Video sort order in search */
+"Relevance" = "Relevanță";
+"Remove" = "Eliminați";
+"Remove from Favorites" = "Eliminați din Favorite";
+"Reset watched status when playing again" = "Resetați starea vizionată când redați din nou";
+"Restart" = "Reporniți";
+"Related" = "Legate de";
+"Remove from history" = "Eliminați din istoric";
+"Resolution" = "Rezoluţie";
+"Save" = "Salvați";
+"Select location closest to you:" = "Selectează locația cea mai apropiată de tine:";
+"Share %@ link" = "Partajați link-ul %@";
+"Remove from the queue" = "Eliminare din coadă";
+"Show playback statistics" = "Afișează statisticile de redare";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Auto-promovare";
+"Reset search filters" = "Resetați filtrele de căutare";
+"Restart the app to apply the settings above." = "Reporniți aplicația pentru a aplica setările de mai sus.";
+"Rotate to portrait when exiting fullscreen" = "Rotiți la portret când ieșiți din ecranul complet";
+"Save history of played videos" = "Salvați istoricul videoclipurilor redate";
+"Restart/Play next" = "Repornire/Redare în continuare";
+"Restore default profiles..." = "Restaurați profilurile implicite...";
+"Save history of searches, channels and playlists" = "Salvați istoricul căutărilor, canalelor și listelor de redare";
+"Search" = "Căutare";
+"Sections" = "Secțiuni";
+"Sidebar" = "Bara laterală";
+"Round corners" = "Colțuri rotunjite";
+"Search history is empty" = "Istoricul de căutare este gol";
+"Settings" = "Setări";
+"Shuffle All" = "Shuffle Toate";
+"Sign In Required" = "Conectare obligatorie";
+
+/* Player controls layout size */
+"Small" = "Mici";
+"Share %@ link with time" = "Partajați link-ul %@ cu timpul";
+"Show account username" = "Afișați numele de utilizator al contului";
+"Show anonymous accounts" = "Afișați conturi anonime";
+"Show channel name" = "Afișează numele canalului";
+"Show video length" = "Afișează durata videoclipului";
+"Shuffle" = "Shuffle";
+"Show keywords" = "Afișați cuvintele cheie";
+"Sort" = "Fel";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"Show progress of watching on thumbnails" = "Afișează progresul vizionării pe miniaturi";
+"Show sidebar when space permits" = "Afișați bara laterală atunci când spațiul permite";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Tot";
+"Add to Favorites" = "Adaugă la favorite";
+"Add to Playlist..." = "Adaugă la Playlist...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bug-urile și ideile de caracteristici importante pot fi trimise pe GitHub issues tracker. ";
+"Hide sidebar" = "Ascunde bara laterală";
+"Highest" = "Cel mai înalt";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Dacă vă interesează ce urmează să se întâmple în actualizările viitoare, puteți urmări etapele proiectului.";
+
+/* Player controls layout size */
+"Smaller" = "Mai mici";
+"Sort: %@" = "Fel: %@";
+"Source" = "Sursă";
+"SponsorBlock API Instance" = "Instanță API SponsorBlock";
+"Switch to other public location" = "Comutați în altă locație publică";
+"SponsorBlock" = "SponsorBlock";
+"Subscribe" = "Abonati-va";
+
+/* Subscriptions title */
+"Subscriptions" = "Abonamente";
+"Switch to public locations" = "Comutați în locații publice";
+"System controls buttons" = "Butoane de control al sistemului";
+
+/* Player controls layout size */
+"Large" = "Mare";
+
+/* Video duration filter in search */
+"Long" = "Lung";
+"Mark video as watched after playing" = "Marcați videoclipul ca vizionat după redare";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Ma bucur sa aud asta. Este distractiv să livrezi aplicații pe care alți oameni doresc să le folosească. Puteți lua în considerare donarea proiectului sau ajutați contribuind la dezvoltarea de noi funcții.";
+"This cannot be reverted" = "Acest lucru nu poate fi inversat";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Acest lucru nu poate fi inversat. Poate fi necesar să comutați între vizualizări sau să reporniți aplicația pentru a vedea modificările.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Aceste informații vor fi procesate numai pe dispozitivul dvs. și utilizate pentru a vă conecta la serverul din țara specificată.";
+"Thumbnails" = "Miniaturi";
+
+/* Video date filter in search */
+"Today" = "Astăzi";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Acest lucru va elimina toate profilurile dvs. personalizate și va returna valorile lor implicite. Acest lucru nu poate fi inversat.";
+"Trending" = "Tendințe";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "De obicei, lângă sau la sfârșitul videoclipului, când se afișează creditele și/sau sunt afișate cardurile de final.";
+"Watched" = "Vizionat";
+"Yattee" = "Yattee";
+"You can find information about using Yattee in the Wiki pages." = "Puteți găsi informații despre utilizarea Yattee în paginile Wiki.";
+"Yattee %@ (build %@)" = "Yattee %@ (build %@)";
+"Used to create links from videos, channels and playlists" = "Folosit pentru a crea linkuri din videoclipuri, canale și playlisturi";
+
+/* Player controls layout size */
+"Very Large" = "Foarte larg";
+
+/* Video sort order in search */
+"Views" = "Vizionări";
+
+/* Selected video was played on given date */
+"Watched %@" = "Vizionat %@";
+
+/* Selected video is being played */
+"Watching now" = "Vizionarea acum";
+"Username" = "Nume de utilizator";
+"Wiki" = "Wiki";
+
+/* Video date filter in search */
+"Year" = "Anul";
+"Now Playing" = "Acum Redând";
+"Current Location" = "Locația curentă";
+"Unlisted" = "Nelistate";
+"Private" = "Privat";
+"Playing Next" = "Redarea Următorul";
+"You can switch between profiles in playback settings controls." = "Puteți comuta între profiluri în controalele setărilor de redare.";
+"Visibility" = "Vizibilitate";
+"Add Channels, Playlists and Searches to Favorites using" = "Adăugați Canale, Playlisturi și Căutări la Favorite utilizând";
+"Current Playlist" = "Playlist curentă";
+"Stream & Player" = "Stream și Player";
+"Hardware decoder" = "Decodor hardware";
+"Statistics" = "Statistici";
+"Stream FPS" = "Flux FPS";
+"Cached time" = "Timp în cache";
+"Rate & Captions" = "Rata & Subtitrări";
+"Any format" = "Orice format";
+"%@ formats" = "formatele %@";
+"Dropped frames" = "Cadre scăpate";
+"Press and hold remote button to open captions and quality menus" = "Țineți apăsat butonul de la distanță pentru a deschide subtitrările și meniurile de calitate";
+"Keep last played video in the queue after restart" = "Păstrați ultimul videoclip redat în coadă după repornire";
+"Comments are disabled" = "Comentariile sunt dezactivate";
+"No comments" = "Nici un comentariu";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Playlist-ul este goală\n\nAtingeți și mențineți apăsat un videoclip, apoi\n\"Adaugă în playlist\"";
+"It can be changed later in settings. You can use your own locations too." = "Acesta poate fi modificat mai târziu în setări. Puteți utiliza și propriile locații.";
+"No chapters information available" = "Nu există capitole de informații disponibile";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promovarea unui produs sau serviciu care are legătură directă cu creatorul însuși. Aceasta include de obicei mărfuri sau promovarea platformelor monetizate.";
+"Seek gesture speed" = "Căutați viteza gesturilor";
+
+/* Video duration filter in search */
+"Short" = "Scurt";
+"Could not load streams" = "Nu s-au putut încărca fluxurile";
+"Open logs in Finder" = "Deschideți jurnalele în Finder";
+"Share Logs..." = "Partajați jurnalele…";
+"Could not refresh Subscriptions" = "Nu s-a putut reîmprospăta Abonamente";
+"Could not open video" = "Nu s-a putut deschide videoclipul";
+"Channel could not be found" = "Canalul nu a putut fi găsit";
+"Could not extract channel information" = "Nu s-au putut extrage informații despre canal";
+"Could not refresh Trending" = "Nu s-a putut reîmprospăta Tendinție";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatele vor fi selectate în ordinea din listă.\nHLS este un format adaptiv (nu se aplică setările de rezoluție).";
+"Not Playing" = "Nu se Redat";
+"Play" = "Reda";
+"Play in PiP" = "Reda în PiP";
+"Remove from Playlist" = "Eliminați din Playlist";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Parte a unui videoclip care promovează un produs sau un serviciu care nu are legătură directă cu creatorul. Creatorul va primi o plată sau o compensație sub formă de bani sau produse gratuite.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Playlist \"%@” va fi ștearsă.\nNu poate fi inversat.";
+"System controls show buttons for %@" = "Controalele de sistem arată butoanele pentru %@";
