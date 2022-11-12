@@ -148,6 +148,11 @@ struct ContentView: View {
             .background(
                 EmptyView().sheet(isPresented: $navigation.presentingOpenVideos) {
                     OpenVideosView()
+                        .environmentObject(accounts)
+                        .environmentObject(navigation)
+                        .environmentObject(player)
+                        .environmentObject(recents)
+                        .environmentObject(search)
                 }
             )
             .background(playerViewInitialize)
