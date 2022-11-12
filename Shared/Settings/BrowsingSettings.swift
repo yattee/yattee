@@ -120,7 +120,9 @@ struct BrowsingSettings: View {
 
     private var interfaceSettings: some View {
         Section(header: SettingsHeader(text: "Interface".localized())) {
-            Toggle("Show Open Videos toolbar button", isOn: $showOpenActionsToolbarItem)
+            #if !os(tvOS)
+                Toggle("Show Open Videos toolbar button", isOn: $showOpenActionsToolbarItem)
+            #endif
             #if os(iOS)
                 Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                     .onChange(of: lockPortraitWhenBrowsing) { lock in

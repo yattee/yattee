@@ -7,12 +7,12 @@ struct OpenVideosButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: 8) {
                 if let imageSystemName {
                     Image(systemName: imageSystemName)
                 }
                 if let text {
-                    Text(text ?? "")
+                    Text(text)
                         .fontWeight(.bold)
                 }
             }

@@ -84,6 +84,16 @@ struct ContentView: View {
                         .environmentObject(navigation)
                 }
             )
+            .background(
+                EmptyView().sheet(isPresented: $navigation.presentingSettings) {
+                    SettingsView()
+                        .environmentObject(accounts)
+                        .environmentObject(instances)
+                        .environmentObject(settings)
+                        .environmentObject(navigation)
+                        .environmentObject(player)
+                }
+            )
         #if !os(tvOS)
             .fileImporter(
                 isPresented: $navigation.presentingFileImporter,
@@ -132,16 +142,6 @@ struct ContentView: View {
                     PlaylistFormView(playlist: $navigation.editedPlaylist)
                         .environmentObject(accounts)
                         .environmentObject(playlists)
-                }
-            )
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingSettings) {
-                    SettingsView()
-                        .environmentObject(accounts)
-                        .environmentObject(instances)
-                        .environmentObject(settings)
-                        .environmentObject(navigation)
-                        .environmentObject(player)
                 }
             )
         #endif

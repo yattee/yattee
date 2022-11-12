@@ -26,14 +26,21 @@ struct HomeView: View {
     var body: some View {
         BrowserPlayerControls {
             ScrollView(.vertical, showsIndicators: false) {
-                if showOpenActionsInHome {
-                    HStack {
-                        #if os(tvOS)
-                            OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
-                                NavigationModel.shared.presentingOpenVideos = true
+                HStack {
+                    #if os(tvOS)
+                        Group {
+                            if showOpenActionsInHome {
+                                OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
+                                    NavigationModel.shared.presentingOpenVideos = true
+                                }
                             }
-                            .frame(maxWidth: 600)
-                        #else
+                            OpenVideosButton(text: "Settings", imageSystemName: "gear") {
+                                NavigationModel.shared.presentingSettings = true
+                            }
+                        }
+
+                    #else
+                        if showOpenActionsInHome {
                             OpenVideosButton(text: "Files", imageSystemName: "folder") {
                                 NavigationModel.shared.presentingFileImporter = true
                             }
@@ -44,19 +51,19 @@ struct HomeView: View {
                                 NavigationModel.shared.presentingOpenVideos = true
                             }
                             .frame(maxWidth: 40)
-                        #endif
-                    }
-                    #if os(iOS)
-                    .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
-                    #else
-                    .padding(.top, 15)
-                    #endif
-                    #if os(tvOS)
-                    .padding(.horizontal, 40)
-                    #else
-                    .padding(.horizontal, 15)
+                        }
                     #endif
                 }
+                #if os(iOS)
+                .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
+                #else
+                .padding(.top, 15)
+                #endif
+                #if os(tvOS)
+                .padding(.horizontal, 40)
+                #else
+                .padding(.horizontal, 15)
+                #endif
 
                 if !accounts.current.isNil, showFavoritesInHome {
                     #if os(tvOS)
@@ -112,7 +119,6 @@ struct HomeView: View {
             #if os(tvOS)
                 .edgesIgnoringSafeArea(.horizontal)
             #else
-                .onDrop(of: [UTType.text], delegate: DropFavoriteOutside(current: $dragging))
                 .navigationTitle("Home")
             #endif
             #if os(macOS)

@@ -50,10 +50,6 @@ struct TVNavigationView: View {
                         .tabItem { Image(systemName: "magnifyingglass") }
                         .tag(TabSelection.search)
                 }
-
-                LazyView(SettingsView())
-                    .tabItem { Image(systemName: "gear") }
-                    .tag(TabSelection.settings)
             }
         }
         .fullScreenCover(isPresented: $navigation.presentingAddToPlaylist) {

@@ -4,6 +4,12 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoBanner: View {
+    #if os(tvOS)
+        static let titleAppend = ""
+    #else
+        static let titleAppend = "\n"
+    #endif
+
     let video: Video?
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
@@ -27,7 +33,7 @@ struct VideoBanner: View {
                 Group {
                     if let video {
                         HStack(alignment: .top) {
-                            Text(video.displayTitle + "\n")
+                            Text(video.displayTitle + Self.titleAppend)
                             if video.isLocal, let fileExtension = video.localStreamFileExtension {
                                 Spacer()
                                 Text(fileExtension)

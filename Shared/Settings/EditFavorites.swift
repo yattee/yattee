@@ -10,51 +10,69 @@ struct EditFavorites: View {
 
     var body: some View {
         Group {
-            List {
-                Section(header: Text("Favorites")) {
-                    if favorites.isEmpty {
-                        Text("Favorites is empty")
-                            .foregroundColor(.secondary)
-                    }
-                    ForEach(favorites) { item in
-                        HStack {
-                            Text(label(item))
-
-                            Spacer()
-                            HStack(spacing: 30) {
-                                Button {
-                                    model.moveUp(item)
-                                } label: {
-                                    Label("Move Up", systemImage: "arrow.up")
-                                }
-
-                                Button {
-                                    model.moveDown(item)
-                                } label: {
-                                    Label("Move Down", systemImage: "arrow.down")
-                                }
-
-                                Button {
-                                    model.remove(item)
-                                } label: {
-                                    Label("Remove", systemImage: "trash")
-                                }
-                            }
-                            #if !os(tvOS)
-                            .buttonStyle(.borderless)
-                            #endif
-                        }
+            #if os(tvOS)
+                ScrollView {
+                    VStack {
+                        editor
                     }
                 }
-                #if os(tvOS)
-                .padding(.trailing, 40)
-                #endif
+                .frame(width: 1000)
+            #else
+                List {
+                    editor
+                }
+            #endif
+        }
+        .navigationTitle("Favorites")
+    }
 
-                #if os(tvOS)
-                    Divider()
-                        .padding(20)
-                #endif
+    var editor: some View {
+        Group {
+            Section(header: Text("Favorites")) {
+                if favorites.isEmpty {
+                    Text("Favorites is empty")
+                        .foregroundColor(.secondary)
+                }
+                ForEach(favorites) { item in
+                    HStack {
+                        Text(label(item))
 
+                        Spacer()
+                        HStack(spacing: 30) {
+                            Button {
+                                model.moveUp(item)
+                            } label: {
+                                Label("Move Up", systemImage: "arrow.up")
+                            }
+
+                            Button {
+                                model.moveDown(item)
+                            } label: {
+                                Label("Move Down", systemImage: "arrow.down")
+                            }
+
+                            Button {
+                                model.remove(item)
+                            } label: {
+                                Label("Remove", systemImage: "trash")
+                            }
+                        }
+                        #if !os(tvOS)
+                        .buttonStyle(.borderless)
+                        #endif
+                    }
+                }
+            }
+            #if os(tvOS)
+            .padding(.trailing, 40)
+            #endif
+
+            #if os(tvOS)
+                Divider()
+                    .padding(20)
+            #endif
+
+            if !model.addableItems().isEmpty {
                 Section(header: Text("Available")) {
                     ForEach(model.addableItems()) { item in
                         HStack {
@@ -70,6 +88,9 @@ struct EditFavorites: View {
                                     .font(.system(size: 30))
                                 #endif
                             }
+                            #if !os(tvOS)
+                            .buttonStyle(.borderless)
+                            #endif
                         }
                     }
                 }
@@ -77,13 +98,8 @@ struct EditFavorites: View {
                 .padding(.trailing, 40)
                 #endif
             }
-            .labelStyle(.iconOnly)
-            .frame(alignment: .leading)
-            #if os(tvOS)
-                .frame(width: 1000)
-            #endif
         }
-        .navigationTitle("Favorites")
+        .labelStyle(.iconOnly)
     }
 
     func label(_ item: FavoriteItem) -> String {
@@ -97,9 +113,9 @@ struct EditFavorites: View {
 
 struct EditFavorites_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            EditFavorites()
-        }
-        .injectFixtureEnvironmentObjects()
+//        NavigationView {
+        EditFavorites()
+//        }
+            .injectFixtureEnvironmentObjects()
     }
 }

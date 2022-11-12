@@ -97,9 +97,7 @@ struct SettingsView: View {
         #else
             NavigationView {
                 settingsList
-                #if os(tvOS)
-                .navigationBarHidden(true)
-                #endif
+                    .navigationTitle("Settings")
             }
         #endif
     }
@@ -115,14 +113,6 @@ struct SettingsView: View {
                 #endif
 
                 Section {
-                    #if os(tvOS)
-                        NavigationLink {
-                            EditFavorites()
-                        } label: {
-                            Label("Favorites", systemImage: "heart.fill")
-                        }
-                    #endif
-
                     NavigationLink {
                         BrowsingSettings()
                     } label: {
@@ -195,7 +185,6 @@ struct SettingsView: View {
                     }
                 #endif
             }
-            .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     #if !os(tvOS)
@@ -217,9 +206,9 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case nil:
-                return accounts.isEmpty ? 680 : 520
+                return accounts.isEmpty ? 680 : 580
             case .browsing:
-                return 520
+                return 580
             case .player:
                 return 680
             case .quality:
