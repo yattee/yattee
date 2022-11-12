@@ -130,13 +130,8 @@ final class AVPlayerBackend: PlayerBackend {
         if var url = stream.singleAssetURL {
             model.logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
 
-            if video.isLocal, video.localStreamIsFile, let localURL = video.localStream?.localURL {
-                guard localURL.startAccessingSecurityScopedResource() else {
-                    model.navigation.presentAlert(title: "Could not open file")
-                    model.closeCurrentItem()
-                    return
-                }
-                url = localURL
+            if video.isLocal, video.localStreamIsFile {
+                _ = url.startAccessingSecurityScopedResource()
             }
 
             loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime)

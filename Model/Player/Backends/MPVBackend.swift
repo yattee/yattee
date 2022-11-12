@@ -290,12 +290,8 @@ final class MPVBackend: PlayerBackend {
                         startPlaying()
                     }
 
-                    if video.isLocal, video.localStreamIsFile, let localStream = video.localStream {
-                        guard localStream.localURL.startAccessingSecurityScopedResource() else {
-                            self.model.navigation.presentAlert(title: "Could not open file")
-                            self.model.closeCurrentItem()
-                            return
-                        }
+                    if video.isLocal, video.localStreamIsFile {
+                        _ = url.startAccessingSecurityScopedResource()
                     }
 
                     self.client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
