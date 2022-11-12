@@ -133,6 +133,7 @@ final class AVPlayerBackend: PlayerBackend {
             if video.isLocal, video.localStreamIsFile, let localURL = video.localStream?.localURL {
                 guard localURL.startAccessingSecurityScopedResource() else {
                     model.navigation.presentAlert(title: "Could not open file")
+                    model.closeCurrentItem()
                     return
                 }
                 url = localURL

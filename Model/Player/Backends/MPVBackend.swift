@@ -293,6 +293,7 @@ final class MPVBackend: PlayerBackend {
                     if video.isLocal, video.localStreamIsFile, let localStream = video.localStream {
                         guard localStream.localURL.startAccessingSecurityScopedResource() else {
                             self.model.navigation.presentAlert(title: "Could not open file")
+                            self.model.closeCurrentItem()
                             return
                         }
                     }
