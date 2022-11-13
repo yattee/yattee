@@ -314,16 +314,27 @@ extension PlayerModel {
             message += errorString
         }
 
-        let alert = Alert(
-            title: Text("Could not load video"),
-            message: Text(message),
-            primaryButton: .cancel(),
-            secondaryButton: .default(Text("Retry")) { [weak self] in
-                if let self, let video = video {
+        var retryButton: Alert.Button?
+
+        if let video {
+            retryButton = Alert.Button.default(Text("Retry")) { [weak self] in
+                if let self {
                     self.enqueueVideo(video, play: true, prepending: true, loadDetails: true)
                 }
             }
-        )
+        }
+
+        var alert: Alert
+        if let retryButton {
+            alert = Alert(
+                title: Text("Could not load video"),
+                message: Text(message),
+                primaryButton: .cancel(),
+                secondaryButton: retryButton
+            )
+        } else {
+            alert = Alert(title: Text("Could not load video"))
+        }
 
         navigation.presentAlert(alert)
         advancing = false
