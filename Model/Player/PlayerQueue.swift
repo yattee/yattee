@@ -2,6 +2,7 @@ import AVKit
 import Defaults
 import Foundation
 import Siesta
+import SwiftUI
 
 extension PlayerModel {
     var currentVideo: Video? {
@@ -154,7 +155,7 @@ extension PlayerModel {
         currentItem.playbackTime = time
 
         let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
-        playerAPI.loadDetails(currentItem, failureHandler: videoLoadFailureHandler) { newItem in
+        playerAPI.loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
             self.playItem(newItem, at: playTime)
         }
     }
@@ -197,7 +198,7 @@ extension PlayerModel {
         }
 
         if loadDetails {
-            playerAPI.loadDetails(item, failureHandler: videoLoadFailureHandler) { [weak self] newItem in
+            playerAPI.loadDetails(item, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { [weak self] newItem in
                 guard let self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
@@ -303,7 +304,7 @@ extension PlayerModel {
         })
     }
 
-    private func videoLoadFailureHandler(_ error: RequestError) {
+    private func videoLoadFailureHandler(_ error: RequestError, video: Video? = nil) {
         var message = error.userMessage
         if let errorDictionary = error.json.dictionaryObject,
            let errorMessage = errorDictionary["message"] ?? errorDictionary["error"],
@@ -313,7 +314,18 @@ extension PlayerModel {
             message += errorString
         }
 
-        navigation.presentAlert(title: "Could not load video", message: message)
+        let alert = Alert(
+            title: Text("Could not load video"),
+            message: Text(message),
+            primaryButton: .cancel(),
+            secondaryButton: .default(Text("Retry")) { [weak self] in
+                if let self, let video = video {
+                    self.enqueueVideo(video, play: true, prepending: true, loadDetails: true)
+                }
+            }
+        )
+
+        navigation.presentAlert(alert)
         advancing = false
         videoBeingOpened = nil
         currentItem = nil
