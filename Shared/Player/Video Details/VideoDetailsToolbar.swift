@@ -37,41 +37,48 @@ struct VideoDetailsToolbar: View {
                 activeTool = tools.first { $0.id == newValue.rawValue }
             }
             .coordinateSpace(name: "toolbarArea")
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        withAnimation(.linear(duration: 0.2)) {
-                            opacity = 1
-                        }
-
-                        guard let firstTool = tools.first else { return }
-                        if startedToolPosition == .zero {
-                            startedToolPosition = firstTool.toolPostion
-                        }
-                        let location = CGPoint(x: value.location.x, y: value.location.y)
-
-                        if let index = tools.firstIndex(where: { $0.toolPostion.contains(location) }),
-                           activeTool?.id != tools[index].id,
-                           tools[index].isAvailable(for: video, sidebarQueue: sidebarQueue)
-                        {
-                            withAnimation(.interpolatingSpring(stiffness: 230, damping: 22)) {
-                                activeTool = tools[index]
+            #if !os(tvOS)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            withAnimation(.linear(duration: 0.2)) {
+                                opacity = 1
                             }
-                            withAnimation(.linear(duration: 0.25)) {
-                                page = activeTool?.page ?? .info
+
+                            guard let firstTool = tools.first else { return }
+                            if startedToolPosition == .zero {
+                                startedToolPosition = firstTool.toolPostion
+                            }
+                            let location = CGPoint(x: value.location.x, y: value.location.y)
+
+                            if let index = tools.firstIndex(where: { $0.toolPostion.contains(location) }),
+                               activeTool?.id != tools[index].id,
+                               tools[index].isAvailable(for: video, sidebarQueue: sidebarQueue)
+                            {
+                                withAnimation(.interpolatingSpring(stiffness: 230, damping: 22)) {
+                                    activeTool = tools[index]
+                                }
+                                withAnimation(.linear(duration: 0.25)) {
+                                    page = activeTool?.page ?? .info
+                                }
                             }
                         }
-                    }
-                    .onEnded { _ in
-                        withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
-                            startedToolPosition = .zero
+                        .onEnded { _ in
+                            withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 1, blendDuration: 1)) {
+                                startedToolPosition = .zero
+                            }
+                            Delay.by(2) {
+                                lowerOpacity()
+                            }
                         }
-                        Delay.by(2) {
-                            lowerOpacity()
-                        }
-                    }
-            )
+                )
+            #endif
         }
+        #if !os(tvOS)
+        .onHover { hovering in
+            hovering ? resetOpacity(0.2) : lowerOpacity(0.2)
+        }
+        #endif
         .onAppear {
             Delay.by(2) { lowerOpacity() }
         }
@@ -81,9 +88,6 @@ struct VideoDetailsToolbar: View {
                 .contentShape(Rectangle())
                 .foregroundColor(.clear)
         )
-        .onHover { hovering in
-            hovering ? resetOpacity(0.2) : lowerOpacity(0.2)
-        }
     }
 
     func lowerOpacity(_ duration: Double = 1.0) {

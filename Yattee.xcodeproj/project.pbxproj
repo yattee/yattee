@@ -167,6 +167,13 @@
 		37169AA62729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
+		3718B9A02921A9620003DB2E /* VideoDetailsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E80F3B287B107F00561799 /* VideoDetailsOverlay.swift */; };
+		3718B9A12921A9640003DB2E /* VideoDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFE26D2CA3700675966 /* VideoDetails.swift */; };
+		3718B9A22921A9670003DB2E /* VideoActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924EF29216C630017D862 /* VideoActions.swift */; };
+		3718B9A32921A96A0003DB2E /* VideoDetailsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924DF292126A00017D862 /* VideoDetailsToolbar.swift */; };
+		3718B9A42921A96C0003DB2E /* VideoDetailsTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924E92921666E0017D862 /* VideoDetailsTool.swift */; };
+		3718B9A52921A97F0003DB2E /* InspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924E2292141320017D862 /* InspectorView.swift */; };
+		3718B9A62921A9BE0003DB2E /* PreferenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924EC2921669B0017D862 /* PreferenceKeys.swift */; };
 		37192D5528B0D5D60012EEDD /* PlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373031F22838388A000CFD59 /* PlayerLayerView.swift */; };
 		37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
 		37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
@@ -807,10 +814,8 @@
 		37E80F3D287B107F00561799 /* VideoDetailsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E80F3B287B107F00561799 /* VideoDetailsOverlay.swift */; };
 		37E80F40287B472300561799 /* ScrollContentBackground+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E80F3F287B472300561799 /* ScrollContentBackground+Backport.swift */; };
 		37E80F43287B7AAF00561799 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37E80F42287B7AAF00561799 /* SwiftUIPager */; };
-		37E80F44287B7AB400561799 /* VideoDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFE26D2CA3700675966 /* VideoDetails.swift */; };
 		37E80F45287B7AC000561799 /* ControlsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372CFD14285F2E2A00B0B54B /* ControlsBar.swift */; };
 		37E80F46287B7AEC00561799 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */; };
-		37E80F47287B7B9400561799 /* VideoDetailsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E80F3B287B107F00561799 /* VideoDetailsOverlay.swift */; };
 		37E8B0EC27B326C00024006F /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8B0EB27B326C00024006F /* TimelineView.swift */; };
 		37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8B0EB27B326C00024006F /* TimelineView.swift */; };
 		37E8B0EE27B326C00024006F /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E8B0EB27B326C00024006F /* TimelineView.swift */; };
@@ -3356,6 +3361,7 @@
 				37CC3F52270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F49BA526CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				376CD21826FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,
+				3718B9A22921A9670003DB2E /* VideoActions.swift in Sources */,
 				37CEE4BF2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				37648B69286CF5F1003D330B /* TVControls.swift in Sources */,
 				374C053D2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
@@ -3367,6 +3373,7 @@
 				379DC3D328BA4EB400B09677 /* Seek.swift in Sources */,
 				375DFB5A26F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3769C0302779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
+				3718B9A32921A96A0003DB2E /* VideoDetailsToolbar.swift in Sources */,
 				37F4AE7426828F0900BD60EA /* VerticalCells.swift in Sources */,
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37D4B1802671650A00C925CA /* YatteeApp.swift in Sources */,
@@ -3390,6 +3397,7 @@
 				37C3A24727235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
+				3718B9A52921A97F0003DB2E /* InspectorView.swift in Sources */,
 				37E70925271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				376BE50D27349108009AD608 /* BrowsingSettings.swift in Sources */,
 				37CFB48728AFE2510070024C /* VideoDescription.swift in Sources */,
@@ -3400,8 +3408,10 @@
 				37F4AD2828613B81004D0F66 /* Color+Debug.swift in Sources */,
 				37E8B0F227B326F30024006F /* Comparable+Clamped.swift in Sources */,
 				375168D82700FDB9008F96A6 /* Debounce.swift in Sources */,
+				3718B9A42921A96C0003DB2E /* VideoDetailsTool.swift in Sources */,
 				37BA794126DB8F97002A0235 /* ChannelVideosView.swift in Sources */,
 				37C0697C2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */,
+				3718B9A12921A9640003DB2E /* VideoDetails.swift in Sources */,
 				378AE93D274EDFB3006A4EE1 /* Backport.swift in Sources */,
 				37130A5D277657090033018A /* Yattee.xcdatamodeld in Sources */,
 				37C3A243272359900087A57A /* Double+Format.swift in Sources */,
@@ -3425,8 +3435,6 @@
 				3752069B285E8DD300CA655F /* Chapter.swift in Sources */,
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,
-				37E80F47287B7B9400561799 /* VideoDetailsOverlay.swift in Sources */,
-				37E80F44287B7AB400561799 /* VideoDetails.swift in Sources */,
 				3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				37030FFD27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				37192D5928B179D60012EEDD /* ChaptersView.swift in Sources */,
@@ -3536,12 +3544,14 @@
 				3782B95627557E4E00990149 /* SearchView.swift in Sources */,
 				3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37C3A24F272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
+				3718B9A02921A9620003DB2E /* VideoDetailsOverlay.swift in Sources */,
 				37FB28432721B22200A57617 /* ContentItem.swift in Sources */,
 				37D2E0D228B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,
 				37484C1B26FC837400287258 /* PlayerSettings.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,
 				37BAB54C269B39FD00E75ED1 /* TVNavigationView.swift in Sources */,
+				3718B9A62921A9BE0003DB2E /* PreferenceKeys.swift in Sources */,
 				3797758D2689345500DD52A8 /* Store.swift in Sources */,
 				37484C2F26FC844700287258 /* InstanceSettings.swift in Sources */,
 			);

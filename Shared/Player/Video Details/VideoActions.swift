@@ -12,13 +12,15 @@ struct VideoActions: View {
     var body: some View {
         HStack {
             if let video {
-                if !video.isLocal || video.localStreamIsRemoteURL {
-                    ShareButton(contentItem: .init(video: video)) {
-                        actionButton("Share", systemImage: "square.and.arrow.up")
-                    }
+                #if !os(tvOS)
+                    if !video.isLocal || video.localStreamIsRemoteURL {
+                        ShareButton(contentItem: .init(video: video)) {
+                            actionButton("Share", systemImage: "square.and.arrow.up")
+                        }
 
-                    Spacer()
-                }
+                        Spacer()
+                    }
+                #endif
 
                 if !video.isLocal {
                     if accounts.signedIn, accounts.app.supportsUserPlaylists {
