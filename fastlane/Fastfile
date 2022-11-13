@@ -42,6 +42,7 @@ platform :ios do
       scheme: "Yattee (iOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/iOS",
       output_name: "Yattee-#{version}-iOS.ipa",
+      xcargs: "-allowProvisioningUpdates"
     )
 
     altool(
@@ -70,6 +71,7 @@ platform :tvos do
       scheme: "Yattee (tvOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/tvOS",
       output_name: "Yattee-#{version}-tvOS.ipa",
+      xcargs: "-allowProvisioningUpdates"
     )
 
     altool(
@@ -98,6 +100,7 @@ platform :mac do
       scheme: "Yattee (macOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
       output_name: "Yattee-#{version}-macOS.app",
+      xcargs: "-allowProvisioningUpdates"
     )
 
     altool(
