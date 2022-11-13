@@ -12,39 +12,50 @@ struct VideoActions: View {
     var body: some View {
         HStack {
             if let video {
-                ShareButton(contentItem: .init(video: video)) {
-                    actionButton("Share", systemImage: "square.and.arrow.up")
-                }
+                if !video.isLocal || video.localStreamIsRemoteURL {
+                    ShareButton(contentItem: .init(video: video)) {
+                        actionButton("Share", systemImage: "square.and.arrow.up")
+                    }
 
-                Spacer()
-
-                actionButton("Add", systemImage: "text.badge.plus") {
-                    navigation.presentAddToPlaylist(video)
-                }
-                if accounts.app.supportsSubscriptions, accounts.signedIn {
                     Spacer()
-                    if subscriptions.isSubscribing(video.channel.id) {
-                        actionButton("Unsubscribe", systemImage: "xmark.circle") {
-                            #if os(tvOS)
-                                subscriptions.unsubscribe(video.channel.id)
-                            #else
-                                navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
-                            #endif
+                }
+
+                if !video.isLocal {
+                    if accounts.signedIn, accounts.app.supportsUserPlaylists {
+                        actionButton("Add", systemImage: "text.badge.plus") {
+                            navigation.presentAddToPlaylist(video)
                         }
-                    } else {
-                        actionButton("Subscribe", systemImage: "star.circle") {
-                            subscriptions.subscribe(video.channel.id) {
-                                navigation.sidebarSectionChanged.toggle()
+                        Spacer()
+                    }
+                    if accounts.signedIn, accounts.app.supportsSubscriptions {
+                        if subscriptions.isSubscribing(video.channel.id) {
+                            actionButton("Unsubscribe", systemImage: "xmark.circle") {
+                                #if os(tvOS)
+                                    subscriptions.unsubscribe(video.channel.id)
+                                #else
+                                    navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
+                                #endif
+                            }
+                        } else {
+                            actionButton("Subscribe", systemImage: "star.circle") {
+                                subscriptions.subscribe(video.channel.id) {
+                                    navigation.sidebarSectionChanged.toggle()
+                                }
                             }
                         }
+                        Spacer()
                     }
                 }
             }
-            Spacer()
+
+            if player.currentItem == nil {
+                Spacer()
+            }
 
             actionButton("Hide", systemImage: "chevron.down") {
                 player.hide(animate: true)
             }
+
             if player.currentItem != nil {
                 Spacer()
                 actionButton("Close", systemImage: "xmark") {
@@ -79,58 +90,6 @@ struct VideoActions: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(name))
-    }
-
-    @ViewBuilder var videoProperties: some View {
-        HStack(spacing: 2) {
-            publishedDateSection
-
-            Spacer()
-
-            HStack(spacing: 4) {
-                Image(systemName: "eye")
-
-                if let views = video?.viewsCount, player.videoBeingOpened.isNil {
-                    Text(views)
-                } else {
-                    Text("1,234M").redacted(reason: .placeholder)
-                }
-
-                Image(systemName: "hand.thumbsup")
-
-                if let likes = video?.likesCount, player.videoBeingOpened.isNil {
-                    Text(likes)
-                } else {
-                    Text("1,234M").redacted(reason: .placeholder)
-                }
-
-                if Defaults[.enableReturnYouTubeDislike] {
-                    Image(systemName: "hand.thumbsdown")
-
-                    if let dislikes = video?.dislikesCount, player.videoBeingOpened.isNil {
-                        Text(dislikes)
-                    } else {
-                        Text("1,234M").redacted(reason: .placeholder)
-                    }
-                }
-            }
-        }
-        .font(.system(size: 12))
-        .foregroundColor(.secondary)
-    }
-
-    var publishedDateSection: some View {
-        Group {
-            if let video {
-                HStack(spacing: 4) {
-                    if let published = video.publishedDate {
-                        Text(published)
-                    } else {
-                        Text("1 century ago").redacted(reason: .placeholder)
-                    }
-                }
-            }
-        }
     }
 }
 
