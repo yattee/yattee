@@ -42,6 +42,9 @@ final class PlayerControlsModel: ObservableObject {
                 self?.resetTimer()
             }
         } else {
+            #if os(macOS)
+                NSCursor.setHiddenUntilMouseMoves(player.playingFullScreen)
+            #endif
             if !player.musicMode {
                 DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
                     player.backend.stopControlsUpdates()
