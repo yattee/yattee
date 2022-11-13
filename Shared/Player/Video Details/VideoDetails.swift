@@ -31,7 +31,6 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
-    @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
     @Default(.playerSidebar) private var playerSidebar
 
     var video: Video? {
@@ -53,6 +52,7 @@ struct VideoDetails: View {
 
             ZStack(alignment: .bottom) {
                 currentPage
+                    .frame(maxWidth: detailsSize.width)
                     .transition(.fade)
 
                 HStack(alignment: .center) {
@@ -182,7 +182,11 @@ struct VideoDetails: View {
                 if let views = video?.viewsCount, player.videoBeingOpened.isNil {
                     Text(views)
                 } else {
-                    Text("1,234M").redacted(reason: .placeholder)
+                    if player.videoBeingOpened == nil {
+                        Text("?")
+                    } else {
+                        Text("1,234M").redacted(reason: .placeholder)
+                    }
                 }
 
                 Image(systemName: "hand.thumbsup")
@@ -190,7 +194,11 @@ struct VideoDetails: View {
                 if let likes = video?.likesCount, player.videoBeingOpened.isNil {
                     Text(likes)
                 } else {
-                    Text("1,234M").redacted(reason: .placeholder)
+                    if player.videoBeingOpened == nil {
+                        Text("?")
+                    } else {
+                        Text("1,234M").redacted(reason: .placeholder)
+                    }
                 }
 
                 if Defaults[.enableReturnYouTubeDislike] {
@@ -199,7 +207,11 @@ struct VideoDetails: View {
                     if let dislikes = video?.dislikesCount, player.videoBeingOpened.isNil {
                         Text(dislikes)
                     } else {
-                        Text("1,234M").redacted(reason: .placeholder)
+                        if player.videoBeingOpened == nil {
+                            Text("?")
+                        } else {
+                            Text("1,234M").redacted(reason: .placeholder)
+                        }
                     }
                 }
             }

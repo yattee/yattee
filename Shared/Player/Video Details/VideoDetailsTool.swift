@@ -18,7 +18,7 @@ struct VideoDetailsTool: Identifiable {
         case .info:
             return video != nil && !video!.isLocal
         case .inspector:
-            return true
+            return false
         case .chapters:
             return video != nil && !video!.chapters.isEmpty
         case .comments:

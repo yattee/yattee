@@ -64,7 +64,7 @@ struct VideoActions: View {
             }
         }
         .padding(.horizontal)
-        .borderBottom(height: 0.4, color: Color("ControlsBorderColor"))
+        .borderBottom(height: 0.5, color: Color("ControlsBorderColor"))
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
         .frame(height: 50)
