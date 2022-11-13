@@ -6,6 +6,9 @@ struct PlayerSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
+    @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
+    @Default(.detailsToolbarPosition) private var detailsToolbarPosition
+    @Default(.showInspector) private var showInspector
     @Default(.playerControlsLayout) private var playerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
@@ -106,6 +109,19 @@ struct PlayerSettings: View {
                 }
             }
 
+            #if !os(tvOS)
+                Section(header: SettingsHeader(text: "Video Details").padding(.bottom, videoDetailsHeaderPadding)) {
+                    SettingsHeader(text: "Buttons labels".localized(), secondary: true)
+                    detailsButtonLabelStylePicker
+
+                    SettingsHeader(text: "Show Inspector".localized(), secondary: true)
+                    showInspectorPicker
+
+                    SettingsHeader(text: "Pages toolbar position".localized(), secondary: true)
+                    detailsToolbarPositionPicker
+                }
+            #endif
+
             #if os(iOS)
                 Section(header: SettingsHeader(text: "Orientation".localized())) {
                     if idiom == .pad {
@@ -125,6 +141,14 @@ struct PlayerSettings: View {
                 #endif
             }
         }
+    }
+
+    private var videoDetailsHeaderPadding: Double {
+        #if os(macOS)
+            5.0
+        #else
+            0.0
+        #endif
     }
 
     private var sourcePicker: some View {
@@ -168,6 +192,31 @@ struct PlayerSettings: View {
             #endif
 
             Text("Hide sidebar").tag(PlayerSidebarSetting.never)
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var detailsButtonLabelStylePicker: some View {
+        Picker("Buttons labels", selection: $playerDetailsPageButtonLabelStyle) {
+            Text("Show only icons").tag(PlayerDetailsPageButtonLabelStyle.iconOnly)
+            Text("Show icons and text when space permits").tag(PlayerDetailsPageButtonLabelStyle.iconAndText)
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var showInspectorPicker: some View {
+        Picker("Inspector visibility", selection: $showInspector) {
+            Text("Always").tag(ShowInspectorSetting.always)
+            Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var detailsToolbarPositionPicker: some View {
+        Picker("Pages toolbar position", selection: $detailsToolbarPosition) {
+            ForEach(DetailsToolbarPositionSetting.allCases, id: \.self) { setting in
+                Text(setting.rawValue.capitalized).tag(setting)
+            }
         }
         .modifier(SettingsPickerModifier())
     }
@@ -287,6 +336,7 @@ struct PlayerSettings_Previews: PreviewProvider {
         VStack(alignment: .leading) {
             PlayerSettings()
         }
+        .frame(minHeight: 800)
         .injectFixtureEnvironmentObjects()
     }
 }

@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct VideoDetailsToolbar: View {
-    static let lowOpacity = 0.33
+    static let lowOpacity = 0.5
     var video: Video?
     @Binding var page: VideoDetails.DetailsPage
     var sidebarQueue: Bool
@@ -123,6 +123,7 @@ struct VideoDetailsToolbar: View {
             {
                 Text(tool.wrappedValue.name)
                     .font(.system(size: 14).bold())
+                    .padding(.trailing, 4)
                     .foregroundColor(.white)
                     .allowsTightening(true)
                     .lineLimit(1)
@@ -136,7 +137,18 @@ struct VideoDetailsToolbar: View {
         )
     }
 
+    var visibleToolsCount: Int {
+        tools.filter { $0.isAvailable(for: video, sidebarQueue: sidebarQueue) }.count
+    }
+
     var activeToolID: VideoDetailsTool.ID {
         activeTool?.id ?? "queue"
+    }
+}
+
+struct VideoDetailsToolbar_Previews: PreviewProvider {
+    static var previews: some View {
+        VideoDetailsToolbar(page: .constant(.queue), sidebarQueue: false)
+            .injectFixtureEnvironmentObjects()
     }
 }

@@ -31,6 +31,7 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @Default(.detailsToolbarPosition) private var detailsToolbarPosition
     @Default(.playerSidebar) private var playerSidebar
 
     var video: Video? {
@@ -56,12 +57,17 @@ struct VideoDetails: View {
                     .transition(.fade)
 
                 HStack(alignment: .center) {
-                    Spacer()
+                    if detailsToolbarPosition.needsLeftSpacer { Spacer() }
+
                     VideoDetailsToolbar(video: video, page: $page, sidebarQueue: sidebarQueue)
-                    Spacer()
+
+                    if detailsToolbarPosition.needsRightSpacer { Spacer() }
                 }
+                .padding(.leading, detailsToolbarPosition == .left ? 10 : 0)
+                .padding(.trailing, detailsToolbarPosition == .right ? 10 : 0)
+
                 #if os(iOS)
-                .offset(y: bottomPadding ? -SafeArea.insets.bottom : 0)
+                    .offset(y: bottomPadding ? -SafeArea.insets.bottom : 0)
                 #endif
             }
             .onChange(of: player.currentItem) { newItem in

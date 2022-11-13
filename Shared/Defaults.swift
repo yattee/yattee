@@ -100,7 +100,9 @@ extension Defaults.Keys {
     static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: chargingNonCellularProfileDefault)
     static let forceAVPlayerForLiveStreams = Key<Bool>("forceAVPlayerForLiveStreams", default: true)
 
-    static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: PlayerSidebarSetting.defaultValue)
+    static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: .defaultValue)
+    static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
+    static let detailsToolbarPosition = Key<DetailsToolbarPositionSetting>("detailsToolbarPosition", default: .center)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
 
     #if os(iOS)
@@ -328,4 +330,20 @@ enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
 
 enum SystemControlsCommands: String, CaseIterable, Defaults.Serializable {
     case seek, restartAndAdvanceToNext
+}
+
+enum ShowInspectorSetting: String, Defaults.Serializable {
+    case always, onlyLocal
+}
+
+enum DetailsToolbarPositionSetting: String, CaseIterable, Defaults.Serializable {
+    case left, center, right
+
+    var needsLeftSpacer: Bool {
+        self == .center || self == .right
+    }
+
+    var needsRightSpacer: Bool {
+        self == .center || self == .left
+    }
 }

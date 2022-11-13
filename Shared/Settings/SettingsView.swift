@@ -223,7 +223,7 @@ struct SettingsView: View {
             case .browsing:
                 return 580
             case .player:
-                return 680
+                return 850
             case .quality:
                 return 420
             case .history:

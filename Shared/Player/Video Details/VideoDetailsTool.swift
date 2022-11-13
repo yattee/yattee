@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 
 struct VideoDetailsTool: Identifiable {
@@ -18,7 +19,7 @@ struct VideoDetailsTool: Identifiable {
         case .info:
             return video != nil && !video!.isLocal
         case .inspector:
-            return false
+            return video == nil || Defaults[.showInspector] == .always || video!.isLocal
         case .chapters:
             return video != nil && !video!.chapters.isEmpty
         case .comments:

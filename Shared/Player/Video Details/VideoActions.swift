@@ -83,8 +83,9 @@ struct VideoActions: View {
                 Text(name)
                     .foregroundColor(.secondary)
                     .font(.caption2)
+                    .allowsTightening(true)
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 6)
             .padding(.vertical, 5)
             .contentShape(Rectangle())
         }
