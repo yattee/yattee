@@ -107,7 +107,7 @@ struct NowPlayingView: View {
                         VStack(alignment: .center) {
                             PlaceholderProgressView()
                                 .onAppear {
-                                    comments.load()
+                                    comments.loadIfNeeded()
                                 }
                         }
                     } else {

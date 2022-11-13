@@ -5,8 +5,7 @@ struct VideoDetailsOverlay: View {
     @EnvironmentObject<PlayerControlsModel> private var controls
 
     var body: some View {
-        VideoDetails(sidebarQueue: false, fullScreen: fullScreenBinding)
-            .modifier(ControlBackgroundModifier())
+        VideoDetails(sidebarQueue: .constant(false), fullScreen: fullScreenBinding)
             .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 

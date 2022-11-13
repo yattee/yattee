@@ -212,7 +212,11 @@ struct PlayerControls: View {
 
     var detailsHeight: Double {
         guard let player, player.playerSize.height.isFinite else { return 200 }
-        return [player.playerSize.height, 500].min()!
+        var inset = 0.0
+        #if os(iOS)
+            inset = SafeArea.insets.bottom
+        #endif
+        return [player.playerSize.height - inset, 500].min()!
     }
 
     @ViewBuilder var controlsBackground: some View {

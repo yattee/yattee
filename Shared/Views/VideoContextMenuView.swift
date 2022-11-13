@@ -90,7 +90,10 @@ struct VideoContextMenuView: View {
         }
 
         #if os(iOS)
-            if video.isLocal, let url = video.localStream?.localURL, DocumentsModel.shared.isDocument(url) {
+            if video.isLocal,
+               let url = video.localStream?.localURL,
+               DocumentsModel.shared.isDocument(url)
+            {
                 Section {
                     removeDocumentButton
                 }

@@ -1,14 +1,22 @@
 import SwiftUI
 
-struct ShareButton: View {
+struct ShareButton<LabelView: View>: View {
     let contentItem: ContentItem
 
     @EnvironmentObject<AccountsModel> private var accounts
     @EnvironmentObject<NavigationModel> private var navigation
     @EnvironmentObject<PlayerModel> private var player
 
-    init(contentItem: ContentItem) {
+    let label: LabelView?
+
+    init(
+        contentItem: ContentItem,
+        @ViewBuilder label: @escaping () -> LabelView? = {
+            Label("Share...", systemImage: "square.and.arrow.up")
+        }
+    ) {
         self.contentItem = contentItem
+        self.label = label()
     }
 
     @ViewBuilder var body: some View {
@@ -24,11 +32,11 @@ struct ShareButton: View {
                     }
                 }
             } label: {
-                Label("Share...", systemImage: "square.and.arrow.up")
+                label
             }
             .menuStyle(.borderlessButton)
             #if os(macOS)
-                .frame(maxWidth: 35)
+                .frame(maxWidth: 60)
             #endif
         }
     }

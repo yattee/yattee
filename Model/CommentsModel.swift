@@ -25,6 +25,11 @@ final class CommentsModel: ObservableObject {
         !(nextPage?.isEmpty ?? true)
     }
 
+    func loadIfNeeded() {
+        guard !loaded else { return }
+        load()
+    }
+
     func load(page: String? = nil) {
         guard let video = player.currentVideo else { return }
 

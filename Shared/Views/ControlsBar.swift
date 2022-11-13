@@ -137,20 +137,32 @@ struct ControlsBar: View {
     var details: some View {
         HStack {
             HStack(spacing: 8) {
-                ZStack(alignment: .bottomTrailing) {
-                    authorAvatar
+                Button {
+                    if let video = model.currentVideo, !video.isLocal {
+                        NavigationModel.openChannel(
+                            video.channel,
+                            player: model,
+                            recents: recents,
+                            navigation: navigation,
+                            navigationStyle: navigationStyle
+                        )
+                    }
+                } label: {
+                    ZStack(alignment: .bottomTrailing) {
+                        authorAvatar
 
-                    if accounts.app.supportsSubscriptions,
-                       accounts.signedIn,
-                       let video = model.currentVideo,
-                       subscriptions.isSubscribing(video.channel.id)
-                    {
-                        Image(systemName: "star.circle.fill")
-                        #if !os(tvOS)
-                            .background(Color.background)
-                        #endif
-                            .clipShape(Circle())
-                            .foregroundColor(.secondary)
+                        if accounts.app.supportsSubscriptions,
+                           accounts.signedIn,
+                           let video = model.currentVideo,
+                           subscriptions.isSubscribing(video.channel.id)
+                        {
+                            Image(systemName: "star.circle.fill")
+                            #if !os(tvOS)
+                                .background(Color.background)
+                            #endif
+                                .clipShape(Circle())
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
                 .contextMenu {

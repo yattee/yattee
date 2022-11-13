@@ -29,9 +29,12 @@ struct PlayerQueueRow: View {
 
     var body: some View {
         Button {
+            guard let video = item.video else {
+                return
+            }
             #if os(iOS)
-                guard !item.video.localStreamIsDirectory else {
-                    if let url = item.video?.localStream?.localURL {
+                guard !video.localStreamIsDirectory else {
+                    if let url = video.localStream?.localURL {
                         withAnimation {
                             DocumentsModel.shared.goToURL(url)
                         }
@@ -40,7 +43,7 @@ struct PlayerQueueRow: View {
                 }
             #endif
 
-            if item.video.localStreamIsFile, let url = item.video.localStream?.localURL {
+            if video.localStreamIsFile, let url = video.localStream?.localURL {
                 URLBookmarkModel.shared.saveBookmark(url)
             }
 
@@ -48,7 +51,7 @@ struct PlayerQueueRow: View {
 
             player.avPlayerBackend.startPictureInPictureOnPlay = player.playingInPictureInPicture
 
-            player.videoBeingOpened = item.video
+            player.videoBeingOpened = video
 
             let playItem = {
                 if history {

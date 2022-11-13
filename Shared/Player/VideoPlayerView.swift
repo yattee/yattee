@@ -28,9 +28,7 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @State private var playerSize: CGSize = .zero { didSet {
-        sidebarQueue = playerSize.width > 900 && Defaults[.playerSidebar] == .whenFits
-    }}
+    @State private var playerSize: CGSize = .zero { didSet { updateSidebarQueue() } }
     @State private var hoveringPlayer = false
     @State private var fullScreenDetails = false
     @State private var sidebarQueue = defaultSidebarQueueValue
@@ -70,6 +68,7 @@ struct VideoPlayerView: View {
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
+    @Default(.playerSidebar) var playerSidebar
 
     @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -87,6 +86,10 @@ struct VideoPlayerView: View {
             if player.musicMode {
                 player.backend.startControlsUpdates()
             }
+            updateSidebarQueue()
+        }
+        .onChange(of: playerSidebar) { _ in
+            updateSidebarQueue()
         }
     }
 
@@ -187,6 +190,14 @@ struct VideoPlayerView: View {
             .backport
             .persistentSystemOverlays(!fullScreenPlayer)
             #endif
+        #endif
+    }
+
+    func updateSidebarQueue() {
+        #if os(iOS)
+            sidebarQueue = playerSize.width > 900 && playerSidebar == .whenFits
+        #elseif os(macOS)
+            sidebarQueue = playerSidebar != .never
         #endif
     }
 
@@ -328,11 +339,10 @@ struct VideoPlayerView: View {
 
                         #if !os(tvOS)
                             if !fullScreenPlayer {
-                                VideoDetails(sidebarQueue: sidebarQueue, fullScreen: $fullScreenDetails)
+                                VideoDetails(sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
                                 #if os(iOS)
                                     .ignoresSafeArea(.all, edges: .bottom)
                                 #endif
-                                    .background(colorScheme == .dark ? Color.black : Color.white)
                                     .modifier(VideoDetailsPaddingModifier(
                                         playerSize: player.playerSize,
                                         fullScreen: fullScreenDetails
@@ -411,6 +421,14 @@ struct VideoPlayerView: View {
         #endif
     }
 
+    var detailsNeedBottomPadding: Bool {
+        #if os(iOS)
+            return true
+        #else
+            return false
+        #endif
+    }
+
     var fullScreenPlayer: Bool {
         #if os(iOS)
             player.playingFullScreen || verticalSizeClass == .compact
@@ -449,6 +467,7 @@ struct VideoPlayerView: View {
                         Image(systemName: "xmark")
                             .font(.system(size: 40))
                     }
+                    .opacity(fullScreenPlayer ? 1 : 0)
                     .buttonStyle(.plain)
                     .padding(10)
                     .foregroundColor(.gray)

@@ -72,7 +72,9 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
         #if os(iOS)
             player.playerSize = .init(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         #endif
-        player.queue = Video.allFixtures.map { PlayerQueueItem($0) }
+        let local = (1 ... 10).map { Video.local(URL(string: "https://\($0)")!) }
+        let videos = Video.allFixtures + local
+        player.queue = videos.map { PlayerQueueItem($0) }
 
         return player
     }
