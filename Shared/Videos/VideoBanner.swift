@@ -22,7 +22,7 @@ struct VideoBanner: View {
 
     var body: some View {
         HStack(alignment: stackAlignment, spacing: 12) {
-            ZStack(alignment: .bottom) {
+            VStack(spacing: thumbnailStackSpacing) {
                 smallThumbnail
 
                 #if !os(tvOS)
@@ -111,6 +111,14 @@ struct VideoBanner: View {
             playbackTime.isNil ? .center : .top
         #else
                 .center
+        #endif
+    }
+
+    private var thumbnailStackSpacing: Double {
+        #if os(tvOS)
+            8
+        #else
+            2
         #endif
     }
 
