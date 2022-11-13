@@ -62,7 +62,10 @@ final class AVPlayerBackend: PlayerBackend {
 
     var aspectRatio: Double {
         #if os(iOS)
-            videoWidth! / videoHeight!
+            guard let videoWidth, let videoHeight else {
+                return VideoPlayerView.defaultAspectRatio
+            }
+            return videoWidth / videoHeight
         #else
             VideoPlayerView.defaultAspectRatio
         #endif
@@ -168,6 +171,11 @@ final class AVPlayerBackend: PlayerBackend {
 
     func stop() {
         avPlayer.replaceCurrentItem(with: nil)
+    }
+
+    func cancelLoads() {
+        asset?.cancelLoading()
+        composition.cancelLoading()
     }
 
     func seek(to time: CMTime, seekType _: SeekType, completionHandler: ((Bool) -> Void)?) {

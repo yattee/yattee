@@ -353,6 +353,10 @@ final class MPVBackend: PlayerBackend {
         isPlaying ? pause() : play()
     }
 
+    func cancelLoads() {
+        stop()
+    }
+
     func stop() {
         client?.stop()
     }

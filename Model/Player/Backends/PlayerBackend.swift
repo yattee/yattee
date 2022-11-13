@@ -69,6 +69,8 @@ protocol PlayerBackend {
 
     func setNeedsDrawing(_ needsDrawing: Bool)
     func setSize(_ width: Double, _ height: Double)
+
+    func cancelLoads()
 }
 
 extension PlayerBackend {

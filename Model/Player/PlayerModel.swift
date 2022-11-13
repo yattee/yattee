@@ -498,6 +498,9 @@ final class PlayerModel: ObservableObject {
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
 
+        toBackend.cancelLoads()
+        fromBackend.cancelLoads()
+
         if !self.backend.canPlayAtRate(currentRate) {
             currentRate = self.backend.suggestedPlaybackRates.last { $0 < currentRate } ?? 1.0
         }
