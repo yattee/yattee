@@ -29,6 +29,7 @@ struct CommentsView: View {
                 if embedInScrollView {
                     ScrollView(.vertical, showsIndicators: false) {
                         commentsStack
+                        Color.clear.frame(height: 50)
                     }
                 } else {
                     commentsStack

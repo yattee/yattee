@@ -18,6 +18,8 @@ struct RelatedView: View {
                                 VideoContextMenuView(video: video)
                             }
                     }
+                    Color.clear.padding(.bottom, 50)
+                        .listRowBackground(Color.clear)
                 }
             }
         }

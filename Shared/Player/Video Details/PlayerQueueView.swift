@@ -32,6 +32,8 @@ struct PlayerQueueView: View {
                 .padding(.vertical, 5)
                 .listRowInsets(EdgeInsets())
             #endif
+            Color.clear.padding(.bottom, 50)
+                .listRowBackground(Color.clear)
         }
         #if os(macOS)
         .listStyle(.inset)

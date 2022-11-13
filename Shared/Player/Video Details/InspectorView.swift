@@ -7,11 +7,11 @@ struct InspectorView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 4) {
+            VStack(alignment: .leading, spacing: 12) {
                 if let video {
-                    Group {
+                    VStack(spacing: 4) {
                         if player.activeBackend == .mpv, player.mpvBackend.videoFormat != "unknown" {
-                            videoDetailGroupHeading("Video")
+                            videoDetailGroupHeading("Video", image: "film")
 
                             videoDetailRow("Format", value: player.mpvBackend.videoFormat)
                             videoDetailRow("Codec", value: player.mpvBackend.videoCodec)
@@ -26,8 +26,8 @@ struct InspectorView: View {
                     }
 
                     if player.activeBackend == .mpv, player.mpvBackend.audioFormat != "unknown" {
-                        Group {
-                            videoDetailGroupHeading("Audio")
+                        VStack(spacing: 4) {
+                            videoDetailGroupHeading("Audio", image: "music.note")
                             videoDetailRow("Format", value: player.mpvBackend.audioFormat)
                             videoDetailRow("Codec", value: player.mpvBackend.audioCodec)
                             videoDetailRow("Driver", value: player.mpvBackend.currentAo)
@@ -36,27 +36,38 @@ struct InspectorView: View {
                         }
                     }
 
-                    if video.localStream != nil || video.localStreamFileExtension != nil {
-                        videoDetailGroupHeading("File")
-                    }
+                    VStack(spacing: 4) {
+                        if video.localStream != nil || video.localStreamFileExtension != nil {
+                            videoDetailGroupHeading("File", image: "doc")
+                        }
 
-                    if let fileExtension = video.localStreamFileExtension {
-                        videoDetailRow("File Extension", value: fileExtension)
-                    }
+                        if let fileExtension = video.localStreamFileExtension {
+                            videoDetailRow("File Extension", value: fileExtension)
+                        }
 
-                    if let url = video.localStream?.localURL, video.localStreamIsRemoteURL {
-                        videoDetailRow("URL", value: url.absoluteString)
+                        if let url = video.localStream?.localURL, video.localStreamIsRemoteURL {
+                            videoDetailRow("URL", value: url.absoluteString)
+                        }
                     }
+                } else {
+                    NoCommentsView(text: "Not playing", systemImage: "stop.circle.fill")
                 }
             }
+            .padding(.top, 10)
+            .padding(.bottom, 50)
         }
         .padding(.horizontal)
     }
 
-    @ViewBuilder func videoDetailGroupHeading(_ heading: String) -> some View {
-        Text(heading.uppercased())
-            .font(.footnote)
-            .foregroundColor(.secondary)
+    @ViewBuilder func videoDetailGroupHeading(_ heading: String, image systemName: String? = nil) -> some View {
+        HStack {
+            if let systemName {
+                Image(systemName: systemName)
+            }
+            Text(heading.uppercased())
+                .font(.footnote)
+        }
+        .foregroundColor(.secondary)
     }
 
     @ViewBuilder func videoDetailRow(_ detail: String, value: String) -> some View {
@@ -81,5 +92,6 @@ struct InspectorView: View {
 struct InspectorView_Previews: PreviewProvider {
     static var previews: some View {
         InspectorView(video: .fixture)
+            .injectFixtureEnvironmentObjects()
     }
 }

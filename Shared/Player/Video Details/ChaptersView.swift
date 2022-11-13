@@ -12,6 +12,8 @@ struct ChaptersView: View {
                     ForEach(chapters) { chapter in
                         ChapterView(chapter: chapter)
                     }
+                    Color.clear.frame(height: 50)
+                        .listRowBackground(Color.clear)
                 }
                 .listRowBackground(Color.clear)
             }
