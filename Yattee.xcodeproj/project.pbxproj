@@ -304,6 +304,9 @@
 		37484C3126FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
 		37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37484C3026FCB8F900287258 /* AccountValidator.swift */; };
+		374924DA2921050B0017D862 /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924D92921050B0017D862 /* LocationsSettings.swift */; };
+		374924DB2921050B0017D862 /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924D92921050B0017D862 /* LocationsSettings.swift */; };
+		374924DC2921050B0017D862 /* LocationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924D92921050B0017D862 /* LocationsSettings.swift */; };
 		37494EA529200B14000DF176 /* DocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37494EA429200B14000DF176 /* DocumentsView.swift */; };
 		37494EA729200E0B000DF176 /* DocumentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37494EA629200E0B000DF176 /* DocumentsModel.swift */; };
 		374AB3D728BCAF0000DF56FB /* SeekModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374AB3D628BCAF0000DF56FB /* SeekModel.swift */; };
@@ -1095,6 +1098,7 @@
 		37484C2826FC83FF00287258 /* AccountForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountForm.swift; sourceTree = "<group>"; };
 		37484C2C26FC844700287258 /* InstanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceSettings.swift; sourceTree = "<group>"; };
 		37484C3026FCB8F900287258 /* AccountValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidator.swift; sourceTree = "<group>"; };
+		374924D92921050B0017D862 /* LocationsSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsSettings.swift; sourceTree = "<group>"; };
 		37494EA429200B14000DF176 /* DocumentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsView.swift; sourceTree = "<group>"; };
 		37494EA629200E0B000DF176 /* DocumentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsModel.swift; sourceTree = "<group>"; };
 		3749BF6F27ADA135000480FF /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
@@ -1814,6 +1818,7 @@
 				37BC50A72778A84700510953 /* HistorySettings.swift */,
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
 				37484C2C26FC844700287258 /* InstanceSettings.swift */,
+				374924D92921050B0017D862 /* LocationsSettings.swift */,
 				37484C1826FC837400287258 /* PlayerSettings.swift */,
 				374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */,
 				376BE50627347B57009AD608 /* SettingsHeader.swift */,
@@ -2795,6 +2800,7 @@
 				37BD07C82698B71C003EBB87 /* AppTabNavigation.swift in Sources */,
 				37599F38272B4D740087F250 /* FavoriteButton.swift in Sources */,
 				3754B01528B7F84D009717C8 /* Constants.swift in Sources */,
+				374924DA2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				378FFBC428660172009E3FBE /* URLParser.swift in Sources */,
 				3784B23D2728B85300B09468 /* ShareButton.swift in Sources */,
 				37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
@@ -3057,6 +3063,7 @@
 				3743CA4F270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				374C053C2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
+				374924DB2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */,
 				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
 				37E80F3D287B107F00561799 /* VideoDetailsOverlay.swift in Sources */,
@@ -3368,6 +3375,7 @@
 				37A5DBCA285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */,
 				37E80F46287B7AEC00561799 /* PlayerQueueView.swift in Sources */,
 				37C0698427260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
+				374924DC2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				37D6025B28C17375009E8D98 /* PlaybackStatsView.swift in Sources */,
 				37666BAA27023AF000F869E5 /* AccountSelectionView.swift in Sources */,
 				3765788B2685471400D4EA09 /* Playlist.swift in Sources */,

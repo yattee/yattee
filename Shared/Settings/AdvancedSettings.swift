@@ -2,7 +2,6 @@ import Defaults
 import SwiftUI
 
 struct AdvancedSettings: View {
-    @Default(.instancesManifest) private var instancesManifest
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
     @Default(.mpvCacheSecs) private var mpvCacheSecs
     @Default(.mpvCachePauseWait) private var mpvCachePauseWait
@@ -25,12 +24,10 @@ struct AdvancedSettings: View {
         VStack(alignment: .leading) {
             #if os(macOS)
                 advancedSettings
-                locationsSettings
                 Spacer()
             #else
                 List {
                     advancedSettings
-                    locationsSettings
                 }
                 #if os(iOS)
                 .sheet(isPresented: $presentingShareSheet) {
@@ -41,16 +38,8 @@ struct AdvancedSettings: View {
                 #endif
             #endif
         }
-        .onAppear(perform: loadCountries)
         .onChange(of: countryOfPublicInstances) { newCountry in
             InstancesManifest.shared.setPublicAccount(newCountry, accounts: accounts, asCurrent: accounts.current?.isPublic ?? true)
-        }
-        .onChange(of: instancesManifest) { _ in
-            countryOfPublicInstances = nil
-            if let account = accounts.current, account.isPublic {
-                accounts.setCurrent(nil)
-            }
-            countries.removeAll()
         }
         .sheet(isPresented: $presentingInstanceForm) {
             InstanceForm(savedInstanceID: $savedFormInstanceID)
@@ -103,17 +92,6 @@ struct AdvancedSettings: View {
                 logButton
             }
         }
-
-        Section(header: manifestHeader) {
-            TextField("URL", text: $instancesManifest)
-            Button("Reload manifest", action: loadCountries)
-                .disabled(instancesManifest.isEmpty)
-            #if !os(macOS)
-                .keyboardType(.webSearch)
-            #endif
-                .disableAutocorrection(true)
-        }
-        .padding(.bottom, 4)
     }
 
     @ViewBuilder var mpvFooter: some View {
@@ -137,10 +115,6 @@ struct AdvancedSettings: View {
         .foregroundColor(.secondary)
     }
 
-    var manifestHeader: some View {
-        SettingsHeader(text: "Locations Manifest".localized())
-    }
-
     var showMPVPlaybackStatsToggle: some View {
         Toggle("Show playback statistics", isOn: $showMPVPlaybackStats)
     }
@@ -158,72 +132,6 @@ struct AdvancedSettings: View {
             }
         }
     #endif
-
-    @ViewBuilder var locationsSettings: some View {
-        if !InstancesManifest.shared.manifestURL.isNil, !countries.isEmpty {
-            Section(header: SettingsHeader(text: "Public Locations".localized()), footer: countryFooter) {
-                Picker("Country", selection: $countryOfPublicInstances) {
-                    Text("Don't use public locations").tag(String?.none)
-                    ForEach(countries, id: \.self) { country in
-                        Text(country).tag(Optional(country))
-                    }
-                }
-                #if os(tvOS)
-                .pickerStyle(.inline)
-                #endif
-                .disabled(countries.isEmpty)
-
-                Button {
-                    InstancesManifest.shared.changePublicAccount(accounts, settings: settings)
-                } label: {
-                    if let account = accounts.current, account.isPublic {
-                        Text("Switch to other public location")
-                    } else {
-                        Text("Switch to public locations")
-                    }
-                }
-                .disabled(countryOfPublicInstances.isNil)
-            }
-        }
-
-        Section(header: SettingsHeader(text: "Custom Locations".localized())) {
-            #if os(macOS)
-                InstancesSettings()
-                    .environmentObject(settings)
-            #else
-                ForEach(instances) { instance in
-                    AccountsNavigationLink(instance: instance)
-                }
-                addInstanceButton
-            #endif
-        }
-    }
-
-    @ViewBuilder var countryFooter: some View {
-        if let account = accounts.current {
-            let locationType = account.isPublic ? (account.country ?? "Unknown") : "Custom".localized()
-            let description = account.isPublic ? account.url : account.instance?.description ?? "unknown".localized()
-
-            Text("Current: \(locationType)\n\(description)")
-                .foregroundColor(.secondary)
-            #if os(macOS)
-                .padding(.bottom, 10)
-            #endif
-        }
-    }
-
-    func loadCountries() {
-        InstancesManifest.shared.configure()
-        InstancesManifest.shared.instancesList?.load()
-            .onSuccess { response in
-                if let instances: [ManifestedInstance] = response.typedContent() {
-                    self.countries = instances.map(\.country).unique().sorted()
-                }
-            }
-            .onFailure { _ in
-                settings.presentAlert(title: "Could not load locations manifest".localized())
-            }
-    }
 
     private var addInstanceButton: some View {
         Button {

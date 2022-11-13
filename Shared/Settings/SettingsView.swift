@@ -7,7 +7,7 @@ struct SettingsView: View {
 
     #if os(macOS)
         private enum Tabs: Hashable {
-            case browsing, player, quality, history, sponsorBlock, advanced, help
+            case browsing, player, quality, history, sponsorBlock, locations, advanced, help
         }
 
         @State private var selection: Tabs?
@@ -75,6 +75,13 @@ struct SettingsView: View {
                     }
                     .tag(Optional(Tabs.sponsorBlock))
                 }
+                Form {
+                    LocationsSettings()
+                }
+                .tabItem {
+                    Label("Locations", systemImage: "globe")
+                }
+                .tag(Optional(Tabs.locations))
 
                 Group {
                     AdvancedSettings()
@@ -143,6 +150,12 @@ struct SettingsView: View {
                         } label: {
                             Label("SponsorBlock", systemImage: "dollarsign.circle")
                         }
+                    }
+
+                    NavigationLink {
+                        LocationsSettings()
+                    } label: {
+                        Label("Locations", systemImage: "globe")
                     }
 
                     NavigationLink {
@@ -217,10 +230,12 @@ struct SettingsView: View {
                 return 500
             case .sponsorBlock:
                 return 700
-            case .advanced:
-                return 750
-            case .help:
+            case .locations:
                 return 600
+            case .advanced:
+                return 250
+            case .help:
+                return 580
             }
         }
     #endif

@@ -74,7 +74,7 @@ struct InstanceForm: View {
         Group {
             TextField("Name", text: $name)
 
-            TextField("URL", text: $url)
+            TextField("Address", text: $url)
 
             #if !os(macOS)
                 .autocapitalization(.none)
