@@ -155,6 +155,8 @@ struct VideoPlayerView: View {
                     }
                     stopOrientationUpdates()
                     player.controls.hideOverlays()
+
+                    player.lockedOrientation = nil
                 }
                 .onAnimationCompleted(for: viewDragOffset) {
                     guard !dragGestureState else { return }

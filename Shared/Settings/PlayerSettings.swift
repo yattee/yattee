@@ -15,6 +15,7 @@ struct PlayerSettings: View {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
     #if os(iOS)
+        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
     #endif
@@ -111,6 +112,7 @@ struct PlayerSettings: View {
                         enterFullscreenInLandscapeToggle
                     }
                     rotateToPortraitOnExitFullScreenToggle
+                    honorSystemOrientationLockToggle
                 }
             #endif
 
@@ -247,6 +249,11 @@ struct PlayerSettings: View {
     }
 
     #if os(iOS)
+        private var honorSystemOrientationLockToggle: some View {
+            Toggle("Honor orientation lock", isOn: $honorSystemOrientationLock)
+                .disabled(!enterFullscreenInLandscape)
+        }
+
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
         }
