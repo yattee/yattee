@@ -7,11 +7,13 @@ extension VideoPlayerView {
         let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
         if currentOrientation.isLandscape,
            Defaults[.enterFullscreenInLandscape],
+           !Defaults[.honorSystemOrientationLock],
            !player.playingFullScreen,
-           !player.playingInPictureInPicture
+           !player.currentItem.isNil,
+           player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape),
+           !player.playingInPictureInPicture,
+           player.presentingPlayer
         {
-            guard player.presentingPlayer else { return }
-
             DispatchQueue.main.async {
                 player.controls.presentingControls = false
                 player.enterFullScreen(showControls: false)

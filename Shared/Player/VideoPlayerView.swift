@@ -55,6 +55,7 @@ struct VideoPlayerView: View {
         @State internal var isVerticalDrag = false
         @State internal var viewDragOffset = Self.hiddenOffset
         @State internal var orientationObserver: Any?
+        @State internal var orientationNotification: Any?
     #endif
 
     @EnvironmentObject<PlayerModel> internal var player
@@ -144,6 +145,8 @@ struct VideoPlayerView: View {
                                 orientationMask,
                                 andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
                             )
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown)
                         }
                     }
                 }
@@ -155,8 +158,13 @@ struct VideoPlayerView: View {
                     }
                     stopOrientationUpdates()
                     player.controls.hideOverlays()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                    guard player.lockedOrientation.isNil else {
+                        return
+                    }
 
-                    player.lockedOrientation = nil
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
                 }
                 .onAnimationCompleted(for: viewDragOffset) {
                     guard !dragGestureState else { return }
