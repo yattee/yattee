@@ -26,12 +26,7 @@ struct OpenVideosView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                            Label("Close", systemImage: "xmark")
-                        }
-                        #if !os(tvOS)
-                        .keyboardShortcut(.cancelAction)
-                        #endif
+                        closeButton
                     }
                 }
                 .navigationTitle("Open Videos")
@@ -42,8 +37,24 @@ struct OpenVideosView: View {
         #endif
     }
 
+    var closeButton: some View {
+        Button(action: { presentationMode.wrappedValue.dismiss() }) {
+            Label("Close", systemImage: "xmark")
+        }
+        #if os(macOS)
+        .labelStyle(.titleOnly)
+        #endif
+        #if !os(tvOS)
+        .keyboardShortcut(.cancelAction)
+        #endif
+    }
+
     var openVideos: some View {
         VStack(alignment: .leading) {
+            #if os(macOS)
+                closeButton
+            #endif
+
             ZStack(alignment: .topLeading) {
                 #if os(tvOS)
                     TextField("URL to Open", text: $urlsToOpenText)
