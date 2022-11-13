@@ -131,7 +131,7 @@ struct OpenVideosView: View {
                         return url
                     }
 
-                    openURLs(selectedFiles)
+                    openURLs(urlsToOpen)
                 } catch {
                     NavigationModel.shared.alert = Alert(title: Text("Could not open Files"))
                     NavigationModel.shared.presentingAlertInOpenVideos = true
