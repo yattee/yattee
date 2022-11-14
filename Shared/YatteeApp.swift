@@ -241,6 +241,8 @@ struct YatteeApp: App {
                 }
             }
         #endif
+
+        URLBookmarkModel.shared.refreshAll()
     }
 
     func migrateAccounts() {
