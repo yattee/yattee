@@ -126,11 +126,11 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var likesCount: String? {
-        guard (likes ?? 0) > 0 else {
+        guard let likes else {
             return nil
         }
 
-        return likes?.formattedAsAbbreviation()
+        return likes.formattedAsAbbreviation()
     }
 
     var dislikesCount: String? {

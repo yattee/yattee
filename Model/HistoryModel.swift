@@ -19,15 +19,6 @@ extension PlayerModel {
             return
         }
 
-        if historyItemBeingLoaded == nil {
-            logger.info("loading history details: \(id)")
-            historyItemBeingLoaded = id
-        } else {
-            logger.info("POSTPONING history load: \(id)")
-            historyItemsToLoad.append(id)
-            return
-        }
-
         playerAPI.video(id)
             .load()
             .onSuccess { [weak self] response in
