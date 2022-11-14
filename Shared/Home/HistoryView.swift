@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HistoryView: View {
+    static let detailsPreloadLimit = 50
+
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
@@ -15,7 +17,6 @@ struct HistoryView: View {
                     HStack {
                         Image(systemName: "clock")
                         Text("Playback history is empty")
-
                     }.foregroundColor(.secondary)
                 }
             } else {
@@ -24,14 +25,17 @@ struct HistoryView: View {
                         item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
                         history: true
                     )
-                    .onAppear {
-                        player.loadHistoryVideoDetails(watch.videoID)
-                    }
                     .contextMenu {
                         VideoContextMenuView(video: player.historyVideo(watch.videoID) ?? watch.video)
                     }
                 }
             }
+        }
+        .onAppear {
+            visibleWatches
+                .prefix(Self.detailsPreloadLimit)
+                .map(\.videoID)
+                .forEach(player.loadHistoryVideoDetails)
         }
         #if os(tvOS)
         .padding(.horizontal, 40)
