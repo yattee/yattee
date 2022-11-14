@@ -33,6 +33,7 @@ struct VideoDetailsToolbar: View {
                     }
                 }
             }
+            .id(video?.id)
             .onChange(of: page) { newValue in
                 activeTool = tools.first { $0.id == newValue.rawValue }
             }
