@@ -117,7 +117,7 @@
 /* Player controls layout size for TV */
 "TV" = "TV";
 "unknown" = "necunoscut";
-"Unsubscribe" = "Dezabonați-vă";
+"Unsubscribe" = "Dezabonează-te";
 "URL" = "URL-ul";
 "Upload date" = "Data de incarcare";
 "Videos" = "Videoclipuri";
@@ -186,8 +186,8 @@
 "Filter" = "Filtru";
 "Donations" = "Donații";
 "Edit Quality Profile" = "Editați profilul de calitate";
-"Enable logging" = "Activați jurnalizarea";
-"Enable Return YouTube Dislike" = "Activați Return YouTube Dislike";
+"Enable logging" = "Activează jurnalizarea";
+"Enable Return YouTube Dislike" = "Activează Return YouTube Dislike";
 "Error" = "Eroare";
 "Filter: active" = "Filtru: activ";
 "Fullscreen size" = "Dimensiunea ecranului complet";
@@ -329,7 +329,7 @@
 "Add to Playlist..." = "Adaugă la Playlist...";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bug-urile și ideile de caracteristici importante pot fi trimise pe GitHub issues tracker. ";
 "Hide sidebar" = "Ascunde bara laterală";
-"Highest" = "Cel mai înalt";
+"Highest" = "Cea mai mare";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Dacă vă interesează ce urmează să se întâmple în actualizările viitoare, puteți urmări etapele proiectului.";
 
 /* Player controls layout size */
@@ -339,7 +339,7 @@
 "SponsorBlock API Instance" = "Instanță API SponsorBlock";
 "Switch to other public location" = "Comutați în altă locație publică";
 "SponsorBlock" = "SponsorBlock";
-"Subscribe" = "Abonati-va";
+"Subscribe" = "Abonează-te";
 
 /* Subscriptions title */
 "Subscriptions" = "Abonamente";
@@ -352,7 +352,7 @@
 /* Video duration filter in search */
 "Long" = "Lung";
 "Mark video as watched after playing" = "Marcați videoclipul ca vizionat după redare";
-"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Ma bucur sa aud asta. Este distractiv să livrezi aplicații pe care alți oameni doresc să le folosească. Puteți lua în considerare donarea proiectului sau ajutați contribuind la dezvoltarea de noi funcții.";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Mă bucur să aud asta. Este distractiv să livrezi aplicații pe care alți oameni doresc să le folosească. Puteți lua în considerare donarea proiectului sau ajutați contribuind la dezvoltarea de noi funcții.";
 "This cannot be reverted" = "Acest lucru nu poate fi inversat";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Acest lucru nu poate fi inversat. Poate fi necesar să comutați între vizualizări sau să reporniți aplicația pentru a vedea modificările.";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "Aceste informații vor fi procesate numai pe dispozitivul dvs. și utilizate pentru a vă conecta la serverul din țara specificată.";
