@@ -1,1 +1,433 @@
 
+
+
+/* Video sort order in search */
+"Date" = "Datum";
+"%@ Channel" = "%@ Kanál";
+"%@ Playlist" = "%@ Playlist";
+" subscribers" = " odběratelů";
+"%@ subscribers" = "%@ odběratelů";
+"%lld videos" = "%lld videí";
+"10 seconds forwards/backwards" = "10 sekund dopředu/dozadu";
+"Accounts" = "Účty";
+"Add Account" = "Přidat účet";
+"Add Account..." = "Přidat účet...";
+"Add Location" = "Přidat umístění";
+"Add Location..." = "Přidat umístění...";
+"Add profile..." = "Přidat profil...";
+"Add Quality Profile" = "Přidat profil kvality";
+"Add to Playlist" = "Přidat do playlistu";
+"Add to Playlist..." = "Přidat do playlistu...";
+"Advanced" = "Pokročilé";
+"Always use AVPlayer for live videos" = "Vždy používat AVPlayer pro živá videa";
+"Anonymous" = "Anonymní";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Jakékoliv";
+"Apply to all" = "Použít pro všechny";
+"Are you sure you want to clear history of watched videos?" = "Určitě chcete vymazat historii sledovaných videí?";
+"Are you sure you want to clear search history?" = "Určitě chcete smazat historii vyhledávání?";
+"Are you sure you want to delete playlist?" = "Určitě chcete smazat playlist?";
+"Automatic" = "Automaticky";
+"Badge" = "Značka";
+"Based on system color scheme" = "Podle motivu systému";
+"Browsing" = "Prohlížení";
+"Buffering stream..." = "Načítání streamu...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bugy a nápady na skvělé funkce můžete poslat na Github. ";
+"Autoplaying Next" = "Automaticky se přehrává další";
+"Backend" = "Backend";
+"Badge & Decreased opacity" = "Odznak & Snížená průhlednost";
+"Badge color" = "Barva odznaku";
+"Button" = "Tlačítko";
+"Cancel" = "Zrušit";
+"Categories to Skip" = "Kategorie k přeskočení";
+"Cellular" = "Mobilní data";
+"Chapters" = "Kapitoly";
+"Charging" = "Nabíjení";
+"Clear" = "Vyčistit";
+"Clear All" = "Vyčistit vše";
+"Clear All Recents" = "Smazat poslední";
+"Clear Search History" = "Smazat historii vyhledávání";
+"Clear Search History..." = "Vymazat historii vyhledávání...";
+"Clear the queue" = "Vymazat frontu";
+"Close" = "Zavřít";
+"Close PiP and open player when application enters foreground" = "Zavřít PiP a otevřít přehrávač když je aplikace na popředí";
+"Close PiP when player is opened" = "Zavřít PiP když je otevřen přehrávač";
+"Close player when starting PiP" = "Zavřít přehrávač při spuštění PiP";
+"Close Video" = "Zavřít video";
+"Close video after playing last in the queue" = "Zavřít video po přehrání posledního ve frontě";
+"Comments" = "Komentáře";
+"Connected successfully (%@)" = "Úspěšně připojeno (%@)";
+"Connection failed" = "Připojení se nezdařilo";
+"Contact" = "Kontakt";
+"Continue from %@" = "Pokračovat od %@";
+"Contributing" = "Kontribuce";
+"Controls" = "Ovládání";
+"Copy %@ link" = "Zkopírovat %@ odkaz";
+"Copy %@ link with time" = "Zkopírovat %@ odkaz s časem";
+"Could not load locations manifest" = "Nepodařilo se načíst manifest lokací";
+"Country" = "Země";
+"Country Name or Code" = "Kód nebo název země";
+"Create Playlist" = "Vytvořit playlist";
+"Current: %@\n%@" = "Aktuálně: %@\n%@";
+"Custom Locations" = "Vlastní umístění";
+"Delete" = "Smazat";
+"Disabled" = "Deaktivováno";
+"Discord Server" = "Server Discordu";
+"Decrease rate" = "Snížit tempo";
+"Decreased opacity" = "Snížená průhlednost";
+"Don't use public locations" = "Nepoužívat veřejné lokace";
+"Donations" = "Darovat";
+"Done" = "Hotovo";
+"Duration" = "Trvání";
+"Edit" = "Upravit";
+"Edit Playlist" = "Upravit playlist";
+"Edit..." = "Upravit...";
+"Enable logging" = "Povolit logy";
+"Error" = "Chyba";
+"Enter fullscreen in landscape" = "Vstup na celou obrazovku na šířku";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Výrazné připomenutí k lajknutí, odběru či interakcí s autorem či jinou bezplatnou či placenou službou (např. kliknutí na video)";
+"Favorites" = "Oblíbené";
+"Filter" = "Filtr";
+"Filter: active" = "Filtr: aktivní";
+"Find Other" = "Najít ostatní";
+"Frontend URL" = "URL Frontendu";
+"Gaming" = "Hry";
+"Help" = "Pomoc";
+"Hide sidebar" = "Skrýt postranní panel";
+"High" = "Vysoká";
+"Highest" = "Nejvyšší";
+"Highest quality" = "Nejvyšší kvalita";
+"History" = "Historie";
+"Honor orientation lock" = "Dodržovat zámek orientace";
+"Finding something to play..." = "Hledá se něco k přehrání…";
+"Fullscreen size" = "Velikost celé obrazovky";
+"I am lost" = "Jsem ztracen";
+"I have a feature request" = "Mám prosbu o přidání funkce";
+"I like this app!" = "Tato aplikace se mi líbí!";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Pokud vás zajímá co přijde v budoucích aktualizacích, můžete sledovat Milestony projektu.";
+"Info" = "Info";
+"Instance of current account" = "Instance aktuálního účtu";
+
+/* SponsorBlock category name */
+"Interaction" = "Interakce";
+"Interface" = "Rozhraní";
+
+/* SponsorBlock category name */
+"Intro" = "Úvod";
+
+/* Selected video has just finished playing */
+"Just watched" = "Nedávno shlédnuto";
+
+/* Player controls layout size */
+"Large" = "Velké";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Velké rozložení není vhodné pro každé zařízení a může způsobit, že se ovládací prvky nevejdou na displej.";
+"LIVE" = "ŽIVĚ";
+"Loading..." = "Načítání...";
+"Locations" = "Lokace";
+"Lock portrait mode" = "Zamknout režim portrétu";
+"Increase rate" = "Zvýšit tempo";
+"Issues Tracker" = "Tracker problémů";
+
+/* Video duration filter in search */
+"Long" = "Dlouhé";
+"Low quality" = "Nízká kvalita";
+"Lowest" = "Nejnižší";
+"Mark as watched" = "Označit jako shlédnuté";
+"Mark video as watched after playing" = "Označit video jako shlédnuté po přehrání";
+"Mark watched videos with" = "Označit přehrána videa s";
+"Matrix Channel" = "Matrix Kanál";
+
+/* Player controls layout size */
+"Medium" = "Střední";
+"Medium quality" = "Střední kvalita";
+"Milestones" = "Milníky";
+
+/* Video date filter in search */
+"Month" = "Měsíc";
+"More info can be found in:" = "Více info lze nalézt v:";
+"Movies" = "Filmy";
+"MPV Documentation" = "Dokumentace MPV";
+"Music" = "Hudba";
+"Name" = "Jméno";
+"New Playlist" = "Nový playlist";
+"Next" = "Další";
+"No description" = "Žádný popis";
+"No Playlists" = "Žádné playlisty";
+"No results" = "Žádné výsledky";
+"Normal" = "Normální";
+"Not available" = "Není k dispozici";
+"Not Playing" = "Nepřehrává se";
+"Nothing" = "Nic";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Offtopic v hudebních videích";
+"Only when signed in" = "Pouze když přihlášený";
+"Open \"Playlists\" tab to create new one" = "Otevřete kartu \"Playlisty\", aby jste vytvořili nový";
+"Open Settings" = "Otevřete Nastavení";
+"Opening audio stream..." = "Otevírám audio stream...";
+"Orientation" = "Orientace";
+"Password" = "Heslo";
+"Pause" = "Pauza";
+"Pause when entering background" = "Pauza při vstupu na pozadí";
+"Pause when player is closed" = "Pauza při zavření přehrávače";
+"Picture in Picture" = "Obraz v obraze";
+"Play" = "Přehrát";
+"Play All" = "Přehrát vše";
+"Play in PiP" = "Přehrát v PiP";
+"Play Last" = "Přehrát poslední";
+"Play Music" = "Přehrát hudbu";
+"Play Next" = "Přehrát další";
+"Play Now" = "Přehrát nyní";
+"Playlist" = "Playlist";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Playlist \"%@\" bude odstraněn.\nTuto akci nelze vrátit.";
+"Preferred Formats" = "Preferované formáty";
+"Profiles" = "Profily";
+"Proxy videos" = "Proxy pro přehrávání videí";
+"Public Locations" = "Veřejné lokace";
+"Public Manifest" = "Veřejný manifest";
+"Quality" = "Kvalita";
+"Queue" = "Fronta";
+"Queue is empty" = "Fronta je prázdná";
+"Rate" = "Tempo";
+
+/* Video sort order in search */
+"Rating" = "Hodnocení";
+"Recents" = "Poslední";
+"Red" = "Červený";
+"Refresh" = "Obnovit";
+"Regular size" = "Normální rozměr";
+"Regular Size" = "Normální rozměr";
+"Related" = "Související";
+
+/* Video sort order in search */
+"Relevance" = "Relevantnost";
+"Remove" = "Odstranit";
+"Remove from Playlist" = "Odstranit z playlistu";
+"Remove from the queue" = "Odstranit z fronty";
+"Replies" = "Odpovědi";
+"Reset" = "Resetovat";
+"Reset search filters" = "Resetovat filtr vyhledávání";
+"Reset watched status when playing again" = "Resetovat stav zhlédnutí při opětovném přehrání";
+"Resolution" = "Rozlišení";
+"Restart" = "Od začátku";
+"Restart the app to apply the settings above." = "Restartujte aplikaci pro použití výše uvedeného nastavení.";
+"Restart/Play next" = "Přehrát znovu/Přehrát další";
+"Restore default profiles..." = "Obnovit výchozí profily...";
+"Rotate to portrait when exiting fullscreen" = "Otočit do portrétu při ukončení režimu celé obrazovky";
+"Round corners" = "Zakulacené rohy";
+"Save" = "Uložit";
+"Save history of played videos" = "Uložit historii přehraných videí";
+"Search" = "Hledat";
+"Search history is empty" = "Historie hledání je prázdná";
+"Search..." = "Hledat...";
+"Sections" = "Sekce";
+"Seek gesture sensitivity" = "Sensitivita gest vyhledávání";
+"Seek with horizontal swipe on video" = "Vyhledávat pomocí horizontálního potažení na videu";
+"Select location closest to you:" = "Vyberte nejbližší lokaci:";
+"Share %@ link" = "Sdílet %@ odkaz";
+"Share %@ link with time" = "Sdílet %@ odkaz s časem";
+"Share..." = "Sdílet...";
+
+/* Video duration filter in search */
+"Short" = "Krátké";
+"Show account username" = "Zobrazit uživatelské jméno účtu";
+"Show anonymous accounts" = "Zobrazit anonymní účty";
+"Show channel name" = "Zobrazit jméno kanálu";
+"Show keywords" = "Zobrazit klíčová slova";
+"Show playback statistics" = "Zobrazit statistiky přehrávání";
+"Show progress of watching on thumbnails" = "Zobrazit postup sledování na náhledu";
+"Show sidebar when space permits" = "Zobrazit postranní panel pokud je dost místa";
+"Show video length" = "Zobrazit délku videa";
+"Shuffle" = "Zamíchat";
+"Sidebar" = "Postranní panel";
+"Sign In Required" = "Požaduje se přihlášení";
+
+/* Player controls layout size */
+"Smaller" = "Menší";
+"Sort: %@" = "Třídit: %@";
+"Source" = "Zdroj";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponzor";
+"SponsorBlock API Instance" = "Instance API SponsorBlocku";
+"Subscribe" = "Odebírat";
+
+/* Subscriptions title */
+"Subscriptions" = "Odběry";
+"Switch to other public location" = "Přepnout na jinou veřejnou lokaci";
+"Switch to public locations" = "Přepnout na veřejnou lokaci";
+"System controls buttons" = "Tlačítka ovládání systému";
+"System controls show buttons for %@" = "Ovládací prvky systému zobrazují tlačítka pro %@";
+"This cannot be reverted" = "Toto nelze vrátit zpět";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "To nelze vrátit zpět. Možná budete muset přepínat mezi zobrazeními nebo restartovat aplikaci, abyste viděli změny.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Tyto informace budou zpracovány pouze na vašem zařízení a použity k připojení k serveru v určené zemi.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Tím odstraníte všechny vlastní profily a vrátíte jejich výchozí hodnoty. Toto nelze vrátit zpět.";
+"Thumbnails" = "Náhledy";
+"Trending" = "Trendy";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Obvykle na konci videa, kdy se objeví závěrečné titulky a/nebo se zobrazí koncové karty.";
+"unknown" = "neznámé";
+"Unsubscribe" = "Odhlásit odběr";
+"Upload date" = "Datum nahrání";
+"URL" = "URL";
+"Username" = "Uživatelské jméno";
+
+/* Player controls layout size */
+"Very Large" = "Velmi velké";
+"Videos" = "Videa";
+
+/* Video sort order in search */
+"Views" = "Zhlédnutí";
+"Watched" = "Shlédnuto";
+"Used to create links from videos, channels and playlists" = "Slouží k vytváření odkazů z videí, kanálů a playlistů";
+
+/* Video date filter in search */
+"Week" = "Týden";
+"Welcome" = "Vítejte";
+"When partially watched video is played" = "Když částečně shlédnuté video je přehráno";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+"Yattee %@ (build %@)" = "Yattee %@ (sestavení %@)";
+
+/* Video date filter in search */
+"Year" = "Rok";
+"You can find information about using Yattee in the Wiki pages." = "Informace o používání Yattee najdete na Wiki stránkách.";
+"You have no Playlists" = "Nemáte žádné playlisty";
+"You need to create an instance and accounts\nto access %@ section" = "Musíte vytvořit instanci a účty\naby jste otevřeli sekci: %@";
+"You need to select an account\nto access %@ section" = "Musíte si zvolit účet\naby jste otevřeli sekci: %@";
+
+
+"Public" = "Veřejná";
+"Unlisted" = "Neuvedená";
+"Now Playing" = "Nyní hraje";
+"Current Location" = "Aktuální lokace";
+"Private" = "Soukromá";
+"Playback queue is empty" = "Fronta přehrávání je prázdná";
+"Playing Next" = "Dále hraje";
+"You can switch between profiles in playback settings controls." = "Můžete přepínat mezi profily v nastavení přehrávání.";
+"Add Channels, Playlists and Searches to Favorites using" = "Přidejte kanály, playlisty a vyhledávání do oblíbených pomocí";
+"Make default" = "Nastavit jako výchozí";
+"Visibility" = "Viditelnost";
+"Current Playlist" = "Aktuální playlist";
+"Stream & Player" = "Stream & přehrávač";
+"Statistics" = "Statistiky";
+"Hardware decoder" = "Hardwarový dekodér";
+"Stream FPS" = "FPS streamu";
+"Cached time" = "Čas v mezipaměti";
+"Rate & Captions" = "Hodnocení & titulky";
+"Dropped frames" = "Dropnuté snímky";
+"Any format" = "Jakýkoliv formát";
+"Keep last played video in the queue after restart" = "Nechat poslední přehrané video ve frontě po restartu";
+"Press and hold remote button to open captions and quality menus" = "Stisknutím a podržením tlačítka dálkového ovladače otevřete nabídku titulků a kvality";
+"Comments are disabled" = "Komentáře jsou vypnuty";
+"No comments" = "Žádné komentáře";
+"No chapters information available" = "Žádné informace o kapitolách";
+"Share Logs..." = "Sdílet logy…";
+"Open logs in Finder" = "Otevřít logy ve Finderu";
+"Could not refresh Subscriptions" = "Nepodařilo se obnovit odběry";
+"Could not load streams" = "Nepodařilo se načíst streamy";
+"Channel could not be found" = "Nepodařilo se najít kanál";
+"Could not update your token." = "Nepodařilo se aktualizovat váš token.";
+"This URL could not be opened" = "Tuto URL nelze otevřít";
+"Could not open channel" = "Nelze otevřít kanál";
+"Could not refresh Popular" = "Nepodařilo se obnovit Populární";
+"Could not create share link" = "Nepodařilo se vytvořit odkaz ke sdílení";
+"Could not open playlist" = "Nepodařilo se otevřít playlist";
+"This video could not be opened" = "Toto video nelze otevřít";
+"Could not extract playlist ID" = "Nelze extrahovat ID playlistu";
+"Could not load video" = "Nelze načíst video";
+"If you want this app to be available in your language, join translation project." = "Jestli chcete aby tato aplikace byla i ve vašem jazyce, připojte se do překladového projektu.";
+"Translations" = "Překlady";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Vše";
+"Category" = "Kategorie";
+"Blue" = "Modrá";
+"Add to %@" = "Přidat do %@";
+"Add to Favorites" = "Přidat do oblíbených";
+"Are you sure you want to restore default quality profiles?" = "Určitě chcete obnovit výchozí profily kvality?";
+"Are you sure you want to unsubscribe from %@?" = "Určitě chcete zrušit odběr %@?";
+"Battery" = "Baterie";
+"Captions" = "Titulky";
+"Clear History" = "Smazat historii";
+"Continue" = "Pokračovat";
+"Close PiP when starting playing other video" = "Zavřít PiP když začne přehrávání jiného videa";
+"Close player when closing video" = "Zavřít přehrávač při zavření videa";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Vlastní";
+"Error when accessing playlist" = "Chyba při přístupu k playlistu";
+"I found a bug /" = "Našel jsem bug /";
+"Low" = "Nízké";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Diskuze se odehrává na Discordu a Matrixu. Je to dobré místo pro obecnou diskuzi.";
+"Edit Quality Profile" = "Upravit profil kvality";
+"Enable Return YouTube Dislike" = "Povolit Return YouTube Dislike";
+"For videos which feature music as the primary content." = "Pro videa která obsahují hudbu jako hlavní obsah.";
+"Playback" = "Přehrávání";
+"I want to ask a question" = "Chci se zeptat";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Pokud chcete nahlásit bug, uveďte všechny relevantní detaily (především: verzi aplikace, zařízení a verze systému, kroky k napodobení bugu).";
+
+/* Video date filter in search */
+"Hour" = "Hodina";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formáty budou vybrány v pořadí jako na seznamu.\nHLS je adaptivní formát (nastavení rozlišení neplatí).";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "To rád slyším. Je zábavné dodávat aplikace, které chtějí ostatní používat. Můžete zvážit možnost přispět na projekt nebo pomoci tím, že přispějete k vývoji nových funkcí.";
+
+/* Video date filter in search */
+"Today" = "Dnes";
+
+/* Selected video was played on given date */
+"Watched %@" = "Shlédnuto %@";
+
+/* Selected video is being played */
+"Watching now" = "Sledováno nyní";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Nemáte žádné playlisty.\n\nKlikněte na \"Nový playlist\" aby jste jeden vytvořili";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Playlist je prázdný\n\nKlikněte a podržte video a vyberte\n\"Přidat do playlistu\"";
+"%@ formats" = "%@ formáty";
+"It can be changed later in settings. You can use your own locations too." = "Lze změnit později v nastavení. Můžete použít i své lokace.";
+"Could not open video" = "Nepodařilo se otevřít video";
+"Could not extract SID from received cookies: %@" = "Nepodařilo se extrahovat SID z obdržených souborů cookie: %@";
+"Could not refresh Playlists" = "Nepodařilo se obnovit Playlisty";
+"Could not extract channel information" = "Nepodařilo se extrahovat informace o kanálu";
+"Could not refresh Trending" = "Nepodařilo se obnovit trendy";
+"Could not extract video ID" = "Nepodařilo se extrahovat ID videa";
+"No locations available at the moment" = "Žádné lokace nejsou aktuálně k dispozici";
+"For custom locations you can configure Frontend URL in Locations settings" = "Pro vlastní umístění můžete nakonfigurovat adresu URL frontendu v nastavení umístění";
+"Accounts are not supported for the application of this instance" = "Účty nejsou pro tuto instanci podporovány";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Propagace produktu nebo služby, která přímo souvisí s tvůrcem samotným. Obvykle se jedná o zboží nebo zpeněžené platformy.";
+
+/* Loading stream OSD */
+"Loading streams..." = "Načítaní streamu...";
+"Matrix Chat" = "Matrix Chat";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Otevírám %@ stream...";
+
+/* SponsorBlock category name */
+"Outro" = "Zakončení";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Část videa propagující produkt nebo službu, která se přímo netýká tvůrce. Tvůrce obdrží platbu nebo kompenzaci v podobě peněž nebo bezplatných produktů.";
+"Player" = "Přehrávač";
+"Playlists" = "Playlisty";
+"Popular" = "Populární";
+"Quality Profile" = "Profil kvality";
+"Remove from Favorites" = "Odstranit z oblíbených";
+"Remove from history" = "Odstranit z historie";
+"Seek gesture speed" = "Rychlost gest vyhledávání";
+"Save history of searches, channels and playlists" = "Uložit historii vyhledávání, kanálů a playlistů";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segmenty, typicky na začátku videa, které obsahují animaci, nehybný obraz nebo klip viditelný i na ostatních videích od stejného tvůrce.";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Sebe-propagace";
+"Settings" = "Nastavení";
+"Show history" = "Zobrazit historii";
+
+/* Player controls layout size */
+"Small" = "Malý";
+"Shuffle All" = "Zamíchat vše";
+"Sort" = "Třídit";
+"SponsorBlock" = "SponsorBlock";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Můžete použít automatický výběr profilu podle aktuálního stavu zařízení nebo jej přepnout v nastavení přehrávání.";
