@@ -151,10 +151,7 @@ struct HistorySettings: View {
                     message: Text(
                         "This cannot be reverted. You might need to switch between views or restart the app to see changes."
                     ),
-                    primaryButton: .destructive(Text("Clear All")) {
-                        player.removeAllWatches()
-                        CacheModel.shared.removeAll()
-                    },
+                    primaryButton: .destructive(Text("Clear All"), action: player.removeHistory),
                     secondaryButton: .cancel()
                 )
             )

@@ -3,12 +3,12 @@ import SwiftUI
 struct HistoryView: View {
     static let detailsPreloadLimit = 50
 
+    var limit = 10
+
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
     @EnvironmentObject<PlayerModel> private var player
-
-    var limit = 10
 
     var body: some View {
         LazyVStack {

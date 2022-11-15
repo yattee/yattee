@@ -94,6 +94,11 @@ extension PlayerModel {
         }
     }
 
+    func removeHistory() {
+        removeAllWatches()
+        CacheModel.shared.removeAll()
+    }
+
     func removeWatch(_ watch: Watch) {
         context.delete(watch)
         try? context.save()

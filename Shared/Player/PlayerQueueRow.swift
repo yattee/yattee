@@ -29,9 +29,12 @@ struct PlayerQueueRow: View {
 
     var body: some View {
         Button {
-            guard let video = item.video else {
+            guard let video = item.video else { return }
+            guard video != player.currentVideo else {
+                player.show()
                 return
             }
+
             #if os(iOS)
                 guard !video.localStreamIsDirectory else {
                     if let url = video.localStream?.localURL {

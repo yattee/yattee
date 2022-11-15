@@ -12,6 +12,10 @@ struct HomeView: View {
 
     @State private var favoritesChanged = false
 
+    @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
+    var watches: FetchedResults<Watch>
+    @State private var historyID = UUID()
+
     var favoritesObserver: Any?
 
     #if !os(tvOS)
@@ -79,27 +83,45 @@ struct HomeView: View {
                             #if os(macOS)
                                 .workaroundForVerticalScrollingBug()
                             #endif
-                            #if os(iOS)
-                            .padding(.top, item == first && RefreshControl.navigationBarTitleDisplayMode == .inline ? 10 : 0)
-                            #endif
                         }
                     #endif
                 }
 
                 if homeHistoryItems > 0 {
                     VStack {
-                        Text("History")
+                        HStack {
+                            Text("History")
+                            Spacer()
+                            Button {
+                                navigation.presentAlert(
+                                    Alert(
+                                        title: Text("Are you sure you want to clear history of watched videos?"),
+                                        message: Text("It cannot be reverted"),
+                                        primaryButton: .destructive(Text("Clear All")) {
+                                            PlayerModel.shared.removeHistory()
+                                            historyID = UUID()
+                                        },
+                                        secondaryButton: .cancel()
+                                    )
+                                )
+                            } label: {
+                                Label("Clear History", systemImage: "trash")
+                                    .font(.headline)
+                                    .labelStyle(.iconOnly)
+                            }
+                        }
 
                         #if os(tvOS)
-                            .padding(.horizontal, 40)
+                        .padding(.horizontal, 40)
                         #else
-                            .padding(.horizontal, 15)
+                        .padding(.horizontal, 15)
                         #endif
-                            .font(.title3.bold())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundColor(.secondary)
+                        .font(.title3.bold())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.secondary)
 
                         HistoryView(limit: homeHistoryItems)
+                            .id(historyID)
                     }
                 }
 
