@@ -17,28 +17,30 @@ struct TVNavigationView: View {
                     .tabItem { Text("Home") }
                     .tag(TabSelection.home)
 
-                if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
-                    LazyView(SubscriptionsView())
-                        .tabItem { Text("Subscriptions") }
-                        .tag(TabSelection.subscriptions)
-                }
-
-                if visibleSections.contains(.popular), accounts.app.supportsPopular {
-                    LazyView(PopularView())
-                        .tabItem { Text("Popular") }
-                        .tag(TabSelection.popular)
-                }
-
-                if visibleSections.contains(.trending) {
-                    LazyView(TrendingView())
-                        .tabItem { Text("Trending") }
-                        .tag(TabSelection.trending)
-                }
-
-                if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists, accounts.signedIn {
-                    LazyView(PlaylistsView())
-                        .tabItem { Text("Playlists") }
-                        .tag(TabSelection.playlists)
+                if !accounts.isEmpty {
+                    if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions, accounts.api.signedIn {
+                        LazyView(SubscriptionsView())
+                            .tabItem { Text("Subscriptions") }
+                            .tag(TabSelection.subscriptions)
+                    }
+                    
+                    if visibleSections.contains(.popular), accounts.app.supportsPopular {
+                        LazyView(PopularView())
+                            .tabItem { Text("Popular") }
+                            .tag(TabSelection.popular)
+                    }
+                    
+                    if visibleSections.contains(.trending) {
+                        LazyView(TrendingView())
+                            .tabItem { Text("Trending") }
+                            .tag(TabSelection.trending)
+                    }
+                    
+                    if visibleSections.contains(.playlists), accounts.app.supportsUserPlaylists, accounts.signedIn {
+                        LazyView(PlaylistsView())
+                            .tabItem { Text("Playlists") }
+                            .tag(TabSelection.playlists)
+                    }
                 }
 
                 LazyView(NowPlayingView())
