@@ -1022,6 +1022,7 @@
 		37095E86291DC85400301883 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		370B79C8286279810045DB77 /* NSObject+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+Swizzle.swift"; sourceTree = "<group>"; };
 		370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+HideHomeIndicator.swift"; sourceTree = "<group>"; };
+		370D5E4F292423F400D053A6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		370F4FAE27CC16CA001B35DC /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libssl.3.dylib; sourceTree = "<group>"; };
 		370F4FAF27CC16CA001B35DC /* libXau.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libXau.6.dylib; sourceTree = "<group>"; };
 		370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libxcb.1.1.0.dylib; sourceTree = "<group>"; };
@@ -2580,6 +2581,7 @@
 				az,
 				uk,
 				ro,
+				cs,
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -3604,6 +3606,7 @@
 				3771429629087BF000306CEA /* az */,
 				376787BA291C43CD00D356A4 /* uk */,
 				374924DE29211F5F0017D862 /* ro */,
+				370D5E4F292423F400D053A6 /* cs */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
