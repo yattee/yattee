@@ -70,7 +70,7 @@ final class PlayerControlsModel: ObservableObject {
 
     func hideOverlays() {
         presentingDetailsOverlay = false
-        controlsOverlayModel.presenting = false
+        controlsOverlayModel.hide()
     }
 
     func show() {

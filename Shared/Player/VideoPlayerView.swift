@@ -367,7 +367,7 @@ struct VideoPlayerView: View {
                     player.controls.show()
                 } else if direction == .down, !controlsOverlayModel.presenting, !player.controls.presentingControls {
                     withAnimation(PlayerControls.animation) {
-                        controlsOverlayModel.presenting = true
+                        controlsOverlayModel.hide()
                     }
                 }
 

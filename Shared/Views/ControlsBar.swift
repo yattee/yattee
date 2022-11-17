@@ -66,7 +66,7 @@ struct ControlsBar: View {
             }
         } else if detailsToggleFullScreen {
             Button {
-                controlsOverlayModel.presenting = false
+                controlsOverlayModel.hide()
                 controls.presentingControls = false
                 withAnimation {
                     fullScreen.toggle()

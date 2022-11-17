@@ -195,7 +195,7 @@ struct PlayerControls: View {
             guard player.presentingPlayer else { return }
             if value == "swipe down", !model.presentingControls, !model.presentingOverlays {
                 withAnimation(Self.animation) {
-                    controlsOverlayModel.presenting = false
+                    controlsOverlayModel.hide()
                 }
             } else {
                 model.show()
