@@ -1,1 +1,235 @@
 
+
+" subscribers" = " 订阅者";
+"%@ Channel" = "%@ 频道";
+"%@ Playlist" = "%@ 播放列表";
+"%@ subscribers" = "%@ 订阅者";
+"%lld videos" = "%lld 视频";
+"10 seconds forwards/backwards" = "向前/向后10秒";
+"Accounts" = "账号";
+"Accounts are not supported for the application of this instance" = "此实例的应用程序不支持帐户";
+"Add Account" = "新建账户";
+"Add Account..." = "新建账户...";
+"Add Location" = "新建地址";
+"Add Location..." = "新建地址...";
+"Add profile..." = "新建配置...";
+"Add Quality Profile" = "新建质量配置";
+"Add to %@" = "添加到 %@";
+"Add to Favorites" = "添加到喜欢";
+"Add to Playlist" = "添加到播放列表";
+"Add to Playlist..." = "添加到播放列表...";
+"Advanced" = "高级";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "所有";
+"Always use AVPlayer for live videos" = "对于直播，总是使用 AVPlayer";
+"Anonymous" = "匿名";
+"Apply to all" = "应用到所有";
+"Are you sure you want to clear history of watched videos?" = "你确定要清除视频播放历史记录吗？";
+"Are you sure you want to clear search history?" = "你确定要清除搜索记录吗？";
+"Are you sure you want to delete playlist?" = "你确定要删除播放列表吗？";
+"Are you sure you want to restore default quality profiles?" = "你确定要重置默认的质量配置？";
+"Are you sure you want to unsubscribe from %@?" = "你确定要取消订阅 %@？";
+"Automatic" = "自动";
+"Autoplaying Next" = "自动播放下一个";
+"Backend" = "后端";
+"Badge" = "标记";
+"Badge color" = "标记颜色";
+"Battery" = "电池";
+"Blue" = "蓝色";
+"Browsing" = "浏览";
+"Buffering stream..." = "缓冲中...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bug 以及不错的主意可以在 GitHub Issues 界面提出。 ";
+"Button" = "按钮";
+"Cancel" = "取消";
+"Captions" = "字幕";
+"Categories to Skip" = "要调过的类别";
+"Category" = "类别";
+"Chapters" = "章节";
+"Charging" = "充电";
+"Clear" = "清除";
+"Clear All" = "清除所有";
+"Clear All Recents" = "清除最近所有";
+"Clear History" = "清除历史记录";
+"Clear Search History" = "清除搜索记录";
+"Clear Search History..." = "清除搜索记录...";
+"Clear the queue" = "清除队列";
+"Close" = "关闭";
+"Close PiP and open player when application enters foreground" = "当应用程序进入前台时，关闭 PiP 并打开播放器";
+"Close PiP when player is opened" = "关闭 PiP 当播放器打开时";
+"Close PiP when starting playing other video" = "关闭 PiP 当开始播放其他视频时";
+"Close player when closing video" = "关闭播放器当关闭视频时";
+"Close player when starting PiP" = "关闭播放器当启动 PiP 时";
+"Close Video" = "关闭视频";
+"Close video after playing last in the queue" = "关闭视频当列表播放完毕后";
+"Comments" = "评论";
+"Connected successfully (%@)" = "连接成功（%@）";
+"Connection failed" = "连接失败";
+"Contact" = "联系";
+"Continue" = "继续";
+"Continue from %@" = "从 %@ 处继续";
+"Contributing" = "贡献";
+"Controls" = "控制";
+"Copy %@ link" = "复制 %@ 的链接";
+"Copy %@ link with time" = "复制 %@ 的链接（包含时间）";
+"Could not load locations manifest" = "无法加载地区列表";
+"Country" = "国家和地区";
+"Cellular" = "移动网络";
+"Country Name or Code" = "地区名称或代码";
+"Create Playlist" = "创建播放列表";
+"Current: %@\n%@" = "正在播放：%@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "自定义";
+"Custom Locations" = "自定义地址";
+
+/* Video sort order in search */
+"Date" = "日期";
+"Decrease rate" = "损失率";
+"Decreased opacity" = "降低不透明度";
+"Delete" = "删除";
+"Disabled" = "禁用";
+"Discord Server" = "Discord 服务器";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "讨论在 Discord 以及 Matrix 中进行，您可以在里面询问一些普通的问题。";
+"Don't use public locations" = "不要使用公开地址";
+"Donations" = "捐赠";
+"Done" = "完成";
+"Duration" = "时长";
+"Edit" = "编辑";
+"Edit Playlist" = "编辑播放列表";
+"Edit Quality Profile" = "编辑质量配置";
+"Edit..." = "编辑...";
+"Enable logging" = "启用日志";
+"Enter fullscreen in landscape" = "在宽屏模式中进入全屏";
+"Error" = "错误";
+"Error when accessing playlist" = "在访问播放列表时出错";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "明确提醒你在任何付费或免费平台上点赞、订阅或与他们互动（例如点击视频）。";
+"Favorites" = "喜欢";
+"Filter" = "过滤器";
+"Filter: active" = "过滤器：启用";
+"Find Other" = "寻找其他";
+"Finding something to play..." = "正在寻找一些视频来播放...";
+"Enable Return YouTube Dislike" = "启用返回 YouTube 不喜欢";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "格式将按列出的顺序选择。\nHLS是一种自适应格式（不应用分辨率设置）。";
+"Frontend URL" = "前端地址";
+"Fullscreen size" = "全屏大小";
+"Gaming" = "游戏";
+"Help" = "帮助";
+"Hide sidebar" = "隐藏侧边栏";
+"High" = "高度";
+"Highest" = "最高";
+"Highest quality" = "最高质量";
+"History" = "历史记录";
+"Honor orientation lock" = "方向锁";
+
+/* Video date filter in search */
+"Hour" = "小时";
+"I am lost" = "我迷路了";
+"I found a bug /" = "我找到一个 bug /";
+"I have a feature request" = "我有一个功能建议";
+"I like this app!" = "我喜欢这个应用！";
+"I want to ask a question" = "我想要问一个问题";
+"If you are interested what's coming in future updates, you can track project Milestones." = "如果您对最近的功能更新感兴趣，您可以跟踪我们的项目里程碑。";
+"Increase rate" = "增长率";
+"Info" = "信息";
+"Instance of current account" = "正在使用的帐户实例";
+
+/* SponsorBlock category name */
+"Interaction" = "交互";
+"Interface" = "接口";
+
+/* SponsorBlock category name */
+"Intro" = "简介";
+"Issues Tracker" = "问题追踪器";
+
+/* Selected video has just finished playing */
+"Just watched" = "只观看";
+
+/* Player controls layout size */
+"Large" = "大";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "大布局并不适合所有设备。使用它可能导致控制按钮在屏幕上并不适合。";
+"LIVE" = "直播";
+"Loading..." = "加载中...";
+
+/* Loading stream OSD */
+"Loading streams..." = "加载流中...";
+"Locations" = "地址";
+"Lock portrait mode" = "锁定竖屏模式";
+
+/* Video duration filter in search */
+"Long" = "长";
+"Low" = "低";
+"Low quality" = "低质量";
+"Lowest" = "最低";
+"Mark as watched" = "标记为已观看";
+"Mark video as watched after playing" = "在观看后标记视频为已观看";
+"Mark watched videos with" = "标记看过的视频";
+"Matrix Channel" = "Matrix 频道";
+"Matrix Chat" = "Matrix 聊天";
+
+/* Player controls layout size */
+"Medium" = "中等";
+"Medium quality" = "中等质量";
+"Milestones" = "里程碑";
+
+/* Video date filter in search */
+"Month" = "月";
+"More info can be found in:" = "更多信息可以在这里找到：";
+"Movies" = "电影";
+"MPV Documentation" = "MPV 文档";
+"Name" = "名称";
+"New Playlist" = "新播放列表";
+"Next" = "下一个";
+"No description" = "没有简介";
+"No results" = "没有结果";
+"Normal" = "普通";
+"Not available" = "不可用";
+"Not Playing" = "没有播放";
+"Nothing" = "没有东西";
+"Only when signed in" = "仅当登陆时";
+"Open \"Playlists\" tab to create new one" = "打开“播放列表” 页面创建新的播放列表";
+"Open Settings" = "打开设置";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "正在打开 %@ 的流...";
+"Opening audio stream..." = "正在打开音频流...";
+"Orientation" = "方向";
+
+/* SponsorBlock category name */
+"Outro" = "结尾部分";
+"Password" = "密码";
+"Pause" = "暂停";
+"Pause when entering background" = "在主界面隐藏时暂停";
+"Pause when player is closed" = "在播放器关闭时暂停";
+"Picture in Picture" = "画中画";
+"Play" = "播放";
+"Play All" = "播放全部";
+"Play in PiP" = "在 PiP 中播放";
+"Play Music" = "播放音乐";
+"Play Next" = "播放下一个";
+"Play Last" = "播放上一个";
+"Play Now" = "现在播放";
+"Playback" = "回放";
+"Player" = "播放器";
+"Playlist" = "播放列表";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "播放列表 “%@” 将被删除。\n此操作不可恢复。";
+"Playlists" = "播放列表";
+"Popular" = "流行";
+"Preferred Formats" = "首选格式";
+"Profiles" = "配置";
+"Proxy videos" = "代理的视频";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "任何";
+"Badge & Decreased opacity" = "标记 & 降低透明度";
+"Based on system color scheme" = "根据系统配色方案";
+"For videos which feature music as the primary content." = "以音乐为主要内容的视频。";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "如果你要反馈一个 bug，请包括所有有效信息 （特别是：App 版本，使用设备以及系统版本，复现步骤）。";
+"No Playlists" = "没有播放列表";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "在音乐视频中的无关内容";
+"Music" = "音乐";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "视频宣传产品或服务的一部分，与创作者没有直接关系。创作者将以金钱或免费产品的形式获得报酬或补偿。";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "推广与创作者本身直接相关的产品或服务。这通常包括商品或盈利平台的推广。";
