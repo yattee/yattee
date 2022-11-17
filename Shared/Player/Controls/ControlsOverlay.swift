@@ -26,7 +26,7 @@ struct ControlsOverlay: View {
     var body: some View {
         ScrollView {
             VStack {
-                Section(header: controlsHeader("Rate & Captions".localized())) {
+                Section(header: controlsHeader(rateAndCaptionsLabel.localized())) {
                     HStack(spacing: rateButtonsSpacing) {
                         decreaseRateButton
                         #if os(tvOS)
@@ -39,15 +39,16 @@ struct ControlsOverlay: View {
                         #endif
                     }
 
-                    captionsButton
-                    #if os(tvOS)
-                    .focused($focusedField, equals: .captions)
-                    #endif
-                    .disabled(player.activeBackend != .mpv)
+                    if player.activeBackend == .mpv {
+                        captionsButton
+                        #if os(tvOS)
+                        .focused($focusedField, equals: .captions)
+                        #endif
 
-                    #if os(iOS)
+                        #if os(iOS)
                         .foregroundColor(.white)
-                    #endif
+                        #endif
+                    }
                 }
 
                 Section(header: controlsHeader("Quality Profile".localized())) {
@@ -108,6 +109,10 @@ struct ControlsOverlay: View {
                 focusedField = .qualityProfile
             }
         #endif
+    }
+
+    private var rateAndCaptionsLabel: String {
+        player.activeBackend == .mpv ? "Rate & Captions" : "Playback Rate"
     }
 
     private var overlayHeight: Double {
