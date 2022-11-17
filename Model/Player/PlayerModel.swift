@@ -445,14 +445,16 @@ final class PlayerModel: ObservableObject {
             changeActiveBackend(from: activeBackend, to: backend)
         }
 
-        guard let stream = ((availableStreams.count == 1 && availableStreams.first!.isLocal) ? availableStreams.first : nil) ?? streamByQualityProfile else {
+        guard let stream = (((availableStreams.count == 1 && availableStreams.first!.isLocal) ? availableStreams.first : nil) ?? streamByQualityProfile),
+              let currentVideo
+        else {
             return
         }
 
         streamSelection = stream
         playStream(
             stream,
-            of: currentVideo!,
+            of: currentVideo,
             preservingTime: !currentItem.playbackTime.isNil
         )
     }
