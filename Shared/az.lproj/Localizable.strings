@@ -3,21 +3,21 @@
 "Translations" = "Tərcümələr";
 "%@ Channel" = "%@ Kanal";
 "%@ Playlist" = "%@ Pleylist";
-"%@ subscribers" = "%@ abunəçisi";
+"%@ subscribers" = "%@ abunəçi";
 "10 seconds forwards/backwards" = "10 saniyə irəli/geri";
 "Accounts" = "Hesablar";
-"Add Account" = "Hesab əlavə edin";
-"Add Account..." = "Hesab əlavə edin...";
-"Add Location" = "Məkan əlavə edin";
-"Add Location..." = "Məkan əlavə edin...";
+"Add Account" = "Hesab əlavə et";
+"Add Account..." = "Hesab əlavə et...";
+"Add Location" = "Məkan əlavə et";
+"Add Location..." = "Məkan əlavə et...";
 "Add profile..." = "Profil əlavə et...";
-"Add Quality Profile" = "Keyfiyyət Profili Əlavə edin";
+"Add Quality Profile" = "Keyfiyyət Profili Əlavə et";
 "Add to %@" = "Əlavə et %@";
-"Add to Favorites" = "Seçilmişlərə əlavə et";
-"Add to Playlist" = "Pleylistə əlavə edin";
+"Add to Favorites" = "Sevimlilərə əlavə et";
+"Add to Playlist" = "Pleylistə əlavə et";
 "Add to Playlist..." = "Pleylistə əlavə et...";
 "Advanced" = "Qabaqcıl";
-"Always use AVPlayer for live videos" = "Canlı videolar üçün həmişə AVPlayer istifadə edin";
+"Always use AVPlayer for live videos" = "Canlı videolar üçün həmişə AVPlayer istifadə et";
 "Anonymous" = "Adsız";
 
 /* Video date filter in search
@@ -25,7 +25,7 @@
 "Any" = "Hər hansı";
 "Apply to all" = "Hamısına tətbiq et";
 "Automatic" = "Avtomatik";
-"Autoplaying Next" = "Növbətini Avto-Oynadın";
+"Autoplaying Next" = "Növbətini Avto-Oynat";
 "Backend" = "Arxa uc";
 "Badge color" = "Nişan rəngi";
 "Based on system color scheme" = "Sistem rəng sxeminə əsaslanır";
