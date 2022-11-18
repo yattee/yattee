@@ -4,8 +4,10 @@ import SwiftUI
 struct VideoDetailsOverlay: View {
     @EnvironmentObject<PlayerControlsModel> private var controls
 
+    @State private var detailsPage = VideoDetails.DetailsPage.queue
+
     var body: some View {
-        VideoDetails(sidebarQueue: .constant(false), fullScreen: fullScreenBinding)
+        VideoDetails(page: $detailsPage, sidebarQueue: .constant(false), fullScreen: fullScreenBinding)
             .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 

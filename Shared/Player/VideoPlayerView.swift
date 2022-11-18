@@ -30,6 +30,7 @@ struct VideoPlayerView: View {
 
     @State private var playerSize: CGSize = .zero { didSet { updateSidebarQueue() } }
     @State private var hoveringPlayer = false
+    @State private var detailsPage = VideoDetails.DetailsPage.queue
     @State private var fullScreenDetails = false
     @State private var sidebarQueue = defaultSidebarQueueValue
 
@@ -339,7 +340,7 @@ struct VideoPlayerView: View {
 
                         #if !os(tvOS)
                             if !fullScreenPlayer {
-                                VideoDetails(sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
+                                VideoDetails(page: $detailsPage, sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
                                 #if os(iOS)
                                     .ignoresSafeArea(.all, edges: .bottom)
                                 #endif

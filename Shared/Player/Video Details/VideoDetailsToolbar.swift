@@ -7,14 +7,7 @@ struct VideoDetailsToolbar: View {
     @Binding var page: VideoDetails.DetailsPage
     var sidebarQueue: Bool
 
-    @State private var tools: [VideoDetailsTool] = [
-        .init(icon: "info.circle", name: "Info", page: .info),
-        .init(icon: "wand.and.stars", name: "Inspector", page: .inspector),
-        .init(icon: "bookmark", name: "Chapters", page: .chapters),
-        .init(icon: "text.bubble", name: "Comments", page: .comments),
-        .init(icon: "rectangle.stack.fill", name: "Related", page: .related),
-        .init(icon: "list.number", name: "Queue", page: .queue)
-    ]
+    @State private var tools = VideoDetailsTool.all
 
     @State private var activeTool: VideoDetailsTool?
     @State private var startedToolPosition: CGRect = .zero
@@ -34,6 +27,9 @@ struct VideoDetailsToolbar: View {
                 }
             }
             .id(video?.id)
+            .onAppear {
+                activeTool = .find(for: page)
+            }
             .onChange(of: page) { newValue in
                 activeTool = tools.first { $0.id == newValue.rawValue }
             }

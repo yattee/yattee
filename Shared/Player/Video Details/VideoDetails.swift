@@ -8,14 +8,13 @@ struct VideoDetails: View {
         case info, inspector, chapters, comments, related, queue
     }
 
+    @Binding var page: DetailsPage
     @Binding var sidebarQueue: Bool
     @Binding var fullScreen: Bool
     var bottomPadding = false
 
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
-
-    @State private var page = DetailsPage.queue
 
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
@@ -84,7 +83,11 @@ struct VideoDetails: View {
             }
         }
         .onAppear {
-            page = sidebarQueue ? .inspector : .queue
+            if video.isNil ||
+                !VideoDetailsTool.find(for: page)!.isAvailable(for: video!, sidebarQueue: sidebarQueue)
+            {
+                page = .info
+            }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
                 subscribed = false
@@ -243,7 +246,7 @@ struct VideoDetails: View {
 
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDetails(sidebarQueue: .constant(true), fullScreen: .constant(false))
+        VideoDetails(page: .constant(.info), sidebarQueue: .constant(true), fullScreen: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }
