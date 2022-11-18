@@ -15,13 +15,17 @@ struct URLParser {
     }
 
     var url: URL
+    var allowFileURLs = true
 
-    init(url: URL) {
+    init(url: URL, allowFileURLs: Bool = true) {
         self.url = url
+        self.allowFileURLs = allowFileURLs
         let urlString = url.absoluteString
         let scheme = urlComponents?.scheme
         if scheme == nil,
-           urlString.contains("youtube.com"),
+           urlString.contains("youtube.com") ||
+           urlString.contains("youtu.be") ||
+           urlString.contains("youtube-nocookie.com"),
            let url = URL(string: "https://\(urlString)"
            )
         {
@@ -48,7 +52,7 @@ struct URLParser {
                 return .channel
             }
 
-            return .fileURL
+            return allowFileURLs ? .fileURL : nil
         }
 
         return .video
@@ -56,8 +60,22 @@ struct URLParser {
 
     var isYoutubeHost: Bool {
         guard let urlComponents else { return false }
+        let hostComponents = (urlComponents.host ?? "").components(separatedBy: ".").prefix(2)
 
-        return urlComponents.host == "youtube.com" || urlComponents.host == "www.youtube.com"
+        if hostComponents.contains("youtube") || hostComponents.contains("youtube-nocookie") {
+            return true
+        }
+
+        let host = hostComponents.joined(separator: ".")
+            .replacingFirstOccurrence(of: "www.", with: "")
+
+        return host == "youtu.be"
+    }
+
+    var isYoutube: Bool {
+        guard let urlComponents else { return false }
+
+        return urlComponents.host == "youtube.com" || urlComponents.host == "www.youtube.com" || urlComponents.host == "youtu.be"
     }
 
     var isShortsPath: Bool {
@@ -65,7 +83,7 @@ struct URLParser {
     }
 
     var fileURL: URL? {
-        guard destination == .fileURL else { return nil }
+        guard allowFileURLs, destination == .fileURL else { return nil }
         return url
     }
 

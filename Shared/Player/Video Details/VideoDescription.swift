@@ -133,7 +133,7 @@ struct VideoDescription: View {
             if var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
                 components.scheme = "yattee"
                 if let yatteeURL = components.url {
-                    let parser = URLParser(url: urlToOpen)
+                    let parser = URLParser(url: urlToOpen, allowFileURLs: false)
                     let destination = parser.destination
                     if destination == .video,
                        parser.videoID == player.currentVideo?.videoID,
