@@ -303,35 +303,37 @@ struct VideoCell: View {
         }
     }
 
-    private func channelButton(badge: Bool = true) -> some View {
-        Button {
-            guard !inChannelView else {
-                return
-            }
+    @ViewBuilder private func channelButton(badge: Bool = true) -> some View {
+        if !video.channel.name.isEmpty {
+            Button {
+                guard !inChannelView else {
+                    return
+                }
 
-            NavigationModel.openChannel(
-                video.channel,
-                player: player,
-                recents: recents,
-                navigation: navigation,
-                navigationStyle: navigationStyle
-            )
-        } label: {
-            if badge {
-                DetailBadge(text: video.author, style: .prominent)
-                    .foregroundColor(.primary)
-            } else {
-                Text(video.channel.name)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.secondary)
+                NavigationModel.openChannel(
+                    video.channel,
+                    player: player,
+                    recents: recents,
+                    navigation: navigation,
+                    navigationStyle: navigationStyle
+                )
+            } label: {
+                if badge {
+                    DetailBadge(text: video.author, style: .prominent)
+                        .foregroundColor(.primary)
+                } else {
+                    Text(video.channel.name)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                }
             }
+            #if os(tvOS)
+            .buttonStyle(.card)
+            #else
+            .buttonStyle(.plain)
+            #endif
+            .help("\(video.channel.name) Channel")
         }
-        #if os(tvOS)
-        .buttonStyle(.card)
-        #else
-        .buttonStyle(.plain)
-        #endif
-        .help("\(video.channel.name) Channel")
     }
 
     private var additionalDetailsAvailable: Bool {
