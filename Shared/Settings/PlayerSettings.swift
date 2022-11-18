@@ -124,8 +124,9 @@ struct PlayerSettings: View {
 
             #if !os(tvOS)
                 Section(header: SettingsHeader(text: "Video Details").padding(.bottom, videoDetailsHeaderPadding)) {
-                    SettingsHeader(text: "Buttons labels".localized(), secondary: true)
+                    SettingsHeader(text: "Actions buttons".localized(), secondary: true)
                     playerActionsButtonLabelStylePicker
+                    SettingsHeader(text: "Pages buttons".localized(), secondary: true)
                     detailsButtonLabelStylePicker
 
                     SettingsHeader(text: "Show Inspector".localized(), secondary: true)

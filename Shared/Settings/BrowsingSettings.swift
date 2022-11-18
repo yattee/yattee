@@ -10,12 +10,12 @@ struct BrowsingSettings: View {
     #if os(iOS)
         @Default(.homeRecentDocumentsItems) private var homeRecentDocumentsItems
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
+        @Default(.showDocuments) private var showDocuments
     #endif
     @Default(.thumbnailsQuality) private var thumbnailsQuality
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.showHome) private var showHome
-    @Default(.showDocuments) private var showDocuments
     @Default(.showFavoritesInHome) private var showFavoritesInHome
     @Default(.showOpenActionsInHome) private var showOpenActionsInHome
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
@@ -59,7 +59,14 @@ struct BrowsingSettings: View {
     private var sections: some View {
         Group {
             homeSettings
-            interfaceSettings
+            let interface = interfaceSettings
+            #if os(tvOS)
+                if !accounts.isEmpty {
+                    interface
+                }
+            #else
+                interface
+            #endif
             if !accounts.isEmpty {
                 thumbnailsSettings
                 visibleSectionsSettings
@@ -91,21 +98,23 @@ struct BrowsingSettings: View {
             }
             .multilineTextAlignment(.trailing)
 
-            HStack {
-                Text("Recent Documents")
-                TextField("Recent Documents", text: $homeRecentDocumentsItemsText)
-                    .labelsHidden()
-                #if !os(macOS)
-                    .keyboardType(.numberPad)
-                #endif
-                    .onAppear {
-                        homeRecentDocumentsItemsText = String(homeRecentDocumentsItems)
-                    }
-                    .onChange(of: homeRecentDocumentsItemsText) { newValue in
-                        homeRecentDocumentsItems = Int(newValue) ?? 3
-                    }
-            }
-            .multilineTextAlignment(.trailing)
+            #if os(iOS)
+                HStack {
+                    Text("Recent Documents")
+                    TextField("Recent Documents", text: $homeRecentDocumentsItemsText)
+                        .labelsHidden()
+                    #if !os(macOS)
+                        .keyboardType(.numberPad)
+                    #endif
+                        .onAppear {
+                            homeRecentDocumentsItemsText = String(homeRecentDocumentsItems)
+                        }
+                        .onChange(of: homeRecentDocumentsItemsText) { newValue in
+                            homeRecentDocumentsItems = Int(newValue) ?? 3
+                        }
+                }
+                .multilineTextAlignment(.trailing)
+            #endif
 
             if !accounts.isEmpty {
                 Toggle("Show Favorites", isOn: $showFavoritesInHome)
@@ -115,7 +124,7 @@ struct BrowsingSettings: View {
                         Button {
                             presentingEditFavoritesSheet = true
                         } label: {
-                            Text("Edit Favorites...")
+                            Text("Edit Favorites…")
                         }
                         .sheet(isPresented: $presentingEditFavoritesSheet) {
                             VStack(alignment: .leading) {

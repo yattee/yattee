@@ -6,8 +6,10 @@ struct Sidebar: View {
     @EnvironmentObject<NavigationModel> private var navigation
 
     @Default(.showHome) private var showHome
-    @Default(.showDocuments) private var showDocuments
     @Default(.visibleSections) private var visibleSections
+    #if os(iOS)
+        @Default(.showDocuments) private var showDocuments
+    #endif
 
     var body: some View {
         ScrollViewReader { scrollView in

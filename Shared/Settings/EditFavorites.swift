@@ -104,18 +104,16 @@ struct EditFavorites: View {
 
     func label(_ item: FavoriteItem) -> String {
         if case let .playlist(id) = item.section {
-            return playlistsModel.find(id: id)?.title ?? "Playlist"
+            return playlistsModel.find(id: id)?.title ?? "Playlist".localized()
         }
 
-        return item.section.label
+        return item.section.label.localized()
     }
 }
 
 struct EditFavorites_Previews: PreviewProvider {
     static var previews: some View {
-//        NavigationView {
         EditFavorites()
-//        }
             .injectFixtureEnvironmentObjects()
     }
 }

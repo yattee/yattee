@@ -47,6 +47,7 @@ struct HomeView: View {
                             OpenVideosButton(text: "Settings", imageSystemName: "gear") {
                                 NavigationModel.shared.presentingSettings = true
                             }
+                            .frame(maxWidth: 600)
                         }
 
                     #else
@@ -93,28 +94,30 @@ struct HomeView: View {
                     #endif
                 }
 
-                if homeRecentDocumentsItems > 0 {
-                    VStack {
-                        HStack {
-                            sectionLabel("Recent Documents")
+                #if os(iOS)
+                    if homeRecentDocumentsItems > 0 {
+                        VStack {
+                            HStack {
+                                sectionLabel("Recent Documents")
 
-                            Spacer()
+                                Spacer()
 
-                            Button {
-                                recentDocumentsID = UUID()
-                            } label: {
-                                Label("Refresh", systemImage: "arrow.clockwise")
-                                    .font(.headline)
-                                    .labelStyle(.iconOnly)
-                                    .foregroundColor(.secondary)
+                                Button {
+                                    recentDocumentsID = UUID()
+                                } label: {
+                                    Label("Refresh", systemImage: "arrow.clockwise")
+                                        .font(.headline)
+                                        .labelStyle(.iconOnly)
+                                        .foregroundColor(.secondary)
+                                }
                             }
-                        }
 
-                        RecentDocumentsView(limit: homeRecentDocumentsItems)
-                            .id(recentDocumentsID)
+                            RecentDocumentsView(limit: homeRecentDocumentsItems)
+                                .id(recentDocumentsID)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                #endif
 
                 if homeHistoryItems > 0 {
                     VStack {
@@ -140,8 +143,10 @@ struct HomeView: View {
                                     .foregroundColor(.secondary)
                             }
                         }
-
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        #if os(tvOS)
+                            .padding(.trailing, 40)
+                        #endif
 
                         HistoryView(limit: homeHistoryItems)
                             .id(historyID)
