@@ -237,7 +237,7 @@ struct PlayerSettings: View {
     private var detailsToolbarPositionPicker: some View {
         Picker("Pages toolbar position", selection: $detailsToolbarPosition) {
             ForEach(DetailsToolbarPositionSetting.allCases, id: \.self) { setting in
-                Text(setting.rawValue.capitalized).tag(setting)
+                Text(setting.rawValue.capitalized.localized()).tag(setting)
             }
         }
         .modifier(SettingsPickerModifier())

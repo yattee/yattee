@@ -85,7 +85,7 @@ struct VideoActions: View {
                 Image(systemName: systemImage)
                     .frame(width: 20, height: 20)
                 if playerActionsButtonLabelStyle.text {
-                    Text(name)
+                    Text(name.localized())
                         .foregroundColor(.secondary)
                         .font(.caption2)
                         .allowsTightening(true)

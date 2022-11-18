@@ -96,7 +96,6 @@ struct OpenVideosView: View {
                     Spacer()
 
                     #if !os(tvOS)
-
                         openFromClipboardButton
                     #endif
                 }

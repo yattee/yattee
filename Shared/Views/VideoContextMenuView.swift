@@ -248,7 +248,7 @@ struct VideoContextMenuView: View {
                     )
                 }
             }
-            let label = Label("Remove...", systemImage: "trash.fill")
+            let label = Label("Remove…", systemImage: "trash.fill")
                 .foregroundColor(Color("AppRedColor"))
 
             if #available(iOS 15, macOS 12, *) {

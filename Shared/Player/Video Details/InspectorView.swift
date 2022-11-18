@@ -64,7 +64,7 @@ struct InspectorView: View {
             if let systemName {
                 Image(systemName: systemName)
             }
-            Text(heading.uppercased())
+            Text(heading.localized().uppercased())
                 .font(.footnote)
         }
         .foregroundColor(.secondary)
@@ -72,7 +72,7 @@ struct InspectorView: View {
 
     @ViewBuilder func videoDetailRow(_ detail: String, value: String) -> some View {
         HStack {
-            Text(detail)
+            Text(detail.localized())
                 .foregroundColor(.secondary)
             Spacer()
             let value = Text(value).lineLimit(1)

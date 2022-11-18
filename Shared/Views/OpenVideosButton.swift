@@ -12,7 +12,7 @@ struct OpenVideosButton: View {
                     Image(systemName: imageSystemName)
                 }
                 if let text {
-                    Text(text)
+                    Text(text.localized())
                         .fontWeight(.bold)
                 }
             }

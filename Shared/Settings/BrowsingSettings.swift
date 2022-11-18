@@ -76,8 +76,8 @@ struct BrowsingSettings: View {
             #endif
             Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
             HStack {
-                Text("Recent history")
-                TextField("Recent history", text: $homeHistoryItemsText)
+                Text("Recent History")
+                TextField("Recent History", text: $homeHistoryItemsText)
                     .labelsHidden()
                 #if !os(macOS)
                     .keyboardType(.numberPad)
@@ -92,8 +92,8 @@ struct BrowsingSettings: View {
             .multilineTextAlignment(.trailing)
 
             HStack {
-                Text("Recent documents")
-                TextField("Recent documents", text: $homeRecentDocumentsItemsText)
+                Text("Recent Documents")
+                TextField("Recent Documents", text: $homeRecentDocumentsItemsText)
                     .labelsHidden()
                 #if !os(macOS)
                     .keyboardType(.numberPad)
@@ -131,7 +131,7 @@ struct BrowsingSettings: View {
                         }
                     #else
                         NavigationLink(destination: LazyView(EditFavorites())) {
-                            Text("Edit Favorites...")
+                            Text("Edit Favorites…")
                         }
                     #endif
                 }

@@ -182,7 +182,7 @@ struct HomeView: View {
     }
 
     func sectionLabel(_ label: String) -> some View {
-        Text(label)
+        Text(label.localized())
         #if os(tvOS)
             .padding(.horizontal, 40)
         #else

@@ -119,9 +119,9 @@ struct FavoriteItemView: View {
 
     private var label: String {
         if case let .playlist(id) = item.section {
-            return playlists.find(id: id)?.title ?? "Playlist"
+            return playlists.find(id: id)?.title ?? "Playlist".localized()
         }
 
-        return item.section.label
+        return item.section.label.localized()
     }
 }

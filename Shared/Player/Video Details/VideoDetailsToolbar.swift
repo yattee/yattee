@@ -122,7 +122,7 @@ struct VideoDetailsToolbar: View {
                playerDetailsPageButtonLabelStyle.text,
                player.playerSize.width > 450
             {
-                Text(tool.wrappedValue.name)
+                Text(tool.wrappedValue.name.localized())
                     .font(.system(size: 14).bold())
                     .padding(.trailing, 4)
                     .foregroundColor(.white)
