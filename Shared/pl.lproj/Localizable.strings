@@ -434,7 +434,7 @@
 "Translations" = "Tłumaczenia";
 "No documents" = "Brak dokumentów";
 "Inspector visibility" = "Widoczność Inspektora";
-"Recent Documents" = "Najnowsze dokumenty";
+"Recent Documents" = "Ostatnie dokumenty";
 "Recent History" = "Ostatnie z historii";
 "Show Open Videos quick actions" = "Pokaż akcje szybkiego otwierania wideo";
 "Show Favorites" = "Pokaż Ulubione";
@@ -483,3 +483,13 @@
 "Only for local files and URLs" = "Tylko dla lokalnych plików i adresów URL";
 "Show icons and text when space permits" = "Pokazuj ikony i tekst, gdy jest na to miejsce";
 "Left" = "Lewa";
+"Could not find any links to open in your clipboard" = "Nie udało się znaleźć w schowku żadnych linków do otwarcia";
+"Address" = "Adres";
+"Remove…" = "Usuń…";
+"Actions buttons" = "Przyciski akcji";
+"Show sidebar" = "Pokaż pasek boczny";
+"Locations Manifest" = "Manifest lokalizacji";
+"Remove Location" = "Usuń Lokalizację";
+"Open Video" = "Otwórz wideo";
+"Default Profile" = "Domyślny profil";
+"Playback history is empty" = "Historia odtwarzania jest pusta";
