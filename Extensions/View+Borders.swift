@@ -19,12 +19,21 @@ extension View {
     }
 
     private func verticalEdgeBorder(_ edge: Alignment, height: Double, color: Color) -> some View {
-        overlay(Rectangle().frame(width: nil, height: height, alignment: .top)
-            .foregroundColor(color).ignoresSafeArea(.all, edges: .horizontal), alignment: edge)
+        overlay(
+            Rectangle()
+                .frame(width: nil, height: height, alignment: .top)
+                .foregroundColor(color)
+                .ignoresSafeArea(.all, edges: .horizontal),
+            alignment: edge
+        )
     }
 
     private func horizontalEdgeBorder(_ edge: Alignment, width: Double, color: Color) -> some View {
-        overlay(Rectangle().frame(width: width, height: nil, alignment: .leading)
-            .foregroundColor(color), alignment: edge)
+        overlay(
+            Rectangle()
+                .frame(width: width, height: nil, alignment: .leading)
+                .foregroundColor(color),
+            alignment: edge
+        )
     }
 }

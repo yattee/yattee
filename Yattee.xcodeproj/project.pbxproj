@@ -2620,6 +2620,7 @@
 				37D4B0C82671614900C925CA /* Yattee (iOS) */,
 				37D4B0CE2671614900C925CA /* Yattee (macOS) */,
 				37D4B157267164AE00C925CA /* Yattee (tvOS) */,
+				37095E7E291DC85400301883 /* Open in Yattee */,
 				37A3B19C27258492000FB5EE /* Periphery (iOS) */,
 				37FD43E62704A2240073EE42 /* Periphery (macOS) */,
 				37FD43EB2704A7710073EE42 /* Periphery (tvOS) */,
@@ -2627,7 +2628,6 @@
 				37D4B0DD2671614900C925CA /* Tests (macOS) */,
 				37D4B170267164B000C925CA /* Tests (tvOS) */,
 				3712643A2865FF4500D77974 /* Shared Tests */,
-				37095E7E291DC85400301883 /* Open in Yattee */,
 			);
 		};
 /* End PBXProject section */

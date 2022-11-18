@@ -130,7 +130,7 @@ final class AVPlayerBackend: PlayerBackend {
         preservingTime: Bool,
         upgrading _: Bool
     ) {
-        if var url = stream.singleAssetURL {
+        if let url = stream.singleAssetURL {
             model.logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
 
             if video.isLocal, video.localStreamIsFile {
