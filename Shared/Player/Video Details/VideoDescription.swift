@@ -29,6 +29,7 @@ struct VideoDescription: View {
 
             keywords
         }
+        .id(video.videoID)
     }
 
     @ViewBuilder var textDescription: some View {
