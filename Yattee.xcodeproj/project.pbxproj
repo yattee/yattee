@@ -536,6 +536,9 @@
 		377ABC48286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
 		377ABC49286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
 		377ABC4A286E5887009C986F /* Sequence+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377ABC47286E5887009C986F /* Sequence+Unique.swift */; };
+		377E17142928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
+		377E17152928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
+		377E17162928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
 		377FC7DB267A080300A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7DA267A080300A6BBAF /* Logging */; };
 		377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularView.swift */; };
@@ -1204,6 +1207,7 @@
 		377ABC3F286E4AD5009C986F /* InstancesManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstancesManifest.swift; sourceTree = "<group>"; };
 		377ABC43286E4B74009C986F /* ManifestedInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestedInstance.swift; sourceTree = "<group>"; };
 		377ABC47286E5887009C986F /* Sequence+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Unique.swift"; sourceTree = "<group>"; };
+		377E17132928265900894889 /* ListRowSeparator+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListRowSeparator+Backport.swift"; sourceTree = "<group>"; };
 		377FF88A291A60310028EB0B /* OpenVideosModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosModel.swift; sourceTree = "<group>"; };
 		377FF88E291A99580028EB0B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		37824309291E58D6005DEC1C /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
@@ -1727,13 +1731,14 @@
 			children = (
 				3722AEBD274DA401005EA4D6 /* Backport.swift */,
 				3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */,
+				377E17132928265900894889 /* ListRowSeparator+Backport.swift */,
 				37136CAB286273060095C0CF /* PersistentSystemOverlays+Backport.swift */,
 				3759234528C26C7B00C052EC /* Refreshable+Backport.swift */,
 				37E80F3F287B472300561799 /* ScrollContentBackground+Backport.swift */,
+				376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */,
 				3722AEBF274DAEB8005EA4D6 /* Tint+Backport.swift */,
 				3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */,
 				3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */,
-				376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */,
 			);
 			path = Backports;
 			sourceTree = "<group>";
@@ -3006,6 +3011,7 @@
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
 				370015A928BBAE7F000149FD /* ProgressBar.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
+				377E17142928265900894889 /* ListRowSeparator+Backport.swift in Sources */,
 				373CFACB26966264003CB2C6 /* SearchQuery.swift in Sources */,
 				37F7AB4D28A9361F00FB46B5 /* UIDevice+Cellular.swift in Sources */,
 				37141673267A8E10006CA35D /* Country.swift in Sources */,
@@ -3190,6 +3196,7 @@
 				3748186F26A769D60084E870 /* DetailBadge.swift in Sources */,
 				3744A96128B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */,
 				372915E72687E3B900F5A35B /* Defaults.swift in Sources */,
+				377E17152928265900894889 /* ListRowSeparator+Backport.swift in Sources */,
 				37C3A242272359900087A57A /* Double+Format.swift in Sources */,
 				37B795912771DAE0001CF27B /* OpenURLHandler.swift in Sources */,
 				37EFAC0928C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */,
@@ -3547,6 +3554,7 @@
 				3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37C3A24F272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				3718B9A02921A9620003DB2E /* VideoDetailsOverlay.swift in Sources */,
+				377E17162928265900894889 /* ListRowSeparator+Backport.swift in Sources */,
 				37FB28432721B22200A57617 /* ContentItem.swift in Sources */,
 				37D2E0D228B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				37AAF2A226741C97007FC770 /* SubscriptionsView.swift in Sources */,

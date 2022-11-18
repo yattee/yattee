@@ -18,8 +18,11 @@ struct RelatedView: View {
                                 VideoContextMenuView(video: video)
                             }
                     }
+
                     Color.clear.padding(.bottom, 50)
                         .listRowBackground(Color.clear)
+                        .backport
+                        .listRowSeparator(false)
                 }
             }
         }
@@ -38,5 +41,6 @@ struct RelatedView: View {
 struct RelatedView_Previews: PreviewProvider {
     static var previews: some View {
         RelatedView()
+            .injectFixtureEnvironmentObjects()
     }
 }

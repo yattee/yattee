@@ -42,8 +42,8 @@ struct ControlsBar: View {
         .labelStyle(.iconOnly)
         .padding(.horizontal)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: barHeight)
-        .borderTop(height: borderTop ? 0.4 : 0, color: Color("ControlsBorderColor"))
-        .borderBottom(height: borderBottom ? 0.4 : 0, color: Color("ControlsBorderColor"))
+        .borderTop(height: borderTop ? 0.5 : 0, color: Color("ControlsBorderColor"))
+        .borderBottom(height: borderBottom ? 0.5 : 0, color: Color("ControlsBorderColor"))
         .modifier(ControlBackgroundModifier(enabled: backgroundEnabled, edgesIgnoringSafeArea: .bottom))
         #if os(iOS)
             .background(

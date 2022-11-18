@@ -14,6 +14,8 @@ struct ChaptersView: View {
                     }
                     Color.clear.frame(height: 50)
                         .listRowBackground(Color.clear)
+                        .backport
+                        .listRowSeparator(false)
                 }
                 .listRowBackground(Color.clear)
             }
