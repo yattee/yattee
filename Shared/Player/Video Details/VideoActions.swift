@@ -9,6 +9,8 @@ struct VideoActions: View {
 
     var video: Video?
 
+    @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
+
     var body: some View {
         HStack {
             if let video {
@@ -82,13 +84,15 @@ struct VideoActions: View {
             VStack(spacing: 3) {
                 Image(systemName: systemImage)
                     .frame(width: 20, height: 20)
-                Text(name)
-                    .foregroundColor(.secondary)
-                    .font(.caption2)
-                    .allowsTightening(true)
+                if playerActionsButtonLabelStyle.text {
+                    Text(name)
+                        .foregroundColor(.secondary)
+                        .font(.caption2)
+                        .allowsTightening(true)
+                }
             }
-            .padding(.horizontal, 6)
-            .padding(.vertical, 5)
+            .padding(.horizontal, playerActionsButtonLabelStyle.text ? 6 : 12)
+            .padding(.vertical, playerActionsButtonLabelStyle.text ? 5 : 10)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

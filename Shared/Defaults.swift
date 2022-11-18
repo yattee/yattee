@@ -187,11 +187,12 @@ extension Defaults.Keys {
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
 
     #if os(macOS)
-        static let playerDetailsPageButtonLabelStyleDefault = PlayerDetailsPageButtonLabelStyle.iconAndText
+        static let playerDetailsPageButtonLabelStyleDefault = ButtonLabelStyle.iconAndText
     #else
-        static let playerDetailsPageButtonLabelStyleDefault = UIDevice.current.userInterfaceIdiom == .phone ? PlayerDetailsPageButtonLabelStyle.iconOnly : .iconAndText
+        static let playerDetailsPageButtonLabelStyleDefault = UIDevice.current.userInterfaceIdiom == .phone ? ButtonLabelStyle.iconOnly : .iconAndText
     #endif
-    static let playerDetailsPageButtonLabelStyle = Key<PlayerDetailsPageButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
+    static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: .iconAndText)
+    static let playerDetailsPageButtonLabelStyle = Key<ButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
@@ -305,7 +306,7 @@ enum WatchedVideoPlayNowBehavior: String, Defaults.Serializable {
     }
 #endif
 
-enum PlayerDetailsPageButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
+enum ButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
     case iconOnly, iconAndText
 
     var text: Bool {

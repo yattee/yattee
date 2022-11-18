@@ -6,6 +6,7 @@ struct PlayerSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
+    @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
     @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
     @Default(.detailsToolbarPosition) private var detailsToolbarPosition
     @Default(.showInspector) private var showInspector
@@ -92,7 +93,7 @@ struct PlayerSettings: View {
                 }
             #endif
 
-            Section(header: SettingsHeader(text: "Interface".localized())) {
+            let interface = Section(header: SettingsHeader(text: "Interface".localized())) {
                 #if os(iOS)
                     if idiom == .pad {
                         sidebarPicker
@@ -109,9 +110,22 @@ struct PlayerSettings: View {
                 }
             }
 
+            #if os(tvOS)
+                if !accounts.isEmpty {
+                    interface
+                }
+            #elseif os(macOS)
+                interface
+            #elseif os(iOS)
+                if idiom == .pad || !accounts.isEmpty {
+                    interface
+                }
+            #endif
+
             #if !os(tvOS)
                 Section(header: SettingsHeader(text: "Video Details").padding(.bottom, videoDetailsHeaderPadding)) {
                     SettingsHeader(text: "Buttons labels".localized(), secondary: true)
+                    playerActionsButtonLabelStylePicker
                     detailsButtonLabelStylePicker
 
                     SettingsHeader(text: "Show Inspector".localized(), secondary: true)
@@ -196,10 +210,18 @@ struct PlayerSettings: View {
         .modifier(SettingsPickerModifier())
     }
 
+    private var playerActionsButtonLabelStylePicker: some View {
+        Picker("Video actions buttons", selection: $playerActionsButtonLabelStyle) {
+            Text("Show only icons").tag(ButtonLabelStyle.iconOnly)
+            Text("Show icons and text when space permits").tag(ButtonLabelStyle.iconAndText)
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
     private var detailsButtonLabelStylePicker: some View {
-        Picker("Buttons labels", selection: $playerDetailsPageButtonLabelStyle) {
-            Text("Show only icons").tag(PlayerDetailsPageButtonLabelStyle.iconOnly)
-            Text("Show icons and text when space permits").tag(PlayerDetailsPageButtonLabelStyle.iconAndText)
+        Picker("Pages buttons", selection: $playerDetailsPageButtonLabelStyle) {
+            Text("Show only icons").tag(ButtonLabelStyle.iconOnly)
+            Text("Show icons and text when space permits").tag(ButtonLabelStyle.iconAndText)
         }
         .modifier(SettingsPickerModifier())
     }
