@@ -431,3 +431,15 @@
 "Channel could not be found" = "Der Kanal konnte nicht gefunden werden";
 "Could not refresh Subscriptions" = "Abonnements konnten nicht aktualisiert werden";
 "If you want this app to be available in your language, join translation project." = "Wenn Sie wünschen, dass diese App auch in Ihrer Sprache verfügbar ist, nehmen Sie am Übersetzungsprojekt teil.";
+"No documents" = "Keine Dokumente";
+"Recent Documents" = "Neueste Dokumente";
+"Show Open Videos quick actions" = "Geöffnete Videos als Schnellaktionen anzeigen";
+"Show Favorites" = "Favoriten anzeigen";
+"Home" = "Startseite";
+"Show Home" = "Startseite anzeigen";
+"Video Details" = "Videodetails";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Teilen von Dateien über den Finder auf einem Mac\\noder iTunes unter Windows";
+"Recent History" = "Neueste Verlauf";
+"Show Open Videos toolbar button" = "Schaltfläche \"Videos öffnen\" in der Symbolleiste anzeigen";
+"Edit Favorites…" = "Favoriten bearbeiten…";
+"Show Documents" = "Dokumente anzeigen";
