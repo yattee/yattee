@@ -54,6 +54,19 @@ final class DocumentsModel: ObservableObject {
         return nil
     }
 
+    func recentDocuments(_ limit: Int = 10) -> [URL] {
+        guard let documentsDirectory else { return [] }
+
+        return Array(
+            contents(of: documentsDirectory)
+                .sorted {
+                    ((try? $0.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date()) >
+                        ((try? $1.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date())
+                }
+                .prefix(limit)
+        )
+    }
+
     func isDocument(_ video: Video) -> Bool {
         guard video.isLocal, let url = video.localStream?.localURL, let url = replacePrivateVar(url) else { return false }
         return isDocument(url)

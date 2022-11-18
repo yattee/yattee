@@ -8,6 +8,7 @@ struct BrowsingSettings: View {
     #endif
     @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
     #if os(iOS)
+        @Default(.homeRecentDocumentsItems) private var homeRecentDocumentsItems
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
     #endif
     @Default(.thumbnailsQuality) private var thumbnailsQuality
@@ -24,6 +25,9 @@ struct BrowsingSettings: View {
     @EnvironmentObject<AccountsModel> private var accounts
 
     @State private var homeHistoryItemsText = ""
+    #if os(iOS)
+        @State private var homeRecentDocumentsItemsText = ""
+    #endif
     #if os(macOS)
         @State private var presentingEditFavoritesSheet = false
     #endif
@@ -83,6 +87,22 @@ struct BrowsingSettings: View {
                     }
                     .onChange(of: homeHistoryItemsText) { newValue in
                         homeHistoryItems = Int(newValue) ?? 10
+                    }
+            }
+            .multilineTextAlignment(.trailing)
+
+            HStack {
+                Text("Recent documents")
+                TextField("Recent documents", text: $homeRecentDocumentsItemsText)
+                    .labelsHidden()
+                #if !os(macOS)
+                    .keyboardType(.numberPad)
+                #endif
+                    .onAppear {
+                        homeRecentDocumentsItemsText = String(homeRecentDocumentsItems)
+                    }
+                    .onChange(of: homeRecentDocumentsItemsText) { newValue in
+                        homeRecentDocumentsItems = Int(newValue) ?? 3
                     }
             }
             .multilineTextAlignment(.trailing)

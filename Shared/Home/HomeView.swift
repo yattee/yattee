@@ -15,11 +15,17 @@ struct HomeView: View {
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
     @State private var historyID = UUID()
+    #if os(iOS)
+        @State private var recentDocumentsID = UUID()
+    #endif
 
     var favoritesObserver: Any?
 
     #if !os(tvOS)
         @Default(.favorites) private var favorites
+    #endif
+    #if os(iOS)
+        @Default(.homeRecentDocumentsItems) private var homeRecentDocumentsItems
     #endif
     @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.showFavoritesInHome) private var showFavoritesInHome
@@ -87,10 +93,33 @@ struct HomeView: View {
                     #endif
                 }
 
+                if homeRecentDocumentsItems > 0 {
+                    VStack {
+                        HStack {
+                            sectionLabel("Recent Documents")
+
+                            Spacer()
+
+                            Button {
+                                recentDocumentsID = UUID()
+                            } label: {
+                                Label("Refresh", systemImage: "arrow.clockwise")
+                                    .font(.headline)
+                                    .labelStyle(.iconOnly)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        RecentDocumentsView(limit: homeRecentDocumentsItems)
+                            .id(recentDocumentsID)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
                 if homeHistoryItems > 0 {
                     VStack {
                         HStack {
-                            Text("History")
+                            sectionLabel("History")
                             Spacer()
                             Button {
                                 navigation.presentAlert(
@@ -108,17 +137,11 @@ struct HomeView: View {
                                 Label("Clear History", systemImage: "trash")
                                     .font(.headline)
                                     .labelStyle(.iconOnly)
+                                    .foregroundColor(.secondary)
                             }
                         }
 
-                        #if os(tvOS)
-                        .padding(.horizontal, 40)
-                        #else
-                        .padding(.horizontal, 15)
-                        #endif
-                        .font(.title3.bold())
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.secondary)
 
                         HistoryView(limit: homeHistoryItems)
                             .id(historyID)
@@ -157,9 +180,21 @@ struct HomeView: View {
             #endif
         }
     }
+
+    func sectionLabel(_ label: String) -> some View {
+        Text(label)
+        #if os(tvOS)
+            .padding(.horizontal, 40)
+        #else
+            .padding(.horizontal, 15)
+        #endif
+            .font(.title3.bold())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundColor(.secondary)
+    }
 }
 
-struct Favorites_Previews: PreviewProvider {
+struct Home_Previews: PreviewProvider {
     static var previews: some View {
         TabView {
             HomeView()

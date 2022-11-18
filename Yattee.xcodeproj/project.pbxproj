@@ -77,6 +77,8 @@
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B184267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
+		3709528829283A21001ECA40 /* RecentDocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3709528729283A21001ECA40 /* RecentDocumentsView.swift */; };
+		3709528A29283E14001ECA40 /* NoDocumentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3709528929283E14001ECA40 /* NoDocumentsView.swift */; };
 		37095E82291DC85400301883 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37095E81291DC85400301883 /* ShareViewController.swift */; };
 		37095E89291DC85400301883 /* Open in Yattee.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37095E7F291DC85400301883 /* Open in Yattee.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
@@ -1020,6 +1022,8 @@
 		3703100127B0713600ECDDAA /* PlayerGestures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerGestures.swift; sourceTree = "<group>"; };
 		3705B17F267B4DFB00704544 /* TrendingCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCountry.swift; sourceTree = "<group>"; };
 		3705B181267B4E4900704544 /* TrendingCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCategory.swift; sourceTree = "<group>"; };
+		3709528729283A21001ECA40 /* RecentDocumentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentDocumentsView.swift; sourceTree = "<group>"; };
+		3709528929283E14001ECA40 /* NoDocumentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoDocumentsView.swift; sourceTree = "<group>"; };
 		37095E7F291DC85400301883 /* Open in Yattee.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open in Yattee.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37095E81291DC85400301883 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		37095E86291DC85400301883 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1873,6 +1877,8 @@
 			isa = PBXGroup;
 			children = (
 				37494EA429200B14000DF176 /* DocumentsView.swift */,
+				3709528929283E14001ECA40 /* NoDocumentsView.swift */,
+				3709528729283A21001ECA40 /* RecentDocumentsView.swift */,
 			);
 			path = Documents;
 			sourceTree = "<group>";
@@ -2873,6 +2879,7 @@
 				375EC959289EEB8200751258 /* QualityProfileForm.swift in Sources */,
 				37D2E0D028B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
 				3727B74A27872A920021C15E /* VisualEffectBlur-iOS.swift in Sources */,
+				3709528829283A21001ECA40 /* RecentDocumentsView.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				374AB3D728BCAF0000DF56FB /* SeekModel.swift in Sources */,
 				37130A5F277657300033018A /* PersistenceController.swift in Sources */,
@@ -2916,6 +2923,7 @@
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37FFC440272734C3009FFD26 /* Throttle.swift in Sources */,
 				37DD9DB42785D58D00539416 /* RefreshControlModifier.swift in Sources */,
+				3709528A29283E14001ECA40 /* NoDocumentsView.swift in Sources */,
 				3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */,
 				378AE940274EDFB5006A4EE1 /* Tint+Backport.swift in Sources */,
 				376BE50927347B5F009AD608 /* SettingsHeader.swift in Sources */,

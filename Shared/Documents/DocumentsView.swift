@@ -7,16 +7,7 @@ struct DocumentsView: View {
         BrowserPlayerControls {
             ScrollView(.vertical, showsIndicators: false) {
                 if model.directoryContents.isEmpty {
-                    VStack(alignment: .center, spacing: 20) {
-                        HStack {
-                            Image(systemName: "doc")
-                            Text("No documents")
-                        }
-                        Text("Share files from Finder on a Mac\nor iTunes on Windows")
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.secondary)
+                    NoDocumentsView()
                 } else {
                     ForEach(model.sortedDirectoryContents, id: \.absoluteString) { url in
                         let video = Video.local(model.replacePrivateVar(url) ?? url)
