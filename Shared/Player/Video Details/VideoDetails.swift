@@ -30,6 +30,7 @@ struct VideoDetails: View {
     @EnvironmentObject<RecentsModel> private var recents
     @EnvironmentObject<SubscriptionsModel> private var subscriptions
 
+    @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.detailsToolbarPosition) private var detailsToolbarPosition
     @Default(.playerSidebar) private var playerSidebar
 
@@ -210,7 +211,7 @@ struct VideoDetails: View {
                     }
                 }
 
-                if Defaults[.enableReturnYouTubeDislike] {
+                if enableReturnYouTubeDislike {
                     Image(systemName: "hand.thumbsdown")
 
                     if let dislikes = video?.dislikesCount, player.videoBeingOpened.isNil {
