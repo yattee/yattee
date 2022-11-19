@@ -43,6 +43,12 @@ extension PlayerModel {
             }
         }
 
+        var closeCurrentItemAction: UIAction {
+            UIAction(title: "Close video", image: UIImage(systemName: "xmark")) { [weak self] _ in
+                self?.closeCurrentItem()
+            }
+        }
+
         var switchToMPVAction: UIAction? {
             UIAction(title: "Switch to MPV", image: UIImage(systemName: "m.circle")) { _ in
                 self.avPlayerBackend.controller?.dismiss(animated: false)
@@ -89,6 +95,7 @@ extension PlayerModel {
         #if os(tvOS)
             avPlayerBackend.controller?.playerView.transportBarCustomMenuItems = [
                 restoreLastSkippedSegmentAction,
+                closeCurrentItemAction,
                 rateMenu,
                 streamsMenu,
                 playbackModeMenu,
