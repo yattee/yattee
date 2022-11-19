@@ -492,3 +492,9 @@
 "Open Videos" = "Deschideți videoclipuri";
 "Locations Manifest" = "Locații manifeste";
 "Default Profile" = "Profil implicit";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" va fi eliminat ireversibil de pe acest dispozitiv.";
+"Are you sure you want to remove this document?" = "Sigur doriți să eliminați acest document?";
+"Could not delete document" = "Nu s-a putut șterge documentul";
+"Are you sure you want to remove %@ location?" = "Sigur doriți să eliminați locația %@?";
+"Copy%@link" = "Copiați%@link";
+"Share%@link" = "Partajați link-ul %@";
