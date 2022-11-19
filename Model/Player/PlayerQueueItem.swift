@@ -42,7 +42,7 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
             return false
         }
 
-        return duration - seconds <= 20
+        return (seconds / duration) * 100 > Double(Defaults[.watchedThreshold])
     }
 
     var hasDetailsLoaded: Bool {

@@ -1,4 +1,5 @@
 import CoreMedia
+import Defaults
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
@@ -169,11 +170,17 @@ struct VideoBanner: View {
     private var progressView: some View {
         Group {
             if !playbackTime.isNil, !(video?.live ?? false) {
-                ProgressView(value: progressViewValue, total: progressViewTotal)
+                ProgressView(value: watchValue, total: progressViewTotal)
                     .progressViewStyle(.linear)
                     .frame(maxWidth: thumbnailWidth)
             }
         }
+    }
+
+    private var watchValue: Double {
+        if finished { return progressViewTotal }
+
+        return progressViewValue
     }
 
     private var progressViewValue: Double {
@@ -184,6 +191,10 @@ struct VideoBanner: View {
     private var progressViewTotal: Double {
         guard videoDuration != 0 else { return 1 }
         return videoDuration ?? video?.length ?? 1
+    }
+
+    private var finished: Bool {
+        (progressViewValue / progressViewTotal) * 100 > Double(Defaults[.watchedThreshold])
     }
 }
 
