@@ -75,8 +75,8 @@
 "Continue from %@" = "Kontynuuj od %@";
 "Contributing" = "Współpraca nad rozwojem";
 "Controls" = "Kontrolki";
-"Copy %@ link" = "Kopiuj link do %@";
-"Copy %@ link with time" = "Kopiuj link do %@ wraz z czasem";
+"Copy %@ link" = "Kopiuj link %@";
+"Copy %@ link with time" = "Kopiuj link %@ wraz z czasem";
 "Could not load locations manifest" = "Nie można wczytać publicznej listy instancji";
 "Country" = "Kraj";
 "Country Name or Code" = "Nazwa kraju lub kod";
@@ -282,8 +282,8 @@
 /* SponsorBlock category name */
 "Self-promotion" = "Autopromocja";
 "Settings" = "Ustawienia";
-"Share %@ link" = "Udostępnij link do %@";
-"Share %@ link with time" = "Udostępnij link do %@ wraz z czasem";
+"Share %@ link" = "Udostępnij link %@";
+"Share %@ link with time" = "Udostępnij link %@ wraz z czasem";
 "Share..." = "Udostępnij…";
 
 /* Video duration filter in search */
@@ -493,3 +493,5 @@
 "Open Video" = "Otwórz wideo";
 "Default Profile" = "Domyślny profil";
 "Playback history is empty" = "Historia odtwarzania jest pusta";
+"Copy%@link" = "Kopiuj link%@";
+"Share%@link" = "Udostępnij link%@";
