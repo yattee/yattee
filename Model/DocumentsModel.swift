@@ -59,6 +59,7 @@ final class DocumentsModel: ObservableObject {
 
         return Array(
             contents(of: documentsDirectory)
+                .filter { !isDirectory($0) }
                 .sorted {
                     ((try? $0.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date()) >
                         ((try? $1.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? Date())
