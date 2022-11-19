@@ -47,9 +47,7 @@ struct HomeView: View {
                             OpenVideosButton(text: "Settings", imageSystemName: "gear") {
                                 NavigationModel.shared.presentingSettings = true
                             }
-                            .frame(maxWidth: 600)
                         }
-
                     #else
                         if showOpenActionsInHome {
                             OpenVideosButton(text: "Files", imageSystemName: "folder") {
