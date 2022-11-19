@@ -82,26 +82,12 @@ struct BrowsingSettings: View {
                 }
             #endif
             Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
-            HStack {
-                Text("Recent History")
-                TextField("Recent History", text: $homeHistoryItemsText)
-                    .labelsHidden()
-                #if !os(macOS)
-                    .keyboardType(.numberPad)
-                #endif
-                    .onAppear {
-                        homeHistoryItemsText = String(homeHistoryItems)
-                    }
-                    .onChange(of: homeHistoryItemsText) { newValue in
-                        homeHistoryItems = Int(newValue) ?? 10
-                    }
-            }
-            .multilineTextAlignment(.trailing)
 
             #if os(iOS)
                 HStack {
                     Text("Recent Documents")
                     TextField("Recent Documents", text: $homeRecentDocumentsItemsText)
+                        .multilineTextAlignment(.trailing)
                         .labelsHidden()
                     #if !os(macOS)
                         .keyboardType(.numberPad)
@@ -113,8 +99,23 @@ struct BrowsingSettings: View {
                             homeRecentDocumentsItems = Int(newValue) ?? 3
                         }
                 }
-                .multilineTextAlignment(.trailing)
             #endif
+
+            HStack {
+                Text("Recent History")
+                TextField("Recent History", text: $homeHistoryItemsText)
+                    .multilineTextAlignment(.trailing)
+                    .labelsHidden()
+                #if !os(macOS)
+                    .keyboardType(.numberPad)
+                #endif
+                    .onAppear {
+                        homeHistoryItemsText = String(homeHistoryItems)
+                    }
+                    .onChange(of: homeHistoryItemsText) { newValue in
+                        homeHistoryItems = Int(newValue) ?? 10
+                    }
+            }
 
             if !accounts.isEmpty {
                 Toggle("Show Favorites", isOn: $showFavoritesInHome)
