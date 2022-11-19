@@ -107,17 +107,6 @@ struct VideoDetailsToolbar: View {
                 .frame(width: 30, height: 30)
                 .layoutPriority(1)
 
-                .background(
-                    GeometryReader { proxy in
-                        let frame = proxy.frame(in: .named("toolbarArea"))
-                        Color.clear
-                            .preference(key: RectKey.self, value: frame)
-                            .onPreferenceChange(RectKey.self) { rect in
-                                tool.wrappedValue.toolPostion = rect
-                            }
-                    }
-                )
-
             if activeToolID == tool.wrappedValue.id,
                playerDetailsPageButtonLabelStyle.text,
                player.playerSize.width > 450
@@ -135,6 +124,16 @@ struct VideoDetailsToolbar: View {
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(activeToolID == tool.wrappedValue.id ? Color.accentColor : Color.secondary)
+        )
+        .background(
+            GeometryReader { proxy in
+                let frame = proxy.frame(in: .named("toolbarArea"))
+                Color.clear
+                    .preference(key: RectKey.self, value: frame)
+                    .onPreferenceChange(RectKey.self) { rect in
+                        tool.wrappedValue.toolPostion = rect
+                    }
+            }
         )
     }
 
