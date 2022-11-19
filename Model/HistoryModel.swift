@@ -72,13 +72,12 @@ extension PlayerModel {
                 watch.videoID = id
             } else {
                 watch = results?.first
-
-                if !self.resetWatchedStatusOnPlaying, watch.finished {
-                    return
-                }
             }
 
-            if let seconds = self.playerItemDuration?.seconds {
+            if self.resetWatchedStatusOnPlaying,
+               !watch.finished,
+               let seconds = self.playerItemDuration?.seconds
+            {
                 watch.videoDuration = seconds
             }
 
