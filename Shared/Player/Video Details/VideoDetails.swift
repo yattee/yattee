@@ -71,15 +71,17 @@ struct VideoDetails: View {
                 #endif
             }
             .onChange(of: player.currentItem) { newItem in
-                guard let newItem else {
-                    page = sidebarQueue ? .inspector : .queue
-                    return
-                }
+                Delay.by(0.2) {
+                    guard let newItem else {
+                        page = sidebarQueue ? .inspector : .queue
+                        return
+                    }
 
-                if let video = newItem.video {
-                    page = video.isLocal ? .inspector : .info
-                } else {
-                    page = sidebarQueue ? .inspector : .queue
+                    if let video = newItem.video {
+                        page = video.isLocal ? .inspector : .info
+                    } else {
+                        page = sidebarQueue ? .inspector : .queue
+                    }
                 }
             }
         }
@@ -87,7 +89,7 @@ struct VideoDetails: View {
             if video.isNil ||
                 !VideoDetailsTool.find(for: page)!.isAvailable(for: video!, sidebarQueue: sidebarQueue)
             {
-                page = video == nil ? .inspector : (video!.isLocal ? .inspector : .info)
+                page = video == nil ? (sidebarQueue ? .inspector : .queue) : (video!.isLocal ? .inspector : .info)
             }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
