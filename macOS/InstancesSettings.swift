@@ -124,9 +124,10 @@ struct InstancesSettings: View {
 
                     Button("Remove Location") {
                         settings.presentAlert(Alert(
-                            title: Text(
-                                "Are you sure you want to remove \(selectedInstance!.longDescription) location?"
-                            ),
+                            title: Text(String(
+                                format: "Are you sure you want to remove %@ location?",
+                                selectedInstance?.longDescription ?? ""
+                            )),
                             message: Text("This cannot be reverted"),
                             primaryButton: .destructive(Text("Remove")) {
                                 if accounts.current?.instance == selectedInstance {
