@@ -114,6 +114,11 @@ struct HomeView: View {
                                 .id(recentDocumentsID)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        #if os(tvOS)
+                            .padding(.trailing, 40)
+                        #else
+                            .padding(.trailing, 15)
+                        #endif
                     }
                 #endif
 
@@ -144,6 +149,8 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         #if os(tvOS)
                             .padding(.trailing, 40)
+                        #else
+                            .padding(.trailing, 15)
                         #endif
 
                         HistoryView(limit: homeHistoryItems)
