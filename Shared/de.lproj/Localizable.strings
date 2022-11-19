@@ -433,7 +433,7 @@
 "If you want this app to be available in your language, join translation project." = "Wenn Sie wünschen, dass diese App auch in Ihrer Sprache verfügbar ist, nehmen Sie am Übersetzungsprojekt teil.";
 "No documents" = "Keine Dokumente";
 "Recent Documents" = "Neueste Dokumente";
-"Show Open Videos quick actions" = "Geöffnete Videos als Schnellaktionen anzeigen";
+"Show Open Videos quick actions" = "Videos öffnen als Schnellaktionen anzeigen";
 "Show Favorites" = "Favoriten anzeigen";
 "Home" = "Startseite";
 "Show Home" = "Startseite anzeigen";
@@ -488,3 +488,7 @@
 "Show sidebar" = "Seitenleiste anzeigen";
 "Locations Manifest" = "Standorte Manifest";
 "Remove Location" = "Standort entfernen";
+"Address" = "Adresse";
+"Open Video" = "Video öffnen";
+"Default Profile" = "Standardprofil";
+"Playback history is empty" = "Wiedergabeverlauf ist leer";
