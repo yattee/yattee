@@ -492,3 +492,9 @@
 "Open Video" = "Video öffnen";
 "Default Profile" = "Standardprofil";
 "Playback history is empty" = "Wiedergabeverlauf ist leer";
+"\"%@\" will be irreversibly removed from this device." = "„%@“ wird unwiderruflich von diesem Gerät entfernt.";
+"Are you sure you want to remove this document?" = "Möchten Sie dieses Dokument wirklich entfernen?";
+"Could not delete document" = "Dokument kann nicht gelöscht werden";
+"Are you sure you want to remove %@ location?" = "Möchten Sie den Ort %@ wirklich entfernen?";
+"Copy%@link" = "%@-Link kopieren";
+"Share%@link" = "%@-Link teilen";
