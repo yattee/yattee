@@ -67,7 +67,10 @@ struct VideoBanner: View {
                                                 Text("•")
                                                 Text(size)
                                             }
+
+                                            Spacer()
                                         }
+                                        .frame(maxWidth: .infinity)
                                     }
                                 #endif
                             }

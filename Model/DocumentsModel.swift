@@ -85,8 +85,7 @@ final class DocumentsModel: ObservableObject {
     var creationDateFormatter: DateFormatter {
         let formatter = DateFormatter()
 
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
+        formatter.setLocalizedDateFormatFromTemplate("YYMMddHHmm")
 
         return formatter
     }
