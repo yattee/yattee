@@ -102,6 +102,11 @@ extension PlayerBackend {
 
             if model.queue.isEmpty {
                 if Defaults[.closeLastItemOnPlaybackEnd] {
+                    #if os(tvOS)
+                        if model.activeBackend == .appleAVPlayer {
+                            model.avPlayerBackend.controller?.dismiss(animated: false)
+                        }
+                    #endif
                     model.resetQueue()
                     model.hide()
                 }
