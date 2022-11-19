@@ -87,7 +87,7 @@ struct VideoDetails: View {
             if video.isNil ||
                 !VideoDetailsTool.find(for: page)!.isAvailable(for: video!, sidebarQueue: sidebarQueue)
             {
-                page = .info
+                page = video == nil ? .inspector : (video!.isLocal ? .inspector : .info)
             }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
@@ -135,7 +135,7 @@ struct VideoDetails: View {
             case .comments:
                 CommentsView(embedInScrollView: true)
                     .onAppear {
-                        comments.loadIfNeeded()
+                        Delay.by(0.3) { comments.loadIfNeeded() }
                     }
 
             case .related:
