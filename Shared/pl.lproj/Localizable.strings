@@ -495,3 +495,7 @@
 "Playback history is empty" = "Historia odtwarzania jest pusta";
 "Copy%@link" = "Kopiuj link%@";
 "Share%@link" = "Udostępnij link%@";
+"Are you sure you want to remove this document?" = "Czy na pewno usunąć ten dokument?";
+"\"%@\" will be irreversibly removed from this device." = "Dokument \"%@\" zostanie nieodwracalnie usunięty z tego urządzenia.";
+"Could not delete document" = "Nie można usunąć dokumentu";
+"Are you sure you want to remove %@ location?" = "Czy na pewno usunąć lokalizację %@?";
