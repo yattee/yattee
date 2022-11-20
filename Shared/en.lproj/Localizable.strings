@@ -492,3 +492,7 @@
 "Playback history is empty" = "Playback history is empty";
 "Copy%@link" = "Copy%@link";
 "Share%@link" = "Share%@link";
+"Are you sure you want to remove this document?" = "Are you sure you want to remove this document?";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" will be irreversibly removed from this device.";
+"Could not delete document" = "Could not delete document";
+"Are you sure you want to remove %@ location?" = "Are you sure you want to remove %@ location?";
