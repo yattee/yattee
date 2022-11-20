@@ -145,6 +145,7 @@ struct HomeView: View {
                                     .labelStyle(.iconOnly)
                                     .foregroundColor(.secondary)
                             }
+                            .buttonStyle(.plain)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         #if os(tvOS)
