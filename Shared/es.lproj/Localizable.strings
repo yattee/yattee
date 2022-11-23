@@ -40,7 +40,7 @@
 "Add to Playlist" = "Añadir a playlist";
 "Add to Playlist..." = "Añadir a playlist...";
 "Advanced" = "Avanzado";
-"Always use AVPlayer for live videos" = "Siempre usar AVPlayer para vídeos en directo";
+"Always use AVPlayer for live videos" = "Siempre usar AVPlayer para vídeos en vivo";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Todo";
@@ -111,3 +111,5 @@
 "Frontend URL" = "URL del frontend";
 "Help" = "Ayuda";
 "Hide sidebar" = "Ocultar barra lateral";
+"Add Location" = "Añadir ubicación";
+"Add Location..." = "Añadir ubicación...";
