@@ -3,15 +3,13 @@ import Siesta
 import SwiftUI
 
 final class SubscriptionsModel: ObservableObject {
+    static var shared = SubscriptionsModel()
+
     @Published var channels = [Channel]()
-    var accounts: AccountsModel
+    var accounts: AccountsModel { .shared }
 
     var resource: Resource? {
         accounts.api.subscriptions
-    }
-
-    init(accounts: AccountsModel? = nil) {
-        self.accounts = accounts ?? AccountsModel()
     }
 
     var all: [Channel] {

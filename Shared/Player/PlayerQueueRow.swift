@@ -9,7 +9,7 @@ struct PlayerQueueRow: View {
     var autoplay = false
     @Binding var fullScreen: Bool
 
-    @EnvironmentObject<PlayerModel> private var player
+    private var player = PlayerModel.shared
 
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
 

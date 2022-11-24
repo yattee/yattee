@@ -13,8 +13,7 @@ struct AddToPlaylistView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlaylistsModel> private var model
+    @ObservedObject private var model = PlaylistsModel.shared
 
     var body: some View {
         Group {
@@ -164,7 +163,7 @@ struct AddToPlaylistView: View {
 
         Defaults[.lastUsedPlaylistID] = id
 
-        model.addVideo(playlistID: id, videoID: video.videoID, navigation: navigation)
+        model.addVideo(playlistID: id, videoID: video.videoID)
 
         presentationMode.wrappedValue.dismiss()
     }

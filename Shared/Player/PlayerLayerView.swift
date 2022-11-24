@@ -8,7 +8,7 @@ import Foundation
 
 #if os(macOS)
     final class PlayerLayerView: NSView {
-        var player: PlayerModel! { didSet {
+        var player = PlayerModel.shared { didSet {
             wantsLayer = true
         }}
 
@@ -26,7 +26,7 @@ import Foundation
     }
 #else
     final class PlayerLayerView: UIView {
-        var player: PlayerModel!
+        var player: PlayerModel { .shared }
 
         override init(frame: CGRect) {
             super.init(frame: frame)

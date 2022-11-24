@@ -32,19 +32,16 @@ struct YatteeApp: App {
 
     @State private var configured = false
 
-    @StateObject private var accounts = AccountsModel()
-    @StateObject private var comments = CommentsModel()
-    @StateObject private var instances = InstancesModel()
-    @StateObject private var menu = MenuModel()
-    @StateObject private var navigation = NavigationModel()
-    @StateObject private var networkState = NetworkStateModel()
-    @StateObject private var player = PlayerModel()
-    @StateObject private var playlists = PlaylistsModel()
-    @StateObject private var recents = RecentsModel()
-    @StateObject private var search = SearchModel()
-    @StateObject private var settings = SettingsModel()
-    @StateObject private var subscriptions = SubscriptionsModel()
-    @StateObject private var thumbnails = ThumbnailsModel()
+    @StateObject private var comments = CommentsModel.shared
+    @StateObject private var instances = InstancesModel.shared
+    @StateObject private var menu = MenuModel.shared
+    @StateObject private var networkState = NetworkStateModel.shared
+    @StateObject private var player = PlayerModel.shared
+    @StateObject private var playlists = PlaylistsModel.shared
+    @StateObject private var recents = RecentsModel.shared
+    @StateObject private var settings = SettingsModel.shared
+    @StateObject private var subscriptions = SubscriptionsModel.shared
+    @StateObject private var thumbnails = ThumbnailsModel.shared
 
     let persistenceController = PersistenceController.shared
 
@@ -55,20 +52,6 @@ struct YatteeApp: App {
             ContentView()
                 .onAppear(perform: configure)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(accounts)
-                .environmentObject(comments)
-                .environmentObject(instances)
-                .environmentObject(navigation)
-                .environmentObject(networkState)
-                .environmentObject(player)
-                .environmentObject(playerControls)
-                .environmentObject(playlists)
-                .environmentObject(recents)
-                .environmentObject(settings)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnails)
-                .environmentObject(menu)
-                .environmentObject(search)
             #if os(macOS)
                 .background(
                     HostingWindowFinder { window in
@@ -100,7 +83,7 @@ struct YatteeApp: App {
 
             CommandGroup(replacing: .newItem, addition: {})
 
-            MenuCommands(model: Binding<MenuModel>(get: { menu }, set: { _ in }))
+            MenuCommands(model: Binding<MenuModel>(get: { MenuModel.shared }, set: { _ in }))
         }
         #endif
 
@@ -127,18 +110,7 @@ struct YatteeApp: App {
                     .onDisappear { player.presentingPlayer = false }
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.navigationStyle, .sidebar)
-                    .environmentObject(accounts)
-                    .environmentObject(comments)
-                    .environmentObject(instances)
-                    .environmentObject(navigation)
-                    .environmentObject(networkState)
-                    .environmentObject(player)
-                    .environmentObject(playerControls)
-                    .environmentObject(playlists)
-                    .environmentObject(recents)
-                    .environmentObject(search)
-                    .environmentObject(subscriptions)
-                    .environmentObject(thumbnails)
+
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
             }
             .handlesExternalEvents(matching: Set(["player", "*"]))
@@ -146,12 +118,6 @@ struct YatteeApp: App {
             Settings {
                 SettingsView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environmentObject(accounts)
-                    .environmentObject(instances)
-                    .environmentObject(navigation)
-                    .environmentObject(player)
-                    .environmentObject(playerControls)
-                    .environmentObject(settings)
             }
         #endif
     }
@@ -171,39 +137,14 @@ struct YatteeApp: App {
         migrateAccounts()
 
         if !Defaults[.lastAccountIsPublic] {
-            accounts.configureAccount()
+            AccountsModel.shared.configureAccount()
         }
 
         if let countryOfPublicInstances = Defaults[.countryOfPublicInstances] {
-            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances, accounts: accounts, asCurrent: accounts.current.isNil)
+            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances, asCurrent: AccountsModel.shared.current.isNil)
         }
 
-        playlists.accounts = accounts
-        search.accounts = accounts
-        subscriptions.accounts = accounts
-
-        comments.player = player
-
-        menu.accounts = accounts
-        menu.navigation = navigation
-        menu.player = player
-
-        player.accounts = accounts
-        player.comments = comments
-        player.navigation = navigation
-
-        PlayerModel.shared = player
-        PlayerTimeModel.shared.player = player
-
-        #if !os(tvOS)
-            OpenURLHandler.shared.accounts = accounts
-            OpenURLHandler.shared.navigation = navigation
-            OpenURLHandler.shared.recents = recents
-            OpenURLHandler.shared.player = player
-            OpenURLHandler.shared.search = search
-        #endif
-
-        if !accounts.current.isNil {
+        if !AccountsModel.shared.current.isNil {
             player.restoreQueue()
         }
 
@@ -219,9 +160,7 @@ struct YatteeApp: App {
             }
         #endif
 
-        navigation.tabSelection = section ?? .search
-
-        NavigationModel.shared = navigation
+        NavigationModel.shared.tabSelection = section ?? .search
 
         subscriptions.load()
         playlists.load()

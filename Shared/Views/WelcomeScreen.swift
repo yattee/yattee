@@ -5,7 +5,6 @@ import SwiftUI
 struct WelcomeScreen: View {
     @Environment(\.presentationMode) private var presentationMode
 
-    @EnvironmentObject<AccountsModel> private var accounts
     @State private var store = [ManifestedInstance]()
 
     var body: some View {
@@ -25,7 +24,7 @@ struct WelcomeScreen: View {
                 ForEach(countries, id: \.self) { country in
                     Button {
                         Defaults[.countryOfPublicInstances] = country
-                        InstancesManifest.shared.setPublicAccount(country, accounts: accounts)
+                        InstancesManifest.shared.setPublicAccount(country)
 
                         presentationMode.wrappedValue.dismiss()
                     } label: {

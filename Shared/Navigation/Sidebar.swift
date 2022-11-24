@@ -2,8 +2,8 @@ import Defaults
 import SwiftUI
 
 struct Sidebar: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.visibleSections) private var visibleSections

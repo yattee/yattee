@@ -23,12 +23,9 @@ struct VideoDetails: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @ObservedObject private var accounts = AccountsModel.shared
+    let comments = CommentsModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.detailsToolbarPosition) private var detailsToolbarPosition
@@ -148,6 +145,7 @@ struct VideoDetails: View {
             }
         }
         .contentShape(Rectangle())
+        .frame(maxHeight: .infinity)
     }
 
     @State private var detailsSize = CGSize.zero

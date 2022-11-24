@@ -312,7 +312,8 @@ final class MPVClient: ObservableObject {
             }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self, let model = self.backend.model else { return }
+                guard let self else { return }
+                let model = self.backend.model
                 UIView.animate(withDuration: 0.2, animations: {
                     let aspectRatio = self.aspectRatio > 0 && self.aspectRatio < VideoPlayerView.defaultAspectRatio ? self.aspectRatio : VideoPlayerView.defaultAspectRatio
                     let height = [model.playerSize.height, model.playerSize.width / aspectRatio].min()!
@@ -329,7 +330,7 @@ final class MPVClient: ObservableObject {
                         self.glView?.queue.async {
                             self.glView.display()
                         }
-                        self.backend?.controls?.objectWillChange.send()
+                        self.backend?.controls.objectWillChange.send()
                     }
                 }
             }

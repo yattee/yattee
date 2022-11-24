@@ -9,11 +9,6 @@ struct AdvancedSettings: View {
     @Default(.countryOfPublicInstances) private var countryOfPublicInstances
     @Default(.instances) private var instances
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<SettingsModel> private var settings
-
     @State private var countries = [String]()
     @State private var filesToShare = [MPVClient.logFile]
     @State private var presentingInstanceForm = false
@@ -39,7 +34,7 @@ struct AdvancedSettings: View {
             #endif
         }
         .onChange(of: countryOfPublicInstances) { newCountry in
-            InstancesManifest.shared.setPublicAccount(newCountry, accounts: accounts, asCurrent: accounts.current?.isPublic ?? true)
+            InstancesManifest.shared.setPublicAccount(newCountry, asCurrent: AccountsModel.shared.current?.isPublic ?? true)
         }
         .sheet(isPresented: $presentingInstanceForm) {
             InstanceForm(savedInstanceID: $savedFormInstanceID)

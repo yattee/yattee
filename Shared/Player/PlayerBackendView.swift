@@ -4,8 +4,7 @@ struct PlayerBackendView: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<ThumbnailsModel> private var thumbnails
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -29,7 +28,7 @@ struct PlayerBackendView: View {
 
             #if !os(tvOS)
                 PlayerGestures()
-                PlayerControls(player: player, thumbnails: thumbnails)
+                PlayerControls()
                 #if os(iOS)
                     .padding(.top, controlsTopPadding)
                     .padding(.bottom, controlsBottomPadding)

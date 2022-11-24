@@ -5,7 +5,7 @@ struct SignInRequiredView<Content: View>: View {
     let title: String
     let content: Content
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     @Default(.instances) private var instances
 

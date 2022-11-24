@@ -4,8 +4,8 @@ import SwiftUI
 struct HistorySettings: View {
     static let watchedThresholds = [50, 60, 70, 80, 90, 95, 100]
 
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<SettingsModel> private var settings
+    private var player = PlayerModel.shared
+    private var settings = SettingsModel.shared
 
     @Default(.saveRecents) private var saveRecents
     @Default(.saveLastPlayed) private var saveLastPlayed

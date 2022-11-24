@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct SearchSuggestions: View {
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var state
+    @ObservedObject private var state = SearchModel.shared
 
     var body: some View {
         List {
@@ -80,10 +78,10 @@ struct SearchSuggestions: View {
 
         state.changeQuery { query in
             query.query = queryText
-            navigation.hideKeyboard()
+            NavigationModel.shared.hideKeyboard()
         }
 
-        recents.addQuery(queryText, navigation: navigation)
+        RecentsModel.shared.addQuery(queryText)
     }
 
     private var visibleSuggestions: [String] {

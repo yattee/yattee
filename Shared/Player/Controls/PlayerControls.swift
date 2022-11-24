@@ -6,8 +6,8 @@ import SwiftUI
 struct PlayerControls: View {
     static let animation = Animation.easeInOut(duration: 0.2)
 
-    private var player: PlayerModel!
-    private var thumbnails: ThumbnailsModel!
+    private var player: PlayerModel { .shared }
+    private var thumbnails: ThumbnailsModel { .shared }
 
     @ObservedObject private var model = PlayerControlsModel.shared
 
@@ -37,11 +37,6 @@ struct PlayerControls: View {
 
     var playerControlsLayout: PlayerControlsLayout {
         player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
-    }
-
-    init(player: PlayerModel, thumbnails: ThumbnailsModel) {
-        self.player = player
-        self.thumbnails = thumbnails
     }
 
     var body: some View {
@@ -206,12 +201,12 @@ struct PlayerControls: View {
     }
 
     var detailsWidth: Double {
-        guard let player, player.playerSize.width.isFinite else { return 200 }
+        guard player.playerSize.width.isFinite else { return 200 }
         return [player.playerSize.width, 600].min()!
     }
 
     var detailsHeight: Double {
-        guard let player, player.playerSize.height.isFinite else { return 200 }
+        guard player.playerSize.height.isFinite else { return 200 }
         var inset = 0.0
         #if os(iOS)
             inset = SafeArea.insets.bottom
@@ -499,7 +494,7 @@ struct PlayerControls_Previews: PreviewProvider {
         ZStack {
             Color.gray
 
-            PlayerControls(player: PlayerModel(), thumbnails: ThumbnailsModel())
+            PlayerControls()
                 .injectFixtureEnvironmentObjects()
         }
     }

@@ -11,12 +11,11 @@ struct VideoContextMenuView: View {
     @Environment(\.navigationStyle) private var navigationStyle
     @Environment(\.currentPlaylistID) private var playlistID
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var player = PlayerModel.shared
+    @ObservedObject private var playlists = PlaylistsModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
@@ -261,11 +260,8 @@ struct VideoContextMenuView: View {
 
     private var openChannelButton: some View {
         Button {
-            NavigationModel.openChannel(
+            NavigationModel.shared.openChannel(
                 video.channel,
-                player: player,
-                recents: recents,
-                navigation: navigation,
                 navigationStyle: navigationStyle
             )
         } label: {
@@ -308,7 +304,7 @@ struct VideoContextMenuView: View {
     @ViewBuilder private var addToLastPlaylistButton: some View {
         if let playlist = playlists.lastUsed {
             Button {
-                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
             } label: {
                 Label("Add to \(playlist.title)", systemImage: "text.badge.star")
             }

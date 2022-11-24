@@ -10,7 +10,7 @@ struct Buffering: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout

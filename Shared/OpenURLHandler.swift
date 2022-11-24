@@ -7,11 +7,11 @@ struct OpenURLHandler {
     static var shared = OpenURLHandler()
     static let yatteeProtocol = "yattee://"
 
-    var accounts: AccountsModel!
-    var navigation: NavigationModel!
-    var recents: RecentsModel!
-    var player: PlayerModel!
-    var search: SearchModel!
+    var accounts: AccountsModel { .shared }
+    var navigation: NavigationModel { .shared }
+    var recents: RecentsModel { .shared }
+    var player: PlayerModel { .shared }
+    var search: SearchModel { .shared }
     var navigationStyle = NavigationStyle.sidebar
 
     func handle(_ url: URL) {
@@ -162,11 +162,8 @@ struct OpenURLHandler {
                 if var playlist: ChannelPlaylist = response.typedContent() {
                     playlist.id = playlistID
                     DispatchQueue.main.async {
-                        NavigationModel.openChannelPlaylist(
+                        NavigationModel.shared.openChannelPlaylist(
                             playlist,
-                            player: player,
-                            recents: recents,
-                            navigation: navigation,
                             navigationStyle: navigationStyle
                         )
                     }
@@ -194,11 +191,8 @@ struct OpenURLHandler {
             .onSuccess { response in
                 if let channel: Channel = response.typedContent() {
                     DispatchQueue.main.async {
-                        NavigationModel.openChannel(
+                        NavigationModel.shared.openChannel(
                             channel,
-                            player: player,
-                            recents: recents,
-                            navigation: navigation,
                             navigationStyle: navigationStyle
                         )
                     }
@@ -228,7 +222,7 @@ struct OpenURLHandler {
             return accounts.api.channelByName(name)
         }
 
-        if let instance = InstancesModel.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
+        if let instance = InstancesModel.shared.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
             return instance.anonymous.channelByName(name)
         }
 
@@ -242,7 +236,7 @@ struct OpenURLHandler {
             return accounts.api.channelByUsername(username)
         }
 
-        if let instance = InstancesModel.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
+        if let instance = InstancesModel.shared.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
             return instance.anonymous.channelByUsername(username)
         }
 
@@ -254,13 +248,7 @@ struct OpenURLHandler {
             if alertIfNoMainWindowOpen() { return }
         #endif
 
-        NavigationModel.openSearchQuery(
-            parser.searchQuery,
-            player: player,
-            recents: recents,
-            navigation: navigation,
-            search: search
-        )
+        NavigationModel.shared.openSearchQuery(parser.searchQuery)
 
         #if os(macOS)
             focusMainWindow()

@@ -13,8 +13,8 @@ struct InstancesSettings: View {
     @State private var proxiesVideos = false
 
     @Environment(\.colorScheme) private var colorScheme
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<SettingsModel> private var settings
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var settings = SettingsModel.shared
 
     @Default(.instances) private var instances
 
@@ -86,7 +86,7 @@ struct InstancesSettings: View {
                         frontendURL = selectedInstanceFrontendURL
                     }
                     .onChange(of: frontendURL) { newValue in
-                        InstancesModel.setFrontendURL(selectedInstance, newValue)
+                        InstancesModel.shared.setFrontendURL(selectedInstance, newValue)
                     }
                     .labelsHidden()
 
@@ -101,7 +101,7 @@ struct InstancesSettings: View {
                         proxiesVideos = selectedInstance.proxiesVideos
                     }
                     .onChange(of: proxiesVideos) { newValue in
-                        InstancesModel.setProxiesVideos(selectedInstance, newValue)
+                        InstancesModel.shared.setProxiesVideos(selectedInstance, newValue)
                     }
             }
 
@@ -134,7 +134,7 @@ struct InstancesSettings: View {
                                     accounts.setCurrent(nil)
                                 }
 
-                                InstancesModel.remove(selectedInstance!)
+                                InstancesModel.shared.remove(selectedInstance!)
                                 selectedInstanceID = instances.last?.id
                             },
                             secondaryButton: .cancel()
@@ -170,7 +170,7 @@ struct InstancesSettings: View {
     }
 
     var selectedInstance: Instance! {
-        InstancesModel.find(selectedInstanceID)
+        InstancesModel.shared.find(selectedInstanceID)
     }
 
     var selectedInstanceFrontendURL: String {
@@ -182,7 +182,7 @@ struct InstancesSettings: View {
             return []
         }
 
-        return InstancesModel.accounts(selectedInstanceID)
+        return InstancesModel.shared.accounts(selectedInstanceID)
     }
 
     private var proxiesVideosToggle: some View {

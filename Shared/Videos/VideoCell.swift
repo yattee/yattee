@@ -14,9 +14,7 @@ struct VideoCell: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<ThumbnailsModel> private var thumbnails
+    @ObservedObject var thumbnails = ThumbnailsModel.shared
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
@@ -53,7 +51,6 @@ struct VideoCell: View {
             .contentShape(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
             .contextMenu {
                 VideoContextMenuView(video: video)
-                    .environmentObject(accounts)
             }
     }
 
@@ -310,11 +307,8 @@ struct VideoCell: View {
                     return
                 }
 
-                NavigationModel.openChannel(
+                NavigationModel.shared.openChannel(
                     video.channel,
-                    player: player,
-                    recents: recents,
-                    navigation: navigation,
                     navigationStyle: navigationStyle
                 )
             } label: {

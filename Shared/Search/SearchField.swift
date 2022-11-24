@@ -4,9 +4,8 @@ import SwiftUI
 struct SearchTextField: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var state
+    private var navigation = NavigationModel.shared
+    @ObservedObject private var state = SearchModel.shared
 
     @Binding var favoriteItem: FavoriteItem?
 
@@ -34,7 +33,7 @@ struct SearchTextField: View {
                         query.query = state.queryText
                         navigation.hideKeyboard()
                     }
-                    recents.addQuery(state.queryText, navigation: navigation)
+                    RecentsModel.shared.addQuery(state.queryText)
                 }
                 .disableAutocorrection(true)
                 #if os(macOS)

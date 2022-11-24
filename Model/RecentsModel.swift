@@ -2,6 +2,8 @@ import Defaults
 import Foundation
 
 final class RecentsModel: ObservableObject {
+    static var shared = RecentsModel()
+
     @Default(.recentlyOpened) var items
     @Default(.saveRecents) var saveRecents
 
@@ -35,9 +37,9 @@ final class RecentsModel: ObservableObject {
         }
     }
 
-    func addQuery(_ query: String, navigation: NavigationModel? = nil) {
+    func addQuery(_ query: String) {
         if !query.isEmpty {
-            navigation?.tabSelection = .search
+            NavigationModel.shared.tabSelection = .search
             add(.init(from: query))
         }
     }

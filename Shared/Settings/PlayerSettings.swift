@@ -35,8 +35,8 @@ struct PlayerSettings: View {
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.systemControlsCommands) private var systemControlsCommands
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var player = PlayerModel.shared
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {

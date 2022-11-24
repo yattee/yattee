@@ -9,14 +9,14 @@ final class PlayerTimeModel: ObservableObject {
     @Published var currentTime = CMTime.zero
     @Published var duration = CMTime.zero
 
-    var player: PlayerModel!
+    var player: PlayerModel { .shared }
 
     var forceHours: Bool {
         duration.seconds >= 60 * 60
     }
 
     var currentPlaybackTime: String {
-        if player?.currentItem.isNil ?? true || duration.seconds.isZero {
+        if player.currentItem.isNil || duration.seconds.isZero {
             return Self.timePlaceholder
         }
 
@@ -24,7 +24,7 @@ final class PlayerTimeModel: ObservableObject {
     }
 
     var durationPlaybackTime: String {
-        if player?.currentItem.isNil ?? true {
+        if player.currentItem.isNil {
             return Self.timePlaceholder
         }
 
@@ -32,7 +32,7 @@ final class PlayerTimeModel: ObservableObject {
     }
 
     var withoutSegmentsPlaybackTime: String {
-        guard let withoutSegmentsDuration = player?.playerItemDurationWithoutSponsorSegments?.seconds else { return Self.timePlaceholder }
+        guard let withoutSegmentsDuration = player.playerItemDurationWithoutSponsorSegments?.seconds else { return Self.timePlaceholder }
         return withoutSegmentsDuration.formattedAsPlaybackTime(forceHours: forceHours) ?? Self.timePlaceholder
     }
 }

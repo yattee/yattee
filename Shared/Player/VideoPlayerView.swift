@@ -57,13 +57,10 @@ struct VideoPlayerView: View {
         @State internal var orientationNotification: Any?
     #endif
 
-    @EnvironmentObject<PlayerModel> internal var player
+    internal var player: PlayerModel! = PlayerModel.shared
+
     #if os(macOS)
-        @EnvironmentObject<NavigationModel> internal var navigation
-        @EnvironmentObject<SearchModel> internal var search
-    #endif
-    #if os(tvOS)
-        @EnvironmentObject<ThumbnailsModel> private var thumbnails
+        @ObservedObject private var navigation = NavigationModel.shared
     #endif
 
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
@@ -482,7 +479,7 @@ struct VideoPlayerView: View {
 
     #if os(tvOS)
         var tvControls: some View {
-            TVControls(player: player, thumbnails: thumbnails)
+            TVControls()
         }
     #endif
 }

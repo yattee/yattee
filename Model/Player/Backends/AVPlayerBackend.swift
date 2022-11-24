@@ -12,11 +12,11 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var logger = Logger(label: "avplayer-backend")
 
-    var model: PlayerModel! { .shared }
-    var controls: PlayerControlsModel! { .shared }
-    var playerTime: PlayerTimeModel! { .shared }
-    var networkState: NetworkStateModel! { .shared }
-    var seek: SeekModel! { .shared }
+    var model: PlayerModel { .shared }
+    var controls: PlayerControlsModel { .shared }
+    var playerTime: PlayerTimeModel { .shared }
+    var networkState: NetworkStateModel { .shared }
+    var seek: SeekModel { .shared }
 
     var stream: Stream?
     var video: Video?

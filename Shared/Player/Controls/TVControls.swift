@@ -3,8 +3,8 @@ import SwiftUI
 
 struct TVControls: UIViewRepresentable {
     var model: PlayerControlsModel!
-    var player: PlayerModel!
-    var thumbnails: ThumbnailsModel!
+    var player: PlayerModel { .shared }
+    var thumbnails: ThumbnailsModel { .shared }
 
     @State private var direction = ""
     @State private var controlsArea = UIView()
@@ -30,7 +30,7 @@ struct TVControls: UIViewRepresentable {
         controlsArea.addGestureRecognizer(downSwipe)
         controlsArea.addGestureRecognizer(tap)
 
-        let controls = UIHostingController(rootView: PlayerControls(player: player, thumbnails: thumbnails))
+        let controls = UIHostingController(rootView: PlayerControls())
         controls.view.frame = .init(
             origin: .init(x: SafeArea.insets.left, y: SafeArea.insets.top),
             size: .init(

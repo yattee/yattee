@@ -4,6 +4,8 @@ import Siesta
 import SwiftUI
 
 final class SearchModel: ObservableObject {
+    static var shared = SearchModel()
+
     @Published var store = Store<[ContentItem]>()
     @Published var page: SearchPage?
 
@@ -14,7 +16,7 @@ final class SearchModel: ObservableObject {
     @Published var querySuggestions = [String]()
     private var suggestionsDebouncer = Debouncer(.milliseconds(200))
 
-    var accounts = AccountsModel()
+    var accounts: AccountsModel { .shared }
     private var resource: Resource!
 
     var isLoading: Bool {

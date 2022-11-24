@@ -45,7 +45,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    static var shared: PlayerModel!
+    static var shared = PlayerModel()
 
     let logger = Logger(label: "stream.yattee.app")
 
@@ -76,7 +76,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    var playerBackendView = PlayerBackendView()
+    lazy var playerBackendView = PlayerBackendView()
 
     @Published var playerSize: CGSize = .zero { didSet {
         #if !os(tvOS)
@@ -125,13 +125,12 @@ final class PlayerModel: ObservableObject {
         @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
     #endif
 
-    var accounts: AccountsModel
-    var comments: CommentsModel
+    var comments: CommentsModel { .shared }
     var controls: PlayerControlsModel { .shared }
     var playerTime: PlayerTimeModel { .shared }
     var networkState: NetworkStateModel { .shared }
     var seek: SeekModel { .shared }
-    var navigation: NavigationModel
+    var navigation: NavigationModel { .shared }
 
     var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
@@ -173,15 +172,7 @@ final class PlayerModel: ObservableObject {
     var onPresentPlayer = [() -> Void]()
     private var remoteCommandCenterConfigured = false
 
-    init(
-        accounts: AccountsModel = AccountsModel(),
-        comments: CommentsModel = CommentsModel(),
-        navigation: NavigationModel = NavigationModel()
-    ) {
-        self.accounts = accounts
-        self.comments = comments
-        self.navigation = navigation
-
+    init() {
         #if !os(macOS)
             mpvBackend.controller = mpvController
             mpvBackend.client = mpvController.client

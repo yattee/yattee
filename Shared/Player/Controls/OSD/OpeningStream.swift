@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct OpeningStream: View {
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<NetworkStateModel> private var model
+    @ObservedObject private var player = PlayerModel.shared
+    @ObservedObject private var model = NetworkStateModel.shared
 
     var body: some View {
         Buffering(reason: reason, state: state)

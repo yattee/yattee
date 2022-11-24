@@ -8,19 +8,11 @@ import Siesta
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<InstancesModel> private var instances
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
-    @EnvironmentObject<SettingsModel> private var settings
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
-
-    @EnvironmentObject<MenuModel> private var menu
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var player = PlayerModel.shared
+    private var playlists = PlaylistsModel.shared
+    private var subscriptions = SubscriptionsModel.shared
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -44,7 +36,6 @@ struct ContentView: View {
                 AppSidebarNavigation()
             #elseif os(tvOS)
                 TVNavigationView()
-                    .environmentObject(settings)
             #endif
         }
         .onChange(of: accounts.current) { _ in
@@ -55,99 +46,74 @@ struct ContentView: View {
             subscriptions.load(force: true)
             playlists.load(force: true)
         }
-        .environmentObject(accounts)
-        .environmentObject(comments)
-        .environmentObject(instances)
-        .environmentObject(navigation)
-        .environmentObject(player)
-        .environmentObject(playlists)
-        .environmentObject(recents)
-        .environmentObject(search)
-        .environmentObject(subscriptions)
-        .environmentObject(thumbnailsModel)
 
         #if os(iOS)
-            .overlay(videoPlayer)
-            .sheet(isPresented: $navigation.presentingShareSheet) {
-                if let shareURL = navigation.shareURL {
-                    ShareSheet(activityItems: [shareURL])
-                }
+        .overlay(videoPlayer)
+        .sheet(isPresented: $navigation.presentingShareSheet) {
+            if let shareURL = navigation.shareURL {
+                ShareSheet(activityItems: [shareURL])
             }
+        }
         #endif
 
-            // iOS 14 has problem with multiple sheets in one view
-            // but it's ok when it's in background
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingWelcomeScreen) {
-                    WelcomeScreen()
-                        .environmentObject(accounts)
-                        .environmentObject(navigation)
-                }
-            )
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingSettings) {
-                    SettingsView()
-                        .environmentObject(accounts)
-                        .environmentObject(instances)
-                        .environmentObject(settings)
-                        .environmentObject(navigation)
-                        .environmentObject(player)
-                }
-            )
+        // iOS 14 has problem with multiple sheets in one view
+        // but it's ok when it's in background
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingWelcomeScreen) {
+                WelcomeScreen()
+            }
+        )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingSettings) {
+                SettingsView()
+            }
+        )
         #if !os(tvOS)
-            .fileImporter(
-                isPresented: $navigation.presentingFileImporter,
-                allowedContentTypes: [.audiovisualContent],
-                allowsMultipleSelection: true
-            ) { result in
-                do {
-                    let selectedFiles = try result.get()
-                    let urlsToOpen = selectedFiles.map { url in
-                        if let bookmarkURL = URLBookmarkModel.shared.loadBookmark(url) {
-                            return bookmarkURL
-                        }
-
-                        if url.startAccessingSecurityScopedResource() {
-                            URLBookmarkModel.shared.saveBookmark(url)
-                        }
-
-                        return url
+        .fileImporter(
+            isPresented: $navigation.presentingFileImporter,
+            allowedContentTypes: [.audiovisualContent],
+            allowsMultipleSelection: true
+        ) { result in
+            do {
+                let selectedFiles = try result.get()
+                let urlsToOpen = selectedFiles.map { url in
+                    if let bookmarkURL = URLBookmarkModel.shared.loadBookmark(url) {
+                        return bookmarkURL
                     }
 
-                    OpenVideosModel.shared.openURLs(urlsToOpen)
-                } catch {
-                    NavigationModel.shared.presentAlert(title: "Could not open Files")
+                    if url.startAccessingSecurityScopedResource() {
+                        URLBookmarkModel.shared.saveBookmark(url)
+                    }
+
+                    return url
                 }
 
-                NavigationModel.shared.presentingOpenVideos = false
+                OpenVideosModel.shared.openURLs(urlsToOpen)
+            } catch {
+                NavigationModel.shared.presentAlert(title: "Could not open Files")
             }
-            .onOpenURL(perform: OpenURLHandler.shared.handle)
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
-                    AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-                        .environmentObject(playlists)
-                }
-            )
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
-                    PlaylistFormView(playlist: $navigation.editedPlaylist)
-                        .environmentObject(accounts)
-                        .environmentObject(playlists)
-                }
-            )
+
+            NavigationModel.shared.presentingOpenVideos = false
+        }
+        .onOpenURL(perform: OpenURLHandler.shared.handle)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
+                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
+            }
+        )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
+                PlaylistFormView(playlist: $navigation.editedPlaylist)
+            }
+        )
         #endif
-            .background(
-                EmptyView().sheet(isPresented: $navigation.presentingOpenVideos) {
-                    OpenVideosView()
-                        .environmentObject(accounts)
-                        .environmentObject(navigation)
-                        .environmentObject(player)
-                        .environmentObject(recents)
-                        .environmentObject(search)
-                }
-            )
-            .background(playerViewInitialize)
-            .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingOpenVideos) {
+                OpenVideosView()
+            }
+        )
+        .background(playerViewInitialize)
+        .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }
 
     var navigationStyle: NavigationStyle {
@@ -174,16 +140,6 @@ struct ContentView: View {
 
     var playerView: some View {
         VideoPlayerView()
-            .environmentObject(accounts)
-            .environmentObject(comments)
-            .environmentObject(instances)
-            .environmentObject(navigation)
-            .environmentObject(player)
-            .environmentObject(playerControls)
-            .environmentObject(playlists)
-            .environmentObject(recents)
-            .environmentObject(subscriptions)
-            .environmentObject(thumbnailsModel)
             .environment(\.navigationStyle, navigationStyle)
     }
 

@@ -3,6 +3,8 @@ import Defaults
 import Foundation
 
 final class AccountsModel: ObservableObject {
+    static let shared = AccountsModel()
+
     @Published private(set) var current: Account!
 
     @Published private var invidious = InvidiousAPI()
@@ -61,8 +63,8 @@ final class AccountsModel: ObservableObject {
 
     func configureAccount() {
         if let account = lastUsed ??
-            InstancesModel.lastUsed?.anonymousAccount ??
-            InstancesModel.all.first?.anonymousAccount
+            InstancesModel.shared.lastUsed?.anonymousAccount ??
+            InstancesModel.shared.all.first?.anonymousAccount
         {
             setCurrent(account)
         }

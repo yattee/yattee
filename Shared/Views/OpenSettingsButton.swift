@@ -4,7 +4,7 @@ struct OpenSettingsButton: View {
     @Environment(\.presentationMode) private var presentationMode
 
     #if !os(macOS)
-        @EnvironmentObject<NavigationModel> private var navigation
+        private var navigation: NavigationModel { .shared }
     #endif
 
     var body: some View {

@@ -12,10 +12,9 @@ struct ChannelPlaylistView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
+    @ObservedObject private var accounts = AccountsModel.shared
+    var player = PlayerModel.shared
+    @ObservedObject private var recents = RecentsModel.shared
 
     private var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
@@ -89,7 +88,7 @@ struct ChannelPlaylistView: View {
                 if navigationStyle == .tab {
                     Button("Done") {
                         withAnimation(Constants.overlayAnimation) {
-                            navigation.presentingPlaylist = false
+                            NavigationModel.shared.presentingPlaylist = false
                         }
                     }
                 }

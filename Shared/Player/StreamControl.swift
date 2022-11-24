@@ -9,7 +9,7 @@ struct StreamControl: View {
         }
     #endif
 
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         Group {

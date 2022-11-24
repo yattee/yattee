@@ -45,9 +45,9 @@ struct TimelineView: View {
     #endif
 
     @ObservedObject private var playerTime = PlayerTimeModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlayerControlsModel> private var controls
+    private var controls = PlayerControlsModel.shared
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
@@ -124,6 +124,8 @@ struct TimelineView: View {
                     .frame(minWidth: 35)
                     .padding(.leading, playerControlsLayout.timeLeadingEdgePadding)
                     .padding(.trailing, playerControlsLayout.timeTrailingEdgePadding)
+                    .modifier(ControlBackgroundModifier())
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
 
                 ZStack(alignment: .center) {
                     ZStack(alignment: .leading) {
@@ -172,6 +174,8 @@ struct TimelineView: View {
                     .padding(.leading, playerControlsLayout.timeTrailingEdgePadding)
                     .padding(.trailing, playerControlsLayout.timeLeadingEdgePadding)
                     .frame(minWidth: 30, alignment: .trailing)
+                    .modifier(ControlBackgroundModifier())
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
             #if !os(tvOS)
             .highPriorityGesture(
@@ -207,8 +211,6 @@ struct TimelineView: View {
                     }
             )
             #endif
-            .modifier(ControlBackgroundModifier())
-            .clipShape(RoundedRectangle(cornerRadius: 4))
             .font(.system(size: playerControlsLayout.timeFontSize).monospacedDigit())
             .zIndex(2)
         }
@@ -369,14 +371,11 @@ struct TimelineView_Previews: PreviewProvider {
         let playerModel = PlayerModel()
         playerModel.currentItem = .init(Video.fixture)
         let playerTimeModel = PlayerTimeModel.shared
-        playerTimeModel.player = playerModel
         playerTimeModel.currentTime = .secondsInDefaultTimescale(33)
         playerTimeModel.duration = .secondsInDefaultTimescale(100)
         return VStack(spacing: 40) {
             TimelineView()
         }
-        .environmentObject(playerModel)
-        .environmentObject(PlayerControlsModel())
         .padding()
     }
 }

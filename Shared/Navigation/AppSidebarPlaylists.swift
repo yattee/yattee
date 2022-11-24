@@ -1,9 +1,10 @@
 import SwiftUI
 
 struct AppSidebarPlaylists: View {
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    private var player = PlayerModel.shared
+    @ObservedObject private var playlists = PlaylistsModel.shared
 
     var body: some View {
         Section(header: Text("Playlists")) {
@@ -35,7 +36,7 @@ struct AppSidebarPlaylists: View {
     @ViewBuilder func playlistLabel(_ playlist: Playlist) -> some View {
         let label = Label(playlist.title, systemImage: RecentsModel.symbolSystemImage(playlist.title))
 
-        if player.accounts.app.userPlaylistsEndpointIncludesVideos, !playlist.videos.isEmpty {
+        if accounts.app.userPlaylistsEndpointIncludesVideos, !playlist.videos.isEmpty {
             label
                 .backport
                 .badge(Text("\(playlist.videos.count)"))

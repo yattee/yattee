@@ -12,7 +12,7 @@ struct MenuCommands: Commands {
 
     private var openVideosMenu: some Commands {
         CommandGroup(after: .newItem) {
-            Button("Open Videos...") { model.navigation?.presentingOpenVideos = true }
+            Button("Open Videos...") { NavigationModel.shared.presentingOpenVideos = true }
                 .keyboardShortcut("t")
         }
     }
@@ -33,7 +33,7 @@ struct MenuCommands: Commands {
             Button("Popular") {
                 setTabSelection(.popular)
             }
-            .disabled(!(model.accounts?.app.supportsPopular ?? false))
+            .disabled(!AccountsModel.shared.app.supportsPopular)
             .keyboardShortcut("3")
 
             Button("Trending") {
@@ -51,36 +51,30 @@ struct MenuCommands: Commands {
     }
 
     private func setTabSelection(_ tabSelection: NavigationModel.TabSelection) {
-        guard let navigation = model.navigation else {
-            return
-        }
-
-        navigation.sidebarSectionChanged.toggle()
-        navigation.tabSelection = tabSelection
+        NavigationModel.shared.sidebarSectionChanged.toggle()
+        NavigationModel.shared.tabSelection = tabSelection
     }
 
     private var subscriptionsDisabled: Bool {
-        !(
-            (model.accounts?.app.supportsSubscriptions ?? false) && model.accounts?.signedIn ?? false
-        )
+        !(AccountsModel.shared.app.supportsSubscriptions && AccountsModel.shared.signedIn)
     }
 
     private var playbackMenu: some Commands {
         CommandMenu("Playback") {
-            Button((model.player?.isPlaying ?? true) ? "Pause" : "Play") {
-                model.player?.togglePlay()
+            Button((PlayerModel.shared.isPlaying) ? "Pause" : "Play") {
+                PlayerModel.shared.togglePlay()
             }
-            .disabled(model.player?.currentItem.isNil ?? true)
+            .disabled(PlayerModel.shared.currentItem.isNil)
             .keyboardShortcut("p")
 
             Button("Play Next") {
-                model.player?.advanceToNextItem()
+                PlayerModel.shared.advanceToNextItem()
             }
-            .disabled(model.player?.queue.isEmpty ?? true)
+            .disabled(PlayerModel.shared.queue.isEmpty)
             .keyboardShortcut("s")
 
             Button(togglePlayerLabel) {
-                model.player?.togglePlayer()
+                PlayerModel.shared.togglePlayer()
             }
             .keyboardShortcut("o")
         }
@@ -90,7 +84,7 @@ struct MenuCommands: Commands {
         #if os(macOS)
             "Show Player"
         #else
-            (model.player?.presentingPlayer ?? true) ? "Hide Player" : "Show Player"
+            PlayerModel.shared.presentingPlayer ? "Hide Player" : "Show Player"
         #endif
     }
 }

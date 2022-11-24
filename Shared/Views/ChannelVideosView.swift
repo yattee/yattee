@@ -15,14 +15,12 @@ struct ChannelVideosView: View {
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-        @EnvironmentObject<PlayerModel> private var player
     #endif
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var recents = RecentsModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
     @Namespace private var focusNamespace
 
     var presentedChannel: Channel? {

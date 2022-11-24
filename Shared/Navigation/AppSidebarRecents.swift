@@ -2,7 +2,8 @@ import Defaults
 import SwiftUI
 
 struct AppSidebarRecents: View {
-    @EnvironmentObject<RecentsModel> private var recents
+    @ObservedObject private var navigation = NavigationModel.shared
+    var recents = RecentsModel.shared
 
     @Default(.recentlyOpened) private var recentItems
 
@@ -47,8 +48,8 @@ struct AppSidebarRecents: View {
 }
 
 struct RecentNavigationLink<DestinationContent: View>: View {
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<RecentsModel> private var recents
+    var recents = RecentsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
 
     var recent: RecentItem
     var systemImage: String?

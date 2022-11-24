@@ -34,11 +34,11 @@ final class InstancesManifest: Service, ObservableObject {
         }
     }
 
-    func setPublicAccount(_ country: String?, accounts: AccountsModel, asCurrent: Bool = true) {
+    func setPublicAccount(_ country: String?, asCurrent: Bool = true) {
         guard let country else {
-            accounts.publicAccount = nil
+            AccountsModel.shared.publicAccount = nil
             if asCurrent {
-                accounts.configureAccount()
+                AccountsModel.shared.configureAccount()
             }
             return
         }
@@ -47,42 +47,42 @@ final class InstancesManifest: Service, ObservableObject {
             if let instances: [ManifestedInstance] = response.typedContent() {
                 guard let instance = instances.filter { $0.country == country }.randomElement() else { return }
                 let account = instance.anonymousAccount
-                accounts.publicAccount = account
+                AccountsModel.shared.publicAccount = account
                 if asCurrent {
-                    accounts.setCurrent(account)
+                    AccountsModel.shared.setCurrent(account)
                 }
             }
         }
     }
 
-    func changePublicAccount(_ accounts: AccountsModel, settings: SettingsModel) {
+    func changePublicAccount() {
         instancesList?.load().onSuccess { response in
             if let instances: [ManifestedInstance] = response.typedContent() {
                 var countryInstances = instances.filter { $0.country == Defaults[.countryOfPublicInstances] }
                 let region = countryInstances.first?.region ?? "Europe"
                 var regionInstances = instances.filter { $0.region == region }
 
-                if let publicAccountUrl = accounts.publicAccount?.url {
+                if let publicAccountUrl = AccountsModel.shared.publicAccount?.url {
                     countryInstances = countryInstances.filter { $0.url.absoluteString != publicAccountUrl }
                     regionInstances = regionInstances.filter { $0.url.absoluteString != publicAccountUrl }
                 }
 
                 var instance: ManifestedInstance?
 
-                if accounts.current?.isPublic ?? false {
+                if AccountsModel.shared.current?.isPublic ?? false {
                     instance = regionInstances.randomElement()
                 } else {
                     instance = countryInstances.randomElement() ?? regionInstances.randomElement()
                 }
 
                 guard let instance else {
-                    settings.presentAlert(title: "Could not change location", message: "No locations available at the moment")
+                    SettingsModel.shared.presentAlert(title: "Could not change location", message: "No locations available at the moment")
                     return
                 }
 
                 let account = instance.anonymousAccount
-                accounts.publicAccount = account
-                accounts.setCurrent(account)
+                AccountsModel.shared.publicAccount = account
+                AccountsModel.shared.setCurrent(account)
             }
         }
     }

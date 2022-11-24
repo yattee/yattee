@@ -7,17 +7,10 @@ struct ChannelCell: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-
     var body: some View {
         Button {
-            NavigationModel.openChannel(
+            NavigationModel.shared.openChannel(
                 channel,
-                player: player,
-                recents: recents,
-                navigation: navigation,
                 navigationStyle: navigationStyle
             )
         } label: {

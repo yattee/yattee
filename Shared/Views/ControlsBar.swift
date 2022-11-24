@@ -10,12 +10,11 @@ struct ControlsBar: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var model
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @ObservedObject private var accounts = AccountsModel.shared
+    var navigation = NavigationModel.shared
+    @ObservedObject private var model = PlayerModel.shared
+    @ObservedObject private var playlists = PlaylistsModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
 
     @ObservedObject private var controls = PlayerControlsModel.shared
 
@@ -139,11 +138,8 @@ struct ControlsBar: View {
             HStack(spacing: 8) {
                 Button {
                     if let video = model.currentVideo, !video.isLocal {
-                        NavigationModel.openChannel(
+                        navigation.openChannel(
                             video.channel,
-                            player: model,
-                            recents: recents,
-                            navigation: navigation,
                             navigationStyle: navigationStyle
                         )
                     }
@@ -179,7 +175,7 @@ struct ControlsBar: View {
 
                                         if let playlist = playlists.lastUsed, let video = model.currentVideo {
                                             Button {
-                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID, navigation: navigation)
+                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
                                             } label: {
                                                 Label("Add to \(playlist.title)", systemImage: "text.badge.star")
                                             }
@@ -194,11 +190,8 @@ struct ControlsBar: View {
                                 Section {
                                     if !video.isLocal {
                                         Button {
-                                            NavigationModel.openChannel(
+                                            navigation.openChannel(
                                                 video.channel,
-                                                player: model,
-                                                recents: recents,
-                                                navigation: navigation,
                                                 navigationStyle: navigationStyle
                                             )
                                         } label: {

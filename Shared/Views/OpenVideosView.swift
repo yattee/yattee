@@ -6,11 +6,7 @@ struct OpenVideosView: View {
     @State private var playbackMode = OpenVideosModel.PlaybackMode.playNow
     @State private var removeQueueItems = false
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
+    @ObservedObject private var navigation = NavigationModel.shared
 
     @Environment(\.openURL) private var openURL
     @Environment(\.presentationMode) private var presentationMode
@@ -132,8 +128,8 @@ struct OpenVideosView: View {
 
                     openURLs(urlsToOpen)
                 } catch {
-                    NavigationModel.shared.alert = Alert(title: Text("Could not open Files"))
-                    NavigationModel.shared.presentingAlertInOpenVideos = true
+                    navigation.alert = Alert(title: Text("Could not open Files"))
+                    navigation.presentingAlertInOpenVideos = true
                 }
 
                 presentationMode.wrappedValue.dismiss()

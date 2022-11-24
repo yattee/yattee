@@ -14,11 +14,8 @@ struct CommentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @ObservedObject private var comments = CommentsModel.shared
+    var subscriptions = SubscriptionsModel.shared
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -252,11 +249,8 @@ struct CommentView: View {
     }
 
     private func openChannelAction() {
-        NavigationModel.openChannel(
+        NavigationModel.shared.openChannel(
             comment.channel,
-            player: player,
-            recents: recents,
-            navigation: navigation,
             navigationStyle: navigationStyle
         )
     }
@@ -269,7 +263,6 @@ struct CommentView_Previews: PreviewProvider {
 
     static var previews: some View {
         CommentView(comment: fixture, repliesID: .constant(fixture.id))
-            .environmentObject(SubscriptionsModel())
             .padding(5)
     }
 }

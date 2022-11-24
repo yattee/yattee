@@ -4,12 +4,11 @@ import SwiftUI
 
 final class AppleAVPlayerViewController: UIViewController {
     var playerLoaded = false
-    var accountsModel: AccountsModel!
-    var commentsModel: CommentsModel!
-    var navigationModel: NavigationModel!
-    var playerModel: PlayerModel!
-    var playlistsModel: PlaylistsModel!
-    var subscriptionsModel: SubscriptionsModel!
+    var accountsModel: AccountsModel { .shared }
+    var navigationModel: NavigationModel { .shared }
+    var playerModel: PlayerModel { .shared }
+    var playlistsModel: PlaylistsModel { .shared }
+    var subscriptionsModel: SubscriptionsModel { .shared }
     var playerView = AVPlayerViewController()
 
     let persistenceController = PersistenceController.shared
@@ -66,12 +65,6 @@ final class AppleAVPlayerViewController: UIViewController {
             AnyView(
                 NowPlayingView(sections: sections, inInfoViewController: true)
                     .frame(maxHeight: 600)
-                    .environmentObject(accountsModel)
-                    .environmentObject(commentsModel)
-                    .environmentObject(navigationModel)
-                    .environmentObject(playerModel)
-                    .environmentObject(playlistsModel)
-                    .environmentObject(subscriptionsModel)
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
             )
         )

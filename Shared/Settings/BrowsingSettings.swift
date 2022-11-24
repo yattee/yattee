@@ -22,7 +22,7 @@ struct BrowsingSettings: View {
     @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.visibleSections) private var visibleSections
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     @State private var homeHistoryItemsText = ""
     #if os(iOS)

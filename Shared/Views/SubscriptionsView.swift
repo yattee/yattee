@@ -4,7 +4,7 @@ import SwiftUI
 struct SubscriptionsView: View {
     @StateObject private var store = Store<[Video]>()
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     var feed: Resource? {
         accounts.api.feed

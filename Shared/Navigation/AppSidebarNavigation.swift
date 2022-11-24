@@ -5,20 +5,11 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var navigation: NavigationModel { .shared }
 
     #if os(iOS)
         @State private var didApplyPrimaryViewWorkAround = false
-
-        @EnvironmentObject<CommentsModel> private var comments
-        @EnvironmentObject<InstancesModel> private var instances
-        @EnvironmentObject<PlayerModel> private var player
-        @EnvironmentObject<PlaylistsModel> private var playlists
-        @EnvironmentObject<RecentsModel> private var recents
-        @EnvironmentObject<SearchModel> private var search
-        @EnvironmentObject<SubscriptionsModel> private var subscriptions
-        @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
     #endif
 
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem

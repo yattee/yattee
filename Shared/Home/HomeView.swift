@@ -4,8 +4,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct HomeView: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlaylistsModel> private var playlists
+    @ObservedObject private var accounts = AccountsModel.shared
 
     @State private var dragging: FavoriteItem?
     @State private var presentingEditFavorites = false

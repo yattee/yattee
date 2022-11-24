@@ -4,7 +4,7 @@ import SwiftUI
 struct PopularView: View {
     @StateObject private var store = Store<[Video]>()
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     var resource: Resource? {
         accounts.api.popular

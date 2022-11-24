@@ -2,7 +2,11 @@ import Foundation
 import SwiftUI
 
 final class NavigationModel: ObservableObject {
-    static var shared: NavigationModel!
+    static var shared = NavigationModel()
+
+    var player = PlayerModel.shared
+    var recents = RecentsModel.shared
+    var search = SearchModel.shared
 
     enum TabSelection: Hashable {
         case home
@@ -89,21 +93,15 @@ final class NavigationModel: ObservableObject {
 
     @Published var presentingFileImporter = false
 
-    static func openChannel(
-        _ channel: Channel,
-        player: PlayerModel,
-        recents: RecentsModel,
-        navigation: NavigationModel,
-        navigationStyle: NavigationStyle
-    ) {
+    func openChannel(_ channel: Channel, navigationStyle: NavigationStyle) {
         guard channel.id != Video.fixtureChannelID else {
             return
         }
 
-        navigation.hideKeyboard()
+        hideKeyboard()
         let presentingPlayer = player.presentingPlayer
         player.hide()
-        navigation.presentingChannel = false
+        presentingChannel = false
 
         #if os(macOS)
             Windows.main.open()
@@ -113,8 +111,8 @@ final class NavigationModel: ObservableObject {
         recents.add(RecentItem(from: channel))
 
         if navigationStyle == .sidebar {
-            navigation.sidebarSectionChanged.toggle()
-            navigation.tabSelection = .recentlyOpened(recent.tag)
+            sidebarSectionChanged.toggle()
+            tabSelection = .recentlyOpened(recent.tag)
         } else {
             var delay = 0.0
             #if os(iOS)
@@ -122,21 +120,15 @@ final class NavigationModel: ObservableObject {
             #endif
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 withAnimation(Constants.overlayAnimation) {
-                    navigation.presentingChannel = true
+                    self.presentingChannel = true
                 }
             }
         }
     }
 
-    static func openChannelPlaylist(
-        _ playlist: ChannelPlaylist,
-        player: PlayerModel,
-        recents: RecentsModel,
-        navigation: NavigationModel,
-        navigationStyle: NavigationStyle
-    ) {
-        navigation.presentingChannel = false
-        navigation.presentingPlaylist = false
+    func openChannelPlaylist(_ playlist: ChannelPlaylist, navigationStyle: NavigationStyle) {
+        presentingChannel = false
+        presentingPlaylist = false
 
         let recent = RecentItem(from: playlist)
         #if os(macOS)
@@ -145,16 +137,17 @@ final class NavigationModel: ObservableObject {
             player.hide()
         #endif
 
-        navigation.hideKeyboard()
+        hideKeyboard()
         let presentingPlayer = player.presentingPlayer
         player.hide()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            recents.add(recent)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard let self else { return }
+            self.recents.add(recent)
 
             if navigationStyle == .sidebar {
-                navigation.sidebarSectionChanged.toggle()
-                navigation.tabSelection = .recentlyOpened(recent.tag)
+                self.sidebarSectionChanged.toggle()
+                self.tabSelection = .recentlyOpened(recent.tag)
             } else {
                 var delay = 0.0
                 #if os(iOS)
@@ -162,25 +155,19 @@ final class NavigationModel: ObservableObject {
                 #endif
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     withAnimation(Constants.overlayAnimation) {
-                        navigation.presentingPlaylist = true
+                        self.presentingPlaylist = true
                     }
                 }
             }
         }
     }
 
-    static func openSearchQuery(
-        _ searchQuery: String?,
-        player: PlayerModel,
-        recents: RecentsModel,
-        navigation: NavigationModel,
-        search: SearchModel
-    ) {
-        navigation.presentingChannel = false
-        navigation.presentingPlaylist = false
-        navigation.tabSelection = .search
+    func openSearchQuery(_ searchQuery: String?) {
+        presentingChannel = false
+        presentingPlaylist = false
+        tabSelection = .search
 
-        navigation.hideKeyboard()
+        hideKeyboard()
 
         let presentingPlayer = player.presentingPlayer
         player.hide()
@@ -193,9 +180,10 @@ final class NavigationModel: ObservableObject {
             #if os(iOS)
                 if presentingPlayer { delay = 1.0 }
             #endif
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                search.queryText = searchQuery
-                search.changeQuery { query in query.query = searchQuery }
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self else { return }
+                self.search.queryText = searchQuery
+                self.search.changeQuery { query in query.query = searchQuery }
             }
         }
 

@@ -4,10 +4,12 @@ import Siesta
 import SwiftUI
 
 final class PlaylistsModel: ObservableObject {
+    static var shared = PlaylistsModel()
+
     @Published var playlists = [Playlist]()
     @Published var reloadPlaylists = false
 
-    var accounts = AccountsModel()
+    var accounts = AccountsModel.shared
 
     init(_ playlists: [Playlist] = [Playlist]()) {
         self.playlists = playlists
@@ -63,14 +65,13 @@ final class PlaylistsModel: ObservableObject {
         playlistID: Playlist.ID,
         videoID: Video.ID,
         onSuccess: @escaping () -> Void = {},
-        navigation: NavigationModel?,
         onFailure: ((RequestError) -> Void)? = nil
     ) {
         accounts.api.addVideoToPlaylist(
             videoID,
             playlistID,
             onFailure: onFailure ?? { requestError in
-                navigation?.presentAlert(
+                NavigationModel.shared.presentAlert(
                     title: "Error when adding to playlist",
                     message: "(\(requestError.httpStatusCode ?? -1)) \(requestError.userMessage)"
                 )

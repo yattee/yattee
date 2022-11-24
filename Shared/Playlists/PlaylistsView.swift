@@ -14,9 +14,9 @@ struct PlaylistsView: View {
     @StateObject private var channelPlaylist = Store<ChannelPlaylist>()
     @StateObject private var userPlaylist = Store<Playlist>()
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var model
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var player = PlayerModel.shared
+    @ObservedObject private var model = PlaylistsModel.shared
 
     @Namespace private var focusNamespace
 
@@ -26,7 +26,7 @@ struct PlaylistsView: View {
         if videos.isEmpty {
             videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
 
-            if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
+            if !accounts.app.userPlaylistsEndpointIncludesVideos {
                 var i = 0
 
                 for index in videos.indices {
@@ -44,9 +44,9 @@ struct PlaylistsView: View {
     private var resource: Resource? {
         guard let playlist = currentPlaylist else { return nil }
 
-        let resource = player.accounts.api.playlist(playlist.id)
+        let resource = accounts.api.playlist(playlist.id)
 
-        if player.accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
+        if accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
             resource?.addObserver(channelPlaylist)
         } else {
             resource?.addObserver(userPlaylist)
@@ -150,11 +150,9 @@ struct PlaylistsView: View {
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
             PlaylistFormView(playlist: $createdPlaylist)
-                .environmentObject(accounts)
         }
         .fullScreenCover(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
             PlaylistFormView(playlist: $editedPlaylist)
-                .environmentObject(accounts)
         }
         .focusScope(focusNamespace)
         #else
@@ -162,14 +160,12 @@ struct PlaylistsView: View {
             EmptyView()
                 .sheet(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
                     PlaylistFormView(playlist: $createdPlaylist)
-                        .environmentObject(accounts)
                 }
         )
         .background(
             EmptyView()
                 .sheet(isPresented: $showingEditPlaylist, onDismiss: selectEditedPlaylist) {
                     PlaylistFormView(playlist: $editedPlaylist)
-                        .environmentObject(accounts)
                 }
         )
         #endif

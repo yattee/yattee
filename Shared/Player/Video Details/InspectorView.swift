@@ -3,7 +3,7 @@ import SwiftUI
 struct InspectorView: View {
     var video: Video?
 
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         ScrollView {

@@ -15,7 +15,5 @@ struct NetworkState_Previews: PreviewProvider {
         networkState.bufferingState = 30
 
         return NetworkState()
-            .environmentObject(networkState)
-            .environmentObject(PlayerModel())
     }
 }

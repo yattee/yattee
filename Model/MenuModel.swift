@@ -2,11 +2,14 @@ import Combine
 import Foundation
 
 final class MenuModel: ObservableObject {
-    @Published var accounts: AccountsModel? { didSet { registerChildModel(accounts) } }
-    @Published var navigation: NavigationModel? { didSet { registerChildModel(navigation) } }
-    @Published var player: PlayerModel? { didSet { registerChildModel(player) } }
-
+    static let shared = MenuModel()
     private var cancellables = [AnyCancellable]()
+
+    init() {
+        registerChildModel(AccountsModel.shared)
+        registerChildModel(NavigationModel.shared)
+        registerChildModel(PlayerModel.shared)
+    }
 
     func registerChildModel<T: ObservableObject>(_ model: T?) {
         guard !model.isNil else {

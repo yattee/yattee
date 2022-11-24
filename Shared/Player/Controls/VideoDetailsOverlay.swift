@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct VideoDetailsOverlay: View {
-    @EnvironmentObject<PlayerControlsModel> private var controls
+    @ObservedObject private var controls = PlayerControlsModel.shared
 
     @State private var detailsPage = VideoDetails.DetailsPage.queue
 

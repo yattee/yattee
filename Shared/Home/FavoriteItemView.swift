@@ -11,9 +11,8 @@ struct FavoriteItemView: View {
     @Default(.favorites) private var favorites
     @Binding private var dragging: FavoriteItem?
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlaylistsModel> private var playlists
-
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var playlists = PlaylistsModel.shared
     private var favoritesModel = FavoritesModel.shared
 
     init(

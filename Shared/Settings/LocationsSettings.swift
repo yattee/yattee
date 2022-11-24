@@ -6,9 +6,8 @@ struct LocationsSettings: View {
     @State private var presentingInstanceForm = false
     @State private var savedFormInstanceID: Instance.ID?
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SettingsModel> private var model
+    @ObservedObject private var accounts = AccountsModel.shared
+    private var model = SettingsModel.shared
 
     @Default(.countryOfPublicInstances) private var countryOfPublicInstances
     @Default(.instances) private var instances
@@ -30,7 +29,7 @@ struct LocationsSettings: View {
         }
         .onAppear(perform: loadCountries)
         .onChange(of: countryOfPublicInstances) { newCountry in
-            InstancesManifest.shared.setPublicAccount(newCountry, accounts: accounts, asCurrent: accounts.current?.isPublic ?? true)
+            InstancesManifest.shared.setPublicAccount(newCountry, asCurrent: accounts.current?.isPublic ?? true)
         }
         .onChange(of: instancesManifest) { _ in
             countryOfPublicInstances = nil
@@ -74,7 +73,7 @@ struct LocationsSettings: View {
                 .disabled(countries.isEmpty)
 
                 Button {
-                    InstancesManifest.shared.changePublicAccount(accounts, settings: model)
+                    InstancesManifest.shared.changePublicAccount()
                 } label: {
                     if let account = accounts.current, account.isPublic {
                         Text("Switch to other public location")
@@ -89,7 +88,6 @@ struct LocationsSettings: View {
         Section(header: SettingsHeader(text: "Custom Locations".localized())) {
             #if os(macOS)
                 InstancesSettings()
-                    .environmentObject(model)
             #else
                 ForEach(instances) { instance in
                     AccountsNavigationLink(instance: instance)
@@ -137,8 +135,5 @@ struct LocationsSettings: View {
 struct LocationsSettings_Previews: PreviewProvider {
     static var previews: some View {
         LocationsSettings()
-            .environmentObject(AccountsModel())
-            .environmentObject(NavigationModel())
-            .environmentObject(SettingsModel())
     }
 }

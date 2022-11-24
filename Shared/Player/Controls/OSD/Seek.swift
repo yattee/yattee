@@ -6,7 +6,7 @@ struct Seek: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @EnvironmentObject<PlayerControlsModel> private var controls
+    @ObservedObject private var controls = PlayerControlsModel.shared
     @StateObject private var model = SeekModel.shared
 
     private var updateThrottle = Throttle(interval: 2)
@@ -137,6 +137,5 @@ struct Seek: View {
 struct Seek_Previews: PreviewProvider {
     static var previews: some View {
         Seek()
-            .environmentObject(PlayerTimeModel())
     }
 }

@@ -2,10 +2,8 @@ import SwiftUI
 
 #if !os(macOS)
     struct MPVPlayerView: UIViewControllerRepresentable {
-        @EnvironmentObject<PlayerModel> private var player
-
         func makeUIViewController(context _: Context) -> some UIViewController {
-            player.mpvController
+            PlayerModel.shared.mpvController
         }
 
         func updateUIViewController(_: UIViewControllerType, context _: Context) {}
@@ -15,10 +13,8 @@ import SwiftUI
         @State private var client = MPVClient()
         @State private var layer = VideoLayer()
 
-        @EnvironmentObject<PlayerModel> private var player
-
         func makeNSView(context _: Context) -> some NSView {
-            player.mpvBackend.client = client
+            PlayerModel.shared.mpvBackend.client = client
 
             let view = MPVOGLView()
 

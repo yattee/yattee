@@ -7,10 +7,10 @@ import Foundation
 
 protocol PlayerBackend {
     var suggestedPlaybackRates: [Double] { get }
-    var model: PlayerModel! { get }
-    var controls: PlayerControlsModel! { get }
-    var playerTime: PlayerTimeModel! { get }
-    var networkState: NetworkStateModel! { get }
+    var model: PlayerModel { get }
+    var controls: PlayerControlsModel { get }
+    var playerTime: PlayerTimeModel { get }
+    var networkState: NetworkStateModel { get }
 
     var stream: Stream? { get set }
     var video: Video? { get set }

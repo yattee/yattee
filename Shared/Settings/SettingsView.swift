@@ -19,15 +19,13 @@ struct SettingsView: View {
         @Environment(\.presentationMode) private var presentationMode
     #endif
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SettingsModel> private var model
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var model = SettingsModel.shared
 
     @Default(.instances) private var instances
 
     var body: some View {
         settings
-            .environmentObject(model)
             .alert(isPresented: $model.presentingAlert) { model.alert }
     }
 

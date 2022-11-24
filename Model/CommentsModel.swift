@@ -3,6 +3,8 @@ import Foundation
 import SwiftyJSON
 
 final class CommentsModel: ObservableObject {
+    static let shared = CommentsModel()
+
     @Published var all = [Comment]()
 
     @Published var nextPage: String?
@@ -15,10 +17,11 @@ final class CommentsModel: ObservableObject {
     @Published var repliesPageID: String?
     @Published var repliesLoaded = false
 
-    var player: PlayerModel!
+    var player = PlayerModel.shared
+    var accounts = AccountsModel.shared
 
     var instance: Instance? {
-        player.accounts.current?.instance
+        accounts.current?.instance
     }
 
     var nextPageAvailable: Bool {
@@ -80,7 +83,7 @@ final class CommentsModel: ObservableObject {
         repliesPageID = page
         repliesLoaded = false
 
-        player.accounts.api.comments(player.currentVideo!.videoID, page: page)?
+        accounts.api.comments(player.currentVideo!.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {

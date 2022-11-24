@@ -2,8 +2,8 @@ import Defaults
 import SwiftUI
 
 struct ControlsOverlay: View {
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlayerControlsModel> private var model
+    @ObservedObject private var player = PlayerModel.shared
+    private var model = PlayerControlsModel.shared
 
     @State private var contentSize: CGSize = .zero
 
@@ -399,8 +399,5 @@ struct ControlsOverlay: View {
 struct ControlsOverlay_Previews: PreviewProvider {
     static var previews: some View {
         ControlsOverlay()
-            .environmentObject(NetworkStateModel())
-            .environmentObject(PlayerModel())
-            .environmentObject(PlayerControlsModel())
     }
 }

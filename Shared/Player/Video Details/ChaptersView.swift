@@ -3,7 +3,7 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct ChaptersView: View {
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         if let chapters = player.currentVideo?.chapters, !chapters.isEmpty {

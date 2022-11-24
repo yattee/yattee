@@ -5,7 +5,7 @@ import SwiftUI
 struct ChapterView: View {
     var chapter: Chapter
 
-    @EnvironmentObject<PlayerModel> private var player
+    var player = PlayerModel.shared
 
     var body: some View {
         Button {

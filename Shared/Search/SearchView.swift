@@ -14,17 +14,15 @@ struct SearchView: View {
     #if os(tvOS)
         @State private var searchDebounce = Debounce()
         @State private var recentsDebounce = Debounce()
+        private var recents = RecentsModel.shared
     #endif
 
     @State private var favoriteItem: FavoriteItem?
 
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var state
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var state = SearchModel.shared
     private var favorites = FavoritesModel.shared
 
     @Default(.recentlyOpened) private var recentlyOpened
@@ -313,20 +311,17 @@ struct SearchView: View {
             case .query:
                 state.queryText = item.title
                 state.changeQuery { query in query.query = item.title }
-                navigation.hideKeyboard()
+                NavigationModel.shared.hideKeyboard()
 
                 updateFavoriteItem()
-                recents.add(item)
+                RecentsModel.shared.add(item)
             case .channel:
                 guard let channel = item.channel else {
                     return
                 }
 
-                NavigationModel.openChannel(
+                NavigationModel.shared.openChannel(
                     channel,
-                    player: player,
-                    recents: recents,
-                    navigation: navigation,
                     navigationStyle: navigationStyle
                 )
             case .playlist:
@@ -334,11 +329,8 @@ struct SearchView: View {
                     return
                 }
 
-                NavigationModel.openChannelPlaylist(
+                NavigationModel.shared.openChannelPlaylist(
                     playlist,
-                    player: player,
-                    recents: recents,
-                    navigation: navigation,
                     navigationStyle: navigationStyle
                 )
             }
@@ -359,7 +351,7 @@ struct SearchView: View {
 
     private func removeButton(_ item: RecentItem) -> some View {
         Button {
-            recents.close(item)
+            RecentsModel.shared.close(item)
             recentsChanged.toggle()
         } label: {
             Label("Remove", systemImage: "trash")
@@ -368,12 +360,12 @@ struct SearchView: View {
 
     private var clearHistoryButton: some View {
         Button {
-            navigation.presentAlert(
+            NavigationModel.shared.presentAlert(
                 Alert(
                     title: Text("Are you sure you want to clear search history?"),
                     message: Text("This cannot be reverted"),
                     primaryButton: .destructive(Text("Clear")) {
-                        recents.clear()
+                        RecentsModel.shared.clear()
                         recentsChanged.toggle()
                     },
                     secondaryButton: .cancel()

@@ -8,7 +8,7 @@ struct HistoryView: View {
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         LazyVStack {

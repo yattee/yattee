@@ -155,7 +155,7 @@ struct OpenVideosModel {
     }
 
     var canOpenVideosByID: Bool {
-        guard let app = player.accounts.current?.app else { return false }
-        return !player.accounts.isEmpty && app.supportsOpeningVideosByID
+        guard let app = AccountsModel.shared.current?.app else { return false }
+        return !AccountsModel.shared.isEmpty && app.supportsOpeningVideosByID
     }
 }

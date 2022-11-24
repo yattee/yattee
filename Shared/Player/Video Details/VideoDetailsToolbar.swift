@@ -13,7 +13,7 @@ struct VideoDetailsToolbar: View {
     @State private var startedToolPosition: CGRect = .zero
     @State private var opacity = 1.0
 
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var player = PlayerModel.shared
     @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
 
     var body: some View {

@@ -83,11 +83,11 @@ extension PlayerModel {
     }
 
     var playerInstance: Instance? {
-        InstancesModel.forPlayer ?? accounts.current?.instance ?? InstancesModel.all.first
+        InstancesModel.shared.forPlayer ?? AccountsModel.shared.current?.instance ?? InstancesModel.shared.all.first
     }
 
     var playerAPI: VideosAPI {
-        playerInstance?.anonymous ?? accounts.api
+        playerInstance?.anonymous ?? AccountsModel.shared.api
     }
 
     var qualityProfile: QualityProfile? {
@@ -269,7 +269,7 @@ extension PlayerModel {
     }
 
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
-        guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
+        guard !AccountsModel.shared.current.isNil, !item.hasDetailsLoaded else { return }
 
         let videoID = item.video?.videoID ?? item.videoID
 

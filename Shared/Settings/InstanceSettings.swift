@@ -13,7 +13,7 @@ struct InstanceSettings: View {
         List {
             Section(header: Text("Accounts".localized())) {
                 if instance.app.supportsAccounts {
-                    ForEach(InstancesModel.accounts(instance.id), id: \.self) { account in
+                    ForEach(InstancesModel.shared.accounts(instance.id), id: \.self) { account in
                         #if os(tvOS)
                             Button(account.description) {}
                                 .contextMenu {
@@ -70,7 +70,7 @@ struct InstanceSettings: View {
                         frontendURL = instance.frontendURL ?? ""
                     }
                     .onChange(of: frontendURL) { newValue in
-                        InstancesModel.setFrontendURL(instance, newValue)
+                        InstancesModel.shared.setFrontendURL(instance, newValue)
                     }
                     .labelsHidden()
                     .autocapitalization(.none)
@@ -84,7 +84,7 @@ struct InstanceSettings: View {
                         proxiesVideos = instance.proxiesVideos
                     }
                     .onChange(of: proxiesVideos) { newValue in
-                        InstancesModel.setProxiesVideos(instance, newValue)
+                        InstancesModel.shared.setProxiesVideos(instance, newValue)
                     }
             }
         }

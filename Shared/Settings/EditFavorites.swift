@@ -2,8 +2,7 @@ import Defaults
 import SwiftUI
 
 struct EditFavorites: View {
-    @EnvironmentObject<PlaylistsModel> private var playlistsModel
-
+    private var playlistsModel = PlaylistsModel.shared
     private var model = FavoritesModel.shared
 
     @Default(.favorites) private var favorites

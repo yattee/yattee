@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct AccountsMenuView: View {
-    @EnvironmentObject<AccountsModel> private var model
+    @ObservedObject private var model = AccountsModel.shared
 
     @Default(.accounts) private var accounts
     @Default(.instances) private var instances

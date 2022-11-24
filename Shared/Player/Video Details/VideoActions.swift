@@ -2,10 +2,10 @@ import Defaults
 import SwiftUI
 
 struct VideoActions: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<PlayerModel> private var player
+    @ObservedObject private var accounts = AccountsModel.shared
+    var navigation = NavigationModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
     var video: Video?
 

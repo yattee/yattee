@@ -2,16 +2,10 @@ import Defaults
 import SwiftUI
 
 struct AppTabNavigation: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<InstancesModel> private var instances
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
-    @EnvironmentObject<ThumbnailsModel> private var thumbnailsModel
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    private var player = PlayerModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.showDocuments) private var showDocuments
@@ -187,11 +181,6 @@ struct AppTabNavigation: View {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environment(\.inChannelView, true)
                 .environment(\.navigationStyle, .tab)
-                .environmentObject(accounts)
-                .environmentObject(navigation)
-                .environmentObject(player)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnailsModel)
                 .id("channelVideos")
                 .zIndex(player.presentingPlayer ? -1 : 2)
                 .transition(.move(edge: .bottom))
@@ -202,11 +191,6 @@ struct AppTabNavigation: View {
         if navigation.presentingPlaylist {
             ChannelPlaylistView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(accounts)
-                .environmentObject(navigation)
-                .environmentObject(player)
-                .environmentObject(subscriptions)
-                .environmentObject(thumbnailsModel)
                 .id("channelPlaylist")
                 .zIndex(player.presentingPlayer ? -1 : 1)
                 .transition(.move(edge: .bottom))

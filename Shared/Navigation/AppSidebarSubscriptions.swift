@@ -2,8 +2,8 @@ import Defaults
 import SwiftUI
 
 struct AppSidebarSubscriptions: View {
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<SubscriptionsModel> private var subscriptions
+    @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var subscriptions = SubscriptionsModel.shared
 
     var body: some View {
         Section(header: Text("Subscriptions")) {

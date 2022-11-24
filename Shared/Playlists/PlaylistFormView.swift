@@ -16,8 +16,8 @@ struct PlaylistFormView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<PlaylistsModel> private var playlists
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var playlists = PlaylistsModel.shared
 
     var editing: Bool {
         playlist != nil

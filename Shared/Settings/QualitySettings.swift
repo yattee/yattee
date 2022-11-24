@@ -5,7 +5,7 @@ struct QualitySettings: View {
     @State private var presentingProfileForm = false
     @State private var editedProfileID: QualityProfile.ID?
 
-    @EnvironmentObject<SettingsModel> private var settings
+    @ObservedObject private var settings = SettingsModel.shared
 
     @Default(.qualityProfiles) private var qualityProfiles
     @Default(.batteryCellularProfile) private var batteryCellularProfile

@@ -15,9 +15,8 @@ struct NowPlayingView: View {
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
-    @EnvironmentObject<CommentsModel> private var comments
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
+    @ObservedObject private var comments = CommentsModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
     @Default(.saveHistory) private var saveHistory
 

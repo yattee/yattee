@@ -2,10 +2,7 @@ import Defaults
 import SwiftUI
 
 struct RelatedView: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var playlists
+    @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
         List {

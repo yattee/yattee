@@ -16,7 +16,7 @@ struct InstanceForm: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -140,7 +140,7 @@ struct InstanceForm: View {
             return
         }
 
-        let savedInstance = InstancesModel.add(app: app, name: name, url: url)
+        let savedInstance = InstancesModel.shared.add(app: app, name: name, url: url)
         savedInstanceID = savedInstance.id
 
         if accounts.isEmpty {

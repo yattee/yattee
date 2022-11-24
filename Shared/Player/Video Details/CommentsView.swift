@@ -4,7 +4,7 @@ struct CommentsView: View {
     var embedInScrollView = false
     @State private var repliesID: Comment.ID?
 
-    @EnvironmentObject<CommentsModel> private var comments
+    @ObservedObject private var comments = CommentsModel.shared
 
     var body: some View {
         Group {

@@ -4,8 +4,9 @@ import SwiftUI
 struct PlaylistVideosView: View {
     let playlist: Playlist
 
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<PlaylistsModel> private var model
+    @ObservedObject private var accounts = AccountsModel.shared
+    var player = PlayerModel.shared
+    @ObservedObject private var model = PlaylistsModel.shared
 
     @StateObject private var channelPlaylist = Store<ChannelPlaylist>()
     @StateObject private var userPlaylist = Store<Playlist>()
@@ -15,7 +16,7 @@ struct PlaylistVideosView: View {
 
         if videos.isEmpty {
             videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
-            if !player.accounts.app.userPlaylistsEndpointIncludesVideos {
+            if !accounts.app.userPlaylistsEndpointIncludesVideos {
                 var i = 0
 
                 for index in videos.indices {
@@ -31,9 +32,9 @@ struct PlaylistVideosView: View {
     }
 
     private var resource: Resource? {
-        let resource = player.accounts.api.playlist(playlist.id)
+        let resource = accounts.api.playlist(playlist.id)
 
-        if player.accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
+        if accounts.app.userPlaylistsUseChannelPlaylistEndpoint {
             resource?.addObserver(channelPlaylist)
         } else {
             resource?.addObserver(userPlaylist)

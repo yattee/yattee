@@ -2,6 +2,8 @@ import Foundation
 import SwiftUI
 
 final class SettingsModel: ObservableObject {
+    static var shared = SettingsModel()
+
     @Published var presentingAlert = false
     @Published var alert = Alert(title: Text("Error"))
 

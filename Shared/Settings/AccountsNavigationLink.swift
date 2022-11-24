@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AccountsNavigationLink: View {
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
     var instance: Instance
 
     var body: some View {
@@ -30,6 +30,6 @@ struct AccountsNavigationLink: View {
         if accounts.current?.instance == instance {
             accounts.setCurrent(nil)
         }
-        InstancesModel.remove(instance)
+        InstancesModel.shared.remove(instance)
     }
 }

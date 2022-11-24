@@ -2,6 +2,8 @@ import Defaults
 import Foundation
 
 final class ThumbnailsModel: ObservableObject {
+    static var shared = ThumbnailsModel()
+
     @Published var unloadable = Set<URL>()
 
     func insertUnloadable(_ url: URL) {

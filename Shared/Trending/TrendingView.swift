@@ -13,7 +13,7 @@ struct TrendingView: View {
 
     @State private var favoriteItem: FavoriteItem?
 
-    @EnvironmentObject<AccountsModel> private var accounts
+    @ObservedObject private var accounts = AccountsModel.shared
 
     var trending: [ContentItem] {
         ContentItem.array(of: store.collection)

@@ -6,10 +6,7 @@ import Foundation
 import SwiftUI
 
 struct VideoDescription: View {
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SearchModel> private var search
+    private var search: SearchModel { .shared }
     @Default(.showKeywords) private var showKeywords
 
     var video: Video
@@ -56,7 +53,7 @@ struct VideoDescription: View {
                 HStack {
                     ForEach(video.keywords, id: \.self) { keyword in
                         Button {
-                            NavigationModel.openSearchQuery(keyword, player: player, recents: recents, navigation: navigation, search: search)
+                            NavigationModel.shared.openSearchQuery(keyword)
                         } label: {
                             HStack(alignment: .center, spacing: 0) {
                                 Text("#")
@@ -96,7 +93,8 @@ struct VideoDescription: View {
         @State private var label = ActiveLabel()
 
         @Environment(\.openURL) private var openURL
-        @EnvironmentObject<PlayerModel> private var player
+
+        var player = PlayerModel.shared
 
         func makeUIView(context _: Context) -> some UIView {
             customizeLabel()

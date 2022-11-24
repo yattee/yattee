@@ -13,11 +13,11 @@ final class MPVBackend: PlayerBackend {
 
     private var logger = Logger(label: "mpv-backend")
 
-    var model: PlayerModel! { .shared }
-    var controls: PlayerControlsModel! { .shared }
-    var playerTime: PlayerTimeModel! { .shared }
-    var networkState: NetworkStateModel! { .shared }
-    var seek: SeekModel! { .shared }
+    var model: PlayerModel { .shared }
+    var controls: PlayerControlsModel { .shared }
+    var playerTime: PlayerTimeModel { .shared }
+    var networkState: NetworkStateModel { .shared }
+    var seek: SeekModel { .shared }
 
     var stream: Stream?
     var video: Video?
@@ -37,9 +37,9 @@ final class MPVBackend: PlayerBackend {
                 return
             }
 
-            self.controls?.isLoadingVideo = self.isLoadingVideo
+            self.controls.isLoadingVideo = self.isLoadingVideo
             self.setNeedsNetworkStateUpdates(true)
-            self.model?.objectWillChange.send()
+            self.model.objectWillChange.send()
         }
     }}
 
@@ -333,7 +333,7 @@ final class MPVBackend: PlayerBackend {
         isPlaying = true
         startClientUpdates()
 
-        if controls?.presentingControls ?? false {
+        if controls.presentingControls {
             startControlsUpdates()
         }
 
@@ -428,9 +428,9 @@ final class MPVBackend: PlayerBackend {
     }
 
     private func updateControlsIsPlaying() {
-        guard model?.activeBackend == .mpv else { return }
+        guard model.activeBackend == .mpv else { return }
         DispatchQueue.main.async { [weak self] in
-            self?.controls?.isPlaying = self?.isPlaying ?? false
+            self?.controls.isPlaying = self?.isPlaying ?? false
         }
     }
 
@@ -533,14 +533,11 @@ final class MPVBackend: PlayerBackend {
     }
 
     func updateNetworkState() {
-        guard let client, let networkState else {
-            return
-        }
-
-        DispatchQueue.main.async {
-            networkState.pausedForCache = client.pausedForCache
-            networkState.cacheDuration = client.cacheDuration
-            networkState.bufferingState = client.bufferingState
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.networkState.pausedForCache = self.client.pausedForCache
+            self.networkState.cacheDuration = self.client.cacheDuration
+            self.networkState.bufferingState = self.client.bufferingState
         }
 
         if !networkState.needsUpdates {

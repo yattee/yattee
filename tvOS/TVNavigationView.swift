@@ -2,11 +2,10 @@ import Defaults
 import SwiftUI
 
 struct TVNavigationView: View {
-    @EnvironmentObject<AccountsModel> private var accounts
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<PlayerModel> private var player
-    @EnvironmentObject<RecentsModel> private var recents
-    @EnvironmentObject<SettingsModel> private var settings
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var player = PlayerModel.shared
+    @ObservedObject private var recents = RecentsModel.shared
 
     @Default(.visibleSections) private var visibleSections
 

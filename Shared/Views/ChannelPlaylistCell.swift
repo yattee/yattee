@@ -6,13 +6,12 @@ struct ChannelPlaylistCell: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
 
-    @EnvironmentObject<NavigationModel> private var navigation
-    @EnvironmentObject<RecentsModel> private var recents
+    var navigation = NavigationModel.shared
 
     var body: some View {
         Button {
             let recent = RecentItem(from: playlist)
-            recents.add(recent)
+            RecentsModel.shared.add(recent)
             navigation.presentingPlaylist = true
 
             if navigationStyle == .sidebar {
