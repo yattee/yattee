@@ -39,7 +39,7 @@ struct AccountForm: View {
     }
 
     var header: some View {
-        HStack(alignment: .center) {
+        HStack {
             Text("Add Account")
                 .font(.title2.bold())
 

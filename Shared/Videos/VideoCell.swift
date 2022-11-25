@@ -205,7 +205,7 @@ struct VideoCell: View {
                     if let time = video.length.formattedAsPlaybackTime() || video.live || video.upcoming {
                         Spacer()
 
-                        VStack(alignment: .center) {
+                        VStack {
                             Spacer()
 
                             if let time = video.length.formattedAsPlaybackTime() {
@@ -377,7 +377,7 @@ struct VideoCell: View {
 
                 Spacer()
 
-                HStack(alignment: .center) {
+                HStack {
                     if saveHistory,
                        watchedVideoStyle.isShowingBadge,
                        watch?.finished ?? false

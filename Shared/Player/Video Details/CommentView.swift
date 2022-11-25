@@ -19,7 +19,7 @@ struct CommentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .center, spacing: 10) {
+            HStack(spacing: 10) {
                 HStack(spacing: 10) {
                     ZStack(alignment: .bottomTrailing) {
                         authorAvatar

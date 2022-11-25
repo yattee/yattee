@@ -127,7 +127,7 @@ struct TimelineView: View {
                     .modifier(ControlBackgroundModifier())
                     .clipShape(RoundedRectangle(cornerRadius: 4))
 
-                ZStack(alignment: .center) {
+                ZStack {
                     ZStack(alignment: .leading) {
                         ZStack(alignment: .leading) {
                             Rectangle()

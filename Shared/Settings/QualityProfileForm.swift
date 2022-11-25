@@ -53,7 +53,7 @@ struct QualityProfileForm: View {
     }
 
     var header: some View {
-        HStack(alignment: .center) {
+        HStack {
             Text(editing ? "Edit Quality Profile" : "Add Quality Profile")
                 .font(.title2.bold())
 

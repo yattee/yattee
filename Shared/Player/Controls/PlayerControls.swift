@@ -57,7 +57,7 @@ struct PlayerControls: View {
             #endif
 
             VStack {
-                ZStack(alignment: .center) {
+                ZStack {
                     VStack(spacing: 0) {
                         ZStack {
                             OpeningStream()

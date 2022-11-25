@@ -43,7 +43,7 @@ struct AppSidebarNavigation: View {
 
             VStack {
                 BrowserPlayerControls {
-                    HStack(alignment: .center) {
+                    HStack {
                         Spacer()
                         Image(systemName: "4k.tv")
                             .renderingMode(.original)

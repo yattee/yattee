@@ -53,7 +53,7 @@ struct VideoDetails: View {
                     .frame(maxWidth: detailsSize.width)
                     .transition(.fade)
 
-                HStack(alignment: .center) {
+                HStack {
                     if detailsToolbarPosition.needsLeftSpacer { Spacer() }
 
                     VideoDetailsToolbar(video: video, page: $page, sidebarQueue: sidebarQueue)

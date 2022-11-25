@@ -58,7 +58,7 @@ struct TrendingView: View {
             .padding(.horizontal)
         }) {
             Section {
-                VStack(alignment: .center, spacing: 0) {
+                VStack(spacing: 0) {
                     #if os(tvOS)
                         toolbar
                         HorizontalCells(items: trending)

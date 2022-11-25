@@ -27,7 +27,7 @@ struct PlaylistFormView: View {
         Group {
             #if os(macOS) || os(iOS)
                 VStack(alignment: .leading) {
-                    HStack(alignment: .center) {
+                    HStack {
                         Text(editing ? "Edit Playlist" : "Create Playlist")
                             .font(.title2.bold())
 
@@ -99,7 +99,7 @@ struct PlaylistFormView: View {
 
     #if os(tvOS)
         var header: some View {
-            HStack(alignment: .center) {
+            HStack {
                 Text(editing ? "Edit Playlist" : "Create Playlist")
                     .font(.title2.bold())
 

@@ -67,7 +67,7 @@ struct AddToPlaylistView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .center) {
+        HStack {
             Text("Add to Playlist")
                 .font(.title2.bold())
 

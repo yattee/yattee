@@ -41,7 +41,7 @@ struct InstanceForm: View {
     }
 
     private var header: some View {
-        HStack(alignment: .center) {
+        HStack {
             Text("Add Location")
                 .font(.title2.bold())
 
@@ -84,7 +84,7 @@ struct InstanceForm: View {
     }
 
     private var footer: some View {
-        HStack(alignment: .center) {
+        HStack {
             AccountValidationStatus(
                 app: $app,
                 isValid: $isValid,

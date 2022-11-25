@@ -103,7 +103,7 @@ struct NowPlayingView: View {
                     } else if comments.loaded && comments.all.isEmpty {
                         NoCommentsView(text: "No comments".localized(), systemImage: "0.circle.fill")
                     } else if !comments.loaded {
-                        VStack(alignment: .center) {
+                        VStack {
                             PlaceholderProgressView()
                                 .onAppear {
                                     comments.loadIfNeeded()

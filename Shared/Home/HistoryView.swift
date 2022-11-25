@@ -13,7 +13,7 @@ struct HistoryView: View {
     var body: some View {
         LazyVStack {
             if visibleWatches.isEmpty {
-                VStack(alignment: .center, spacing: 20) {
+                VStack(spacing: 20) {
                     HStack {
                         Image(systemName: "clock")
                         Text("Playback history is empty")
