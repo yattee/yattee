@@ -23,6 +23,11 @@ struct URLBookmarkModel {
             return
         }
 
+        guard url.isFileURL else {
+            logger.error("trying to save bookmark for something that is not a file")
+            return
+        }
+
         if let bookmarkData = try? url.bookmarkData(options: bookmarkCreationOptions, includingResourceValuesForKeys: nil, relativeTo: nil) {
             defaults.set(bookmarkData, forKey: bookmarkKey(url))
             logger.info("saved bookmark for \(bookmarkKey(url))")
