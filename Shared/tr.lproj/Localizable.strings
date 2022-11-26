@@ -68,3 +68,5 @@
 "Close PiP and open player when application enters foreground" = "Uygulama ön plana geldiğinde Resim içinde Resim modunu kapatın ve oynatıcıyı açın";
 "Close PiP when player is opened" = "Oynatıcı açıldığında Resim içinde Resim modunu kapat";
 "Clear the queue" = "Kuyruğu temizle";
+"Charging" = "Şarj oluyor";
+"Accounts are not supported for the application of this instance" = "Bu oluşumun hesapları uygulamada desteklenmemektedir";
