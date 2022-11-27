@@ -5,6 +5,7 @@ extension Video {
     static var fixtureChannelID: Channel.ID = "channel-fixture"
 
     static var fixture: Video {
+        let bannerURL = "https://yt3.ggpht.com/SQiRareBDrV2Z6A30HSD0iUABOGysanmKLtaJq7lJ_ME-MtoLb3O61QdlJfH2KhSOA0eKPr_=w2560-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
         let thumbnailURL = "https://yt3.ggpht.com/ytc/AKedOLR-pT_JEsz_hcaA4Gjx8DHcqJ8mS42aTRqcVy6P7w=s88-c-k-c0x00ffffff-no-rj-mo"
         let chapterImageURL = URL(string: "https://pipedproxy.kavin.rocks/vi/rr2XfL_df3o/hqdefault_29633.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&rs=AOn4CLDFDm9D5SvsIA7D3v5n5KZahLs_UA&host=i.ytimg.com")!
 
@@ -20,8 +21,10 @@ extension Video {
             channel: Channel(
                 id: fixtureChannelID,
                 name: "The Channel",
+                bannerURL: URL(string: bannerURL)!,
                 thumbnailURL: URL(string: thumbnailURL)!,
                 subscriptionsCount: 2300,
+                totalViews: 3_260_378_817,
                 videos: []
             ),
             thumbnails: [],

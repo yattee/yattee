@@ -6,7 +6,7 @@ protocol VideosAPI {
     var account: Account! { get }
     var signedIn: Bool { get }
 
-    func channel(_ id: String) -> Resource
+    func channel(_ id: String, contentType: Channel.ContentType, data: String?) -> Resource
     func channelByName(_ name: String) -> Resource?
     func channelByUsername(_ username: String) -> Resource?
     func channelVideos(_ id: String) -> Resource
@@ -70,6 +70,10 @@ protocol VideosAPI {
 }
 
 extension VideosAPI {
+    func channel(_ id: String, contentType: Channel.ContentType, data: String? = nil) -> Resource {
+        channel(id, contentType: contentType, data: data)
+    }
+
     func loadDetails(
         _ item: PlayerQueueItem,
         failureHandler: ((RequestError) -> Void)? = nil,

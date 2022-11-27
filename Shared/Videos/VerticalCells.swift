@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct VerticalCells: View {
+struct VerticalCells<Header: View>: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
@@ -12,12 +12,25 @@ struct VerticalCells: View {
     var items = [ContentItem]()
     var allowEmpty = false
 
+    let header: Header?
+    init(items: [ContentItem], allowEmpty: Bool = false, @ViewBuilder header: @escaping () -> Header? = { nil }) {
+        self.items = items
+        self.allowEmpty = allowEmpty
+        self.header = header()
+    }
+
+    init(items: [ContentItem], allowEmpty: Bool = false) where Header == EmptyView {
+        self.init(items: items, allowEmpty: allowEmpty) { EmptyView() }
+    }
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
             LazyVGrid(columns: columns, alignment: .center) {
-                ForEach(contentItems) { item in
-                    ContentItemView(item: item)
-                        .onAppear { loadMoreContentItemsIfNeeded(current: item) }
+                Section(header: header) {
+                    ForEach(contentItems) { item in
+                        ContentItemView(item: item)
+                            .onAppear { loadMoreContentItemsIfNeeded(current: item) }
+                    }
                 }
             }
             .padding()

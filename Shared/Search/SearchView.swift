@@ -31,10 +31,6 @@ struct SearchView: View {
 
     private var videos = [Video]()
 
-    var items: [ContentItem] {
-        state.store.collection.sorted { $0 < $1 }
-    }
-
     init(_ query: SearchQuery? = nil, videos: [Video] = []) {
         self.query = query
         self.videos = videos
@@ -233,12 +229,12 @@ struct SearchView: View {
                                 .font(.system(size: 25))
                         }
 
-                        HorizontalCells(items: items)
+                        HorizontalCells(items: state.store.collection)
                             .environment(\.loadMoreContentHandler) { state.loadNextPage() }
                     }
                     .edgesIgnoringSafeArea(.horizontal)
                 #else
-                    VerticalCells(items: items, allowEmpty: state.query.isEmpty)
+                    VerticalCells(items: state.store.collection, allowEmpty: state.query.isEmpty)
                         .environment(\.loadMoreContentHandler) { state.loadNextPage() }
                 #endif
 
@@ -278,7 +274,7 @@ struct SearchView: View {
     }
 
     private var noResults: Bool {
-        items.isEmpty && !state.isLoading && !state.query.isEmpty
+        state.store.collection.isEmpty && !state.isLoading && !state.query.isEmpty
     }
 
     private var recentQueries: some View {

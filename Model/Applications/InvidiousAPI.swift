@@ -154,6 +154,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.map(self.extractVideo)
         }
 
+        configureTransformer(pathPattern("channels/*/playlists"), requestMethods: [.get]) { (content: Entity<JSON>) -> [ContentItem] in
+            let playlists = (content.json.dictionaryValue["playlists"]?.arrayValue ?? []).compactMap { self.extractChannelPlaylist(from: $0) }
+            return ContentItem.array(of: playlists)
+        }
+
         configureTransformer(pathPattern("playlists/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPlaylist in
             self.extractChannelPlaylist(from: content.json)
         }
@@ -287,8 +292,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             .onCompletion { _ in onCompletion() }
     }
 
-    func channel(_ id: String) -> Resource {
-        resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
+    func channel(_ id: String, contentType: Channel.ContentType, data _: String?) -> Resource {
+        if contentType == .playlists {
+            return resource(baseURL: account.url, path: basePathAppending("channels/\(id)/playlists"))
+        }
+        return resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
     }
 
     func channelByName(_: String) -> Resource? {
@@ -518,9 +526,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         return Channel(
             id: json["authorId"].stringValue,
             name: json["author"].stringValue,
+            bannerURL: json["authorBanners"].arrayValue.first?.dictionaryValue["url"]?.url,
             thumbnailURL: URL(string: thumbnailURL),
+            description: json["description"].stringValue,
             subscriptionsCount: json["subCount"].int,
             subscriptionsText: json["subCountText"].string,
+            totalViews: json["totalViews"].int,
             videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(extractVideo) ?? []
         )
     }
@@ -532,7 +543,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             title: details["title"]?.stringValue ?? "",
             thumbnailURL: details["playlistThumbnail"]?.url,
             channel: extractChannel(from: json),
-            videos: details["videos"]?.arrayValue.compactMap(extractVideo) ?? []
+            videos: details["videos"]?.arrayValue.compactMap(extractVideo) ?? [],
+            videosCount: details["videoCount"]?.int
         )
     }
 

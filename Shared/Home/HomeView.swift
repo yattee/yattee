@@ -79,9 +79,6 @@ struct HomeView: View {
                             FavoriteItemView(item: item, dragging: $dragging)
                         }
                     #else
-                        #if os(iOS)
-                            let first = favorites.first
-                        #endif
                         ForEach(favorites) { item in
                             FavoriteItemView(item: item, dragging: $dragging)
                             #if os(macOS)

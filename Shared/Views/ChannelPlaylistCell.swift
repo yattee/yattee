@@ -10,14 +10,7 @@ struct ChannelPlaylistCell: View {
 
     var body: some View {
         Button {
-            let recent = RecentItem(from: playlist)
-            RecentsModel.shared.add(recent)
-            navigation.presentingPlaylist = true
-
-            if navigationStyle == .sidebar {
-                navigation.sidebarSectionChanged.toggle()
-                navigation.tabSelection = .recentlyOpened(recent.tag)
-            }
+            NavigationModel.shared.openChannelPlaylist(playlist, navigationStyle: navigationStyle)
         } label: {
             content
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)

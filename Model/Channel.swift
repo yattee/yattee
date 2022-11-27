@@ -4,29 +4,56 @@ import Foundation
 import SwiftyJSON
 
 struct Channel: Identifiable, Hashable {
+    enum ContentType: String, Identifiable {
+        case videos
+        case playlists
+        case livestreams
+        case shorts
+        case channels
+
+        var id: String {
+            rawValue
+        }
+
+        var contentItemType: ContentItem.ContentType {
+            switch self {
+            case .videos:
+                return .video
+            case .playlists:
+                return .playlist
+            case .livestreams:
+                return .video
+            case .shorts:
+                return .video
+            case .channels:
+                return .channel
+            }
+        }
+    }
+
+    struct Tab: Identifiable, Hashable {
+        var contentType: ContentType
+        var data: String
+
+        var id: String {
+            contentType.id
+        }
+    }
+
     var id: String
     var name: String
+    var bannerURL: URL?
     var thumbnailURL: URL?
+    var description = ""
+
+    var subscriptionsCount: Int?
+    var subscriptionsText: String?
+
+    var totalViews: Int?
+    var verified: Bool? // swiftlint:disable discouraged_optional_boolean
+
     var videos = [Video]()
-
-    private var subscriptionsCount: Int?
-    private var subscriptionsText: String?
-
-    init(
-        id: String,
-        name: String,
-        thumbnailURL: URL? = nil,
-        subscriptionsCount: Int? = nil,
-        subscriptionsText: String? = nil,
-        videos: [Video] = []
-    ) {
-        self.id = id
-        self.name = name
-        self.thumbnailURL = thumbnailURL
-        self.subscriptionsCount = subscriptionsCount
-        self.subscriptionsText = subscriptionsText
-        self.videos = videos
-    }
+    var tabs = [Tab]()
 
     var detailsLoaded: Bool {
         !subscriptionsString.isNil
@@ -40,7 +67,17 @@ struct Channel: Identifiable, Hashable {
         return subscriptionsText
     }
 
+    var totalViewsString: String? {
+        guard let totalViews, totalViews > 0 else { return nil }
+
+        return totalViews.formattedAsAbbreviation()
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+
+    var contentItem: ContentItem {
+        ContentItem(channel: self)
     }
 }

@@ -40,6 +40,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             self.extractChannel(from: content.json)
         }
 
+        configureTransformer(pathPattern("channels/tabs*")) { (content: Entity<JSON>) -> [ContentItem] in
+            (content.json.dictionaryValue["content"]?.arrayValue ?? []).compactMap { self.extractContentItem(from: $0) }
+        }
+
         configureTransformer(pathPattern("c/*")) { (content: Entity<JSON>) -> Channel? in
             self.extractChannel(from: content.json)
         }
@@ -147,8 +151,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "login")
     }
 
-    func channel(_ id: String) -> Resource {
-        resource(baseURL: account.url, path: "channel/\(id)")
+    func channel(_ id: String, contentType: Channel.ContentType, data: String?) -> Resource {
+        if contentType == .videos {
+            return resource(baseURL: account.url, path: "channel/\(id)")
+        }
+
+        return resource(baseURL: account.url, path: "channels/tabs")
+            .withParam("data", data)
     }
 
     func channelByName(_ name: String) -> Resource? {
@@ -160,7 +169,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     func channelVideos(_ id: String) -> Resource {
-        channel(id)
+        channel(id, contentType: .videos)
     }
 
     func channelPlaylist(_ id: String) -> Resource? {
@@ -385,12 +394,25 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             attributes["avatar"]?.url ??
             attributes["thumbnail"]?.url
 
+        let tabs = attributes["tabs"]?.arrayValue.compactMap { tab in
+            let name = tab["name"].string
+            let data = tab["data"].string
+            if let name, let data, let type = Channel.ContentType(rawValue: name) {
+                return Channel.Tab(contentType: type, data: data)
+            }
+
+            return nil
+        } ?? [Channel.Tab]()
+
         return Channel(
             id: id,
             name: name,
+            bannerURL: attributes["bannerUrl"]?.url,
             thumbnailURL: thumbnailURL,
             subscriptionsCount: subscriptionsCount,
-            videos: videos
+            verified: attributes["verified"]?.bool,
+            videos: videos,
+            tabs: tabs
         )
     }
 

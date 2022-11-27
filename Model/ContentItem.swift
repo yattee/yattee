@@ -30,6 +30,14 @@ struct ContentItem: Identifiable {
         videos.map { ContentItem(video: $0) }
     }
 
+    static func array(of playlists: [ChannelPlaylist]) -> [ContentItem] {
+        playlists.map { ContentItem(playlist: $0) }
+    }
+
+    static func array(of channels: [Channel]) -> [ContentItem] {
+        channels.map { ContentItem(channel: $0) }
+    }
+
     static func < (lhs: ContentItem, rhs: ContentItem) -> Bool {
         lhs.contentType < rhs.contentType
     }

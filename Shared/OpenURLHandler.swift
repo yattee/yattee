@@ -207,7 +207,7 @@ struct OpenURLHandler {
 
     private func resourceForChannelUrl(_ parser: URLParser) -> Resource? {
         if let id = parser.channelID {
-            return accounts.api.channel(id)
+            return accounts.api.channel(id, contentType: .videos)
         }
 
         if let resource = resourceForUsernameUrl(parser) {

@@ -138,6 +138,7 @@ final class NavigationModel: ObservableObject {
         #endif
 
         hideKeyboard()
+        presentingChannel = false
         let presentingPlayer = player.presentingPlayer
         player.hide()
 

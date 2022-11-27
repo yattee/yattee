@@ -1,3 +1,4 @@
+import SDWebImageSwiftUI
 import Siesta
 import SwiftUI
 
@@ -7,6 +8,9 @@ struct ChannelVideosView: View {
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
     @State private var subscriptionToggleButtonDisabled = false
+
+    @State private var contentType = Channel.ContentType.videos
+    @StateObject private var contentTypeItems = Store<[ContentItem]>()
 
     @StateObject private var store = Store<Channel>()
 
@@ -24,11 +28,15 @@ struct ChannelVideosView: View {
     @Namespace private var focusNamespace
 
     var presentedChannel: Channel? {
-        channel ?? recents.presentedChannel
+        store.item ?? channel ?? recents.presentedChannel
     }
 
-    var videos: [ContentItem] {
-        ContentItem.array(of: store.item?.videos ?? [])
+    var contentItems: [ContentItem] {
+        guard contentType != .videos else {
+            return ContentItem.array(of: presentedChannel?.videos ?? [])
+        }
+
+        return contentTypeItems.collection
     }
 
     var body: some View {
@@ -48,30 +56,36 @@ struct ChannelVideosView: View {
     var content: some View {
         let content = VStack {
             #if os(tvOS)
-                HStack {
-                    Text(navigationTitle)
-                        .font(.title2)
-                        .frame(alignment: .leading)
+                VStack {
+                    HStack(spacing: 24) {
+                        thumbnail
 
-                    Spacer()
+                        Text(navigationTitle)
+                            .font(.title2)
+                            .frame(alignment: .leading)
 
-                    if let channel = presentedChannel {
-                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
-                            .labelStyle(.iconOnly)
+                        Spacer()
+
+                        subscriptionsLabel
+                        viewsLabel
+
+                        subscriptionToggleButton
+
+                        if let channel = presentedChannel {
+                            FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                                .labelStyle(.iconOnly)
+                        }
                     }
-
-                    if let subscribers = store.item?.subscriptionsString {
-                        Text("**\(subscribers)** subscribers")
-                            .foregroundColor(.secondary)
-                    }
-
-                    subscriptionToggleButton
+                    contentTypePicker
+                        .pickerStyle(.automatic)
                 }
                 .frame(maxWidth: .infinity)
             #endif
 
-            VerticalCells(items: videos)
-                .environment(\.inChannelView, true)
+            VerticalCells(items: contentItems) {
+                banner
+            }
+            .environment(\.inChannelView, true)
             #if os(tvOS)
                 .prefersDefaultFocus(in: focusNamespace)
             #endif
@@ -79,6 +93,11 @@ struct ChannelVideosView: View {
 
         #if !os(tvOS)
         .toolbar {
+            #if os(iOS)
+                ToolbarItem(placement: .principal) {
+                    channelMenu
+                }
+            #endif
             ToolbarItem(placement: .cancellationAction) {
                 if navigationStyle == .tab {
                     Button {
@@ -88,38 +107,41 @@ struct ChannelVideosView: View {
                     } label: {
                         Label("Close", systemImage: "xmark")
                     }
+                    .buttonStyle(.plain)
                 }
             }
+            #if !os(iOS)
+                ToolbarItem(placement: .navigation) {
+                    thumbnail
+                }
+                ToolbarItem {
+                    contentTypePicker
+                }
 
-            ToolbarItem {
-                HStack {
+                ToolbarItem {
                     HStack(spacing: 3) {
-                        Text("\(store.item?.subscriptionsString ?? "")")
-                            .fontWeight(.bold)
-
-                        let subscribers = Text(" subscribers")
-                            .allowsTightening(true)
-                            .foregroundColor(.secondary)
-                            .opacity(store.item?.subscriptionsString != nil ? 1 : 0)
-
-                        #if os(iOS)
-                            if navigationStyle == .sidebar {
-                                subscribers
-                            }
-                        #else
-                            subscribers
-                        #endif
-                    }
-
-                    ShareButton(contentItem: contentItem)
-
-                    subscriptionToggleButton
-
-                    if let channel = presentedChannel {
-                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                        subscriptionsLabel
+                        viewsLabel
                     }
                 }
-            }
+
+                ToolbarItem {
+                    if let contentItem = presentedChannel?.contentItem {
+                        ShareButton(contentItem: contentItem)
+                    }
+                }
+
+                ToolbarItem {
+                    subscriptionToggleButton
+                        .layoutPriority(2)
+                }
+
+                ToolbarItem {
+                    if let presentedChannel {
+                        FavoriteButton(item: FavoriteItem(section: .channel(presentedChannel.id, presentedChannel.name)))
+                    }
+                }
+            #endif
         }
         #endif
         .onAppear {
@@ -131,6 +153,12 @@ struct ChannelVideosView: View {
                 resource?.loadIfNeeded()
             }
         }
+        .onChange(of: contentType) { _ in
+            resource?.load()
+        }
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         #if !os(tvOS)
         .navigationTitle(navigationTitle)
         #endif
@@ -150,13 +178,143 @@ struct ChannelVideosView: View {
         }
     }
 
-    private var resource: Resource? {
-        guard let channel = presentedChannel else {
-            return nil
-        }
+    var thumbnail: some View {
+        Group {
+            if let thumbnail = store.item?.thumbnailURL {
+                WebImage(url: thumbnail)
+                    .resizable()
+            } else {
+                ZStack {
+                    Color(white: 0.6)
+                        .opacity(0.5)
 
-        let resource = accounts.api.channel(channel.id)
-        resource.addObserver(store)
+                    Image(systemName: "play.rectangle")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                        .contentShape(Rectangle())
+                }
+            }
+        }
+        #if os(tvOS)
+        .frame(width: 80, height: 80, alignment: .trailing)
+        #else
+        .frame(width: 30, height: 30, alignment: .trailing)
+        #endif
+        .clipShape(Circle())
+    }
+
+    @ViewBuilder var banner: some View {
+        if let banner = presentedChannel?.bannerURL {
+            WebImage(url: banner)
+                .resizable()
+                .placeholder { Color.clear.frame(height: 0) }
+                .scaledToFit()
+                .clipShape(RoundedRectangle(cornerRadius: 3))
+        }
+    }
+
+    var subscriptionsLabel: some View {
+        HStack(spacing: 0) {
+            if let subscribers = presentedChannel?.subscriptionsString {
+                Text(subscribers)
+            } else {
+                Text("1234")
+                    .redacted(reason: .placeholder)
+            }
+
+            Image(systemName: "person.2.fill")
+                .imageScale(.small)
+        }
+        .foregroundColor(.secondary)
+    }
+
+    var viewsLabel: some View {
+        HStack(spacing: 0) {
+            if let views = presentedChannel?.totalViewsString {
+                Text(views)
+
+                Image(systemName: "eye.fill")
+                    .imageScale(.small)
+            }
+        }
+        .foregroundColor(.secondary)
+    }
+
+    #if !os(tvOS)
+        var channelMenu: some View {
+            Menu {
+                if let channel = presentedChannel {
+                    contentTypePicker
+                    Section {
+                        subscriptionToggleButton
+                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                    }
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    thumbnail
+
+                    VStack(alignment: .leading) {
+                        Text(presentedChannel?.name ?? "Channel")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .layoutPriority(1)
+                            .frame(minWidth: 120, alignment: .leading)
+
+                        Group {
+                            HStack(spacing: 12) {
+                                subscriptionsLabel
+
+                                if presentedChannel?.verified ?? false {
+                                    Text("Verified")
+                                }
+
+                                viewsLabel
+                            }
+                            .frame(minWidth: 120, alignment: .leading)
+                        }
+                        .font(.caption2.bold())
+                        .foregroundColor(.secondary)
+                    }
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .frame(maxWidth: 300)
+            }
+        }
+    #endif
+
+    private var contentTypePicker: some View {
+        Picker("Content type", selection: $contentType) {
+            if let channel = presentedChannel {
+                Text("Videos").tag(Channel.ContentType.videos)
+                Text("Playlists").tag(Channel.ContentType.playlists)
+
+                if channel.tabs.contains(where: { $0.contentType == .livestreams }) {
+                    Text("Live streams").tag(Channel.ContentType.livestreams)
+                }
+                if channel.tabs.contains(where: { $0.contentType == .shorts }) {
+                    Text("Shorts").tag(Channel.ContentType.shorts)
+                }
+                if channel.tabs.contains(where: { $0.contentType == .channels }) {
+                    Text("Channels").tag(Channel.ContentType.channels)
+                }
+            }
+        }
+    }
+
+    private var resource: Resource? {
+        guard let channel = presentedChannel else { return nil }
+
+        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        let resource = accounts.api.channel(channel.id, contentType: contentType, data: data)
+        if contentType == .videos {
+            resource.addObserver(store)
+        } else {
+            resource.addObserver(contentTypeItems)
+        }
 
         return resource
     }
@@ -203,18 +361,21 @@ struct ChannelVideosView: View {
         }
     }
 
-    private var contentItem: ContentItem {
-        ContentItem(channel: presentedChannel)
-    }
-
     private var navigationTitle: String {
-        presentedChannel?.name ?? store.item?.name ?? "No channel"
+        presentedChannel?.name ?? "No channel"
     }
 }
 
 struct ChannelVideosView_Previews: PreviewProvider {
     static var previews: some View {
         ChannelVideosView(channel: Video.fixture.channel)
+            .environment(\.navigationStyle, .tab)
             .injectFixtureEnvironmentObjects()
+
+        NavigationView {
+            Spacer()
+            ChannelVideosView(channel: Video.fixture.channel)
+                .environment(\.navigationStyle, .sidebar)
+        }
     }
 }
