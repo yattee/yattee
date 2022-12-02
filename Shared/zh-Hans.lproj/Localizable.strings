@@ -233,3 +233,268 @@
 "Music" = "音乐";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "视频宣传产品或服务的一部分，与创作者没有直接关系。创作者将以金钱或免费产品的形式获得报酬或补偿。";
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "推广与创作者本身直接相关的产品或服务。这通常包括商品或盈利平台的推广。";
+"Remove from Playlist" = "从播放列表中删除";
+"Remove from the queue" = "从队列中删除";
+"Restart the app to apply the settings above." = "重启 App 以应用以上设置。";
+"Restart/Play next" = "重新播放/播放下一个";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "通常在视频结束时或接近视频结尾时，出现 Credits Pop Up 和结束卡片。";
+"Public Locations" = "公共地址";
+"Public Manifest" = "公共清单";
+"Quality" = "质量";
+"Quality Profile" = "质量配置";
+"Queue" = "队列";
+"Queue is empty" = "队列为空";
+"Rate" = "比率";
+
+/* Video sort order in search */
+"Rating" = "评级";
+"Recents" = "最近";
+"Red" = "红色";
+"Refresh" = "刷新";
+"Regular size" = "规定大小";
+"Regular Size" = "规定大小";
+"Related" = "相关";
+
+/* Video sort order in search */
+"Relevance" = "相关";
+"Remove" = "删除";
+"Remove from Favorites" = "从收藏中删除";
+"Remove from history" = "从历史列表中删除";
+"Replies" = "回复";
+"Reset" = "重置";
+"Reset search filters" = "重置搜索过滤器";
+"Reset watched status when playing again" = "重置播放状态当重新播放时";
+"Resolution" = "解决方法";
+"Restart" = "重新播放";
+"Search history is empty" = "搜索记录为空";
+"Restore default profiles..." = "重置默认配置文件...";
+"Rotate to portrait when exiting fullscreen" = "离开全屏时旋转到竖屏";
+"Round corners" = "圆角";
+"Save" = "保存";
+"Save history of played videos" = "保存视频播放历史记录";
+"Save history of searches, channels and playlists" = "保存搜索、频道、播放列表的历史记录";
+"Search" = "搜索";
+"Search..." = "搜索...";
+"Sections" = "章节";
+"Seek gesture sensitivity" = "手势灵敏度";
+"Seek gesture speed" = "手势灵敏度速度";
+"Seek with horizontal swipe on video" = "视频水平滑动搜索";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "通常在视频开头找到的片段，包括动画、静止帧或剪辑，这些片段也可以由同一创作者在其他视频中看到。";
+"Select location closest to you:" = "选择离你最近的位置：";
+
+/* SponsorBlock category name */
+"Self-promotion" = "自我推销";
+"Settings" = "设置";
+"Share %@ link" = "分享 %@ 的链接";
+"Share %@ link with time" = "分享 %@ 的链接（包含时间）";
+"Share..." = "分享...";
+
+/* Video duration filter in search */
+"Short" = "短视频";
+"Show account username" = "显示帐户名称";
+"Show anonymous accounts" = "显示匿名帐户";
+"Show channel name" = "显示频道名称";
+"Show history" = "显示历史记录";
+"Show keywords" = "显示关键词";
+"Show playback statistics" = "显示回放统计信息";
+"Show progress of watching on thumbnails" = "在缩略图上显示观看进度";
+"Show sidebar when space permits" = "在空间允许时显示侧边栏";
+"Show video length" = "显示视频长度";
+"Shuffle All" = "打乱所有顺序";
+"Shuffle" = "打乱顺序";
+"Sidebar" = "侧边栏";
+"Sign In Required" = "需要登陆";
+
+/* Player controls layout size */
+"Small" = "小";
+
+/* Player controls layout size */
+"Smaller" = "更小";
+"Sort" = "排序";
+"Sort: %@" = "排序： %@";
+"Source" = "源";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"SponsorBlock API Instance" = "SponsorBlock API 实例";
+"Subscribe" = "关注";
+
+/* Subscriptions title */
+"Subscriptions" = "关注列表";
+"Switch to other public location" = "选择其他公共地址";
+"Switch to public locations" = "切换到公共地址";
+"System controls buttons" = "系统控制按钮";
+"System controls show buttons for %@" = "系统控件显示 %@ 的按钮";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "很高兴听到您这么说。提供人们想要的应用程序是一件很有趣的事情。您可以考虑为项目捐款，或为新功能开发做出贡献。";
+"This cannot be reverted" = "此操作不可还原";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "此操作无法恢复。您可能需要在视图之间切换或重新启动 App 以查看更改。";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "此信息将仅在您的设备上处理，并用于将您连接到指定国家/地区的服务器。";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "这将删除所有自定义配置文件并还原为其默认值。此操作无法恢复。";
+"Thumbnails" = "缩略图";
+
+/* Video date filter in search */
+"Today" = "今天";
+"Trending" = "今日趋势";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"unknown" = "未知";
+"Unsubscribe" = "取消关注";
+"SponsorBlock" = "SponsorBlock (Skip over YouTube Sponsors)";
+"Upload date" = "上传日期";
+"URL" = "链接";
+"Used to create links from videos, channels and playlists" = "用于从视频、频道和播放列表创建链接";
+"Username" = "用户名";
+
+/* Player controls layout size */
+"Very Large" = "非常大";
+"Videos" = "视频";
+
+/* Video sort order in search */
+"Views" = "观看";
+"Watched" = "观看";
+
+/* Selected video was played on given date */
+"Watched %@" = "观看了 %@";
+
+/* Selected video is being played */
+"Watching now" = "现在观看";
+
+/* Video date filter in search */
+"Week" = "周";
+"Welcome" = "欢迎";
+"When partially watched video is played" = "播放未完全观看的视频时";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+
+/* Video date filter in search */
+"Year" = "年";
+"You can find information about using Yattee in the Wiki pages." = "您可以在 Wiki 相关页面中找到有关使用 Yattee 的信息。";
+"Yattee %@ (build %@)" = "Yattee %@ (内部构建版本 %@)";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "您可以使用基于当前设备状态的自动配置文件选择，或在视频播放设置控件中进行切换。";
+"You have no Playlists" = "你没有播放列表";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "你还没有播放列表啦~\n\n点击 「新建播放列表」 来创建一个";
+"You need to create an instance and accounts\nto access %@ section" = "你需要创建一个实例和账号\n才能访问 %@ 的部分";
+"You need to select an account\nto access %@ section" = "你需要选择一个账号\n来访问 %@ 的部分";
+
+
+"Public" = "公开";
+"Unlisted" = "未列出";
+"Now Playing" = "正在播放";
+"Current Location" = "当前地址";
+"Private" = "私有";
+"Playback queue is empty" = "回放列表空空如也";
+"Playing Next" = "播放下一个";
+"You can switch between profiles in playback settings controls." = "您可以在回放设置控件中切换配置文件。";
+"Add Channels, Playlists and Searches to Favorites using" = "添加将频道、播放列表和搜索到收藏夹";
+"Make default" = "设置默认值";
+"Visibility" = "可见性";
+"Current Playlist" = "当前播放列表";
+"Stream & Player" = "播放流 & 播放器";
+"Statistics" = "统计";
+"Hardware decoder" = "硬件解码";
+"Stream FPS" = "流 FPS";
+"Cached time" = "缓存时间";
+"Rate & Captions" = "速率 & 标题";
+"Dropped frames" = "丢失的帧";
+"Any format" = "任何格式";
+"%@ formats" = "%@ 格式";
+"Keep last played video in the queue after restart" = "重新启动后在队列中保留上次播放的视频";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "播放列表空空如也\n\n点击并按住视频，然后\n「添加到播放列表」";
+"It can be changed later in settings. You can use your own locations too." = "稍后可以在设置中更改。你也可以使用自己的地址。";
+"Press and hold remote button to open captions and quality menus" = "按住遥控按钮打开字幕和质量菜单";
+"Comments are disabled" = "评论区已被关闭";
+"No comments" = "没有评论";
+"No chapters information available" = "没有可用的章节信息";
+"Share Logs..." = "分享日志…";
+"Open logs in Finder" = "在 Finder 中打开日志";
+"Could not refresh Subscriptions" = "无法刷新关注列表";
+"Could not load streams" = "无法加载视频流";
+"Could not open video" = "无法打开视频";
+"Channel could not be found" = "无法找到频道";
+"Could not extract channel information" = "无法获取频道信息";
+"Could not extract SID from received cookies: %@" = "无法从收到的 Cookie 中提取 SID：%@";
+"Could not update your token." = "无法更新你的令牌（Token）。";
+"Could not refresh Trending" = "无法刷新今日趋势";
+"For custom locations you can configure Frontend URL in Locations settings" = "对于自定义位置，您可以在设置中配置前端 URL";
+"This URL could not be opened" = "无法打开此 URL";
+"Could not open channel" = "无法打开频道";
+"Could not refresh Popular" = "无法刷新「流行」";
+"Could not create share link" = "无法创建分享链接";
+"Could not open playlist" = "无法打开播放列表";
+"Could not extract video ID" = "无法获取视频 ID";
+"This video could not be opened" = "无法打开这个视频";
+"Could not extract playlist ID" = "无法获取播放列表 ID";
+"Could not load video" = "无法加载视频";
+"No locations available at the moment" = "此时没有地址可用";
+"Could not refresh Playlists" = "无法刷新播放列表";
+"If you want this app to be available in your language, join translation project." = "如果你想让此 App 在你的语言中可用，或翻译存在错误，请加入翻译项目。";
+"Translations" = "翻译";
+"No documents" = "没有文档";
+"Are you sure you want to remove this document?" = "你确定想要删除这个文档吗？";
+"\"%@\" will be irreversibly removed from this device." = "“%@” 将会从这个设备中删除。此操作不可逆。";
+"Could not delete document" = "无法删除文档";
+"Are you sure you want to remove %@ location?" = "你确定想要删除 %@ 地址？";
+"Recent Documents" = "最近的文档";
+"Recent History" = "最近的历史记录";
+"Show Open Videos quick actions" = "显示打开视频快速操作";
+"Show Favorites" = "显示收藏";
+"Home" = "主页";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "在 Windows iTunes \\n或 Mac 上共享 Finder 中的文件";
+"Show Home" = "显示主页";
+"Pages toolbar position" = "页面工具栏位置";
+"URL to Open" = "要打开的 URL";
+"Enter link to open" = "输入要打开的链接";
+"Show only icons" = "仅显示图标";
+"Video" = "视频";
+"Sample Rate" = "码率示例";
+"Edit Favorites…" = "编辑收藏…";
+"Show Open Videos toolbar button" = "显示「打开视频」工具栏按钮";
+"Buttons labels" = "按钮标签";
+"Files" = "文件";
+"Show Documents" = "显示文档";
+"Video Details" = "视频详细描述";
+"Show Inspector" = "显示检查器";
+"Inspector visibility" = "检查器可见性";
+"Reload manifest" = "重新加载清单";
+"Clear Queue before opening" = "在打开前清除队列";
+"Open" = "打开";
+"Video actions buttons" = "视频操作按钮";
+"Pages buttons" = "页面按钮";
+"Could not open Files" = "无法打开文件";
+"Paste" = "粘贴";
+"Open Videos" = "打开视频";
+"Enter links to open, one per line" = "输入需要打开的链接，每行一个";
+"Playback Mode" = "回放模式";
+"Add" = "添加";
+"Hide" = "隐藏";
+"Always" = "总是";
+"Only for local files and URLs" = "仅针对本地文件以及链接";
+"Right" = "右";
+"Channels" = "频道";
+"Open Files" = "打开文件";
+"Share" = "分享";
+"Show icons and text when space permits" = "在空间允许时显示图标和文本";
+"Left" = "左";
+"Format" = "格式";
+"Driver" = "驱动";
+"Center" = "居中";
+"Documents" = "文档";
+"Audio" = "音频";
+"File" = "文件";
+"Codec" = "编码器（Codec）";
+"Size" = "大小";
+"FPS" = "FPS";
+"Could not find any links to open in your clipboard" = "无法在你的剪辑版中找到任何可以打开的链接";
+"Remove…" = "删除…";
+"Playback history is empty" = "回放历史为空";
+"Address" = "地址";
+"Actions buttons" = "动作按钮";
+"Show sidebar" = "显示侧边栏";
+"Locations Manifest" = "地址清单";
+"Remove Location" = "删除地址";
+"Open Video" = "打开视频";
+"Default Profile" = "默认配置";
+"Copy%@link" = "复制 %@ 的链接";
+"Share%@link" = "分享 %@ 链接";
