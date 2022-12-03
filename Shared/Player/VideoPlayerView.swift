@@ -30,7 +30,6 @@ struct VideoPlayerView: View {
 
     @State private var playerSize: CGSize = .zero { didSet { updateSidebarQueue() } }
     @State private var hoveringPlayer = false
-    @State private var detailsPage = VideoDetails.DetailsPage.queue
     @State private var fullScreenDetails = false
     @State private var sidebarQueue = defaultSidebarQueueValue
 
@@ -67,6 +66,7 @@ struct VideoPlayerView: View {
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
     @Default(.playerSidebar) var playerSidebar
+    @Default(.videoDetailsPage) var detailsPage
 
     @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
 
