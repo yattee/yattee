@@ -453,7 +453,7 @@ struct PlayerControls: View {
         width _: Double? = nil,
         height _: Double? = nil,
         cornerRadius: Double = 3,
-        background: Bool = true,
+        background: Bool = false,
         foregroundColor: Color? = nil,
         active: Bool = false,
         action: @escaping () -> Void = {}
@@ -486,6 +486,7 @@ struct PlayerControls: View {
         .frame(width: size ?? playerControlsLayout.buttonSize, height: size ?? playerControlsLayout.buttonSize)
         .modifier(ControlBackgroundModifier(enabled: useBackground))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .environment(\.colorScheme, .dark)
     }
 }
 

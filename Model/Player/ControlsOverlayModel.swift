@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 final class ControlOverlaysModel: ObservableObject {
-    static let animation = Animation.easeInOut(duration: 0.2)
+    static let animation = Animation.easeInOut(duration: 0.1)
     static let shared = ControlOverlaysModel()
     @Published private(set) var presenting = false { didSet { handlePresentationChange() } }
 

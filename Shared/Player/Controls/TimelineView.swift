@@ -124,7 +124,7 @@ struct TimelineView: View {
                     .frame(minWidth: 35)
                     .padding(.leading, playerControlsLayout.timeLeadingEdgePadding)
                     .padding(.trailing, playerControlsLayout.timeTrailingEdgePadding)
-                    .modifier(ControlBackgroundModifier())
+                    .shadow(radius: 3)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
 
                 ZStack {
@@ -171,10 +171,10 @@ struct TimelineView: View {
                 #endif
 
                 durationView
+                    .shadow(radius: 3)
                     .padding(.leading, playerControlsLayout.timeTrailingEdgePadding)
                     .padding(.trailing, playerControlsLayout.timeLeadingEdgePadding)
                     .frame(minWidth: 30, alignment: .trailing)
-                    .modifier(ControlBackgroundModifier())
                     .clipShape(RoundedRectangle(cornerRadius: 4))
             }
             #if !os(tvOS)
@@ -213,6 +213,7 @@ struct TimelineView: View {
             #endif
             .font(.system(size: playerControlsLayout.timeFontSize).monospacedDigit())
             .zIndex(2)
+            .foregroundColor(.white)
         }
     }
 
@@ -319,7 +320,7 @@ struct TimelineView: View {
         ForEach(chapters) { chapter in
             RoundedRectangle(cornerRadius: 4)
                 .fill(Color.orange)
-                .frame(maxWidth: 2, maxHeight: 12)
+                .frame(maxWidth: 2, maxHeight: height)
                 .offset(x: (chapter.start * oneUnitWidth) - 1)
         }
     }
@@ -376,6 +377,7 @@ struct TimelineView_Previews: PreviewProvider {
         return VStack(spacing: 40) {
             TimelineView()
         }
+        .background(Color.black)
         .padding()
     }
 }
