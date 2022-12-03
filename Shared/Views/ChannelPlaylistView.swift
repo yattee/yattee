@@ -84,13 +84,14 @@ struct ChannelPlaylistView: View {
         .background(Color.background(scheme: colorScheme))
         #else
         .toolbar {
-            ToolbarItem(placement: .navigation) {
+            ToolbarItem(placement: .cancellationAction) {
                 if navigationStyle == .tab {
-                    Button("Done") {
-                        withAnimation(Constants.overlayAnimation) {
-                            NavigationModel.shared.presentingPlaylist = false
-                        }
+                    Button {
+                        NavigationModel.shared.presentingPlaylist = false
+                    } label: {
+                        Label("Close", systemImage: "xmark")
                     }
+                    .buttonStyle(.plain)
                 }
             }
 
