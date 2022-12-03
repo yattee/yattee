@@ -388,6 +388,10 @@ final class PlayerModel: ObservableObject {
             }
         }
 
+        if video.isLocal {
+            resetSegments()
+        }
+
         (withBackend ?? backend).playStream(
             stream,
             of: video,
@@ -436,7 +440,9 @@ final class PlayerModel: ObservableObject {
             changeActiveBackend(from: activeBackend, to: backend)
         }
 
-        guard let stream = (((availableStreams.count == 1 && availableStreams.first!.isLocal) ? availableStreams.first : nil) ?? streamByQualityProfile),
+        let localStream = (availableStreams.count == 1 && availableStreams.first!.isLocal) ? availableStreams.first : nil
+
+        guard let stream = localStream ?? streamByQualityProfile,
               let currentVideo
         else {
             return

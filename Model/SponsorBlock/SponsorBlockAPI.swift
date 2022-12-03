@@ -80,6 +80,11 @@ final class SponsorBlockAPI: ObservableObject {
         }
     }
 
+    func reset() {
+        videoID = nil
+        segments = []
+    }
+
     private func requestSegments(categories: Set<String>, completionHandler: @escaping () -> Void = {}) {
         guard let url = skipSegmentsURL, !categories.isEmpty else {
             return
