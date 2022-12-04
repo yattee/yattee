@@ -437,7 +437,7 @@
 "Show Open Videos quick actions" = "Afișați acțiuni rapide pentru videoclipuri deschise";
 "Show Favorites" = "Afișează favoritele";
 "Home" = "Acasă";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Partajați fișiere din Finder pe un Mac\\sau iTunes pe Windows";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Partajați fișiere din Finder pe un Mac sau iTunes pe Windows";
 "Show Home" = "Arată Acasă";
 "Pages toolbar position" = "Poziția barei de instrumente a paginilor";
 "URL to Open" = "URL-ul pentru a deschide";
@@ -498,3 +498,7 @@
 "Are you sure you want to remove %@ location?" = "Sigur doriți să eliminați locația %@?";
 "Copy%@link" = "Copiați%@link";
 "Share%@link" = "Partajați link-ul %@";
+"Live Streams" = "Fluxuri live";
+"Shorts" = "Shorts";
+"Verified" = "Verificat";
+"Channel" = "Canal";
