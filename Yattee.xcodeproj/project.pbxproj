@@ -1117,6 +1117,7 @@
 		3743CA4D270EFE3400E4D32B /* PlayerQueueRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueRow.swift; sourceTree = "<group>"; };
 		3743CA51270F284F00E4D32B /* View+Borders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Borders.swift"; sourceTree = "<group>"; };
 		3744A95F28B99ADD005DE0A7 /* PlayerControlsLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsLayout.swift; sourceTree = "<group>"; };
+		3744F85C293CC9B800B09AB9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		374710042755291C00CE0F87 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
 		3748186526A7627F0084E870 /* Video+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Video+Fixtures.swift"; sourceTree = "<group>"; };
 		3748186926A764FB0084E870 /* Thumbnail+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Thumbnail+Fixtures.swift"; sourceTree = "<group>"; };
@@ -2600,6 +2601,7 @@
 				uk,
 				ro,
 				cs,
+				"zh-Hans",
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -3635,6 +3637,7 @@
 				376787BA291C43CD00D356A4 /* uk */,
 				374924DE29211F5F0017D862 /* ro */,
 				370D5E4F292423F400D053A6 /* cs */,
+				3744F85C293CC9B800B09AB9 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
