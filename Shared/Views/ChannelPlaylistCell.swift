@@ -23,7 +23,7 @@ struct ChannelPlaylistCell: View {
         VStack {
             HStack(alignment: .top, spacing: 3) {
                 Image(systemName: "list.and.film")
-                Text("Playlist".uppercased())
+                Text("Playlist".localized().uppercased())
                     .fontWeight(.light)
                     .opacity(0.6)
             }

@@ -25,7 +25,7 @@ struct ChannelCell: View {
         VStack {
             HStack(alignment: .top, spacing: 3) {
                 Image(systemName: "person.crop.rectangle")
-                Text("Channel".uppercased())
+                Text("Channel".localized().uppercased())
                     .fontWeight(.light)
                     .opacity(0.6)
             }
