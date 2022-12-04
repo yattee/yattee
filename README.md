@@ -9,11 +9,7 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/yattee)](https://github.com/yattee/yattee/pulls)
 [![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#Yattee:matrix.org)
 
-[![Dark theme preview](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
-
-<h3><strong>🎉 Now available on the App Store 🎉</strong></h3>
-  <a href="https://apps.apple.com/us/app/yattee/id1595136629?itsct=apps_box_badge&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 250px; height: 83px;"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1666742400&h=eda3695f90de92150bc4ec7505362a1a" alt="Download on the App Store" style="border-radius: 13px; width: 150px; height: 83px;"></a>
-<hr />
+[![Discord](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
 
 ![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
 </div>
