@@ -5,61 +5,58 @@ body:
   - type: markdown
     attributes:
       value: |
-        **README: Before You Submit Your Issue**
-        - Issues are not a place to ask support questions or discussions. Please ask any questions or discussions on the [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) or [discussions page](https://github.com/yattee/yattee/discussions).
-        - Also check the [Wiki](https://github.com/yattee/yattee/wiki) for any information or FAQs that help you with yattee.
-        
+        **Before You Submit Your Issue**
+        - This is not a right place to ask questions. Use [Discussions](https://github.com/yattee/yattee/discussions) or contact directly via [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#Yattee:matrix.org)
+
   - type: checkboxes
     attributes:
       label: Guidelines
-      description: Please ensure you've completed all of the following.
+      description: Please ensure you've completed the following
       options:
-        - label: I have searched the [issue tracker](https://github.com/yattee/yattee/issues) for a bug report but haven't found the one that I'm opening for.
+        - label: I have searched the [issue tracker](https://github.com/yattee/yattee/issues) and I haven't found bug report like this
           required: true
 
   - type: textarea
     attributes:
       label: Current Behavior
-      description: Tell us what happened and the steps you have done to encounter this bug if possible in clear description?
+      description: Describe what happened and the steps you have done to encounter the problem
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: Expected Behavior
-      description: Tell us what you expected to happen in clear description?
+      description: Describe what you expected to happen
     validations:
       required: true
 
   - type: input
     attributes:
       label: Device & OS Version
-      description: What Device and version are you running?
-      placeholder: e.g. iPhone (iOS 15.5)
+      description: What device and operating system version are you running? You can find it in device settings
+      placeholder: e.g. iPhone, iOS 16.1
     validations:
       required: true
 
   - type: input
     attributes:
-      label: App Version
-      description: What version are you running?
-      placeholder: e.g. 1.4
-    validations:
-      required: true
-
-  - type: dropdown
-    attributes:
-      label: App Installation Method
-      options:
-        - TestFlight
-        - ipa (GitHub Releases)
+      label: App Build
+      description: What build of the application are you running? You can find this in the bottom of the Settings page
+      placeholder: e.g. 112
     validations:
       required: true
 
   - type: textarea
     attributes:
+      label: App Settings
+      description: If the issue is related to some non-default configuration, please provide the settings you have changed
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
       label: Crash log
-      description: Submit your crash log if available
+      description: If you are reporing a crash, attach crash log here
       placeholder: |
           1. Go to 'Settings'
           2. Click on 'Privacy'
@@ -71,7 +68,7 @@ body:
 
   - type: textarea
     attributes:
-      label: Screenshots or Videos
-      description: If possible, submit your screenshots or a video of the bug that you have encountered to better understanding
+      label: Screenshots, Videos and other files
+      description: Submit screenshots, video of the issue or other files that can help to understand the problem better. If you are reporting issue with playback in MPV, attach [logs from MPV](https://github.com/yattee/yattee/wiki/Getting-MPV-logs)
     validations:
       required: false

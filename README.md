@@ -20,33 +20,15 @@
 
 ## Features
 * Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/) with customization settings
-* [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 * Player queue and history
 * Player component with custom controls, gestures and support for 4K playback
 * Fullscreen, Picture in Picture and background audio playback
-
-### Availability
-|| Invidious | Piped |
-| - | - | - |
-| User Accounts | ✅ | ✅ |
-| Subscriptions | ✅ | ✅ |
-| User Playlists | ✅ | ✅ |
-| Trending | ✅ | ✅ |
-| Channels | ✅ | ✅ |
-| Channel Playlists | ✅ | ✅ |
-| Search | ✅ | ✅ |
-| Search Suggestions | ✅ | ✅ |
-| Comments | ✅ | ✅ |
-| Subtitles | ✅ |🔴 |
-| Search Filters | ✅ | 🔴 |
-| Popular | ✅ | 🔴 |
-
-You can browse and use accounts from one app and play videos with another (for example: use Invidious account for subscriptions and use Piped as playback source). Comments can be displayed from Piped even when Invidious is used for browsing/playing.
+* [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 
 ## Documentation
 * [Installation](https://github.com/yattee/yattee/wiki/Installation-Instructions)
 * [Building](https://github.com/yattee/yattee/wiki/Building-instructions)
-* [FAQ](https://github.com/yattee/yattee/wiki)
+* [Features](https://github.com/yattee/yattee/wiki/Features)
 * [Screenshots Gallery](https://github.com/yattee/yattee/wiki/Screenshots-Gallery)
 * [Tips](https://github.com/yattee/yattee/wiki/Tips)
 * [Integrations](https://github.com/yattee/yattee/wiki/Integrations)
