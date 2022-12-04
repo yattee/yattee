@@ -291,7 +291,9 @@ final class MPVBackend: PlayerBackend {
                     }
 
                     if video.isLocal, video.localStreamIsFile {
-                        _ = url.startAccessingSecurityScopedResource()
+                        if url.startAccessingSecurityScopedResource() {
+                            URLBookmarkModel.shared.saveBookmark(url)
+                        }
                     }
 
                     self.client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in

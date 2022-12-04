@@ -95,7 +95,10 @@ struct ContentView: View {
 
             NavigationModel.shared.presentingOpenVideos = false
         }
-        .onOpenURL(perform: OpenURLHandler.shared.handle)
+        .onOpenURL { url in
+            URLBookmarkModel.shared.saveBookmark(url)
+            OpenURLHandler.shared.handle(url)
+        }
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
                 AddToPlaylistView(video: navigation.videoToAddToPlaylist)

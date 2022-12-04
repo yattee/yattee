@@ -1,52 +1,49 @@
 import Social
 import UIKit
+import UniformTypeIdentifiers
 
 final class ShareViewController: SLComposeServiceViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         openExtensionContextURLs()
-
-        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     private func openExtensionContextURLs() {
         for item in extensionContext?.inputItems as! [NSExtensionItem] {
             if let attachments = item.attachments {
-                tryToOpenItemForPlainTextTypeIdentifier(attachments)
                 tryToOpenItemForUrlTypeIdentifier(attachments)
+                tryToOpenItemForPlainTextTypeIdentifier(attachments)
             }
         }
     }
 
     private func tryToOpenItemForPlainTextTypeIdentifier(_ attachments: [NSItemProvider]) {
-        for itemProvider in attachments where itemProvider.hasItemConformingToTypeIdentifier("public.plain-text") {
-            itemProvider.loadItem(forTypeIdentifier: "public.plain-text", options: nil) { item, _ in
+        for itemProvider in attachments {
+            itemProvider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { item, _ in
                 if let url = (item as? String),
                    let absoluteURL = URL(string: url)?.absoluteURL
                 {
-                    URLBookmarkModel.shared.saveBookmark(absoluteURL)
                     if let url = URL(string: "yattee://\(absoluteURL.absoluteString)") {
                         self.open(url: url)
                     }
-                }
 
-                self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+                    self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+                }
             }
         }
     }
 
     private func tryToOpenItemForUrlTypeIdentifier(_ attachments: [NSItemProvider]) {
-        for itemProvider in attachments where itemProvider.hasItemConformingToTypeIdentifier("public.url") {
-            itemProvider.loadItem(forTypeIdentifier: "public.url", options: nil) { item, _ in
+        for itemProvider in attachments {
+            itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, _ in
                 if let url = (item as? NSURL), let absoluteURL = url.absoluteURL {
-                    URLBookmarkModel.shared.saveBookmark(absoluteURL)
                     if let url = URL(string: "yattee://\(absoluteURL.absoluteString)") {
                         self.open(url: url)
                     }
-                }
 
-                self.extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                    self.extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                }
             }
         }
     }

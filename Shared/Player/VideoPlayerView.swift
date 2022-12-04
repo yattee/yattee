@@ -109,7 +109,10 @@ struct VideoPlayerView: View {
                 }
             }
             .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
-            .onOpenURL(perform: OpenURLHandler.shared.handle)
+            .onOpenURL { url in
+                URLBookmarkModel.shared.saveBookmark(url)
+                OpenURLHandler.shared.handle(url)
+            }
             .frame(minWidth: 950, minHeight: 700)
         #else
             return GeometryReader { geometry in

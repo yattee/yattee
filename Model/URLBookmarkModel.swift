@@ -18,13 +18,39 @@ struct URLBookmarkModel {
     }
 
     func saveBookmark(_ url: URL) {
+        var urlForBookmark = url
+        if let yatteeSanitizedUrl = url.byReplacingYatteeProtocol() {
+            urlForBookmark = yatteeSanitizedUrl
+        }
+
+        guard urlForBookmark.isFileURL else {
+            logger.error("trying to save bookmark for something that is not a file")
+            logger.error("not a file: \(urlForBookmark.absoluteString)")
+            return
+        }
+
         guard let defaults = CacheModel.shared.bookmarksDefaults else {
             logger.error("could not open bookmarks defaults")
             return
         }
 
+        if let bookmarkData = try? urlForBookmark.bookmarkData(options: bookmarkCreationOptions, includingResourceValuesForKeys: nil, relativeTo: nil) {
+            defaults.set(bookmarkData, forKey: bookmarkKey(urlForBookmark))
+            logger.info("saved bookmark for \(bookmarkKey(urlForBookmark))")
+        } else {
+            logger.error("no bookmark data for \(urlForBookmark)")
+        }
+    }
+
+    func saveBookmark(_ url: NSURL) {
         guard url.isFileURL else {
             logger.error("trying to save bookmark for something that is not a file")
+            logger.error("not a file: \(url.absoluteString)")
+            return
+        }
+
+        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+            logger.error("could not open bookmarks defaults")
             return
         }
 
@@ -37,14 +63,19 @@ struct URLBookmarkModel {
     }
 
     func loadBookmark(_ url: URL) -> URL? {
-        logger.info("loading bookmark for \(bookmarkKey(url))")
+        var urlForBookmark = url
+        if let yatteeSanitizedUrl = url.byReplacingYatteeProtocol() {
+            urlForBookmark = yatteeSanitizedUrl
+        }
+
+        logger.info("loading bookmark for \(bookmarkKey(urlForBookmark))")
 
         guard let defaults = CacheModel.shared.bookmarksDefaults else {
             logger.error("could not open bookmarks defaults")
             return nil
         }
 
-        if let data = defaults.data(forKey: bookmarkKey(url)) {
+        if let data = defaults.data(forKey: bookmarkKey(urlForBookmark)) {
             do {
                 var isStale = false
                 let url = try URL(
@@ -54,9 +85,9 @@ struct URLBookmarkModel {
                     bookmarkDataIsStale: &isStale
                 )
                 if isStale {
-                    saveBookmark(url)
+                    saveBookmark(urlForBookmark)
                 }
-                logger.info("loaded bookmark for \(bookmarkKey(url))")
+                logger.info("loaded bookmark for \(bookmarkKey(urlForBookmark))")
 
                 return url
             } catch {
@@ -64,7 +95,7 @@ struct URLBookmarkModel {
                 return nil
             }
         } else {
-            logger.warning("could not find bookmark for \(bookmarkKey(url))")
+            logger.warning("could not find bookmark for \(bookmarkKey(urlForBookmark))")
             return nil
         }
     }
@@ -93,7 +124,11 @@ struct URLBookmarkModel {
     }
 
     private func bookmarkKey(_ url: URL) -> String {
-        "\(Self.bookmarkPrefix)\(url.absoluteString)"
+        "\(Self.bookmarkPrefix)\(NSString(string: url.absoluteString).standardizingPath)"
+    }
+
+    private func bookmarkKey(_ url: NSURL) -> String {
+        "\(Self.bookmarkPrefix)\(url.standardizingPath?.absoluteString ?? "unknown")"
     }
 
     private func urlFromBookmark(_ key: String) -> URL? {

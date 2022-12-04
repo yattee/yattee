@@ -11,7 +11,7 @@ struct RecentDocumentsView: View {
                 NoDocumentsView()
             } else {
                 ForEach(recentDocuments, id: \.absoluteString) { url in
-                    let video = Video.local(model.replacePrivateVar(url) ?? url)
+                    let video = Video.local(model.standardizedURL(url) ?? url)
                     PlayerQueueRow(
                         item: PlayerQueueItem(video)
                     )

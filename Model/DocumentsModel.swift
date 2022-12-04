@@ -49,7 +49,7 @@ final class DocumentsModel: ObservableObject {
 
     var documentsDirectory: URL? {
         if let url = try? fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) {
-            return replacePrivateVar(url)
+            return standardizedURL(url)
         }
         return nil
     }
@@ -69,12 +69,12 @@ final class DocumentsModel: ObservableObject {
     }
 
     func isDocument(_ video: Video) -> Bool {
-        guard video.isLocal, let url = video.localStream?.localURL, let url = replacePrivateVar(url) else { return false }
+        guard video.isLocal, let url = video.localStream?.localURL, let url = standardizedURL(url) else { return false }
         return isDocument(url)
     }
 
     func isDocument(_ url: URL) -> Bool {
-        guard let url = replacePrivateVar(url), let documentsDirectory else { return false }
+        guard let url = standardizedURL(url), let documentsDirectory else { return false }
         return url.absoluteString.starts(with: documentsDirectory.absoluteString)
     }
 
@@ -91,7 +91,7 @@ final class DocumentsModel: ObservableObject {
     }
 
     func creationDate(_ video: Video) -> Date? {
-        guard video.isLocal, let url = video.localStream?.localURL, let url = replacePrivateVar(url) else { return nil }
+        guard video.isLocal, let url = video.localStream?.localURL, let url = standardizedURL(url) else { return nil }
         return creationDate(url)
     }
 
@@ -100,7 +100,7 @@ final class DocumentsModel: ObservableObject {
     }
 
     func formattedCreationDate(_ video: Video) -> String? {
-        guard video.isLocal, let url = video.localStream?.localURL, let url = replacePrivateVar(url) else { return nil }
+        guard video.isLocal, let url = video.localStream?.localURL, let url = standardizedURL(url) else { return nil }
         return formattedCreationDate(url)
     }
 
@@ -124,7 +124,7 @@ final class DocumentsModel: ObservableObject {
     }
 
     func size(_ video: Video) -> Int? {
-        guard video.isLocal, let url = video.localStream?.localURL, let url = replacePrivateVar(url) else { return nil }
+        guard video.isLocal, let url = video.localStream?.localURL, let url = standardizedURL(url) else { return nil }
         return size(url)
     }
 
@@ -168,7 +168,7 @@ final class DocumentsModel: ObservableObject {
 
     var canGoBack: Bool {
         guard let directoryURL, let documentsDirectory else { return false }
-        return replacePrivateVar(directoryURL) != documentsDirectory
+        return standardizedURL(directoryURL) != documentsDirectory
     }
 
     func goToURL(_ url: URL) {
@@ -187,9 +187,9 @@ final class DocumentsModel: ObservableObject {
         directoryURL?.deletingLastPathComponent()
     }
 
-    func replacePrivateVar(_ url: URL) -> URL? {
-        let urlStringWithPrivateVarRemoved = url.absoluteString.replacingFirstOccurrence(of: "/private/var/", with: "/var/")
-        return URL(string: urlStringWithPrivateVarRemoved)
+    func standardizedURL(_ url: URL) -> URL? {
+        let standardizedURL = NSString(string: url.absoluteString).standardizingPath
+        return URL(string: standardizedURL)
     }
 
     func refresh() {

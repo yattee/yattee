@@ -911,6 +911,11 @@
 		37FD43E42704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD43E22704847C0073EE42 /* View+Fixtures.swift */; };
 		37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
+		37FD77002932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */; };
+		37FD77012932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */; };
+		37FD77022932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */; };
+		37FD77032932C5EC00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */; };
+		37FD77042932C5FC00D91A5F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754B01428B7F84D009717C8 /* Constants.swift */; };
 		37FEF11327EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
 		37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
 		37FEF11527EFD8580033912F /* PlaceholderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEF11227EFD8580033912F /* PlaceholderCell.swift */; };
@@ -1367,6 +1372,7 @@
 		37FB285D272225E800A57617 /* ContentItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentItemView.swift; sourceTree = "<group>"; };
 		37FD43DB270470B70073EE42 /* InstancesSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesSettings.swift; sourceTree = "<group>"; };
 		37FD43E22704847C0073EE42 /* View+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Fixtures.swift"; sourceTree = "<group>"; };
+		37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+ByReplacingYatteeProtocol.swift"; sourceTree = "<group>"; };
 		37FEF11227EFD8580033912F /* PlaceholderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderCell.swift; sourceTree = "<group>"; };
 		37FFC43F272734C3009FFD26 /* Throttle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
 		3DA101AD287C30F50027D920 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
@@ -2048,11 +2054,12 @@
 				3782B95C2755858100990149 /* NSTextField+FocusRingType.swift */,
 				377ABC47286E5887009C986F /* Sequence+Unique.swift */,
 				3782B9512755667600990149 /* String+Format.swift */,
+				37270F1B28E06E3E00856150 /* String+Localizable.swift */,
 				377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */,
 				37F7AB4C28A9361F00FB46B5 /* UIDevice+Cellular.swift */,
 				370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */,
+				37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */,
 				3743CA51270F284F00E4D32B /* View+Borders.swift */,
-				37270F1B28E06E3E00856150 /* String+Localizable.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2812,8 +2819,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37FD77042932C5FC00D91A5F /* Constants.swift in Sources */,
 				37095E8E291DD5FE00301883 /* CacheModel.swift in Sources */,
 				37095E82291DC85400301883 /* ShareViewController.swift in Sources */,
+				37FD77032932C5EC00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */,
 				37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2940,6 +2949,7 @@
 				37E64DD126D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				376578892685471400D4EA09 /* Playlist.swift in Sources */,
 				37B4E803277D0A72004BF56A /* AppDelegate.swift in Sources */,
+				37FD77002932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */,
 				373CFADB269663F1003CB2C6 /* Thumbnail.swift in Sources */,
 				3714166F267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				3782B9522755667600990149 /* String+Format.swift in Sources */,
@@ -3089,6 +3099,7 @@
 				37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */,
 				3743CA53270F284F00E4D32B /* View+Borders.swift in Sources */,
 				37599F39272B4D740087F250 /* FavoriteButton.swift in Sources */,
+				37FD77012932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */,
 				374924F129216C630017D862 /* VideoActions.swift in Sources */,
 				37C3A24627235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				37CEE4BE2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
@@ -3519,6 +3530,7 @@
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
 				37EBD8CC27AF26C200F1C24B /* MPVBackend.swift in Sources */,
 				3711404126B206A6005B3555 /* SearchModel.swift in Sources */,
+				37FD77022932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */,
 				37FEF11527EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37FD43F02704A9C00073EE42 /* RecentsModel.swift in Sources */,
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,

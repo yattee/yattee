@@ -36,7 +36,7 @@ struct OpenURLHandler {
             }
         #endif
 
-        guard let url = urlByReplacingYatteeProtocol(url) else { return }
+        guard let url = url.byReplacingYatteeProtocol() else { return }
 
         let parser = URLParser(url: url)
 
@@ -91,21 +91,6 @@ struct OpenURLHandler {
         navigation.presentingChannel = false
         navigation.presentingPlaylist = false
         navigation.presentingOpenVideos = false
-    }
-
-    private func urlByReplacingYatteeProtocol(_ url: URL, with urlProtocol: String = "https") -> URL! {
-        var urlAbsoluteString = url.absoluteString
-
-        guard urlAbsoluteString.hasPrefix(Self.yatteeProtocol) else {
-            return url
-        }
-
-        urlAbsoluteString = String(urlAbsoluteString.dropFirst(Self.yatteeProtocol.count))
-        if url.absoluteString.contains("://") {
-            return URL(string: urlAbsoluteString)
-        }
-
-        return URL(string: "\(urlProtocol)://\(urlAbsoluteString)")
     }
 
     private func handleFileURLOpen(_ parser: URLParser) {
