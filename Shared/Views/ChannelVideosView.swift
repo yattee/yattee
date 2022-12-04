@@ -289,17 +289,10 @@ struct ChannelVideosView: View {
     private var contentTypePicker: some View {
         Picker("Content type", selection: $contentType) {
             if let channel = presentedChannel {
-                Text("Videos").tag(Channel.ContentType.videos)
-                Text("Playlists").tag(Channel.ContentType.playlists)
-
-                if channel.tabs.contains(where: { $0.contentType == .livestreams }) {
-                    Text("Live streams").tag(Channel.ContentType.livestreams)
-                }
-                if channel.tabs.contains(where: { $0.contentType == .shorts }) {
-                    Text("Shorts").tag(Channel.ContentType.shorts)
-                }
-                if channel.tabs.contains(where: { $0.contentType == .channels }) {
-                    Text("Channels").tag(Channel.ContentType.channels)
+                ForEach(Channel.ContentType.allCases, id: \.self) { type in
+                    if channel.hasData(for: type) {
+                        Label(type.description, systemImage: type.systemImage).tag(type)
+                    }
                 }
             }
         }
