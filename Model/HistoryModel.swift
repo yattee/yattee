@@ -58,7 +58,7 @@ extension PlayerModel {
         let results = try? backgroundContext.fetch(watchFetchRequest)
 
         backgroundContext.perform { [weak self] in
-            guard let self else {
+            guard let self, finished || self.backend.isPlaying else {
                 return
             }
 
@@ -74,13 +74,16 @@ extension PlayerModel {
                 watch = results?.first
             }
 
-            if let seconds = self.playerItemDuration?.seconds {
-                watch.videoDuration = seconds
+            let duration = self.playerTime.duration.seconds
+            if duration.isFinite, duration > 0 {
+                watch.videoDuration = duration
             }
 
-            if finished {
-                watch.stoppedAt = watch.videoDuration
-            } else if self.resetWatchedStatusOnPlaying, seconds.isFinite, seconds > 0 {
+            if watch.finished {
+                if !finished, self.resetWatchedStatusOnPlaying, seconds.isFinite, seconds > 0 {
+                    watch.stoppedAt = seconds
+                }
+            } else if seconds.isFinite, seconds > 0 {
                 watch.stoppedAt = seconds
             }
 

@@ -187,7 +187,7 @@ struct VideoCell: View {
                                 }
                             }
 
-                            if !timeOnThumbnail, let time = video.length.formattedAsPlaybackTime() {
+                            if !timeOnThumbnail, let time = videoDuration {
                                 VStack {
                                     Image(systemName: "clock")
                                         .frame(height: 15)
@@ -202,13 +202,13 @@ struct VideoCell: View {
                 .frame(minHeight: 180)
 
                 #if os(tvOS)
-                    if let time = video.length.formattedAsPlaybackTime() || video.live || video.upcoming {
+                    if let time = videoDuration || video.live || video.upcoming {
                         Spacer()
 
                         VStack {
                             Spacer()
 
-                            if let time = video.length.formattedAsPlaybackTime() {
+                            if let time = videoDuration {
                                 HStack(spacing: 4) {
                                     Image(systemName: "clock")
                                     Text(time)
@@ -229,6 +229,11 @@ struct VideoCell: View {
             }
         }
     #endif
+
+    private var videoDuration: String? {
+        let length = video.length.isZero ? watch?.videoDuration : video.length
+        return length?.formattedAsPlaybackTime()
+    }
 
     private var verticalRow: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -332,7 +337,7 @@ struct VideoCell: View {
 
     private var additionalDetailsAvailable: Bool {
         video.publishedDate != nil || video.views != 0 ||
-            (!timeOnThumbnail && !video.length.formattedAsPlaybackTime().isNil)
+            (!timeOnThumbnail && !videoDuration.isNil)
     }
 
     private var thumbnail: some View {
@@ -438,7 +443,7 @@ struct VideoCell: View {
     }
 
     private var time: String? {
-        guard var videoTime = video.length.formattedAsPlaybackTime() else {
+        guard var videoTime = videoDuration else {
             return nil
         }
 
