@@ -1,3 +1,4 @@
+import Alamofire
 import Foundation
 import Siesta
 import SwiftUI
@@ -118,10 +119,60 @@ final class AccountValidator: Service {
     func validateAccount() {
         reset()
 
+        switch app.wrappedValue {
+        case .invidious:
+            invidiousValidation()
+        case .piped:
+            pipedValidation()
+        default:
+            setValidationResult(false)
+        }
+    }
+
+    func invidiousValidation() {
+        guard let username = account?.username,
+              let password = account?.password
+        else {
+            setValidationResult(false)
+
+            return
+        }
+
+        AF
+            .request(login.url, method: .post, parameters: ["email": username, "password": password], encoding: URLEncoding.default)
+            .redirect(using: .doNotFollow)
+            .response { response in
+                guard let headers = response.response?.headers,
+                      let cookies = headers["Set-Cookie"]
+                else {
+                    self.setValidationResult(false)
+                    return
+                }
+
+                let sidRegex = #"SID=(?<sid>[^;]*);"#
+                guard let sidRegex = try? NSRegularExpression(pattern: sidRegex),
+                      let match = sidRegex.matches(in: cookies, range: NSRange(cookies.startIndex..., in: cookies)).first
+                else {
+                    self.setValidationResult(false)
+                    return
+                }
+
+                let matchRange = match.range(withName: "sid")
+
+                if let substringRange = Range(matchRange, in: cookies) {
+                    let sid = String(cookies[substringRange])
+                    if !sid.isEmpty {
+                        self.setValidationResult(true)
+                    }
+                } else {
+                    self.setValidationResult(false)
+                }
+            }
+    }
+
+    func pipedValidation() {
         guard let request = accountRequest else {
-            isValid.wrappedValue = false
-            isValidated.wrappedValue = true
-            isValidating.wrappedValue = false
+            setValidationResult(false)
 
             return
         }
@@ -156,7 +207,13 @@ final class AccountValidator: Service {
         }
     }
 
-    var accountRequest: Request? {
+    func setValidationResult(_ result: Bool) {
+        isValid.wrappedValue = result
+        isValidated.wrappedValue = true
+        isValidating.wrappedValue = false
+    }
+
+    var accountRequest: Siesta.Request? {
         switch app.wrappedValue {
         case .invidious:
             guard let password = account.password else { return nil }
