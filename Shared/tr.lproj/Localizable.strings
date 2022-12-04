@@ -70,3 +70,92 @@
 "Clear the queue" = "Kuyruğu temizle";
 "Charging" = "Şarj oluyor";
 "Accounts are not supported for the application of this instance" = "Bu oluşumun hesapları uygulamada desteklenmemektedir";
+"Don't use public locations" = "Herkese açık konumları kullanma";
+"Donations" = "Bağışlar";
+"Locations" = "Konumlar";
+"Highest" = "En yüksek";
+"Error when accessing playlist" = "Oynatma listesine erişirken hata oluştu";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Tartışmalar Discord ve Matrix'te yer alır. Genel sorular için iyi bir yerdir.";
+"Done" = "Tamamlandı";
+"Edit" = "Düzenle";
+"Gaming" = "Oyun";
+"Hide sidebar" = "Kenar çubuğunu gizle";
+
+/* SponsorBlock category name */
+"Intro" = "Giriş";
+"Connected successfully (%@)" = "Başarıyla bağlandı (%@)";
+"Close PiP when starting playing other video" = "Başka bir video oynatmaya başlarken Resim içinde Resim modunu kapat";
+"Continue" = "Devam et";
+"Controls" = "Kontroller";
+"Info" = "Bilgi";
+"Interface" = "Arayüz";
+"Loading..." = "Yükleniyor...";
+"I am lost" = "Kayboldum";
+"Close Video" = "Videoyu Kapat";
+"Contributing" = "Katkıda Bulunmak";
+"Favorites" = "Favoriler";
+"I like this app!" = "Bu uygulamayı beğendim!";
+
+/* Selected video has just finished playing */
+"Just watched" = "Az önce izlendi";
+"Finding something to play..." = "Oynatılacak bir şeyler bul...";
+"LIVE" = "CANLI";
+"Enable Return YouTube Dislike" = "YouTube Beğenmemeyi Geri Getirmeyi Etkinleştir";
+"Edit..." = "Düzenle...";
+
+/* Video date filter in search */
+"Hour" = "Saat";
+"I found a bug /" = "Bir hata buldum /";
+"I have a feature request" = "Bir özellik isteğim var";
+"I want to ask a question" = "Bir soru sormak istiyorum";
+
+/* Loading stream OSD */
+"Loading streams..." = "Akışlar yükleniyor...";
+"Edit Quality Profile" = "Kalite Profilini Düzenle";
+"Frontend URL" = "Ön uç URL'si";
+"Close player when starting PiP" = "Resim içinde Resim modu başlatılırken oynatıcıyı kapat";
+"Connection failed" = "Bağlantı başarısız";
+"Contact" = "İletişim";
+"Discord Server" = "Discord Sunucusu";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Herhangi bir ücretli veya ücretsiz platformda beğenmek, abone olmak veya onlarla etkileşimde bulunmak için açık hatırlatıcılar (ör. bir videoya tıklayın).";
+"History" = "Geçmiş";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Bir hata bildiriyorsanız, ilgili tüm ayrıntıları ekleyin (özellikle: uygulama sürümü, kullanılan cihaz ve sistem sürümü, yeniden üretme adımları).";
+"Instance of current account" = "Mevcut hesabın oluşumu";
+"Issues Tracker" = "Sorun İzleyici";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Büyük düzen tüm cihazlar için uygun değildir ve kullanılması kontrollerin ekrana sığmamasına neden olabilir.";
+"Delete" = "Sil";
+
+/* SponsorBlock category name */
+"Interaction" = "Etkileşim";
+"Close player when closing video" = "Videoyu kapatırken oynatıcıyı da kapat";
+"Close video after playing last in the queue" = "Kuyruktaki son videoyu oynattıktan sonra videoyu kapat";
+"Could not load locations manifest" = "Konum bildirimi yüklenemedi";
+"Country Name or Code" = "Ülke Adı veya Kodu";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Özel";
+"Custom Locations" = "Özel Konumlar";
+
+/* Video sort order in search */
+"Date" = "Tarih";
+"Error" = "Hata";
+"Highest quality" = "En yüksek kalite";
+"Filter" = "Filtre";
+"Comments" = "Yorumlar";
+"Help" = "Yardım";
+"Fullscreen size" = "Tam ekran boyutu";
+"For videos which feature music as the primary content." = "Müziğin birincil içerik olduğu videolar için.";
+"Edit Playlist" = "Oynatma Listesini Düzenle";
+"Filter: active" = "Filtre: etkin";
+"High" = "Yüksek";
+
+/* Player controls layout size */
+"Large" = "Büyük";
+"Create Playlist" = "Oynatma Listesi Oluştur";
+"Disabled" = "Devre dışı";
+"Country" = "Ülke";
+"Decrease rate" = "Azalma oranı";
+"Duration" = "Süre";
+"Enable logging" = "Günlük kaydını etkinleştir";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatlar listedeki sıraya göre seçilecektir.\nHLS uyarlanabilir bir formattır (çözünürlük ayarı geçerli değildir).";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Gelecek güncellemelerde neler olacağını merak ediyorsanız, projenin dönüm noktalarını takip edebilirsiniz.";
