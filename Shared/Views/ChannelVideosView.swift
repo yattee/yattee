@@ -214,23 +214,27 @@ struct ChannelVideosView: View {
     }
 
     var subscriptionsLabel: some View {
-        HStack(spacing: 0) {
-            if let subscribers = presentedChannel?.subscriptionsString {
-                Text(subscribers)
-            } else {
-                Text("1234")
-                    .redacted(reason: .placeholder)
+        Group {
+            if let subscribers = store.item?.subscriptionsString {
+                HStack(spacing: 0) {
+                    Text(subscribers)
+                    Image(systemName: "person.2.fill")
+                }
+            } else if store.item.isNil {
+                HStack(spacing: 0) {
+                    Text("1234")
+                        .redacted(reason: .placeholder)
+                    Image(systemName: "person.2.fill")
+                }
             }
-
-            Image(systemName: "person.2.fill")
-                .imageScale(.small)
         }
+        .imageScale(.small)
         .foregroundColor(.secondary)
     }
 
     var viewsLabel: some View {
         HStack(spacing: 0) {
-            if let views = presentedChannel?.totalViewsString {
+            if let views = store.item?.totalViewsString {
                 Text(views)
 
                 Image(systemName: "eye.fill")
@@ -259,7 +263,7 @@ struct ChannelVideosView: View {
                             .font(.headline)
                             .foregroundColor(.primary)
                             .layoutPriority(1)
-                            .frame(minWidth: 120, alignment: .leading)
+                            .frame(minWidth: 160, alignment: .leading)
 
                         Group {
                             HStack(spacing: 12) {
@@ -271,7 +275,7 @@ struct ChannelVideosView: View {
 
                                 viewsLabel
                             }
-                            .frame(minWidth: 120, alignment: .leading)
+                            .frame(minWidth: 160, alignment: .leading)
                         }
                         .font(.caption2.bold())
                         .foregroundColor(.secondary)
@@ -281,7 +285,7 @@ struct ChannelVideosView: View {
                         .foregroundColor(.accentColor)
                         .imageScale(.small)
                 }
-                .frame(maxWidth: 300)
+                .frame(maxWidth: 320)
             }
         }
     #endif

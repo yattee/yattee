@@ -84,8 +84,8 @@ struct Channel: Identifiable, Hashable {
     }
 
     var subscriptionsString: String? {
-        if subscriptionsCount != nil, subscriptionsCount! > 0 {
-            return subscriptionsCount!.formattedAsAbbreviation()
+        if let subscriptionsCount, subscriptionsCount > 0 {
+            return subscriptionsCount.formattedAsAbbreviation()
         }
 
         return subscriptionsText
@@ -107,6 +107,6 @@ struct Channel: Identifiable, Hashable {
 
     func hasData(for contentType: ContentType) -> Bool {
         guard contentType != .videos, contentType != .playlists else { return true }
-        return tabs.contains(where: { $0.contentType == contentType })
+        return tabs.contains { $0.contentType == contentType }
     }
 }
