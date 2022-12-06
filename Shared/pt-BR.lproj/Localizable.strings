@@ -442,7 +442,7 @@
 "Show Open Videos quick actions" = "Mostrar ações rápidas de Abrir Vídeos";
 "Home" = "Início";
 "Show Home" = "Mostrar Início";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Compartilhe documentos do Finder em um Mac\\nou no iTunes no Windows";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Compartilhe documentos do Finder em um Mac\nou no iTunes no Windows";
 "Pages toolbar position" = "Posição da toolbar das páginas";
 "URL to Open" = "URL para Abrir";
 "Enter link to open" = "Insira link para abrir";
@@ -498,3 +498,7 @@
 "Open Video" = "Abrir Vídeo";
 "Copy%@link" = "Copiar link %@";
 "Share%@link" = "Compartilhar link %@";
+"Shorts" = "Shorts";
+"Live Streams" = "Transmissões ao Vivo";
+"Verified" = "Verificado";
+"Channel" = "Canal";
