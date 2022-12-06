@@ -440,7 +440,7 @@
 "Show Favorites" = "Mostra preferiti";
 "Show Open Videos quick actions" = "Mostra i controlli rapidi per aprire video";
 "Home" = "Home";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Condividi file dal Finder su Mac\\no da iTunes su Windows";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Condividi file dal Finder su Mac\no da iTunes su Windows";
 "Show Home" = "Mostra la Home";
 "Pages toolbar position" = "Posizione della barra delle pagine";
 "URL to Open" = "URL da aprire";
@@ -498,3 +498,7 @@
 "Channels" = "Canali";
 "Share" = "Condividi";
 "\"%@\" will be irreversibly removed from this device." = "\"%@\" sarà eliminato permanentemente da questo dispositivo.";
+"Live Streams" = "Trasmissioni dal vivo";
+"Shorts" = "Shorts";
+"Verified" = "Verificato";
+"Channel" = "Canale";
