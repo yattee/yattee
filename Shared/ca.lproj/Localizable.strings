@@ -1,1 +1,504 @@
 
+
+"Share" = "Compartir";
+"Size" = "Tamany";
+"FPS" = "FPS";
+"Playback history is empty" = "L'historial de reproducció està buit";
+"Are you sure you want to remove this document?" = "Esteu segur que voleu eliminar aquest document?";
+"10 seconds forwards/backwards" = "10 segons cap endavant/enrere";
+"Reset" = "Restableix";
+"Seek gesture sensitivity" = "Busca sensibilitat gestual";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Segments que normalment es troben a l'inici d'un vídeo que inclouen una animació, un fotograma o un clip que també es veuen en altres vídeos pel mateix creador.";
+"Select location closest to you:" = "Seleccioneu la ubicació més propera a vosaltres:";
+"Settings" = "Configuració";
+"Share..." = "Compartir...";
+"Show anonymous accounts" = "Mostra els comptes anònims";
+"Show history" = "Mostra la història";
+"%lld videos" = "%lld vídeos";
+"Add Account" = "Afegir compte";
+"Add Account..." = "Afegir compte...";
+"Add Location..." = "Afegeix una ubicació...";
+"Add profile..." = "Afegeix un perfil...";
+"Add to %@" = "Afegeix a %@";
+"Add to Playlist..." = "Afegir a la llista de reproducció...";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Tots";
+"Anonymous" = "Anònim";
+"Apply to all" = "Aplicar a tots";
+"Are you sure you want to clear history of watched videos?" = "Confirmes que vols esborrar l'historial dels vídeos vists?";
+"Are you sure you want to clear search history?" = "Esteu segur que voleu esborrar l'historial de cerques?";
+"Are you sure you want to restore default quality profiles?" = "Esteu segur que voleu restaurar els perfils de qualitat predeterminats?";
+"Automatic" = "Automàtic";
+"Backend" = "Backend";
+"Badge" = "Insígnia";
+"Badge & Decreased opacity" = "Insígnia i opacitat reduïda";
+"Badge color" = "Color de la placa";
+"Battery" = "Bateria";
+"Blue" = "Blau";
+"Browsing" = "Navegació";
+"Captions" = "Subtítols";
+"Categories to Skip" = "Categories per saltar";
+"Category" = "Categoria";
+"Chapters" = "Capítols";
+"Charging" = "Carregant";
+"Clear" = "Netejar";
+"Clear All" = "Esborra-ho tot";
+"Clear History" = "Esborrar historial";
+"Clear Search History..." = "Esborrar l'historial de cerques...";
+"Clear the queue" = "Netegeu la cua";
+"Close" = "Tanca";
+"Close PiP and open player when application enters foreground" = "Tanqueu PiP i obriu el reproductor quan l'aplicació entri en primer pla";
+"Close PiP when player is opened" = "Tanqueu PiP quan s'obri el reproductor";
+"Close Video" = "Tanca el vídeo";
+"Comments" = "Comentaris";
+"Connection failed" = "Connexió fallida";
+"Contact" = "Contacte";
+"Continue from %@" = "Continuar des de %@";
+"Controls" = "Controls";
+"Copy %@ link" = "Copia l'enllaç %@";
+"Copy %@ link with time" = "Copia l'enllaç %@ amb temps";
+"Could not load locations manifest" = "No s'han pogut carregar el manifest d'ubicacions";
+"Create Playlist" = "Crea una llista de reproducció";
+"Current: %@\n%@" = "Actual: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Personalitzat";
+"Custom Locations" = "Ubicacions personalitzades";
+
+/* Video sort order in search */
+"Date" = "Data";
+"Decrease rate" = "Disminuir la taxa";
+"Delete" = "Suprimeix";
+"Disabled" = "Inhabilitat";
+"Discord Server" = "Servidor de Discord";
+"Don't use public locations" = "No utilitzeu llocs públics";
+"Donations" = "Donacions";
+"Duration" = "Durada";
+"Edit Quality Profile" = "Edita el perfil de qualitat";
+"Edit..." = "Edita...";
+"Enable Return YouTube Dislike" = "Activa Retorn no m'agrada de YouTube";
+"Enter fullscreen in landscape" = "Pantalla completa en horitzontal";
+"Error when accessing playlist" = "Error en accedir a la llista de reproducció";
+"Filter" = "Filtre";
+"Filter: active" = "Filtre: actiu";
+"Finding something to play..." = "Trobar alguna cosa per reproduïr...";
+"Frontend URL" = "URL d'interfície";
+"Fullscreen size" = "Mida de pantalla completa";
+"Gaming" = "Jocs";
+"Help" = "Ajuda";
+"Hide sidebar" = "Amaga la barra lateral";
+"High" = "Alt";
+"Highest quality" = "Màxima qualitat";
+"Honor orientation lock" = "Bloqueig d'orientació d'honor";
+
+/* Video date filter in search */
+"Hour" = "Hora";
+"I am lost" = "Estic perdut";
+"I found a bug /" = "He trobat un error /";
+"I like this app!" = "M'agrada aquesta aplicació!";
+"I want to ask a question" = "Vull fer una pregunta";
+"Increase rate" = "Augmentar la taxa";
+
+/* SponsorBlock category name */
+"Interaction" = "Interacció";
+"Interface" = "Interfície";
+"Issues Tracker" = "Seguiment de problemes";
+
+/* Selected video has just finished playing */
+"Just watched" = "Acabo de mirar";
+
+/* Player controls layout size */
+"Large" = "Gran";
+"LIVE" = "EN VIU";
+
+/* Loading stream OSD */
+"Loading streams..." = "S'estan carregant els fluxos...";
+"Loading..." = "Carregant...";
+"Locations" = "Ubicacions";
+"Lock portrait mode" = "Bloqueja el mode vertical";
+"Low quality" = "Baixa qualitat";
+"Lowest" = "El més baix";
+"Mark as watched" = "Marca com a observat";
+"Mark video as watched after playing" = "Marca el vídeo com a vist després de reproduïr";
+"Mark watched videos with" = "Marca els videos com a vist amb";
+"Matrix Channel" = "Canal Matrix";
+"Matrix Chat" = "Xat Matrix";
+"Medium quality" = "Qualitat mitjana";
+"Milestones" = "Fites";
+
+/* Video date filter in search */
+"Month" = "Mes";
+"More info can be found in:" = "Podeu trobar més informació a:";
+"Movies" = "Pel·lícules";
+"MPV Documentation" = "Documentació MPV";
+"Music" = "Música";
+"Name" = "Nom";
+"New Playlist" = "Nova llista de reproducció";
+"Next" = "Següent";
+"No description" = "Sense descripció";
+"No results" = "Sense resultats";
+"Normal" = "Normal";
+"Not available" = "No disponible";
+"Not Playing" = "No reproduïnt";
+"Nothing" = "Res";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Offtopic als vídeos musicals";
+"Open \"Playlists\" tab to create new one" = "Obriu la pestanya \"Llistes de reproducció\" per crear-ne una de nova";
+"Open Settings" = "Obriu Configuració";
+"Opening audio stream..." = "Obrint la reproducció d'àudio...";
+"Orientation" = "Orientació";
+
+/* SponsorBlock category name */
+"Outro" = "Altre";
+"Pause" = "Pausa";
+"Pause when entering background" = "Feu una pausa quan entreu en segon pla";
+"Pause when player is closed" = "Feu una pausa quan el reproductor estigui tancat";
+"Picture in Picture" = "Imatge a imatge";
+"Play" = "Reprodueix";
+"Play All" = "Reprodueix tot";
+"Play in PiP" = "Reprodueix a finestra";
+"Play Last" = "Reprodueix l'últim";
+"Play Music" = "Reprodueix música";
+"Play Next" = "Reprodueix el següent";
+"Play Now" = "Reprodueix ara";
+"Playback" = "Reproducció";
+"Player" = "Reproductor";
+"Playlist" = "Llista de reproducció";
+"Playlists" = "Llistes de reproducció";
+"Popular" = "Popular";
+"Preferred Formats" = "Formats preferits";
+"Profiles" = "Perfils";
+"Proxy videos" = "Vídeos proxy";
+"Public Locations" = "Llocs Públics";
+"Public Manifest" = "Manifest Públic";
+"Quality" = "Qualitat";
+"Quality Profile" = "Perfil de qualitat";
+"Queue" = "Cua";
+"Queue is empty" = "La cua està buida";
+"Rate" = "Taxa";
+
+/* Video sort order in search */
+"Rating" = "Valoració";
+"Recents" = "Recents";
+"Red" = "Vermell";
+"Refresh" = "Actualitzar";
+"Regular size" = "Talla normal";
+"Regular Size" = "Talla normal";
+"Related" = "Relacionats";
+
+/* Video sort order in search */
+"Relevance" = "Pertinença";
+"Remove" = "Eliminar";
+"Remove from history" = "Esborrar de l'historial";
+"Remove from Playlist" = "Elimina de la llista de reproducció";
+"Remove from the queue" = "Eliminar de la cua";
+"Replies" = "Respostes";
+"Reset watched status when playing again" = "Restableix l'estat de visualització quan tornis a reproduïr";
+"Resolution" = "Resolució";
+"Restart" = "Reinicia";
+"Restart the app to apply the settings above." = "Reinicieu l'aplicació per aplicar la configuració anterior.";
+"Restart/Play next" = "Reinicia/Reprodueix a continuació";
+"Restore default profiles..." = "Restaura els perfils predeterminats...";
+"Rotate to portrait when exiting fullscreen" = "Gireu a vertical quan sortiu de pantalla completa";
+"Round corners" = "Cantons arrodonits";
+"Save" = "Desa";
+"Save history of played videos" = "Desa l'historial dels vídeos reproduïts";
+"Search" = "Cerca";
+"Search history is empty" = "L'historial de cerques està buit";
+"Seek gesture speed" = "Busqueu la velocitat dels gestos";
+"Seek with horizontal swipe on video" = "Cerca amb llisca horitzontal al vídeo";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Autopromoció";
+"Share %@ link" = "Compartir Enllaç %@";
+"Share %@ link with time" = "Comparteix l'enllaç %@ amb temps";
+"Show account username" = "Mostra el nom d'usuari del compte";
+"Show keywords" = "Mostra les paraules clau";
+"Show playback statistics" = "Mostra les estadístiques de reproducció";
+"Show progress of watching on thumbnails" = "Mostra el progrés de la visualització a les miniatures";
+"Show sidebar when space permits" = "Mostra la barra lateral quan l'espai ho permeti";
+"Show video length" = "Mostra la durada del vídeo";
+"Sidebar" = "Barra lateral";
+"Sign In Required" = "Inicia sessió obligatori";
+"Sort" = "Ordena";
+"Sort: %@" = "Ordena: %@";
+"Source" = "Font";
+
+/* SponsorBlock category name */
+"Sponsor" = "Patrocinador";
+"SponsorBlock API Instance" = "Instància de l'API de SponsorBlock";
+"Subscribe" = "Subscriu-te";
+"Switch to other public location" = "Canvia a un altre lloc públic";
+"System controls show buttons for %@" = "Els controls del sistema mostren botons per a %@";
+"This cannot be reverted" = "Això no es pot desfer";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Això no es pot desfer. És possible que hàgiu de canviar entre visualitzacions o reiniciar l'aplicació per veure els canvis.";
+
+/* Video date filter in search */
+"Today" = "Avui";
+"Trending" = "Tendència";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"unknown" = "desconegut";
+"Unsubscribe" = "Cancel·la la subscripció";
+"Upload date" = "Data de càrrega";
+"URL" = "URL";
+"Username" = "Nom d'usuari";
+
+/* Player controls layout size */
+"Very Large" = "Molt gran";
+"Videos" = "Vídeos";
+"Watched" = "Mirat";
+
+/* Selected video was played on given date */
+"Watched %@" = "Mirat %@";
+
+/* Selected video is being played */
+"Watching now" = "Mirant ara";
+"Welcome" = "Benvingut";
+"When partially watched video is played" = "Quan es reprodueix un vídeo parcialment vist";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Viqui";
+"Yattee" = "Yattee";
+"Yattee %@ (build %@)" = "Yattee %@ (compilació %@)";
+
+/* Video date filter in search */
+"Year" = "Any";
+"You can find information about using Yattee in the Wiki pages." = "Podeu trobar informació sobre com utilitzar Yattee a les pàgines de la Viqui.";
+"You have no Playlists" = "No tens llistes de reproducció";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "No tens llistes de reproducció\n\nToqueu \"Nova llista de reproducció\" per crear-ne una";
+"You need to select an account\nto access %@ section" = "Heu de seleccionar un compte\nper accedir a la secció %@";
+
+
+"Public" = "Públic";
+"Unlisted" = "No llistat";
+"Private" = "Privat";
+"Add Channels, Playlists and Searches to Favorites using" = "Afegiu canals, llistes de reproducció i cerques als preferits mitjançant";
+"Visibility" = "Visibilitat";
+"Current Playlist" = "Llista de reproducció actual";
+"Stream & Player" = "Transmissió i reproductor";
+"Statistics" = "Estadístiques";
+"Hardware decoder" = "Descodificador de maquinari";
+"Stream FPS" = "Transmissió d'FPS";
+"Cached time" = "Temps en memòria cau";
+"Rate & Captions" = "Valoració i subtítols";
+"Dropped frames" = "Fotogrames perduts";
+"Any format" = "Qualsevol format";
+"%@ formats" = "formats %@";
+"Press and hold remote button to open captions and quality menus" = "Mantén premut el botó del comandament per obrir subtítols i menús de qualitat";
+"Comments are disabled" = "Els comentaris estan desactivats";
+"No comments" = "Sense comentaris";
+"Could not refresh Subscriptions" = "No s'han pogut actualitzar les subscripcions";
+"Could not load streams" = "No s'han pogut carregar els fluxos";
+"Could not open video" = "No s'ha pogut obrir el vídeo";
+"Could not extract channel information" = "No s'ha pogut extreure la informació del canal";
+"Could not extract SID from received cookies: %@" = "No s'ha pogut extreure el SID de les galetes rebudes: %@";
+"Could not update your token." = "No s'ha pogut actualitzar el vostre token.";
+"This URL could not be opened" = "Aquest URL no s'ha pogut obrir";
+"Could not open channel" = "No s'ha pogut obrir el canal";
+"Could not open playlist" = "No s'ha pogut obrir la llista de reproducció";
+"This video could not be opened" = "Aquest vídeo no s'ha pogut obrir";
+"Could not load video" = "No s'ha pogut carregar el vídeo";
+"Could not refresh Playlists" = "No s'han pogut actualitzar les llistes de reproducció";
+"Translations" = "Traduccions";
+"No documents" = "Sense documents";
+"Recent Documents" = "Documents recents";
+"Home" = "Inici";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Comparteix fitxers des del Finder en un Mac\no iTunes a Windows";
+"Show Home" = "Mostra Inici";
+"Show Open Videos quick actions" = "Mostra accions ràpides de vídeos oberts";
+"Recent History" = "Històrial recent";
+"Show Favorites" = "Mostra els favorits";
+"Inspector visibility" = "Visibilitat de l'inspector";
+"Buttons labels" = "Etiquetes de botons";
+"Files" = "Fitxers";
+"Show Documents" = "Mostra documents";
+"Pages toolbar position" = "Posició de la barra d'eines de les pàgines";
+"Video Details" = "Detalls del vídeo";
+"Show Inspector" = "Mostra inspector";
+"Reload manifest" = "Torna a carregar el manifest";
+"Open" = "Obrir";
+"Video actions buttons" = "Botons d'accions de vídeo";
+"Pages buttons" = "Botons de pàgines";
+"URL to Open" = "URL per obrir";
+"Enter link to open" = "Introdueix l'enllaç per obrir";
+"Could not open Files" = "No s'han pogut obrir Fitxers";
+"Paste" = "Enganxa";
+"Open Videos" = "Vídeos oberts";
+"Enter links to open, one per line" = "Introduïu els enllaços per obrir, un per línia";
+"Playback Mode" = "Mode de reproducció";
+"Add" = "Afegeix";
+"Hide" = "Amaga";
+"Always" = "Sempre";
+"Only for local files and URLs" = "Només per a fitxers i URL locals";
+"Channels" = "Canals";
+"Open Files" = "Obriu Fitxers";
+"Show icons and text when space permits" = "Mostra les icones i el text quan l'espai ho permeti";
+"Left" = "Esquerra";
+"Driver" = "Controlador";
+"Show only icons" = "Mostra només icones";
+"Center" = "Centre";
+"Documents" = "Documents";
+"Audio" = "Audio";
+"File" = "Fitxer";
+"Video" = "Vídeo";
+"Codec" = "Còdec";
+"Sample Rate" = "Freqüència de mostreig";
+"Could not find any links to open in your clipboard" = "No s'ha pogut trobar cap enllaç per obrir al porta-retalls";
+"Address" = "Adreça";
+"Remove…" = "Esborrar…";
+"Actions buttons" = "Botons d'accions";
+"Show sidebar" = "Mostra la barra lateral";
+"Locations Manifest" = "Manifest d'ubicacions";
+"Remove Location" = "Elimina la ubicació";
+"Open Video" = "Obre el vídeo";
+"Default Profile" = "Perfil predeterminat";
+"Copy%@link" = "Copia%@link";
+"Share%@link" = "Compartir Enllaç %@";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" s'eliminarà d'aquest dispositiu de manera irreversible.";
+"Could not delete document" = "No s'ha pogut suprimir el document";
+"Are you sure you want to remove %@ location?" = "Esteu segur que voleu eliminar %@ ubicació?";
+"Live Streams" = "Transmissions en directe";
+"Shorts" = "Curt";
+"Verified" = "Verificat";
+"Channel" = "Canal";
+"Shuffle" = "Barrejar";
+"Shuffle All" = "Barreja-ho tot";
+"Keep last played video in the queue after restart" = "Manteniu el darrer vídeo reproduït a la cua després de reiniciar-lo";
+"It can be changed later in settings. You can use your own locations too." = "Es pot canviar més endavant a la configuració. També podeu utilitzar les vostres pròpies ubicacions.";
+"For custom locations you can configure Frontend URL in Locations settings" = "Per a ubicacions personalitzades, podeu configurar l'URL d'interfície a la configuració d'Ubicacions";
+"If you want this app to be available in your language, join translation project." = "Si vols que aquesta aplicació estigui disponible en el teu idioma, uneix-te al projecte de traducció.";
+"Right" = "Dreta";
+"Share Logs..." = "Comparteix registres…";
+"Could not refresh Trending" = "No s'ha pogut actualitzar Tendència";
+"Could not refresh Popular" = "No s'ha pogut actualitzar Popular";
+"Could not create share link" = "No s'ha pogut crear l'enllaç compartit";
+"No chapters information available" = "No hi ha informació de capítols disponible";
+"Channel could not be found" = "No s'ha pogut trobar el canal";
+"Could not extract video ID" = "No s'ha pogut extreure l'identificador del vídeo";
+"Could not extract playlist ID" = "No s'ha pogut extreure l'identificador de la llista de reproducció";
+"Edit Favorites…" = "Edita els favorits…";
+"Show Open Videos toolbar button" = "Mostra el botó de la barra d'eines de vídeos oberts";
+"Clear Queue before opening" = "Esborra la cua abans d'obrir";
+"Format" = "Format";
+
+/* Subscriptions title */
+"Subscriptions" = "Subscripcions";
+"Switch to public locations" = "Canvia a llocs públics";
+"System controls buttons" = "Botons de control del sistema";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "És agradable escoltar-ho. És divertit oferir aplicacions que altres persones vulguin utilitzar. Podeu considerar fer una donació al projecte o ajudar contribuint al desenvolupament de noves funcions.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Aquesta informació només es processarà al vostre dispositiu i s'utilitzarà per connectar-vos al servidor del país especificat.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Això eliminarà tots els vostres perfils personalitzats i retornarà els seus valors predeterminats. Això no es pot desfer.";
+"Thumbnails" = "Miniatures";
+
+/* Video date filter in search */
+"Week" = "Setmana";
+"Used to create links from videos, channels and playlists" = "S'utilitza per crear enllaços a partir de vídeos, canals i llistes de reproducció";
+
+/* Video sort order in search */
+"Views" = "Vistes";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Normalment a prop o al final del vídeo quan apareixen els crèdits i/o es mostren les targetes finals.";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Podeu utilitzar la selecció automàtica de perfils segons l'estat actual del dispositiu o canviar-lo als controls de configuració de reproducció de vídeo.";
+"Playback queue is empty" = "La cua de reproducció està buida";
+"You need to create an instance and accounts\nto access %@ section" = "Heu de crear una instància i comptes\nper accedir a la secció %@";
+"Now Playing" = "Ara reproduïnt";
+"Playing Next" = "Reproduint a continuació";
+"Make default" = "Per defecte";
+"Current Location" = "Localització actual";
+"You can switch between profiles in playback settings controls." = "Podeu canviar entre perfils als controls de configuració de reproducció.";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions tenen lloc a Discord i Matrix. És un bon lloc per a preguntes generals.";
+"Close PiP when starting playing other video" = "Tanqueu PiP quan comenceu a reproduir un altre vídeo";
+"Close player when closing video" = "Tanqueu el reproductor quan tanqueu el vídeo";
+"Accounts" = "Comptes";
+"Accounts are not supported for the application of this instance" = "Els comptes no són compatibles amb l'aplicació d'aquesta instància";
+"No Playlists" = "No hi ha llistes de reproducció";
+"Buffering stream..." = "S'està guardant la memòria intermèdia...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Els errors i les idees de funcions fantàstiques es poden enviar al rastrejador de problemes de GitHub. ";
+"Button" = "Botó";
+"Cellular" = "Cel·lular";
+"Add Location" = "Afegeix una ubicació";
+"Add to Favorites" = "Afegir a preferits";
+"Add Quality Profile" = "Afegeix un perfil de qualitat";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Cap";
+"Are you sure you want to unsubscribe from %@?" = "Esteu segur que voleu cancel·lar la subscripció a %@?";
+"Autoplaying Next" = "Reproducció automàtica següent";
+"Based on system color scheme" = "Basat en l'esquema de colors del sistema";
+"Cancel" = "Cancel·lar";
+"Add to Playlist" = "Afegir a la llista de reproducció";
+"Advanced" = "Avançat";
+"Connected successfully (%@)" = "Connectat correctament (%@)";
+"Always use AVPlayer for live videos" = "Feu servir sempre AVPlayer per als vídeos en directe";
+"Are you sure you want to delete playlist?" = "Confirmes que vols suprimir la llista de reproducció?";
+"Find Other" = "Troba un altre";
+"For videos which feature music as the primary content." = "Per als vídeos que inclouen música com a contingut principal.";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Els formats es seleccionaran en l'ordre indicat.\nHLS és un format adaptatiu (la configuració de resolució no s'aplica).";
+"Highest" = "El més alt";
+"History" = "Història";
+"I have a feature request" = "Tinc una sol·licitud de funció";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Si esteu interessats en les actualitzacions futures, podeu fer un seguiment de les fites del projecte.";
+"Info" = "Informació";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Si informeu d'un error, incloeu tots els detalls rellevants (especialment: versió de l'aplicació, versió del dispositiu i del sistema utilitzats, passos per reproduir-lo).";
+"Instance of current account" = "Instància del compte actual";
+
+/* SponsorBlock category name */
+"Intro" = "Introducció";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "El disseny gran no és adequat per a tots els dispositius i el seu ús pot provocar que els controls no encaixin a la pantalla.";
+
+/* Video duration filter in search */
+"Long" = "Llarg";
+"Low" = "Baix";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "S'està obrint %@...";
+"Only when signed in" = "Només quan s'ha iniciat la sessió";
+"Password" = "Contrasenya";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Part d'un vídeo que promociona un producte o servei no relacionat directament amb el creador. El creador rebrà un pagament o compensació en forma de diners o productes gratuïts.";
+"Favorites" = "Preferits";
+"Close video after playing last in the queue" = "Tanca el vídeo després de reproduïr l'últim a la cua";
+"Continue" = "Continua";
+"Contributing" = "Contribuint";
+"Country" = "País";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Recordatoris explícits per fer m'agrada, subscriure's o interactuar amb ells en qualsevol plataforma o plataformes de pagament o gratuïtes (p. ex., feu clic a un vídeo).";
+"Done" = "Fet";
+"Edit" = "Edita";
+"Enable logging" = "Activa el registre";
+
+/* Player controls layout size */
+"Medium" = "Mitjana";
+"Clear All Recents" = "Esborra tots els recents";
+"Clear Search History" = "Esborrar l'historial de cerques";
+"Close player when starting PiP" = "Tanca el reproductor quan s'inicia PiP";
+"Country Name or Code" = "Nom o codi del país";
+"Decreased opacity" = "Disminució de l'opacitat";
+"Edit Playlist" = "Edita la llista de reproducció";
+"Error" = "Error";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "La llista de reproducció \"%@\" se suprimirà.\nNo es pot desfer.";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promocionar un producte o servei que estigui directament relacionat amb el propi creador. Això sol incloure la mercaderia o la promoció de plataformes monetitzades.";
+"%@ Channel" = "Canal %@";
+" subscribers" = " subscriptors";
+"%@ Playlist" = "Llista de reproducció %@";
+"%@ subscribers" = "%@ subscriptors";
+"Remove from Favorites" = "Elimina dels preferits";
+"Reset search filters" = "Restableix els filtres de cerca";
+"Save history of searches, channels and playlists" = "Desa l'historial de cerques, canals i llistes de reproducció";
+
+/* Video duration filter in search */
+"Short" = "Curt";
+"Show channel name" = "Mostra el nom del canal";
+"Search..." = "Cerca...";
+"Sections" = "Seccions";
+
+/* Player controls layout size */
+"Small" = "Petit";
+
+/* Player controls layout size */
+"Smaller" = "Més petit";
+"SponsorBlock" = "SponsorBlock";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "La llista de reproducció està buida\n\nMantén premut un vídeo i després\n\"Afegir a la llista de reproducció\"";
+"Open logs in Finder" = "Obriu els registres al Finder";
+"No locations available at the moment" = "No hi ha ubicacions disponibles en aquest moment";
