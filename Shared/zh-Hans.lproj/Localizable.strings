@@ -441,7 +441,7 @@
 "Show Open Videos quick actions" = "显示打开视频快速操作";
 "Show Favorites" = "显示收藏";
 "Home" = "主页";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "在 Windows iTunes \\n或 Mac 上共享 Finder 中的文件";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "在 Windows iTunes 或 Mac 上\n共享 Finder 中的文件";
 "Show Home" = "显示主页";
 "Pages toolbar position" = "页面工具栏位置";
 "URL to Open" = "要打开的 URL";
@@ -498,3 +498,7 @@
 "Default Profile" = "默认配置";
 "Copy%@link" = "复制 %@ 的链接";
 "Share%@link" = "分享 %@ 链接";
+"Live Streams" = "直播流";
+"Shorts" = "短视频";
+"Verified" = "已验证";
+"Channel" = "频道";
