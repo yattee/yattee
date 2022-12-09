@@ -89,8 +89,12 @@ extension Watch {
     }
 
     var video: Video {
-        if !Video.VideoID.isValid(videoID), let url = URL(string: videoID) {
-            return .local(url)
+        let url = URL(string: videoID)
+
+        if app == nil || !Video.VideoID.isValid(videoID) {
+            if let url {
+                return .local(url)
+            }
         }
 
         return Video(app: app, instanceURL: instanceURL, videoID: videoID)

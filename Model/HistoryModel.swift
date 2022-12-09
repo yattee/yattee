@@ -11,7 +11,6 @@ extension PlayerModel {
     }
 
     func loadHistoryVideoDetails(_ watch: Watch) {
-        logger.info("id: \(watch.videoID), instance \(watch.instanceURL), app \(watch.appName)")
         guard historyVideo(watch.videoID).isNil else {
             return
         }
@@ -21,7 +20,10 @@ extension PlayerModel {
             return
         }
 
-        playerAPI(watch.video).video(watch.videoID).load()
+        guard let api = playerAPI(watch.video) else { return }
+
+        api.video(watch.videoID)
+            .load()
             .onSuccess { [weak self] response in
                 guard let self else { return }
 
