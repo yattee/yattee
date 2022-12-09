@@ -23,6 +23,10 @@ final class SearchModel: ObservableObject {
         resource?.isLoading ?? false
     }
 
+    func reloadQuery() {
+        changeQuery()
+    }
+
     func changeQuery(_ changeHandler: @escaping (SearchQuery) -> Void = { _ in }) {
         changeHandler(query)
 
@@ -78,6 +82,10 @@ final class SearchModel: ObservableObject {
     }}
 
     func loadSuggestions(_ query: String) {
+        guard accounts.app.supportsSearchSuggestions else {
+            querySuggestions.removeAll()
+            return
+        }
         suggestionsDebouncer.callback = {
             guard !query.isEmpty else { return }
             DispatchQueue.main.async {

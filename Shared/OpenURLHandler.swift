@@ -113,9 +113,9 @@ struct OpenURLHandler {
             Windows.main.open()
         #endif
 
-        player.videoBeingOpened = Video(videoID: id)
+        player.videoBeingOpened = Video(app: accounts.current.app!, videoID: id)
 
-        player.playerAPI.video(id)
+        player.playerAPI(player.videoBeingOpened!).video(id)
             .load()
             .onSuccess { response in
                 if let video: Video = response.typedContent() {

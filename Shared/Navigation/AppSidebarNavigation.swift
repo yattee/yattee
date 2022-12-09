@@ -82,7 +82,7 @@ struct AppSidebarNavigation: View {
                     .help(
                         "Switch Instances and Accounts\n" +
                             "Current Instance: \n" +
-                            "\(accounts.current?.url ?? "Not Set")\n" +
+                            "\(accounts.current?.urlString ?? "Not Set")\n" +
                             "Current User: \(accounts.current?.description ?? "Not set")"
                     )
             }

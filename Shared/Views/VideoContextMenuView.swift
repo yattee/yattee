@@ -148,7 +148,7 @@ struct VideoContextMenuView: View {
 
     var markAsWatchedButton: some View {
         Button {
-            Watch.markAsWatched(videoID: video.videoID, duration: video.length, context: backgroundContext)
+            Watch.markAsWatched(videoID: video.videoID, account: accounts.current, duration: video.length, context: backgroundContext)
         } label: {
             Label("Mark as watched", systemImage: "checkmark.circle.fill")
         }

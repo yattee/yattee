@@ -14,7 +14,7 @@ extension Watch {
         NSFetchRequest<Watch>(entityName: "Watch")
     }
 
-    @nonobjc class func markAsWatched(videoID: String, duration: Double, context: NSManagedObjectContext) {
+    @nonobjc class func markAsWatched(videoID: String, account: Account, duration: Double, context: NSManagedObjectContext) {
         let watchFetchRequest = Watch.fetchRequest()
         watchFetchRequest.predicate = NSPredicate(format: "videoID = %@", videoID as String)
 
@@ -26,6 +26,8 @@ extension Watch {
             if results?.isEmpty ?? true {
                 watch = Watch(context: context)
                 watch?.videoID = videoID
+                watch?.appName = account.app?.rawValue
+                watch?.instanceURL = account.url
             } else {
                 watch = results?.first
             }
@@ -45,6 +47,14 @@ extension Watch {
 
     @NSManaged var watchedAt: Date?
     @NSManaged var stoppedAt: Double
+
+    @NSManaged var appName: String?
+    @NSManaged var instanceURL: URL?
+
+    var app: VideosApp! {
+        guard let appName else { return nil }
+        return .init(rawValue: appName)
+    }
 
     var progress: Double {
         guard videoDuration.isFinite, !videoDuration.isZero else {
@@ -83,6 +93,6 @@ extension Watch {
             return .local(url)
         }
 
-        return Video(videoID: videoID)
+        return Video(app: app, instanceURL: instanceURL, videoID: videoID)
     }
 }

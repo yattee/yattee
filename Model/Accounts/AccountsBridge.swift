@@ -14,7 +14,7 @@ struct AccountsBridge: Defaults.Bridge {
             "id": value.id,
             "instanceID": value.instanceID ?? "",
             "name": value.name ?? "",
-            "apiURL": value.url,
+            "apiURL": value.urlString,
             "username": value.username,
             "password": value.password ?? ""
         ]
@@ -34,6 +34,6 @@ struct AccountsBridge: Defaults.Bridge {
         let name = object["name"] ?? ""
         let password = object["password"]
 
-        return Account(id: id, instanceID: instanceID, name: name, url: url, username: username, password: password)
+        return Account(id: id, instanceID: instanceID, name: name, urlString: url, username: username, password: password)
     }
 }

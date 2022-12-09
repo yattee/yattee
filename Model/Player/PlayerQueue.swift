@@ -83,11 +83,21 @@ extension PlayerModel {
     }
 
     var playerInstance: Instance? {
-        InstancesModel.shared.forPlayer ?? AccountsModel.shared.current?.instance ?? InstancesModel.shared.all.first
+        InstancesModel.shared.forPlayer ?? accounts.current?.instance ?? InstancesModel.shared.all.first
     }
 
-    var playerAPI: VideosAPI {
-        playerInstance?.anonymous ?? AccountsModel.shared.api
+    func playerAPI(_ video: Video) -> VideosAPI! {
+        guard let url = video.instanceURL else { return nil }
+        switch video.app {
+        case .local:
+            return nil
+        case .peerTube:
+            return PeerTubeAPI.withAnonymousAccountForInstanceURL(url)
+        case .invidious:
+            return InvidiousAPI.withAnonymousAccountForInstanceURL(url)
+        case .piped:
+            return PipedAPI.withAnonymousAccountForInstanceURL(url)
+        }
     }
 
     var qualityProfile: QualityProfile? {
@@ -155,7 +165,7 @@ extension PlayerModel {
         currentItem.playbackTime = time
 
         let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
-        playerAPI.loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
+        playerAPI(newItem.video).loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
             self.playItem(newItem, at: playTime)
         }
     }
@@ -198,7 +208,7 @@ extension PlayerModel {
         }
 
         if loadDetails {
-            playerAPI.loadDetails(item, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { [weak self] newItem in
+            playerAPI(item.video).loadDetails(item, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { [weak self] newItem in
                 guard let self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
@@ -269,7 +279,7 @@ extension PlayerModel {
     }
 
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
-        guard !AccountsModel.shared.current.isNil, !item.hasDetailsLoaded else { return }
+        guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
 
         let videoID = item.video?.videoID ?? item.videoID
 
@@ -282,7 +292,7 @@ extension PlayerModel {
             return
         }
 
-        playerAPI.loadDetails(item, completionHandler: { [weak self] newItem in
+        playerAPI(item.video).loadDetails(item, completionHandler: { [weak self] newItem in
             guard let self else { return }
 
             self.queue.filter { $0.videoID == item.videoID }.forEach { item in

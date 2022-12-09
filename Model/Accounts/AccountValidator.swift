@@ -56,11 +56,22 @@ final class AccountValidator: Service {
 
         case .piped:
             return resource("/streams/dQw4w9WgXcQ")
+
+        case .peerTube:
+            // TODO: fixme
+            return resource("")
+
+        case .local:
+            return resource("")
         }
     }
 
     func validateInstance() {
         reset()
+
+        app.wrappedValue = .peerTube
+        setValidationResult(true)
+        return
 
         guard let app = appsToValidateInstance.popLast() else { return }
         tryValidatingUsing(app)

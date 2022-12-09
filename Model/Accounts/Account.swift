@@ -8,7 +8,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     var app: VideosApp?
     let instanceID: String?
     var name: String?
-    let url: String
+    let urlString: String
     var username: String
     var password: String?
     let anonymous: Bool
@@ -20,7 +20,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         app: VideosApp? = nil,
         instanceID: String? = nil,
         name: String? = nil,
-        url: String? = nil,
+        urlString: String? = nil,
         username: String? = nil,
         password: String? = nil,
         anonymous: Bool = false,
@@ -29,15 +29,19 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     ) {
         self.anonymous = anonymous
 
-        self.id = id ?? (anonymous ? "anonymous-\(instanceID ?? url ?? UUID().uuidString)" : UUID().uuidString)
+        self.id = id ?? (anonymous ? "anonymous-\(instanceID ?? urlString ?? UUID().uuidString)" : UUID().uuidString)
         self.instanceID = instanceID
         self.name = name
-        self.url = url ?? ""
+        self.urlString = urlString ?? ""
         self.username = username ?? ""
         self.password = password ?? ""
         self.country = country
         self.region = region
         self.app = app ?? instance.app
+    }
+
+    var url: URL! {
+        URL(string: urlString)
     }
 
     var token: String? {
@@ -49,7 +53,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var instance: Instance! {
-        Defaults[.instances].first { $0.id == instanceID } ?? Instance(app: app ?? .invidious, name: url, apiURL: url)
+        Defaults[.instances].first { $0.id == instanceID } ?? Instance(app: app ?? .invidious, name: urlString, apiURLString: urlString)
     }
 
     var isPublic: Bool {

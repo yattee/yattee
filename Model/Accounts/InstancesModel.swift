@@ -38,7 +38,7 @@ final class InstancesModel: ObservableObject {
 
     func add(app: VideosApp, name: String, url: String) -> Instance {
         let instance = Instance(
-            app: app, id: UUID().uuidString, name: name, apiURL: standardizedURL(url)
+            app: app, id: UUID().uuidString, name: name, apiURLString: standardizedURL(url)
         )
         Defaults[.instances].append(instance)
 

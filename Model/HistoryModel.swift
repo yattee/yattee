@@ -2,6 +2,7 @@ import CoreData
 import CoreMedia
 import Defaults
 import Foundation
+import Siesta
 import SwiftyJSON
 
 extension PlayerModel {
@@ -9,18 +10,18 @@ extension PlayerModel {
         historyVideos.first { $0.videoID == id }
     }
 
-    func loadHistoryVideoDetails(_ id: Video.ID) {
-        guard historyVideo(id).isNil else {
+    func loadHistoryVideoDetails(_ watch: Watch) {
+        logger.info("id: \(watch.videoID), instance \(watch.instanceURL), app \(watch.appName)")
+        guard historyVideo(watch.videoID).isNil else {
             return
         }
 
-        if !Video.VideoID.isValid(id), let url = URL(string: id) {
+        if !Video.VideoID.isValid(watch.videoID), let url = URL(string: watch.videoID) {
             historyVideos.append(.local(url))
             return
         }
 
-        playerAPI.video(id)
-            .load()
+        playerAPI(watch.video).video(watch.videoID).load()
             .onSuccess { [weak self] response in
                 guard let self else { return }
 
@@ -29,26 +30,23 @@ extension PlayerModel {
                 }
             }
             .onCompletion { _ in
-                self.logger.info("LOADED history details: \(id)")
+                self.logger.info("LOADED history details: \(watch.videoID)")
 
-                if self.historyItemBeingLoaded == id {
+                if self.historyItemBeingLoaded == watch.videoID {
                     self.logger.info("setting no history loaded")
                     self.historyItemBeingLoaded = nil
                 }
 
-                if let id = self.historyItemsToLoad.popLast() {
-                    self.loadHistoryVideoDetails(id)
+                if let watch = self.historyItemsToLoad.popLast() {
+                    self.loadHistoryVideoDetails(watch)
                 }
             }
     }
 
     func updateWatch(finished: Bool = false) {
-        guard let id = currentVideo?.videoID,
-              Defaults[.saveHistory]
-        else {
-            return
-        }
+        guard let currentVideo, saveHistory else { return }
 
+        let id = currentVideo.videoID
         let time = backend.currentTime
         let seconds = time?.seconds ?? 0
 
@@ -70,6 +68,8 @@ extension PlayerModel {
                 }
                 watch = Watch(context: self.backgroundContext)
                 watch.videoID = id
+                watch.appName = currentVideo.app.rawValue
+                watch.instanceURL = currentVideo.instanceURL
             } else {
                 watch = results?.first
             }

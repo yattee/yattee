@@ -128,7 +128,7 @@ struct OpenVideosModel {
                 let parser = URLParser(url: url)
 
                 if parser.destination == .video, let id = parser.videoID {
-                    video = Video(videoID: id)
+                    video = Video(app: .local, videoID: id)
                     logger.info("identified remote video: \(id)")
                 } else {
                     video = .local(url)

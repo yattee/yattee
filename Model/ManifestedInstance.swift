@@ -9,7 +9,7 @@ struct ManifestedInstance: Identifiable, Hashable {
     let url: URL
 
     var instance: Instance {
-        .init(app: app, name: "Public - \(country)", apiURL: url.absoluteString)
+        .init(app: app, name: "Public - \(country)", apiURLString: url.absoluteString)
     }
 
     var location: String {
@@ -21,7 +21,7 @@ struct ManifestedInstance: Identifiable, Hashable {
             id: UUID().uuidString,
             app: app,
             name: location,
-            url: url.absoluteString,
+            urlString: url.absoluteString,
             anonymous: true,
             country: country,
             region: region

@@ -9,6 +9,7 @@ final class AccountsModel: ObservableObject {
 
     @Published private var invidious = InvidiousAPI()
     @Published private var piped = PipedAPI()
+    @Published private var peerTube = PeerTubeAPI()
 
     @Published var publicAccount: Account?
 
@@ -31,15 +32,19 @@ final class AccountsModel: ObservableObject {
     }
 
     var app: VideosApp {
-        current?.instance?.app ?? .invidious
+        current?.instance?.app ?? .local
     }
 
-    var api: VideosAPI {
+    var api: VideosAPI! {
         switch app {
         case .piped:
             return piped
         case .invidious:
             return invidious
+        case .peerTube:
+            return peerTube
+        default:
+            return nil
         }
     }
 
@@ -83,10 +88,14 @@ final class AccountsModel: ObservableObject {
         }
 
         switch account.instance.app {
+        case .local:
+            return
         case .invidious:
             invidious.setAccount(account)
         case .piped:
             piped.setAccount(account)
+        case .peerTube:
+            peerTube.setAccount(account)
         }
 
         Defaults[.lastAccountIsPublic] = account.isPublic
@@ -102,7 +111,7 @@ final class AccountsModel: ObservableObject {
     }
 
     static func add(instance: Instance, name: String, username: String, password: String) -> Account {
-        let account = Account(instanceID: instance.id, name: name, url: instance.apiURL)
+        let account = Account(instanceID: instance.id, name: name, urlString: instance.apiURLString)
         Defaults[.accounts].append(account)
 
         setCredentials(account, username: username, password: password)

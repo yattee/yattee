@@ -99,7 +99,7 @@ final class PlayerModel: ObservableObject {
     @Published var queueItemBeingLoaded: PlayerQueueItem?
     @Published var queueItemsToLoad = [PlayerQueueItem]()
     @Published var historyItemBeingLoaded: Video.ID?
-    @Published var historyItemsToLoad = [Video.ID]()
+    @Published var historyItemsToLoad = [Watch]()
 
     @Published var preservedTime: CMTime?
 
@@ -125,6 +125,7 @@ final class PlayerModel: ObservableObject {
         @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
     #endif
 
+    var accounts: AccountsModel { .shared }
     var comments: CommentsModel { .shared }
     var controls: PlayerControlsModel { .shared }
     var playerTime: PlayerTimeModel { .shared }
@@ -152,6 +153,7 @@ final class PlayerModel: ObservableObject {
         }
     }}
 
+    @Default(.saveHistory) var saveHistory
     @Default(.saveLastPlayed) var saveLastPlayed
     @Default(.lastPlayed) var lastPlayed
     @Default(.qualityProfiles) var qualityProfiles
@@ -709,7 +711,7 @@ final class PlayerModel: ObservableObject {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 guard let self else { return }
-                self.playerAPI.loadDetails(item, completionHandler: { newItem in
+                self.playerAPI(item.video).loadDetails(item, completionHandler: { newItem in
                     guard newItem.videoID == self.autoplayItem?.videoID else { return }
                     self.autoplayItem = newItem
                     self.updateRemoteCommandCenter()

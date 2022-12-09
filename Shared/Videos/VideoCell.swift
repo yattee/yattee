@@ -14,7 +14,7 @@ struct VideoCell: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @ObservedObject var thumbnails = ThumbnailsModel.shared
+    @ObservedObject private var thumbnails = ThumbnailsModel.shared
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail

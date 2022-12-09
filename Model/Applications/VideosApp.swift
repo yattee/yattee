@@ -1,14 +1,17 @@
 import Foundation
 
 enum VideosApp: String, CaseIterable {
-    case invidious, piped
+    case local
+    case invidious
+    case piped
+    case peerTube
 
     var name: String {
         rawValue.capitalized
     }
 
     var supportsAccounts: Bool {
-        true
+        self != .local
     }
 
     var supportsPopular: Bool {
@@ -17,6 +20,10 @@ enum VideosApp: String, CaseIterable {
 
     var supportsSearchFilters: Bool {
         self == .invidious
+    }
+
+    var supportsSearchSuggestions: Bool {
+        self != .peerTube
     }
 
     var supportsSubscriptions: Bool {
@@ -28,7 +35,7 @@ enum VideosApp: String, CaseIterable {
     }
 
     var supportsUserPlaylists: Bool {
-        true
+        self != .local
     }
 
     var userPlaylistsEndpointIncludesVideos: Bool {
@@ -64,6 +71,6 @@ enum VideosApp: String, CaseIterable {
     }
 
     var supportsOpeningVideosByID: Bool {
-        true
+        self != .local
     }
 }

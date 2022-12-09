@@ -42,7 +42,7 @@ final class CommentsModel: ObservableObject {
 
         firstPage = page.isNil || page!.isEmpty
 
-        player.playerAPI.comments(video.videoID, page: page)?
+        player.playerAPI(video).comments(video.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
                 if let page: CommentsPage = response.typedContent() {

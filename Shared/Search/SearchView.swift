@@ -58,7 +58,7 @@ struct SearchView: View {
                 VStack {
                     SearchTextField(favoriteItem: $favoriteItem)
 
-                    if state.query.query != state.queryText {
+                    if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
                         SearchSuggestions()
                             .opacity(state.queryText.isEmpty ? 0 : 1)
                     } else {
@@ -72,7 +72,7 @@ struct SearchView: View {
                     results
 
                     #if os(macOS)
-                        if state.query.query != state.queryText {
+                        if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
                             HStack {
                                 Spacer()
                                 SearchSuggestions()
@@ -121,6 +121,9 @@ struct SearchView: View {
             if !videos.isEmpty {
                 state.store.replace(ContentItem.array(of: videos))
             }
+        }
+        .onChange(of: accounts.current) { _ in
+            state.reloadQuery()
         }
         .onChange(of: state.queryText) { newQuery in
             if newQuery.isEmpty {

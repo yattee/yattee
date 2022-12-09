@@ -10,6 +10,7 @@ extension Video {
         let chapterImageURL = URL(string: "https://pipedproxy.kavin.rocks/vi/rr2XfL_df3o/hqdefault_29633.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&rs=AOn4CLDFDm9D5SvsIA7D3v5n5KZahLs_UA&host=i.ytimg.com")!
 
         return Video(
+            app: .invidious,
             videoID: fixtureID,
             title: "Relaxing Piano Music to feel good",
             author: "Fancy Videotuber",

@@ -9,6 +9,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
     @Published var account: Account!
 
+    static func withAnonymousAccountForInstanceURL(_ url: URL) -> PipedAPI {
+        .init(account: Instance(app: .piped, apiURLString: url.absoluteString).anonymousAccount)
+    }
+
     init(account: Account? = nil) {
         super.init()
 
@@ -473,6 +477,9 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
 
         return Video(
+            instanceID: account.instanceID,
+            app: .piped,
+            instanceURL: account.instance.apiURL,
             videoID: extractID(from: content),
             title: details["title"]?.string ?? "",
             author: author,

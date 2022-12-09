@@ -20,6 +20,7 @@ struct ShareButton<LabelView: View>: View {
     }
 
     @ViewBuilder var body: some View {
+        // TODO: this should work with other content item types
         if let video = contentItem.video, !video.localStreamIsFile {
             Menu {
                 if video.localStreamIsRemoteURL {
@@ -44,7 +45,7 @@ struct ShareButton<LabelView: View>: View {
     private var instanceActions: some View {
         Group {
             Button(labelForShareURL(accounts.app.name)) {
-                if let url = player.playerAPI.shareURL(contentItem) {
+                if let url = player.playerAPI(contentItem.video).shareURL(contentItem) {
                     shareAction(url)
                 } else {
                     navigation.presentAlert(
@@ -57,7 +58,7 @@ struct ShareButton<LabelView: View>: View {
             if contentItemIsPlayerCurrentVideo {
                 Button(labelForShareURL(accounts.app.name, withTime: true)) {
                     shareAction(
-                        player.playerAPI.shareURL(
+                        player.playerAPI(player.currentVideo!).shareURL(
                             contentItem,
                             time: player.backend.currentTime
                         )!

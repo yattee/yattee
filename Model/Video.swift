@@ -7,12 +7,25 @@ import SwiftyJSON
 struct Video: Identifiable, Equatable, Hashable {
     enum VideoID {
         static func isValid(_ id: Video.ID) -> Bool {
+            isYouTube(id) || isPeerTube(id)
+        }
+
+        static func isYouTube(_ id: Video.ID) -> Bool {
             id.count == 11
+        }
+
+        static func isPeerTube(_ id: Video.ID) -> Bool {
+            id.count == 36
         }
     }
 
-    let id: String
-    let videoID: String
+    var instanceID: Instance.ID?
+    var app: VideosApp
+    var instanceURL: URL?
+
+    var id: String
+    var videoID: String
+    var videoURL: URL?
     var title: String
     var thumbnails: [Thumbnail]
     var author: String
@@ -43,8 +56,12 @@ struct Video: Identifiable, Equatable, Hashable {
     var captions = [Captions]()
 
     init(
+        instanceID: Instance.ID? = nil,
+        app: VideosApp,
+        instanceURL: URL? = nil,
         id: String? = nil,
         videoID: String,
+        videoURL: URL? = nil,
         title: String = "",
         author: String = "",
         length: TimeInterval = .zero,
@@ -66,8 +83,12 @@ struct Video: Identifiable, Equatable, Hashable {
         chapters: [Chapter] = [],
         captions: [Captions] = []
     ) {
+        self.instanceID = instanceID
+        self.app = app
+        self.instanceURL = instanceURL
         self.id = id ?? UUID().uuidString
         self.videoID = videoID
+        self.videoURL = videoURL
         self.title = title
         self.author = author
         self.length = length
@@ -92,9 +113,22 @@ struct Video: Identifiable, Equatable, Hashable {
 
     static func local(_ url: URL) -> Video {
         Video(
+            app: .local,
             videoID: url.absoluteString,
             streams: [.init(localURL: url)]
         )
+    }
+
+    var instance: Instance! {
+        if let instance = InstancesModel.shared.find(instanceID) {
+            return instance
+        }
+
+        if let url = instanceURL?.absoluteString {
+            return Instance(app: app, id: instanceID, apiURLString: url, proxiesVideos: false)
+        }
+
+        return nil
     }
 
     var isLocal: Bool {
@@ -118,7 +152,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var publishedDate: String? {
-        (published.isEmpty || published == "0 seconds ago") ? nil : published
+        (published.isEmpty || published == "0 seconds ago") ? publishedAt?.timeIntervalSince1970.formattedAsRelativeTime() : published
     }
 
     var viewsCount: String? {

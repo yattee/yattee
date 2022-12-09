@@ -63,8 +63,8 @@ final class InstancesManifest: Service, ObservableObject {
                 var regionInstances = instances.filter { $0.region == region }
 
                 if let publicAccountUrl = AccountsModel.shared.publicAccount?.url {
-                    countryInstances = countryInstances.filter { $0.url.absoluteString != publicAccountUrl }
-                    regionInstances = regionInstances.filter { $0.url.absoluteString != publicAccountUrl }
+                    countryInstances = countryInstances.filter { $0.url != publicAccountUrl }
+                    regionInstances = regionInstances.filter { $0.url != publicAccountUrl }
                 }
 
                 var instance: ManifestedInstance?

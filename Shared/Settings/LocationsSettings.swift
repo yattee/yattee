@@ -100,7 +100,7 @@ struct LocationsSettings: View {
     @ViewBuilder var countryFooter: some View {
         if let account = accounts.current {
             let locationType = account.isPublic ? (account.country ?? "Unknown") : "Custom".localized()
-            let description = account.isPublic ? account.url : account.instance?.description ?? "unknown".localized()
+            let description = account.isPublic ? account.urlString : account.instance?.description ?? "unknown".localized()
 
             Text("Current: \(locationType)\n\(description)")
                 .foregroundColor(.secondary)

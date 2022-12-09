@@ -65,6 +65,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
         checkError(mpv_set_option_string(mpv, "hwdec", machine == "x86_64" ? "no" : "auto-safe"))
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
+        checkError(mpv_set_option_string(mpv, "demuxer-lavf-analyzeduration", "1"))
 
         checkError(mpv_initialize(mpv))
 
@@ -134,8 +135,9 @@ final class MPVClient: ObservableObject {
         var args = [url.absoluteString]
         var options = [String]()
 
-        if let time {
-            args.append("replace")
+        args.append("replace")
+
+        if let time, time.seconds > 0 {
             options.append("start=\(Int(time.seconds))")
         }
 
@@ -148,8 +150,10 @@ final class MPVClient: ObservableObject {
         }
 
         if forceSeekable {
-            options.append("force-seekable=yes")
+//            options.append("stream-lavf-o=seekable=0")
         }
+
+        options.append("stream-lavf-o=seekable=0")
 
         if !options.isEmpty {
             args.append(options.joined(separator: ","))

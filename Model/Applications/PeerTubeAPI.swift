@@ -5,20 +5,21 @@ import Foundation
 import Siesta
 import SwiftyJSON
 
-final class InvidiousAPI: Service, ObservableObject, VideosAPI {
+final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
     static let basePath = "/api/v1"
 
     @Published var account: Account!
-    @Published var validInstance = true
 
-    static func withAnonymousAccountForInstanceURL(_ url: URL) -> InvidiousAPI {
-        .init(account: Instance(app: .invidious, apiURLString: url.absoluteString).anonymousAccount)
-    }
+    @Published var validInstance = true
 
     var signedIn: Bool {
         guard let account else { return false }
 
         return !account.anonymous && !(account.token?.isEmpty ?? true)
+    }
+
+    static func withAnonymousAccountForInstanceURL(_ url: URL) -> PeerTubeAPI {
+        .init(account: Instance(app: .peerTube, apiURLString: url.absoluteString).anonymousAccount)
     }
 
     init(account: Account? = nil) {
@@ -94,25 +95,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.map(self.extractVideo)
         }
 
-        configureTransformer(pathPattern("trending"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(self.extractVideo)
+        configureTransformer(pathPattern("videos"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
+            content.json.dictionaryValue["data"]?.arrayValue.map(self.extractVideo) ?? []
         }
 
-        configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
-            let results = content.json.arrayValue.compactMap { json -> ContentItem? in
-                let type = json.dictionaryValue["type"]?.string
-
-                if type == "channel" {
-                    return ContentItem(channel: self.extractChannel(from: json))
-                } else if type == "playlist" {
-                    return ContentItem(playlist: self.extractChannelPlaylist(from: json))
-                } else if type == "video" {
-                    return ContentItem(video: self.extractVideo(from: json))
-                }
-
-                return nil
-            }
-
+        configureTransformer(pathPattern("search/videos"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
+            let results = content.json.dictionaryValue["data"]?.arrayValue.compactMap { json -> ContentItem in .init(video: self.extractVideo(from: json)) } ?? []
             return SearchPage(results: results, last: results.isEmpty)
         }
 
@@ -264,9 +252,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func trending(country: Country, category: TrendingCategory?) -> Resource {
-        resource(baseURL: account.url, path: "\(Self.basePath)/trending")
-            .withParam("type", category?.name)
-            .withParam("region", country.rawValue)
+        resource(baseURL: account.url, path: "\(Self.basePath)/videos")
+            .withParam("isLocal", "true")
+//            .withParam("type", category?.name)
+//            .withParam("region", country.rawValue)
     }
 
     var home: Resource? {
@@ -403,22 +392,22 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func search(_ query: SearchQuery, page: String?) -> Resource {
-        var resource = resource(baseURL: account.url, path: basePathAppending("search"))
-            .withParam("q", searchQuery(query.query))
-            .withParam("sort_by", query.sortBy.parameter)
-            .withParam("type", "all")
-
-        if let date = query.date, date != .any {
-            resource = resource.withParam("date", date.rawValue)
-        }
-
-        if let duration = query.duration, duration != .any {
-            resource = resource.withParam("duration", duration.rawValue)
-        }
-
-        if let page {
-            resource = resource.withParam("page", page)
-        }
+        var resource = resource(baseURL: account.url, path: basePathAppending("search/videos"))
+            .withParam("search", query.query)
+//            .withParam("sort_by", query.sortBy.parameter)
+//            .withParam("type", "all")
+//
+//        if let date = query.date, date != .any {
+//            resource = resource.withParam("date", date.rawValue)
+//        }
+//
+//        if let duration = query.duration, duration != .any {
+//            resource = resource.withParam("duration", duration.rawValue)
+//        }
+//
+//        if let page {
+//            resource = resource.withParam("page", page)
+//        }
 
         return resource
     }
@@ -435,27 +424,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         return resource.withParam("continuation", page)
     }
 
-    private func searchQuery(_ query: String) -> String {
-        var searchQuery = query
-
-        let url = URLComponents(string: query)
-
-        if url != nil,
-           url!.host == "youtu.be"
-        {
-            searchQuery = url!.path.replacingOccurrences(of: "/", with: "")
-        }
-
-        let queryItem = url?.queryItems?.first { item in item.name == "v" }
-        if let id = queryItem?.value {
-            searchQuery = id
-        }
-
-        return searchQuery
-    }
-
     static func proxiedAsset(instance: Instance, asset: AVURLAsset) -> AVURLAsset? {
-        guard let instanceURLComponents = URLComponents(url: instance.apiURL, resolvingAgainstBaseURL: false),
+        guard let instanceURLComponents = URLComponents(string: instance.apiURLString),
               var urlComponents = URLComponents(url: asset.url, resolvingAgainstBaseURL: false) else { return nil }
 
         urlComponents.scheme = instanceURLComponents.scheme
@@ -469,75 +439,41 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func extractVideo(from json: JSON) -> Video {
-        let indexID: String?
-        var id: Video.ID
-        var publishedAt: Date?
-
-        if let publishedInterval = json["published"].double {
-            publishedAt = Date(timeIntervalSince1970: publishedInterval)
-        }
-
-        let videoID = json["videoId"].stringValue
-
-        if let index = json["indexId"].string {
-            indexID = index
-            id = videoID + index
-        } else {
-            indexID = nil
-            id = videoID
-        }
-
-        let description = json["description"].stringValue
+        let id = json["uuid"].stringValue
+        let url = json["url"].url
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let publishedAt = dateFormatter.date(from: json["publishedAt"].stringValue)
 
         return Video(
             instanceID: account.instanceID,
-            app: .invidious,
+            app: .peerTube,
             instanceURL: account.instance.apiURL,
-            videoID: videoID,
-            title: json["title"].stringValue,
-            author: json["author"].stringValue,
-            length: json["lengthSeconds"].doubleValue,
-            published: json["publishedText"].stringValue,
-            views: json["viewCount"].intValue,
-            description: description,
-            genre: json["genre"].stringValue,
-            channel: extractChannel(from: json),
+            id: id,
+            videoID: id,
+            videoURL: url,
+            title: json["name"].stringValue,
+            author: json["channel"].dictionaryValue["name"]?.stringValue ?? "",
+            length: json["duration"].doubleValue,
+            views: json["views"].intValue,
+            description: json["description"].stringValue,
+            channel: extractChannel(from: json["channel"]),
             thumbnails: extractThumbnails(from: json),
-            indexID: indexID,
-            live: json["liveNow"].boolValue,
-            upcoming: json["isUpcoming"].boolValue,
+            live: json["isLive"].boolValue,
             publishedAt: publishedAt,
-            likes: json["likeCount"].int,
-            dislikes: json["dislikeCount"].int,
-            keywords: json["keywords"].arrayValue.compactMap { $0.string },
-            streams: extractStreams(from: json),
-            related: extractRelated(from: json),
-            chapters: extractChapters(from: description),
-            captions: extractCaptions(from: json)
+            likes: json["likes"].int,
+            dislikes: json["dislikes"].int,
+            streams: extractStreams(from: json)
+//            related: extractRelated(from: json),
+//            chapters: extractChapters(from: description),
+//            captions: extractCaptions(from: json)
         )
     }
 
     func extractChannel(from json: JSON) -> Channel {
-        var thumbnailURL = json["authorThumbnails"].arrayValue.last?.dictionaryValue["url"]?.string ?? ""
-
-        // append protocol to unproxied thumbnail URL if it's missing
-        if thumbnailURL.count > 2,
-           String(thumbnailURL[..<thumbnailURL.index(thumbnailURL.startIndex, offsetBy: 2)]) == "//",
-           let accountUrlComponents = URLComponents(string: account.urlString)
-        {
-            thumbnailURL = "\(accountUrlComponents.scheme ?? "https"):\(thumbnailURL)"
-        }
-
-        return Channel(
-            id: json["authorId"].stringValue,
-            name: json["author"].stringValue,
-            bannerURL: json["authorBanners"].arrayValue.first?.dictionaryValue["url"]?.url,
-            thumbnailURL: URL(string: thumbnailURL),
-            description: json["description"].stringValue,
-            subscriptionsCount: json["subCount"].int,
-            subscriptionsText: json["subCountText"].string,
-            totalViews: json["totalViews"].int,
-            videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(extractVideo) ?? []
+        Channel(
+            id: json["id"].stringValue,
+            name: json["name"].stringValue
         )
     }
 
@@ -554,88 +490,48 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractThumbnails(from details: JSON) -> [Thumbnail] {
-        details["videoThumbnails"].arrayValue.compactMap { json in
-            guard let url = json["url"].url,
-                  var components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                  let quality = json["quality"].string,
-                  let accountUrlComponents = URLComponents(string: account.urlString)
-            else {
-                return nil
-            }
-
-            // some of instances are not configured properly and return thumbnails links
-            // with incorrect scheme
-            components.scheme = accountUrlComponents.scheme
-
-            guard let thumbnailUrl = components.url else {
-                return nil
-            }
-
-            return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
+        if let thumbnailPath = details["thumbnailPath"].string {
+            return [Thumbnail(url: URL(string: thumbnailPath, relativeTo: account.url)!, quality: .medium)]
         }
+        return []
     }
 
     private func extractStreams(from json: JSON) -> [Stream] {
         let hls = extractHLSStreams(from: json)
-        if json["liveNow"].boolValue {
+
+        if json["isLive"].boolValue {
             return hls
         }
 
-        return extractFormatStreams(from: json["formatStreams"].arrayValue) +
-            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue) +
+        return extractFormatStreams(from: json) +
+            extractAdaptiveFormats(from: json) +
             hls
     }
 
-    private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
-        streams.compactMap { stream in
-            guard let streamURL = stream["url"].url else {
-                return nil
-            }
-
-            return SingleAssetStream(
-                instance: account.instance,
-                avAsset: AVURLAsset(url: streamURL),
-                resolution: Stream.Resolution.from(resolution: stream["resolution"].string ?? ""),
-                kind: .stream,
-                encoding: stream["encoding"].string ?? ""
-            )
+    private func extractFormatStreams(from json: JSON) -> [Stream] {
+        var streams = [Stream]()
+        if let fileURL = json.dictionaryValue["streamingPlaylists"]?.arrayValue.first?
+            .dictionaryValue["files"]?.arrayValue.first?
+            .dictionaryValue["fileUrl"]?.url
+        {
+            streams.append(SingleAssetStream(instance: account.instance, avAsset: AVURLAsset(url: fileURL), resolution: .hd720p30, kind: .stream))
         }
+
+        return streams
     }
 
-    private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
-        let audioStreams = streams
-            .filter { $0["type"].stringValue.starts(with: "audio/mp4") }
-            .sorted {
-                $0.dictionaryValue["bitrate"]?.int ?? 0 >
-                    $1.dictionaryValue["bitrate"]?.int ?? 0
-            }
-        guard let audioStream = audioStreams.first else {
-            return .init()
-        }
-
-        let videoStreams = streams.filter { $0["type"].stringValue.starts(with: "video/") }
-
-        return videoStreams.compactMap { videoStream in
-            guard let audioAssetURL = audioStream["url"].url,
-                  let videoAssetURL = videoStream["url"].url
-            else {
-                return nil
+    private func extractAdaptiveFormats(from json: JSON) -> [Stream] {
+        json.dictionaryValue["files"]?.arrayValue.compactMap { file in
+            if let resolution = file.dictionaryValue["resolution"]?.dictionaryValue["label"]?.stringValue, let url = file.dictionaryValue["fileUrl"]?.url {
+                return SingleAssetStream(instance: account.instance, avAsset: AVURLAsset(url: url), resolution: Stream.Resolution.from(resolution: resolution), kind: .adaptive, videoFormat: "mp4")
             }
 
-            return Stream(
-                instance: account.instance,
-                audioAsset: AVURLAsset(url: audioAssetURL),
-                videoAsset: AVURLAsset(url: videoAssetURL),
-                resolution: Stream.Resolution.from(resolution: videoStream["resolution"].stringValue),
-                kind: .adaptive,
-                encoding: videoStream["encoding"].string,
-                videoFormat: videoStream["type"].string
-            )
-        }
+            return nil
+        } ?? []
     }
 
     private func extractHLSStreams(from content: JSON) -> [Stream] {
-        if let hlsURL = content.dictionaryValue["hlsUrl"]?.url {
+        if let hlsURL = content.dictionaryValue["streamingPlaylists"]?.arrayValue.first?.dictionaryValue["playlistUrl"]?.url {
             return [Stream(instance: account.instance, hlsURL: hlsURL)]
         }
 
@@ -681,14 +577,16 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractCaptions(from content: JSON) -> [Captions] {
-        content["captions"].arrayValue.compactMap { details in
-            guard let url = URL(string: details["url"].stringValue, relativeTo: account.url) else { return nil }
-
-            return Captions(
-                label: details["label"].stringValue,
-                code: details["language_code"].stringValue,
-                url: url
-            )
+        content["captions"].arrayValue.compactMap { _ in
+            nil
+//            let baseURL = account.url
+//            guard let url = URL(string: baseURL + details["url"].stringValue) else { return nil }
+//
+//            return Captions(
+//                label: details["label"].stringValue,
+//                code: details["language_code"].stringValue,
+//                url: url
+//            )
         }
     }
 }

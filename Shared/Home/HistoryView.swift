@@ -34,7 +34,6 @@ struct HistoryView: View {
         .onAppear {
             visibleWatches
                 .prefix(Self.detailsPreloadLimit)
-                .map(\.videoID)
                 .forEach(player.loadHistoryVideoDetails)
         }
         #if os(tvOS)

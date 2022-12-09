@@ -33,6 +33,7 @@ struct FixtureEnvironmentObjectsModifier: ViewModifier {
 
         player.currentItem = PlayerQueueItem(
             Video(
+                app: .invidious,
                 videoID: "https://a/b/c",
                 title: "Video Name",
                 author: "",

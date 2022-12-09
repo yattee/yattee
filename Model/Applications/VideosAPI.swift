@@ -6,6 +6,8 @@ protocol VideosAPI {
     var account: Account! { get }
     var signedIn: Bool { get }
 
+    static func withAnonymousAccountForInstanceURL(_ url: URL) -> Self
+
     func channel(_ id: String, contentType: Channel.ContentType, data: String?) -> Resource
     func channelByName(_ name: String) -> Resource?
     func channelByUsername(_ username: String) -> Resource?

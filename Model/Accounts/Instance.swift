@@ -7,25 +7,33 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     let app: VideosApp
     let id: String
     let name: String
-    let apiURL: String
+    let apiURLString: String
     var frontendURL: String?
     var proxiesVideos: Bool
 
-    init(app: VideosApp, id: String? = nil, name: String, apiURL: String, frontendURL: String? = nil, proxiesVideos: Bool = false) {
+    init(app: VideosApp, id: String? = nil, name: String? = nil, apiURLString: String, frontendURL: String? = nil, proxiesVideos: Bool = false) {
         self.app = app
         self.id = id ?? UUID().uuidString
-        self.name = name
-        self.apiURL = apiURL
+        self.name = name ?? app.rawValue
+        self.apiURLString = apiURLString
         self.frontendURL = frontendURL
         self.proxiesVideos = proxiesVideos
     }
 
-    var anonymous: VideosAPI {
+    var apiURL: URL! {
+        URL(string: apiURLString)
+    }
+
+    var anonymous: VideosAPI! {
         switch app {
         case .invidious:
             return InvidiousAPI(account: anonymousAccount)
         case .piped:
             return PipedAPI(account: anonymousAccount)
+        case .peerTube:
+            return PeerTubeAPI(account: anonymousAccount)
+        case .local:
+            return nil
         }
     }
 
@@ -34,23 +42,23 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var longDescription: String {
-        name.isEmpty ? "\(app.name) - \(apiURL)" : "\(app.name) - \(name) (\(apiURL))"
+        name.isEmpty ? "\(app.name) - \(apiURLString)" : "\(app.name) - \(name) (\(apiURL))"
     }
 
     var shortDescription: String {
-        name.isEmpty ? apiURL : name
+        name.isEmpty ? apiURLString : name
     }
 
     var anonymousAccount: Account {
-        Account(instanceID: id, name: "Anonymous".localized(), url: apiURL, anonymous: true)
+        Account(instanceID: id, name: "Anonymous".localized(), urlString: apiURLString, anonymous: true)
     }
 
     var urlComponents: URLComponents {
-        URLComponents(string: apiURL)!
+        URLComponents(url: apiURL, resolvingAgainstBaseURL: false)!
     }
 
     var frontendHost: String? {
-        guard let url = app == .invidious ? apiURL : frontendURL else {
+        guard let url = app == .invidious ? apiURLString : frontendURL else {
             return nil
         }
 
