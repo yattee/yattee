@@ -34,14 +34,15 @@ struct SignInRequiredView<Content: View>: View {
 
             Group {
                 if instances.isEmpty {
-                    Text("You need to create an instance and accounts\nto access \(title) section")
+                    Text("You need to create an instance and accounts to access \(title) section")
                 } else {
-                    Text("You need to select an account\nto access \(title) section")
+                    Text("You need to select an account to access \(title) section")
                 }
             }
             .multilineTextAlignment(.center)
             .foregroundColor(.secondary)
             .font(.title3)
+            .padding(.horizontal, 10)
             .padding(.vertical)
 
             #if !os(tvOS)
@@ -65,6 +66,5 @@ struct SignInRequiredView_Previews: PreviewProvider {
                 Text("Only when signed in")
             }
         }
-        .injectFixtureEnvironmentObjects()
     }
 }
