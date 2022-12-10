@@ -37,7 +37,7 @@ struct SearchView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls {
+        VStack {
             #if os(iOS)
                 VStack {
                     if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {

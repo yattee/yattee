@@ -61,10 +61,8 @@ struct SignInRequiredView<Content: View>: View {
 
 struct SignInRequiredView_Previews: PreviewProvider {
     static var previews: some View {
-        BrowserPlayerControls {
-            SignInRequiredView(title: "Subscriptions") {
-                Text("Only when signed in")
-            }
+        SignInRequiredView(title: "Subscriptions") {
+            Text("Only when signed in")
         }
     }
 }

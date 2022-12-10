@@ -33,20 +33,18 @@ struct TrendingView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls {
-            Section {
-                VStack(spacing: 0) {
-                    #if os(tvOS)
-                        toolbar
-                        HorizontalCells(items: trending)
-                            .padding(.top, 40)
+        Section {
+            VStack(spacing: 0) {
+                #if os(tvOS)
+                    toolbar
+                    HorizontalCells(items: trending)
+                        .padding(.top, 40)
 
-                        Spacer()
-                    #else
-                        VerticalCells(items: trending)
-                            .environment(\.scrollViewBottomPadding, 70)
-                    #endif
-                }
+                    Spacer()
+                #else
+                    VerticalCells(items: trending)
+                        .environment(\.scrollViewBottomPadding, 70)
+                #endif
             }
         }
 

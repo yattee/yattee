@@ -33,159 +33,157 @@ struct HomeView: View {
     private var navigation: NavigationModel { .shared }
 
     var body: some View {
-        BrowserPlayerControls {
-            ScrollView(.vertical, showsIndicators: false) {
-                HStack {
-                    #if os(tvOS)
-                        Group {
-                            if showOpenActionsInHome {
-                                OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
-                                    NavigationModel.shared.presentingOpenVideos = true
-                                }
-                            }
-                            OpenVideosButton(text: "Settings", imageSystemName: "gear") {
-                                NavigationModel.shared.presentingSettings = true
-                            }
-                        }
-                    #else
+        ScrollView(.vertical, showsIndicators: false) {
+            HStack {
+                #if os(tvOS)
+                    Group {
                         if showOpenActionsInHome {
-                            OpenVideosButton(text: "Files", imageSystemName: "folder") {
-                                NavigationModel.shared.presentingFileImporter = true
-                            }
-                            OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
-                                OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
-                            }
-                            OpenVideosButton(imageSystemName: "ellipsis") {
+                            OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
                                 NavigationModel.shared.presentingOpenVideos = true
                             }
-                            .frame(maxWidth: 40)
                         }
-                    #endif
-                }
-                #if os(iOS)
-                .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
+                        OpenVideosButton(text: "Settings", imageSystemName: "gear") {
+                            NavigationModel.shared.presentingSettings = true
+                        }
+                    }
                 #else
-                .padding(.top, 15)
+                    if showOpenActionsInHome {
+                        OpenVideosButton(text: "Files", imageSystemName: "folder") {
+                            NavigationModel.shared.presentingFileImporter = true
+                        }
+                        OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
+                            OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
+                        }
+                        OpenVideosButton(imageSystemName: "ellipsis") {
+                            NavigationModel.shared.presentingOpenVideos = true
+                        }
+                        .frame(maxWidth: 40)
+                    }
                 #endif
+            }
+            #if os(iOS)
+            .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
+            #else
+            .padding(.top, 15)
+            #endif
+            #if os(tvOS)
+            .padding(.horizontal, 40)
+            #else
+            .padding(.horizontal, 15)
+            #endif
+
+            if !accounts.current.isNil, showFavoritesInHome {
                 #if os(tvOS)
-                .padding(.horizontal, 40)
+                    ForEach(Defaults[.favorites]) { item in
+                        FavoriteItemView(item: item, dragging: $dragging)
+                    }
                 #else
-                .padding(.horizontal, 15)
-                #endif
-
-                if !accounts.current.isNil, showFavoritesInHome {
-                    #if os(tvOS)
-                        ForEach(Defaults[.favorites]) { item in
-                            FavoriteItemView(item: item, dragging: $dragging)
-                        }
-                    #else
-                        ForEach(favorites) { item in
-                            FavoriteItemView(item: item, dragging: $dragging)
-                            #if os(macOS)
-                                .workaroundForVerticalScrollingBug()
-                            #endif
-                        }
-                    #endif
-                }
-
-                #if os(iOS)
-                    if homeRecentDocumentsItems > 0 {
-                        VStack {
-                            HStack {
-                                sectionLabel("Recent Documents")
-
-                                Spacer()
-
-                                Button {
-                                    recentDocumentsID = UUID()
-                                } label: {
-                                    Label("Refresh", systemImage: "arrow.clockwise")
-                                        .font(.headline)
-                                        .labelStyle(.iconOnly)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-
-                            RecentDocumentsView(limit: homeRecentDocumentsItems)
-                                .id(recentDocumentsID)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        #if os(tvOS)
-                            .padding(.trailing, 40)
-                        #else
-                            .padding(.trailing, 15)
+                    ForEach(favorites) { item in
+                        FavoriteItemView(item: item, dragging: $dragging)
+                        #if os(macOS)
+                            .workaroundForVerticalScrollingBug()
                         #endif
                     }
                 #endif
+            }
 
-                if homeHistoryItems > 0 {
+            #if os(iOS)
+                if homeRecentDocumentsItems > 0 {
                     VStack {
                         HStack {
-                            sectionLabel("History")
+                            sectionLabel("Recent Documents")
+
                             Spacer()
+
                             Button {
-                                navigation.presentAlert(
-                                    Alert(
-                                        title: Text("Are you sure you want to clear history of watched videos?"),
-                                        message: Text("It cannot be reverted"),
-                                        primaryButton: .destructive(Text("Clear All")) {
-                                            PlayerModel.shared.removeHistory()
-                                            historyID = UUID()
-                                        },
-                                        secondaryButton: .cancel()
-                                    )
-                                )
+                                recentDocumentsID = UUID()
                             } label: {
-                                Label("Clear History", systemImage: "trash")
+                                Label("Refresh", systemImage: "arrow.clockwise")
                                     .font(.headline)
                                     .labelStyle(.iconOnly)
                                     .foregroundColor(.secondary)
                             }
-                            .buttonStyle(.plain)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        #if os(tvOS)
-                            .padding(.trailing, 40)
-                        #else
-                            .padding(.trailing, 15)
-                        #endif
 
-                        HistoryView(limit: homeHistoryItems)
-                            .id(historyID)
+                        RecentDocumentsView(limit: homeRecentDocumentsItems)
+                            .id(recentDocumentsID)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    #if os(tvOS)
+                        .padding(.trailing, 40)
+                    #else
+                        .padding(.trailing, 15)
+                    #endif
                 }
+            #endif
 
-                #if !os(tvOS)
-                    Color.clear.padding(.bottom, 60)
-                #endif
-            }
-            .onAppear {
-                Defaults.observe(.favorites) { _ in
-                    favoritesChanged.toggle()
+            if homeHistoryItems > 0 {
+                VStack {
+                    HStack {
+                        sectionLabel("History")
+                        Spacer()
+                        Button {
+                            navigation.presentAlert(
+                                Alert(
+                                    title: Text("Are you sure you want to clear history of watched videos?"),
+                                    message: Text("It cannot be reverted"),
+                                    primaryButton: .destructive(Text("Clear All")) {
+                                        PlayerModel.shared.removeHistory()
+                                        historyID = UUID()
+                                    },
+                                    secondaryButton: .cancel()
+                                )
+                            )
+                        } label: {
+                            Label("Clear History", systemImage: "trash")
+                                .font(.headline)
+                                .labelStyle(.iconOnly)
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    #if os(tvOS)
+                        .padding(.trailing, 40)
+                    #else
+                        .padding(.trailing, 15)
+                    #endif
+
+                    HistoryView(limit: homeHistoryItems)
+                        .id(historyID)
                 }
-                .tieToLifetime(of: accounts)
             }
 
-            .redrawOn(change: favoritesChanged)
-
-            #if os(tvOS)
-                .edgesIgnoringSafeArea(.horizontal)
-            #else
-                .navigationTitle("Home")
-            #endif
-            #if os(macOS)
-            .background(Color.secondaryBackground)
-            .frame(minWidth: 360)
-            #endif
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
-            #endif
-            #if !os(macOS)
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                favoritesChanged.toggle()
-            }
+            #if !os(tvOS)
+                Color.clear.padding(.bottom, 60)
             #endif
         }
+        .onAppear {
+            Defaults.observe(.favorites) { _ in
+                favoritesChanged.toggle()
+            }
+            .tieToLifetime(of: accounts)
+        }
+
+        .redrawOn(change: favoritesChanged)
+
+        #if os(tvOS)
+            .edgesIgnoringSafeArea(.horizontal)
+        #else
+            .navigationTitle("Home")
+        #endif
+        #if os(macOS)
+        .background(Color.secondaryBackground)
+        .frame(minWidth: 360)
+        #endif
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        #endif
+        #if !os(macOS)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            favoritesChanged.toggle()
+        }
+        #endif
     }
 
     func sectionLabel(_ label: String) -> some View {

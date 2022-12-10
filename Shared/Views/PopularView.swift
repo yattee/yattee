@@ -15,24 +15,20 @@ struct PopularView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls {
-            VerticalCells(items: videos)
-                .onAppear {
-                    resource?.addObserver(store)
-                    resource?.loadIfNeeded()
-                }
-            #if !os(tvOS)
-                .navigationTitle("Popular")
-            #endif
-        }
-        #if !os(tvOS)
-        .background(
-            Button("Refresh") {
-                resource?.load()
+        VerticalCells(items: videos)
+            .onAppear {
+                resource?.addObserver(store)
+                resource?.loadIfNeeded()
             }
-            .keyboardShortcut("r")
-            .opacity(0)
-        )
+        #if !os(tvOS)
+            .navigationTitle("Popular")
+            .background(
+                Button("Refresh") {
+                    resource?.load()
+                }
+                .keyboardShortcut("r")
+                .opacity(0)
+            )
         #endif
         #if os(iOS)
         .refreshControl { refreshControl in

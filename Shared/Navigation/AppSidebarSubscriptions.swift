@@ -9,7 +9,7 @@ struct AppSidebarSubscriptions: View {
         Section(header: Text("Subscriptions")) {
             ForEach(subscriptions.all) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
-                    LazyView(ChannelVideosView(channel: channel))
+                    LazyView(ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier()))
                 } label: {
                     Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                 }

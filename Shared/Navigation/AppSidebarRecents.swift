@@ -16,17 +16,17 @@ struct AppSidebarRecents: View {
                             switch recent.type {
                             case .channel:
                                 RecentNavigationLink(recent: recent) {
-                                    LazyView(ChannelVideosView(channel: recent.channel!))
+                                    LazyView(ChannelVideosView(channel: recent.channel!).modifier(PlayerOverlayModifier()))
                                 }
 
                             case .playlist:
                                 RecentNavigationLink(recent: recent, systemImage: "list.and.film") {
-                                    LazyView(ChannelPlaylistView(playlist: recent.playlist!))
+                                    LazyView(ChannelPlaylistView(playlist: recent.playlist!).modifier(PlayerOverlayModifier()))
                                 }
 
                             case .query:
                                 RecentNavigationLink(recent: recent, systemImage: "magnifyingglass") {
-                                    LazyView(SearchView(recent.query!))
+                                    LazyView(SearchView(recent.query!).modifier(PlayerOverlayModifier()))
                                 }
                             }
                         }

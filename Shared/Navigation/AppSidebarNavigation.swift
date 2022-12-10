@@ -42,15 +42,13 @@ struct AppSidebarNavigation: View {
                 .frame(minWidth: sidebarMinWidth)
 
             VStack {
-                BrowserPlayerControls {
-                    HStack {
-                        Spacer()
-                        Image(systemName: "4k.tv")
-                            .renderingMode(.original)
-                            .font(.system(size: 60))
-                            .foregroundColor(.accentColor)
-                        Spacer()
-                    }
+                HStack {
+                    Spacer()
+                    Image(systemName: "4k.tv")
+                        .renderingMode(.original)
+                        .font(.system(size: 60))
+                        .foregroundColor(.accentColor)
+                    Spacer()
                 }
             }
         }

@@ -16,7 +16,7 @@ struct AppTabNavigation: View {
 
     var body: some View {
         TabView(selection: navigation.tabSelectionBinding) {
-            let tabs = Group {
+            Group {
                 if showHome {
                     homeNavigationView
                 }
@@ -45,13 +45,7 @@ struct AppTabNavigation: View {
                     searchNavigationView
                 }
             }
-
-            if #available(iOS 16, tvOS 16, *) {
-                tabs
-                    .toolbar(accounts.isEmpty ? .hidden : .visible, for: .tabBar)
-            } else {
-                tabs
-            }
+            .overlay(ControlsBar(fullScreen: .constant(false)), alignment: .bottom)
         }
 
         .id(accounts.current?.id ?? "")
@@ -194,5 +188,11 @@ struct AppTabNavigation: View {
                 .zIndex(player.presentingPlayer ? -1 : 1)
                 .transition(.move(edge: .bottom))
         }
+    }
+}
+
+struct AppTabNavigation_Preview: PreviewProvider {
+    static var previews: some View {
+        AppTabNavigation()
     }
 }

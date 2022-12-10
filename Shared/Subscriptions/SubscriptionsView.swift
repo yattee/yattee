@@ -10,47 +10,45 @@ struct SubscriptionsView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls {
-            SignInRequiredView(title: "Subscriptions".localized()) {
-                VerticalCells(items: videos) {
-                    HStack {
-                        Spacer()
+        SignInRequiredView(title: "Subscriptions".localized()) {
+            VerticalCells(items: videos) {
+                HStack {
+                    Spacer()
 
-                        CacheStatusHeader(refreshTime: model.formattedFeedTime, isLoading: model.isLoading)
+                    CacheStatusHeader(refreshTime: model.formattedFeedTime, isLoading: model.isLoading)
 
-                        #if os(tvOS)
-                            Button {
-                                model.loadResources(force: true)
-                            } label: {
-                                Label("Refresh", systemImage: "arrow.clockwise")
-                                    .labelStyle(.iconOnly)
-                                    .imageScale(.small)
-                                    .font(.caption2)
-                            }
-                            .padding(.horizontal, 10)
-                        #endif
-                    }
+                    #if os(tvOS)
+                        Button {
+                            model.loadResources(force: true)
+                        } label: {
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                                .labelStyle(.iconOnly)
+                                .imageScale(.small)
+                                .font(.caption2)
+                        }
+                        .padding(.horizontal, 10)
+                    #endif
                 }
-                .environment(\.loadMoreContentHandler) { model.loadNextPage() }
-                .onAppear {
-                    model.loadResources()
-                }
-                .onChange(of: accounts.current) { _ in
-                    model.reset()
-                    model.loadResources(force: true)
-                }
-                #if os(iOS)
-                .refreshControl { refreshControl in
-                    model.loadResources(force: true) {
-                        refreshControl.endRefreshing()
-                    }
-                }
-                .backport
-                .refreshable {
-                    await model.loadResources(force: true)
-                }
-                #endif
             }
+            .environment(\.loadMoreContentHandler) { model.loadNextPage() }
+            .onAppear {
+                model.loadResources()
+            }
+            .onChange(of: accounts.current) { _ in
+                model.reset()
+                model.loadResources(force: true)
+            }
+            #if os(iOS)
+            .refreshControl { refreshControl in
+                model.loadResources(force: true) {
+                    refreshControl.endRefreshing()
+                }
+            }
+            .backport
+            .refreshable {
+                await model.loadResources(force: true)
+            }
+            #endif
         }
 
         #if !os(tvOS)

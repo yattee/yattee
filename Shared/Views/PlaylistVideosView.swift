@@ -52,39 +52,37 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls {
-            VerticalCells(items: contentItems)
-                .onAppear {
-                    guard contentItems.isEmpty else { return }
-                    resource?.load()
-                }
-                .onChange(of: model.reloadPlaylists) { _ in
-                    resource?.load()
-                }
-            #if !os(tvOS)
-                .navigationTitle("\(playlist.title) Playlist")
-            #endif
-        }
-        .toolbar {
-            ToolbarItem(placement: playlistButtonsPlacement) {
-                HStack {
-                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+        VerticalCells(items: contentItems)
+            .onAppear {
+                guard contentItems.isEmpty else { return }
+                resource?.load()
+            }
+            .onChange(of: model.reloadPlaylists) { _ in
+                resource?.load()
+            }
+        #if !os(tvOS)
+            .navigationTitle("\(playlist.title) Playlist")
+        #endif
+            .toolbar {
+                ToolbarItem(placement: playlistButtonsPlacement) {
+                    HStack {
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
 
-                    Button {
-                        player.play(videos)
-                    } label: {
-                        Label("Play All", systemImage: "play")
-                    }
-                    .contextMenu {
                         Button {
-                            player.play(videos, shuffling: true)
+                            player.play(videos)
                         } label: {
-                            Label("Shuffle All", systemImage: "shuffle")
+                            Label("Play All", systemImage: "play")
+                        }
+                        .contextMenu {
+                            Button {
+                                player.play(videos, shuffling: true)
+                            } label: {
+                                Label("Shuffle All", systemImage: "shuffle")
+                            }
                         }
                     }
                 }
             }
-        }
     }
 
     private var playlistButtonsPlacement: ToolbarItemPlacement {

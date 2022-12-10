@@ -42,14 +42,10 @@ struct ChannelVideosView: View {
     var body: some View {
         if navigationStyle == .tab {
             NavigationView {
-                BrowserPlayerControls {
-                    content
-                }
-            }
-        } else {
-            BrowserPlayerControls {
                 content
             }
+        } else {
+            content
         }
     }
 
