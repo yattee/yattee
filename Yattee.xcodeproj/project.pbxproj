@@ -82,7 +82,6 @@
 		37095E82291DC85400301883 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37095E81291DC85400301883 /* ShareViewController.swift */; };
 		37095E89291DC85400301883 /* Open in Yattee.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37095E7F291DC85400301883 /* Open in Yattee.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
-		37095E8E291DD5FE00301883 /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* CacheModel.swift */; };
 		370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79C8286279810045DB77 /* NSObject+Swizzle.swift */; };
 		370B79CC286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */; };
 		370F4FA927CC163A001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
@@ -259,6 +258,10 @@
 		3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
 		3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
 		3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
+		3738535429451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
+		3738535529451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
+		3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
+		3738535729451E0C00D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		373C8FE4275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE5275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
 		373C8FE6275B955100CB5936 /* CommentsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373C8FE3275B955100CB5936 /* CommentsPage.swift */; };
@@ -1128,6 +1131,7 @@
 		3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavfilter.xcframework; sourceTree = "<group>"; };
 		3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libharfbuzz.xcframework; sourceTree = "<group>"; };
 		3736A1FD286BB72300C9E5EE /* libmpv.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libmpv.xcframework; sourceTree = "<group>"; };
+		3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCacheModel.swift; sourceTree = "<group>"; };
 		373C8FE3275B955100CB5936 /* CommentsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsPage.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
 		373CFADA269663F1003CB2C6 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
@@ -1992,6 +1996,7 @@
 		377F9F79294403DC0043F856 /* Cache */ = {
 			isa = PBXGroup;
 			children = (
+				3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */,
 				37F5E8B9291BEF69006C15F5 /* CacheModel.swift */,
 				377F9F7E2944175F0043F856 /* FeedCacheModel.swift */,
 				377F9F7A294403F20043F856 /* VideosCacheModel.swift */,
@@ -2878,8 +2883,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3738535729451E0C00D2D0CB /* BookmarksCacheModel.swift in Sources */,
 				37FD77042932C5FC00D91A5F /* Constants.swift in Sources */,
-				37095E8E291DD5FE00301883 /* CacheModel.swift in Sources */,
 				37095E82291DC85400301883 /* ShareViewController.swift in Sources */,
 				37FD77032932C5EC00D91A5F /* URL+ByReplacingYatteeProtocol.swift in Sources */,
 				37095E8D291DD5DA00301883 /* URLBookmarkModel.swift in Sources */,
@@ -3046,6 +3051,7 @@
 				37169AA22729D98A0011DE61 /* InstancesBridge.swift in Sources */,
 				37C3A24527235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				37030FFF27B04DCC00ECDDAA /* PlayerControls.swift in Sources */,
+				3738535429451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */,
 				37E6D7A02944CD3800550C3D /* CacheStatusHeader.swift in Sources */,
 				374C053F272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
 				375F7410289DC35A00747050 /* PlayerBackendView.swift in Sources */,
@@ -3169,6 +3175,7 @@
 				37CEE4BE2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				3703100327B0713600ECDDAA /* PlayerGestures.swift in Sources */,
 				374C0540272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
+				3738535529451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */,
 				379F1420289ECE7F00DE48B5 /* QualitySettings.swift in Sources */,
 				3751BA8027E64244007B1A60 /* VideoLayer.swift in Sources */,
 				375EC96B289F232600751258 /* QualityProfilesModel.swift in Sources */,
@@ -3530,6 +3537,7 @@
 				376A33E22720CAD6000C1D6B /* VideosApp.swift in Sources */,
 				373CFADD269663F1003CB2C6 /* Thumbnail.swift in Sources */,
 				376B0562293FF45F0062AC78 /* PeerTubeAPI.swift in Sources */,
+				3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */,
 				37E64DD326D597EB00C71877 /* SubscriptionsModel.swift in Sources */,
 				3752069B285E8DD300CA655F /* Chapter.swift in Sources */,
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,

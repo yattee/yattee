@@ -10,16 +10,6 @@ struct CacheModel {
     static let jsonFromDataTransformer: (Data) -> JSON = { try! JSON(data: $0) }
     static let jsonTransformer = Transformer(toData: jsonToDataTransformer, fromData: jsonFromDataTransformer)
 
-    let logger = Logger(label: "stream.yattee.cache")
-
-    static let bookmarksGroup = "group.stream.yattee.app.bookmarks"
-    let bookmarksDefaults = UserDefaults(suiteName: Self.bookmarksGroup)
-
-    func clearBookmarks() {
-        guard let bookmarksDefaults else { return }
-        bookmarksDefaults.dictionaryRepresentation().keys.forEach(bookmarksDefaults.removeObject(forKey:))
-    }
-
     func clear() {
         FeedCacheModel.shared.clear()
         VideosCacheModel.shared.clear()

@@ -16,6 +16,8 @@ struct SubscriptionsView: View {
                     HStack {
                         Spacer()
 
+                        CacheStatusHeader(refreshTime: model.formattedFeedTime, isLoading: model.isLoading)
+
                         #if os(tvOS)
                             Button {
                                 model.loadResources(force: true)
@@ -27,8 +29,7 @@ struct SubscriptionsView: View {
                             }
                             .padding(.horizontal, 10)
                         #endif
-
-                        CacheStatusHeader(refreshTime: model.formattedFeedTime, isLoading: model.isLoading)
+                    }
                 }
                 .environment(\.loadMoreContentHandler) { model.loadNextPage() }
                 .onAppear {

@@ -42,7 +42,8 @@ struct ContentView: View {
             subscriptions.load(force: true)
             playlists.load(force: true)
         }
-        .onChange(of: accounts.signedIn) { _ in
+        .onChange(of: accounts.signedIn) { newValue in
+            guard newValue else { return }
             subscriptions.load(force: true)
             playlists.load(force: true)
         }

@@ -8,7 +8,7 @@ struct URLBookmarkModel {
     var logger = Logger(label: "stream.yattee.url-bookmark")
 
     var allBookmarksKeys: [String] {
-        guard let defaults = CacheModel.shared.bookmarksDefaults else { return [] }
+        guard let defaults = BookmarksCacheModel.shared.defaults else { return [] }
 
         return defaults.dictionaryRepresentation().keys.filter { $0.starts(with: Self.bookmarkPrefix) }
     }
@@ -29,7 +29,7 @@ struct URLBookmarkModel {
             return
         }
 
-        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+        guard let defaults = BookmarksCacheModel.shared.defaults else {
             logger.error("could not open bookmarks defaults")
             return
         }
@@ -49,7 +49,7 @@ struct URLBookmarkModel {
             return
         }
 
-        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+        guard let defaults = BookmarksCacheModel.shared.defaults else {
             logger.error("could not open bookmarks defaults")
             return
         }
@@ -70,7 +70,7 @@ struct URLBookmarkModel {
 
         logger.info("loading bookmark for \(bookmarkKey(urlForBookmark))")
 
-        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+        guard let defaults = BookmarksCacheModel.shared.defaults else {
             logger.error("could not open bookmarks defaults")
             return nil
         }
@@ -103,7 +103,7 @@ struct URLBookmarkModel {
     func removeBookmark(_ url: URL) {
         logger.info("removing bookmark for \(bookmarkKey(url))")
 
-        guard let defaults = CacheModel.shared.bookmarksDefaults else {
+        guard let defaults = BookmarksCacheModel.shared.defaults else {
             logger.error("could not open bookmarks defaults")
             return
         }

@@ -162,7 +162,6 @@ struct YatteeApp: App {
 
         NavigationModel.shared.tabSelection = section ?? .search
 
-        subscriptions.load()
         playlists.load()
 
         #if !os(macOS)
