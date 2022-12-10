@@ -288,8 +288,8 @@
 		3744A96028B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3744A95F28B99ADD005DE0A7 /* PlayerControlsLayout.swift */; };
 		3744A96128B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3744A95F28B99ADD005DE0A7 /* PlayerControlsLayout.swift */; };
 		3744A96228B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3744A95F28B99ADD005DE0A7 /* PlayerControlsLayout.swift */; };
-		374710052755291C00CE0F87 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374710042755291C00CE0F87 /* SearchField.swift */; };
-		374710062755291C00CE0F87 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374710042755291C00CE0F87 /* SearchField.swift */; };
+		374710052755291C00CE0F87 /* SearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374710042755291C00CE0F87 /* SearchTextField.swift */; };
+		374710062755291C00CE0F87 /* SearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374710042755291C00CE0F87 /* SearchTextField.swift */; };
 		3748186626A7627F0084E870 /* Video+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3748186526A7627F0084E870 /* Video+Fixtures.swift */; };
 		3748186726A7627F0084E870 /* Video+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3748186526A7627F0084E870 /* Video+Fixtures.swift */; };
 		3748186826A7627F0084E870 /* Video+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3748186526A7627F0084E870 /* Video+Fixtures.swift */; };
@@ -1127,7 +1127,7 @@
 		3743CA51270F284F00E4D32B /* View+Borders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Borders.swift"; sourceTree = "<group>"; };
 		3744A95F28B99ADD005DE0A7 /* PlayerControlsLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsLayout.swift; sourceTree = "<group>"; };
 		3744F85C293CC9B800B09AB9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		374710042755291C00CE0F87 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
+		374710042755291C00CE0F87 /* SearchTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTextField.swift; sourceTree = "<group>"; };
 		3748186526A7627F0084E870 /* Video+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Video+Fixtures.swift"; sourceTree = "<group>"; };
 		3748186926A764FB0084E870 /* Thumbnail+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Thumbnail+Fixtures.swift"; sourceTree = "<group>"; };
 		3748186D26A769D60084E870 /* DetailBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailBadge.swift; sourceTree = "<group>"; };
@@ -2007,8 +2007,8 @@
 		3782B95527557A2400990149 /* Search */ = {
 			isa = PBXGroup;
 			children = (
-				374710042755291C00CE0F87 /* SearchField.swift */,
 				3782B94E27553A6700990149 /* SearchSuggestions.swift */,
+				374710042755291C00CE0F87 /* SearchTextField.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
 			);
 			path = Search;
@@ -2872,7 +2872,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				374710052755291C00CE0F87 /* SearchField.swift in Sources */,
+				374710052755291C00CE0F87 /* SearchTextField.swift in Sources */,
 				37494EA529200B14000DF176 /* DocumentsView.swift in Sources */,
 				374DE88028BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */,
 				37ECED56289FE166002BC2C9 /* SafeArea.swift in Sources */,
@@ -3123,7 +3123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3727B74B27872B880021C15E /* VisualEffectBlur-macOS.swift in Sources */,
-				374710062755291C00CE0F87 /* SearchField.swift in Sources */,
+				374710062755291C00CE0F87 /* SearchTextField.swift in Sources */,
 				37F0F4EB286F397E00C06C2E /* SettingsModel.swift in Sources */,
 				378AE93F274EDFB5006A4EE1 /* Tint+Backport.swift in Sources */,
 				37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */,

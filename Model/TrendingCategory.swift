@@ -21,6 +21,19 @@ enum TrendingCategory: String, CaseIterable, Identifiable, Defaults.Serializable
         }
     }
 
+    var systemImage: String {
+        switch self {
+        case .default:
+            return "chart.bar"
+        case .music:
+            return "music.note"
+        case .gaming:
+            return "gamecontroller"
+        case .movies:
+            return "film"
+        }
+    }
+
     var name: String {
         id == "default" ? "Trending".localized() : title
     }

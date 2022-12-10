@@ -37,27 +37,9 @@ struct SearchView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls(toolbar: {
-            #if os(iOS)
-                if accounts.app.supportsSearchFilters {
-                    HStack(spacing: 0) {
-                        Menu("Sort: \(searchSortOrder.name)") {
-                            searchSortOrderPicker
-                        }
-                        .transaction { t in t.animation = .none }
-
-                        Spacer()
-
-                        filtersMenu
-                    }
-                    .padding()
-                }
-            #endif
-        }) {
+        BrowserPlayerControls {
             #if os(iOS)
                 VStack {
-                    SearchTextField(favoriteItem: $favoriteItem)
-
                     if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
                         SearchSuggestions()
                             .opacity(state.queryText.isEmpty ? 0 : 1)
@@ -182,10 +164,60 @@ struct SearchView: View {
                 .navigationTitle("Search")
         #endif
         #if os(iOS)
-        .navigationBarHidden(navigationBarHidden)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarLeading) {
+                if !navigationBarHidden {
+                    Button(action: { NavigationModel.shared.presentingSettings = true }) {
+                        Image(systemName: "gearshape.2")
+                    }
+                }
+            }
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 0) {
+                    if !state.query.isEmpty {
+                        searchMenu
+                    }
+                    SearchTextField()
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         #endif
     }
+
+    #if os(iOS)
+        var searchMenu: some View {
+            Menu {
+                if accounts.app.supportsSearchFilters {
+                    searchSortOrderPicker
+                        .pickerStyle(.menu)
+
+                    Picker(selection: $searchDuration, label: Text("Duration")) {
+                        ForEach(SearchQuery.Duration.allCases) { duration in
+                            Text(duration.name).tag(duration)
+                        }
+                    }
+                    .pickerStyle(.menu)
+
+                    Picker("Upload date", selection: $searchDate) {
+                        ForEach(SearchQuery.Date.allCases) { date in
+                            Text(date.name).tag(date)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                Section {
+                    FavoriteButton(item: favoriteItem)
+                }
+
+            } label: {
+                Image(systemName: "chevron.down.circle.fill")
+                    .foregroundColor(.accentColor)
+                    .imageScale(.medium)
+            }
+        }
+    #endif
 
     private var navigationBarHidden: Bool {
         if navigationStyle == .sidebar {

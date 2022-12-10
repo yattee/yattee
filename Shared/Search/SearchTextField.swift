@@ -2,16 +2,8 @@ import Repeat
 import SwiftUI
 
 struct SearchTextField: View {
-    @Environment(\.navigationStyle) private var navigationStyle
-
     private var navigation = NavigationModel.shared
     @ObservedObject private var state = SearchModel.shared
-
-    @Binding var favoriteItem: FavoriteItem?
-
-    init(favoriteItem: Binding<FavoriteItem?>? = nil) {
-        _favoriteItem = favoriteItem ?? .constant(nil)
-    }
 
     var body: some View {
         ZStack {
@@ -41,18 +33,9 @@ struct SearchTextField: View {
                     .textFieldStyle(.plain)
                 #else
                     .textFieldStyle(.roundedBorder)
-                    .padding(.leading)
-                    .padding(.trailing, 15)
+                    .padding(.leading, 5)
+                    .padding(.trailing, 10)
                 #endif
-
-                if let favoriteItem {
-                    #if os(iOS)
-                        FavoriteButton(item: favoriteItem)
-                            .id(favoriteItem.id)
-                            .labelStyle(.iconOnly)
-                            .padding(.trailing)
-                    #endif
-                }
 
                 if !state.queryText.isEmpty {
                     clearButton
@@ -64,7 +47,6 @@ struct SearchTextField: View {
                 }
             }
         }
-        .padding(.top, navigationStyle == .tab ? 10 : 0)
     }
 
     private var fieldBorder: some View {
@@ -83,17 +65,16 @@ struct SearchTextField: View {
             self.state.queryText = ""
         }) {
             Image(systemName: "xmark.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
             #if os(macOS)
-                .frame(width: 14, height: 14)
+                .imageScale(.small)
             #else
-                .frame(width: 18, height: 18)
+                .imageScale(.medium)
             #endif
-                .padding(.trailing, 3)
         }
         .buttonStyle(PlainButtonStyle())
-        .padding(.trailing, 10)
-        .opacity(0.7)
+        #if os(macOS)
+            .padding(.trailing, 10)
+        #endif
+            .opacity(0.7)
     }
 }

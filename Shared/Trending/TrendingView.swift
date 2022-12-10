@@ -33,30 +33,7 @@ struct TrendingView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls(toolbar: {
-            HStack {
-                if accounts.app.supportsTrendingCategories {
-                    categoryButton
-                        .layoutPriority(1)
-                        // only way to disable Menu animation is to
-                        // force redraw of the view when it changes
-                        .id(UUID())
-
-                    Spacer()
-                }
-
-                if let favoriteItem {
-                    FavoriteButton(item: favoriteItem, labelPadding: true)
-                        .id(favoriteItem.id)
-                        .labelStyle(.iconOnly)
-
-                    Spacer()
-                }
-
-                countryButton
-            }
-            .padding(.horizontal)
-        }) {
+        BrowserPlayerControls {
             Section {
                 VStack(spacing: 0) {
                     #if os(tvOS)
@@ -137,7 +114,12 @@ struct TrendingView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                trendingMenu
+            }
+        }
         #endif
         #if !os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -174,6 +156,29 @@ struct TrendingView: View {
         }
     #endif
 
+    #if os(iOS)
+        var trendingMenu: some View {
+            Menu {
+                countryButton
+                if accounts.app.supportsTrendingCategories {
+                    categoryButton
+                }
+                FavoriteButton(item: favoriteItem)
+            } label: {
+                HStack(spacing: 12) {
+                    Text("\(country.flag) \(country.name)")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .frame(maxWidth: 320)
+            }
+        }
+    #endif
+
     private var categoryButton: some View {
         #if os(tvOS)
             Button(category.name) {
@@ -190,10 +195,9 @@ struct TrendingView: View {
         #else
             Picker(category.controlLabel, selection: $category) {
                 ForEach(TrendingCategory.allCases) { category in
-                    Text(category.controlLabel).tag(category)
+                    Label(category.controlLabel, systemImage: category.systemImage).tag(category)
                 }
             }
-            .pickerStyle(.menu)
         #endif
     }
 
@@ -202,7 +206,12 @@ struct TrendingView: View {
             presentingCountrySelection.toggle()
             resource.removeObservers(ownedBy: store)
         }) {
-            Text("\(country.flag) \(country.id)")
+            #if os(iOS)
+                Label("Switch country...", systemImage: "flag")
+            #else
+                Text("\(country.flag) \(country.id)")
+
+            #endif
         }
     }
 
@@ -213,7 +222,8 @@ struct TrendingView: View {
 
 struct TrendingView_Previews: PreviewProvider {
     static var previews: some View {
-        TrendingView(Video.allFixtures)
-            .injectFixtureEnvironmentObjects()
+        NavigationView {
+            TrendingView(Video.allFixtures)
+        }
     }
 }

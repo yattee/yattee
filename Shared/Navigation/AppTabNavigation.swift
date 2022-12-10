@@ -145,7 +145,6 @@ struct AppTabNavigation: View {
     private var searchNavigationView: some View {
         NavigationView {
             LazyView(SearchView())
-                .toolbar { toolbarContent }
         }
         .tabItem {
             Label("Search", systemImage: "magnifyingglass")
