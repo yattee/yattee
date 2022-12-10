@@ -119,6 +119,71 @@ struct Video: Identifiable, Equatable, Hashable {
         )
     }
 
+    var cacheKey: String {
+        switch app {
+        case .local:
+            return videoID
+        case .invidious:
+            return "youtube-\(videoID)"
+        case .piped:
+            return "youtube-\(videoID)"
+        case .peerTube:
+            return "peertube-\(instanceURL?.absoluteString ?? "unknown-instance")-\(videoID)"
+        }
+    }
+
+    var json: JSON {
+        let dateFormatter = ISO8601DateFormatter()
+        let publishedAt = self.publishedAt == nil ? "" : dateFormatter.string(from: self.publishedAt!)
+        return [
+            "instanceID": instanceID ?? "",
+            "app": app.rawValue,
+            "instanceURL": instanceURL?.absoluteString ?? "",
+            "id": id,
+            "videoID": videoID,
+            "videoURL": videoURL?.absoluteString ?? "",
+            "title": title,
+            "author": author,
+            "length": length,
+            "published": published,
+            "views": views,
+            "description": description ?? "",
+            "genre": genre ?? "",
+            "channel": channel.json.object,
+            "thumbnails": thumbnails.compactMap { $0.json.object },
+            "indexID": indexID ?? "",
+            "live": live,
+            "upcoming": upcoming,
+            "publishedAt": publishedAt
+        ]
+    }
+
+    static func from(_ json: JSON) -> Self {
+        let dateFormatter = ISO8601DateFormatter()
+
+        return Video(
+            instanceID: json["instanceID"].stringValue,
+            app: .init(rawValue: json["app"].stringValue) ?? AccountsModel.shared.current.app ?? .local,
+            instanceURL: URL(string: json["instanceURL"].stringValue) ?? AccountsModel.shared.current.instance.apiURL,
+            id: json["id"].stringValue,
+            videoID: json["videoID"].stringValue,
+            videoURL: json["videoURL"].url,
+            title: json["title"].stringValue,
+            author: json["author"].stringValue,
+            length: json["length"].doubleValue,
+            published: json["published"].stringValue,
+            views: json["views"].intValue,
+            description: json["description"].string,
+            genre: json["genre"].string,
+            channel: Channel.from(json["channel"]),
+            thumbnails: json["thumbnails"].arrayValue.compactMap { Thumbnail.from($0) },
+            indexID: json["indexID"].stringValue,
+            live: json["live"].boolValue,
+            upcoming: json["upcoming"].boolValue,
+            publishedAt: dateFormatter.date(from: json["publishedAt"].stringValue)
+        )
+    }
+
     var instance: Instance! {
         if let instance = InstancesModel.shared.find(instanceID) {
             return instance

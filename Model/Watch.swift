@@ -91,12 +91,12 @@ extension Watch {
     var video: Video {
         let url = URL(string: videoID)
 
-        if app == nil || !Video.VideoID.isValid(videoID) {
+        if !Video.VideoID.isValid(videoID) {
             if let url {
                 return .local(url)
             }
         }
 
-        return Video(app: app, instanceURL: instanceURL, videoID: videoID)
+        return Video(app: app ?? AccountsModel.shared.current.app ?? .local, instanceURL: instanceURL, videoID: videoID)
     }
 }

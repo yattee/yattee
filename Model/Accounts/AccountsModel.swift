@@ -41,10 +41,8 @@ final class AccountsModel: ObservableObject {
             return piped
         case .invidious:
             return invidious
-        case .peerTube:
-            return peerTube
         default:
-            return nil
+            return peerTube
         }
     }
 

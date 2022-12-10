@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "cache",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hyperoslo/Cache.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "eeaf771d8d2e8247fbd6da2e27c986d99803fb1f"
+      }
+    },
+    {
       "identity" : "defaults",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/Defaults",

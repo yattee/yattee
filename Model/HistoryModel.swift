@@ -20,6 +20,11 @@ extension PlayerModel {
             return
         }
 
+        if let video = VideosCacheModel.shared.retrieveVideo(watch.video.cacheKey) {
+            historyVideos.append(video)
+            return
+        }
+
         guard let api = playerAPI(watch.video) else { return }
 
         api.video(watch.videoID)
@@ -28,6 +33,7 @@ extension PlayerModel {
                 guard let self else { return }
 
                 if let video: Video = response.typedContent() {
+                    VideosCacheModel.shared.storeVideo(video)
                     self.historyVideos.append(video)
                 }
             }

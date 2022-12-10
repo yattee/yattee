@@ -36,4 +36,18 @@ struct Thumbnail {
         self.url = url
         self.quality = quality
     }
+
+    var json: JSON {
+        [
+            "url": url.absoluteString,
+            "quality": quality.rawValue
+        ]
+    }
+
+    static func from(_ json: JSON) -> Self {
+        .init(
+            url: URL(string: json["url"].stringValue)!,
+            quality: .init(rawValue: json["quality"].stringValue) ?? .default
+        )
+    }
 }

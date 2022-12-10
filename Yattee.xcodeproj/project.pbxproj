@@ -346,6 +346,7 @@
 		374C0540272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053E272472C0009BDDBE /* PlayerSponsorBlock.swift */; };
 		374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C053E272472C0009BDDBE /* PlayerSponsorBlock.swift */; };
 		374C0543272496E4009BDDBE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374C0542272496E4009BDDBE /* AppDelegate.swift */; };
+		374D11E72943C56300CB4350 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 374D11E62943C56300CB4350 /* Cache */; };
 		374DE88028BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374DE87F28BB896C0062BBF2 /* PlayerDragGesture.swift */; };
 		374DE88128BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374DE87F28BB896C0062BBF2 /* PlayerDragGesture.swift */; };
 		374DE88328BB8A280062BBF2 /* PlayerOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374DE88228BB8A280062BBF2 /* PlayerOrientation.swift */; };
@@ -544,6 +545,11 @@
 		377E17142928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
 		377E17152928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
 		377E17162928265900894889 /* ListRowSeparator+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377E17132928265900894889 /* ListRowSeparator+Backport.swift */; };
+		377F9F74294403770043F856 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 377F9F73294403770043F856 /* Cache */; };
+		377F9F76294403880043F856 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 377F9F75294403880043F856 /* Cache */; };
+		377F9F7B294403F20043F856 /* VideosCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377F9F7A294403F20043F856 /* VideosCacheModel.swift */; };
+		377F9F7C294403F20043F856 /* VideosCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377F9F7A294403F20043F856 /* VideosCacheModel.swift */; };
+		377F9F7D294403F20043F856 /* VideosCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377F9F7A294403F20043F856 /* VideosCacheModel.swift */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
 		377FC7DB267A080300A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7DA267A080300A6BBAF /* Logging */; };
 		377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularView.swift */; };
@@ -1222,6 +1228,7 @@
 		377ABC43286E4B74009C986F /* ManifestedInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestedInstance.swift; sourceTree = "<group>"; };
 		377ABC47286E5887009C986F /* Sequence+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Unique.swift"; sourceTree = "<group>"; };
 		377E17132928265900894889 /* ListRowSeparator+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListRowSeparator+Backport.swift"; sourceTree = "<group>"; };
+		377F9F7A294403F20043F856 /* VideosCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideosCacheModel.swift; sourceTree = "<group>"; };
 		377FF88A291A60310028EB0B /* OpenVideosModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosModel.swift; sourceTree = "<group>"; };
 		377FF88E291A99580028EB0B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		37824309291E58D6005DEC1C /* Open in Yattee.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Open in Yattee.entitlements"; sourceTree = "<group>"; };
@@ -1426,6 +1433,7 @@
 				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
+				377F9F74294403770043F856 /* Cache in Frameworks */,
 				3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
 				3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
@@ -1465,6 +1473,7 @@
 				370F4FC927CC16CB001B35DC /* libssl.3.dylib in Frameworks */,
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
+				374D11E72943C56300CB4350 /* Cache in Frameworks */,
 				370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */,
 				3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */,
@@ -1526,6 +1535,7 @@
 				37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */,
 				3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
+				377F9F76294403880043F856 /* Cache in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
@@ -1963,6 +1973,15 @@
 			path = Modifiers;
 			sourceTree = "<group>";
 		};
+		377F9F79294403DC0043F856 /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				37F5E8B9291BEF69006C15F5 /* CacheModel.swift */,
+				377F9F7A294403F20043F856 /* VideosCacheModel.swift */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
 		377FC7D1267A080300A6BBAF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -2187,11 +2206,11 @@
 			children = (
 				3743B86627216A1E00261544 /* Accounts */,
 				3743B864272169E200261544 /* Applications */,
+				377F9F79294403DC0043F856 /* Cache */,
 				3743B86527216A0600261544 /* Player */,
 				3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */,
 				37FB283F2721B20800A57617 /* Search */,
 				374C0539272436DA009BDDBE /* SponsorBlock */,
-				37F5E8B9291BEF69006C15F5 /* CacheModel.swift */,
 				3776ADD5287381240078EBC4 /* Captions.swift */,
 				37AAF28F26740715007FC770 /* Channel.swift */,
 				37C3A24427235DA70087A57A /* ChannelPlaylist.swift */,
@@ -2405,6 +2424,7 @@
 				3799AC0828B03CED001376F9 /* ActiveLabel */,
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
 				3797104828D3D10600D5F53C /* SDWebImageSwiftUI */,
+				377F9F73294403770043F856 /* Cache */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2441,6 +2461,7 @@
 				372AA413286D06A10000B1DC /* Repeat */,
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
 				3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */,
+				374D11E62943C56300CB4350 /* Cache */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2518,6 +2539,7 @@
 				37E80F42287B7AAF00561799 /* SwiftUIPager */,
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
 				3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */,
+				377F9F75294403880043F856 /* Cache */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2626,6 +2648,7 @@
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -3089,6 +3112,7 @@
 				3784CDE227772EE40055BBF2 /* Watch.swift in Sources */,
 				37FB285E272225E800A57617 /* ContentItemView.swift in Sources */,
 				3797758B2689345500DD52A8 /* Store.swift in Sources */,
+				377F9F7B294403F20043F856 /* VideosCacheModel.swift in Sources */,
 				37B795902771DAE0001CF27B /* OpenURLHandler.swift in Sources */,
 				37732FF02703A26300F04329 /* AccountValidationStatus.swift in Sources */,
 			);
@@ -3284,6 +3308,7 @@
 				37599F31272B42810087F250 /* FavoriteItem.swift in Sources */,
 				3730F75A2733481E00F385FC /* RelatedView.swift in Sources */,
 				37E04C0F275940FB00172673 /* VerticalScrollingFix.swift in Sources */,
+				377F9F7C294403F20043F856 /* VideosCacheModel.swift in Sources */,
 				374924E4292141320017D862 /* InspectorView.swift in Sources */,
 				375168D72700FDB8008F96A6 /* Debounce.swift in Sources */,
 				37D526DF2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
@@ -3515,6 +3540,7 @@
 				3744A96228B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */,
 				377A20AB2693C9A2002842B8 /* TypedContentAccessors.swift in Sources */,
 				3748186826A7627F0084E870 /* Video+Fixtures.swift in Sources */,
+				377F9F7D294403F20043F856 /* VideosCacheModel.swift in Sources */,
 				37C3A253272366440087A57A /* ChannelPlaylistView.swift in Sources */,
 				378AE945274EF00A006A4EE1 /* Color+Background.swift in Sources */,
 				3743CA54270F284F00E4D32B /* View+Borders.swift in Sources */,
@@ -4458,6 +4484,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hyperoslo/Cache.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
@@ -4638,6 +4672,11 @@
 			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
+		374D11E62943C56300CB4350 /* Cache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */;
+			productName = Cache;
+		};
 		375B8AB028B57F4200397B31 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
@@ -4682,6 +4721,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		377F9F73294403770043F856 /* Cache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */;
+			productName = Cache;
+		};
+		377F9F75294403880043F856 /* Cache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */;
+			productName = Cache;
 		};
 		377FC7D4267A080300A6BBAF /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;

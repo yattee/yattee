@@ -34,6 +34,7 @@ extension PlayerModel {
             .load()
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
+                    VideosCacheModel.shared.storeVideo(video)
                     guard video.videoID == self.currentVideo?.videoID else {
                         self.logger.info("ignoring loaded streams from \(instance.description) as current video has changed")
                         return

@@ -109,4 +109,18 @@ struct Channel: Identifiable, Hashable {
         guard contentType != .videos, contentType != .playlists else { return true }
         return tabs.contains { $0.contentType == contentType }
     }
+
+    var json: JSON {
+        [
+            "id": id,
+            "name": name
+        ]
+    }
+
+    static func from(_ json: JSON) -> Self {
+        .init(
+            id: json["id"].stringValue,
+            name: json["name"].stringValue
+        )
+    }
 }

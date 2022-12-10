@@ -1,10 +1,12 @@
 import Foundation
-import SwiftyJSON
+import Logging
 
 struct CacheModel {
     static var shared = CacheModel()
-    static let bookmarksGroup = "group.stream.yattee.app.bookmarks"
 
+    let logger = Logger(label: "stream.yattee.cache")
+
+    static let bookmarksGroup = "group.stream.yattee.app.bookmarks"
     let bookmarksDefaults = UserDefaults(suiteName: Self.bookmarksGroup)
 
     func removeAll() {
