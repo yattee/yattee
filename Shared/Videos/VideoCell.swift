@@ -421,18 +421,7 @@ struct VideoCell: View {
 
     private var thumbnailImage: some View {
         Group {
-            let url = thumbnails.best(video)
-
-            WebImage(url: url, options: [.lowPriority])
-                .resizable()
-                .placeholder {
-                    Rectangle().foregroundColor(Color("PlaceholderColor"))
-                }
-                .retryOnAppear(true)
-                .onFailure { _ in
-                    guard let url else { return }
-                    thumbnails.insertUnloadable(url)
-                }
+            ThumbnailView(url: thumbnails.best(video))
 
             #if os(tvOS)
                 .frame(minHeight: 320)

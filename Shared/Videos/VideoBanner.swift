@@ -131,8 +131,7 @@ struct VideoBanner: View {
             Color("PlaceholderColor")
             if let video {
                 if let thumbnail = video.thumbnailURL(quality: .medium) {
-                    WebImage(url: thumbnail, options: [.lowPriority])
-                        .resizable()
+                    ThumbnailView(url: thumbnail)
                 } else if video.isLocal {
                     Image(systemName: video.localStreamImageSystemName)
                 }

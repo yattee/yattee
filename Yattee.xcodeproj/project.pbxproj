@@ -603,6 +603,9 @@
 		378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
 		378E50FF26FE8EEE00F49626 /* AccountsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */; };
 		378E510026FE8EEE00F49626 /* AccountsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */; };
+		378E9C38294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
+		378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
+		378E9C3A294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
 		378FFBC428660172009E3FBE /* URLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC328660172009E3FBE /* URLParser.swift */; };
 		378FFBC528660172009E3FBE /* URLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC328660172009E3FBE /* URLParser.swift */; };
 		378FFBC628660172009E3FBE /* URLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC328660172009E3FBE /* URLParser.swift */; };
@@ -1259,6 +1262,7 @@
 		378AE942274EF00A006A4EE1 /* Color+Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Background.swift"; sourceTree = "<group>"; };
 		378E50FA26FE8B9F00F49626 /* Instance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instance.swift; sourceTree = "<group>"; };
 		378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsMenuView.swift; sourceTree = "<group>"; };
+		378E9C37294552A700B2D696 /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
 		378FFBC328660172009E3FBE /* URLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLParser.swift; sourceTree = "<group>"; };
 		378FFBC82866018A009E3FBE /* URLParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLParserTests.swift; sourceTree = "<group>"; };
 		3795593527B08538007FF8F4 /* StreamControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamControl.swift; sourceTree = "<group>"; };
@@ -1733,6 +1737,7 @@
 			isa = PBXGroup;
 			children = (
 				37A9965926D6F8CA006E3224 /* HorizontalCells.swift */,
+				378E9C37294552A700B2D696 /* ThumbnailView.swift */,
 				37F4AE7126828F0900BD60EA /* VerticalCells.swift */,
 				37CC3F4F270D010D00608308 /* VideoBanner.swift */,
 				37D4B18B26717B3800C925CA /* VideoCell.swift */,
@@ -3119,6 +3124,7 @@
 				373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				372915E62687E3B900F5A35B /* Defaults.swift in Sources */,
 				37E084AC2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */,
+				378E9C38294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				37732FF42703D32400F04329 /* Sidebar.swift in Sources */,
 				37D4B19726717E1500C925CA /* Video.swift in Sources */,
 				37484C2926FC83FF00287258 /* AccountForm.swift in Sources */,
@@ -3367,6 +3373,7 @@
 				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				37D2E0D528B67EFC00F64D52 /* Delay.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
+				378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
 				37FB28422721B22200A57617 /* ContentItem.swift in Sources */,
@@ -3596,6 +3603,7 @@
 				37484C3326FCB8F900287258 /* AccountValidator.swift in Sources */,
 				375EC96C289F232600751258 /* QualityProfilesModel.swift in Sources */,
 				372D85DF283842EC00FF3C7D /* PiPDelegate.swift in Sources */,
+				378E9C3A294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				372D85E0283842EE00FF3C7D /* PlayerLayerView.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
