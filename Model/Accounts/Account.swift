@@ -84,4 +84,8 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(username)
     }
+
+    var feedCacheKey: String {
+        "feed-\(id)"
+    }
 }

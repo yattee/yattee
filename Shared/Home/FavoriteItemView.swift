@@ -53,13 +53,29 @@ struct FavoriteItemView: View {
                 #endif
                     .onAppear {
                         resource?.addObserver(store)
-                        resource?.loadIfNeeded()
+                        if item.section == .subscriptions {
+                            cacheFeed(resource?.loadIfNeeded())
+                        } else {
+                            resource?.loadIfNeeded()
+                        }
                     }
             }
         }
         .onChange(of: accounts.current) { _ in
             resource?.addObserver(store)
-            resource?.load()
+            if item.section == .subscriptions {
+                cacheFeed(resource?.load())
+            } else {
+                resource?.load()
+            }
+        }
+    }
+
+    private func cacheFeed(_ request: Request?) {
+        request?.onSuccess { response in
+            if let videos: [Video] = response.typedContent() {
+                FeedCacheModel.shared.storeFeed(account: accounts.current, videos: videos)
+            }
         }
     }
 
@@ -78,7 +94,7 @@ struct FavoriteItemView: View {
         switch item.section {
         case .subscriptions:
             if accounts.app.supportsSubscriptions {
-                return accounts.api.feed
+                return accounts.api.feed(1)
             }
 
         case .popular:

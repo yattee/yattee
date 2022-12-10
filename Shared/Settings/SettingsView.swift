@@ -231,7 +231,7 @@ struct SettingsView: View {
             case .locations:
                 return 600
             case .advanced:
-                return 250
+                return 350
             case .help:
                 return 650
             }

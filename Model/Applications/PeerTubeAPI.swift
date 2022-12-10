@@ -70,7 +70,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
             return
         }
 
-        feed?
+        feed(1)?
             .load()
             .onFailure { _ in
                 self.updateToken(force: true)
@@ -262,8 +262,9 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "/feed/subscriptions")
     }
 
-    var feed: Resource? {
+    func feed(_ page: Int?) -> Resource? {
         resource(baseURL: account.url, path: "\(Self.basePath)/auth/feed")
+            .withParam("page", String(page ?? 1))
     }
 
     var subscriptions: Resource? {

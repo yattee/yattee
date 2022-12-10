@@ -11,9 +11,9 @@ struct AdvancedSettings: View {
 
     @State private var countries = [String]()
     @State private var filesToShare = [MPVClient.logFile]
-    @State private var presentingInstanceForm = false
     @State private var presentingShareSheet = false
-    @State private var savedFormInstanceID: Instance.ID?
+
+    private var settings = SettingsModel.shared
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -35,9 +35,6 @@ struct AdvancedSettings: View {
         }
         .onChange(of: countryOfPublicInstances) { newCountry in
             InstancesManifest.shared.setPublicAccount(newCountry, asCurrent: AccountsModel.shared.current?.isPublic ?? true)
-        }
-        .sheet(isPresented: $presentingInstanceForm) {
-            InstanceForm(savedInstanceID: $savedFormInstanceID)
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -87,6 +84,11 @@ struct AdvancedSettings: View {
                 logButton
             }
         }
+
+        Section(header: SettingsHeader(text: "Cache")) {
+            clearCacheButton
+            cacheSize
+        }
     }
 
     @ViewBuilder var mpvFooter: some View {
@@ -128,12 +130,26 @@ struct AdvancedSettings: View {
         }
     #endif
 
-    private var addInstanceButton: some View {
+    private var clearCacheButton: some View {
         Button {
-            presentingInstanceForm = true
+            settings.presentAlert(
+                Alert(
+                    title: Text(
+                        "Are you sure you want to clear cache?"
+                    ),
+                    primaryButton: .destructive(Text("Clear"), action: CacheModel.shared.clear),
+                    secondaryButton: .cancel()
+                )
+            )
         } label: {
-            Label("Add Location...", systemImage: "plus")
+            Text("Clear all")
+                .foregroundColor(.red)
         }
+    }
+
+    var cacheSize: some View {
+        Text(String(format: "Total size: %@", CacheModel.shared.totalSizeFormatted))
+            .foregroundColor(.secondary)
     }
 }
 

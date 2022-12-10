@@ -103,7 +103,7 @@ extension PlayerModel {
 
     func removeHistory() {
         removeAllWatches()
-        CacheModel.shared.removeAll()
+        CacheModel.shared.clearBookmarks()
     }
 
     func removeWatch(_ watch: Watch) {

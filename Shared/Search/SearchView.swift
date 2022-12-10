@@ -89,7 +89,7 @@ struct SearchView: View {
                         filtersMenu
                     }
 
-                    SearchTextField(favoriteItem: $favoriteItem)
+                    SearchTextField()
                 }
             #endif
         }

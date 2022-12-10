@@ -9,7 +9,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     static let basePath = "/api/v1"
 
     @Published var account: Account!
-    @Published var validInstance = true
 
     static func withAnonymousAccountForInstanceURL(_ url: URL) -> InvidiousAPI {
         .init(account: Instance(app: .invidious, apiURLString: url.absoluteString).anonymousAccount)
@@ -35,8 +34,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func setAccount(_ account: Account) {
         self.account = account
 
-        validInstance = account.anonymous
-
         configure()
 
         if !account.anonymous {
@@ -45,23 +42,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func validate() {
-        validateInstance()
         validateSID()
-    }
-
-    func validateInstance() {
-        guard !validInstance else {
-            return
-        }
-
-        home?
-            .load()
-            .onSuccess { _ in
-                self.validInstance = true
-            }
-            .onFailure { _ in
-                self.validInstance = false
-            }
     }
 
     func validateSID() {
@@ -69,7 +50,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return
         }
 
-        feed?
+        notifications?
             .load()
             .onFailure { _ in
                 self.updateToken(force: true)
@@ -273,8 +254,17 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "/feed/subscriptions")
     }
 
-    var feed: Resource? {
+    func feed(_ page: Int?) -> Resource? {
         resource(baseURL: account.url, path: "\(Self.basePath)/auth/feed")
+            .withParam("page", String(page ?? 1))
+    }
+
+    var feed: Resource? {
+        resource(baseURL: account.url, path: basePathAppending("auth/feed"))
+    }
+
+    var notifications: Resource? {
+        resource(baseURL: account.url, path: basePathAppending("auth/notifications"))
     }
 
     var subscriptions: Resource? {

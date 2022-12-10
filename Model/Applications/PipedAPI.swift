@@ -220,7 +220,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.instance.apiURL, path: "subscriptions")
     }
 
-    var feed: Resource? {
+    func feed(_: Int?) -> Resource? {
         resource(baseURL: account.instance.apiURL, path: "feed")
             .withParam("authToken", account.token)
     }

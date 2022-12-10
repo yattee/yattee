@@ -279,7 +279,7 @@ extension PlayerModel {
     }
 
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
-        guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
+        guard !accounts.current.isNil, !item.hasDetailsLoaded, let video = item.video else { return }
 
         let videoID = item.video?.videoID ?? item.videoID
 
@@ -292,7 +292,7 @@ extension PlayerModel {
             return
         }
 
-        playerAPI(item.video).loadDetails(item, completionHandler: { [weak self] newItem in
+        playerAPI(video)?.loadDetails(item, completionHandler: { [weak self] newItem in
             guard let self else { return }
 
             self.queue.filter { $0.videoID == item.videoID }.forEach { item in

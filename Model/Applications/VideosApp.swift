@@ -30,6 +30,10 @@ enum VideosApp: String, CaseIterable {
         supportsAccounts
     }
 
+    var paginatesSubscriptions: Bool {
+        self == .invidious
+    }
+
     var supportsTrendingCategories: Bool {
         self == .invidious
     }

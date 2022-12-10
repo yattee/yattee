@@ -82,7 +82,7 @@ struct CommentView: View {
                         repliesButton
 
                         ProgressView()
-                            .scaleEffect(progressViewScale, anchor: .center)
+                            .scaleEffect(Constants.progressViewScale, anchor: .center)
                             .opacity(repliesID == comment.id && !comments.repliesLoaded ? 1 : 0)
                             .frame(maxHeight: 0)
                     }
@@ -197,14 +197,6 @@ struct CommentView: View {
             4
         #else
             2
-        #endif
-    }
-
-    private var progressViewScale: Double {
-        #if os(macOS)
-            0.4
-        #else
-            0.6
         #endif
     }
 

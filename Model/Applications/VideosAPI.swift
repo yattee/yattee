@@ -18,8 +18,8 @@ protocol VideosAPI {
 
     func video(_ id: Video.ID) -> Resource
 
+    func feed(_ page: Int?) -> Resource?
     var subscriptions: Resource? { get }
-    var feed: Resource? { get }
     var home: Resource? { get }
     var popular: Resource? { get }
     var playlists: Resource? { get }

@@ -164,7 +164,9 @@ struct HistorySettings: View {
 
 struct HistorySettings_Previews: PreviewProvider {
     static var previews: some View {
-        HistorySettings()
-            .injectFixtureEnvironmentObjects()
+        VStack(alignment: .leading) {
+            HistorySettings()
+        }
+        .frame(minHeight: 500)
     }
 }
