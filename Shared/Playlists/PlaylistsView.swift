@@ -56,41 +56,9 @@ struct PlaylistsView: View {
     }
 
     var body: some View {
-        BrowserPlayerControls(toolbar: {
-            HStack {
-                HStack {
-                    newPlaylistButton
-                        .offset(x: -10)
-                    if currentPlaylist != nil {
-                        editPlaylistButton
-                    }
-                }
-
-                if !model.isEmpty {
-                    Spacer()
-                }
-
-                HStack {
-                    if model.isEmpty {
-                        Text("No Playlists")
-                            .foregroundColor(.secondary)
-                    } else {
-                        selectPlaylistButton
-                            .transaction { t in t.animation = .none }
-                    }
-                }
-
-                Spacer()
-
-                if currentPlaylist != nil {
-                    playButton
-                        .offset(x: 10)
-                }
-            }
-            .padding(.horizontal)
-        }) {
+        BrowserPlayerControls {
             SignInRequiredView(title: "Playlists".localized()) {
-                ScrollView {
+                Section {
                     VStack {
                         #if os(tvOS)
                             toolbar
@@ -145,7 +113,12 @@ struct PlaylistsView: View {
                 model.load(force: true) { model.reloadPlaylists.toggle() }
             }
         }
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                playlistsMenu
+            }
+        }
         #endif
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingNewPlaylist, onDismiss: selectCreatedPlaylist) {
@@ -187,6 +160,37 @@ struct PlaylistsView: View {
         #endif
     }
 
+    #if os(iOS)
+        var playlistsMenu: some View {
+            Menu {
+                selectPlaylistButton
+
+                Section {
+                    if let currentPlaylist {
+                        playButton
+
+                        editPlaylistButton
+
+                        FavoriteButton(item: FavoriteItem(section: .playlist(currentPlaylist.id)))
+                            .labelStyle(.iconOnly)
+                    }
+                }
+                newPlaylistButton
+            } label: {
+                HStack(spacing: 12) {
+                    Text(currentPlaylist?.title ?? "Playlists")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .transaction { t in t.animation = nil }
+            }
+        }
+    #endif
+
     #if os(tvOS)
         var toolbar: some View {
             HStack {
@@ -214,6 +218,7 @@ struct PlaylistsView: View {
                 newPlaylistButton
                     .padding(.leading, 40)
             }
+            .labelStyle(.iconOnly)
         }
     #endif
 
@@ -277,19 +282,10 @@ struct PlaylistsView: View {
                 Button("Cancel", role: .cancel) {}
             }
         #else
-            Menu {
+            Picker("Current Playlist", selection: $selectedPlaylistID) {
                 ForEach(model.all) { playlist in
-                    Button(action: { selectedPlaylistID = playlist.id }) {
-                        if playlist == currentPlaylist {
-                            Label(playlist.title, systemImage: "checkmark")
-                        } else {
-                            Text(playlist.title)
-                        }
-                    }
+                    Text(playlist.title).tag(playlist.id)
                 }
-            } label: {
-                Text(currentPlaylist?.title ?? "Select playlist")
-                    .frame(maxWidth: 140, alignment: .center)
             }
         #endif
     }
@@ -299,22 +295,13 @@ struct PlaylistsView: View {
             self.editedPlaylist = self.currentPlaylist
             self.showingEditPlaylist = true
         }) {
-            HStack(spacing: 8) {
-                Image(systemName: "rectangle.and.pencil.and.ellipsis")
-            }
+            Label("Edit Playlist", systemImage: "rectangle.and.pencil.and.ellipsis")
         }
     }
 
     var newPlaylistButton: some View {
         Button(action: { self.showingNewPlaylist = true }) {
-            HStack(spacing: 0) {
-                Image(systemName: "plus")
-                    .padding(8)
-                    .contentShape(Rectangle())
-                #if os(tvOS)
-                    Text("New Playlist")
-                #endif
-            }
+            Label("New Playlist", systemImage: "plus")
         }
     }
 
@@ -322,29 +309,31 @@ struct PlaylistsView: View {
         Button {
             player.play(items.compactMap(\.video))
         } label: {
-            Image(systemName: "play")
-                .padding(8)
-                .contentShape(Rectangle())
+            Label("Play", systemImage: "play")
         }
         .contextMenu {
             Button {
                 player.play(items.compactMap(\.video), shuffling: true)
             } label: {
                 Label("Shuffle", systemImage: "shuffle")
-                    .padding(8)
-                    .contentShape(Rectangle())
             }
         }
     }
 
     private var currentPlaylist: Playlist? {
-        model.find(id: selectedPlaylistID) ?? model.all.first
+        if selectedPlaylistID.isEmpty {
+            DispatchQueue.main.async {
+                self.selectedPlaylistID = model.all.first?.id ?? ""
+            }
+        }
+        return model.find(id: selectedPlaylistID) ?? model.all.first
     }
 }
 
 struct PlaylistsView_Provider: PreviewProvider {
     static var previews: some View {
-        PlaylistsView()
-            .injectFixtureEnvironmentObjects()
+        NavigationView {
+            PlaylistsView()
+        }
     }
 }
