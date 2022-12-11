@@ -69,6 +69,11 @@ struct ContentView: View {
                 SettingsView()
             }
         )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingAccounts) {
+                AccountsView()
+            }
+        )
         #if !os(tvOS)
         .fileImporter(
             isPresented: $navigation.presentingFileImporter,

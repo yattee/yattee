@@ -112,7 +112,15 @@ struct SettingsView: View {
             List {
                 #if os(tvOS)
                     if !accounts.isEmpty {
-                        AccountSelectionView()
+                        Section(header: Text("Current Location")) {
+                            NavigationLink(destination: AccountsView()) {
+                                if let account = accounts.current {
+                                    Text(account.isPublic ? account.description : "\(account.description) — \(account.instance.shortDescription)")
+                                } else {
+                                    Text("Not Selected")
+                                }
+                            }
+                        }
                         Divider()
                     }
                 #endif

@@ -7,7 +7,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     let id: String
     var app: VideosApp?
     let instanceID: String?
-    var name: String?
+    var name: String
     let urlString: String
     var username: String
     var password: String?
@@ -31,7 +31,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
 
         self.id = id ?? (anonymous ? "anonymous-\(instanceID ?? urlString ?? UUID().uuidString)" : UUID().uuidString)
         self.instanceID = instanceID
-        self.name = name
+        self.name = name ?? ""
         self.urlString = urlString ?? ""
         self.username = username ?? ""
         self.password = password ?? ""
@@ -74,11 +74,15 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var description: String {
-        guard let name, !name.isEmpty else {
+        guard !name.isEmpty else {
             return shortUsername
         }
 
         return name
+    }
+
+    var urlHost: String {
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?.host ?? ""
     }
 
     func hash(into hasher: inout Hasher) {

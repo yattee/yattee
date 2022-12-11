@@ -213,9 +213,7 @@ struct SearchView: View {
                 }
 
                 Section {
-                    Button(action: { navigation.presentingSettings = true }) {
-                        Label("Settings", systemImage: "gearshape.2")
-                    }
+                    SettingsButtons()
                 }
             } label: {
                 HStack {

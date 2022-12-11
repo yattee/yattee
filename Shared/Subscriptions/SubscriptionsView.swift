@@ -39,6 +39,10 @@ struct SubscriptionsView: View {
                     Label("Feed", systemImage: "film").tag(Page.feed)
                     Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
                 }
+
+                Section {
+                    SettingsButtons()
+                }
             } label: {
                 HStack(spacing: 12) {
                     Text(menuLabel)

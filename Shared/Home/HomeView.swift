@@ -40,6 +40,9 @@ struct HomeView: View {
                                 NavigationModel.shared.presentingOpenVideos = true
                             }
                         }
+                        OpenVideosButton(text: "Locations", imageSystemName: "globe") {
+                            NavigationModel.shared.presentingAccounts = true
+                        }
                         OpenVideosButton(text: "Settings", imageSystemName: "gear") {
                             NavigationModel.shared.presentingSettings = true
                         }

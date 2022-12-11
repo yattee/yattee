@@ -35,7 +35,7 @@ struct OpenVideosView: View {
 
     var closeButton: some View {
         Button(action: { presentationMode.wrappedValue.dismiss() }) {
-            Label("Close", systemImage: "xmark")
+            Label("Done", systemImage: "xmark")
         }
         #if os(macOS)
         .labelStyle(.titleOnly)

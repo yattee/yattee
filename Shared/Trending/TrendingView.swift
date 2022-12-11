@@ -158,10 +158,14 @@ struct TrendingView: View {
         var trendingMenu: some View {
             Menu {
                 countryButton
+
                 if accounts.app.supportsTrendingCategories {
                     categoryButton
                 }
-                FavoriteButton(item: favoriteItem)
+
+                Section {
+                    SettingsButtons()
+                }
             } label: {
                 HStack(spacing: 12) {
                     Text("\(country.flag) \(country.name)")

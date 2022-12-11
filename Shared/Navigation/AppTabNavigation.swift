@@ -81,7 +81,6 @@ struct AppTabNavigation: View {
     private var subscriptionsNavigationView: some View {
         NavigationView {
             LazyView(SubscriptionsView())
-                .toolbar { toolbarContent }
         }
         .tabItem {
             Label("Subscriptions", systemImage: "star.circle.fill")
@@ -115,7 +114,6 @@ struct AppTabNavigation: View {
     private var trendingNavigationView: some View {
         NavigationView {
             LazyView(TrendingView())
-                .toolbar { toolbarContent }
         }
         .tabItem {
             Label("Trending", systemImage: "chart.bar.fill")
@@ -127,7 +125,6 @@ struct AppTabNavigation: View {
     private var playlistsNavigationView: some View {
         NavigationView {
             LazyView(PlaylistsView())
-                .toolbar { toolbarContent }
         }
         .tabItem {
             Label("Playlists", systemImage: "list.and.film")

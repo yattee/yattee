@@ -13,7 +13,12 @@ enum VideosApp: String, CaseIterable {
     case peerTube
 
     var name: String {
-        rawValue.capitalized
+        switch self {
+        case .peerTube:
+            return "PeerTube"
+        default:
+            return rawValue.capitalized
+        }
     }
 
     var appType: AppType {

@@ -77,12 +77,6 @@ struct AppSidebarNavigation: View {
 
             ToolbarItemGroup(placement: accountsMenuToolbarItemPlacement) {
                 AccountsMenuView()
-                    .help(
-                        "Switch Instances and Accounts\n" +
-                            "Current Instance: \n" +
-                            "\(accounts.current?.urlString ?? "Not Set")\n" +
-                            "Current User: \(accounts.current?.description ?? "Not set")"
-                    )
             }
 
             #if os(macOS)

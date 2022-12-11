@@ -191,8 +191,6 @@ struct PlaylistsView: View {
     #if os(iOS)
         var playlistsMenu: some View {
             Menu {
-                selectPlaylistButton
-
                 Section {
                     if let currentPlaylist {
                         playButton
@@ -206,6 +204,12 @@ struct PlaylistsView: View {
 
                 if accounts.signedIn {
                     newPlaylistButton
+                }
+
+                selectPlaylistButton
+
+                Section {
+                    SettingsButtons()
                 }
             } label: {
                 HStack(spacing: 12) {

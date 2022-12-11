@@ -79,6 +79,7 @@ final class NavigationModel: ObservableObject {
 
     @Published var presentingOpenVideos = false
     @Published var presentingSettings = false
+    @Published var presentingAccounts = false
     @Published var presentingWelcomeScreen = false
 
     @Published var presentingShareSheet = false
