@@ -1,6 +1,12 @@
 import Foundation
 
 enum VideosApp: String, CaseIterable {
+    enum AppType: String {
+        case local
+        case youTube
+        case peerTube
+    }
+
     case local
     case invidious
     case piped
@@ -8,6 +14,19 @@ enum VideosApp: String, CaseIterable {
 
     var name: String {
         rawValue.capitalized
+    }
+
+    var appType: AppType {
+        switch self {
+        case .local:
+            return .local
+        case .invidious:
+            return .youTube
+        case .piped:
+            return .youTube
+        case .peerTube:
+            return .peerTube
+        }
     }
 
     var supportsAccounts: Bool {

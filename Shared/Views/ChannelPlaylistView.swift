@@ -87,7 +87,7 @@ struct ChannelPlaylistView: View {
                     ShareButton(contentItem: contentItem)
 
                     if let playlist = presentedPlaylist {
-                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
                     }
 
                     playButton

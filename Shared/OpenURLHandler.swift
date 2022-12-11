@@ -15,13 +15,6 @@ struct OpenURLHandler {
     var navigationStyle = NavigationStyle.sidebar
 
     func handle(_ url: URL) {
-        if Self.firstHandle {
-            Self.firstHandle = false
-
-            Delay.by(1) { Self.shared.handle(url) }
-            return
-        }
-
         if accounts.current.isNil {
             accounts.setCurrent(accounts.any)
         }
@@ -52,27 +45,27 @@ struct OpenURLHandler {
         case .search:
             handleSearchUrlOpen(parser)
         case .favorites:
-            hideViewsAboveBrowser()
+            navigation.hideViewsAboveBrowser()
             navigation.tabSelection = .home
             #if os(macOS)
                 focusMainWindow()
             #endif
         case .subscriptions:
             guard accounts.app.supportsSubscriptions, accounts.signedIn else { return }
-            hideViewsAboveBrowser()
+            navigation.hideViewsAboveBrowser()
             navigation.tabSelection = .subscriptions
             #if os(macOS)
                 focusMainWindow()
             #endif
         case .popular:
             guard accounts.app.supportsPopular else { return }
-            hideViewsAboveBrowser()
+            navigation.hideViewsAboveBrowser()
             navigation.tabSelection = .popular
             #if os(macOS)
                 focusMainWindow()
             #endif
         case .trending:
-            hideViewsAboveBrowser()
+            navigation.hideViewsAboveBrowser()
             navigation.tabSelection = .trending
             #if os(macOS)
                 focusMainWindow()
@@ -84,13 +77,6 @@ struct OpenURLHandler {
                 navigation.presentingAlertInVideoPlayer = true
             #endif
         }
-    }
-
-    private func hideViewsAboveBrowser() {
-        player.hide()
-        navigation.presentingChannel = false
-        navigation.presentingPlaylist = false
-        navigation.presentingOpenVideos = false
     }
 
     private func handleFileURLOpen(_ parser: URLParser) {

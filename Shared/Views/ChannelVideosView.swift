@@ -231,7 +231,7 @@ struct ChannelVideosView: View {
                     contentTypePicker
                     Section {
                         subscriptionToggleButton
-                        FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                        FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, channel.id, channel.name)))
                     }
                 }
             } label: {

@@ -237,6 +237,13 @@ final class NavigationModel: ObservableObject {
         presentingAlert = true
     }
 
+    func hideViewsAboveBrowser() {
+        player.hide()
+        presentingChannel = false
+        presentingPlaylist = false
+        presentingOpenVideos = false
+    }
+
     func hideKeyboard() {
         #if os(iOS)
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

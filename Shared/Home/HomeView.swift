@@ -6,9 +6,7 @@ import UniformTypeIdentifiers
 struct HomeView: View {
     @ObservedObject private var accounts = AccountsModel.shared
 
-    @State private var dragging: FavoriteItem?
     @State private var presentingEditFavorites = false
-
     @State private var favoritesChanged = false
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
@@ -75,11 +73,11 @@ struct HomeView: View {
             if !accounts.current.isNil, showFavoritesInHome {
                 #if os(tvOS)
                     ForEach(Defaults[.favorites]) { item in
-                        FavoriteItemView(item: item, dragging: $dragging)
+                        FavoriteItemView(item: item)
                     }
                 #else
                     ForEach(favorites) { item in
-                        FavoriteItemView(item: item, dragging: $dragging)
+                        FavoriteItemView(item: item)
                         #if os(macOS)
                             .workaroundForVerticalScrollingBug()
                         #endif
