@@ -102,11 +102,12 @@ struct EditFavorites: View {
     }
 
     func label(_ item: FavoriteItem) -> String {
-        if case let .playlist(id) = item.section {
+        switch item.section {
+        case let .playlist(_, id):
             return playlistsModel.find(id: id)?.title ?? "Playlist".localized()
+        default:
+            return item.section.label.localized()
         }
-
-        return item.section.label.localized()
     }
 }
 

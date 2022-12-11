@@ -197,8 +197,10 @@ struct PlaylistsView: View {
 
                         editPlaylistButton
 
-                        FavoriteButton(item: FavoriteItem(section: .playlist(currentPlaylist.id)))
-                            .labelStyle(.iconOnly)
+                        if let account = accounts.current {
+                            FavoriteButton(item: FavoriteItem(section: .playlist(account.id, currentPlaylist.id)))
+                                .labelStyle(.iconOnly)
+                        }
                     }
                 }
 

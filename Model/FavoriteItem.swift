@@ -7,7 +7,7 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
         case popular
         case trending(String, String?)
         case channel(String, String, String)
-        case playlist(String)
+        case playlist(String, String)
         case channelPlaylist(String, String, String)
         case searchQuery(String, String, String, String)
 

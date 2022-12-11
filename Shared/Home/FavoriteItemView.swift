@@ -124,7 +124,7 @@ struct FavoriteItemView: View {
                 ChannelVideosView(channel: .init(id: id, name: name))
             case let .channelPlaylist(_, id, title):
                 ChannelPlaylistView(playlist: .init(id: id, title: title))
-            case let .playlist(id):
+            case let .playlist(_, id):
                 ChannelPlaylistView(playlist: .init(id: id, title: label))
             case .subscriptions:
                 SubscriptionsView()
@@ -157,7 +157,7 @@ struct FavoriteItemView: View {
         case let .searchQuery(text, _, _, _):
             navigation.hideViewsAboveBrowser()
             navigation.openSearchQuery(text)
-        case let .playlist(id):
+        case let .playlist(_, id):
             navigation.tabSelection = .playlist(id)
         }
     }
@@ -193,6 +193,8 @@ struct FavoriteItemView: View {
         case let .channelPlaylist(appType, _, _):
             guard let appType = VideosApp.AppType(rawValue: appType) else { return false }
             return accounts.app.appType == appType
+        case let .playlist(accountID, _):
+            return accounts.current?.id == accountID
         default:
             return true
         }
@@ -222,7 +224,7 @@ struct FavoriteItemView: View {
         case let .channelPlaylist(_, id, _):
             return accounts.api.channelPlaylist(id)
 
-        case let .playlist(id):
+        case let .playlist(_, id):
             return accounts.api.playlist(id)
 
         case let .searchQuery(text, date, duration, order):
@@ -241,11 +243,12 @@ struct FavoriteItemView: View {
     }
 
     private var label: String {
-        if case let .playlist(id) = item.section {
+        switch item.section {
+        case let .playlist(_, id):
             return playlists.find(id: id)?.title ?? "Playlist".localized()
+        default:
+            return item.section.label.localized()
         }
-
-        return item.section.label.localized()
     }
 }
 
