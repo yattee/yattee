@@ -210,11 +210,13 @@ struct SearchView: View {
                 Section {
                     FavoriteButton(item: favoriteItem)
                 }
-
             } label: {
-                Image(systemName: "chevron.down.circle.fill")
-                    .foregroundColor(.accentColor)
-                    .imageScale(.medium)
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "chevron.down.circle.fill")
+                }
+                .foregroundColor(.accentColor)
+                .imageScale(.medium)
             }
         }
     #endif

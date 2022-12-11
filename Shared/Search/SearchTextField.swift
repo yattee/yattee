@@ -33,8 +33,8 @@ struct SearchTextField: View {
                     .textFieldStyle(.plain)
                 #else
                     .textFieldStyle(.roundedBorder)
-                    .padding(.leading, 5)
-                    .padding(.trailing, 10)
+                    .padding(.horizontal, 5)
+                    .padding(.trailing, state.queryText.isEmpty ? 0 : 10)
                 #endif
 
                 if !state.queryText.isEmpty {

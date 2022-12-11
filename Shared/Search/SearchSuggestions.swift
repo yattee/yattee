@@ -30,16 +30,10 @@ struct SearchSuggestions: View {
                         HStack {
                             Image(systemName: "magnifyingglass")
                             HStack(spacing: 0) {
-                                if suggestion.hasPrefix(state.suggestionsText.lowercased()) {
-                                    Text(state.suggestionsText.lowercased())
-                                        .lineLimit(1)
-                                        .layoutPriority(2)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                Text(querySuffix(suggestion))
+                                Text(suggestion)
                                     .lineLimit(1)
                                     .layoutPriority(1)
+                                    .truncationMode(.head)
                                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                                     .contentShape(Rectangle())
                             }
@@ -88,10 +82,6 @@ struct SearchSuggestions: View {
         state.querySuggestions.filter {
             $0.compare(state.queryText, options: .caseInsensitive) != .orderedSame
         }
-    }
-
-    private func querySuffix(_ suggestion: String) -> String {
-        suggestion.replacingFirstOccurrence(of: state.suggestionsText.lowercased(), with: "")
     }
 
     #if os(macOS)
