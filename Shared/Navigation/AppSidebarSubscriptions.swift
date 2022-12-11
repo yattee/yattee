@@ -11,7 +11,16 @@ struct AppSidebarSubscriptions: View {
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
                     LazyView(ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier()))
                 } label: {
-                    Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
+                    if channel.thumbnailURL != nil {
+                        HStack {
+                            ChannelAvatarView(channel: channel, subscribedBadge: false)
+                                .frame(width: 20, height: 20)
+
+                            Text(channel.name)
+                        }
+                    } else {
+                        Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
+                    }
                 }
                 .contextMenu {
                     Button("Unsubscribe") {

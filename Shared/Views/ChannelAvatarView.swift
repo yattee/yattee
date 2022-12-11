@@ -4,6 +4,8 @@ struct ChannelAvatarView: View {
     var channel: Channel?
     var video: Video?
 
+    var subscribedBadge = true
+
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var subscribedChannels = SubscribedChannelsModel.shared
 
@@ -33,13 +35,18 @@ struct ChannelAvatarView: View {
                 }
                 .clipShape(Circle())
 
-                if accounts.app.supportsSubscriptions,
+                if subscribedBadge,
+                   accounts.app.supportsSubscriptions,
                    accounts.signedIn,
                    let channel,
                    subscribedChannels.isSubscribing(channel.id)
                 {
                     Image(systemName: "star.circle.fill")
+                    #if os(tvOS)
                         .background(Color.black)
+                    #else
+                        .background(Color.background)
+                    #endif
                         .clipShape(Circle())
                         .foregroundColor(.secondary)
                 }
