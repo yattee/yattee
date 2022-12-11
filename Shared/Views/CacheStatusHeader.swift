@@ -12,7 +12,7 @@ struct CacheStatusHeader: View {
                 .opacity(isLoading ? 1 : 0)
             Text(refreshTime)
         }
-        .font(.caption)
+        .font(.caption.monospacedDigit())
         .foregroundColor(.secondary)
     }
 }

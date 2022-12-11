@@ -14,7 +14,7 @@ struct ControlsBar: View {
     var navigation = NavigationModel.shared
     @ObservedObject private var model = PlayerModel.shared
     @ObservedObject private var playlists = PlaylistsModel.shared
-    @ObservedObject private var subscriptions = SubscriptionsModel.shared
+    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
 
     @ObservedObject private var controls = PlayerControlsModel.shared
 

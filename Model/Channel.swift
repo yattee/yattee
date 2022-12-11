@@ -113,14 +113,16 @@ struct Channel: Identifiable, Hashable {
     var json: JSON {
         [
             "id": id,
-            "name": name
+            "name": name,
+            "thumbnailURL": thumbnailURL?.absoluteString ?? ""
         ]
     }
 
     static func from(_ json: JSON) -> Self {
         .init(
             id: json["id"].stringValue,
-            name: json["name"].stringValue
+            name: json["name"].stringValue,
+            thumbnailURL: json["thumbnailURL"].url
         )
     }
 }

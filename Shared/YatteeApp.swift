@@ -40,7 +40,7 @@ struct YatteeApp: App {
     @StateObject private var playlists = PlaylistsModel.shared
     @StateObject private var recents = RecentsModel.shared
     @StateObject private var settings = SettingsModel.shared
-    @StateObject private var subscriptions = SubscriptionsModel.shared
+    @StateObject private var subscriptions = SubsribedChannelsModel.shared
     @StateObject private var thumbnails = ThumbnailsModel.shared
 
     let persistenceController = PersistenceController.shared

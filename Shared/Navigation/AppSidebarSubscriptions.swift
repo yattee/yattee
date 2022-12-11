@@ -3,7 +3,7 @@ import SwiftUI
 
 struct AppSidebarSubscriptions: View {
     @ObservedObject private var navigation = NavigationModel.shared
-    @ObservedObject private var subscriptions = SubscriptionsModel.shared
+    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
 
     var body: some View {
         Section(header: Text("Subscriptions")) {
@@ -21,5 +21,11 @@ struct AppSidebarSubscriptions: View {
                 .id("channel\(channel.id)")
             }
         }
+    }
+}
+
+struct AppSidebarSubscriptions_Previews: PreviewProvider {
+    static var previews: some View {
+        AppSidebarSubscriptions()
     }
 }

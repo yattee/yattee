@@ -1,78 +1,68 @@
-import Siesta
+import Defaults
 import SwiftUI
 
 struct SubscriptionsView: View {
-    @ObservedObject private var model = SubscriptionsViewModel.shared
-    @ObservedObject private var accounts = AccountsModel.shared
-
-    var videos: [ContentItem] {
-        ContentItem.array(of: model.videos)
+    enum Page: String, CaseIterable, Defaults.Serializable {
+        case feed
+        case channels
     }
+
+    @Default(.subscriptionsViewPage) private var subscriptionsViewPage
 
     var body: some View {
         SignInRequiredView(title: "Subscriptions".localized()) {
-            VerticalCells(items: videos) {
-                HStack {
-                    Spacer()
-
-                    CacheStatusHeader(refreshTime: model.formattedFeedTime, isLoading: model.isLoading)
-
-                    #if os(tvOS)
-                        Button {
-                            model.loadResources(force: true)
-                        } label: {
-                            Label("Refresh", systemImage: "arrow.clockwise")
-                                .labelStyle(.iconOnly)
-                                .imageScale(.small)
-                                .font(.caption2)
-                        }
-                        .padding(.horizontal, 10)
-                    #endif
-                }
+            switch subscriptionsViewPage {
+            case .feed:
+                FeedView()
+            case .channels:
+                ChannelsView()
+                #if os(tvOS)
+                    .ignoresSafeArea(.all, edges: .horizontal)
+                #endif
             }
-            .environment(\.loadMoreContentHandler) { model.loadNextPage() }
-            .onAppear {
-                model.loadResources()
-            }
-            .onChange(of: accounts.current) { _ in
-                model.reset()
-                model.loadResources(force: true)
-            }
-            #if os(iOS)
-            .refreshControl { refreshControl in
-                model.loadResources(force: true) {
-                    refreshControl.endRefreshing()
-                }
-            }
-            .backport
-            .refreshable {
-                await model.loadResources(force: true)
-            }
-            #endif
         }
 
-        #if !os(tvOS)
-        .background(
-            Button("Refresh") {
-                model.loadResources(force: true)
-            }
-            .keyboardShortcut("r")
-            .opacity(0)
-        )
-        #endif
         #if os(iOS)
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
-        #endif
-        #if !os(macOS)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            model.loadResources()
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                subscriptionsMenu
+            }
         }
         #endif
     }
+
+    #if os(iOS)
+        var subscriptionsMenu: some View {
+            Menu {
+                Picker("Page", selection: $subscriptionsViewPage) {
+                    Label("Feed", systemImage: "film").tag(Page.feed)
+                    Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Text(menuLabel)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .transaction { t in t.animation = nil }
+            }
+        }
+
+        var menuLabel: String {
+            subscriptionsViewPage == .channels ? "Channels" : "Feed"
+        }
+    #endif
 }
 
-struct SubscriptonsView_Previews: PreviewProvider {
+struct SubscriptionsView_Previews: PreviewProvider {
     static var previews: some View {
-        SubscriptionsView()
+        NavigationView {
+            SubscriptionsView()
+        }
     }
 }

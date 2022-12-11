@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ChannelVideosView: View {
     var channel: Channel?
+    var showCloseButton = false
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
@@ -15,7 +16,6 @@ struct ChannelVideosView: View {
     @StateObject private var store = Store<Channel>()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.navigationStyle) private var navigationStyle
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -24,7 +24,7 @@ struct ChannelVideosView: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var recents = RecentsModel.shared
-    @ObservedObject private var subscriptions = SubscriptionsModel.shared
+    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
     @Namespace private var focusNamespace
 
     var presentedChannel: Channel? {
@@ -40,16 +40,6 @@ struct ChannelVideosView: View {
     }
 
     var body: some View {
-        if navigationStyle == .tab {
-            NavigationView {
-                content
-            }
-        } else {
-            content
-        }
-    }
-
-    var content: some View {
         let content = VStack {
             #if os(tvOS)
                 VStack {
@@ -95,7 +85,7 @@ struct ChannelVideosView: View {
                 }
             #endif
             ToolbarItem(placement: .cancellationAction) {
-                if navigationStyle == .tab {
+                if showCloseButton {
                     Button {
                         withAnimation(Constants.overlayAnimation) {
                             navigation.presentingChannel = false
@@ -141,13 +131,7 @@ struct ChannelVideosView: View {
         }
         #endif
         .onAppear {
-            if navigationStyle == .tab {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    resource?.loadIfNeeded()
-                }
-            } else {
-                resource?.loadIfNeeded()
-            }
+            resource?.loadIfNeeded()
         }
         .onChange(of: contentType) { _ in
             resource?.load()

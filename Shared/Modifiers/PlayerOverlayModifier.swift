@@ -4,6 +4,8 @@ import SwiftUI
 struct PlayerOverlayModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .overlay(ControlsBar(fullScreen: .constant(false)), alignment: .bottom)
+        #if !os(tvOS)
+        .overlay(ControlsBar(fullScreen: .constant(false)), alignment: .bottom)
+        #endif
     }
 }

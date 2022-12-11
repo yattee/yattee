@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ChannelPlaylistView: View {
     var playlist: ChannelPlaylist?
+    var showCloseButton = false
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
@@ -36,16 +37,6 @@ struct ChannelPlaylistView: View {
     }
 
     var body: some View {
-        if navigationStyle == .tab {
-            NavigationView {
-                content
-            }
-        } else {
-            content
-        }
-    }
-
-    var content: some View {
         VStack(alignment: .leading) {
             #if os(tvOS)
                 HStack {
@@ -81,7 +72,7 @@ struct ChannelPlaylistView: View {
         #else
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                if navigationStyle == .tab {
+                if showCloseButton {
                     Button {
                         NavigationModel.shared.presentingPlaylist = false
                     } label: {

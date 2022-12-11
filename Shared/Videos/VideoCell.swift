@@ -164,7 +164,7 @@ struct VideoCell: View {
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
                     if !channelOnThumbnail, !inChannelView {
-                        channelButton(badge: false)
+                        channelControl(badge: false)
                     }
 
                     if additionalDetailsAvailable {
@@ -251,7 +251,7 @@ struct VideoCell: View {
                             .frame(minHeight: 40, alignment: .top)
                         #endif
                         if !channelOnThumbnail, !inChannelView {
-                            channelButton(badge: false)
+                            channelControl(badge: false)
                                 .padding(.top, 4)
                                 .padding(.bottom, 6)
                         }
@@ -305,33 +305,55 @@ struct VideoCell: View {
         }
     }
 
-    @ViewBuilder private func channelButton(badge: Bool = true) -> some View {
+    @ViewBuilder private func channelControl(badge: Bool = true) -> some View {
         if !video.channel.name.isEmpty {
-            Button {
-                guard !inChannelView else {
-                    return
-                }
-
-                NavigationModel.shared.openChannel(
-                    video.channel,
-                    navigationStyle: navigationStyle
-                )
-            } label: {
-                if badge {
-                    DetailBadge(text: video.author, style: .prominent)
-                        .foregroundColor(.primary)
-                } else {
-                    Text(video.channel.name)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-                }
-            }
             #if os(tvOS)
-            .buttonStyle(.card)
+                channelButton(badge: badge)
             #else
-            .buttonStyle(.plain)
+                if navigationStyle == .tab {
+                    channelNavigationLink(badge: badge)
+                } else {
+                    channelButton(badge: badge)
+                }
             #endif
-            .help("\(video.channel.name) Channel")
+        }
+    }
+
+    @ViewBuilder private func channelNavigationLink(badge: Bool = true) -> some View {
+        NavigationLink(destination: ChannelVideosView(channel: video.channel)) {
+            channelLabel(badge: badge)
+        }
+    }
+
+    @ViewBuilder private func channelButton(badge: Bool = true) -> some View {
+        Button {
+            guard !inChannelView else {
+                return
+            }
+
+            NavigationModel.shared.openChannel(
+                video.channel,
+                navigationStyle: navigationStyle
+            )
+        } label: {
+            channelLabel(badge: badge)
+        }
+        #if os(tvOS)
+        .buttonStyle(.card)
+        #else
+        .buttonStyle(.plain)
+        #endif
+        .help("\(video.channel.name) Channel")
+    }
+
+    @ViewBuilder private func channelLabel(badge: Bool = true) -> some View {
+        if badge {
+            DetailBadge(text: video.author, style: .prominent)
+                .foregroundColor(.primary)
+        } else {
+            Text(video.channel.name)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
         }
     }
 
@@ -371,7 +393,7 @@ struct VideoCell: View {
                     Spacer()
 
                     if channelOnThumbnail, !inChannelView {
-                        channelButton()
+                        channelControl()
                     }
                 }
                 #if os(tvOS)

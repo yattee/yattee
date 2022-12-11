@@ -201,6 +201,8 @@ extension Defaults.Keys {
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
+
+    static let subscriptionsViewPage = Key<SubscriptionsView.Page>("subscriptionsViewPage", default: .feed)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

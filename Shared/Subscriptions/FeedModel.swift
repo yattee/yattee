@@ -1,8 +1,8 @@
 import Foundation
 import Siesta
 
-final class SubscriptionsViewModel: ObservableObject {
-    static let shared = SubscriptionsViewModel()
+final class FeedModel: ObservableObject {
+    static let shared = FeedModel()
 
     @Published var isLoading = false
     @Published var videos = [Video]()
@@ -114,7 +114,8 @@ final class SubscriptionsViewModel: ObservableObject {
     }
 
     private func loadCachedFeed() {
-        let cache = FeedCacheModel.shared.retrieveFeed(account: accounts.current)
+        guard let account = accounts.current else { return }
+        let cache = FeedCacheModel.shared.retrieveFeed(account: account)
         if !cache.isEmpty {
             DispatchQueue.main.async { [weak self] in
                 self?.videos = cache

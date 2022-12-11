@@ -5,19 +5,20 @@ import Siesta
 import SwiftUI
 import SwiftyJSON
 
-final class SubscriptionsModel: ObservableObject {
-    static var shared = SubscriptionsModel()
+final class SubsribedChannelsModel: ObservableObject {
+    static var shared = SubsribedChannelsModel()
     let logger = Logger(label: "stream.yattee.cache.channels")
 
     static let diskConfig = DiskConfig(name: "channels")
     static let memoryConfig = MemoryConfig()
 
     let storage = try! Storage<String, JSON>(
-        diskConfig: SubscriptionsModel.diskConfig,
-        memoryConfig: SubscriptionsModel.memoryConfig,
+        diskConfig: SubsribedChannelsModel.diskConfig,
+        memoryConfig: SubsribedChannelsModel.memoryConfig,
         transformer: CacheModel.jsonTransformer
     )
 
+    @Published var isLoading = false
     @Published var channels = [Channel]()
     var accounts: AccountsModel { .shared }
 
@@ -46,37 +47,49 @@ final class SubscriptionsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        guard accounts.app.supportsSubscriptions, accounts.signedIn, let account = accounts.current else {
+        guard accounts.app.supportsSubscriptions, !isLoading, accounts.signedIn, let account = accounts.current else {
             channels = []
             return
         }
 
         loadCachedChannels(account)
 
-        let request = force ? resource?.load() : resource?.loadIfNeeded()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let request = force ? self.resource?.load() : self.resource?.loadIfNeeded()
 
-        request?
-            .onSuccess { resource in
-                if let channels: [Channel] = resource.typedContent() {
-                    self.channels = channels
-                    self.storeChannels(account: account, channels: channels)
-                    onSuccess()
+            if request != nil {
+                self.isLoading = true
+            }
+
+            request?
+                .onCompletion { [weak self] _ in
+                    self?.isLoading = false
                 }
-            }
-            .onFailure { _ in
-                self.channels = []
-            }
+                .onSuccess { resource in
+                    if let channels: [Channel] = resource.typedContent() {
+                        self.channels = channels
+                        self.storeChannels(account: account, channels: channels)
+                        onSuccess()
+                    }
+                }
+                .onFailure { _ in
+                    self.channels = []
+                }
+        }
     }
 
     func loadCachedChannels(_ account: Account) {
         let cache = getChannels(account: account)
         if !cache.isEmpty {
-            channels = cache
+            DispatchQueue.main.async {
+                self.channels = cache
+            }
         }
     }
 
     func storeChannels(account: Account, channels: [Channel]) {
-        let date = dateFormatter.string(from: Date())
+        let date = iso8601DateFormatter.string(from: Date())
         logger.info("caching channels \(channelsDateCacheKey(account)) -- \(date)")
 
         let dateObject: JSON = ["date": date]
@@ -104,7 +117,7 @@ final class SubscriptionsModel: ObservableObject {
         }
     }
 
-    private var dateFormatter: ISO8601DateFormatter {
+    private var iso8601DateFormatter: ISO8601DateFormatter {
         .init()
     }
 
@@ -114,5 +127,50 @@ final class SubscriptionsModel: ObservableObject {
 
     private func channelsDateCacheKey(_ account: Account) -> String {
         "channels-\(account.id)-date"
+    }
+
+    func getFeedTime(account: Account) -> Date? {
+        if let json = try? storage.object(forKey: channelsDateCacheKey(account)),
+           let string = json.dictionaryValue["date"]?.string,
+           let date = iso8601DateFormatter.date(from: string)
+        {
+            return date
+        }
+
+        return nil
+    }
+
+    var feedTime: Date? {
+        if let account = accounts.current {
+            return getFeedTime(account: account)
+        }
+
+        return nil
+    }
+
+    var formattedCacheTime: String {
+        if let feedTime {
+            let isSameDay = Calendar(identifier: .iso8601).isDate(feedTime, inSameDayAs: Date())
+            let formatter = isSameDay ? dateFormatterForTimeOnly : dateFormatter
+            return formatter.string(from: feedTime)
+        }
+
+        return ""
+    }
+
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .medium
+
+        return formatter
+    }
+
+    private var dateFormatterForTimeOnly: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .medium
+
+        return formatter
     }
 }

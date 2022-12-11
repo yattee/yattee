@@ -5,7 +5,7 @@ struct AppTabNavigation: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     private var player = PlayerModel.shared
-    @ObservedObject private var subscriptions = SubscriptionsModel.shared
+    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.showDocuments) private var showDocuments
@@ -170,23 +170,27 @@ struct AppTabNavigation: View {
 
     @ViewBuilder private var channelView: some View {
         if navigation.presentingChannel {
-            ChannelVideosView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environment(\.inChannelView, true)
-                .environment(\.navigationStyle, .tab)
-                .id("channelVideos")
-                .zIndex(player.presentingPlayer ? -1 : 2)
-                .transition(.move(edge: .bottom))
+            NavigationView {
+                ChannelVideosView(showCloseButton: true)
+            }
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .environment(\.inChannelView, true)
+            .environment(\.navigationStyle, .tab)
+            .id("channelVideos")
+            .zIndex(player.presentingPlayer ? -1 : 2)
+            .transition(.move(edge: .bottom))
         }
     }
 
     @ViewBuilder private var playlistView: some View {
         if navigation.presentingPlaylist {
-            ChannelPlaylistView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .id("channelPlaylist")
-                .zIndex(player.presentingPlayer ? -1 : 1)
-                .transition(.move(edge: .bottom))
+            NavigationView {
+                ChannelPlaylistView(showCloseButton: true)
+            }
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .id("channelPlaylist")
+            .zIndex(player.presentingPlayer ? -1 : 1)
+            .transition(.move(edge: .bottom))
         }
     }
 }

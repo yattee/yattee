@@ -8,20 +8,42 @@ struct ChannelCell: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
     var body: some View {
+        #if os(tvOS)
+            button
+        #else
+            if navigationStyle == .tab {
+                navigationLink
+            } else {
+                button
+            }
+        #endif
+    }
+
+    var navigationLink: some View {
+        NavigationLink(destination: ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier())) {
+            labelContent
+        }
+    }
+
+    var button: some View {
         Button {
             NavigationModel.shared.openChannel(
                 channel,
                 navigationStyle: navigationStyle
             )
         } label: {
-            content
-                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                .contentShape(RoundedRectangle(cornerRadius: 12))
+            labelContent
         }
         .buttonStyle(.plain)
     }
 
-    var content: some View {
+    var label: some View {
+        labelContent
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    var labelContent: some View {
         VStack {
             HStack(alignment: .top, spacing: 3) {
                 Image(systemName: "person.crop.rectangle")

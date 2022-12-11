@@ -15,7 +15,7 @@ struct CommentView: View {
     @Environment(\.navigationStyle) private var navigationStyle
 
     @ObservedObject private var comments = CommentsModel.shared
-    var subscriptions = SubscriptionsModel.shared
+    var subscriptions = SubsribedChannelsModel.shared
 
     var body: some View {
         VStack(alignment: .leading) {

@@ -9,14 +9,22 @@ struct ChannelPlaylistCell: View {
     var navigation = NavigationModel.shared
 
     var body: some View {
-        Button {
-            NavigationModel.shared.openChannelPlaylist(playlist, navigationStyle: navigationStyle)
-        } label: {
-            content
-                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                .contentShape(RoundedRectangle(cornerRadius: 12))
+        if navigationStyle == .tab {
+            NavigationLink(destination: ChannelPlaylistView(playlist: playlist)) { cell }
+        } else {
+            Button {
+                NavigationModel.shared.openChannelPlaylist(playlist, navigationStyle: navigationStyle)
+            } label: {
+                cell
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+    }
+
+    var cell: some View {
+        content
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
     var content: some View {

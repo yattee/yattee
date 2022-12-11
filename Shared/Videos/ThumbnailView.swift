@@ -14,24 +14,27 @@ struct ThumbnailView: View {
     var body: some View {
         Group {
             if imageManager.image != nil {
-                #if os(macOS)
-                    Image(nsImage: imageManager.image!)
-                        .resizable()
-                #else
-                    Image(uiImage: imageManager.image!)
-                        .resizable()
-                #endif
+                Group {
+                    #if os(macOS)
+                        Image(nsImage: imageManager.image!)
+                            .resizable()
+                    #else
+                        Image(uiImage: imageManager.image!)
+                            .resizable()
+                    #endif
+                }
             } else {
                 Rectangle().fill(Color("PlaceholderColor"))
-                    .onAppear {
-                        self.imageManager.setOnFailure { _ in
-                            guard let url else { return }
-                            self.thumbnails.insertUnloadable(url)
-                        }
-                        self.imageManager.load(url: url)
-                    }
-                    .onDisappear { self.imageManager.cancel() }
             }
         }
+        .onAppear {
+            guard let url else { return }
+
+            self.imageManager.setOnFailure { _ in
+                self.thumbnails.insertUnloadable(url)
+            }
+            self.imageManager.load(url: url)
+        }
+        .onDisappear { self.imageManager.cancel() }
     }
 }

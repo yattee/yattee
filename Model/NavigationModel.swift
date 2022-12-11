@@ -221,7 +221,7 @@ final class NavigationModel: ObservableObject {
         presentingPlaylistForm = true
     }
 
-    func presentUnsubscribeAlert(_ channel: Channel, subscriptions: SubscriptionsModel) {
+    func presentUnsubscribeAlert(_ channel: Channel, subscriptions: SubsribedChannelsModel) {
         channelToUnsubscribe = channel
         alert = Alert(
             title: Text(
