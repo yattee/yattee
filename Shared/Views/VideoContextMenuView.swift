@@ -15,7 +15,7 @@ struct VideoContextMenuView: View {
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var player = PlayerModel.shared
     @ObservedObject private var playlists = PlaylistsModel.shared
-    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 

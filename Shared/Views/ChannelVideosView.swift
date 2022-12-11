@@ -24,7 +24,7 @@ struct ChannelVideosView: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var recents = RecentsModel.shared
-    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @Namespace private var focusNamespace
 
     var presentedChannel: Channel? {

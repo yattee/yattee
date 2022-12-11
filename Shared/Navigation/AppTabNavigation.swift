@@ -5,7 +5,7 @@ struct AppTabNavigation: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     private var player = PlayerModel.shared
-    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.showDocuments) private var showDocuments

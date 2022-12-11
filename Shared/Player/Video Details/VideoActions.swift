@@ -4,7 +4,7 @@ import SwiftUI
 struct VideoActions: View {
     @ObservedObject private var accounts = AccountsModel.shared
     var navigation = NavigationModel.shared
-    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var player = PlayerModel.shared
 
     var video: Video?

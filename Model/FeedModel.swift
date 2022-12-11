@@ -18,7 +18,7 @@ final class FeedModel: ObservableObject {
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self else { return }
 
-            if !force {
+            if force || self.videos.isEmpty {
                 self.loadCachedFeed()
             }
 
@@ -117,7 +117,7 @@ final class FeedModel: ObservableObject {
         guard let account = accounts.current else { return }
         let cache = FeedCacheModel.shared.retrieveFeed(account: account)
         if !cache.isEmpty {
-            DispatchQueue.main.async { [weak self] in
+            DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
                 self?.videos = cache
             }
         }

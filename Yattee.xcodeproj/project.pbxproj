@@ -497,7 +497,7 @@
 		3774124C27387D2300423605 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		3774124D27387D2300423605 /* PlaylistsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA794226DBA973002A0235 /* PlaylistsModel.swift */; };
 		3774124E27387D2300423605 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376578882685471400D4EA09 /* Playlist.swift */; };
-		3774124F27387D2300423605 /* SubsribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */; };
+		3774124F27387D2300423605 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
 		3774125027387D2300423605 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B19626717E1500C925CA /* Video.swift */; };
 		3774125127387D2300423605 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		3774125227387D2300423605 /* Thumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CFADA269663F1003CB2C6 /* Thumbnail.swift */; };
@@ -833,9 +833,9 @@
 		37E04C0F275940FB00172673 /* VerticalScrollingFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */; };
 		37E084AC2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */; };
 		37E084AD2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */; };
-		37E64DD126D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */; };
-		37E64DD226D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */; };
-		37E64DD326D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */; };
+		37E64DD126D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
+		37E64DD226D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
+		37E64DD326D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
 		37E6D79C2944AE1A00550C3D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E6D79B2944AE1A00550C3D /* FeedModel.swift */; };
 		37E6D79D2944AE1A00550C3D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E6D79B2944AE1A00550C3D /* FeedModel.swift */; };
 		37E6D79E2944AE1A00550C3D /* FeedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E6D79B2944AE1A00550C3D /* FeedModel.swift */; };
@@ -1377,7 +1377,7 @@
 		37DD9DC22785D63A00539416 /* UIResponder+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIResponder+Extensions.swift"; sourceTree = "<group>"; };
 		37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalScrollingFix.swift; sourceTree = "<group>"; };
 		37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsNavigationLink.swift; sourceTree = "<group>"; };
-		37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsribedChannelsModel.swift; sourceTree = "<group>"; };
+		37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedChannelsModel.swift; sourceTree = "<group>"; };
 		37E6D79B2944AE1A00550C3D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStatusHeader.swift; sourceTree = "<group>"; };
 		37E70922271CD43000D34DDE /* WelcomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreen.swift; sourceTree = "<group>"; };
@@ -2261,6 +2261,7 @@
 				37494EA629200E0B000DF176 /* DocumentsModel.swift */,
 				37599F2F272B42810087F250 /* FavoriteItem.swift */,
 				37599F33272B44000087F250 /* FavoritesModel.swift */,
+				37E6D79B2944AE1A00550C3D /* FeedModel.swift */,
 				37BC50AB2778BCBA00510953 /* HistoryModel.swift */,
 				377ABC3F286E4AD5009C986F /* InstancesManifest.swift */,
 				375B8AB228B580D300397B31 /* KeychainModel.swift */,
@@ -2282,7 +2283,7 @@
 				37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */,
 				3797758A2689345500DD52A8 /* Store.swift */,
 				37CEE4C02677B697005A1EFE /* Stream.swift */,
-				37E64DD026D597EB00C71877 /* SubsribedChannelsModel.swift */,
+				37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */,
 				373CFADA269663F1003CB2C6 /* Thumbnail.swift */,
 				37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
@@ -2336,7 +2337,6 @@
 			isa = PBXGroup;
 			children = (
 				378E9C3F29455A5800B2D696 /* ChannelsView.swift */,
-				37E6D79B2944AE1A00550C3D /* FeedModel.swift */,
 				37AAF29F26741C97007FC770 /* FeedView.swift */,
 				3728203F2945E4A8009A0E2D /* SubscriptionsPageButton.swift */,
 				378E9C3B2945565500B2D696 /* SubscriptionsView.swift */,
@@ -3031,7 +3031,7 @@
 				375E45F827B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */,
 				37EAD86F267B9ED100D9E01B /* Segment.swift in Sources */,
 				375168D62700FAFF008F96A6 /* Debounce.swift in Sources */,
-				37E64DD126D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */,
+				37E64DD126D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */,
 				37C89322294532220032AFD3 /* PlayerOverlayModifier.swift in Sources */,
 				376578892685471400D4EA09 /* Playlist.swift in Sources */,
 				37B4E803277D0A72004BF56A /* AppDelegate.swift in Sources */,
@@ -3338,7 +3338,7 @@
 				3784B23E2728B85300B09468 /* ShareButton.swift in Sources */,
 				375F7411289DC35A00747050 /* PlayerBackendView.swift in Sources */,
 				37FEF11427EFD8580033912F /* PlaceholderCell.swift in Sources */,
-				37E64DD226D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */,
+				37E64DD226D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */,
 				37F0F4EF286F734400C06C2E /* AdvancedSettings.swift in Sources */,
 				37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */,
@@ -3468,7 +3468,7 @@
 				3774123327387CB000423605 /* Defaults.swift in Sources */,
 				3774124E27387D2300423605 /* Playlist.swift in Sources */,
 				3766AFD2273DA97D00686348 /* Int+FormatTests.swift in Sources */,
-				3774124F27387D2300423605 /* SubsribedChannelsModel.swift in Sources */,
+				3774124F27387D2300423605 /* SubscribedChannelsModel.swift in Sources */,
 				3774126127387D2D00423605 /* AccountsModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3563,7 +3563,7 @@
 				373CFADD269663F1003CB2C6 /* Thumbnail.swift in Sources */,
 				376B0562293FF45F0062AC78 /* PeerTubeAPI.swift in Sources */,
 				3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */,
-				37E64DD326D597EB00C71877 /* SubsribedChannelsModel.swift in Sources */,
+				37E64DD326D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */,
 				3752069B285E8DD300CA655F /* Chapter.swift in Sources */,
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,

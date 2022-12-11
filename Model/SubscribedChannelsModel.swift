@@ -5,16 +5,16 @@ import Siesta
 import SwiftUI
 import SwiftyJSON
 
-final class SubsribedChannelsModel: ObservableObject {
-    static var shared = SubsribedChannelsModel()
+final class SubscribedChannelsModel: ObservableObject {
+    static var shared = SubscribedChannelsModel()
     let logger = Logger(label: "stream.yattee.cache.channels")
 
     static let diskConfig = DiskConfig(name: "channels")
     static let memoryConfig = MemoryConfig()
 
     let storage = try! Storage<String, JSON>(
-        diskConfig: SubsribedChannelsModel.diskConfig,
-        memoryConfig: SubsribedChannelsModel.memoryConfig,
+        diskConfig: SubscribedChannelsModel.diskConfig,
+        memoryConfig: SubscribedChannelsModel.memoryConfig,
         transformer: CacheModel.jsonTransformer
     )
 

@@ -2,7 +2,7 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct ChannelsView: View {
-    @ObservedObject private var subscriptions = SubsribedChannelsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
 
     var body: some View {

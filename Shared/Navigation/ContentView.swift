@@ -12,7 +12,7 @@ struct ContentView: View {
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var player = PlayerModel.shared
     private var playlists = PlaylistsModel.shared
-    private var subscriptions = SubsribedChannelsModel.shared
+    private var subscriptions = SubscribedChannelsModel.shared
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass

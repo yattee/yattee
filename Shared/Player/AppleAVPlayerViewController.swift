@@ -8,7 +8,7 @@ final class AppleAVPlayerViewController: UIViewController {
     var navigationModel: NavigationModel { .shared }
     var playerModel: PlayerModel { .shared }
     var playlistsModel: PlaylistsModel { .shared }
-    var subscriptionsModel: SubsribedChannelsModel { .shared }
+    var subscriptionsModel: SubscribedChannelsModel { .shared }
     var playerView = AVPlayerViewController()
 
     let persistenceController = PersistenceController.shared
