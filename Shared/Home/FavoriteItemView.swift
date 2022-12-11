@@ -106,6 +106,8 @@ struct FavoriteItemView: View {
             return navigationStyle == .tab
         case .channelPlaylist:
             return navigationStyle == .tab
+        case .playlist:
+            return navigationStyle == .tab
         case .subscriptions:
             return navigationStyle == .tab
         case .popular:
@@ -122,6 +124,8 @@ struct FavoriteItemView: View {
                 ChannelVideosView(channel: .init(id: id, name: name))
             case let .channelPlaylist(_, id, title):
                 ChannelPlaylistView(playlist: .init(id: id, title: title))
+            case let .playlist(id):
+                ChannelPlaylistView(playlist: .init(id: id, title: label))
             case .subscriptions:
                 SubscriptionsView()
             case .popular:
