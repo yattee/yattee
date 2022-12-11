@@ -52,6 +52,7 @@ struct VideoCell: View {
             .contextMenu {
                 VideoContextMenuView(video: video)
             }
+            .id(video.videoID)
     }
 
     private var thumbnailRoundingCornerRadius: Double {
