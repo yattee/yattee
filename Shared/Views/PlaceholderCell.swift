@@ -3,7 +3,7 @@ import SwiftUI
 
 struct PlaceholderCell: View {
     var body: some View {
-        VideoCell(video: .fixture)
+        VideoCell(id: UUID().uuidString, video: .fixture)
             .redacted(reason: .placeholder)
     }
 }

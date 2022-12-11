@@ -4,6 +4,7 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoCell: View {
+    var id: String?
     private var video: Video
 
     @Environment(\.horizontalCells) private var horizontalCells
@@ -30,7 +31,8 @@ struct VideoCell: View {
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
-    init(video: Video) {
+    init(id: String? = nil, video: Video) {
+        self.id = id
         self.video = video
         _watchRequest = video.watchFetchRequest
     }
@@ -52,7 +54,7 @@ struct VideoCell: View {
             .contextMenu {
                 VideoContextMenuView(video: video)
             }
-            .id(video.videoID)
+            .id(id ?? video.videoID)
     }
 
     private var thumbnailRoundingCornerRadius: Double {
