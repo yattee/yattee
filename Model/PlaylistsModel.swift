@@ -6,6 +6,7 @@ import SwiftUI
 final class PlaylistsModel: ObservableObject {
     static var shared = PlaylistsModel()
 
+    @Published var isLoading = false
     @Published var playlists = [Playlist]()
     @Published var reloadPlaylists = false
 
@@ -36,29 +37,49 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        guard accounts.app.supportsUserPlaylists, accounts.signedIn else {
+        guard accounts.app.supportsUserPlaylists, accounts.signedIn, let account = accounts.current else {
             playlists = []
             return
         }
 
-        let request = force ? resource?.load() : resource?.loadIfNeeded()
+        loadCachedPlaylists(account)
 
-        guard !request.isNil else {
-            onSuccess()
-            return
-        }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let request = force ? self.resource?.load() : self.resource?.loadIfNeeded()
 
-        request?
-            .onSuccess { resource in
-                if let playlists: [Playlist] = resource.typedContent() {
-                    self.playlists = playlists
-                    onSuccess()
+            guard !request.isNil else {
+                onSuccess()
+                return
+            }
+
+            self.isLoading = true
+
+            request?
+                .onCompletion { [weak self] _ in
+                    self?.isLoading = false
                 }
+                .onSuccess { resource in
+                    if let playlists: [Playlist] = resource.typedContent() {
+                        self.playlists = playlists
+                        PlaylistsCacheModel.shared.storePlaylist(account: account, playlists: playlists)
+                        onSuccess()
+                    }
+                }
+                .onFailure { error in
+                    self.playlists = []
+                    NavigationModel.shared.presentAlert(title: "Could not refresh Playlists", message: error.userMessage)
+                }
+        }
+    }
+
+    private func loadCachedPlaylists(_ account: Account) {
+        let cache = PlaylistsCacheModel.shared.retrievePlaylists(account: account)
+        if !cache.isEmpty {
+            DispatchQueue.main.async(qos: .userInteractive) {
+                self.playlists = cache
             }
-            .onFailure { error in
-                self.playlists = []
-                NavigationModel.shared.presentAlert(title: "Could not refresh Playlists", message: error.userMessage)
-            }
+        }
     }
 
     func addVideo(

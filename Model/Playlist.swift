@@ -23,7 +23,14 @@ struct Playlist: Identifiable, Equatable, Hashable {
 
     var videos = [Video]()
 
-    init(id: String, title: String, visibility: Visibility, editable: Bool = true, updated: TimeInterval? = nil, videos: [Video] = []) {
+    init(
+        id: String,
+        title: String,
+        visibility: Visibility,
+        editable: Bool = true,
+        updated: TimeInterval? = nil,
+        videos: [Video] = []
+    ) {
         self.id = id
         self.title = title
         self.visibility = visibility
@@ -32,11 +39,29 @@ struct Playlist: Identifiable, Equatable, Hashable {
         self.videos = videos
     }
 
-    init(_ json: JSON) {
-        id = json["playlistId"].stringValue
-        title = json["title"].stringValue
-        visibility = json["isListed"].boolValue ? .public : .private
-        updated = json["updated"].doubleValue
+    var json: JSON {
+        let dateFormatter = ISO8601DateFormatter()
+
+        return [
+            "id": id,
+            "title": title,
+            "visibility": visibility.rawValue,
+            "editable": editable ? "editable" : "",
+            "updated": updated ?? "",
+            "videos": videos.map(\.json).map(\.object)
+        ]
+    }
+
+    static func from(_ json: JSON) -> Self {
+        let dateFormatter = ISO8601DateFormatter()
+
+        return .init(
+            id: json["id"].stringValue,
+            title: json["title"].stringValue,
+            visibility: .init(rawValue: json["visibility"].stringValue) ?? .public,
+            updated: json["updated"].doubleValue,
+            videos: json["videos"].arrayValue.map { Video.from($0) }
+        )
     }
 
     static func == (lhs: Playlist, rhs: Playlist) -> Bool {

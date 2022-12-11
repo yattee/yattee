@@ -106,7 +106,7 @@ final class FeedModel: ObservableObject {
     var formattedFeedTime: String {
         if let feedTime {
             let isSameDay = Calendar(identifier: .iso8601).isDate(feedTime, inSameDayAs: Date())
-            let formatter = isSameDay ? dateFormatterForTimeOnly : dateFormatter
+            let formatter = isSameDay ? CacheModel.shared.dateFormatterForTimeOnly : CacheModel.shared.dateFormatter
             return formatter.string(from: feedTime)
         }
 
@@ -121,22 +121,6 @@ final class FeedModel: ObservableObject {
                 self?.videos = cache
             }
         }
-    }
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-
-        return formatter
-    }
-
-    private var dateFormatterForTimeOnly: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .medium
-
-        return formatter
     }
 
     private func request(_ resource: Resource, force: Bool = false) -> Request? {

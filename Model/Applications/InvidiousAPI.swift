@@ -114,8 +114,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("auth/playlists"), requestMethods: [.post, .patch]) { (content: Entity<Data>) -> Playlist in
-            // hacky, to verify if possible to get it in easier way
-            Playlist(JSON(parseJSON: String(data: content.content, encoding: .utf8)!))
+            self.extractPlaylist(from: JSON(parseJSON: String(data: content.content, encoding: .utf8)!))
         }
 
         configureTransformer(pathPattern("auth/feed"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in

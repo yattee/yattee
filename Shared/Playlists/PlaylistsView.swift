@@ -17,6 +17,7 @@ struct PlaylistsView: View {
     @ObservedObject private var accounts = AccountsModel.shared
     private var player = PlayerModel.shared
     @ObservedObject private var model = PlaylistsModel.shared
+    private var cache = PlaylistsCacheModel.shared
 
     @Namespace private var focusNamespace
 
@@ -73,8 +74,17 @@ struct PlaylistsView: View {
                                     .padding(.top, 40)
                                 Spacer()
                             #else
-                                VerticalCells(items: items)
-                                    .environment(\.scrollViewBottomPadding, 70)
+                                VerticalCells(items: items) {
+                                    HStack {
+                                        Spacer()
+
+                                        CacheStatusHeader(
+                                            refreshTime: cache.getFormattedPlaylistTime(account: accounts.current),
+                                            isLoading: model.isLoading
+                                        )
+                                    }
+                                }
+                                .environment(\.scrollViewBottomPadding, 70)
                             #endif
                         }
                         .environment(\.currentPlaylistID, currentPlaylist?.id)

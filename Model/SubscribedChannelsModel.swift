@@ -89,7 +89,7 @@ final class SubscribedChannelsModel: ObservableObject {
     }
 
     func storeChannels(account: Account, channels: [Channel]) {
-        let date = iso8601DateFormatter.string(from: Date())
+        let date = CacheModel.shared.iso8601DateFormatter.string(from: Date())
         logger.info("caching channels \(channelsDateCacheKey(account)) -- \(date)")
 
         let dateObject: JSON = ["date": date]
@@ -117,10 +117,6 @@ final class SubscribedChannelsModel: ObservableObject {
         }
     }
 
-    private var iso8601DateFormatter: ISO8601DateFormatter {
-        .init()
-    }
-
     private func channelsCacheKey(_ account: Account) -> String {
         "channels-\(account.id)"
     }
@@ -132,7 +128,7 @@ final class SubscribedChannelsModel: ObservableObject {
     func getFeedTime(account: Account) -> Date? {
         if let json = try? storage.object(forKey: channelsDateCacheKey(account)),
            let string = json.dictionaryValue["date"]?.string,
-           let date = iso8601DateFormatter.date(from: string)
+           let date = CacheModel.shared.iso8601DateFormatter.date(from: string)
         {
             return date
         }
@@ -151,26 +147,10 @@ final class SubscribedChannelsModel: ObservableObject {
     var formattedCacheTime: String {
         if let feedTime {
             let isSameDay = Calendar(identifier: .iso8601).isDate(feedTime, inSameDayAs: Date())
-            let formatter = isSameDay ? dateFormatterForTimeOnly : dateFormatter
+            let formatter = isSameDay ? CacheModel.shared.dateFormatterForTimeOnly : CacheModel.shared.dateFormatter
             return formatter.string(from: feedTime)
         }
 
         return ""
-    }
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-
-        return formatter
-    }
-
-    private var dateFormatterForTimeOnly: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .medium
-
-        return formatter
     }
 }

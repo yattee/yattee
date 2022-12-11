@@ -534,6 +534,9 @@
 		3776924E294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
 		3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
 		37769250294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
+		3776925229463C310055EC18 /* PlaylistsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776925129463C310055EC18 /* PlaylistsCacheModel.swift */; };
+		3776925329463C310055EC18 /* PlaylistsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776925129463C310055EC18 /* PlaylistsCacheModel.swift */; };
+		3776925429463C310055EC18 /* PlaylistsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776925129463C310055EC18 /* PlaylistsCacheModel.swift */; };
 		3776ADD6287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
 		3776ADD7287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
 		3776ADD8287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
@@ -1252,6 +1255,7 @@
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		37737785276F9858000521C1 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
 		3776924D294630110055EC18 /* ChannelAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelAvatarView.swift; sourceTree = "<group>"; };
+		3776925129463C310055EC18 /* PlaylistsCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsCacheModel.swift; sourceTree = "<group>"; };
 		3776ADD5287381240078EBC4 /* Captions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Captions.swift; path = Model/Captions.swift; sourceTree = SOURCE_ROOT; };
 		377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedContentAccessors.swift; sourceTree = "<group>"; };
 		377ABC3F286E4AD5009C986F /* InstancesManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstancesManifest.swift; sourceTree = "<group>"; };
@@ -2019,6 +2023,7 @@
 				3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */,
 				37F5E8B9291BEF69006C15F5 /* CacheModel.swift */,
 				377F9F7E2944175F0043F856 /* FeedCacheModel.swift */,
+				3776925129463C310055EC18 /* PlaylistsCacheModel.swift */,
 				377F9F7A294403F20043F856 /* VideosCacheModel.swift */,
 			);
 			path = Cache;
@@ -2959,6 +2964,7 @@
 				377ABC40286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37BD07B52698AA4D003EBB87 /* ContentView.swift in Sources */,
 				37D2E0D428B67EFC00F64D52 /* Delay.swift in Sources */,
+				3776925229463C310055EC18 /* PlaylistsCacheModel.swift in Sources */,
 				3759234628C26C7B00C052EC /* Refreshable+Backport.swift in Sources */,
 				374924ED2921669B0017D862 /* PreferenceKeys.swift in Sources */,
 				37130A5B277657090033018A /* Yattee.xcdatamodeld in Sources */,
@@ -3253,6 +3259,7 @@
 				3752069A285E8DD300CA655F /* Chapter.swift in Sources */,
 				373EBD69291F252D002ADB9C /* EditFavorites.swift in Sources */,
 				37484C1A26FC837400287258 /* PlayerSettings.swift in Sources */,
+				3776925329463C310055EC18 /* PlaylistsCacheModel.swift in Sources */,
 				37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */,
 				37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */,
 				378E9C4129455A5800B2D696 /* ChannelsView.swift in Sources */,
@@ -3523,6 +3530,7 @@
 				3782B95727557E6E00990149 /* SearchSuggestions.swift in Sources */,
 				3776ADD8287381240078EBC4 /* Captions.swift in Sources */,
 				37F0F4EC286F397E00C06C2E /* SettingsModel.swift in Sources */,
+				3776925429463C310055EC18 /* PlaylistsCacheModel.swift in Sources */,
 				37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */,
 				37BC50AA2778A84700510953 /* HistorySettings.swift in Sources */,
 				37F13B64285E43C000B137E4 /* ControlsOverlay.swift in Sources */,

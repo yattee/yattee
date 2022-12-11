@@ -13,18 +13,36 @@ struct CacheModel {
     func clear() {
         FeedCacheModel.shared.clear()
         VideosCacheModel.shared.clear()
+        PlaylistsCacheModel.shared.clear()
     }
 
     var totalSize: Int {
         (FeedCacheModel.shared.storage.totalDiskStorageSize ?? 0) +
-            (VideosCacheModel.shared.storage.totalDiskStorageSize ?? 0)
+            (VideosCacheModel.shared.storage.totalDiskStorageSize ?? 0) +
+            (PlaylistsCacheModel.shared.storage.totalDiskStorageSize ?? 0)
     }
 
     var totalSizeFormatted: String {
-        totalSizeFormatter.string(fromByteCount: Int64(totalSize))
+        byteCountFormatter.string(fromByteCount: Int64(totalSize))
     }
 
-    private var totalSizeFormatter: ByteCountFormatter {
-        .init()
+    var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .medium
+
+        return formatter
     }
+
+    var dateFormatterForTimeOnly: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .medium
+
+        return formatter
+    }
+
+    var iso8601DateFormatter: ISO8601DateFormatter { .init() }
+
+    private var byteCountFormatter: ByteCountFormatter { .init() }
 }

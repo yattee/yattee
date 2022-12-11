@@ -18,7 +18,7 @@ struct FeedCacheModel {
     )
 
     func storeFeed(account: Account, videos: [Video]) {
-        let date = iso8601DateFormatter.string(from: Date())
+        let date = CacheModel.shared.iso8601DateFormatter.string(from: Date())
         logger.info("caching feed \(account.feedCacheKey) -- \(date)")
         let feedTimeObject: JSON = ["date": date]
         let videosObject: JSON = ["videos": videos.prefix(Self.limit).map { $0.json.object }]
@@ -41,7 +41,7 @@ struct FeedCacheModel {
     func getFeedTime(account: Account) -> Date? {
         if let json = try? storage.object(forKey: feedTimeCacheKey(account.feedCacheKey)),
            let string = json.dictionaryValue["date"]?.string,
-           let date = iso8601DateFormatter.date(from: string)
+           let date = CacheModel.shared.iso8601DateFormatter.date(from: string)
         {
             return date
         }
@@ -55,25 +55,5 @@ struct FeedCacheModel {
 
     private func feedTimeCacheKey(_ feedCacheKey: String) -> String {
         "\(feedCacheKey)-feedTime"
-    }
-
-    private var iso8601DateFormatter: ISO8601DateFormatter {
-        .init()
-    }
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-
-        return formatter
-    }
-
-    private var dateFormatterForTimeOnly: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.timeStyle = .medium
-
-        return formatter
     }
 }
