@@ -40,8 +40,6 @@ struct Playlist: Identifiable, Equatable, Hashable {
     }
 
     var json: JSON {
-        let dateFormatter = ISO8601DateFormatter()
-
         return [
             "id": id,
             "title": title,
@@ -53,8 +51,6 @@ struct Playlist: Identifiable, Equatable, Hashable {
     }
 
     static func from(_ json: JSON) -> Self {
-        let dateFormatter = ISO8601DateFormatter()
-
         return .init(
             id: json["id"].stringValue,
             title: json["title"].stringValue,
@@ -70,5 +66,9 @@ struct Playlist: Identifiable, Equatable, Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+
+    var channelPlaylist: ChannelPlaylist {
+        ChannelPlaylist(id: id, title: title, videos: videos, videosCount: videos.count)
     }
 }

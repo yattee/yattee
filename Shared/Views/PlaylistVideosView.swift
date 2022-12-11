@@ -2,7 +2,7 @@ import Siesta
 import SwiftUI
 
 struct PlaylistVideosView: View {
-    let playlist: Playlist
+    var playlist: Playlist
 
     @ObservedObject private var accounts = AccountsModel.shared
     var player = PlayerModel.shared
@@ -43,6 +43,24 @@ struct PlaylistVideosView: View {
         return resource
     }
 
+    func loadResource() {
+        loadCachedResource()
+        resource?.load()
+            .onSuccess { response in
+                if let playlist: Playlist = response.typedContent() {
+                    ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist.channelPlaylist)
+                }
+            }
+    }
+
+    func loadCachedResource() {
+        if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist.id) {
+            DispatchQueue.main.async {
+                self.channelPlaylist.replace(cache)
+            }
+        }
+    }
+
     var videos: [Video] {
         contentItems.compactMap(\.video)
     }
@@ -55,10 +73,10 @@ struct PlaylistVideosView: View {
         VerticalCells(items: contentItems)
             .onAppear {
                 guard contentItems.isEmpty else { return }
-                resource?.load()
+                loadResource()
             }
             .onChange(of: model.reloadPlaylists) { _ in
-                resource?.load()
+                loadResource()
             }
         #if !os(tvOS)
             .navigationTitle("\(playlist.title) Playlist")

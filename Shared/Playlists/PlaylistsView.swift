@@ -94,19 +94,19 @@ struct PlaylistsView: View {
         }
         .onAppear {
             model.load()
-            resource?.load()
+            loadResource()
         }
         .onChange(of: accounts.current) { _ in
             model.load(force: true)
-            resource?.load()
+            loadResource()
         }
         .onChange(of: currentPlaylist) { _ in
             channelPlaylist.clear()
             userPlaylist.clear()
-            resource?.load()
+            loadResource()
         }
         .onChange(of: model.reloadPlaylists) { _ in
-            resource?.load()
+            loadResource()
         }
         #if os(iOS)
         .refreshControl { refreshControl in
@@ -154,7 +154,7 @@ struct PlaylistsView: View {
         #if !os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             model.load()
-            resource?.loadIfNeeded()
+            loadResource()
         }
         #endif
         #if !os(tvOS)
@@ -166,6 +166,26 @@ struct PlaylistsView: View {
             .opacity(0)
         )
         #endif
+    }
+
+    func loadResource() {
+        loadCachedResource()
+        resource?.load()
+            .onSuccess { response in
+                if let playlist: Playlist = response.typedContent() {
+                    ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist.channelPlaylist)
+                }
+            }
+    }
+
+    func loadCachedResource() {
+        if !selectedPlaylistID.isEmpty,
+           let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(selectedPlaylistID)
+        {
+            DispatchQueue.main.async {
+                self.channelPlaylist.replace(cache)
+            }
+        }
     }
 
     #if os(iOS)
