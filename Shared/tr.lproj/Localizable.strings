@@ -159,3 +159,96 @@
 "Enable logging" = "Günlük kaydını etkinleştir";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatlar listedeki sıraya göre seçilecektir.\nHLS uyarlanabilir bir formattır (çözünürlük ayarı geçerli değildir).";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Gelecek güncellemelerde neler olacağını merak ediyorsanız, projenin dönüm noktalarını takip edebilirsiniz.";
+"Find Other" = "Diğerlerini Bul";
+
+/* Video sort order in search */
+"Rating" = "Derecelendirme";
+"No Playlists" = "Oynatma Listesi Yok";
+"Not Playing" = "Oynatılmıyor";
+"Play Next" = "Sonraki Oynat";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "\"%@\" oynatma listesi silinecektir.\nGeri döndürülemez.";
+"Queue is empty" = "Kuyruk boş";
+"Remove from history" = "Geçmişten kaldır";
+"Replies" = "Yanıtlar";
+"Reset" = "Sıfırla";
+"Reset search filters" = "Arama filtrelerini sıfırla";
+"Lock portrait mode" = "Portre modunu kilitle";
+
+/* Video duration filter in search */
+"Long" = "Uzun";
+"Milestones" = "Dönüm Noktaları";
+"Regular Size" = "Normal Boyut";
+"Play All" = "Tümünü Oynat";
+
+/* Video date filter in search */
+"Month" = "Ay";
+"New Playlist" = "Yeni Oynatma Listesi";
+"Next" = "Sonraki";
+"Password" = "Parola";
+"Pause" = "Duraklat";
+"Picture in Picture" = "Resim içinde Resim";
+"Nothing" = "Hiçbir şey";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Müzik videolarında konu dışı";
+"Related" = "İlgili";
+"Remove from the queue" = "Kuyruktan çıkar";
+"Enter fullscreen in landscape" = "Yatay hâldeyken tam ekrana gir";
+"Play in PiP" = "RiR modunda oynat";
+"Increase rate" = "Artış oranı";
+"Proxy videos" = "Videoları proxy'le";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Doğrudan içerik üreticinin kendisiyle ilgili bir ürün veya hizmetin tanıtılması. Bu genellikle ticari ürünleri veya para kazanılan platformların tanıtımını içerir.";
+"Quality" = "Kalite";
+"Quality Profile" = "Kalite Profili";
+"Refresh" = "Yenile";
+"Mark video as watched after playing" = "Videoyu oynattıktan sonra izlendi olarak işaretle";
+
+/* SponsorBlock category name */
+"Outro" = "Kapanış";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "İçerik üreticiyle doğrudan ilgisi olmayan bir ürün veya hizmeti tanıtan videonun bir parçası. İçerik oluşturucu, para veya ücretsiz ürünler şeklinde ödeme veya tazminat alacaktır.";
+"Pause when entering background" = "Arka plana girerken duraklat";
+"Preferred Formats" = "Tercih Edilen Formatlar";
+"Mark as watched" = "İzlendi olarak işaretle";
+"Matrix Chat" = "Matrix Sohbeti";
+"Play Last" = "Son Oynat";
+"Play Music" = "Müzik Çal";
+"Remove" = "Kaldır";
+"Remove from Favorites" = "Favorilerden kaldır";
+"Matrix Channel" = "Matrix Kanalı";
+"More info can be found in:" = "Daha fazla bilgiyi şurada bulabilirsiniz:";
+"MPV Documentation" = "MPV Belgeleri";
+"Music" = "Müzik";
+"Play" = "Oynat";
+"Playlists" = "Oyun listeleri";
+"Low" = "Düşük";
+"Low quality" = "Düşük kalite";
+"Lowest" = "En düşük";
+"Name" = "Ad";
+"No description" = "Açıklama yok";
+"Normal" = "Normal";
+"Open \"Playlists\" tab to create new one" = "Yeni bir tane oluşturmak için \"Oynatma Listeleri\" sekmesini açın";
+"Opening audio stream..." = "Ses akışı açılıyor...";
+"Rate" = "Derecelendir";
+"Orientation" = "Yönlendirme";
+"No results" = "Sonuç yok";
+"Medium quality" = "Orta kalite";
+"Not available" = "Mevcut değil";
+"Regular size" = "Normal boyut";
+"Play Now" = "Şimdi Oynat";
+"Player" = "Oynatıcı";
+"Playlist" = "Oynatma listesi";
+"Profiles" = "Profiller";
+"Mark watched videos with" = "İzlenen videoları ile işaretle";
+"Pause when player is closed" = "Oynatıcı kapalıyken duraklat";
+
+/* Player controls layout size */
+"Medium" = "Orta";
+"Only when signed in" = "Yalnızca oturum açıldığında";
+"Red" = "Kırmızı";
+"Remove from Playlist" = "Oynatma listesinden kaldır";
+"Popular" = "Popüler";
+"Queue" = "Kuyruk";
+
+/* Video sort order in search */
+"Relevance" = "Alaka düzeyi";
+"Playback" = "Oynatma";
