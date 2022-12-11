@@ -6,7 +6,11 @@ struct SettingsButtons: View {
 
     var body: some View {
         Button(action: { navigation.presentingAccounts = true }) {
-            Label(accounts.current?.description ?? "", image: accounts.app.rawValue.capitalized)
+            if let account = accounts.current {
+                Label(account.description, image: account.app?.rawValue.capitalized ?? "")
+            } else {
+                Label("Signed Out", systemImage: "xmark")
+            }
         }
         Button(action: { navigation.presentingSettings = true }) {
             Label("Settings", systemImage: "gearshape.2")
@@ -16,6 +20,8 @@ struct SettingsButtons: View {
 
 struct SettingsButtons_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsButtons()
+        VStack(spacing: 10) {
+            SettingsButtons()
+        }
     }
 }

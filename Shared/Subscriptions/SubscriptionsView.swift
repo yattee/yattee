@@ -45,8 +45,7 @@ struct SubscriptionsView: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    Text(menuLabel)
-                        .font(.headline)
+                    menuLabel
                         .foregroundColor(.primary)
 
                     Image(systemName: "chevron.down.circle.fill")
@@ -57,8 +56,12 @@ struct SubscriptionsView: View {
             }
         }
 
-        var menuLabel: String {
-            subscriptionsViewPage == .channels ? "Channels" : "Feed"
+        var menuLabel: some View {
+            HStack {
+                Image(systemName: subscriptionsViewPage == .channels ? "person.3.fill" : "film")
+                Text(subscriptionsViewPage.rawValue.capitalized.localized())
+                    .font(.headline)
+            }
         }
     #endif
 }
