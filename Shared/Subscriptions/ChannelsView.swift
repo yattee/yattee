@@ -21,6 +21,13 @@ struct ChannelsView: View {
                             }
                         }
                     }
+                    .contextMenu {
+                        Button {
+                            subscriptions.unsubscribe(channel.id)
+                        } label: {
+                            Label("Unsubscribe", systemImage: "xmark.circle")
+                        }
+                    }
                 }
                 #if os(tvOS)
                 .padding(.horizontal, 50)

@@ -144,22 +144,11 @@ struct ControlsBar: View {
                         )
                     }
                 } label: {
-                    ZStack(alignment: .bottomTrailing) {
-                        authorAvatar
-
-                        if accounts.app.supportsSubscriptions,
-                           accounts.signedIn,
-                           let video = model.currentVideo,
-                           subscriptions.isSubscribing(video.channel.id)
-                        {
-                            Image(systemName: "star.circle.fill")
-                            #if !os(tvOS)
-                                .background(Color.background)
-                            #endif
-                                .clipShape(Circle())
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    ChannelAvatarView(
+                        channel: model.currentVideo?.channel,
+                        video: model.currentVideo
+                    )
+                    .frame(width: barHeight - 10, height: barHeight - 10)
                 }
                 .contextMenu {
                     if let video = model.currentVideo {
@@ -207,7 +196,7 @@ struct ControlsBar: View {
                                                         navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
                                                     #endif
                                                 } label: {
-                                                    Label("Unsubscribe", systemImage: "xmark.circle")
+                                                    Label("Unsubscribe", systemImage: "star.circle")
                                                 }
                                             } else {
                                                 Button {
@@ -274,38 +263,6 @@ struct ControlsBar: View {
 
             Spacer()
         }
-    }
-
-    private var authorAvatar: some View {
-        Group {
-            if let url = model.currentItem?.video?.channel.thumbnailURL {
-                WebImage(url: url, options: [.lowPriority])
-                    .resizable()
-                    .placeholder {
-                        Rectangle().fill(Color("PlaceholderColor"))
-                    }
-                    .retryOnAppear(true)
-                    .indicator(.activity)
-            } else {
-                ZStack {
-                    Color(white: 0.6)
-                        .opacity(0.5)
-
-                    Group {
-                        if let video = model.currentItem?.video, video.isLocal {
-                            Image(systemName: video.localStreamImageSystemName)
-                        } else {
-                            Image(systemName: "play.rectangle")
-                        }
-                    }
-                    .foregroundColor(.accentColor)
-                    .font(.system(size: 20))
-                    .contentShape(Rectangle())
-                }
-            }
-        }
-        .frame(width: 44, height: 44, alignment: .leading)
-        .clipShape(Circle())
     }
 }
 

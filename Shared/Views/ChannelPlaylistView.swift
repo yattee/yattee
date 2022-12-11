@@ -47,7 +47,7 @@ struct ChannelPlaylistView: View {
 
                         Spacer()
 
-                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(playlist.id, playlist.title)))
+                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
                             .labelStyle(.iconOnly)
                     }
 

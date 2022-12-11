@@ -531,6 +531,9 @@
 		3774127827387EB000423605 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127727387EB000423605 /* Logging */; };
 		3774127A27387EBC00423605 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127927387EBC00423605 /* Defaults */; };
 		3774127C27387EC800423605 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127B27387EC800423605 /* Alamofire */; };
+		3776924E294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
+		3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
+		37769250294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
 		3776ADD6287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
 		3776ADD7287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
 		3776ADD8287381240078EBC4 /* Captions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776ADD5287381240078EBC4 /* Captions.swift */; };
@@ -1248,6 +1251,7 @@
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		37737785276F9858000521C1 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
+		3776924D294630110055EC18 /* ChannelAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelAvatarView.swift; sourceTree = "<group>"; };
 		3776ADD5287381240078EBC4 /* Captions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Captions.swift; path = Model/Captions.swift; sourceTree = SOURCE_ROOT; };
 		377A20A82693C9A2002842B8 /* TypedContentAccessors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedContentAccessors.swift; sourceTree = "<group>"; };
 		377ABC3F286E4AD5009C986F /* InstancesManifest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstancesManifest.swift; sourceTree = "<group>"; };
@@ -1759,6 +1763,7 @@
 			isa = PBXGroup;
 			children = (
 				37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */,
+				3776924D294630110055EC18 /* ChannelAvatarView.swift */,
 				3743B86727216D3600261544 /* ChannelCell.swift */,
 				37C3A24827235FAA0087A57A /* ChannelPlaylistCell.swift */,
 				37C3A250272366440087A57A /* ChannelPlaylistView.swift */,
@@ -3166,6 +3171,7 @@
 				379B0253287A1CDF001015B5 /* OrientationTracker.swift in Sources */,
 				37E80F3C287B107F00561799 /* VideoDetailsOverlay.swift in Sources */,
 				370B79C9286279810045DB77 /* NSObject+Swizzle.swift in Sources */,
+				3776924E294630110055EC18 /* ChannelAvatarView.swift in Sources */,
 				37D4B0E42671614900C925CA /* YatteeApp.swift in Sources */,
 				37C3A241272359900087A57A /* Double+Format.swift in Sources */,
 				3784CDE227772EE40055BBF2 /* Watch.swift in Sources */,
@@ -3280,6 +3286,7 @@
 				377FC7E2267A084A00A6BBAF /* VideoCell.swift in Sources */,
 				37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F961A027BD90BB00058149 /* PlayerBackendType.swift in Sources */,
+				3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */,
 				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				3752069E285E910600CA655F /* ChapterView.swift in Sources */,
 				37030FF827B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
@@ -3568,6 +3575,7 @@
 				37B044B926F7AB9000E1419D /* SettingsView.swift in Sources */,
 				3743B86A27216D3600261544 /* ChannelCell.swift in Sources */,
 				3751BA8527E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
+				37769250294630110055EC18 /* ChannelAvatarView.swift in Sources */,
 				37030FFD27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				378E9C4229455A5800B2D696 /* ChannelsView.swift in Sources */,
 				37192D5928B179D60012EEDD /* ChaptersView.swift in Sources */,

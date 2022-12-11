@@ -58,7 +58,7 @@ struct ChannelVideosView: View {
                         subscriptionToggleButton
 
                         if let channel = presentedChannel {
-                            FavoriteButton(item: FavoriteItem(section: .channel(channel.id, channel.name)))
+                            FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, channel.id, channel.name)))
                                 .labelStyle(.iconOnly)
                         }
                     }
@@ -124,7 +124,7 @@ struct ChannelVideosView: View {
 
                 ToolbarItem {
                     if let presentedChannel {
-                        FavoriteButton(item: FavoriteItem(section: .channel(presentedChannel.id, presentedChannel.name)))
+                        FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, presentedChannel.id, presentedChannel.name)))
                     }
                 }
             #endif
@@ -159,28 +159,12 @@ struct ChannelVideosView: View {
     }
 
     var thumbnail: some View {
-        Group {
-            if let thumbnail = store.item?.thumbnailURL {
-                WebImage(url: thumbnail)
-                    .resizable()
-            } else {
-                ZStack {
-                    Color(white: 0.6)
-                        .opacity(0.5)
-
-                    Image(systemName: "play.rectangle")
-                        .foregroundColor(.accentColor)
-                        .imageScale(.small)
-                        .contentShape(Rectangle())
-                }
-            }
-        }
+        ChannelAvatarView(channel: store.item)
         #if os(tvOS)
-        .frame(width: 80, height: 80, alignment: .trailing)
+            .frame(width: 80, height: 80, alignment: .trailing)
         #else
-        .frame(width: 30, height: 30, alignment: .trailing)
+            .frame(width: 30, height: 30, alignment: .trailing)
         #endif
-        .clipShape(Circle())
     }
 
     @ViewBuilder var banner: some View {
@@ -250,7 +234,8 @@ struct ChannelVideosView: View {
                                 subscriptionsLabel
 
                                 if presentedChannel?.verified ?? false {
-                                    Text("Verified")
+                                    Image(systemName: "checkmark.seal.fill")
+                                        .imageScale(.small)
                                 }
 
                                 viewsLabel
@@ -308,7 +293,7 @@ struct ChannelVideosView: View {
                                 subscriptionToggleButtonDisabled = false
                             }
                         } label: {
-                            Label("Unsubscribe", systemImage: "star.circle")
+                            Label("Unsubscribe", systemImage: "xmark.circle")
                             #if os(iOS)
                                 .labelStyle(.automatic)
                             #else

@@ -40,6 +40,7 @@ struct FavoriteItemView: View {
                     #endif
 
                     HorizontalCells(items: store.contentItems)
+                        .environment(\.inChannelView, inChannelView)
                 }
                 .contentShape(Rectangle())
                 .onAppear {
@@ -59,6 +60,15 @@ struct FavoriteItemView: View {
             } else {
                 resource?.load()
             }
+        }
+    }
+
+    var inChannelView: Bool {
+        switch item.section {
+        case .channel:
+            return true
+        default:
+            return false
         }
     }
 
