@@ -173,7 +173,10 @@ struct PlaylistsView: View {
                             .labelStyle(.iconOnly)
                     }
                 }
-                newPlaylistButton
+
+                if accounts.signedIn {
+                    newPlaylistButton
+                }
             } label: {
                 HStack(spacing: 12) {
                     Text(currentPlaylist?.title ?? "Playlists")
@@ -184,8 +187,11 @@ struct PlaylistsView: View {
                         .foregroundColor(.accentColor)
                         .imageScale(.small)
                 }
+                .lineLimit(1)
+                .frame(maxWidth: 300)
                 .transaction { t in t.animation = nil }
             }
+            .disabled(!accounts.signedIn)
         }
     #endif
 
