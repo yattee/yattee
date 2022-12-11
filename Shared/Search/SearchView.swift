@@ -24,6 +24,7 @@ struct SearchView: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var state = SearchModel.shared
     private var favorites = FavoritesModel.shared
+    private var navigation = NavigationModel.shared
 
     @Default(.recentlyOpened) private var recentlyOpened
     @Default(.saveRecents) private var saveRecents
@@ -174,9 +175,7 @@ struct SearchView: View {
             }
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 0) {
-                    if !state.query.isEmpty {
-                        searchMenu
-                    }
+                    searchMenu
                     SearchTextField()
                 }
             }
@@ -207,8 +206,16 @@ struct SearchView: View {
                     .pickerStyle(.menu)
                 }
 
+                if !state.query.isEmpty {
+                    Section {
+                        FavoriteButton(item: favoriteItem)
+                    }
+                }
+
                 Section {
-                    FavoriteButton(item: favoriteItem)
+                    Button(action: { navigation.presentingSettings = true }) {
+                        Label("Settings", systemImage: "gearshape.2")
+                    }
                 }
             } label: {
                 HStack {
@@ -323,7 +330,10 @@ struct SearchView: View {
                             .foregroundColor(.secondary)
                     }
                     ForEach(recentlyOpened.reversed(), id: \.tag) { item in
-                        recentItemButton(item)
+                        recentItemControl(item)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundColor(.accentColor)
                     }
                 }
                 .redrawOn(change: recentsChanged)
@@ -336,6 +346,50 @@ struct SearchView: View {
         #if os(iOS)
         .listStyle(.insetGrouped)
         #endif
+    }
+
+    @ViewBuilder private func recentItemControl(_ item: RecentItem) -> some View {
+        #if os(tvOS)
+            recentItemButton(item)
+        #else
+            if recentItemIsNavigationLink(item) {
+                recentItemNavigationLink(item)
+            } else {
+                recentItemButton(item)
+            }
+        #endif
+    }
+
+    private func recentItemNavigationLink(_ item: RecentItem) -> some View {
+        NavigationLink(destination: recentItemNavigationLinkDestination(item)) {
+            recentItemLabel(item)
+        }
+    }
+
+    @ViewBuilder private func recentItemNavigationLinkDestination(_ item: RecentItem) -> some View {
+        switch item.type {
+        case .channel:
+            if let channel = item.channel {
+                ChannelVideosView(channel: channel)
+            }
+        case .playlist:
+            if let playlist = item.playlist {
+                ChannelPlaylistView(playlist: playlist)
+            }
+        default:
+            EmptyView()
+        }
+    }
+
+    func recentItemIsNavigationLink(_ item: RecentItem) -> Bool {
+        switch item.type {
+        case .channel:
+            return navigationStyle == .tab
+        case .playlist:
+            return navigationStyle == .tab
+        default:
+            return false
+        }
     }
 
     private func recentItemButton(_ item: RecentItem) -> some View {
@@ -368,10 +422,7 @@ struct SearchView: View {
                 )
             }
         } label: {
-            let systemImage = item.type == .query ? "magnifyingglass" :
-                item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
-                "list.and.film"
-            Label(item.title, systemImage: systemImage)
+            recentItemLabel(item)
         }
         .contextMenu {
             removeButton(item)
@@ -380,6 +431,13 @@ struct SearchView: View {
                 Button("Cancel", role: .cancel) {}
             #endif
         }
+    }
+
+    private func recentItemLabel(_ item: RecentItem) -> some View {
+        let systemImage = item.type == .query ? "magnifyingglass" :
+            item.type == .channel ? RecentsModel.symbolSystemImage(item.title) :
+            "list.and.film"
+        return Label(item.title, systemImage: systemImage)
     }
 
     private func removeButton(_ item: RecentItem) -> some View {
