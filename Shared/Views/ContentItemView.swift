@@ -16,6 +16,13 @@ struct ContentItemView: View {
                         .contextMenu {
                             VideoContextMenuView(video: item.video)
                         }
+                    #if os(tvOS)
+                        .padding(.horizontal, 30)
+                    #endif
+
+                    #if !os(tvOS)
+                        Divider()
+                    #endif
                 }
             case .playlist:
                 ChannelPlaylistCell(playlist: item.playlist)

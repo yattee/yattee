@@ -5,12 +5,6 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoBanner: View {
-    #if os(tvOS)
-        static let titleAppend = ""
-    #else
-        static let titleAppend = "\n"
-    #endif
-
     let video: Video?
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
@@ -22,7 +16,7 @@ struct VideoBanner: View {
     }
 
     var body: some View {
-        HStack(alignment: stackAlignment, spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             VStack(spacing: thumbnailStackSpacing) {
                 smallThumbnail
 
@@ -34,7 +28,7 @@ struct VideoBanner: View {
                 Group {
                     if let video {
                         HStack(alignment: .top) {
-                            Text(video.displayTitle + Self.titleAppend)
+                            Text(video.displayTitle)
                             if video.isLocal, let fileExtension = video.localStreamFileExtension {
                                 Spacer()
                                 Text(fileExtension)
@@ -47,11 +41,10 @@ struct VideoBanner: View {
                     }
                 }
                 .truncationMode(.middle)
-                .lineLimit(2)
+                .lineLimit(5)
                 .font(.headline)
-                .frame(alignment: .leading)
 
-                HStack {
+                HStack(alignment: .top) {
                     Group {
                         if let video {
                             if !video.isLocal || video.localStreamIsRemoteURL {
@@ -92,6 +85,7 @@ struct VideoBanner: View {
                             .fontWeight(.light)
                     }
                 }
+
                 .foregroundColor(.secondary)
             }
             .padding(.vertical, playbackTime.isNil ? 0 : 5)
@@ -99,22 +93,13 @@ struct VideoBanner: View {
         .contentShape(Rectangle())
         #if os(tvOS)
             .buttonStyle(.card)
-
         #else
             .buttonStyle(.plain)
         #endif
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 100, alignment: .center)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 150, alignment: .center)
         #if os(tvOS)
             .padding(.vertical, 20)
             .padding(.trailing, 10)
-        #endif
-    }
-
-    private var stackAlignment: VerticalAlignment {
-        #if os(macOS)
-            playbackTime.isNil ? .center : .top
-        #else
-                .center
         #endif
     }
 
@@ -165,8 +150,8 @@ struct VideoBanner: View {
     }
 
     private var videoDurationLabel: String {
-        guard videoDuration != 0 else { return PlayerTimeModel.timePlaceholder }
-        return (videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() ?? PlayerTimeModel.timePlaceholder
+        guard videoDuration != 0 else { return "" }
+        return (videoDuration ?? video?.length ?? 0).formattedAsPlaybackTime() ?? ""
     }
 
     private var progressView: some View {
