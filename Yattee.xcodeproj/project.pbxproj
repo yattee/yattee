@@ -202,6 +202,9 @@
 		371CC77029468BDC00979C1A /* SettingsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76F29468BDC00979C1A /* SettingsButtons.swift */; };
 		371CC77129468BDC00979C1A /* SettingsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76F29468BDC00979C1A /* SettingsButtons.swift */; };
 		371CC77229468BDC00979C1A /* SettingsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76F29468BDC00979C1A /* SettingsButtons.swift */; };
+		371CC7742946963000979C1A /* ListingStyleButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC7732946963000979C1A /* ListingStyleButtons.swift */; };
+		371CC7752946963000979C1A /* ListingStyleButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC7732946963000979C1A /* ListingStyleButtons.swift */; };
+		371CC7762946963000979C1A /* ListingStyleButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC7732946963000979C1A /* ListingStyleButtons.swift */; };
 		371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		371F2F1C269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
@@ -619,8 +622,8 @@
 		378E50FB26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
 		378E50FC26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
 		378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
-		378E50FF26FE8EEE00F49626 /* AccountsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */; };
-		378E510026FE8EEE00F49626 /* AccountsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */; };
+		378E50FF26FE8EEE00F49626 /* AccountViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountViewButton.swift */; };
+		378E510026FE8EEE00F49626 /* AccountViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FE26FE8EEE00F49626 /* AccountViewButton.swift */; };
 		378E9C38294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
 		378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
 		378E9C3A294552A700B2D696 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E9C37294552A700B2D696 /* ThumbnailView.swift */; };
@@ -1131,6 +1134,7 @@
 		371CC76729466ED000979C1A /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
 		371CC76B29466F5A00979C1A /* AccountsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsViewModel.swift; sourceTree = "<group>"; };
 		371CC76F29468BDC00979C1A /* SettingsButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButtons.swift; sourceTree = "<group>"; };
+		371CC7732946963000979C1A /* ListingStyleButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingStyleButtons.swift; sourceTree = "<group>"; };
 		371F2F19269B43D300E4A7AB /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
 		3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Badge+Backport.swift"; sourceTree = "<group>"; };
 		3722AEBD274DA401005EA4D6 /* Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backport.swift; sourceTree = "<group>"; };
@@ -1291,7 +1295,7 @@
 		3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteItemView.swift; sourceTree = "<group>"; };
 		378AE942274EF00A006A4EE1 /* Color+Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Background.swift"; sourceTree = "<group>"; };
 		378E50FA26FE8B9F00F49626 /* Instance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instance.swift; sourceTree = "<group>"; };
-		378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsMenuView.swift; sourceTree = "<group>"; };
+		378E50FE26FE8EEE00F49626 /* AccountViewButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewButton.swift; sourceTree = "<group>"; };
 		378E9C37294552A700B2D696 /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
 		378E9C3B2945565500B2D696 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		378E9C3F29455A5800B2D696 /* ChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsView.swift; sourceTree = "<group>"; };
@@ -1711,9 +1715,9 @@
 		371AAE2326CEB9E800901972 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
-				378E50FE26FE8EEE00F49626 /* AccountsMenuView.swift */,
 				371CC76729466ED000979C1A /* AccountsView.swift */,
 				371CC76B29466F5A00979C1A /* AccountsViewModel.swift */,
+				378E50FE26FE8EEE00F49626 /* AccountViewButton.swift */,
 				37BD07BA2698AB60003EBB87 /* AppSidebarNavigation.swift */,
 				37BA794A26DC30EC002A0235 /* AppSidebarPlaylists.swift */,
 				3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */,
@@ -1793,6 +1797,7 @@
 				3748186D26A769D60084E870 /* DetailBadge.swift */,
 				37599F37272B4D740087F250 /* FavoriteButton.swift */,
 				37152EE926EFEB95004FB96D /* LazyView.swift */,
+				371CC7732946963000979C1A /* ListingStyleButtons.swift */,
 				37030FF627B0347C00ECDDAA /* MPVPlayerView.swift */,
 				37E70926271CDDAE00D34DDE /* OpenSettingsButton.swift */,
 				37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */,
@@ -2990,7 +2995,7 @@
 				37DD9DCB2785E28C00539416 /* UIView+Extensions.swift in Sources */,
 				377FF88F291A99580028EB0B /* HistoryView.swift in Sources */,
 				3782B94F27553A6700990149 /* SearchSuggestions.swift in Sources */,
-				378E50FF26FE8EEE00F49626 /* AccountsMenuView.swift in Sources */,
+				378E50FF26FE8EEE00F49626 /* AccountViewButton.swift in Sources */,
 				374DE88328BB8A280062BBF2 /* PlayerOrientation.swift in Sources */,
 				374924F029216C630017D862 /* VideoActions.swift in Sources */,
 				37169AA62729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
@@ -3141,6 +3146,7 @@
 				37484C2526FC83E000287258 /* InstanceForm.swift in Sources */,
 				37DD9DBD2785D60300539416 /* ScrollViewMatcher.swift in Sources */,
 				37B767DB2677C3CA0098BAA8 /* PlayerModel.swift in Sources */,
+				371CC7742946963000979C1A /* ListingStyleButtons.swift in Sources */,
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
@@ -3275,6 +3281,7 @@
 				3729037F2739E47400EA99F6 /* MenuCommands.swift in Sources */,
 				3763C98A290C7A50004D3B5F /* OpenVideosView.swift in Sources */,
 				37C0698327260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
+				371CC7752946963000979C1A /* ListingStyleButtons.swift in Sources */,
 				374AB3DC28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				376B2E0826F920D600B1D64D /* SignInRequiredView.swift in Sources */,
 				37CC3F4D270CFE1700608308 /* PlayerQueueView.swift in Sources */,
@@ -3303,7 +3310,7 @@
 				37FFC441272734C3009FFD26 /* Throttle.swift in Sources */,
 				37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
 				37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
-				378E510026FE8EEE00F49626 /* AccountsMenuView.swift in Sources */,
+				378E510026FE8EEE00F49626 /* AccountViewButton.swift in Sources */,
 				370F4FA927CC163A001B35DC /* PlayerBackend.swift in Sources */,
 				37141670267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				379DC3D228BA4EB400B09677 /* Seek.swift in Sources */,
@@ -3724,6 +3731,7 @@
 				371B7E6C2759791900D21217 /* CommentsModel.swift in Sources */,
 				374AB3D928BCAF0000DF56FB /* SeekModel.swift in Sources */,
 				375E45F927B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */,
+				371CC7762946963000979C1A /* ListingStyleButtons.swift in Sources */,
 				3782B95627557E4E00990149 /* SearchView.swift in Sources */,
 				3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
 				37C3A24F272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,

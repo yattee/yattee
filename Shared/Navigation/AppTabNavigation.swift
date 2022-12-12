@@ -159,7 +159,7 @@ struct AppTabNavigation: View {
                             Label("Open Videos", systemImage: "play.circle.fill")
                         }
                     }
-                    AccountsMenuView()
+                    AccountViewButton()
                 }
             }
         #endif

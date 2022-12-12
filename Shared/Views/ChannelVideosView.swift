@@ -1,3 +1,4 @@
+import Defaults
 import SDWebImageSwiftUI
 import Siesta
 import SwiftUI
@@ -26,6 +27,8 @@ struct ChannelVideosView: View {
     @ObservedObject private var recents = RecentsModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @Namespace private var focusNamespace
+
+    @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
 
     var presentedChannel: Channel? {
         store.item ?? channel ?? recents.presentedChannel
@@ -56,11 +59,6 @@ struct ChannelVideosView: View {
                         viewsLabel
 
                         subscriptionToggleButton
-
-                        if let channel = presentedChannel {
-                            FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, channel.id, channel.name)))
-                                .labelStyle(.iconOnly)
-                        }
                     }
                     contentTypePicker
                         .pickerStyle(.automatic)
@@ -72,6 +70,7 @@ struct ChannelVideosView: View {
                 banner
             }
             .environment(\.inChannelView, true)
+            .environment(\.listingStyle, channelPlaylistListingStyle)
             #if os(tvOS)
                 .prefersDefaultFocus(in: focusNamespace)
             #endif
@@ -99,6 +98,9 @@ struct ChannelVideosView: View {
             #if !os(iOS)
                 ToolbarItem(placement: .navigation) {
                     thumbnail
+                }
+                ToolbarItem {
+                    ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
                 }
                 ToolbarItem {
                     contentTypePicker
@@ -217,6 +219,8 @@ struct ChannelVideosView: View {
                         subscriptionToggleButton
                         FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, channel.id, channel.name)))
                     }
+
+                    ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
                 }
             } label: {
                 HStack(spacing: 12) {

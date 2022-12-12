@@ -203,6 +203,13 @@ extension Defaults.Keys {
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
 
     static let subscriptionsViewPage = Key<SubscriptionsView.Page>("subscriptionsViewPage", default: .feed)
+
+    static let subscriptionsListingStyle = Key<ListingStyle>("subscriptionsListingStyle", default: .cells)
+    static let popularListingStyle = Key<ListingStyle>("popularListingStyle", default: .cells)
+    static let trendingListingStyle = Key<ListingStyle>("trendingListingStyle", default: .cells)
+    static let playlistListingStyle = Key<ListingStyle>("playlistListingStyle", default: .cells)
+    static let channelPlaylistListingStyle = Key<ListingStyle>("channelPlaylistListingStyle", default: .cells)
+    static let searchListingStyle = Key<ListingStyle>("searchListingStyle", default: .cells)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -19,6 +20,24 @@ enum NavigationStyle {
 
 private struct NavigationStyleKey: EnvironmentKey {
     static let defaultValue = NavigationStyle.tab
+}
+
+private struct ListingStyleKey: EnvironmentKey {
+    static let defaultValue = ListingStyle.cells
+}
+
+enum ListingStyle: String, CaseIterable, Defaults.Serializable {
+    case cells
+    case list
+
+    var systemImage: String {
+        switch self {
+        case .cells:
+            return "rectangle.grid.2x2"
+        case .list:
+            return "list.dash"
+        }
+    }
 }
 
 private struct CurrentPlaylistID: EnvironmentKey {
@@ -69,5 +88,10 @@ extension EnvironmentValues {
     var scrollViewBottomPadding: Double {
         get { self[ScrollViewBottomPaddingKey.self] }
         set { self[ScrollViewBottomPaddingKey.self] = newValue }
+    }
+
+    var listingStyle: ListingStyle {
+        get { self[ListingStyleKey.self] }
+        set { self[ListingStyleKey.self] = newValue }
     }
 }

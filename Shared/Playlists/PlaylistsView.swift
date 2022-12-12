@@ -21,6 +21,8 @@ struct PlaylistsView: View {
 
     @Namespace private var focusNamespace
 
+    @Default(.playlistListingStyle) private var playlistListingStyle
+
     var items: [ContentItem] {
         var videos = currentPlaylist?.videos ?? []
 
@@ -88,6 +90,7 @@ struct PlaylistsView: View {
                             #endif
                         }
                         .environment(\.currentPlaylistID, currentPlaylist?.id)
+                        .environment(\.listingStyle, playlistListingStyle)
                     }
                 }
             }
@@ -151,11 +154,17 @@ struct PlaylistsView: View {
         )
         #endif
 
-        #if !os(macOS)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            model.load()
-            loadResource()
+        #if os(macOS)
+        .toolbar {
+            ToolbarItem {
+                ListingStyleButtons(listingStyle: $playlistListingStyle)
+            }
         }
+        #else
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    model.load()
+                    loadResource()
+                }
         #endif
         #if !os(tvOS)
         .background(
@@ -210,21 +219,27 @@ struct PlaylistsView: View {
 
                 selectPlaylistButton
 
+                ListingStyleButtons(listingStyle: $playlistListingStyle)
+
                 Section {
                     SettingsButtons()
                 }
             } label: {
                 HStack(spacing: 12) {
-                    Text(currentPlaylist?.title ?? "Playlists")
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                    HStack(spacing: 6) {
+                        Image(systemName: "list.and.film")
+
+                        Text(currentPlaylist?.title ?? "Playlists")
+                            .font(.headline)
+                    }
+                    .foregroundColor(.primary)
 
                     Image(systemName: "chevron.down.circle.fill")
                         .foregroundColor(.accentColor)
-                        .imageScale(.small)
                 }
+                .imageScale(.small)
                 .lineLimit(1)
-                .frame(maxWidth: 300)
+                .frame(maxWidth: 320)
                 .transaction { t in t.animation = nil }
             }
             .disabled(!accounts.signedIn)
@@ -247,7 +262,7 @@ struct PlaylistsView: View {
                 if let playlist = currentPlaylist {
                     editPlaylistButton
 
-                    FavoriteButton(item: FavoriteItem(section: .playlist(playlist.id)))
+                    FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
                         .labelStyle(.iconOnly)
 
                     playButton

@@ -74,6 +74,10 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var description: String {
+        guard !isPublic else {
+            return name
+        }
+
         guard !name.isEmpty else {
             return shortUsername
         }

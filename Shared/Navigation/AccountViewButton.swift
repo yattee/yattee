@@ -1,7 +1,7 @@
 import Defaults
 import SwiftUI
 
-struct AccountsMenuView: View {
+struct AccountViewButton: View {
     @ObservedObject private var model = AccountsModel.shared
     private var navigation = NavigationModel.shared
 
@@ -17,7 +17,13 @@ struct AccountsMenuView: View {
             } label: {
                 HStack {
                     if !accountPickerDisplaysUsername || !(model.current?.isPublic ?? true) {
-                        Image(systemName: "globe")
+                        if let name = model.current?.app?.rawValue.capitalized {
+                            Image(name)
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                        } else {
+                            Image(systemName: "globe")
+                        }
                     }
 
                     if accountPickerDisplaysUsername {

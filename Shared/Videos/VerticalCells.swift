@@ -8,6 +8,7 @@ struct VerticalCells<Header: View>: View {
 
     @Environment(\.scrollViewBottomPadding) private var scrollViewBottomPadding
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
+    @Environment(\.listingStyle) private var listingStyle
 
     var items = [ContentItem]()
     var allowEmpty = false
@@ -70,7 +71,11 @@ struct VerticalCells<Header: View>: View {
     }
 
     var adaptiveItem: [GridItem] {
-        [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize, maximum: adaptiveGridItemMaximumSize))]
+        if listingStyle == .list {
+            return [.init(.flexible())]
+        }
+
+        return [GridItem(.adaptive(minimum: adaptiveGridItemMinimumSize, maximum: adaptiveGridItemMaximumSize))]
     }
 
     var adaptiveGridItemMinimumSize: Double {

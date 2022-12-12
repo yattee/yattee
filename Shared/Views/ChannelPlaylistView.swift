@@ -1,3 +1,4 @@
+import Defaults
 import Siesta
 import SwiftUI
 
@@ -12,6 +13,7 @@ struct ChannelPlaylistView: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.navigationStyle) private var navigationStyle
+    @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
 
     @ObservedObject private var accounts = AccountsModel.shared
     var player = PlayerModel.shared
@@ -58,6 +60,7 @@ struct ChannelPlaylistView: View {
             VerticalCells(items: items)
                 .environment(\.inChannelPlaylistView, true)
         }
+        .environment(\.listingStyle, channelPlaylistListingStyle)
         .onAppear {
             if navigationStyle == .tab {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -69,7 +72,15 @@ struct ChannelPlaylistView: View {
         }
         #if os(tvOS)
         .background(Color.background(scheme: colorScheme))
-        #else
+        #endif
+        #if os(iOS)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                playlistMenu
+            }
+        }
+        #endif
+        #if os(macOS)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 if showCloseButton {
@@ -84,18 +95,56 @@ struct ChannelPlaylistView: View {
 
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
+                    ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
                     ShareButton(contentItem: contentItem)
 
-                    if let playlist = presentedPlaylist {
-                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
-                    }
+                    favoriteButton
 
                     playButton
                 }
             }
         }
-        .navigationTitle(presentedPlaylist?.title ?? "")
+        .navigationTitle(label)
         #endif
+    }
+
+    @ViewBuilder private var favoriteButton: some View {
+        if let playlist = presentedPlaylist {
+            FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
+        }
+    }
+
+    #if os(iOS)
+        private var playlistMenu: some View {
+            Menu {
+                favoriteButton
+
+                ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+
+                Section {
+                    SettingsButtons()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    ThumbnailView(url: store.item?.thumbnailURL ?? playlist?.thumbnailURL)
+                        .frame(width: 60, height: 30)
+                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                    Text(label)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .frame(maxWidth: 320)
+                .transaction { t in t.animation = nil }
+            }
+        }
+    #endif
+
+    private var label: String {
+        presentedPlaylist?.title ?? ""
     }
 
     private var playlistButtonsPlacement: ToolbarItemPlacement {
@@ -132,7 +181,8 @@ struct ChannelPlaylistView: View {
 
 struct ChannelPlaylistView_Previews: PreviewProvider {
     static var previews: some View {
-        ChannelPlaylistView(playlist: ChannelPlaylist.fixture)
-            .injectFixtureEnvironmentObjects()
+        NavigationView {
+            ChannelPlaylistView(playlist: ChannelPlaylist.fixture)
+        }
     }
 }

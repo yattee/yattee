@@ -250,7 +250,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "\(Self.basePath)/popular")
     }
 
-    func trending(country: Country, category: TrendingCategory?) -> Resource {
+    func trending(country _: Country, category _: TrendingCategory?) -> Resource {
         resource(baseURL: account.url, path: "\(Self.basePath)/videos")
             .withParam("isLocal", "true")
 //            .withParam("type", category?.name)
@@ -391,7 +391,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: basePathAppending("playlists/\(id)"))
     }
 
-    func search(_ query: SearchQuery, page: String?) -> Resource {
+    func search(_ query: SearchQuery, page _: String?) -> Resource {
         var resource = resource(baseURL: account.url, path: basePathAppending("search/videos"))
             .withParam("search", query.query)
 //            .withParam("sort_by", query.sortBy.parameter)

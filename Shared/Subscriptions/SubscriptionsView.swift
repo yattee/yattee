@@ -8,6 +8,7 @@ struct SubscriptionsView: View {
     }
 
     @Default(.subscriptionsViewPage) private var subscriptionsViewPage
+    @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
 
     var body: some View {
         SignInRequiredView(title: "Subscriptions".localized()) {
@@ -21,12 +22,20 @@ struct SubscriptionsView: View {
                 #endif
             }
         }
+        .environment(\.listingStyle, subscriptionsListingStyle)
 
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    subscriptionsMenu
+                }
+            }
+        #endif
+        #if os(macOS)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                subscriptionsMenu
+            ToolbarItem {
+                ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
             }
         }
         #endif
@@ -38,6 +47,10 @@ struct SubscriptionsView: View {
                 Picker("Page", selection: $subscriptionsViewPage) {
                     Label("Feed", systemImage: "film").tag(Page.feed)
                     Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
+                }
+
+                if subscriptionsViewPage == .feed {
+                    ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
                 }
 
                 Section {
@@ -59,6 +72,7 @@ struct SubscriptionsView: View {
         var menuLabel: some View {
             HStack {
                 Image(systemName: subscriptionsViewPage == .channels ? "person.3.fill" : "film")
+                    .imageScale(.small)
                 Text(subscriptionsViewPage.rawValue.capitalized.localized())
                     .font(.headline)
             }

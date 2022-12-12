@@ -6,6 +6,10 @@ struct FeedView: View {
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
 
+    #if os(tvOS)
+        @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
+    #endif
+
     var videos: [ContentItem] {
         ContentItem.array(of: feed.videos)
     }
@@ -15,6 +19,7 @@ struct FeedView: View {
             HStack {
                 #if os(tvOS)
                     SubscriptionsPageButton()
+                    ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
                 #endif
 
                 Spacer()

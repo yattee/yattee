@@ -9,6 +9,8 @@ struct TrendingView: View {
     @Default(.trendingCategory) private var category
     @Default(.trendingCountry) private var country
 
+    @Default(.trendingListingStyle) private var trendingListingStyle
+
     @State private var presentingCountrySelection = false
 
     @State private var favoriteItem: FavoriteItem?
@@ -46,6 +48,7 @@ struct TrendingView: View {
                         .environment(\.scrollViewBottomPadding, 70)
                 #endif
             }
+            .environment(\.listingStyle, trendingListingStyle)
         }
 
         .toolbar {
@@ -119,10 +122,16 @@ struct TrendingView: View {
             }
         }
         #endif
-        #if !os(macOS)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            resource.loadIfNeeded()
+        #if os(macOS)
+        .toolbar {
+            ToolbarItem {
+                ListingStyleButtons(listingStyle: $trendingListingStyle)
+            }
         }
+        #else
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    resource.loadIfNeeded()
+                }
         #endif
     }
 
@@ -162,6 +171,8 @@ struct TrendingView: View {
                 if accounts.app.supportsTrendingCategories {
                     categoryButton
                 }
+
+                ListingStyleButtons(listingStyle: $trendingListingStyle)
 
                 Section {
                     SettingsButtons()

@@ -1,3 +1,4 @@
+import Defaults
 import Siesta
 import SwiftUI
 
@@ -5,6 +6,8 @@ struct PopularView: View {
     @StateObject private var store = Store<[Video]>()
 
     @ObservedObject private var accounts = AccountsModel.shared
+
+    @Default(.popularListingStyle) private var popularListingStyle
 
     var resource: Resource? {
         accounts.api.popular
@@ -20,6 +23,7 @@ struct PopularView: View {
                 resource?.addObserver(store)
                 resource?.loadIfNeeded()
             }
+            .environment(\.listingStyle, popularListingStyle)
         #if !os(tvOS)
             .navigationTitle("Popular")
             .background(
@@ -31,6 +35,12 @@ struct PopularView: View {
             )
         #endif
         #if os(iOS)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                popularMenu
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
         .refreshControl { refreshControl in
             resource?.load().onCompletion { _ in
                 refreshControl.endRefreshing()
@@ -47,10 +57,53 @@ struct PopularView: View {
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
         #endif
-        #if !os(macOS)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            resource?.loadIfNeeded()
+        #if os(macOS)
+        .toolbar {
+            ToolbarItem {
+                ListingStyleButtons(listingStyle: $popularListingStyle)
+            }
         }
+        #else
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    resource?.loadIfNeeded()
+                }
         #endif
+    }
+
+    #if os(iOS)
+        private var popularMenu: some View {
+            Menu {
+                ListingStyleButtons(listingStyle: $popularListingStyle)
+
+                Section {
+                    SettingsButtons()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.up.right.circle.fill")
+                            .foregroundColor(.primary)
+                            .imageScale(.small)
+
+                        Text("Popular")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .transaction { t in t.animation = nil }
+            }
+        }
+    #endif
+}
+
+struct PopularView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            PopularView()
+        }
     }
 }
