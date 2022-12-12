@@ -5,6 +5,7 @@ struct AppTabNavigation: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     private var player = PlayerModel.shared
+    @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
 
     @Default(.showHome) private var showHome
@@ -47,7 +48,12 @@ struct AppTabNavigation: View {
             }
             .overlay(ControlsBar(fullScreen: .constant(false)), alignment: .bottom)
         }
-
+        .onAppear {
+            feed.calculateUnwatchedFeed()
+        }
+        .onChange(of: accounts.current) { _ in
+            feed.calculateUnwatchedFeed()
+        }
         .id(accounts.current?.id ?? "")
         .overlay(playlistView)
         .overlay(channelView)
@@ -87,6 +93,19 @@ struct AppTabNavigation: View {
                 .accessibility(label: Text("Subscriptions"))
         }
         .tag(TabSelection.subscriptions)
+        .backport
+        .badge(subscriptionsBadge)
+    }
+
+    var subscriptionsBadge: Text? {
+        guard let account = accounts.current,
+              let unwatched = feed.unwatched[account],
+              unwatched > 0
+        else {
+            return nil
+        }
+
+        return Text("\(String(unwatched))")
     }
 
     private var subscriptionsVisible: Bool {

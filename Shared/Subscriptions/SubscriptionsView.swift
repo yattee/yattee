@@ -10,6 +10,8 @@ struct SubscriptionsView: View {
     @Default(.subscriptionsViewPage) private var subscriptionsViewPage
     @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
 
+    @ObservedObject private var feed = FeedModel.shared
+
     var body: some View {
         SignInRequiredView(title: "Subscriptions".localized()) {
             switch subscriptionsViewPage {
@@ -51,6 +53,24 @@ struct SubscriptionsView: View {
 
                 if subscriptionsViewPage == .feed {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+
+                    Button {
+                        feed.playUnwatchedFeed()
+                    } label: {
+                        Label("Play unwatched", systemImage: "play")
+                    }
+
+                    Button {
+                        feed.markAllFeedAsWatched()
+                    } label: {
+                        Label("Mark all as watched", systemImage: "checkmark.circle.fill")
+                    }
+
+                    Button {
+                        feed.markAllFeedAsUnwatched()
+                    } label: {
+                        Label("Mark all as unwatched", systemImage: "checkmark.circle")
+                    }
                 }
 
                 Section {

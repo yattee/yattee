@@ -149,6 +149,7 @@ struct VideoContextMenuView: View {
     var markAsWatchedButton: some View {
         Button {
             Watch.markAsWatched(videoID: video.videoID, account: accounts.current, duration: video.length, context: backgroundContext)
+            FeedModel.shared.calculateUnwatchedFeed()
         } label: {
             Label("Mark as watched", systemImage: "checkmark.circle.fill")
         }
@@ -156,11 +157,9 @@ struct VideoContextMenuView: View {
 
     var removeFromHistoryButton: some View {
         Button {
-            guard let watch else {
-                return
-            }
-
+            guard let watch else { return }
             player.removeWatch(watch)
+            FeedModel.shared.calculateUnwatchedFeed()
         } label: {
             Label("Remove from history", systemImage: "delete.left.fill")
         }

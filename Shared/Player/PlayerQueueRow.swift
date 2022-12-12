@@ -90,7 +90,7 @@ struct PlayerQueueRow: View {
 
             player.show()
         } label: {
-            VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration)
+            VideoBanner(video: item.video, playbackTime: watchStoppedAt, videoDuration: watch?.videoDuration, watch: watch)
         }
         #if os(tvOS)
         .buttonStyle(.card)

@@ -12,7 +12,7 @@ struct AccountsView: View {
 
                 list
             }
-            .frame(minWidth: 500, maxWidth: 800, minHeight: 350, maxHeight: 700)
+            .frame(minWidth: 500, maxWidth: 800, minHeight: 700, maxHeight: 1200)
 
         #else
             NavigationView {

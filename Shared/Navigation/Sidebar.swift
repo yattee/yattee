@@ -4,6 +4,7 @@ import SwiftUI
 struct Sidebar: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var feed = FeedModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.visibleSections) private var visibleSections
@@ -35,6 +36,12 @@ struct Sidebar: View {
                 scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)
             }
             .listStyle(.sidebar)
+        }
+        .onAppear {
+            feed.calculateUnwatchedFeed()
+        }
+        .onChange(of: accounts.current) { _ in
+            feed.calculateUnwatchedFeed()
         }
         .navigationTitle("Yattee")
         #if os(iOS)
@@ -70,6 +77,8 @@ struct Sidebar: View {
                         Label("Subscriptions", systemImage: "star.circle")
                             .accessibility(label: Text("Subscriptions"))
                     }
+                    .backport
+                    .badge(subscriptionsBadge)
                     .id("subscriptions")
                 }
 
@@ -97,6 +106,17 @@ struct Sidebar: View {
                 .keyboardShortcut("f")
             }
         }
+    }
+
+    private var subscriptionsBadge: Text? {
+        guard let account = accounts.current,
+              let unwatched = feed.unwatched[account],
+              unwatched > 0
+        else {
+            return nil
+        }
+
+        return Text("\(String(unwatched))")
     }
 
     private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
