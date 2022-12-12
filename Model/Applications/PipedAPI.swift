@@ -528,11 +528,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     private func extractDescription(from content: JSON) -> String? {
-        guard var description = content.dictionaryValue["description"]?.string else {
-            return nil
-        }
+        guard let description = content.dictionaryValue["description"]?.string else { return nil }
 
-        description = description.replacingOccurrences(
+        return replaceHTML(description)
+    }
+
+    private func replaceHTML(_ string: String) -> String {
+        var string = string.replacingOccurrences(
             of: "<br/>|<br />|<br>",
             with: "\n",
             options: .regularExpression,
@@ -541,9 +543,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let linkRegex = #"(<a\s+(?:[^>]*?\s+)?href=\"[^"]*\">[^<]*<\/a>)"#
         let hrefRegex = #"href=\"([^"]*)\">"#
-        guard let hrefRegex = try? NSRegularExpression(pattern: hrefRegex) else { return description }
-
-        description = description.replacingMatches(regex: linkRegex) { matchingGroup in
+        guard let hrefRegex = try? NSRegularExpression(pattern: hrefRegex) else { return string }
+        string = string.replacingMatches(regex: linkRegex) { matchingGroup in
             let results = hrefRegex.matches(in: matchingGroup, range: NSRange(matchingGroup.startIndex..., in: matchingGroup))
 
             if let result = results.first {
@@ -555,16 +556,17 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             return matchingGroup
         }
 
-        description = description.replacingOccurrences(of: "&amp;", with: "&")
+        string = string
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(
+                of: "<[^>]+>",
+                with: "",
+                options: .regularExpression,
+                range: nil
+            )
 
-        description = description.replacingOccurrences(
-            of: "<[^>]+>",
-            with: "",
-            options: .regularExpression,
-            range: nil
-        )
-
-        return description
+        return string
     }
 
     private func extractVideos(from content: JSON) -> [Video] {
@@ -653,6 +655,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let author = details["author"]?.string ?? ""
         let commentorUrl = details["commentorUrl"]?.string
         let channelId = commentorUrl?.components(separatedBy: "/")[2] ?? ""
+
         return Comment(
             id: details["commentId"]?.string ?? UUID().uuidString,
             author: author,
@@ -661,10 +664,16 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             pinned: details["pinned"]?.bool ?? false,
             hearted: details["hearted"]?.bool ?? false,
             likeCount: details["likeCount"]?.int ?? 0,
-            text: details["commentText"]?.string ?? "",
+            text: extractCommentText(from: details["commentText"]?.stringValue),
             repliesPage: details["repliesPage"]?.string,
             channel: Channel(id: channelId, name: author)
         )
+    }
+
+    private func extractCommentText(from string: String?) -> String {
+        guard let string, !string.isEmpty else { return "" }
+
+        return replaceHTML(string)
     }
 
     private func extractChapters(from content: JSON) -> [Chapter] {
