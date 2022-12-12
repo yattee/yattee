@@ -1,7 +1,9 @@
+import Cache
 import Foundation
 import Siesta
+import SwiftyJSON
 
-final class FeedModel: ObservableObject {
+final class FeedModel: ObservableObject, CacheModel {
     static let shared = FeedModel()
 
     @Published var isLoading = false
@@ -9,6 +11,8 @@ final class FeedModel: ObservableObject {
     @Published private var page = 1
 
     private var accounts = AccountsModel.shared
+
+    var storage: Storage<String, JSON>?
 
     var feed: Resource? {
         accounts.api.feed(page)
@@ -104,13 +108,7 @@ final class FeedModel: ObservableObject {
     }
 
     var formattedFeedTime: String {
-        if let feedTime {
-            let isSameDay = Calendar(identifier: .iso8601).isDate(feedTime, inSameDayAs: Date())
-            let formatter = isSameDay ? CacheModel.shared.dateFormatterForTimeOnly : CacheModel.shared.dateFormatter
-            return formatter.string(from: feedTime)
-        }
-
-        return ""
+        getFormattedDate(feedTime)
     }
 
     private func loadCachedFeed() {

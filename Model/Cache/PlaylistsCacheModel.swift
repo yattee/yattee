@@ -3,7 +3,7 @@ import Foundation
 import Logging
 import SwiftyJSON
 
-struct PlaylistsCacheModel {
+struct PlaylistsCacheModel: CacheModel {
     static let shared = PlaylistsCacheModel()
     static let limit = 30
     let logger = Logger(label: "stream.yattee.cache.playlists")
@@ -11,25 +11,25 @@ struct PlaylistsCacheModel {
     static let diskConfig = DiskConfig(name: "playlists")
     static let memoryConfig = MemoryConfig()
 
-    let storage = try! Storage<String, JSON>(
+    let storage = try? Storage<String, JSON>(
         diskConfig: Self.diskConfig,
         memoryConfig: Self.memoryConfig,
-        transformer: CacheModel.jsonTransformer
+        transformer: BaseCacheModel.jsonTransformer
     )
 
     func storePlaylist(account: Account, playlists: [Playlist]) {
-        let date = CacheModel.shared.iso8601DateFormatter.string(from: Date())
+        let date = iso8601DateFormatter.string(from: Date())
         logger.info("caching \(playlistCacheKey(account)) -- \(date)")
         let feedTimeObject: JSON = ["date": date]
         let playlistsObject: JSON = ["playlists": playlists.map { $0.json.object }]
-        try? storage.setObject(feedTimeObject, forKey: playlistTimeCacheKey(account))
-        try? storage.setObject(playlistsObject, forKey: playlistCacheKey(account))
+        try? storage?.setObject(feedTimeObject, forKey: playlistTimeCacheKey(account))
+        try? storage?.setObject(playlistsObject, forKey: playlistCacheKey(account))
     }
 
     func retrievePlaylists(account: Account) -> [Playlist] {
         logger.info("retrieving cache for \(playlistCacheKey(account))")
 
-        if let json = try? storage.object(forKey: playlistCacheKey(account)),
+        if let json = try? storage?.object(forKey: playlistCacheKey(account)),
            let playlists = json.dictionaryValue["playlists"]
         {
             return playlists.arrayValue.map { Playlist.from($0) }
@@ -39,9 +39,9 @@ struct PlaylistsCacheModel {
     }
 
     func getPlaylistsTime(account: Account) -> Date? {
-        if let json = try? storage.object(forKey: playlistTimeCacheKey(account)),
+        if let json = try? storage?.object(forKey: playlistTimeCacheKey(account)),
            let string = json.dictionaryValue["date"]?.string,
-           let date = CacheModel.shared.iso8601DateFormatter.date(from: string)
+           let date = iso8601DateFormatter.date(from: string)
         {
             return date
         }
@@ -50,17 +50,7 @@ struct PlaylistsCacheModel {
     }
 
     func getFormattedPlaylistTime(account: Account) -> String {
-        if let time = getPlaylistsTime(account: account) {
-            let isSameDay = Calendar(identifier: .iso8601).isDate(time, inSameDayAs: Date())
-            let formatter = isSameDay ? CacheModel.shared.dateFormatterForTimeOnly : CacheModel.shared.dateFormatter
-            return formatter.string(from: time)
-        }
-
-        return ""
-    }
-
-    func clear() {
-        try? storage.removeAll()
+        getFormattedDate(getPlaylistsTime(account: account))
     }
 
     private func playlistCacheKey(_ account: Account) -> String {

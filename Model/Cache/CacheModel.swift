@@ -1,29 +1,24 @@
 import Cache
 import Foundation
-import Logging
 import SwiftyJSON
 
-struct CacheModel {
-    static var shared = CacheModel()
+protocol CacheModel {
+    var storage: Storage<String, JSON>? { get }
 
-    static let jsonToDataTransformer: (JSON) -> Data = { try! $0.rawData() }
-    static let jsonFromDataTransformer: (Data) -> JSON = { try! JSON(data: $0) }
-    static let jsonTransformer = Transformer(toData: jsonToDataTransformer, fromData: jsonFromDataTransformer)
+    func clear()
+}
 
+extension CacheModel {
     func clear() {
-        FeedCacheModel.shared.clear()
-        VideosCacheModel.shared.clear()
-        PlaylistsCacheModel.shared.clear()
+        try? storage?.removeAll()
     }
 
-    var totalSize: Int {
-        (FeedCacheModel.shared.storage.totalDiskStorageSize ?? 0) +
-            (VideosCacheModel.shared.storage.totalDiskStorageSize ?? 0) +
-            (PlaylistsCacheModel.shared.storage.totalDiskStorageSize ?? 0)
-    }
+    func getFormattedDate(_ date: Date?) -> String {
+        guard let date else { return "unknown" }
 
-    var totalSizeFormatted: String {
-        byteCountFormatter.string(fromByteCount: Int64(totalSize))
+        let isSameDay = Calendar(identifier: .iso8601).isDate(date, inSameDayAs: Date())
+        let formatter = isSameDay ? dateFormatterForTimeOnly : dateFormatter
+        return formatter.string(from: date)
     }
 
     var dateFormatter: DateFormatter {
@@ -43,6 +38,4 @@ struct CacheModel {
     }
 
     var iso8601DateFormatter: ISO8601DateFormatter { .init() }
-
-    private var byteCountFormatter: ByteCountFormatter { .init() }
 }

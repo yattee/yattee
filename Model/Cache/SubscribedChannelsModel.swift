@@ -5,17 +5,17 @@ import Siesta
 import SwiftUI
 import SwiftyJSON
 
-final class SubscribedChannelsModel: ObservableObject {
+final class SubscribedChannelsModel: ObservableObject, CacheModel {
     static var shared = SubscribedChannelsModel()
     let logger = Logger(label: "stream.yattee.cache.channels")
 
     static let diskConfig = DiskConfig(name: "channels")
     static let memoryConfig = MemoryConfig()
 
-    let storage = try! Storage<String, JSON>(
+    let storage = try? Storage<String, JSON>(
         diskConfig: SubscribedChannelsModel.diskConfig,
         memoryConfig: SubscribedChannelsModel.memoryConfig,
-        transformer: CacheModel.jsonTransformer
+        transformer: BaseCacheModel.jsonTransformer
     )
 
     @Published var isLoading = false
@@ -89,20 +89,20 @@ final class SubscribedChannelsModel: ObservableObject {
     }
 
     func storeChannels(account: Account, channels: [Channel]) {
-        let date = CacheModel.shared.iso8601DateFormatter.string(from: Date())
+        let date = iso8601DateFormatter.string(from: Date())
         logger.info("caching channels \(channelsDateCacheKey(account)) -- \(date)")
 
         let dateObject: JSON = ["date": date]
         let channelsObject: JSON = ["channels": channels.map(\.json).map(\.object)]
 
-        try? storage.setObject(dateObject, forKey: channelsDateCacheKey(account))
-        try? storage.setObject(channelsObject, forKey: channelsCacheKey(account))
+        try? storage?.setObject(dateObject, forKey: channelsDateCacheKey(account))
+        try? storage?.setObject(channelsObject, forKey: channelsCacheKey(account))
     }
 
     func getChannels(account: Account) -> [Channel] {
         logger.info("getting channels \(channelsDateCacheKey(account))")
 
-        if let json = try? storage.object(forKey: channelsCacheKey(account)),
+        if let json = try? storage?.object(forKey: channelsCacheKey(account)),
            let channels = json.dictionaryValue["channels"]
         {
             return channels.arrayValue.map { Channel.from($0) }
@@ -125,10 +125,10 @@ final class SubscribedChannelsModel: ObservableObject {
         "channels-\(account.id)-date"
     }
 
-    func getFeedTime(account: Account) -> Date? {
-        if let json = try? storage.object(forKey: channelsDateCacheKey(account)),
+    func getChannelsTime(account: Account) -> Date? {
+        if let json = try? storage?.object(forKey: channelsDateCacheKey(account)),
            let string = json.dictionaryValue["date"]?.string,
-           let date = CacheModel.shared.iso8601DateFormatter.date(from: string)
+           let date = iso8601DateFormatter.date(from: string)
         {
             return date
         }
@@ -136,21 +136,15 @@ final class SubscribedChannelsModel: ObservableObject {
         return nil
     }
 
-    var feedTime: Date? {
+    var channelsTime: Date? {
         if let account = accounts.current {
-            return getFeedTime(account: account)
+            return getChannelsTime(account: account)
         }
 
         return nil
     }
 
     var formattedCacheTime: String {
-        if let feedTime {
-            let isSameDay = Calendar(identifier: .iso8601).isDate(feedTime, inSameDayAs: Date())
-            let formatter = isSameDay ? CacheModel.shared.dateFormatterForTimeOnly : CacheModel.shared.dateFormatter
-            return formatter.string(from: feedTime)
-        }
-
-        return ""
+        getFormattedDate(channelsTime)
     }
 }

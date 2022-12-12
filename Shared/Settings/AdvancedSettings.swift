@@ -137,7 +137,7 @@ struct AdvancedSettings: View {
                     title: Text(
                         "Are you sure you want to clear cache?"
                     ),
-                    primaryButton: .destructive(Text("Clear"), action: CacheModel.shared.clear),
+                    primaryButton: .destructive(Text("Clear"), action: BaseCacheModel.shared.clear),
                     secondaryButton: .cancel()
                 )
             )
@@ -148,7 +148,7 @@ struct AdvancedSettings: View {
     }
 
     var cacheSize: some View {
-        Text(String(format: "Total size: %@", CacheModel.shared.totalSizeFormatted))
+        Text(String(format: "Total size: %@", BaseCacheModel.shared.totalSizeFormatted))
             .foregroundColor(.secondary)
     }
 }

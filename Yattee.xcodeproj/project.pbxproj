@@ -662,6 +662,9 @@
 		379F141F289ECE7F00DE48B5 /* QualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F141E289ECE7F00DE48B5 /* QualitySettings.swift */; };
 		379F1420289ECE7F00DE48B5 /* QualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F141E289ECE7F00DE48B5 /* QualitySettings.swift */; };
 		379F1421289ECE7F00DE48B5 /* QualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379F141E289ECE7F00DE48B5 /* QualitySettings.swift */; };
+		37A2B346294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
+		37A2B347294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
+		37A2B348294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
 		37A5DBC4285DFF5400CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC3285DFF5400CA4DD1 /* SwiftUIPager */; };
 		37A5DBC6285E06B100CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */; };
 		37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
@@ -933,9 +936,9 @@
 		37F5E8B6291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
 		37F5E8B7291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
 		37F5E8B8291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */; };
-		37F5E8BA291BEF69006C15F5 /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* CacheModel.swift */; };
-		37F5E8BB291BEF69006C15F5 /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* CacheModel.swift */; };
-		37F5E8BC291BEF69006C15F5 /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* CacheModel.swift */; };
+		37F5E8BA291BEF69006C15F5 /* BaseCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* BaseCacheModel.swift */; };
+		37F5E8BB291BEF69006C15F5 /* BaseCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* BaseCacheModel.swift */; };
+		37F5E8BC291BEF69006C15F5 /* BaseCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F5E8B9291BEF69006C15F5 /* BaseCacheModel.swift */; };
 		37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
 		37F64FE526FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
 		37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */; };
@@ -1309,6 +1312,7 @@
 		379B0252287A1CDF001015B5 /* OrientationTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrientationTracker.swift; sourceTree = "<group>"; };
 		379DC3D028BA4EB400B09677 /* Seek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seek.swift; sourceTree = "<group>"; };
 		379F141E289ECE7F00DE48B5 /* QualitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualitySettings.swift; sourceTree = "<group>"; };
+		37A2B345294723850050933E /* CacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModel.swift; sourceTree = "<group>"; };
 		37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBackgroundModifier.swift; sourceTree = "<group>"; };
 		37A9965926D6F8CA006E3224 /* HorizontalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCells.swift; sourceTree = "<group>"; };
 		37A9965D26D6F9B9006E3224 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -1430,7 +1434,7 @@
 		37F4AD2528613B81004D0F66 /* Color+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Debug.swift"; sourceTree = "<group>"; };
 		37F4AE7126828F0900BD60EA /* VerticalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalCells.swift; sourceTree = "<group>"; };
 		37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLBookmarkModel.swift; sourceTree = "<group>"; };
-		37F5E8B9291BEF69006C15F5 /* CacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModel.swift; sourceTree = "<group>"; };
+		37F5E8B9291BEF69006C15F5 /* BaseCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCacheModel.swift; sourceTree = "<group>"; };
 		37F64FE326FE70A60081B69E /* RedrawOnModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedrawOnModifier.swift; sourceTree = "<group>"; };
 		37F7AB4C28A9361F00FB46B5 /* UIDevice+Cellular.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Cellular.swift"; sourceTree = "<group>"; };
 		37F7AB4E28A94E0600FB46B5 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -2042,11 +2046,13 @@
 		377F9F79294403DC0043F856 /* Cache */ = {
 			isa = PBXGroup;
 			children = (
+				37F5E8B9291BEF69006C15F5 /* BaseCacheModel.swift */,
 				3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */,
-				37F5E8B9291BEF69006C15F5 /* CacheModel.swift */,
+				37A2B345294723850050933E /* CacheModel.swift */,
 				377692552946476F0055EC18 /* ChannelPlaylistsCacheModel.swift */,
 				377F9F7E2944175F0043F856 /* FeedCacheModel.swift */,
 				3776925129463C310055EC18 /* PlaylistsCacheModel.swift */,
+				37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */,
 				377F9F7A294403F20043F856 /* VideosCacheModel.swift */,
 			);
 			path = Cache;
@@ -2315,7 +2321,6 @@
 				37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */,
 				3797758A2689345500DD52A8 /* Store.swift */,
 				37CEE4C02677B697005A1EFE /* Stream.swift */,
-				37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */,
 				373CFADA269663F1003CB2C6 /* Thumbnail.swift */,
 				37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
@@ -3151,7 +3156,7 @@
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */,
-				37F5E8BA291BEF69006C15F5 /* CacheModel.swift in Sources */,
+				37F5E8BA291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
 				370015A928BBAE7F000149FD /* ProgressBar.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
@@ -3196,6 +3201,7 @@
 				375EC972289F2ABF00751258 /* MultiselectRow.swift in Sources */,
 				37001563271B1F250049C794 /* AccountsModel.swift in Sources */,
 				3795593627B08538007FF8F4 /* StreamControl.swift in Sources */,
+				37A2B346294723850050933E /* CacheModel.swift in Sources */,
 				37CC3F50270D010D00608308 /* VideoBanner.swift in Sources */,
 				378E50FB26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37E70923271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
@@ -3316,6 +3322,7 @@
 				379DC3D228BA4EB400B09677 /* Seek.swift in Sources */,
 				376BE50727347B57009AD608 /* SettingsHeader.swift in Sources */,
 				378AE93C274EDFB2006A4EE1 /* Backport.swift in Sources */,
+				37A2B347294723850050933E /* CacheModel.swift in Sources */,
 				37152EEB26EFEB95004FB96D /* LazyView.swift in Sources */,
 				37F4AD2028612DFD004D0F66 /* Buffering.swift in Sources */,
 				375EC973289F2ABF00751258 /* MultiselectRow.swift in Sources */,
@@ -3332,7 +3339,7 @@
 				37B044B826F7AB9000E1419D /* SettingsView.swift in Sources */,
 				377692572946476F0055EC18 /* ChannelPlaylistsCacheModel.swift in Sources */,
 				374924E1292126A00017D862 /* VideoDetailsToolbar.swift in Sources */,
-				37F5E8BB291BEF69006C15F5 /* CacheModel.swift in Sources */,
+				37F5E8BB291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
 				3765788A2685471400D4EA09 /* Playlist.swift in Sources */,
 				37030FFC27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */,
@@ -3541,7 +3548,7 @@
 				37648B69286CF5F1003D330B /* TVControls.swift in Sources */,
 				374C053D2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				37BE0BD426A1D47D0092E2DB /* AppleAVPlayerView.swift in Sources */,
-				37F5E8BC291BEF69006C15F5 /* CacheModel.swift in Sources */,
+				37F5E8BC291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
 				37977585268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
 				3769537928A877C4005D87C3 /* StreamControl.swift in Sources */,
 				3700155D271B0D4D0049C794 /* PipedAPI.swift in Sources */,
@@ -3571,6 +3578,7 @@
 				378FFBC628660172009E3FBE /* URLParser.swift in Sources */,
 				37141671267A8ACC006CA35D /* TrendingView.swift in Sources */,
 				3732C9FD28C012E600E7DCAF /* SafeArea.swift in Sources */,
+				37A2B348294723850050933E /* CacheModel.swift in Sources */,
 				37C3A24727235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
