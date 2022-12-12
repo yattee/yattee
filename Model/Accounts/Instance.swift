@@ -42,7 +42,7 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var longDescription: String {
-        name.isEmpty ? "\(app.name) - \(apiURLString)" : "\(app.name) - \(name) (\(apiURL))"
+        name.isEmpty ? "\(app.name) - \(apiURLString)" : "\(app.name) - \(name) (\(apiURLString))"
     }
 
     var shortDescription: String {
