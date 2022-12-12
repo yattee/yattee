@@ -96,11 +96,6 @@ final class PlayerModel: ObservableObject {
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
     @Published var videoBeingOpened: Video? { didSet { seek.reset() } }
     @Published var historyVideos = [Video]()
-    @Published var queueItemBeingLoaded: PlayerQueueItem?
-    @Published var queueItemsToLoad = [PlayerQueueItem]()
-    @Published var historyItemBeingLoaded: Video.ID?
-    @Published var historyItemsToLoad = [Watch]()
-
     @Published var preservedTime: CMTime?
 
     @Published var sponsorBlock = SponsorBlockAPI()

@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct HistoryView: View {
-    static let detailsPreloadLimit = 50
-
     var limit = 10
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
@@ -33,7 +31,6 @@ struct HistoryView: View {
         }
         .onAppear {
             visibleWatches
-                .prefix(Self.detailsPreloadLimit)
                 .forEach(player.loadHistoryVideoDetails)
         }
         #if os(tvOS)

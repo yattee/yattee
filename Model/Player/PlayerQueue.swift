@@ -165,7 +165,8 @@ extension PlayerModel {
         currentItem.playbackTime = time
 
         let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
-        playerAPI(newItem.video).loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
+        guard let video = newItem.video else { return }
+        playerAPI(video).loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
             self.playItem(newItem, at: playTime)
         }
     }
@@ -276,42 +277,40 @@ extension PlayerModel {
 
         restoredQueue.append(contentsOf: Defaults[.queue])
         queue = restoredQueue.compactMap { $0 }
+        queue.forEach { loadQueueVideoDetails($0) }
     }
 
     func loadQueueVideoDetails(_ item: PlayerQueueItem) {
-        guard !accounts.current.isNil, !item.hasDetailsLoaded, let video = item.video else { return }
+        guard !accounts.current.isNil, !item.hasDetailsLoaded else { return }
 
         let videoID = item.video?.videoID ?? item.videoID
 
-        if queueItemBeingLoaded == nil {
-            logger.info("loading queue details: \(videoID)")
-            queueItemBeingLoaded = item
-        } else {
-            logger.info("POSTPONING details load: \(videoID)")
-            queueItemsToLoad.append(item)
-            return
-        }
+        let video = item.video ?? Video(app: item.app ?? .local, instanceURL: item.instanceURL, videoID: videoID)
 
-        playerAPI(video)?.loadDetails(item, completionHandler: { [weak self] newItem in
-            guard let self else { return }
-
-            self.queue.filter { $0.videoID == item.videoID }.forEach { item in
+        let replaceQueueItem: (PlayerQueueItem) -> Void = { newItem in
+            self.queue.filter { $0.videoID == videoID }.forEach { item in
                 if let index = self.queue.firstIndex(of: item) {
                     self.queue[index] = newItem
                 }
             }
+        }
 
-            self.logger.info("LOADED queue details: \(videoID)")
+        if let video = VideosCacheModel.shared.retrieveVideo(video.cacheKey) {
+            var item = item
+            item.id = UUID()
+            item.video = video
+            replaceQueueItem(item)
+            return
+        }
 
-            if self.queueItemBeingLoaded == item {
-                self.logger.info("setting nothing loaded")
-                self.queueItemBeingLoaded = nil
-            }
+        playerAPI(video)?
+            .loadDetails(item, completionHandler: { [weak self] newItem in
+                guard let self else { return }
 
-            if let item = self.queueItemsToLoad.popLast() {
-                self.loadQueueVideoDetails(item)
-            }
-        })
+                replaceQueueItem(newItem)
+
+                self.logger.info("LOADED queue details: \(videoID)")
+            })
     }
 
     private func videoLoadFailureHandler(_ error: RequestError, video: Video? = nil) {

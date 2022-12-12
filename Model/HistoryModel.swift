@@ -39,15 +39,6 @@ extension PlayerModel {
             }
             .onCompletion { _ in
                 self.logger.info("LOADED history details: \(watch.videoID)")
-
-                if self.historyItemBeingLoaded == watch.videoID {
-                    self.logger.info("setting no history loaded")
-                    self.historyItemBeingLoaded = nil
-                }
-
-                if let watch = self.historyItemsToLoad.popLast() {
-                    self.loadHistoryVideoDetails(watch)
-                }
             }
     }
 
@@ -70,10 +61,11 @@ extension PlayerModel {
 
             let watch: Watch!
 
+            let duration = self.playerTime.duration.seconds
+
             if results?.isEmpty ?? true {
-                if seconds < 1 {
-                    return
-                }
+                if seconds < 3, duration > 3 { return }
+
                 watch = Watch(context: self.backgroundContext)
                 watch.videoID = id
                 watch.appName = currentVideo.app.rawValue
@@ -82,7 +74,6 @@ extension PlayerModel {
                 watch = results?.first
             }
 
-            let duration = self.playerTime.duration.seconds
             if duration.isFinite, duration > 0 {
                 watch.videoDuration = duration
             }
@@ -98,6 +89,8 @@ extension PlayerModel {
             watch.watchedAt = Date()
 
             try? self.backgroundContext.save()
+
+            FeedModel.shared.calculateUnwatchedFeed()
         }
     }
 

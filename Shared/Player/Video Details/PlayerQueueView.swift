@@ -86,9 +86,6 @@ struct PlayerQueueView: View {
 
             ForEach(player.queue) { item in
                 PlayerQueueRow(item: item, fullScreen: $fullScreen)
-                    .onAppear {
-                        player.loadQueueVideoDetails(item)
-                    }
                     .contextMenu {
                         removeButton(item)
                         removeAllButton()

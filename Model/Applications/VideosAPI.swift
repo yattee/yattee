@@ -97,6 +97,8 @@ extension VideosAPI {
                     return
                 }
 
+                VideosCacheModel.shared.storeVideo(video)
+
                 var newItem = item
                 newItem.id = UUID()
                 newItem.video = video

@@ -197,7 +197,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var isLocal: Bool {
-        !VideoID.isValid(videoID)
+        !VideoID.isValid(videoID) && videoID != Self.fixtureID
     }
 
     var displayTitle: String {

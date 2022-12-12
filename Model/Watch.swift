@@ -71,7 +71,10 @@ extension Watch {
     }
 
     var finished: Bool {
-        progress >= Double(watchedThreshold)
+        guard videoDuration.isFinite, !videoDuration.isZero else {
+            return true
+        }
+        return progress >= Double(watchedThreshold)
     }
 
     var watchedAtString: String? {

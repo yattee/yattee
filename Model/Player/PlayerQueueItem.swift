@@ -8,6 +8,8 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     var id = UUID()
     var video: Video!
     var videoID: Video.ID
+    var app: VideosApp?
+    var instanceURL: URL?
     var playbackTime: CMTime?
     var videoDuration: TimeInterval?
 
@@ -15,14 +17,25 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
         .init(
             video,
             videoID: watch.videoID,
+            app: watch.app,
+            instanceURL: watch.instanceURL,
             playbackTime: CMTime.secondsInDefaultTimescale(watch.stoppedAt),
             videoDuration: watch.videoDuration
         )
     }
 
-    init(_ video: Video? = nil, videoID: Video.ID? = nil, playbackTime: CMTime? = nil, videoDuration: TimeInterval? = nil) {
+    init(
+        _ video: Video? = nil,
+        videoID: Video.ID? = nil,
+        app: VideosApp? = nil,
+        instanceURL: URL? = nil,
+        playbackTime: CMTime? = nil,
+        videoDuration: TimeInterval? = nil
+    ) {
         self.video = video
         self.videoID = videoID ?? video!.videoID
+        self.app = app
+        self.instanceURL = instanceURL
         self.playbackTime = playbackTime
         self.videoDuration = videoDuration
     }
