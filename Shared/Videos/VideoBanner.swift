@@ -14,6 +14,7 @@ struct VideoBanner: View {
     @Default(.saveHistory) private var saveHistory
     @Default(.watchedVideoStyle) private var watchedVideoStyle
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
+    @Default(.timeOnThumbnail) private var timeOnThumbnail
 
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inNavigationView) private var inNavigationView
@@ -35,13 +36,20 @@ struct VideoBanner: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            VStack(spacing: 2) {
+            VStack(alignment: .trailing, spacing: 2) {
                 smallThumbnail
 
                 #if !os(tvOS)
                     progressView
                 #endif
+
+                if !timeOnThumbnail, let timeLabel {
+                    Text(timeLabel)
+                        .font(.caption.monospacedDigit())
+                        .foregroundColor(.secondary)
+                }
             }
+
             VStack(alignment: .leading, spacing: 2) {
                 Group {
                     if let video {
@@ -65,44 +73,48 @@ struct VideoBanner: View {
                 Spacer()
 
                 HStack {
-                    Group {
-                        if let video {
-                            if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
-                                channelControl
-                            } else {
-                                #if os(iOS)
-                                    if DocumentsModel.shared.isDocument(video) {
-                                        HStack(spacing: 6) {
-                                            if let date = DocumentsModel.shared.formattedCreationDate(video) {
-                                                Text(date)
-                                            }
-                                            if let size = DocumentsModel.shared.formattedSize(video) {
-                                                Text("•")
-                                                Text(size)
-                                            }
+                    HStack {
+                        if !inChannelView {
+                            ThumbnailView(url: video?.channel.thumbnailURL)
+                                .frame(width: 30, height: 30)
+                                .clipShape(Circle())
+                        }
 
-                                            Spacer()
-                                        }
-                                        .frame(maxWidth: .infinity)
+                        VStack(alignment: .leading) {
+                            Group {
+                                if let video {
+                                    if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
+                                        channelControl
+                                            .font(.subheadline)
+                                    } else {
+                                        #if os(iOS)
+                                            if DocumentsModel.shared.isDocument(video) {
+                                                HStack(spacing: 6) {
+                                                    if let date = DocumentsModel.shared.formattedCreationDate(video) {
+                                                        Text(date)
+                                                    }
+                                                    if let size = DocumentsModel.shared.formattedSize(video) {
+                                                        Text("•")
+                                                        Text(size)
+                                                    }
+
+                                                    Spacer()
+                                                }
+                                                .frame(maxWidth: .infinity)
+                                            }
+                                        #endif
                                     }
-                                #endif
+                                } else {
+                                    Text("Video Author")
+                                        .redacted(reason: .placeholder)
+                                }
                             }
-                        } else {
-                            Text("Video Author")
-                                .redacted(reason: .placeholder)
+
+                            extraAttributes
                         }
                     }
-                    .lineLimit(1)
-
-                    #if os(tvOS)
-                        extraAttributes
-                    #endif
+                    .foregroundColor(.secondary)
                 }
-                .foregroundColor(.secondary)
-
-                #if !os(tvOS)
-                    extraAttributes
-                #endif
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(maxHeight: .infinity)
@@ -141,17 +153,6 @@ struct VideoBanner: View {
                     }
                 }
             }
-
-            if timeInfo {
-                Spacer()
-
-                #if os(tvOS)
-                    progressView
-                #endif
-
-                timeLabel
-                    .layoutPriority(1)
-            }
         }
         .font(.caption)
         .lineLimit(1)
@@ -159,41 +160,47 @@ struct VideoBanner: View {
     }
 
     @ViewBuilder private var smallThumbnail: some View {
-        ZStack(alignment: .bottomLeading) {
-            ZStack {
-                Color("PlaceholderColor")
-                if let video {
-                    if let thumbnail = video.thumbnailURL(quality: .medium) {
-                        ThumbnailView(url: thumbnail)
-                    } else if video.isLocal {
-                        Image(systemName: video.localStreamImageSystemName)
+        ZStack(alignment: .bottomTrailing) {
+            ZStack(alignment: .bottomLeading) {
+                ZStack {
+                    Color("PlaceholderColor")
+
+                    if let video {
+                        if let thumbnail = video.thumbnailURL(quality: .medium) {
+                            ThumbnailView(url: thumbnail)
+                        } else if video.isLocal {
+                            Image(systemName: video.localStreamImageSystemName)
+                        }
+                    } else {
+                        Image(systemName: "ellipsis")
                     }
-                } else {
-                    Image(systemName: "ellipsis")
+                }
+
+                if saveHistory,
+                   watchedVideoStyle.isShowingBadge,
+                   watch?.finished ?? false
+                {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(Color(
+                            watchedVideoBadgeColor == .colorSchemeBased ? "WatchProgressBarColor" :
+                                watchedVideoBadgeColor == .red ? "AppRedColor" : "AppBlueColor"
+                        ))
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .imageScale(.medium)
+                        .offset(x: 5, y: -5)
                 }
             }
 
-            if saveHistory,
-               watchedVideoStyle.isShowingBadge,
-               watch?.finished ?? false
-            {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(Color(
-                        watchedVideoBadgeColor == .colorSchemeBased ? "WatchProgressBarColor" :
-                            watchedVideoBadgeColor == .red ? "AppRedColor" : "AppBlueColor"
-                    ))
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .imageScale(.medium)
-                    .offset(x: 5, y: -5)
+            if timeOnThumbnail {
+                timeView
             }
         }
+        .frame(width: thumbnailWidth, height: thumbnailHeight)
         #if os(tvOS)
-        .frame(width: thumbnailWidth, height: thumbnailHeight)
-        .mask(RoundedRectangle(cornerRadius: 12))
+            .mask(RoundedRectangle(cornerRadius: 12))
         #else
-        .frame(width: thumbnailWidth, height: thumbnailHeight)
-        .mask(RoundedRectangle(cornerRadius: 6))
+            .mask(RoundedRectangle(cornerRadius: 6))
         #endif
     }
 
@@ -212,7 +219,7 @@ struct VideoBanner: View {
         #if os(tvOS)
             250
         #else
-            100
+            120
         #endif
     }
 
@@ -220,7 +227,7 @@ struct VideoBanner: View {
         #if os(tvOS)
             140
         #else
-            60
+            72
         #endif
     }
 
@@ -239,15 +246,23 @@ struct VideoBanner: View {
         videoDurationLabel != nil && (video == nil || !video!.localStreamIsDirectory)
     }
 
-    @ViewBuilder private var timeLabel: some View {
-        Group {
-            if let watch, let watchStoppedAtLabel, let videoDurationLabel, !watch.finished {
-                Text("\(watchStoppedAtLabel) / \(videoDurationLabel)")
-            } else if let videoDurationLabel {
-                Text(videoDurationLabel)
-            } else {
-                EmptyView()
-            }
+    private var timeLabel: String? {
+        if let watch, let watchStoppedAtLabel, let videoDurationLabel, !watch.finished {
+            return "\(watchStoppedAtLabel) / \(videoDurationLabel)"
+        } else if let videoDurationLabel {
+            return videoDurationLabel
+        } else {
+            return nil
+        }
+    }
+
+    @ViewBuilder private var timeView: some View {
+        if let timeLabel {
+            Text(timeLabel)
+                .font(.caption2.weight(.semibold).monospacedDigit())
+                .allowsTightening(true)
+                .padding(2)
+                .modifier(ControlBackgroundModifier())
         }
     }
 
