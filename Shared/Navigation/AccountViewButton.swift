@@ -20,7 +20,7 @@ struct AccountViewButton: View {
                         if let name = model.current?.app?.rawValue.capitalized {
                             Image(name)
                                 .resizable()
-                                .frame(width: 30, height: 30)
+                                .frame(width: accountImageSize, height: accountImageSize)
                         } else {
                             Image(systemName: "globe")
                         }
@@ -34,6 +34,14 @@ struct AccountViewButton: View {
             }
             .transaction { t in t.animation = .none }
         }
+    }
+
+    private var accountImageSize: Double {
+        #if os(macOS)
+            20
+        #else
+            30
+        #endif
     }
 
     private var label: some View {
