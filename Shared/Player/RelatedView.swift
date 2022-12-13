@@ -23,14 +23,15 @@ struct RelatedView: View {
                 }
             }
         }
+        .environment(\.inNavigationView, false)
         #if os(macOS)
-        .listStyle(.inset)
+            .listStyle(.inset)
         #elseif os(iOS)
-        .listStyle(.grouped)
-        .backport
-        .scrollContentBackground(false)
+            .listStyle(.grouped)
+            .backport
+            .scrollContentBackground(false)
         #else
-        .listStyle(.plain)
+            .listStyle(.plain)
         #endif
     }
 }
