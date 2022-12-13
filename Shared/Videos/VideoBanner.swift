@@ -95,38 +95,14 @@ struct VideoBanner: View {
                     .lineLimit(1)
 
                     #if os(tvOS)
-                        progressView
+                        extraAttributes
                     #endif
                 }
                 .foregroundColor(.secondary)
 
-                HStack(spacing: 16) {
-                    if let video {
-                        if let date = video.publishedDate {
-                            HStack(spacing: 2) {
-                                Text(date)
-                                    .allowsTightening(true)
-                            }
-                        }
-
-                        if video.views > 0 {
-                            HStack(spacing: 2) {
-                                Image(systemName: "eye")
-                                Text(video.viewsCount!)
-                            }
-                        }
-                    }
-
-                    if timeInfo {
-                        Spacer()
-
-                        timeLabel
-                            .layoutPriority(1)
-                    }
-                }
-                .font(.caption)
-                .lineLimit(1)
-                .foregroundColor(.secondary)
+                #if !os(tvOS)
+                    extraAttributes
+                #endif
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(maxHeight: .infinity)
@@ -146,6 +122,40 @@ struct VideoBanner: View {
         #endif
         .opacity(contentOpacity)
         .id(id ?? video?.videoID ?? video?.id)
+    }
+
+    private var extraAttributes: some View {
+        HStack(spacing: 16) {
+            if let video {
+                if let date = video.publishedDate {
+                    HStack(spacing: 2) {
+                        Text(date)
+                            .allowsTightening(true)
+                    }
+                }
+
+                if video.views > 0 {
+                    HStack(spacing: 2) {
+                        Image(systemName: "eye")
+                        Text(video.viewsCount!)
+                    }
+                }
+            }
+
+            if timeInfo {
+                Spacer()
+
+                #if os(tvOS)
+                    progressView
+                #endif
+
+                timeLabel
+                    .layoutPriority(1)
+            }
+        }
+        .font(.caption)
+        .lineLimit(1)
+        .foregroundColor(.secondary)
     }
 
     @ViewBuilder private var smallThumbnail: some View {
