@@ -67,7 +67,7 @@ struct VideoBanner: View {
                 HStack {
                     Group {
                         if let video {
-                            if !video.isLocal || video.localStreamIsRemoteURL {
+                            if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
                                 channelControl
                             } else {
                                 #if os(iOS)
