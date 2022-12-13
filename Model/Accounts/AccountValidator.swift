@@ -69,10 +69,6 @@ final class AccountValidator: Service {
     func validateInstance() {
         reset()
 
-        app.wrappedValue = .peerTube
-        setValidationResult(true)
-        return
-
         guard let app = appsToValidateInstance.popLast() else { return }
         tryValidatingUsing(app)
     }
