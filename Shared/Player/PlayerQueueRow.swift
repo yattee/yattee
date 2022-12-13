@@ -7,7 +7,6 @@ struct PlayerQueueRow: View {
     let item: PlayerQueueItem
     var history = false
     var autoplay = false
-    @Binding var fullScreen: Bool
 
     private var player = PlayerModel.shared
 
@@ -15,11 +14,10 @@ struct PlayerQueueRow: View {
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
-    init(item: PlayerQueueItem, history: Bool = false, autoplay: Bool = false, fullScreen: Binding<Bool> = .constant(false)) {
+    init(item: PlayerQueueItem, history: Bool = false, autoplay: Bool = false) {
         self.item = item
         self.history = history
         self.autoplay = autoplay
-        _fullScreen = fullScreen
         _watchRequest = FetchRequest<Watch>(
             entity: Watch.entity(),
             sortDescriptors: [],
@@ -61,12 +59,6 @@ struct PlayerQueueRow: View {
                     player.playHistory(item, at: watchStoppedAt)
                 } else {
                     player.advanceToItem(item, at: watchStoppedAt)
-                }
-
-                if fullScreen {
-                    withAnimation {
-                        fullScreen = false
-                    }
                 }
 
                 if closePiPOnNavigation, player.playingInPictureInPicture {

@@ -86,7 +86,7 @@ struct PlayerQueueView: View {
             }
 
             ForEach(player.queue) { item in
-                PlayerQueueRow(item: item, fullScreen: $fullScreen)
+                PlayerQueueRow(item: item)
                     .contextMenu {
                         removeButton(item)
                         removeAllButton()
@@ -107,7 +107,7 @@ struct PlayerQueueView: View {
         if let related = player.currentVideo?.related, !related.isEmpty {
             Section(header: Text("Related")) {
                 ForEach(related) { video in
-                    PlayerQueueRow(item: PlayerQueueItem(video), fullScreen: $fullScreen)
+                    PlayerQueueRow(item: PlayerQueueItem(video))
                         .contextMenu {
                             VideoContextMenuView(video: video)
                         }
