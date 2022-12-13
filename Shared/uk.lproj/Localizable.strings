@@ -438,7 +438,7 @@
 "Show Open Videos quick actions" = "Показати швидкі дії з відкритими відео";
 "Show Favorites" = "Показати вибране";
 "Home" = "Головна";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Обмін файлами з Finder на Mac\\nабо iTunes на Windows";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Обмін файлами з Finder на Mac\nабо iTunes на Windows";
 "Show Home" = "Показати головну";
 "URL to Open" = "Відкрити посилання";
 "Enter link to open" = "Введіть посилання для відкриття";
@@ -498,3 +498,7 @@
 "\"%@\" will be irreversibly removed from this device." = "\"%@\" буде безповоротно видалено з цього пристрою.";
 "Could not delete document" = "Не вдалося видалити документ";
 "Are you sure you want to remove %@ location?" = "Ви впевнені, що хочете видалити локацію %@?";
+"Live Streams" = "Наживо";
+"Shorts" = "Shorts";
+"Verified" = "Перевірений";
+"Channel" = "Канал";
