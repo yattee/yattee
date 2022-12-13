@@ -107,7 +107,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     func calculateUnwatchedFeed() {
-        guard let account = accounts.current else { return }
+        guard let account = accounts.current, accounts.signedIn else { return }
         let feed = cacheModel.retrieveFeed(account: account)
         guard !feed.isEmpty else { return }
         backgroundContext.perform { [weak self] in
@@ -130,7 +130,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     func markAllFeedAsWatched() {
-        guard let account = accounts.current else { return }
+        guard let account = accounts.current, accounts.signedIn else { return }
 
         let mark = { [weak self] in
             self?.backgroundContext.perform { [weak self] in
@@ -149,7 +149,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     var canMarkAllFeedAsWatched: Bool {
-        guard let account = accounts.current else { return false }
+        guard let account = accounts.current, accounts.signedIn else { return false }
         return (unwatched[account] ?? 0) > 0
     }
 
@@ -183,7 +183,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     func playUnwatchedFeed() {
-        guard let account = accounts.current else { return }
+        guard let account = accounts.current, accounts.signedIn else { return }
         let videos = cacheModel.retrieveFeed(account: account)
         guard !videos.isEmpty else { return }
 
@@ -208,7 +208,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     var canPlayUnwatchedFeed: Bool {
-        guard let account = accounts.current else { return false }
+        guard let account = accounts.current, accounts.signedIn else { return false }
         return (unwatched[account] ?? 0) > 0
     }
 
@@ -225,7 +225,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     private func loadCachedFeed(_ onCompletion: @escaping () -> Void = {}) {
-        guard let account = accounts.current else { return }
+        guard let account = accounts.current, accounts.signedIn else { return }
         let cache = cacheModel.retrieveFeed(account: account)
         if !cache.isEmpty {
             DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
