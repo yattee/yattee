@@ -43,6 +43,10 @@ struct SubscriptionsView: View {
             ToolbarItem {
                 toggleWatchedButton
             }
+
+            ToolbarItem {
+                playUnwatchedButton
+            }
         }
         #endif
     }
