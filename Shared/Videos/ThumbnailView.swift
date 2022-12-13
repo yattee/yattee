@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ThumbnailView: View {
     var url: URL?
-    @ObservedObject private var thumbnails = ThumbnailsModel.shared
+    private let thumbnails = ThumbnailsModel.shared
 
     var body: some View {
         WebImage(url: url)
