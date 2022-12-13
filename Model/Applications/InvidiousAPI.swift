@@ -34,6 +34,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func setAccount(_ account: Account) {
         self.account = account
 
+        wipeResources()
         configure()
 
         if !account.anonymous {
@@ -50,11 +51,13 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return
         }
 
-        notifications?
+        feed?
             .load()
             .onFailure { _ in
                 self.updateToken(force: true)
             }
+
+        wipeResources()
     }
 
     func configure() {
@@ -260,10 +263,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     var feed: Resource? {
         resource(baseURL: account.url, path: basePathAppending("auth/feed"))
-    }
-
-    var notifications: Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/notifications"))
     }
 
     var subscriptions: Resource? {

@@ -26,6 +26,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     func setAccount(_ account: Account) {
         self.account = account
 
+        wipeResources()
         configure()
     }
 
