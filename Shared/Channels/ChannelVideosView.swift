@@ -50,7 +50,7 @@ struct ChannelVideosView: View {
                         thumbnail
 
                         Text(navigationTitle)
-                            .font(.title2)
+                            .font(.headline)
                             .frame(alignment: .leading)
 
                         Spacer()

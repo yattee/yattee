@@ -45,14 +45,6 @@ struct ChannelCell: View {
 
     var labelContent: some View {
         VStack {
-            HStack(alignment: .top, spacing: 3) {
-                Image(systemName: "person.crop.rectangle")
-                Text("Channel".localized().uppercased())
-                    .fontWeight(.light)
-                    .opacity(0.6)
-            }
-            .foregroundColor(.secondary)
-
             WebImage(url: channel.thumbnailURL, options: [.lowPriority])
                 .resizable()
                 .placeholder {

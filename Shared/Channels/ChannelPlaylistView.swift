@@ -43,9 +43,14 @@ struct ChannelPlaylistView: View {
             #if os(tvOS)
                 HStack {
                     if let playlist = presentedPlaylist {
+                        ThumbnailView(url: store.item?.thumbnailURL ?? playlist.thumbnailURL)
+                            .frame(width: 140, height: 80)
+                            .clipShape(RoundedRectangle(cornerRadius: 2))
+
                         Text(playlist.title)
-                            .font(.title2)
+                            .font(.headline)
                             .frame(alignment: .leading)
+                            .lineLimit(1)
 
                         Spacer()
 
@@ -129,6 +134,7 @@ struct ChannelPlaylistView: View {
                     ThumbnailView(url: store.item?.thumbnailURL ?? playlist?.thumbnailURL)
                         .frame(width: 60, height: 30)
                         .clipShape(RoundedRectangle(cornerRadius: 2))
+
                     Text(label)
                         .font(.headline)
                         .foregroundColor(.primary)

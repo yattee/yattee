@@ -29,14 +29,6 @@ struct ChannelPlaylistCell: View {
 
     var content: some View {
         VStack {
-            HStack(alignment: .top, spacing: 3) {
-                Image(systemName: "list.and.film")
-                Text("Playlist".localized().uppercased())
-                    .fontWeight(.light)
-                    .opacity(0.6)
-            }
-            .foregroundColor(.secondary)
-
             WebImage(url: playlist.thumbnailURL, options: [.lowPriority])
                 .resizable()
                 .placeholder {
