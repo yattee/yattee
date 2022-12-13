@@ -213,6 +213,7 @@
 		371F2F1C269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		3722AEBC274DA396005EA4D6 /* Badge+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */; };
 		3722AEBE274DA401005EA4D6 /* Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBD274DA401005EA4D6 /* Backport.swift */; };
+		3726386E2948A4B80043702D /* Badge+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */; };
 		37270F1C28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
 		37270F1D28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
 		37270F1E28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
@@ -3748,6 +3749,7 @@
 				37F961A127BD90BB00058149 /* PlayerBackendType.swift in Sources */,
 				37599F32272B42810087F250 /* FavoriteItem.swift in Sources */,
 				37E8B0EE27B326C00024006F /* TimelineView.swift in Sources */,
+				3726386E2948A4B80043702D /* Badge+Backport.swift in Sources */,
 				37141675267A8E10006CA35D /* Country.swift in Sources */,
 				370F500C27CC1821001B35DC /* MPVViewController.swift in Sources */,
 				3782B9542755667600990149 /* String+Format.swift in Sources */,
