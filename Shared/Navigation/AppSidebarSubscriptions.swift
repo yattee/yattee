@@ -3,7 +3,10 @@ import SwiftUI
 
 struct AppSidebarSubscriptions: View {
     @ObservedObject private var navigation = NavigationModel.shared
+    @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
+
+    @ObservedObject private var accounts = AccountsModel.shared
 
     var body: some View {
         Section(header: Text("Subscriptions")) {
@@ -11,16 +14,18 @@ struct AppSidebarSubscriptions: View {
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
                     LazyView(ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier()))
                 } label: {
-                    if channel.thumbnailURL != nil {
-                        HStack {
+                    HStack {
+                        if channel.thumbnailURL != nil {
                             ChannelAvatarView(channel: channel, subscribedBadge: false)
                                 .frame(width: 20, height: 20)
 
                             Text(channel.name)
+                        } else {
+                            Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                         }
-                    } else {
-                        Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                     }
+                    .backport
+                    .badge(channelBadge(channel))
                 }
                 .contextMenu {
                     Button("Unsubscribe") {
@@ -30,6 +35,14 @@ struct AppSidebarSubscriptions: View {
                 .id("channel\(channel.id)")
             }
         }
+    }
+
+    func channelBadge(_ channel: Channel) -> Text? {
+        if let count = feed.unwatchedByChannel[accounts.current]?[channel.id] {
+            return Text(String(count))
+        }
+
+        return nil
     }
 }
 

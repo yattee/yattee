@@ -39,6 +39,10 @@ struct SubscriptionsView: View {
             ToolbarItem {
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
             }
+
+            ToolbarItem {
+                toggleWatchedButton
+            }
         }
         #endif
     }
@@ -53,25 +57,11 @@ struct SubscriptionsView: View {
 
                 if subscriptionsViewPage == .feed {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
-
-                    Button {
-                        feed.playUnwatchedFeed()
-                    } label: {
-                        Label("Play unwatched", systemImage: "play")
-                    }
-
-                    Button {
-                        feed.markAllFeedAsWatched()
-                    } label: {
-                        Label("Mark all as watched", systemImage: "checkmark.circle.fill")
-                    }
-
-                    Button {
-                        feed.markAllFeedAsUnwatched()
-                    } label: {
-                        Label("Mark all as unwatched", systemImage: "checkmark.circle")
-                    }
                 }
+
+                playUnwatchedButton
+
+                toggleWatchedButton
 
                 Section {
                     SettingsButtons()
@@ -98,6 +88,40 @@ struct SubscriptionsView: View {
             }
         }
     #endif
+
+    var playUnwatchedButton: some View {
+        Button {
+            feed.playUnwatchedFeed()
+        } label: {
+            Label("Play all unwatched", systemImage: "play")
+        }
+        .disabled(!feed.canPlayUnwatchedFeed)
+    }
+
+    @ViewBuilder var toggleWatchedButton: some View {
+        if feed.canMarkAllFeedAsWatched {
+            markAllFeedAsWatchedButton
+        } else {
+            markAllFeedAsUnwatchedButton
+        }
+    }
+
+    var markAllFeedAsWatchedButton: some View {
+        Button {
+            feed.markAllFeedAsWatched()
+        } label: {
+            Label("Mark all as watched", systemImage: "checkmark.circle.fill")
+        }
+        .disabled(!feed.canMarkAllFeedAsWatched)
+    }
+
+    var markAllFeedAsUnwatchedButton: some View {
+        Button {
+            feed.markAllFeedAsUnwatched()
+        } label: {
+            Label("Mark all as unwatched", systemImage: "checkmark.circle")
+        }
+    }
 }
 
 struct SubscriptionsView_Previews: PreviewProvider {

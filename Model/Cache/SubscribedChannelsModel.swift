@@ -70,6 +70,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                     if let channels: [Channel] = resource.typedContent() {
                         self.channels = channels
                         self.storeChannels(account: account, channels: channels)
+                        FeedModel.shared.calculateUnwatchedFeed()
                         onSuccess()
                     }
                 }

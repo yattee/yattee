@@ -3,6 +3,7 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct ChannelsView: View {
+    @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -23,6 +24,8 @@ struct ChannelsView: View {
                                 Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                             }
                         }
+                        .backport
+                        .badge(channelBadge(channel))
                     }
                     .contextMenu {
                         Button {
@@ -76,6 +79,14 @@ struct ChannelsView: View {
         #if os(tvOS)
         .padding(.horizontal, 30)
         #endif
+    }
+
+    func channelBadge(_ channel: Channel) -> Text? {
+        if let count = feed.unwatchedByChannel[accounts.current]?[channel.id] {
+            return Text(String(count))
+        }
+
+        return nil
     }
 
     var header: some View {
