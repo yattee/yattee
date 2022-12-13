@@ -1,11 +1,11 @@
 import Cache
+import Defaults
 import Foundation
 import Logging
 import SwiftyJSON
 
 struct FeedCacheModel: CacheModel {
     static let shared = FeedCacheModel()
-    static let limit = 30
     let logger = Logger(label: "stream.yattee.cache.feed")
 
     static let diskConfig = DiskConfig(name: "feed")
@@ -21,7 +21,7 @@ struct FeedCacheModel: CacheModel {
         let date = iso8601DateFormatter.string(from: Date())
         logger.info("caching feed \(account.feedCacheKey) -- \(date)")
         let feedTimeObject: JSON = ["date": date]
-        let videosObject: JSON = ["videos": videos.prefix(Self.limit).map { $0.json.object }]
+        let videosObject: JSON = ["videos": videos.prefix(cacheLimit).map { $0.json.object }]
         try? storage?.setObject(feedTimeObject, forKey: feedTimeCacheKey(account.feedCacheKey))
         try? storage?.setObject(videosObject, forKey: account.feedCacheKey)
     }
@@ -47,6 +47,15 @@ struct FeedCacheModel: CacheModel {
         }
 
         return nil
+    }
+
+    private var cacheLimit: Int {
+        let setting = Int(Defaults[.feedCacheSize]) ?? 0
+        if setting > 0 {
+            return setting
+        }
+
+        return 50
     }
 
     private func feedTimeCacheKey(_ feedCacheKey: String) -> String {

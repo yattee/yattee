@@ -6,6 +6,8 @@ struct FeedView: View {
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
 
+    @Default(.showCacheStatus) private var showCacheStatus
+
     #if os(tvOS)
         @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
     #endif
@@ -22,11 +24,19 @@ struct FeedView: View {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
                 #endif
 
-                Spacer()
+                if showCacheStatus {
+                    Spacer()
 
-                CacheStatusHeader(refreshTime: feed.formattedFeedTime, isLoading: feed.isLoading)
+                    CacheStatusHeader(
+                        refreshTime: feed.formattedFeedTime,
+                        isLoading: feed.isLoading
+                    )
+                }
 
                 #if os(tvOS)
+                    if !showCacheStatus {
+                        Spacer()
+                    }
                     Button {
                         feed.loadResources(force: true)
                     } label: {

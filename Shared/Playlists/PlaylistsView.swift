@@ -22,6 +22,7 @@ struct PlaylistsView: View {
     @Namespace private var focusNamespace
 
     @Default(.playlistListingStyle) private var playlistListingStyle
+    @Default(.showCacheStatus) private var showCacheStatus
 
     var items: [ContentItem] {
         var videos = currentPlaylist?.videos ?? []
@@ -77,13 +78,15 @@ struct PlaylistsView: View {
                                 Spacer()
                             #else
                                 VerticalCells(items: items) {
-                                    HStack {
-                                        Spacer()
+                                    if showCacheStatus {
+                                        HStack {
+                                            Spacer()
 
-                                        CacheStatusHeader(
-                                            refreshTime: cache.getFormattedPlaylistTime(account: accounts.current),
-                                            isLoading: model.isLoading
-                                        )
+                                            CacheStatusHeader(
+                                                refreshTime: cache.getFormattedPlaylistTime(account: accounts.current),
+                                                isLoading: model.isLoading
+                                            )
+                                        }
                                     }
                                 }
                                 .environment(\.scrollViewBottomPadding, 70)

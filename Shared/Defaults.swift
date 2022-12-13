@@ -202,6 +202,9 @@ extension Defaults.Keys {
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
 
+    static let showCacheStatus = Key<Bool>("showCacheStatus", default: false)
+    static let feedCacheSize = Key<String>("feedCacheSize", default: "50")
+
     static let subscriptionsViewPage = Key<SubscriptionsView.Page>("subscriptionsViewPage", default: .feed)
 
     static let subscriptionsListingStyle = Key<ListingStyle>("subscriptionsListingStyle", default: .cells)

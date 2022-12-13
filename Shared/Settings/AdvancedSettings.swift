@@ -6,8 +6,8 @@ struct AdvancedSettings: View {
     @Default(.mpvCacheSecs) private var mpvCacheSecs
     @Default(.mpvCachePauseWait) private var mpvCachePauseWait
     @Default(.mpvEnableLogging) private var mpvEnableLogging
-    @Default(.countryOfPublicInstances) private var countryOfPublicInstances
-    @Default(.instances) private var instances
+    @Default(.showCacheStatus) private var showCacheStatus
+    @Default(.feedCacheSize) private var feedCacheSize
 
     @State private var countries = [String]()
     @State private var filesToShare = [MPVClient.logFile]
@@ -32,9 +32,6 @@ struct AdvancedSettings: View {
                 .listStyle(.insetGrouped)
                 #endif
             #endif
-        }
-        .onChange(of: countryOfPublicInstances) { newCountry in
-            InstancesManifest.shared.setPublicAccount(newCountry, asCurrent: AccountsModel.shared.current?.isPublic ?? true)
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -85,9 +82,10 @@ struct AdvancedSettings: View {
             }
         }
 
-        Section(header: SettingsHeader(text: "Cache")) {
+        Section(header: SettingsHeader(text: "Cache"), footer: cacheSize) {
+            showCacheStatusToggle
+            feedCacheSizeTextField
             clearCacheButton
-            cacheSize
         }
     }
 
@@ -129,6 +127,22 @@ struct AdvancedSettings: View {
             }
         }
     #endif
+
+    private var feedCacheSizeTextField: some View {
+        HStack {
+            Text("Maximum feed items")
+                .frame(minWidth: 200, alignment: .leading)
+            TextField("Limit", text: $feedCacheSize)
+            #if !os(macOS)
+                .keyboardType(.numberPad)
+            #endif
+        }
+        .multilineTextAlignment(.trailing)
+    }
+
+    private var showCacheStatusToggle: some View {
+        Toggle("Show cache status", isOn: $showCacheStatus)
+    }
 
     private var clearCacheButton: some View {
         Button {

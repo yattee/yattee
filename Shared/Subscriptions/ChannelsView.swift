@@ -1,9 +1,12 @@
+import Defaults
 import SDWebImageSwiftUI
 import SwiftUI
 
 struct ChannelsView: View {
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
+
+    @Default(.showCacheStatus) private var showCacheStatus
 
     var body: some View {
         List {
@@ -81,14 +84,19 @@ struct ChannelsView: View {
                 SubscriptionsPageButton()
             #endif
 
-            Spacer()
+            if showCacheStatus {
+                Spacer()
 
-            CacheStatusHeader(
-                refreshTime: subscriptions.formattedCacheTime,
-                isLoading: subscriptions.isLoading
-            )
+                CacheStatusHeader(
+                    refreshTime: subscriptions.formattedCacheTime,
+                    isLoading: subscriptions.isLoading
+                )
+            }
 
             #if os(tvOS)
+                if !showCacheStatus {
+                    Spacer()
+                }
                 Button {
                     subscriptions.load(force: true)
                 } label: {
