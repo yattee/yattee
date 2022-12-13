@@ -1,0 +1,46 @@
+import Cache
+import Foundation
+import Logging
+import SwiftyJSON
+
+struct ChannelsCacheModel: CacheModel {
+    static let shared = ChannelsCacheModel()
+    let logger = Logger(label: "stream.yattee.cache.channels")
+
+    static let diskConfig = DiskConfig(name: "channels")
+    static let memoryConfig = MemoryConfig()
+
+    let storage = try? Storage<String, JSON>(
+        diskConfig: Self.diskConfig,
+        memoryConfig: Self.memoryConfig,
+        transformer: BaseCacheModel.jsonTransformer
+    )
+
+    func store(_ channel: Channel) {
+        guard channel.hasExtendedDetails else {
+            logger.warning("not caching \(channel.cacheKey)")
+            return
+        }
+
+        logger.info("caching \(channel.cacheKey)")
+        try? storage?.setObject(channel.json, forKey: channel.cacheKey)
+    }
+
+    func storeIfMissing(_ channel: Channel) {
+        guard let storage, !storage.objectExists(forKey: channel.cacheKey) else {
+            return
+        }
+
+        store(channel)
+    }
+
+    func retrieve(_ cacheKey: String) -> Channel? {
+        logger.info("retrieving cache for \(cacheKey)")
+
+        if let json = try? storage?.object(forKey: cacheKey) {
+            return Channel.from(json)
+        }
+
+        return nil
+    }
+}

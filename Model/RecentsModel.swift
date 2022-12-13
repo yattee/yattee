@@ -98,7 +98,7 @@ struct RecentItem: Defaults.Serializable, Identifiable {
             return nil
         }
 
-        return Channel(id: id, name: title)
+        return Channel(app: .invidious, id: id, name: title)
     }
 
     var playlist: ChannelPlaylist? {

@@ -64,6 +64,10 @@ struct Channel: Identifiable, Hashable {
         }
     }
 
+    var app: VideosApp
+    var instanceID: Instance.ID?
+    var instanceURL: URL?
+
     var id: String
     var name: String
     var bannerURL: URL?
@@ -112,14 +116,37 @@ struct Channel: Identifiable, Hashable {
 
     var json: JSON {
         [
+            "app": app.rawValue,
             "id": id,
             "name": name,
             "thumbnailURL": thumbnailURL?.absoluteString ?? ""
         ]
     }
 
+    var cacheKey: String {
+        switch app {
+        case .local:
+            return id
+        case .invidious:
+            return "youtube-\(id)"
+        case .piped:
+            return "youtube-\(id)"
+        case .peerTube:
+            return "peertube-\(instanceURL?.absoluteString ?? "unknown-instance")-\(id)"
+        }
+    }
+
+    var hasExtendedDetails: Bool {
+        thumbnailURL != nil
+    }
+
+    var thumbnailURLOrCached: URL? {
+        thumbnailURL ?? ChannelsCacheModel.shared.retrieve(cacheKey)?.thumbnailURL
+    }
+
     static func from(_ json: JSON) -> Self {
         .init(
+            app: VideosApp(rawValue: json["app"].stringValue) ?? .local,
             id: json["id"].stringValue,
             name: json["name"].stringValue,
             thumbnailURL: json["thumbnailURL"].url

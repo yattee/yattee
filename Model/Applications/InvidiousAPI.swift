@@ -519,6 +519,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         return Channel(
+            app: .invidious,
             id: json["authorId"].stringValue,
             name: json["author"].stringValue,
             bannerURL: json["authorBanners"].arrayValue.first?.dictionaryValue["url"]?.url,
@@ -666,7 +667,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             likeCount: details["likeCount"]?.int ?? 0,
             text: details["content"]?.string ?? "",
             repliesPage: details["replies"]?.dictionaryValue["continuation"]?.string,
-            channel: Channel(id: channelId, name: author)
+            channel: Channel(app: .invidious, id: channelId, name: author)
         )
     }
 

@@ -133,7 +133,18 @@ struct ChannelVideosView: View {
         }
         #endif
         .onAppear {
-            resource?.loadIfNeeded()
+            if let channel,
+               let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey),
+               store.item.isNil
+            {
+                store.replace(cache)
+            }
+
+            resource?.loadIfNeeded()?.onSuccess { response in
+                if let channel: Channel = response.typedContent() {
+                    ChannelsCacheModel.shared.store(channel)
+                }
+            }
         }
         .onChange(of: contentType) { _ in
             resource?.load()

@@ -121,7 +121,7 @@ struct FavoriteItemView: View {
         Group {
             switch item.section {
             case let .channel(_, id, name):
-                ChannelVideosView(channel: .init(id: id, name: name))
+                ChannelVideosView(channel: .init(app: .invidious, id: id, name: name))
             case let .channelPlaylist(_, id, title):
                 ChannelPlaylistView(playlist: .init(id: id, title: title))
             case let .playlist(_, id):
@@ -140,7 +140,7 @@ struct FavoriteItemView: View {
     func itemButtonAction() {
         switch item.section {
         case let .channel(_, id, name):
-            NavigationModel.shared.openChannel(.init(id: id, name: name), navigationStyle: navigationStyle)
+            NavigationModel.shared.openChannel(.init(app: .invidious, id: id, name: name), navigationStyle: navigationStyle)
         case let .channelPlaylist(_, id, title):
             NavigationModel.shared.openChannelPlaylist(.init(id: id, title: title), navigationStyle: navigationStyle)
         case .subscriptions:

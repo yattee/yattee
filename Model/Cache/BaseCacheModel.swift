@@ -14,6 +14,7 @@ struct BaseCacheModel {
         [
             FeedCacheModel.shared,
             VideosCacheModel.shared,
+            ChannelsCacheModel.shared,
             PlaylistsCacheModel.shared,
             ChannelPlaylistsCacheModel.shared,
             SubscribedChannelsModel.shared

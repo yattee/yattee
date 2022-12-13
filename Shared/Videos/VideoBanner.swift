@@ -74,8 +74,11 @@ struct VideoBanner: View {
 
                 HStack {
                     HStack {
-                        if !inChannelView {
-                            ThumbnailView(url: video?.channel.thumbnailURL)
+                        if !inChannelView,
+                           let video,
+                           let url = video.channel.thumbnailURLOrCached
+                        {
+                            ThumbnailView(url: url)
                                 .frame(width: 30, height: 30)
                                 .clipShape(Circle())
                         }

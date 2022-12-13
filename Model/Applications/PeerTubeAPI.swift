@@ -472,6 +472,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
 
     func extractChannel(from json: JSON) -> Channel {
         Channel(
+            app: .peerTube,
             id: json["id"].stringValue,
             name: json["name"].stringValue
         )
@@ -572,7 +573,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
             likeCount: details["likeCount"]?.int ?? 0,
             text: details["content"]?.string ?? "",
             repliesPage: details["replies"]?.dictionaryValue["continuation"]?.string,
-            channel: Channel(id: channelId, name: author)
+            channel: Channel(app: .peerTube, id: channelId, name: author)
         )
     }
 

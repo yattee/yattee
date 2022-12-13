@@ -69,6 +69,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                 .onSuccess { resource in
                     if let channels: [Channel] = resource.typedContent() {
                         self.channels = channels
+                        channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
                         self.storeChannels(account: account, channels: channels)
                         FeedModel.shared.calculateUnwatchedFeed()
                         onSuccess()
@@ -93,6 +94,8 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
         let date = iso8601DateFormatter.string(from: Date())
         logger.info("caching channels \(channelsDateCacheKey(account)) -- \(date)")
 
+        channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
+
         let dateObject: JSON = ["date": date]
         let channelsObject: JSON = ["channels": channels.map(\.json).map(\.object)]
 
@@ -106,7 +109,16 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
         if let json = try? storage?.object(forKey: channelsCacheKey(account)),
            let channels = json.dictionaryValue["channels"]
         {
-            return channels.arrayValue.map { Channel.from($0) }
+            return channels.arrayValue.map { json in
+                let channel = Channel.from(json)
+                if !channel.hasExtendedDetails,
+                   let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey)
+                {
+                    return cache
+                }
+
+                return channel
+            }
         }
 
         return []

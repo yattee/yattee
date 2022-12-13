@@ -166,8 +166,18 @@ struct VideoCell: View {
                     videoDetail(video.displayTitle, lineLimit: 5)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    if !channelOnThumbnail, !inChannelView {
-                        channelControl(badge: false)
+                    HStack(spacing: 12) {
+                        if !inChannelView,
+                           let video,
+                           let url = video.channel.thumbnailURLOrCached
+                        {
+                            ThumbnailView(url: url)
+                                .frame(width: 30, height: 30)
+                                .clipShape(Circle())
+                        }
+                        if !channelOnThumbnail, !inChannelView {
+                            channelControl(badge: false)
+                        }
                     }
 
                     if additionalDetailsAvailable {
@@ -271,6 +281,15 @@ struct VideoCell: View {
                 .padding(.bottom, 4)
 
                 HStack(spacing: 8) {
+                    if !inChannelView,
+                       let video,
+                       let url = video.channel.thumbnailURLOrCached
+                    {
+                        ThumbnailView(url: url)
+                            .frame(width: 30, height: 30)
+                            .clipShape(Circle())
+                    }
+
                     if let date = video.publishedDate {
                         HStack(spacing: 2) {
                             Text(date)
@@ -512,7 +531,7 @@ struct VideoCell_Preview: PreviewProvider {
         #if os(macOS)
         .frame(maxWidth: 300, maxHeight: 250)
         #elseif os(iOS)
-        .frame(maxWidth: 300, maxHeight: 200)
+        .frame(maxWidth: 600, maxHeight: 200)
         #endif
         .injectFixtureEnvironmentObjects()
     }

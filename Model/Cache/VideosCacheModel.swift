@@ -19,6 +19,8 @@ struct VideosCacheModel: CacheModel {
     func storeVideo(_ video: Video) {
         logger.info("caching \(video.cacheKey)")
         try? storage?.setObject(video.json, forKey: video.cacheKey)
+
+        ChannelsCacheModel.shared.storeIfMissing(video.channel)
     }
 
     func retrieveVideo(_ cacheKey: String) -> Video? {

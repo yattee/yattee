@@ -69,7 +69,7 @@ struct Video: Identifiable, Equatable, Hashable {
         views: Int = 0,
         description: String? = nil,
         genre: String? = nil,
-        channel: Channel = .init(id: "", name: ""),
+        channel: Channel? = nil,
         thumbnails: [Thumbnail] = [],
         indexID: String? = nil,
         live: Bool = false,
@@ -96,7 +96,7 @@ struct Video: Identifiable, Equatable, Hashable {
         self.views = views
         self.description = description
         self.genre = genre
-        self.channel = channel
+        self.channel = channel ?? .init(app: app, id: "", name: "")
         self.thumbnails = thumbnails
         self.indexID = indexID
         self.live = live

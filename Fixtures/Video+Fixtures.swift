@@ -20,6 +20,7 @@ extension Video {
             description: "Some relaxing live piano music",
             genre: "Music",
             channel: Channel(
+                app: .invidious,
                 id: fixtureChannelID,
                 name: "The Channel",
                 bannerURL: URL(string: bannerURL)!,

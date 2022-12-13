@@ -410,6 +410,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         } ?? [Channel.Tab]()
 
         return Channel(
+            app: .piped,
             id: id,
             name: name,
             bannerURL: attributes["bannerUrl"]?.url,
@@ -488,7 +489,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             published: published ?? "",
             views: details["views"]?.int ?? 0,
             description: description,
-            channel: Channel(id: channelId, name: author, thumbnailURL: authorThumbnailURL, subscriptionsCount: subscriptionsCount),
+            channel: Channel(app: .piped, id: channelId, name: author, thumbnailURL: authorThumbnailURL, subscriptionsCount: subscriptionsCount),
             thumbnails: thumbnails,
             live: live,
             likes: details["likes"]?.int,
@@ -667,7 +668,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             likeCount: details["likeCount"]?.int ?? 0,
             text: extractCommentText(from: details["commentText"]?.stringValue),
             repliesPage: details["repliesPage"]?.string,
-            channel: Channel(id: channelId, name: author)
+            channel: Channel(app: .piped, id: channelId, name: author)
         )
     }
 

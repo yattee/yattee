@@ -15,7 +15,7 @@ struct ChannelsView: View {
                 ForEach(subscriptions.all) { channel in
                     NavigationLink(destination: ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier())) {
                         HStack {
-                            if let url = channel.thumbnailURL {
+                            if let url = channel.thumbnailURLOrCached {
                                 ThumbnailView(url: url)
                                     .frame(width: 35, height: 35)
                                     .clipShape(RoundedRectangle(cornerRadius: 35))
