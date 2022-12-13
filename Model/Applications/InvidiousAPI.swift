@@ -460,10 +460,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func extractVideo(from json: JSON) -> Video {
         let indexID: String?
         var id: Video.ID
+        var published = json["publishedText"].stringValue
         var publishedAt: Date?
 
         if let publishedInterval = json["published"].double {
             publishedAt = Date(timeIntervalSince1970: publishedInterval)
+            published = ""
         }
 
         let videoID = json["videoId"].stringValue
@@ -486,7 +488,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             title: json["title"].stringValue,
             author: json["author"].stringValue,
             length: json["lengthSeconds"].doubleValue,
-            published: json["publishedText"].stringValue,
+            published: published,
             views: json["viewCount"].intValue,
             description: description,
             genre: json["genre"].stringValue,

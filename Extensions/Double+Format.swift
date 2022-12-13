@@ -19,7 +19,9 @@ extension Double {
         let date = Date(timeIntervalSince1970: self)
 
         let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .full
+        formatter.dateTimeStyle = .named
+        formatter.unitsStyle = .short
+        formatter.formattingContext = .standalone
 
         return formatter.localizedString(for: date, relativeTo: Date())
     }
