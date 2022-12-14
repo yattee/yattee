@@ -114,11 +114,11 @@ struct PlayerControls: View {
                                         Text(player.currentVideo?.displayAuthor ?? "")
                                             .fontWeight(.semibold)
                                             .shadow(radius: 10)
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(.init(white: 0.8))
                                             .font(.system(size: playerControlsLayout.authorLineFontSize))
                                             .lineLimit(1)
                                     }
-
+                                    .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .offset(y: -40)
                                 }

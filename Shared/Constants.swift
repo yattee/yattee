@@ -11,4 +11,20 @@ struct Constants {
             0.6
         #endif
     }
+
+    static var channelThumbnailSize: Double {
+        #if os(tvOS)
+            50
+        #else
+            30
+        #endif
+    }
+
+    static var channelDetailsStackSpacing: Double {
+        #if os(tvOS)
+            12
+        #else
+            6
+        #endif
+    }
 }

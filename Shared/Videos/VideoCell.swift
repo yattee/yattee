@@ -41,7 +41,7 @@ struct VideoCell: View {
         Button(action: playAction) {
             content
             #if os(tvOS)
-            .frame(width: 580, height: 470)
+            .frame(width: 580, height: channelOnThumbnail ? 470 : 500)
             #endif
         }
         .opacity(contentOpacity)
@@ -166,17 +166,22 @@ struct VideoCell: View {
                     videoDetail(video.displayTitle, lineLimit: 5)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    HStack(spacing: 12) {
+                    HStack(spacing: Constants.channelDetailsStackSpacing) {
                         if !inChannelView,
                            let video,
                            let url = video.channel.thumbnailURLOrCached
                         {
-                            ThumbnailView(url: url)
-                                .frame(width: 30, height: 30)
-                                .clipShape(Circle())
+                            ChannelLinkView(channel: video.channel) {
+                                ThumbnailView(url: url)
+                                    .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
+                                    .clipShape(Circle())
+                            }
                         }
+
                         if !channelOnThumbnail, !inChannelView {
-                            channelControl(badge: false)
+                            ChannelLinkView(channel: video.channel) {
+                                channelLabel(badge: false)
+                            }
                         }
                     }
 
@@ -259,14 +264,22 @@ struct VideoCell: View {
                         #if os(tvOS)
                             .frame(minHeight: 60, alignment: .top)
                         #elseif os(macOS)
-                            .frame(minHeight: 32, alignment: .top)
+                            .frame(minHeight: 35, alignment: .top)
                         #else
-                            .frame(minHeight: 40, alignment: .top)
+                            .frame(minHeight: 43, alignment: .top)
                         #endif
                         if !channelOnThumbnail, !inChannelView {
-                            channelControl(badge: false)
-                                .padding(.top, 4)
-                                .padding(.bottom, 6)
+                            ChannelLinkView(channel: video.channel) {
+                                HStack(spacing: Constants.channelDetailsStackSpacing) {
+                                    if let url = video.channel.thumbnailURLOrCached {
+                                        ThumbnailView(url: url)
+                                            .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
+                                            .clipShape(Circle())
+                                    }
+
+                                    channelLabel(badge: false)
+                                }
+                            }
                         }
                     }
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -274,20 +287,23 @@ struct VideoCell: View {
                 #if os(tvOS)
                 .frame(minHeight: channelOnThumbnail ? 80 : 120, alignment: .top)
                 #elseif os(macOS)
-                .frame(minHeight: 35, alignment: .top)
+                .frame(minHeight: channelOnThumbnail ? 52 : 75, alignment: .top)
                 #else
-                .frame(minHeight: 50, alignment: .top)
+                .frame(minHeight: channelOnThumbnail ? 50 : 70, alignment: .top)
                 #endif
                 .padding(.bottom, 4)
 
                 HStack(spacing: 8) {
-                    if !inChannelView,
+                    if channelOnThumbnail,
+                       !inChannelView,
                        let video,
                        let url = video.channel.thumbnailURLOrCached
                     {
-                        ThumbnailView(url: url)
-                            .frame(width: 30, height: 30)
-                            .clipShape(Circle())
+                        ChannelLinkView(channel: video.channel) {
+                            ThumbnailView(url: url)
+                                .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
+                                .clipShape(Circle())
+                        }
                     }
 
                     if let date = video.publishedDate {
@@ -314,7 +330,7 @@ struct VideoCell: View {
                 }
                 .lineLimit(1)
                 .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
+                .frame(maxWidth: .infinity, minHeight: 35, alignment: .topLeading)
                 #if os(tvOS)
                     .padding(.bottom, 10)
                 #endif
@@ -325,47 +341,6 @@ struct VideoCell: View {
                 .padding(.horizontal, horizontalCells ? 10 : 20)
             #endif
         }
-    }
-
-    @ViewBuilder private func channelControl(badge: Bool = true) -> some View {
-        if !video.channel.name.isEmpty {
-            #if os(tvOS)
-                channelButton(badge: badge)
-            #else
-                if navigationStyle == .tab {
-                    channelNavigationLink(badge: badge)
-                } else {
-                    channelButton(badge: badge)
-                }
-            #endif
-        }
-    }
-
-    @ViewBuilder private func channelNavigationLink(badge: Bool = true) -> some View {
-        NavigationLink(destination: ChannelVideosView(channel: video.channel)) {
-            channelLabel(badge: badge)
-        }
-    }
-
-    @ViewBuilder private func channelButton(badge: Bool = true) -> some View {
-        Button {
-            guard !inChannelView else {
-                return
-            }
-
-            NavigationModel.shared.openChannel(
-                video.channel,
-                navigationStyle: navigationStyle
-            )
-        } label: {
-            channelLabel(badge: badge)
-        }
-        #if os(tvOS)
-        .buttonStyle(.card)
-        #else
-        .buttonStyle(.plain)
-        #endif
-        .help("\(video.channel.name) Channel")
     }
 
     @ViewBuilder private func channelLabel(badge: Bool = true) -> some View {
@@ -415,7 +390,9 @@ struct VideoCell: View {
                     Spacer()
 
                     if channelOnThumbnail, !inChannelView {
-                        channelControl()
+                        ChannelLinkView(channel: video.channel) {
+                            channelLabel()
+                        }
                     }
                 }
                 #if os(tvOS)

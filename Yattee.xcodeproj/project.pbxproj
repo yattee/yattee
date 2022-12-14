@@ -171,6 +171,9 @@
 		37169AA62729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
 		37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37169AA52729E2CC0011DE61 /* AccountsBridge.swift */; };
+		3717407D2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */; };
+		3717407E2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */; };
+		3717407F2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */; };
 		3718B9A02921A9620003DB2E /* VideoDetailsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E80F3B287B107F00561799 /* VideoDetailsOverlay.swift */; };
 		3718B9A12921A9640003DB2E /* VideoDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFE26D2CA3700675966 /* VideoDetails.swift */; };
 		3718B9A22921A9670003DB2E /* VideoActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374924EF29216C630017D862 /* VideoActions.swift */; };
@@ -1144,6 +1147,7 @@
 		37152EE926EFEB95004FB96D /* LazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyView.swift; sourceTree = "<group>"; };
 		37169AA12729D98A0011DE61 /* InstancesBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesBridge.swift; sourceTree = "<group>"; };
 		37169AA52729E2CC0011DE61 /* AccountsBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsBridge.swift; sourceTree = "<group>"; };
+		3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelLinkView.swift; sourceTree = "<group>"; };
 		37192D5628B179D60012EEDD /* ChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChaptersView.swift; sourceTree = "<group>"; };
 		371B7E5B27596B8400D21217 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		371B7E602759706A00D21217 /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
@@ -2143,6 +2147,7 @@
 			children = (
 				3776924D294630110055EC18 /* ChannelAvatarView.swift */,
 				3743B86727216D3600261544 /* ChannelCell.swift */,
+				3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */,
 				37BDFF1A29487C5A000C6404 /* ChannelListItem.swift */,
 				37C3A24827235FAA0087A57A /* ChannelPlaylistCell.swift */,
 				37BDFF1E29488117000C6404 /* ChannelPlaylistListItem.swift */,
@@ -3079,6 +3084,7 @@
 				3722AEBC274DA396005EA4D6 /* Badge+Backport.swift in Sources */,
 				3748186626A7627F0084E870 /* Video+Fixtures.swift in Sources */,
 				37599F34272B44000087F250 /* FavoritesModel.swift in Sources */,
+				3717407D2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				37030FF727B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
 				37BA794726DC2E56002A0235 /* AppSidebarSubscriptions.swift in Sources */,
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
@@ -3484,6 +3490,7 @@
 				378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
+				3717407E2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				37FB28422721B22200A57617 /* ContentItem.swift in Sources */,
 				376CD21726FBE18D001E1AC1 /* Instance+Fixtures.swift in Sources */,
 				37B17DA1268A1F89006AEE9B /* VideoContextMenuView.swift in Sources */,
@@ -3694,6 +3701,7 @@
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
 				37130A61277657300033018A /* PersistenceController.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
+				3717407F2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */,
 				376A33E62720CB35000C1D6B /* Account.swift in Sources */,
 				3763C98B290C7A50004D3B5F /* OpenVideosView.swift in Sources */,

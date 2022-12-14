@@ -44,7 +44,7 @@ extension Defaults.Keys {
     #if os(iOS)
         static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
-    static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: true)
+    static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: false)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
     static let thumbnailsQuality = Key<ThumbnailsQuality>("thumbnailsQuality", default: .highest)

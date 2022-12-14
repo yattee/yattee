@@ -74,21 +74,22 @@ struct VideoBanner: View {
 
                 HStack {
                     HStack {
-                        if !inChannelView,
-                           let video,
-                           let url = video.channel.thumbnailURLOrCached
-                        {
-                            ThumbnailView(url: url)
-                                .frame(width: 30, height: 30)
-                                .clipShape(Circle())
-                        }
-
                         VStack(alignment: .leading) {
                             Group {
                                 if let video {
                                     if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
-                                        channelControl
-                                            .font(.subheadline)
+                                        ChannelLinkView(channel: video.channel) {
+                                            HStack(spacing: Constants.channelDetailsStackSpacing) {
+                                                if let url = video.channel.thumbnailURLOrCached {
+                                                    ThumbnailView(url: url)
+                                                        .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
+                                                        .clipShape(Circle())
+                                                }
+
+                                                channelLabel
+                                                    .font(.subheadline)
+                                            }
+                                        }
                                     } else {
                                         #if os(iOS)
                                             if DocumentsModel.shared.isDocument(video) {
@@ -220,7 +221,7 @@ struct VideoBanner: View {
 
     private var thumbnailWidth: Double {
         #if os(tvOS)
-            250
+            356
         #else
             120
         #endif
@@ -228,7 +229,7 @@ struct VideoBanner: View {
 
     private var thumbnailHeight: Double {
         #if os(tvOS)
-            140
+            200
         #else
             72
         #endif
@@ -308,50 +309,7 @@ struct VideoBanner: View {
         (progressViewValue / progressViewTotal) * 100 > Double(Defaults[.watchedThreshold])
     }
 
-    @ViewBuilder private var channelControl: some View {
-        if let video, !video.displayAuthor.isEmpty {
-            #if os(tvOS)
-                displayAuthor
-            #else
-                if navigationStyle == .tab, inNavigationView {
-                    channelNavigationLink
-                } else {
-                    channelButton
-                }
-            #endif
-        }
-    }
-
-    @ViewBuilder private var channelNavigationLink: some View {
-        if let channel = video?.channel {
-            NavigationLink(destination: ChannelVideosView(channel: channel)) {
-                displayAuthor
-            }
-        }
-    }
-
-    @ViewBuilder private var channelButton: some View {
-        if let video {
-            Button {
-                guard !inChannelView else { return }
-
-                NavigationModel.shared.openChannel(
-                    video.channel,
-                    navigationStyle: navigationStyle
-                )
-            } label: {
-                displayAuthor
-            }
-            #if os(tvOS)
-            .buttonStyle(.card)
-            #else
-            .buttonStyle(.plain)
-            #endif
-            .help("\(video.channel.name) Channel")
-        }
-    }
-
-    @ViewBuilder private var displayAuthor: some View {
+    @ViewBuilder private var channelLabel: some View {
         if let video, !video.displayAuthor.isEmpty {
             Text(video.displayAuthor)
                 .fontWeight(.semibold)
