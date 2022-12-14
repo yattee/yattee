@@ -158,20 +158,18 @@ final class FeedModel: ObservableObject, CacheModel {
         return (unwatched[account] ?? 0) > 0
     }
 
-    func markAllFeedAsUnwatched() {
-        guard accounts.current != nil else { return }
+    func canMarkChannelAsWatched(_ channelID: Channel.ID) -> Bool {
+        guard let account = accounts.current, accounts.signedIn else { return false }
+
+        return unwatchedByChannel[account]?.keys.contains(channelID) ?? false
+    }
+
+    func markChannelAsWatched(_ channelID: Channel.ID) {
+        guard accounts.signedIn else { return }
 
         let mark = { [weak self] in
-            self?.backgroundContext.perform { [weak self] in
-                guard let self else { return }
-
-                let watches = self.watchFetchRequestResult(self.videos, context: self.backgroundContext)
-                watches.forEach { self.backgroundContext.delete($0) }
-
-                try? self.backgroundContext.save()
-
-                self.calculateUnwatchedFeed()
-            }
+            guard let self else { return }
+            self.markVideos(self.videos.filter { $0.channel.id == channelID }, watched: true)
         }
 
         if videos.isEmpty {
@@ -181,10 +179,53 @@ final class FeedModel: ObservableObject, CacheModel {
         }
     }
 
-    func watchFetchRequestResult(_ videos: [Video], context: NSManagedObjectContext) -> [Watch] {
-        let watchFetchRequest = Watch.fetchRequest()
-        watchFetchRequest.predicate = NSPredicate(format: "videoID IN %@", videos.map(\.videoID) as [String])
-        return (try? context.fetch(watchFetchRequest)) ?? []
+    func markChannelAsUnwatched(_ channelID: Channel.ID) {
+        guard accounts.signedIn else { return }
+
+        let mark = { [weak self] in
+            guard let self else { return }
+            self.markVideos(self.videos.filter { $0.channel.id == channelID }, watched: false)
+        }
+
+        if videos.isEmpty {
+            loadCachedFeed { mark() }
+        } else {
+            mark()
+        }
+    }
+
+    func markAllFeedAsUnwatched() {
+        guard accounts.current != nil else { return }
+
+        let mark = { [weak self] in
+            guard let self else { return }
+            self.markVideos(self.videos, watched: false)
+        }
+
+        if videos.isEmpty {
+            loadCachedFeed { mark() }
+        } else {
+            mark()
+        }
+    }
+
+    func markVideos(_ videos: [Video], watched: Bool) {
+        guard accounts.signedIn, let account = accounts.current else { return }
+
+        backgroundContext.perform { [weak self] in
+            guard let self else { return }
+
+            if watched {
+                videos.forEach { Watch.markAsWatched(videoID: $0.videoID, account: account, duration: $0.length, context: self.backgroundContext) }
+            } else {
+                let watches = self.watchFetchRequestResult(videos, context: self.backgroundContext)
+                watches.forEach { self.backgroundContext.delete($0) }
+            }
+
+            try? self.backgroundContext.save()
+
+            self.calculateUnwatchedFeed()
+        }
     }
 
     func playUnwatchedFeed() {
@@ -246,5 +287,11 @@ final class FeedModel: ObservableObject, CacheModel {
         }
 
         return resource.loadIfNeeded()
+    }
+
+    private func watchFetchRequestResult(_ videos: [Video], context: NSManagedObjectContext) -> [Watch] {
+        let watchFetchRequest = Watch.fetchRequest()
+        watchFetchRequest.predicate = NSPredicate(format: "videoID IN %@", videos.map(\.videoID) as [String])
+        return (try? context.fetch(watchFetchRequest)) ?? []
     }
 }

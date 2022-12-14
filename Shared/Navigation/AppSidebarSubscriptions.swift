@@ -28,6 +28,10 @@ struct AppSidebarSubscriptions: View {
                     .badge(channelBadge(channel))
                 }
                 .contextMenu {
+                    if subscriptions.isSubscribing(channel.id) {
+                        toggleWatchedButton(channel)
+                    }
+
                     Button("Unsubscribe") {
                         navigation.presentUnsubscribeAlert(channel, subscriptions: subscriptions)
                     }
@@ -43,6 +47,31 @@ struct AppSidebarSubscriptions: View {
         }
 
         return nil
+    }
+
+    @ViewBuilder func toggleWatchedButton(_ channel: Channel) -> some View {
+        if feed.canMarkChannelAsWatched(channel.id) {
+            markChannelAsWatchedButton(channel)
+        } else {
+            markChannelAsUnwatchedButton(channel)
+        }
+    }
+
+    func markChannelAsWatchedButton(_ channel: Channel) -> some View {
+        Button {
+            feed.markChannelAsWatched(channel.id)
+        } label: {
+            Label("Mark channel feed as watched", systemImage: "checkmark.circle.fill")
+        }
+        .disabled(!feed.canMarkAllFeedAsWatched)
+    }
+
+    func markChannelAsUnwatchedButton(_ channel: Channel) -> some View {
+        Button {
+            feed.markChannelAsUnwatched(channel.id)
+        } label: {
+            Label("Mark channel feed as unwatched", systemImage: "checkmark.circle")
+        }
     }
 }
 

@@ -79,6 +79,10 @@ struct Sidebar: View {
                     }
                     .backport
                     .badge(subscriptionsBadge)
+                    .contextMenu {
+                        playUnwatchedButton
+                        toggleWatchedButton
+                    }
                     .id("subscriptions")
                 }
 
@@ -105,6 +109,40 @@ struct Sidebar: View {
                 .id("search")
                 .keyboardShortcut("f")
             }
+        }
+    }
+
+    var playUnwatchedButton: some View {
+        Button {
+            feed.playUnwatchedFeed()
+        } label: {
+            Label("Play all unwatched", systemImage: "play")
+        }
+        .disabled(!feed.canPlayUnwatchedFeed)
+    }
+
+    @ViewBuilder var toggleWatchedButton: some View {
+        if feed.canMarkAllFeedAsWatched {
+            markAllFeedAsWatchedButton
+        } else {
+            markAllFeedAsUnwatchedButton
+        }
+    }
+
+    var markAllFeedAsWatchedButton: some View {
+        Button {
+            feed.markAllFeedAsWatched()
+        } label: {
+            Label("Mark all as watched", systemImage: "checkmark.circle.fill")
+        }
+        .disabled(!feed.canMarkAllFeedAsWatched)
+    }
+
+    var markAllFeedAsUnwatchedButton: some View {
+        Button {
+            feed.markAllFeedAsUnwatched()
+        } label: {
+            Label("Mark all as unwatched", systemImage: "checkmark.circle")
         }
     }
 

@@ -23,6 +23,7 @@ struct ChannelVideosView: View {
     #endif
 
     @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var recents = RecentsModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
@@ -129,6 +130,10 @@ struct ChannelVideosView: View {
                         FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, presentedChannel.id, presentedChannel.name)))
                     }
                 }
+
+                ToolbarItem {
+                    toggleWatchedButton
+                }
             #endif
         }
         #endif
@@ -229,6 +234,10 @@ struct ChannelVideosView: View {
                     Section {
                         subscriptionToggleButton
                         FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, channel.id, channel.name)))
+                    }
+
+                    if subscriptions.isSubscribing(channel.id) {
+                        toggleWatchedButton
                     }
 
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
@@ -340,6 +349,35 @@ struct ChannelVideosView: View {
 
     private var navigationTitle: String {
         presentedChannel?.name ?? "No channel"
+    }
+
+    @ViewBuilder var toggleWatchedButton: some View {
+        if let channel = presentedChannel {
+            if feed.canMarkChannelAsWatched(channel.id) {
+                markChannelAsWatchedButton
+            } else {
+                markChannelAsUnwatchedButton
+            }
+        }
+    }
+
+    var markChannelAsWatchedButton: some View {
+        Button {
+            guard let channel = presentedChannel else { return }
+            feed.markChannelAsWatched(channel.id)
+        } label: {
+            Label("Mark channel feed as watched", systemImage: "checkmark.circle.fill")
+        }
+        .disabled(!feed.canMarkAllFeedAsWatched)
+    }
+
+    var markChannelAsUnwatchedButton: some View {
+        Button {
+            guard let channel = presentedChannel else { return }
+            feed.markChannelAsUnwatched(channel.id)
+        } label: {
+            Label("Mark channel feed as unwatched", systemImage: "checkmark.circle")
+        }
     }
 }
 
