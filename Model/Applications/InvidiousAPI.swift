@@ -34,30 +34,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func setAccount(_ account: Account) {
         self.account = account
 
-        wipeResources()
         configure()
-
-        if !account.anonymous {
-            validate()
-        }
-    }
-
-    func validate() {
-        validateSID()
-    }
-
-    func validateSID() {
-        guard signedIn, !(account.token?.isEmpty ?? true) else {
-            return
-        }
-
-        feed?
-            .load()
-            .onFailure { _ in
-                self.updateToken(force: true)
-            }
-
-        wipeResources()
     }
 
     func configure() {
@@ -162,7 +139,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return CommentsPage(comments: comments, nextPage: nextPage, disabled: disabled)
         }
 
-        updateToken()
+        if account.token.isNil || account.token!.isEmpty {
+            updateToken()
+        } else {
+            FeedModel.shared.onAccountChange()
+        }
     }
 
     func updateToken(force: Bool = false) {

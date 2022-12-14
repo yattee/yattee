@@ -22,10 +22,6 @@ struct FeedView: View {
             .onAppear {
                 feed.loadResources()
             }
-            .onChange(of: accounts.current) { _ in
-                feed.reset()
-                feed.loadResources(force: true)
-            }
         #if os(iOS)
             .refreshControl { refreshControl in
                 feed.loadResources(force: true) {

@@ -106,6 +106,12 @@ final class FeedModel: ObservableObject, CacheModel {
         loadFeed(force: true, paginating: true)
     }
 
+    func onAccountChange() {
+        reset()
+        loadResources(force: true)
+        calculateUnwatchedFeed()
+    }
+
     func calculateUnwatchedFeed() {
         guard let account = accounts.current, accounts.signedIn else { return }
         let feed = cacheModel.retrieveFeed(account: account)

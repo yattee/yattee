@@ -26,7 +26,6 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     func setAccount(_ account: Account) {
         self.account = account
 
-        wipeResources()
         configure()
     }
 
@@ -108,8 +107,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.compactMap { self.extractUserPlaylist(from: $0) }
         }
 
-        if account.token.isNil {
+        if account.token.isNil || account.token!.isEmpty {
             updateToken()
+        } else {
+            FeedModel.shared.loadResources(force: true)
         }
     }
 
