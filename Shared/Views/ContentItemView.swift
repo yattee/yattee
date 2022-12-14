@@ -71,6 +71,7 @@ struct ContentItemView: View {
     @ViewBuilder func placeholderItem() -> some View {
         if listingStyle == .cells {
             PlaceholderCell()
+                .id(item.id)
         } else {
             PlaceholderListItem()
             #if os(tvOS)

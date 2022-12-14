@@ -37,11 +37,7 @@ struct HorizontalCells: View {
     }
 
     var contentItems: [ContentItem] {
-        items.isEmpty ? placeholders : items
-    }
-
-    var placeholders: [ContentItem] {
-        (0 ..< 9).map { _ in .init() }
+        items.isEmpty ? ContentItem.placeholders : items
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {

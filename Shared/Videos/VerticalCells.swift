@@ -48,11 +48,7 @@ struct VerticalCells<Header: View>: View {
     }
 
     var contentItems: [ContentItem] {
-        items.isEmpty ? (allowEmpty ? items : placeholders) : items.sorted { $0 < $1 }
-    }
-
-    var placeholders: [ContentItem] {
-        (0 ..< 9).map { _ in .init() }
+        items.isEmpty ? (allowEmpty ? items : ContentItem.placeholders) : items.sorted { $0 < $1 }
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {

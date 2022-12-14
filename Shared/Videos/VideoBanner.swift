@@ -80,7 +80,7 @@ struct VideoBanner: View {
                                     if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
                                         ChannelLinkView(channel: video.channel) {
                                             HStack(spacing: Constants.channelDetailsStackSpacing) {
-                                                if let url = video.channel.thumbnailURLOrCached {
+                                                if let url = video.channel.thumbnailURLOrCached, video != .fixture {
                                                     ThumbnailView(url: url)
                                                         .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
                                                         .clipShape(Circle())

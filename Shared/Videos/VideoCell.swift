@@ -169,7 +169,8 @@ struct VideoCell: View {
                     HStack(spacing: Constants.channelDetailsStackSpacing) {
                         if !inChannelView,
                            let video,
-                           let url = video.channel.thumbnailURLOrCached
+                           let url = video.channel.thumbnailURLOrCached,
+                           video != .fixture
                         {
                             ChannelLinkView(channel: video.channel) {
                                 ThumbnailView(url: url)
@@ -271,7 +272,9 @@ struct VideoCell: View {
                         if !channelOnThumbnail, !inChannelView {
                             ChannelLinkView(channel: video.channel) {
                                 HStack(spacing: Constants.channelDetailsStackSpacing) {
-                                    if let url = video.channel.thumbnailURLOrCached {
+                                    if let url = video.channel.thumbnailURLOrCached,
+                                       video != .fixture
+                                    {
                                         ThumbnailView(url: url)
                                             .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
                                             .clipShape(Circle())
@@ -297,7 +300,8 @@ struct VideoCell: View {
                     if channelOnThumbnail,
                        !inChannelView,
                        let video,
-                       let url = video.channel.thumbnailURLOrCached
+                       let url = video.channel.thumbnailURLOrCached,
+                       video != .fixture
                     {
                         ChannelLinkView(channel: video.channel) {
                             ThumbnailView(url: url)

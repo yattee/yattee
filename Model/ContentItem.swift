@@ -20,6 +20,10 @@ struct ContentItem: Identifiable {
         }
     }
 
+    static var placeholders: [Self] {
+        (0 ..< 9).map { i in .init(id: String(i)) }
+    }
+
     var video: Video!
     var playlist: ChannelPlaylist!
     var channel: Channel!
