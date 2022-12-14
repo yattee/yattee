@@ -109,13 +109,12 @@ final class FeedModel: ObservableObject, CacheModel {
     func calculateUnwatchedFeed() {
         guard let account = accounts.current, accounts.signedIn else { return }
         let feed = cacheModel.retrieveFeed(account: account)
-        guard !feed.isEmpty else { return }
         backgroundContext.perform { [weak self] in
             guard let self else { return }
 
             let watched = self.watchFetchRequestResult(feed, context: self.backgroundContext).filter { $0.finished }
             let unwatched = feed.filter { video in !watched.contains { $0.videoID == video.videoID } }
-            let unwatchedCount = feed.count - watched.count
+            let unwatchedCount = max(0, feed.count - watched.count)
 
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
