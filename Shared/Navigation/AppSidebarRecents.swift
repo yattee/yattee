@@ -70,8 +70,18 @@ struct RecentNavigationLink<DestinationContent: View>: View {
             destination
         } label: {
             HStack {
-                Label(recent.title, systemImage: labelSystemImage)
-                    .lineLimit(1)
+                if recent.type == .channel,
+                   let channel = recent.channel,
+                   channel.thumbnailURLOrCached != nil
+                {
+                    ChannelAvatarView(channel: channel, subscribedBadge: false)
+                        .frame(width: 20, height: 20)
+
+                    Text(channel.name)
+                } else {
+                    Label(recent.title, systemImage: labelSystemImage)
+                        .lineLimit(1)
+                }
 
                 Spacer()
 

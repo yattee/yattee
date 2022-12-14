@@ -6,6 +6,7 @@ struct ChannelLinkView<ChannelLabel: View>: View {
     let channelLabel: ChannelLabel
 
     @Environment(\.inChannelView) private var inChannelView
+    @Environment(\.inNavigationView) private var inNavigationView
     @Environment(\.navigationStyle) private var navigationStyle
 
     init(
@@ -25,7 +26,7 @@ struct ChannelLinkView<ChannelLabel: View>: View {
             #if os(tvOS)
                 channelLabel
             #else
-                if navigationStyle == .tab {
+                if navigationStyle == .tab, inNavigationView {
                     channelNavigationLink
                 } else {
                     channelButton

@@ -13,7 +13,7 @@ struct ChannelAvatarView: View {
         ZStack(alignment: .bottomTrailing) {
             Group {
                 Group {
-                    if let url = channel?.thumbnailURL {
+                    if let url = channel?.thumbnailURLOrCached {
                         ThumbnailView(url: url)
                     } else {
                         ZStack {
