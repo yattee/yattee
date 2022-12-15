@@ -363,28 +363,39 @@ struct VideoCell: View {
             (!timeOnThumbnail && !videoDuration.isNil)
     }
 
+    private var showProgressView: Bool {
+        saveHistory && showWatchingProgress && ((watch?.finished ?? false) || watch?.progress ?? 0 > 0)
+    }
+
     private var thumbnail: some View {
         ZStack(alignment: .leading) {
             ZStack(alignment: .bottomLeading) {
                 thumbnailImage
-                if saveHistory, showWatchingProgress, watch?.progress ?? 0 > 0 {
-                    ProgressView(value: watch!.progress, total: 100)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
-                    #if os(tvOS)
-                        .padding(.horizontal, 16)
-                    #else
-                        .padding(.horizontal, 10)
-                    #endif
-                    #if os(macOS)
-                    .offset(x: 0, y: 4)
-                    #else
-                    .offset(x: 0, y: -3)
-                    #endif
-                }
+
+                ProgressView(value: watch?.progress ?? 0, total: 100)
+                    .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
+                #if os(tvOS)
+                    .padding(.horizontal, 16)
+                #else
+                    .padding(.horizontal, 10)
+                #endif
+                #if os(macOS)
+                .offset(x: 0, y: 4)
+                #else
+                .offset(x: 0, y: -3)
+                #endif
+                .opacity(showProgressView ? 1 : 0)
             }
 
             VStack {
                 HStack(alignment: .top) {
+                    if saveHistory,
+                       watchedVideoStyle.isShowingBadge,
+                       let video
+                    {
+                        WatchView(watch: watch, videoID: video.videoID, duration: video.length)
+                    }
+
                     if video.live {
                         DetailBadge(text: "Live", style: .outstanding)
                     } else if video.upcoming {
@@ -408,23 +419,6 @@ struct VideoCell: View {
                 Spacer()
 
                 HStack {
-                    if saveHistory,
-                       watchedVideoStyle.isShowingBadge,
-                       watch?.finished ?? false
-                    {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(Color(
-                                watchedVideoBadgeColor == .colorSchemeBased ? "WatchProgressBarColor" :
-                                    watchedVideoBadgeColor == .red ? "AppRedColor" : "AppBlueColor"
-                            ))
-                            .background(Color.white)
-                            .clipShape(Circle())
-                        #if os(tvOS)
-                            .font(.system(size: 40))
-                        #else
-                            .font(.system(size: 30))
-                        #endif
-                    }
                     Spacer()
 
                     if timeOnThumbnail,

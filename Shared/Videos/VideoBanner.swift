@@ -161,7 +161,7 @@ struct VideoBanner: View {
 
     @ViewBuilder private var smallThumbnail: some View {
         ZStack(alignment: .bottomTrailing) {
-            ZStack(alignment: .bottomLeading) {
+            ZStack(alignment: .topLeading) {
                 ZStack {
                     Color("PlaceholderColor")
 
@@ -178,17 +178,10 @@ struct VideoBanner: View {
 
                 if saveHistory,
                    watchedVideoStyle.isShowingBadge,
-                   watch?.finished ?? false
+                   let video
                 {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(Color(
-                            watchedVideoBadgeColor == .colorSchemeBased ? "WatchProgressBarColor" :
-                                watchedVideoBadgeColor == .red ? "AppRedColor" : "AppBlueColor"
-                        ))
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .imageScale(.medium)
-                        .offset(x: 5, y: -5)
+                    WatchView(watch: watch, videoID: video.videoID, duration: video.length)
+                        .offset(x: 2, y: 2)
                 }
             }
 

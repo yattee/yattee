@@ -102,8 +102,14 @@ extension PlayerModel {
     }
 
     func removeWatch(_ watch: Watch) {
-        context.delete(watch)
-        try? context.save()
+        context.perform { [weak self] in
+            guard let self else { return }
+            self.context.delete(watch)
+
+            try? self.context.save()
+
+            FeedModel.shared.calculateUnwatchedFeed()
+        }
     }
 
     func removeAllWatches() {

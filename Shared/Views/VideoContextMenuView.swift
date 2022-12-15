@@ -159,7 +159,6 @@ struct VideoContextMenuView: View {
         Button {
             guard let watch else { return }
             player.removeWatch(watch)
-            FeedModel.shared.calculateUnwatchedFeed()
         } label: {
             Label("Remove from history", systemImage: "delete.left.fill")
         }
