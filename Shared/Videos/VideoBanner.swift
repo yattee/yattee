@@ -38,11 +38,7 @@ struct VideoBanner: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .trailing, spacing: 2) {
                 smallThumbnail
-
-                #if !os(tvOS)
-                    progressView
-                #endif
-
+                
                 if !timeOnThumbnail, let timeLabel {
                     Text(timeLabel)
                         .font(.caption.monospacedDigit())
@@ -268,45 +264,6 @@ struct VideoBanner: View {
                 .padding(2)
                 .modifier(ControlBackgroundModifier())
         }
-    }
-
-    private var progressView: some View {
-        ProgressView(value: watchValue, total: progressViewTotal)
-            .progressViewStyle(.linear)
-            .frame(maxWidth: thumbnailWidth)
-            .opacity(showProgressView ? 1 : 0)
-            .frame(height: 12)
-    }
-
-    private var showProgressView: Bool {
-        guard playbackTime != nil,
-              let video,
-              !video.live
-        else {
-            return false
-        }
-
-        return true
-    }
-
-    private var watchValue: Double {
-        if finished { return progressViewTotal }
-
-        return progressViewValue
-    }
-
-    private var progressViewValue: Double {
-        guard videoDuration != 0 else { return 1 }
-        return [playbackTime?.seconds, videoDuration].compactMap { $0 }.min() ?? 0
-    }
-
-    private var progressViewTotal: Double {
-        guard videoDuration != 0 else { return 1 }
-        return videoDuration ?? video?.length ?? 1
-    }
-
-    private var finished: Bool {
-        (progressViewValue / progressViewTotal) * 100 > Double(Defaults[.watchedThreshold])
     }
 
     @ViewBuilder private var channelLabel: some View {
