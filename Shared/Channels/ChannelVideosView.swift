@@ -383,12 +383,7 @@ struct ChannelVideosView: View {
 
 struct ChannelVideosView_Previews: PreviewProvider {
     static var previews: some View {
-        ChannelVideosView(channel: Video.fixture.channel)
-            .environment(\.navigationStyle, .tab)
-            .injectFixtureEnvironmentObjects()
-
         NavigationView {
-            Spacer()
             ChannelVideosView(channel: Video.fixture.channel)
                 .environment(\.navigationStyle, .sidebar)
         }

@@ -58,7 +58,7 @@ struct ChannelPlaylistView: View {
                             .labelStyle(.iconOnly)
                     }
 
-                    playButton
+                    playButtons
                         .labelStyle(.iconOnly)
                 }
             #endif
@@ -105,7 +105,7 @@ struct ChannelPlaylistView: View {
 
                     favoriteButton
 
-                    playButton
+                    playButtons
                 }
             }
         }
@@ -122,6 +122,8 @@ struct ChannelPlaylistView: View {
     #if os(iOS)
         private var playlistMenu: some View {
             Menu {
+                playButtons
+
                 favoriteButton
 
                 ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
@@ -161,13 +163,13 @@ struct ChannelPlaylistView: View {
         #endif
     }
 
-    private var playButton: some View {
-        Button {
-            player.play(videos)
-        } label: {
-            Label("Play All", systemImage: "play")
-        }
-        .contextMenu {
+    private var playButtons: some View {
+        Group {
+            Button {
+                player.play(videos)
+            } label: {
+                Label("Play All", systemImage: "play")
+            }
             Button {
                 player.play(videos, shuffling: true)
             } label: {

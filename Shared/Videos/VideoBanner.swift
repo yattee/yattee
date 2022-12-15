@@ -38,7 +38,7 @@ struct VideoBanner: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .trailing, spacing: 2) {
                 smallThumbnail
-                
+
                 if !timeOnThumbnail, let timeLabel {
                     Text(timeLabel)
                         .font(.caption.monospacedDigit())

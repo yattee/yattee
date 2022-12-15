@@ -202,10 +202,16 @@ struct PlaylistsView: View {
 
     #if os(iOS)
         var playlistsMenu: some View {
-            Menu {
+            let title = currentPlaylist?.title ?? "Playlists"
+            return Menu {
+                Menu {
+                    selectPlaylistButton
+                } label: {
+                    Label(title, systemImage: "list.and.film")
+                }
                 Section {
                     if let currentPlaylist {
-                        playButton
+                        playButtons
 
                         editPlaylistButton
 
@@ -219,8 +225,6 @@ struct PlaylistsView: View {
                     newPlaylistButton
                 }
 
-                selectPlaylistButton
-
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
 
                 Section {
@@ -231,7 +235,7 @@ struct PlaylistsView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "list.and.film")
 
-                        Text(currentPlaylist?.title ?? "Playlists")
+                        Text(title)
                             .font(.headline)
                     }
                     .foregroundColor(.primary)
@@ -267,7 +271,7 @@ struct PlaylistsView: View {
                     FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
                         .labelStyle(.iconOnly)
 
-                    playButton
+                    playButtons
                 }
 
                 Spacer()
@@ -362,13 +366,13 @@ struct PlaylistsView: View {
         }
     }
 
-    private var playButton: some View {
-        Button {
-            player.play(items.compactMap(\.video))
-        } label: {
-            Label("Play", systemImage: "play")
-        }
-        .contextMenu {
+    private var playButtons: some View {
+        Group {
+            Button {
+                player.play(items.compactMap(\.video))
+            } label: {
+                Label("Play", systemImage: "play")
+            }
             Button {
                 player.play(items.compactMap(\.video), shuffling: true)
             } label: {
