@@ -110,9 +110,7 @@ struct TrendingView: View {
         .backport
         .refreshable {
             DispatchQueue.main.async {
-                resource.load().onFailure { error in
-                    NavigationModel.shared.presentAlert(title: "Could not refresh Trending", message: error.userMessage)
-                }
+                resource.load()
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -220,7 +218,7 @@ struct TrendingView: View {
             resource.removeObservers(ownedBy: store)
         }) {
             #if os(iOS)
-                Label("Switch country...", systemImage: "flag")
+                Label("Country", systemImage: "flag")
             #else
                 Text("\(country.flag) \(country.id)")
 
