@@ -169,18 +169,11 @@ struct SearchView: View {
         #endif
         #if os(iOS)
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarLeading) {
-                if !navigationBarHidden {
-                    Button(action: { NavigationModel.shared.presentingSettings = true }) {
-                        Image(systemName: "gearshape.2")
-                    }
-                }
+            ToolbarItem(placement: .navigationBarLeading) {
+                searchMenu
             }
             ToolbarItem(placement: .principal) {
-                HStack(spacing: 0) {
-                    searchMenu
-                    SearchTextField()
-                }
+                SearchTextField()
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -230,33 +223,6 @@ struct SearchView: View {
             }
         }
     #endif
-
-    private var navigationBarHidden: Bool {
-        if navigationStyle == .sidebar {
-            return true
-        }
-
-        let preferred = Defaults[.visibleSections]
-        var visibleSections = [VisibleSection]()
-
-        if accounts.app.supportsPopular && preferred.contains(.popular) {
-            visibleSections.append(.popular)
-        }
-
-        if accounts.app.supportsSubscriptions && accounts.signedIn && preferred.contains(.subscriptions) {
-            visibleSections.append(.subscriptions)
-        }
-
-        if accounts.app.supportsUserPlaylists && accounts.signedIn && preferred.contains(.playlists) {
-            visibleSections.append(.playlists)
-        }
-
-        if preferred.contains(.trending) {
-            visibleSections.append(.trending)
-        }
-
-        return !visibleSections.isEmpty || showHome
-    }
 
     private var results: some View {
         VStack {

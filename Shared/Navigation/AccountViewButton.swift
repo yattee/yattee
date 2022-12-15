@@ -15,12 +15,16 @@ struct AccountViewButton: View {
             Button {
                 navigation.presentingAccounts = true
             } label: {
-                HStack {
+                HStack(spacing: 6) {
                     if !accountPickerDisplaysUsername || !(model.current?.isPublic ?? true) {
-                        if let name = model.current?.app?.rawValue.capitalized {
-                            Image(name)
-                                .resizable()
-                                .frame(width: accountImageSize, height: accountImageSize)
+                        if #available(iOS 15, macOS 12, *) {
+                            if let name = model.current?.app?.rawValue.capitalized {
+                                Image(name)
+                                    .resizable()
+                                    .frame(width: accountImageSize, height: accountImageSize)
+                            } else {
+                                Image(systemName: "globe")
+                            }
                         } else {
                             Image(systemName: "globe")
                         }

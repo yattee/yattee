@@ -32,6 +32,7 @@ struct SearchTextField: View {
                     .frame(maxWidth: 190)
                     .textFieldStyle(.plain)
                 #else
+                    .frame(minWidth: 200)
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal, 5)
                     .padding(.trailing, state.queryText.isEmpty ? 0 : 10)
@@ -47,6 +48,7 @@ struct SearchTextField: View {
                 }
             }
         }
+        .transaction { t in t.animation = nil }
     }
 
     private var fieldBorder: some View {
