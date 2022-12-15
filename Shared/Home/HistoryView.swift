@@ -19,13 +19,13 @@ struct HistoryView: View {
                 }
             } else {
                 ForEach(visibleWatches, id: \.videoID) { watch in
-                    PlayerQueueRow(
-                        item: PlayerQueueItem.from(watch, video: player.historyVideo(watch.videoID)),
-                        history: true
-                    )
-                    .contextMenu {
-                        VideoContextMenuView(video: player.historyVideo(watch.videoID) ?? watch.video)
-                    }
+                    let video = player.historyVideo(watch.videoID) ?? watch.video
+
+                    ContentItemView(item: .init(video: video))
+                        .environment(\.listingStyle, .list)
+                        .contextMenu {
+                            VideoContextMenuView(video: video)
+                        }
                 }
             }
         }
