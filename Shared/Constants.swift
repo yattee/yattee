@@ -20,7 +20,7 @@ struct Constants {
         #endif
     }
 
-    static var recentsChannelThumbnailSize: Double {
+    static var sidebarChannelThumbnailSize: Double {
         #if os(macOS)
             20
         #else

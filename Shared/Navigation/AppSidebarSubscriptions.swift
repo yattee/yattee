@@ -17,7 +17,7 @@ struct AppSidebarSubscriptions: View {
                     HStack {
                         if channel.thumbnailURL != nil {
                             ChannelAvatarView(channel: channel, subscribedBadge: false)
-                                .frame(width: 20, height: 20)
+                                .frame(width: Constants.sidebarChannelThumbnailSize, height: Constants.sidebarChannelThumbnailSize)
 
                             Text(channel.name)
                         } else {
