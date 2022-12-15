@@ -19,7 +19,6 @@ struct AddToPlaylistView: View {
         Group {
             VStack {
                 header
-                Spacer()
                 if model.isEmpty {
                     emptyPlaylistsMessage
                 } else {
@@ -92,18 +91,23 @@ struct AddToPlaylistView: View {
                 #if os(tvOS)
                     selectPlaylistButton
                 #else
-                    Picker("Playlist", selection: $selectedPlaylistID) {
-                        ForEach(editablePlaylists) { playlist in
-                            Text(playlist.title).tag(playlist.id)
+                    HStack {
+                        Text("Playlist")
+                        Menu {
+                            Picker("Playlist", selection: $selectedPlaylistID) {
+                                ForEach(editablePlaylists) { playlist in
+                                    Text(playlist.title).tag(playlist.id)
+                                }
+                            }
+                        } label: {
+                            Text(selectedPlaylist?.title ?? "Select Playlist")
                         }
+                        .transaction { t in t.animation = nil }
+                        .frame(maxWidth: 500, alignment: .trailing)
+                        #if os(macOS)
+                            .labelsHidden()
+                        #endif
                     }
-                    .frame(maxWidth: 500)
-                    #if os(iOS)
-                        .pickerStyle(.inline)
-                    #elseif os(macOS)
-                        .labelsHidden()
-
-                    #endif
                 #endif
             }
         }
@@ -176,6 +180,8 @@ struct AddToPlaylistView: View {
 struct AddToPlaylistView_Previews: PreviewProvider {
     static var previews: some View {
         AddToPlaylistView(video: Video.fixture)
-            .injectFixtureEnvironmentObjects()
+            .onAppear {
+                PlaylistsModel.shared.playlists = [.fixture]
+            }
     }
 }
