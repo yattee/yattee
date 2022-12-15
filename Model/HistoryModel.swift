@@ -48,6 +48,10 @@ extension PlayerModel {
         let id = currentVideo.videoID
         let time = backend.currentTime
         let seconds = time?.seconds ?? 0
+        let duration = playerTime.duration.seconds
+        if seconds < 3 {
+            return
+        }
 
         let watchFetchRequest = Watch.fetchRequest()
         watchFetchRequest.predicate = NSPredicate(format: "videoID = %@", id as String)
@@ -64,8 +68,6 @@ extension PlayerModel {
             let duration = self.playerTime.duration.seconds
 
             if results?.isEmpty ?? true {
-                if seconds < 3, duration > 3 { return }
-
                 watch = Watch(context: self.backgroundContext)
                 watch.videoID = id
                 watch.appName = currentVideo.app.rawValue

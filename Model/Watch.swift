@@ -58,7 +58,7 @@ extension Watch {
 
     var progress: Double {
         guard videoDuration.isFinite, !videoDuration.isZero else {
-            return 0
+            return 100
         }
 
         let progress = (stoppedAt / videoDuration) * 100
