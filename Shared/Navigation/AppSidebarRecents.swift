@@ -75,7 +75,7 @@ struct RecentNavigationLink<DestinationContent: View>: View {
                    channel.thumbnailURLOrCached != nil
                 {
                     ChannelAvatarView(channel: channel, subscribedBadge: false)
-                        .frame(width: 20, height: 20)
+                        .frame(width: Constants.recentsChannelThumbnailSize, height: Constants.recentsChannelThumbnailSize)
 
                     Text(channel.name)
                 } else {

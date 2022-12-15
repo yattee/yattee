@@ -20,6 +20,14 @@ struct Constants {
         #endif
     }
 
+    static var recentsChannelThumbnailSize: Double {
+        #if os(macOS)
+            20
+        #else
+            30
+        #endif
+    }
+
     static var channelDetailsStackSpacing: Double {
         #if os(tvOS)
             12
