@@ -114,15 +114,6 @@ struct Channel: Identifiable, Hashable {
         return tabs.contains { $0.contentType == contentType }
     }
 
-    var json: JSON {
-        [
-            "app": app.rawValue,
-            "id": id,
-            "name": name,
-            "thumbnailURL": thumbnailURL?.absoluteString ?? ""
-        ]
-    }
-
     var cacheKey: String {
         switch app {
         case .local:
@@ -144,12 +135,23 @@ struct Channel: Identifiable, Hashable {
         thumbnailURL ?? ChannelsCacheModel.shared.retrieve(cacheKey)?.thumbnailURL
     }
 
+    var json: JSON {
+        [
+            "app": app.rawValue,
+            "id": id,
+            "name": name,
+            "thumbnailURL": thumbnailURL?.absoluteString ?? "",
+            "videos": videos.map { $0.json.object }
+        ]
+    }
+
     static func from(_ json: JSON) -> Self {
         .init(
             app: VideosApp(rawValue: json["app"].stringValue) ?? .local,
             id: json["id"].stringValue,
             name: json["name"].stringValue,
-            thumbnailURL: json["thumbnailURL"].url
+            thumbnailURL: json["thumbnailURL"].url,
+            videos: json["videos"].arrayValue.map { Video.from($0) }
         )
     }
 }
