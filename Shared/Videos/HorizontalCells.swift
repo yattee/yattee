@@ -49,7 +49,7 @@ struct HorizontalCells: View {
 
     var cellHeight: Double {
         #if os(tvOS)
-            560
+            600
         #else
             290 - (channelOnThumbnail ? 23 : 0)
         #endif
