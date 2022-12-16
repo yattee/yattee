@@ -136,9 +136,11 @@ struct ChannelPlaylistView: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    ThumbnailView(url: store.item?.thumbnailURL ?? playlist?.thumbnailURL)
-                        .frame(width: 60, height: 30)
-                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                    if let url = store.item?.thumbnailURL ?? playlist?.thumbnailURL {
+                        ThumbnailView(url: url)
+                            .frame(width: 60, height: 30)
+                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                    }
 
                     Text(label)
                         .font(.headline)
