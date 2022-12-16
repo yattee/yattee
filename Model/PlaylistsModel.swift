@@ -38,12 +38,14 @@ final class PlaylistsModel: ObservableObject {
     }
 
     func load(force: Bool = false, onSuccess: @escaping () -> Void = {}) {
-        guard accounts.app.supportsUserPlaylists, accounts.signedIn, let account = accounts.current else {
+        guard accounts.app.supportsUserPlaylists, let account = accounts.current else {
             playlists = []
             return
         }
 
         loadCachedPlaylists(account)
+
+        guard accounts.signedIn else { return }
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }

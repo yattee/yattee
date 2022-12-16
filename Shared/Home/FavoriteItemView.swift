@@ -45,21 +45,73 @@ struct FavoriteItemView: View {
                 .contentShape(Rectangle())
                 .onAppear {
                     resource?.addObserver(store)
-                    if item.section == .subscriptions {
-                        cacheFeed(resource?.loadIfNeeded())
-                    } else {
-                        resource?.loadIfNeeded()
-                    }
+                    loadCacheAndResource()
                 }
             }
         }
         .onChange(of: accounts.current) { _ in
             resource?.addObserver(store)
-            if item.section == .subscriptions {
-                cacheFeed(resource?.load())
-            } else {
-                resource?.load()
+            loadCacheAndResource(force: true)
+        }
+    }
+
+    func loadCacheAndResource(force: Bool = false) {
+        guard var resource else { return }
+
+        var onSuccess: (Entity<Any>) -> Void = { _ in }
+        var contentItems = [ContentItem]()
+
+        switch item.section {
+        case .subscriptions:
+            let feed = FeedCacheModel.shared.retrieveFeed(account: accounts.current)
+            contentItems = ContentItem.array(of: feed)
+
+            onSuccess = { response in
+                if let videos: [Video] = response.typedContent() {
+                    FeedCacheModel.shared.storeFeed(account: accounts.current, videos: videos)
+                }
             }
+        case let .channel(_, id, name):
+            let channel = Channel(app: .invidious, id: id, name: name)
+            if let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey) {
+                contentItems = ContentItem.array(of: cache.videos)
+            }
+
+            onSuccess = { response in
+                if let channel: Channel = response.typedContent() {
+                    ChannelsCacheModel.shared.store(channel)
+                }
+            }
+        case let .channelPlaylist(_, id, _):
+            if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(id),
+               !cache.videos.isEmpty
+            {
+                contentItems = ContentItem.array(of: cache.videos)
+            }
+
+            onSuccess = { response in
+                if let playlist: ChannelPlaylist = response.typedContent() {
+                    ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist)
+                }
+            }
+        case let .playlist(_, id):
+            let playlists = PlaylistsCacheModel.shared.retrievePlaylists(account: accounts.current)
+
+            if let playlist = playlists.first(where: { $0.id == id }) {
+                contentItems = ContentItem.array(of: playlist.videos)
+            }
+        default:
+            contentItems = []
+        }
+
+        if !contentItems.isEmpty {
+            store.contentItems = contentItems
+        }
+
+        if force {
+            resource.load().onSuccess(onSuccess)
+        } else {
+            resource.loadIfNeeded()?.onSuccess(onSuccess)
         }
     }
 
@@ -173,18 +225,10 @@ struct FavoriteItemView: View {
         .padding(.trailing, 10)
     }
 
-    private func cacheFeed(_ request: Request?) {
-        request?.onSuccess { response in
-            if let videos: [Video] = response.typedContent() {
-                FeedCacheModel.shared.storeFeed(account: accounts.current, videos: videos)
-            }
-        }
-    }
-
     private var isVisible: Bool {
         switch item.section {
         case .subscriptions:
-            return accounts.app.supportsSubscriptions && accounts.signedIn
+            return accounts.app.supportsSubscriptions
         case .popular:
             return accounts.app.supportsPopular
         case let .channel(appType, _, _):

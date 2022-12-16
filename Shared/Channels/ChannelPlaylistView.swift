@@ -67,12 +67,15 @@ struct ChannelPlaylistView: View {
         }
         .environment(\.listingStyle, channelPlaylistListingStyle)
         .onAppear {
-            if navigationStyle == .tab {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    resource?.loadIfNeeded()
+            if let playlist = presentedPlaylist,
+               let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist.id)
+            {
+                store.replace(cache)
+            }
+            resource?.loadIfNeeded()?.onSuccess { response in
+                if let playlist: ChannelPlaylist = response.typedContent() {
+                    ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist)
                 }
-            } else {
-                resource?.loadIfNeeded()
             }
         }
         #if os(tvOS)

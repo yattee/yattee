@@ -40,7 +40,7 @@ struct Playlist: Identifiable, Equatable, Hashable {
     }
 
     var json: JSON {
-        return [
+        [
             "id": id,
             "title": title,
             "visibility": visibility.rawValue,
@@ -51,7 +51,7 @@ struct Playlist: Identifiable, Equatable, Hashable {
     }
 
     static func from(_ json: JSON) -> Self {
-        return .init(
+        .init(
             id: json["id"].stringValue,
             title: json["title"].stringValue,
             visibility: .init(rawValue: json["visibility"].stringValue) ?? .public,
