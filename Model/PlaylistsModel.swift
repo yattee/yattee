@@ -9,6 +9,7 @@ final class PlaylistsModel: ObservableObject {
     @Published var isLoading = false
     @Published var playlists = [Playlist]()
     @Published var reloadPlaylists = false
+    @Published var error: RequestError?
 
     var accounts = AccountsModel.shared
 
@@ -60,16 +61,14 @@ final class PlaylistsModel: ObservableObject {
                     self?.isLoading = false
                 }
                 .onSuccess { resource in
+                    self.error = nil
                     if let playlists: [Playlist] = resource.typedContent() {
                         self.playlists = playlists
                         PlaylistsCacheModel.shared.storePlaylist(account: account, playlists: playlists)
                         onSuccess()
                     }
                 }
-                .onFailure { error in
-                    self.playlists = []
-                    NavigationModel.shared.presentAlert(title: "Could not refresh Playlists", message: error.userMessage)
-                }
+                .onFailure { self.error = $0 }
         }
     }
 

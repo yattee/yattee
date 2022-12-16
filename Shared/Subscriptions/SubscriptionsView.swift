@@ -1,4 +1,5 @@
 import Defaults
+import Siesta
 import SwiftUI
 
 struct SubscriptionsView: View {
@@ -11,6 +12,7 @@ struct SubscriptionsView: View {
     @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
 
     @ObservedObject private var feed = FeedModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
 
     var body: some View {
         SignInRequiredView(title: "Subscriptions".localized()) {
@@ -32,6 +34,10 @@ struct SubscriptionsView: View {
                 ToolbarItem(placement: .principal) {
                     subscriptionsMenu
                 }
+
+                ToolbarItem {
+                    RequestErrorButton(error: requestError)
+                }
             }
         #endif
         #if os(macOS)
@@ -49,6 +55,10 @@ struct SubscriptionsView: View {
             }
         }
         #endif
+    }
+
+    var requestError: RequestError? {
+        subscriptionsViewPage == .channels ? subscriptions.error : feed.error
     }
 
     #if os(iOS)

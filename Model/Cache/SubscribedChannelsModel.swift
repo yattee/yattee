@@ -20,6 +20,8 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
 
     @Published var isLoading = false
     @Published var channels = [Channel]()
+    @Published var error: RequestError?
+
     var accounts: AccountsModel { .shared }
 
     var resource: Resource? {
@@ -67,6 +69,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                     self?.isLoading = false
                 }
                 .onSuccess { resource in
+                    self.error = nil
                     if let channels: [Channel] = resource.typedContent() {
                         self.channels = channels
                         channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
@@ -75,9 +78,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                         onSuccess()
                     }
                 }
-                .onFailure { _ in
-                    self.channels = []
-                }
+                .onFailure { self.error = $0 }
         }
     }
 

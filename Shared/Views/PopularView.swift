@@ -7,6 +7,8 @@ struct PopularView: View {
 
     @ObservedObject private var accounts = AccountsModel.shared
 
+    @State private var error: RequestError?
+
     @Default(.popularListingStyle) private var popularListingStyle
 
     var resource: Resource? {
@@ -21,7 +23,9 @@ struct PopularView: View {
         VerticalCells(items: videos)
             .onAppear {
                 resource?.addObserver(store)
-                resource?.loadIfNeeded()
+                resource?.loadIfNeeded()?
+                    .onFailure { self.error = $0 }
+                    .onSuccess { _ in self.error = nil }
             }
             .environment(\.listingStyle, popularListingStyle)
         #if !os(tvOS)
@@ -29,6 +33,8 @@ struct PopularView: View {
             .background(
                 Button("Refresh") {
                     resource?.load()
+                        .onFailure { self.error = $0 }
+                        .onSuccess { _ in self.error = nil }
                 }
                 .keyboardShortcut("r")
                 .opacity(0)
@@ -45,14 +51,15 @@ struct PopularView: View {
             resource?.load().onCompletion { _ in
                 refreshControl.endRefreshing()
             }
-            .onFailure { error in
-                NavigationModel.shared.presentAlert(title: "Could not refresh Popular", message: error.userMessage)
-            }
+            .onFailure { self.error = $0 }
+            .onSuccess { _ in self.error = nil }
         }
         .backport
         .refreshable {
             DispatchQueue.main.async {
                 resource?.load()
+                    .onFailure { self.error = $0 }
+                    .onSuccess { _ in self.error = nil }
             }
         }
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
@@ -65,7 +72,9 @@ struct PopularView: View {
         }
         #else
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    resource?.loadIfNeeded()
+                    resource?.loadIfNeeded()?
+                        .onFailure { self.error = $0 }
+                        .onSuccess { _ in self.error = nil }
                 }
         #endif
     }

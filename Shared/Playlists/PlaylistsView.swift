@@ -15,8 +15,9 @@ struct PlaylistsView: View {
     @StateObject private var userPlaylist = Store<Playlist>()
 
     @ObservedObject private var accounts = AccountsModel.shared
-    private var player = PlayerModel.shared
     @ObservedObject private var model = PlaylistsModel.shared
+
+    private var player = PlayerModel.shared
     private var cache = PlaylistsCacheModel.shared
 
     @Namespace private var focusNamespace
@@ -129,6 +130,10 @@ struct PlaylistsView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem {
+                RequestErrorButton(error: model.error)
+            }
+
             ToolbarItem(placement: .principal) {
                 playlistsMenu
             }

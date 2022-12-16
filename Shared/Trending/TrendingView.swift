@@ -21,6 +21,8 @@ struct TrendingView: View {
         ContentItem.array(of: store.collection)
     }
 
+    @State private var error: RequestError?
+
     init(_ videos: [Video] = [Video]()) {
         self.videos = videos
     }
@@ -52,6 +54,9 @@ struct TrendingView: View {
         }
 
         .toolbar {
+            ToolbarItem {
+                RequestErrorButton(error: error)
+            }
             #if os(macOS)
                 ToolbarItemGroup {
                     if let favoriteItem {
@@ -68,15 +73,14 @@ struct TrendingView: View {
         }
         .onChange(of: resource) { _ in
             resource.load()
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
             updateFavoriteItem()
         }
         .onAppear {
-            if videos.isEmpty {
-                resource.addObserver(store)
-                resource.loadIfNeeded()
-            } else {
-                store.replace(videos)
-            }
+            resource.loadIfNeeded()?
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
 
             updateFavoriteItem()
         }
@@ -95,6 +99,8 @@ struct TrendingView: View {
                 .background(
                     Button("Refresh") {
                         resource.load()
+                            .onFailure { self.error = $0 }
+                            .onSuccess { _ in self.error = nil }
                     }
                     .keyboardShortcut("r")
                     .opacity(0)
@@ -111,6 +117,8 @@ struct TrendingView: View {
         .refreshable {
             DispatchQueue.main.async {
                 resource.load()
+                    .onFailure { self.error = $0 }
+                    .onSuccess { _ in self.error = nil }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -128,7 +136,9 @@ struct TrendingView: View {
         }
         #else
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    resource.loadIfNeeded()
+                    resource.loadIfNeeded()?
+                        .onFailure { self.error = $0 }
+                        .onSuccess { _ in self.error = nil }
                 }
         #endif
     }

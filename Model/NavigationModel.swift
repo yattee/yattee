@@ -1,4 +1,5 @@
 import Foundation
+import Siesta
 import SwiftUI
 
 final class NavigationModel: ObservableObject {
@@ -255,6 +256,11 @@ final class NavigationModel: ObservableObject {
         let message = message.isNil ? nil : Text(message!)
         alert = Alert(title: Text(title), message: message)
         presentingAlert = true
+    }
+
+    func presentRequestErrorAlert(_ error: RequestError) {
+        let errorDescription = String(format: "Verify you have stable connection with the server you are using (%@)", AccountsModel.shared.current.instance.longDescription)
+        presentAlert(title: "Connection Error", message: "\(error.userMessage)\n\n\(errorDescription)")
     }
 
     func presentAlert(_ alert: Alert) {

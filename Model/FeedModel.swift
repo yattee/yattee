@@ -18,6 +18,8 @@ final class FeedModel: ObservableObject, CacheModel {
 
     var storage: Storage<String, JSON>?
 
+    @Published var error: RequestError?
+
     private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
     var feed: Resource? {
@@ -79,6 +81,7 @@ final class FeedModel: ObservableObject, CacheModel {
                     onCompletion()
                 }
                 .onSuccess { response in
+                    self.error = nil
                     if let videos: [Video] = response.typedContent() {
                         if paginating {
                             self.videos.append(contentsOf: videos)
@@ -89,9 +92,7 @@ final class FeedModel: ObservableObject, CacheModel {
                         }
                     }
                 }
-                .onFailure { error in
-                    NavigationModel.shared.presentAlert(title: "Could not refresh Subscriptions", message: error.userMessage)
-                }
+                .onFailure { self.error = $0 }
         }
     }
 
