@@ -250,12 +250,18 @@ struct VideoBanner: View {
     }
 
     @ViewBuilder private var timeView: some View {
-        if let timeLabel {
-            Text(timeLabel)
-                .font(.caption2.weight(.semibold).monospacedDigit())
-                .allowsTightening(true)
-                .padding(2)
-                .modifier(ControlBackgroundModifier())
+        VStack(alignment: .trailing, spacing: 2) {
+            PlayingIndicatorView(video: video, height: 10)
+                .frame(width: 12, alignment: .trailing)
+                .padding(.trailing, 3)
+
+            if let timeLabel {
+                Text(timeLabel)
+                    .font(.caption2.weight(.semibold).monospacedDigit())
+                    .allowsTightening(true)
+                    .padding(2)
+                    .modifier(ControlBackgroundModifier())
+            }
         }
     }
 

@@ -418,14 +418,19 @@ struct VideoCell: View {
 
                 Spacer()
 
-                HStack {
-                    Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    PlayingIndicatorView(video: video, height: 20)
+                        .frame(width: 15, alignment: .trailing)
+                        .padding(.trailing, 3)
+                    HStack {
+                        Spacer()
 
-                    if timeOnThumbnail,
-                       !video.live,
-                       let time
-                    {
-                        DetailBadge(text: time, style: .prominent)
+                        if timeOnThumbnail,
+                           !video.live,
+                           let time
+                        {
+                            DetailBadge(text: time, style: .prominent)
+                        }
                     }
                 }
                 #if os(tvOS)

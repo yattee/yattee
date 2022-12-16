@@ -191,6 +191,9 @@
 		371AC0AC294D1A490085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0AB294D1A490085989E /* CachedAsyncImage */; };
 		371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0B1294D1C230085989E /* CachedAsyncImage */; };
 		371AC0B4294D1C290085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0B3294D1C290085989E /* CachedAsyncImage */; };
+		371AC0B6294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC0B5294D1D6E0085989E /* PlayingIndicatorView.swift */; };
+		371AC0B7294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC0B5294D1D6E0085989E /* PlayingIndicatorView.swift */; };
+		371AC0B8294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC0B5294D1D6E0085989E /* PlayingIndicatorView.swift */; };
 		371B7E5C27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5D27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5E27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
@@ -1162,6 +1165,7 @@
 		3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelLinkView.swift; sourceTree = "<group>"; };
 		37192D5628B179D60012EEDD /* ChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChaptersView.swift; sourceTree = "<group>"; };
 		371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwatchedFeedCountModel.swift; sourceTree = "<group>"; };
+		371AC0B5294D1D6E0085989E /* PlayingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingIndicatorView.swift; sourceTree = "<group>"; };
 		371B7E5B27596B8400D21217 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		371B7E602759706A00D21217 /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		371B7E652759786B00D21217 /* Comment+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comment+Fixtures.swift"; sourceTree = "<group>"; };
@@ -1846,6 +1850,7 @@
 				37FEF11227EFD8580033912F /* PlaceholderCell.swift */,
 				3710A55429488C7D006F8025 /* PlaceholderListItem.swift */,
 				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
+				371AC0B5294D1D6E0085989E /* PlayingIndicatorView.swift */,
 				37AAF27D26737323007FC770 /* PopularView.swift */,
 				3786D05D294C737300D23E82 /* RequestErrorButton.swift */,
 				371CC76F29468BDC00979C1A /* SettingsButtons.swift */,
@@ -3247,6 +3252,7 @@
 				37F4AD1B28612B23004D0F66 /* OpeningStream.swift in Sources */,
 				373CFAEB26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				372915E62687E3B900F5A35B /* Defaults.swift in Sources */,
+				371AC0B6294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */,
 				37E084AC2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */,
 				378E9C38294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				37732FF42703D32400F04329 /* Sidebar.swift in Sources */,
@@ -3346,6 +3352,7 @@
 				371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
 				37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */,
 				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
+				371AC0B7294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */,
 				37E80F3D287B107F00561799 /* VideoDetailsOverlay.swift in Sources */,
 				37DD9DBB2785D60300539416 /* FramePreferenceKey.swift in Sources */,
 				375DFB5926F9DA010013F468 /* InstancesModel.swift in Sources */,
@@ -3786,6 +3793,7 @@
 				379775952689365600DD52A8 /* Array+Next.swift in Sources */,
 				3752069F285E910600CA655F /* ChapterView.swift in Sources */,
 				37F4AD1D28612B23004D0F66 /* OpeningStream.swift in Sources */,
+				371AC0B8294D1D6E0085989E /* PlayingIndicatorView.swift in Sources */,
 				37270F1E28E06E3E00856150 /* String+Localizable.swift in Sources */,
 				3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */,
 				375B8AB528B580D300397B31 /* KeychainModel.swift in Sources */,
