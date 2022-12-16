@@ -7,7 +7,9 @@ final class ThumbnailsModel: ObservableObject {
     @Published var unloadable = Set<URL>()
 
     func insertUnloadable(_ url: URL) {
-        unloadable.insert(url)
+        DispatchQueue.main.async {
+            self.unloadable.insert(url)
+        }
     }
 
     func isUnloadable(_ url: URL!) -> Bool {

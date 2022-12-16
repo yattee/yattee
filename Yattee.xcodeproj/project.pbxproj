@@ -188,6 +188,9 @@
 		371AC09F294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
 		371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
 		371AC0A1294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
+		371AC0AC294D1A490085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0AB294D1A490085989E /* CachedAsyncImage */; };
+		371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0B1294D1C230085989E /* CachedAsyncImage */; };
+		371AC0B4294D1C290085989E /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 371AC0B3294D1C290085989E /* CachedAsyncImage */; };
 		371B7E5C27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5D27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5E27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
@@ -1511,6 +1514,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37C2212B27ADA43700305B41 /* VideoToolbox.framework in Frameworks */,
+				371AC0AC294D1A490085989E /* CachedAsyncImage in Frameworks */,
 				3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
 				3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
 				3799AC0928B03CED001376F9 /* ActiveLabel in Frameworks */,
@@ -1579,6 +1583,7 @@
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
 				370F4FCB27CC16CB001B35DC /* libxcb.1.1.0.dylib in Frameworks */,
 				3703206427D2BB30007A0CB8 /* Logging in Frameworks */,
+				371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */,
 				370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */,
 				370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */,
 				3703206627D2BB35007A0CB8 /* PINCache in Frameworks */,
@@ -1635,6 +1640,7 @@
 				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				377F9F76294403880043F856 /* Cache in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
+				371AC0B4294D1C290085989E /* CachedAsyncImage in Frameworks */,
 				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
 				3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */,
@@ -2564,6 +2570,7 @@
 				375B8AB028B57F4200397B31 /* KeychainAccess */,
 				3797104828D3D10600D5F53C /* SDWebImageSwiftUI */,
 				377F9F73294403770043F856 /* Cache */,
+				371AC0AB294D1A490085989E /* CachedAsyncImage */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2601,6 +2608,7 @@
 				375B8AB628B583BD00397B31 /* KeychainAccess */,
 				3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */,
 				374D11E62943C56300CB4350 /* Cache */,
+				371AC0B1294D1C230085989E /* CachedAsyncImage */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2679,6 +2687,7 @@
 				3732BFCF28B83763009F3F4D /* KeychainAccess */,
 				3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */,
 				377F9F75294403880043F856 /* Cache */,
+				371AC0B3294D1C290085989E /* CachedAsyncImage */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2788,6 +2797,7 @@
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */,
+				371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4679,6 +4689,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		372915E22687E33E00F5A35B /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
@@ -4857,6 +4875,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		371AC0AB294D1A490085989E /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
+		};
+		371AC0B1294D1C230085989E /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
+		};
+		371AC0B3294D1C290085989E /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
 		};
 		372915E32687E33E00F5A35B /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
