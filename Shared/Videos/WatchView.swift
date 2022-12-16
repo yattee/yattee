@@ -42,6 +42,8 @@ struct WatchView: View {
         } else {
             Watch.markAsWatched(videoID: watch?.videoID ?? videoID, account: AccountsModel.shared.current, duration: watch?.videoDuration ?? duration, context: backgroundContext)
         }
+
+        FeedModel.shared.calculateUnwatchedFeed()
     }
 
     var imageSystemName: String {

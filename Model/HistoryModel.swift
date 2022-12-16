@@ -107,6 +107,8 @@ extension PlayerModel {
             self.context.delete(watch)
 
             try? self.context.save()
+
+            FeedModel.shared.calculateUnwatchedFeed()
         }
     }
 
