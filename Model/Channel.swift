@@ -140,7 +140,12 @@ struct Channel: Identifiable, Hashable {
             "app": app.rawValue,
             "id": id,
             "name": name,
-            "thumbnailURL": thumbnailURL?.absoluteString ?? "",
+            "bannerURL": bannerURL?.absoluteString as Any,
+            "thumbnailURL": thumbnailURL?.absoluteString as Any,
+            "subscriptionsCount": subscriptionsCount as Any,
+            "subscriptionsText": subscriptionsText as Any,
+            "totalViews": totalViews as Any,
+            "verified": verified as Any,
             "videos": videos.map { $0.json.object }
         ]
     }
@@ -150,7 +155,11 @@ struct Channel: Identifiable, Hashable {
             app: VideosApp(rawValue: json["app"].stringValue) ?? .local,
             id: json["id"].stringValue,
             name: json["name"].stringValue,
+            bannerURL: json["bannerURL"].url,
             thumbnailURL: json["thumbnailURL"].url,
+            subscriptionsCount: json["subscriptionsCount"].int,
+            subscriptionsText: json["subscriptionsText"].string,
+            totalViews: json["totalViews"].int,
             videos: json["videos"].arrayValue.map { Video.from($0) }
         )
     }
