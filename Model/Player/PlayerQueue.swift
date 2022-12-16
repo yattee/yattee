@@ -338,7 +338,12 @@ extension PlayerModel {
             alert = Alert(
                 title: Text("Could not load video"),
                 message: Text(message),
-                primaryButton: .cancel(),
+                primaryButton: .cancel { [weak self] in
+                    guard let self else { return }
+                    self.advancing = false
+                    self.videoBeingOpened = nil
+                    self.currentItem = nil
+                },
                 secondaryButton: retryButton
             )
         } else {
@@ -346,8 +351,5 @@ extension PlayerModel {
         }
 
         navigation.presentAlert(alert)
-        advancing = false
-        videoBeingOpened = nil
-        currentItem = nil
     }
 }
