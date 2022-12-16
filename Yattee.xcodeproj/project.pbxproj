@@ -447,9 +447,9 @@
 		3761ABFF26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */; };
 		3763495126DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */; };
 		3763495226DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */; };
-		37635FE4291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */; };
-		37635FE5291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */; };
-		37635FE6291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */; };
+		37635FE4291EA6CF00C11E79 /* AccentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* AccentButton.swift */; };
+		37635FE5291EA6CF00C11E79 /* AccentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* AccentButton.swift */; };
+		37635FE6291EA6CF00C11E79 /* AccentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37635FE3291EA6CF00C11E79 /* AccentButton.swift */; };
 		3763C989290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
 		3763C98A290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
 		3763C98B290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
@@ -1264,7 +1264,7 @@
 		375F740F289DC35A00747050 /* PlayerBackendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBackendView.swift; sourceTree = "<group>"; };
 		3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnvironmentValues.swift; sourceTree = "<group>"; };
 		3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarRecents.swift; sourceTree = "<group>"; };
-		37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosButton.swift; sourceTree = "<group>"; };
+		37635FE3291EA6CF00C11E79 /* AccentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccentButton.swift; sourceTree = "<group>"; };
 		3763C988290C7A50004D3B5F /* OpenVideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosView.swift; sourceTree = "<group>"; };
 		37648B68286CF5F1003D330B /* TVControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVControls.swift; sourceTree = "<group>"; };
 		376527BA285F60F700102284 /* PlayerTimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTimeModel.swift; sourceTree = "<group>"; };
@@ -1827,7 +1827,7 @@
 				371CC7732946963000979C1A /* ListingStyleButtons.swift */,
 				37030FF627B0347C00ECDDAA /* MPVPlayerView.swift */,
 				37E70926271CDDAE00D34DDE /* OpenSettingsButton.swift */,
-				37635FE3291EA6CF00C11E79 /* OpenVideosButton.swift */,
+				37635FE3291EA6CF00C11E79 /* AccentButton.swift */,
 				3763C988290C7A50004D3B5F /* OpenVideosView.swift */,
 				37FEF11227EFD8580033912F /* PlaceholderCell.swift */,
 				3769C02D2779F18600DDB3EA /* PlaceholderProgressView.swift */,
@@ -3190,7 +3190,7 @@
 				374C053B2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				37A9965A26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				37EBD8CA27AF26C200F1C24B /* MPVBackend.swift in Sources */,
-				37635FE4291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */,
+				37635FE4291EA6CF00C11E79 /* AccentButton.swift in Sources */,
 				37D526DE2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
 				37484C2526FC83E000287258 /* InstanceForm.swift in Sources */,
 				37DD9DBD2785D60300539416 /* ScrollViewMatcher.swift in Sources */,
@@ -3391,7 +3391,7 @@
 				37030FFC27B0398000ECDDAA /* MPVClient.swift in Sources */,
 				3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */,
 				3782B9532755667600990149 /* String+Format.swift in Sources */,
-				37635FE5291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */,
+				37635FE5291EA6CF00C11E79 /* AccentButton.swift in Sources */,
 				378E9C3D2945565500B2D696 /* SubscriptionsView.swift in Sources */,
 				3776ADD7287381240078EBC4 /* Captions.swift in Sources */,
 				37E70924271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
@@ -3750,7 +3750,7 @@
 				37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				374AB3DD28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
-				37635FE6291EA6CF00C11E79 /* OpenVideosButton.swift in Sources */,
+				37635FE6291EA6CF00C11E79 /* AccentButton.swift in Sources */,
 				377ABC42286E4AD5009C986F /* InstancesManifest.swift in Sources */,
 				37C069802725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
 				37EBD8CC27AF26C200F1C24B /* MPVBackend.swift in Sources */,

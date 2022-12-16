@@ -36,26 +36,26 @@ struct HomeView: View {
                 #if os(tvOS)
                     Group {
                         if showOpenActionsInHome {
-                            OpenVideosButton(text: "Open Video", imageSystemName: "globe") {
+                            AccentButton(text: "Open Video", imageSystemName: "globe") {
                                 NavigationModel.shared.presentingOpenVideos = true
                             }
                         }
-                        OpenVideosButton(text: "Locations", imageSystemName: "globe") {
+                        AccentButton(text: "Locations", imageSystemName: "globe") {
                             NavigationModel.shared.presentingAccounts = true
                         }
-                        OpenVideosButton(text: "Settings", imageSystemName: "gear") {
+                        AccentButton(text: "Settings", imageSystemName: "gear") {
                             NavigationModel.shared.presentingSettings = true
                         }
                     }
                 #else
                     if showOpenActionsInHome {
-                        OpenVideosButton(text: "Files", imageSystemName: "folder") {
+                        AccentButton(text: "Files", imageSystemName: "folder") {
                             NavigationModel.shared.presentingFileImporter = true
                         }
-                        OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
+                        AccentButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
                             OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
                         }
-                        OpenVideosButton(imageSystemName: "ellipsis") {
+                        AccentButton(imageSystemName: "ellipsis") {
                             NavigationModel.shared.presentingOpenVideos = true
                         }
                         .frame(maxWidth: 40)

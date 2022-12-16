@@ -171,7 +171,7 @@ struct OpenVideosView: View {
     }
 
     var openURLsButton: some View {
-        OpenVideosButton(text: "Open", imageSystemName: "network") {
+        AccentButton(text: "Open", imageSystemName: "network") {
             openURLs(urlsToOpenFromText)
         }
         .disabled(urlsToOpenFromText.isEmpty)
@@ -183,7 +183,7 @@ struct OpenVideosView: View {
     }
 
     var openFromClipboardButton: some View {
-        OpenVideosButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
+        AccentButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
             OpenVideosModel.shared.openURLsFromClipboard(
                 removeQueueItems: removeQueueItems,
                 playbackMode: playbackMode
@@ -192,7 +192,7 @@ struct OpenVideosView: View {
     }
 
     var openFilesButton: some View {
-        OpenVideosButton(text: "Open Files", imageSystemName: "folder") {
+        AccentButton(text: "Open Files", imageSystemName: "folder") {
             presentingFileImporter = true
         }
     }

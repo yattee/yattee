@@ -1,8 +1,10 @@
 import SwiftUI
 
-struct OpenVideosButton: View {
+struct AccentButton: View {
     var text: String?
     var imageSystemName: String?
+    var maxWidth: CGFloat? = .infinity
+    var bold = true
     var action: () -> Void = {}
 
     var body: some View {
@@ -13,12 +15,13 @@ struct OpenVideosButton: View {
                 }
                 if let text {
                     Text(text.localized())
-                        .fontWeight(.bold)
+                        .fontWeight(bold ? .bold : .regular)
                 }
             }
             .padding(.vertical, 10)
+            .padding(.horizontal, 10)
             .frame(minHeight: 45)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: maxWidth)
             .contentShape(Rectangle())
         }
         .foregroundColor(.accentColor)
@@ -34,6 +37,6 @@ struct OpenVideosButton: View {
 
 struct OpenVideosButton_Previews: PreviewProvider {
     static var previews: some View {
-        OpenVideosButton(text: "Open Videos", imageSystemName: "play.circle.fill")
+        AccentButton(text: "Open Videos", imageSystemName: "play.circle.fill")
     }
 }
