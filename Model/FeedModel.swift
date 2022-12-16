@@ -10,9 +10,8 @@ final class FeedModel: ObservableObject, CacheModel {
     @Published var isLoading = false
     @Published var videos = [Video]()
     @Published private var page = 1
-    @Published var unwatched = [Account: Int]()
-    @Published var unwatchedByChannel = [Account: [Channel.ID: Int]]()
 
+    private var feedCount = UnwatchedFeedCountModel.shared
     private var cacheModel = FeedCacheModel.shared
     private var accounts = AccountsModel.shared
 
@@ -125,12 +124,12 @@ final class FeedModel: ObservableObject, CacheModel {
 
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                if unwatchedCount != self.unwatched[account] {
-                    self.unwatched[account] = unwatchedCount
+                if unwatchedCount != self.feedCount.unwatched[account] {
+                    self.feedCount.unwatched[account] = unwatchedCount
                 }
 
                 let byChannel = Dictionary(grouping: unwatched) { $0.channel.id }.mapValues(\.count)
-                self.unwatchedByChannel[account] = byChannel
+                self.feedCount.unwatchedByChannel[account] = byChannel
             }
         }
     }
@@ -156,13 +155,13 @@ final class FeedModel: ObservableObject, CacheModel {
 
     var canMarkAllFeedAsWatched: Bool {
         guard let account = accounts.current, accounts.signedIn else { return false }
-        return (unwatched[account] ?? 0) > 0
+        return (feedCount.unwatched[account] ?? 0) > 0
     }
 
     func canMarkChannelAsWatched(_ channelID: Channel.ID) -> Bool {
         guard let account = accounts.current, accounts.signedIn else { return false }
 
-        return unwatchedByChannel[account]?.keys.contains(channelID) ?? false
+        return feedCount.unwatchedByChannel[account]?.keys.contains(channelID) ?? false
     }
 
     func markChannelAsWatched(_ channelID: Channel.ID) {
@@ -256,7 +255,7 @@ final class FeedModel: ObservableObject, CacheModel {
 
     var canPlayUnwatchedFeed: Bool {
         guard let account = accounts.current, accounts.signedIn else { return false }
-        return (unwatched[account] ?? 0) > 0
+        return (feedCount.unwatched[account] ?? 0) > 0
     }
 
     var feedTime: Date? {

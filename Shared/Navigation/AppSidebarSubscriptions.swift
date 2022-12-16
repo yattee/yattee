@@ -4,8 +4,8 @@ import SwiftUI
 struct AppSidebarSubscriptions: View {
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var feed = FeedModel.shared
+    @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
-
     @ObservedObject private var accounts = AccountsModel.shared
 
     var body: some View {
@@ -23,9 +23,9 @@ struct AppSidebarSubscriptions: View {
                         } else {
                             Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                         }
+
+                        feedCount.unwatchedByChannelText(channel)
                     }
-                    .backport
-                    .badge(channelBadge(channel))
                 }
                 .contextMenu {
                     if subscriptions.isSubscribing(channel.id) {
@@ -39,14 +39,6 @@ struct AppSidebarSubscriptions: View {
                 .id("channel\(channel.id)")
             }
         }
-    }
-
-    func channelBadge(_ channel: Channel) -> Text? {
-        if let count = feed.unwatchedByChannel[accounts.current]?[channel.id] {
-            return Text(String(count))
-        }
-
-        return nil
     }
 
     @ViewBuilder func toggleWatchedButton(_ channel: Channel) -> some View {

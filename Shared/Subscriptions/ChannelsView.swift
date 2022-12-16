@@ -6,6 +6,7 @@ struct ChannelsView: View {
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
 
     @Default(.showCacheStatus) private var showCacheStatus
 
@@ -25,7 +26,7 @@ struct ChannelsView: View {
                             }
                         }
                         .backport
-                        .badge(channelBadge(channel))
+                        .badge(feedCount.unwatchedByChannelText(channel))
                     }
                     .contextMenu {
                         if subscriptions.isSubscribing(channel.id) {
@@ -82,14 +83,6 @@ struct ChannelsView: View {
         #if os(tvOS)
         .padding(.horizontal, 30)
         #endif
-    }
-
-    func channelBadge(_ channel: Channel) -> Text? {
-        if let count = feed.unwatchedByChannel[accounts.current]?[channel.id] {
-            return Text(String(count))
-        }
-
-        return nil
     }
 
     var header: some View {

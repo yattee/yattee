@@ -185,6 +185,9 @@
 		37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
 		37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
 		37192D5928B179D60012EEDD /* ChaptersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37192D5628B179D60012EEDD /* ChaptersView.swift */; };
+		371AC09F294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
+		371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
+		371AC0A1294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */; };
 		371B7E5C27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5D27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
 		371B7E5E27596B8400D21217 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E5B27596B8400D21217 /* Comment.swift */; };
@@ -1155,6 +1158,7 @@
 		37169AA52729E2CC0011DE61 /* AccountsBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsBridge.swift; sourceTree = "<group>"; };
 		3717407C2949D40800FDDBC7 /* ChannelLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelLinkView.swift; sourceTree = "<group>"; };
 		37192D5628B179D60012EEDD /* ChaptersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChaptersView.swift; sourceTree = "<group>"; };
+		371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwatchedFeedCountModel.swift; sourceTree = "<group>"; };
 		371B7E5B27596B8400D21217 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		371B7E602759706A00D21217 /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		371B7E652759786B00D21217 /* Comment+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comment+Fixtures.swift"; sourceTree = "<group>"; };
@@ -2328,10 +2332,6 @@
 				3743B86627216A1E00261544 /* Accounts */,
 				3743B864272169E200261544 /* Applications */,
 				377F9F79294403DC0043F856 /* Cache */,
-				3743B86527216A0600261544 /* Player */,
-				3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */,
-				37FB283F2721B20800A57617 /* Search */,
-				374C0539272436DA009BDDBE /* SponsorBlock */,
 				3776ADD5287381240078EBC4 /* Captions.swift */,
 				37AAF28F26740715007FC770 /* Channel.swift */,
 				37C3A24427235DA70087A57A /* ChannelPlaylist.swift */,
@@ -2354,21 +2354,26 @@
 				3756C2A92861151C00E4B059 /* NetworkStateModel.swift */,
 				377FF88A291A60310028EB0B /* OpenVideosModel.swift */,
 				37130A5E277657300033018A /* PersistenceController.swift */,
+				3743B86527216A0600261544 /* Player */,
 				376578882685471400D4EA09 /* Playlist.swift */,
 				37BA794226DBA973002A0235 /* PlaylistsModel.swift */,
 				375EC95C289EEEE000751258 /* QualityProfile.swift */,
 				375EC969289F232600751258 /* QualityProfilesModel.swift */,
 				37C194C626F6A9C8005D3B96 /* RecentsModel.swift */,
+				3751BA8127E69131007B1A60 /* ReturnYouTubeDislike */,
+				37FB283F2721B20800A57617 /* Search */,
 				374AB3D628BCAF0000DF56FB /* SeekModel.swift */,
 				374AB3DA28BCAF7E00DF56FB /* SeekType.swift */,
 				37EAD86E267B9ED100D9E01B /* Segment.swift */,
 				37F0F4E9286F397E00C06C2E /* SettingsModel.swift */,
 				37CEE4BC2677B670005A1EFE /* SingleAssetStream.swift */,
+				374C0539272436DA009BDDBE /* SponsorBlock */,
 				3797758A2689345500DD52A8 /* Store.swift */,
 				37CEE4C02677B697005A1EFE /* Stream.swift */,
 				373CFADA269663F1003CB2C6 /* Thumbnail.swift */,
 				37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */,
 				3705B181267B4E4900704544 /* TrendingCategory.swift */,
+				371AC09E294D13AA0085989E /* UnwatchedFeedCountModel.swift */,
 				37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
 				3784CDDE27772EE40055BBF2 /* Watch.swift */,
@@ -3207,6 +3212,7 @@
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */,
 				37F5E8BA291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
+				371AC09F294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
 				37DD9DC62785D63A00539416 /* UIResponder+Extensions.swift in Sources */,
 				370015A928BBAE7F000149FD /* ProgressBar.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
@@ -3327,6 +3333,7 @@
 				374C053C2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
 				374924DB2921050B0017D862 /* LocationsSettings.swift in Sources */,
+				371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
 				37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */,
 				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
 				37E80F3D287B107F00561799 /* VideoDetailsOverlay.swift in Sources */,
@@ -3786,6 +3793,7 @@
 				3782B9542755667600990149 /* String+Format.swift in Sources */,
 				37D836BE294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
 				37152EEC26EFEB95004FB96D /* LazyView.swift in Sources */,
+				371AC0A1294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
 				37EF9A78275BEB8E0043B585 /* CommentView.swift in Sources */,
 				37484C2726FC83E000287258 /* InstanceForm.swift in Sources */,
 				37E6D7A22944CD3800550C3D /* CacheStatusHeader.swift in Sources */,

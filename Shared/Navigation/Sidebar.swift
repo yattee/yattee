@@ -5,6 +5,7 @@ struct Sidebar: View {
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var feed = FeedModel.shared
+    @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.visibleSections) private var visibleSections
@@ -78,7 +79,7 @@ struct Sidebar: View {
                             .accessibility(label: Text("Subscriptions"))
                     }
                     .backport
-                    .badge(subscriptionsBadge)
+                    .badge(feedCount.unwatchedText)
                     .contextMenu {
                         playUnwatchedButton
                         toggleWatchedButton
@@ -144,17 +145,6 @@ struct Sidebar: View {
         } label: {
             Label("Mark all as unwatched", systemImage: "checkmark.circle")
         }
-    }
-
-    private var subscriptionsBadge: Text? {
-        guard let account = accounts.current,
-              let unwatched = feed.unwatched[account],
-              unwatched > 0
-        else {
-            return nil
-        }
-
-        return Text("\(String(unwatched))")
     }
 
     private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {

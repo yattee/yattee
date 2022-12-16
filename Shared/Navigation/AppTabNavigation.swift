@@ -7,6 +7,7 @@ struct AppTabNavigation: View {
     private var player = PlayerModel.shared
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
+    @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.showDocuments) private var showDocuments
@@ -94,18 +95,7 @@ struct AppTabNavigation: View {
         }
         .tag(TabSelection.subscriptions)
         .backport
-        .badge(subscriptionsBadge)
-    }
-
-    var subscriptionsBadge: Text? {
-        guard let account = accounts.current,
-              let unwatched = feed.unwatched[account],
-              unwatched > 0
-        else {
-            return nil
-        }
-
-        return Text("\(String(unwatched))")
+        .badge(feedCount.unwatchedText)
     }
 
     private var subscriptionsVisible: Bool {
