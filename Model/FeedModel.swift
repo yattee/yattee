@@ -130,7 +130,9 @@ final class FeedModel: ObservableObject, CacheModel {
                 }
 
                 let byChannel = Dictionary(grouping: unwatched) { $0.channel.id }.mapValues(\.count)
-                self.unwatchedByChannel[account] = byChannel
+                if self.unwatchedByChannel[account] != byChannel {
+                    self.unwatchedByChannel[account] = byChannel
+                }
             }
         }
     }
