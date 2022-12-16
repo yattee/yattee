@@ -68,7 +68,7 @@ struct ChannelPlaylistView: View {
         .environment(\.listingStyle, channelPlaylistListingStyle)
         .onAppear {
             if let playlist = presentedPlaylist,
-               let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist.id)
+               let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist)
             {
                 store.replace(cache)
             }

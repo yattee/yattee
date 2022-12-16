@@ -18,17 +18,17 @@ struct ChannelPlaylistsCacheModel: CacheModel {
 
     func storePlaylist(playlist: ChannelPlaylist) {
         let date = iso8601DateFormatter.string(from: Date())
-        logger.info("STORE \(playlistCacheKey(playlist.id)) -- \(date)")
+        logger.info("STORE \(playlist.cacheKey) -- \(date)")
         let feedTimeObject: JSON = ["date": date]
         let playlistObject: JSON = ["playlist": playlist.json.object]
-        try? storage?.setObject(feedTimeObject, forKey: playlistTimeCacheKey(playlist.id))
-        try? storage?.setObject(playlistObject, forKey: playlistCacheKey(playlist.id))
+        try? storage?.setObject(feedTimeObject, forKey: playlistTimeCacheKey(playlist.cacheKey))
+        try? storage?.setObject(playlistObject, forKey: playlist.cacheKey)
     }
 
-    func retrievePlaylist(_ id: ChannelPlaylist.ID) -> ChannelPlaylist? {
-        logger.info("RETRIEVE \(playlistCacheKey(id))")
+    func retrievePlaylist(_ playlist: ChannelPlaylist) -> ChannelPlaylist? {
+        logger.info("RETRIEVE \(playlist.cacheKey)")
 
-        if let json = try? storage?.object(forKey: playlistCacheKey(id)).dictionaryValue["playlist"] {
+        if let json = try? storage?.object(forKey: playlist.cacheKey).dictionaryValue["playlist"] {
             return ChannelPlaylist.from(json)
         }
 
@@ -50,11 +50,7 @@ struct ChannelPlaylistsCacheModel: CacheModel {
         getFormattedDate(getPlaylistsTime(id))
     }
 
-    private func playlistCacheKey(_ playlist: ChannelPlaylist.ID) -> String {
-        "channelplaylists-\(playlist)"
-    }
-
-    private func playlistTimeCacheKey(_ playlist: ChannelPlaylist.ID) -> String {
-        "\(playlistCacheKey(playlist))-time"
+    private func playlistTimeCacheKey(_ cacheKey: ChannelPlaylist.ID) -> String {
+        "\(cacheKey)-time"
     }
 }

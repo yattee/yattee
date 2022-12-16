@@ -49,4 +49,17 @@ struct ContentItem: Identifiable {
     var contentType: ContentType {
         video.isNil ? (channel.isNil ? (playlist.isNil ? .placeholder : .playlist) : .channel) : .video
     }
+
+    var cacheKey: String {
+        switch contentType {
+        case .video:
+            return video.cacheKey
+        case .playlist:
+            return playlist.cacheKey
+        case .channel:
+            return channel.cacheKey
+        case .placeholder:
+            return id
+        }
+    }
 }

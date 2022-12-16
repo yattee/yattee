@@ -2,12 +2,16 @@ import Foundation
 import SwiftyJSON
 
 struct ChannelPlaylist: Identifiable {
-    var id: String = UUID().uuidString
+    var id: String
     var title: String
     var thumbnailURL: URL?
     var channel: Channel?
     var videos = [Video]()
     var videosCount: Int?
+
+    var cacheKey: String {
+        "channelplaylists-\(id)"
+    }
 
     var json: JSON {
         [

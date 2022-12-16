@@ -82,8 +82,8 @@ struct FavoriteItemView: View {
                     ChannelsCacheModel.shared.store(channel)
                 }
             }
-        case let .channelPlaylist(_, id, _):
-            if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(id),
+        case let .channelPlaylist(_, id, title):
+            if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(.init(id: id, title: title)),
                !cache.videos.isEmpty
             {
                 contentItems = ContentItem.array(of: cache.videos)

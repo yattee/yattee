@@ -18,6 +18,7 @@ struct ContentItemView: View {
                 placeholderItem()
             }
         }
+        .id(item.cacheKey)
     }
 
     @ViewBuilder func videoItem(_ video: Video) -> some View {

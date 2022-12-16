@@ -54,7 +54,7 @@ struct PlaylistVideosView: View {
     }
 
     func loadCachedResource() {
-        if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist.id) {
+        if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist.channelPlaylist) {
             DispatchQueue.main.async {
                 self.channelPlaylist.replace(cache)
             }

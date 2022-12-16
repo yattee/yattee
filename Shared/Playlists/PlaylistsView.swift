@@ -197,7 +197,8 @@ struct PlaylistsView: View {
 
     func loadCachedResource() {
         if !selectedPlaylistID.isEmpty,
-           let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(selectedPlaylistID)
+           let currentPlaylist,
+           let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(currentPlaylist.channelPlaylist)
         {
             DispatchQueue.main.async {
                 self.channelPlaylist.replace(cache)
