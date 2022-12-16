@@ -100,6 +100,6 @@ extension Watch {
             }
         }
 
-        return Video(app: app ?? AccountsModel.shared.current.app ?? .local, instanceURL: instanceURL, videoID: videoID)
+        return Video(app: app ?? AccountsModel.shared.current?.app ?? .local, instanceURL: instanceURL, videoID: videoID)
     }
 }
