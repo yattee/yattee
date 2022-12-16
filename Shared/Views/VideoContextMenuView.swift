@@ -72,7 +72,11 @@ struct VideoContextMenuView: View {
 
             if accounts.app.supportsUserPlaylists, accounts.signedIn, !video.isLocal {
                 Section {
-                    addToPlaylistButton
+                    #if os(tvOS)
+                        addToPlaylistButton
+                    #else
+                        addToPlaylistMenu
+                    #endif
                     addToLastPlaylistButton
 
                     if let id = navigation.tabSelection?.playlistID ?? playlistID {
@@ -308,6 +312,26 @@ struct VideoContextMenuView: View {
             }
         }
     }
+
+    #if !os(tvOS)
+        @ViewBuilder private var addToPlaylistMenu: some View {
+            if playlists.playlists.isEmpty {
+                Text("No Playlists")
+            } else {
+                Menu {
+                    ForEach(playlists.editable) { playlist in
+                        Button {
+                            playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
+                        } label: {
+                            Text(playlist.title).tag(playlist.id)
+                        }
+                    }
+                } label: {
+                    Label("Add to Playlist...", systemImage: "text.badge.plus")
+                }
+            }
+        }
+    #endif
 
     func removeFromPlaylistButton(playlistID: String) -> some View {
         Button {

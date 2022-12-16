@@ -21,6 +21,10 @@ final class PlaylistsModel: ObservableObject {
         playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }
     }
 
+    var editable: [Playlist] {
+        all.filter(\.editable)
+    }
+
     var lastUsed: Playlist? {
         find(id: Defaults[.lastUsedPlaylistID])
     }
@@ -100,6 +104,7 @@ final class PlaylistsModel: ObservableObject {
             }
         ) {
             self.load(force: true) {
+                Defaults[.lastUsedPlaylistID] = playlistID
                 self.reloadPlaylists.toggle()
                 onSuccess()
             }

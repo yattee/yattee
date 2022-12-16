@@ -95,7 +95,7 @@ struct AddToPlaylistView: View {
                         Text("Playlist")
                         Menu {
                             Picker("Playlist", selection: $selectedPlaylistID) {
-                                ForEach(editablePlaylists) { playlist in
+                                ForEach(model.editable) { playlist in
                                     Text(playlist.title).tag(playlist.id)
                                 }
                             }
@@ -112,10 +112,6 @@ struct AddToPlaylistView: View {
             }
         }
         .padding(.horizontal)
-    }
-
-    var editablePlaylists: [Playlist] {
-        model.all.filter(\.editable)
     }
 
     private var formAlignment: HorizontalAlignment {
@@ -146,10 +142,10 @@ struct AddToPlaylistView: View {
                     return // swiftlint:disable:this implicit_return
                 }
 
-                selectedPlaylistID = editablePlaylists.next(after: selectedPlaylist!)!.id
+                selectedPlaylistID = model.editable.next(after: selectedPlaylist!)!.id
             }
             .contextMenu {
-                ForEach(editablePlaylists) { playlist in
+                ForEach(model.editable) { playlist in
                     Button(playlist.title) {
                         selectedPlaylistID = playlist.id
                     }
@@ -161,11 +157,7 @@ struct AddToPlaylistView: View {
     #endif
 
     private func addToPlaylist() {
-        guard let id = selectedPlaylist?.id else {
-            return
-        }
-
-        Defaults[.lastUsedPlaylistID] = id
+        guard let id = selectedPlaylist?.id else { return }
 
         model.addVideo(playlistID: id, videoID: video.videoID)
 
