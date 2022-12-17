@@ -82,14 +82,24 @@ final class AccountValidator: Service {
                 }
 
                 guard !response.json.isEmpty else {
-                    guard let app = self.appsToValidateInstance.popLast() else {
+                    if app == .piped {
+                        if response.text.contains("property=\"og:title\" content=\"Piped\"") {
+                            self.isValid.wrappedValue = false
+                            self.isValidated.wrappedValue = true
+                            self.isValidating.wrappedValue = false
+                            self.error?.wrappedValue = "Trying to use Piped front-end URL, you need to use URL for Piped API instead"
+                            return
+                        }
+                    }
+
+                    guard let nextApp = self.appsToValidateInstance.popLast() else {
                         self.isValid.wrappedValue = false
                         self.isValidated.wrappedValue = true
                         self.isValidating.wrappedValue = false
                         return
                     }
 
-                    self.tryValidatingUsing(app)
+                    self.tryValidatingUsing(nextApp)
                     return
                 }
 
@@ -128,15 +138,15 @@ final class AccountValidator: Service {
 
         switch app.wrappedValue {
         case .invidious:
-            invidiousValidation()
+            validateInvidiousAccount()
         case .piped:
-            pipedValidation()
+            validatePipedAccount()
         default:
             setValidationResult(false)
         }
     }
 
-    func invidiousValidation() {
+    func validateInvidiousAccount() {
         guard let username = account?.username,
               let password = account?.password
         else {
@@ -177,7 +187,7 @@ final class AccountValidator: Service {
             }
     }
 
-    func pipedValidation() {
+    func validatePipedAccount() {
         guard let request = accountRequest else {
             setValidationResult(false)
 

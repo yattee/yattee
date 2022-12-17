@@ -9,26 +9,39 @@ struct AccountValidationStatus: View {
     @Binding var error: String?
 
     var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: validationStatusSystemImage)
-                .foregroundColor(validationStatusColor)
+        VStack(alignment: .leading) {
+            HStack {
+                Image(systemName: validationStatusSystemImage)
+                    .foregroundColor(validationStatusColor)
+                    .imageScale(.medium)
+                    .opacity(isValidating ? 1 : (isValidated ? 1 : 0))
 
-                .frame(minWidth: 35, minHeight: 35)
-                .opacity(isValidating ? 1 : (isValidated ? 1 : 0))
-
-            VStack(alignment: .leading) {
                 Text(isValid ? "Connected successfully (\(app?.name ?? "Unknown"))" : "Connection failed")
-                if let error, !isValid {
-                    Text(error)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .truncationMode(.tail)
-                        .lineLimit(1)
-                }
+                    .opacity(isValidated && !isValidating ? 1 : 0)
             }
-            .frame(minHeight: 35)
-            .opacity(isValidating ? 0 : (isValidated ? 1 : 0))
+            if errorVisible {
+                Text(error ?? "")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 5)
+                    .opacity(errorTextVisible ? 1 : 0)
+            }
         }
+    }
+
+    var errorVisible: Bool {
+        #if !os(iOS)
+            true
+        #else
+            errorTextVisible
+        #endif
+    }
+
+    var errorTextVisible: Bool {
+        error != nil && isValidated && !isValid && !isValidating
     }
 
     var validationStatusSystemImage: String {

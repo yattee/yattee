@@ -22,9 +22,14 @@ struct InstanceForm: View {
         VStack(alignment: .leading) {
             Group {
                 header
-
                 form
-
+                #if os(macOS)
+                    VStack {
+                        validationStatus
+                    }
+                    .frame(minHeight: 60, alignment: .topLeading)
+                    .padding(.horizontal, 15)
+                #endif
                 footer
             }
             .frame(maxWidth: 1000)
@@ -36,7 +41,8 @@ struct InstanceForm: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .background(Color.background(scheme: colorScheme))
         #else
-            .frame(width: 400, height: 150)
+            .frame(width: 400, height: 180)
+            .padding(.vertical)
         #endif
     }
 
@@ -80,19 +86,34 @@ struct InstanceForm: View {
                 .autocapitalization(.none)
                 .keyboardType(.URL)
             #endif
+
+            #if os(tvOS)
+                VStack {
+                    validationStatus
+                }
+                .frame(minHeight: 100)
+            #elseif os(iOS)
+                validationStatus
+            #endif
+        }
+    }
+
+    @ViewBuilder var validationStatus: some View {
+        if !url.isEmpty {
+            Section {
+                AccountValidationStatus(
+                    app: $app,
+                    isValid: $isValid,
+                    isValidated: $isValidated,
+                    isValidating: $isValidating,
+                    error: $validationError
+                )
+            }
         }
     }
 
     private var footer: some View {
         HStack {
-            AccountValidationStatus(
-                app: $app,
-                isValid: $isValid,
-                isValidated: $isValidated,
-                isValidating: $isValidating,
-                error: $validationError
-            )
-
             Spacer()
 
             Button("Save", action: submitForm)

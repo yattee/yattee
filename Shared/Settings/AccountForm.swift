@@ -24,6 +24,13 @@ struct AccountForm: View {
             Group {
                 header
                 form
+                #if os(macOS)
+                    VStack {
+                        validationStatus
+                    }
+                    .frame(minHeight: 60, alignment: .topLeading)
+                    .padding(.horizontal, 15)
+                #endif
                 footer
             }
             .frame(maxWidth: 1000)
@@ -34,7 +41,8 @@ struct AccountForm: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .background(Color.background(scheme: colorScheme))
         #else
-        .frame(width: 400, height: 145)
+        .frame(width: 400, height: 180)
+        .padding(.vertical)
         #endif
     }
 
@@ -72,32 +80,36 @@ struct AccountForm: View {
         .onChange(of: password) { _ in validate() }
     }
 
-    var formFields: some View {
-        Group {
-            TextField("Username", text: $username)
-            SecureField("Password", text: $password)
-        }
+    @ViewBuilder var formFields: some View {
+        TextField("Username", text: $username)
+        SecureField("Password", text: $password)
+
+        #if os(tvOS)
+            VStack {
+                validationStatus
+            }
+            .frame(minHeight: 100)
+        #elseif os(iOS)
+            validationStatus
+        #endif
     }
 
-    var usernamePrompt: String {
-        switch instance.app {
-        case .invidious:
-            return "SID Cookie"
-        default:
-            return "Username"
+    @ViewBuilder var validationStatus: some View {
+        if !username.isEmpty && !password.isEmpty {
+            Section {
+                AccountValidationStatus(
+                    app: .constant(instance.app),
+                    isValid: $isValid,
+                    isValidated: $isValidated,
+                    isValidating: $isValidating,
+                    error: $validationError
+                )
+            }
         }
     }
 
     var footer: some View {
         HStack {
-            AccountValidationStatus(
-                app: .constant(instance.app),
-                isValid: $isValid,
-                isValidated: $isValidated,
-                isValidating: $isValidating,
-                error: $validationError
-            )
-
             Spacer()
 
             Button("Save", action: submitForm)
