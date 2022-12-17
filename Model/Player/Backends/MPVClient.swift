@@ -150,10 +150,10 @@ final class MPVClient: ObservableObject {
         }
 
         if forceSeekable {
-//            options.append("stream-lavf-o=seekable=0")
+            options.append("force-seekable=yes")
+            // this is needed for peertube?
+            // options.append("stream-lavf-o=seekable=0")
         }
-
-        options.append("stream-lavf-o=seekable=0")
 
         if !options.isEmpty {
             args.append(options.joined(separator: ","))
