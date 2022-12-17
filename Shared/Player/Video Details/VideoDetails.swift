@@ -39,6 +39,7 @@ struct VideoDetails: View {
         VStack(alignment: .leading, spacing: 0) {
             ControlsBar(
                 fullScreen: $fullScreen,
+                expansionState: .constant(.full),
                 presentingControls: false,
                 backgroundEnabled: false,
                 borderTop: false,

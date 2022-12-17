@@ -12,7 +12,7 @@ struct AppSidebarSubscriptions: View {
         Section(header: Text("Subscriptions")) {
             ForEach(subscriptions.all) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
-                    LazyView(ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier()))
+                    LazyView(ChannelVideosView(channel: channel))
                 } label: {
                     HStack {
                         if channel.thumbnailURL != nil {

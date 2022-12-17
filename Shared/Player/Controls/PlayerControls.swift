@@ -92,7 +92,7 @@ struct PlayerControls: View {
                                                     model.presentingDetailsOverlay = true
                                                 }
                                             } label: {
-                                                ControlsBar(fullScreen: $model.presentingDetailsOverlay, presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
+                                                ControlsBar(fullScreen: $model.presentingDetailsOverlay, expansionState: .constant(.full), presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
                                                     .clipShape(RoundedRectangle(cornerRadius: 4))
                                                     .frame(maxWidth: 300, alignment: .leading)
                                             }

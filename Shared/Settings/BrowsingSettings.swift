@@ -21,6 +21,9 @@ struct BrowsingSettings: View {
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.visibleSections) private var visibleSections
+    @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
+    @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
+    @Default(.playerButtonShowsControlButtonsWhenMinimized) private var playerButtonShowsControlButtonsWhenMinimized
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -65,6 +68,7 @@ struct BrowsingSettings: View {
                     interface
                 }
             #else
+                playerBarSettings
                 interface
             #endif
             if !accounts.isEmpty {
@@ -149,6 +153,32 @@ struct BrowsingSettings: View {
             }
         }
     }
+
+    #if !os(tvOS)
+        private var playerBarSettings: some View {
+            Section(header: SettingsHeader(text: "Player Bar".localized()), footer: playerBarFooter) {
+                Toggle("Always show controls buttons", isOn: $playerButtonShowsControlButtonsWhenMinimized)
+                playerBarGesturePicker("Single tap gesture", selection: $playerButtonSingleTapGesture)
+                playerBarGesturePicker("Double tap gesture", selection: $playerButtonDoubleTapGesture)
+            }
+        }
+
+        func playerBarGesturePicker(_ label: String, selection: Binding<PlayerTapGestureAction>) -> some View {
+            Picker(label, selection: selection) {
+                ForEach(PlayerTapGestureAction.allCases, id: \.rawValue) { action in
+                    Text(action.label).tag(action)
+                }
+            }
+        }
+
+        var playerBarFooter: some View {
+            #if os(iOS)
+                Text("Tap and hold channel thumbnail to open context menu with more actions")
+            #elseif os(macOS)
+                Text("Right click channel thumbnail to open context menu with more actions")
+            #endif
+        }
+    #endif
 
     private var interfaceSettings: some View {
         Section(header: SettingsHeader(text: "Interface".localized())) {

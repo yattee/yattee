@@ -20,7 +20,7 @@ struct ChannelCell: View {
     }
 
     var navigationLink: some View {
-        NavigationLink(destination: ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier())) {
+        NavigationLink(destination: ChannelVideosView(channel: channel)) {
             labelContent
         }
     }

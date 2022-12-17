@@ -47,7 +47,7 @@ struct AppTabNavigation: View {
                     searchNavigationView
                 }
             }
-            .overlay(ControlsBar(fullScreen: .constant(false)), alignment: .bottom)
+            .modifier(PlayerOverlayModifier())
         }
         .onAppear {
             feed.calculateUnwatchedFeed()

@@ -53,7 +53,7 @@ struct Sidebar: View {
     var mainNavigationLinks: some View {
         Section(header: Text("Videos")) {
             if showHome {
-                NavigationLink(destination: LazyView(HomeView().modifier(PlayerOverlayModifier())), tag: TabSelection.home, selection: $navigation.tabSelection) {
+                NavigationLink(destination: LazyView(HomeView()), tag: TabSelection.home, selection: $navigation.tabSelection) {
                     Label("Home", systemImage: "house")
                         .accessibility(label: Text("Home"))
                 }
@@ -62,7 +62,7 @@ struct Sidebar: View {
 
             #if os(iOS)
                 if showDocuments {
-                    NavigationLink(destination: LazyView(DocumentsView().modifier(PlayerOverlayModifier())), tag: TabSelection.documents, selection: $navigation.tabSelection) {
+                    NavigationLink(destination: LazyView(DocumentsView()), tag: TabSelection.documents, selection: $navigation.tabSelection) {
                         Label("Documents", systemImage: "folder")
                             .accessibility(label: Text("Documents"))
                     }
@@ -74,7 +74,7 @@ struct Sidebar: View {
                 if visibleSections.contains(.subscriptions),
                    accounts.app.supportsSubscriptions && accounts.signedIn
                 {
-                    NavigationLink(destination: LazyView(SubscriptionsView().modifier(PlayerOverlayModifier())), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
+                    NavigationLink(destination: LazyView(SubscriptionsView()), tag: TabSelection.subscriptions, selection: $navigation.tabSelection) {
                         Label("Subscriptions", systemImage: "star.circle")
                             .accessibility(label: Text("Subscriptions"))
                     }
@@ -88,7 +88,7 @@ struct Sidebar: View {
                 }
 
                 if visibleSections.contains(.popular), accounts.app.supportsPopular {
-                    NavigationLink(destination: LazyView(PopularView().modifier(PlayerOverlayModifier())), tag: TabSelection.popular, selection: $navigation.tabSelection) {
+                    NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
                         Label("Popular", systemImage: "arrow.up.right.circle")
                             .accessibility(label: Text("Popular"))
                     }
@@ -96,14 +96,14 @@ struct Sidebar: View {
                 }
 
                 if visibleSections.contains(.trending) {
-                    NavigationLink(destination: LazyView(TrendingView().modifier(PlayerOverlayModifier())), tag: TabSelection.trending, selection: $navigation.tabSelection) {
+                    NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
                         Label("Trending", systemImage: "chart.bar")
                             .accessibility(label: Text("Trending"))
                     }
                     .id("trending")
                 }
 
-                NavigationLink(destination: LazyView(SearchView().modifier(PlayerOverlayModifier())), tag: TabSelection.search, selection: $navigation.tabSelection) {
+                NavigationLink(destination: LazyView(SearchView()), tag: TabSelection.search, selection: $navigation.tabSelection) {
                     Label("Search", systemImage: "magnifyingglass")
                         .accessibility(label: Text("Search"))
                 }
@@ -157,5 +157,11 @@ struct Sidebar: View {
         }
 
         scrollView.scrollTo(selection.stringValue)
+    }
+}
+
+struct Sidebar_Previews: PreviewProvider {
+    static var previews: some View {
+        Sidebar()
     }
 }

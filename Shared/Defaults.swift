@@ -32,6 +32,10 @@ extension Defaults.Keys {
     static let homeHistoryItems = Key<Int>("homeHistoryItems", default: 10)
     static let favorites = Key<[FavoriteItem]>("favorites", default: [])
 
+    static let playerButtonSingleTapGesture = Key<PlayerTapGestureAction>("playerButtonSingleTapGesture", default: .togglePlayer)
+    static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .togglePlayerVisibility)
+    static let playerButtonShowsControlButtonsWhenMinimized = Key<Bool>("playerButtonShowsControlButtonsWhenMinimized", default: false)
+
     #if !os(tvOS)
         #if os(macOS)
             static let accountPickerDisplaysUsernameDefault = true
@@ -361,5 +365,25 @@ enum DetailsToolbarPositionSetting: String, CaseIterable, Defaults.Serializable 
 
     var needsRightSpacer: Bool {
         self == .center || self == .left
+    }
+}
+
+enum PlayerTapGestureAction: String, CaseIterable, Defaults.Serializable {
+    case togglePlayerVisibility
+    case togglePlayer
+    case openChannel
+    case nothing
+
+    var label: String {
+        switch self {
+        case .togglePlayerVisibility:
+            return "Toggle size"
+        case .togglePlayer:
+            return "Toggle player"
+        case .openChannel:
+            return "Open channel"
+        case .nothing:
+            return "Do nothing"
+        }
     }
 }

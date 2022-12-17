@@ -10,7 +10,7 @@ struct AppSidebarPlaylists: View {
         Section(header: Text("Playlists")) {
             ForEach(playlists.playlists.sorted { $0.title.lowercased() < $1.title.lowercased() }) { playlist in
                 NavigationLink(tag: TabSelection.playlist(playlist.id), selection: $navigation.tabSelection) {
-                    LazyView(PlaylistVideosView(playlist).modifier(PlayerOverlayModifier()))
+                    LazyView(PlaylistVideosView(playlist))
                 } label: {
                     playlistLabel(playlist)
                 }

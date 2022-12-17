@@ -14,7 +14,7 @@ struct ChannelsView: View {
         List {
             Section(header: header) {
                 ForEach(subscriptions.all) { channel in
-                    NavigationLink(destination: ChannelVideosView(channel: channel).modifier(PlayerOverlayModifier())) {
+                    NavigationLink(destination: ChannelVideosView(channel: channel)) {
                         HStack {
                             if let url = channel.thumbnailURLOrCached {
                                 ThumbnailView(url: url)

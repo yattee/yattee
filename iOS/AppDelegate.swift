@@ -15,11 +15,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         #if os(iOS)
             UIViewController.swizzleHomeIndicatorProperty()
 
-            UITabBar.appearance().shadowImage = UIImage()
-            UITabBar.appearance().backgroundImage = UIImage()
-            UITabBar.appearance().isTranslucent = true
-            UITabBar.appearance().backgroundColor = .clear
-
             OrientationTracker.shared.startDeviceOrientationTracking()
         #endif
         return true

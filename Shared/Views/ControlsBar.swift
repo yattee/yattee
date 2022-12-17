@@ -3,20 +3,15 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct ControlsBar: View {
-    @Binding var fullScreen: Bool
+    enum ExpansionState {
+        case mini
+        case full
+    }
 
+    @Binding var fullScreen: Bool
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
-
-    @Environment(\.navigationStyle) private var navigationStyle
-
-    @ObservedObject private var accounts = AccountsModel.shared
-    var navigation = NavigationModel.shared
-    @ObservedObject private var model = PlayerModel.shared
-    @ObservedObject private var playlists = PlaylistsModel.shared
-    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
-
-    @ObservedObject private var controls = PlayerControlsModel.shared
+    @Binding var expansionState: ExpansionState
 
     var presentingControls = true
     var backgroundEnabled = true
@@ -24,34 +19,57 @@ struct ControlsBar: View {
     var borderBottom = true
     var detailsTogglePlayer = true
     var detailsToggleFullScreen = false
+    var playerBar = false
     var titleLineLimit = 2
 
+    @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var model = PlayerModel.shared
+    @ObservedObject private var playlists = PlaylistsModel.shared
+    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
+    @ObservedObject private var controls = PlayerControlsModel.shared
+
+    @Environment(\.navigationStyle) private var navigationStyle
+
+    private let navigation = NavigationModel.shared
     private let controlsOverlayModel = ControlOverlaysModel.shared
+
+    @Default(.playerButtonShowsControlButtonsWhenMinimized) private var controlsWhenMinimized
+    @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
+    @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
 
     var body: some View {
         HStack(spacing: 0) {
             detailsButton
 
-            if presentingControls {
+            if presentingControls, expansionState == .full || (controlsWhenMinimized && model.currentItem != nil) {
+                if expansionState == .full {
+                    Spacer()
+                }
                 controlsView
                     .frame(maxWidth: 120)
             }
         }
+
         .buttonStyle(.plain)
         .labelStyle(.iconOnly)
-        .padding(.horizontal)
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: barHeight)
-        .borderTop(height: borderTop ? 0.5 : 0, color: Color("ControlsBorderColor"))
-        .borderBottom(height: borderBottom ? 0.5 : 0, color: Color("ControlsBorderColor"))
-        .modifier(ControlBackgroundModifier(enabled: backgroundEnabled, edgesIgnoringSafeArea: .bottom))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 2)
+        .frame(maxHeight: barHeight)
+        .padding(.trailing, expansionState == .mini && !controlsWhenMinimized ? 8 : 0)
+        .modifier(ControlBackgroundModifier(enabled: backgroundEnabled))
+        .clipShape(RoundedRectangle(cornerRadius: expansionState == .full || !playerBar ? 0 : 6))
+        .overlay(
+            RoundedRectangle(cornerRadius: expansionState == .full || !playerBar ? 0 : 6)
+                .stroke(Color("ControlsBorderColor"), lineWidth: playerBar ? 0 : 0.5)
+        )
         #if os(iOS)
-            .background(
-                EmptyView().sheet(isPresented: $presentingShareSheet) {
-                    if let shareURL {
-                        ShareSheet(activityItems: [shareURL])
-                    }
+        .background(
+            EmptyView().sheet(isPresented: $presentingShareSheet) {
+                if let shareURL {
+                    ShareSheet(activityItems: [shareURL])
                 }
-            )
+            }
+        )
         #endif
     }
 
@@ -136,139 +154,187 @@ struct ControlsBar: View {
     var details: some View {
         HStack {
             HStack(spacing: 8) {
-                Button {
-                    if let video = model.currentVideo, !video.isLocal {
-                        navigation.openChannel(
-                            video.channel,
-                            navigationStyle: navigationStyle
+                if !playerBar {
+                    Button {
+                        if let video = model.currentVideo, !video.isLocal {
+                            navigation.openChannel(
+                                video.channel,
+                                navigationStyle: navigationStyle
+                            )
+                        }
+                    } label: {
+                        ChannelAvatarView(
+                            channel: model.currentVideo?.channel,
+                            video: model.currentVideo
                         )
+                        .frame(width: barHeight - 10, height: barHeight - 10)
                     }
-                } label: {
+                    .contextMenu { contextMenu }
+                    .zIndex(3)
+                } else {
                     ChannelAvatarView(
                         channel: model.currentVideo?.channel,
                         video: model.currentVideo
                     )
+                    #if !os(tvOS)
+                    .highPriorityGesture(playerButtonDoubleTapGesture != .nothing ? doubleTapGesture : nil)
+                    .gesture(playerButtonSingleTapGesture != .nothing ? singleTapGesture : nil)
+                    #endif
                     .frame(width: barHeight - 10, height: barHeight - 10)
+                    .contextMenu { contextMenu }
                 }
-                .contextMenu {
-                    if let video = model.currentVideo {
-                        Group {
-                            Section {
-                                if accounts.app.supportsUserPlaylists && accounts.signedIn, !video.isLocal {
-                                    Section {
-                                        Button {
-                                            navigation.presentAddToPlaylist(video)
-                                        } label: {
-                                            Label("Add to Playlist...", systemImage: "text.badge.plus")
-                                        }
 
-                                        if let playlist = playlists.lastUsed, let video = model.currentVideo {
-                                            Button {
-                                                playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
-                                            } label: {
-                                                Label("Add to \(playlist.title)", systemImage: "text.badge.star")
-                                            }
-                                        }
-                                    }
-                                }
+                if expansionState == .full {
+                    VStack(alignment: .leading, spacing: 0) {
+                        let notPlaying = "Not Playing".localized()
+                        Text(model.currentVideo?.displayTitle ?? notPlaying)
+                            .font(.system(size: 14))
+                            .fontWeight(.semibold)
+                            .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(titleLineLimit)
+                            .multilineTextAlignment(.leading)
 
-                                #if !os(tvOS)
-                                    ShareButton(contentItem: .init(video: model.currentVideo))
-                                #endif
+                        if let video = model.currentVideo, !video.localStreamIsFile {
+                            HStack(spacing: 2) {
+                                Text(video.displayAuthor)
+                                    .font(.system(size: 12))
 
-                                Section {
-                                    if !video.isLocal {
-                                        Button {
-                                            navigation.openChannel(
-                                                video.channel,
-                                                navigationStyle: navigationStyle
-                                            )
-                                        } label: {
-                                            Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
-                                        }
+                                if !presentingControls && !video.isLocal {
+                                    HStack(spacing: 2) {
+                                        Image(systemName: "person.2.fill")
 
-                                        if accounts.app.supportsSubscriptions, accounts.signedIn {
-                                            if subscriptions.isSubscribing(video.channel.id) {
-                                                Button {
-                                                    #if os(tvOS)
-                                                        subscriptions.unsubscribe(video.channel.id)
-                                                    #else
-                                                        navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
-                                                    #endif
-                                                } label: {
-                                                    Label("Unsubscribe", systemImage: "star.circle")
-                                                }
+                                        if let channel = model.currentVideo?.channel {
+                                            if let subscriptions = channel.subscriptionsString {
+                                                Text(subscriptions)
                                             } else {
-                                                Button {
-                                                    subscriptions.subscribe(video.channel.id) {
-                                                        navigation.sidebarSectionChanged.toggle()
-                                                    }
-                                                } label: {
-                                                    Label("Subscribe", systemImage: "star.circle")
-                                                }
+                                                Text("1234").redacted(reason: .placeholder)
                                             }
                                         }
                                     }
+                                    .padding(.leading, 4)
+                                    .font(.system(size: 9))
                                 }
                             }
-
-                            Button {
-                                model.closeCurrentItem()
-                            } label: {
-                                Label("Close Video", systemImage: "xmark")
-                            }
+                            .lineLimit(1)
+                            .foregroundColor(.secondary)
                         }
-                        .labelStyle(.automatic)
                     }
-                }
+                    .zIndex(0)
+                    .transition(.opacity)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    let notPlaying = "Not Playing".localized()
-                    Text(model.currentVideo?.displayTitle ?? notPlaying)
-                        .font(.system(size: 14))
-                        .fontWeight(.semibold)
-                        .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .lineLimit(titleLineLimit)
-                        .multilineTextAlignment(.leading)
-
-                    if let video = model.currentVideo, !video.localStreamIsFile {
-                        HStack(spacing: 2) {
-                            Text(video.displayAuthor)
-                                .font(.system(size: 12))
-
-                            if !presentingControls && !video.isLocal {
-                                HStack(spacing: 2) {
-                                    Image(systemName: "person.2.fill")
-
-                                    if let channel = model.currentVideo?.channel {
-                                        if let subscriptions = channel.subscriptionsString {
-                                            Text(subscriptions)
-                                        } else {
-                                            Text("1234").redacted(reason: .placeholder)
-                                        }
-                                    }
-                                }
-                                .padding(.leading, 4)
-                                .font(.system(size: 9))
-                            }
-                        }
-                        .lineLimit(1)
-                        .foregroundColor(.secondary)
+                    if !playerBar {
+                        Spacer()
                     }
                 }
             }
             .buttonStyle(.plain)
             .padding(.vertical)
+        }
+    }
 
-            Spacer()
+    #if !os(tvOS)
+
+        var singleTapGesture: some Gesture {
+            TapGesture(count: 1).onEnded { gestureAction(playerButtonSingleTapGesture) }
+        }
+
+        var doubleTapGesture: some Gesture {
+            TapGesture(count: 2).onEnded { gestureAction(playerButtonDoubleTapGesture) }
+        }
+
+        func gestureAction(_ action: PlayerTapGestureAction) {
+            switch action {
+            case .togglePlayer:
+                model.togglePlayer()
+            case .openChannel:
+                guard let channel = model.currentVideo?.channel else { return }
+                navigation.openChannel(channel, navigationStyle: navigationStyle)
+            case .togglePlayerVisibility:
+                withAnimation(.spring(response: 0.25)) {
+                    expansionState = expansionState == .full ? .mini : .full
+                }
+            default:
+                return
+            }
+        }
+    #endif
+    @ViewBuilder var contextMenu: some View {
+        if let video = model.currentVideo {
+            Group {
+                Section {
+                    if accounts.app.supportsUserPlaylists && accounts.signedIn, !video.isLocal {
+                        Section {
+                            Button {
+                                navigation.presentAddToPlaylist(video)
+                            } label: {
+                                Label("Add to Playlist...", systemImage: "text.badge.plus")
+                            }
+
+                            if let playlist = playlists.lastUsed, let video = model.currentVideo {
+                                Button {
+                                    playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
+                                } label: {
+                                    Label("Add to \(playlist.title)", systemImage: "text.badge.star")
+                                }
+                            }
+                        }
+                    }
+
+                    #if !os(tvOS)
+                        ShareButton(contentItem: .init(video: model.currentVideo))
+                    #endif
+
+                    Section {
+                        if !video.isLocal {
+                            Button {
+                                navigation.openChannel(
+                                    video.channel,
+                                    navigationStyle: navigationStyle
+                                )
+                            } label: {
+                                Label("\(video.author) Channel", systemImage: "rectangle.stack.fill.badge.person.crop")
+                            }
+
+                            if accounts.app.supportsSubscriptions, accounts.signedIn {
+                                if subscriptions.isSubscribing(video.channel.id) {
+                                    Button {
+                                        #if os(tvOS)
+                                            subscriptions.unsubscribe(video.channel.id)
+                                        #else
+                                            navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
+                                        #endif
+                                    } label: {
+                                        Label("Unsubscribe", systemImage: "star.circle")
+                                    }
+                                } else {
+                                    Button {
+                                        subscriptions.subscribe(video.channel.id) {
+                                            navigation.sidebarSectionChanged.toggle()
+                                        }
+                                    } label: {
+                                        Label("Subscribe", systemImage: "star.circle")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button {
+                    model.closeCurrentItem()
+                } label: {
+                    Label("Close Video", systemImage: "xmark")
+                }
+            }
+            .labelStyle(.automatic)
         }
     }
 }
 
 struct ControlsBar_Previews: PreviewProvider {
     static var previews: some View {
-        ControlsBar(fullScreen: .constant(false))
+        ControlsBar(fullScreen: .constant(false), expansionState: .constant(.full))
             .injectFixtureEnvironmentObjects()
     }
 }

@@ -48,7 +48,9 @@ extension PlayerModel {
 
         comments.reset()
         stream = nil
-        currentItem = item
+        withAnimation {
+            currentItem = item
+        }
 
         if !time.isNil {
             currentItem.playbackTime = time
@@ -204,7 +206,9 @@ extension PlayerModel {
         let item = PlayerQueueItem(video, playbackTime: atTime)
 
         if play {
-            currentItem = item
+            withAnimation {
+                currentItem = item
+            }
             videoBeingOpened = video
         }
 

@@ -41,6 +41,7 @@ struct ChannelLinkView<ChannelLabel: View>: View {
     @ViewBuilder private var channelNavigationLink: some View {
         NavigationLink(destination: ChannelVideosView(channel: channel)) {
             channelLabel
+                .lineLimit(1)
         }
     }
 

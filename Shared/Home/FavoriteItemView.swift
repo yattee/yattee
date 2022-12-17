@@ -170,23 +170,20 @@ struct FavoriteItemView: View {
     }
 
     @ViewBuilder var itemNavigationLinkDestination: some View {
-        Group {
-            switch item.section {
-            case let .channel(_, id, name):
-                ChannelVideosView(channel: .init(app: .invidious, id: id, name: name))
-            case let .channelPlaylist(_, id, title):
-                ChannelPlaylistView(playlist: .init(id: id, title: title))
-            case let .playlist(_, id):
-                ChannelPlaylistView(playlist: .init(id: id, title: label))
-            case .subscriptions:
-                SubscriptionsView()
-            case .popular:
-                PopularView()
-            default:
-                EmptyView()
-            }
+        switch item.section {
+        case let .channel(_, id, name):
+            ChannelVideosView(channel: .init(app: .invidious, id: id, name: name))
+        case let .channelPlaylist(_, id, title):
+            ChannelPlaylistView(playlist: .init(id: id, title: title))
+        case let .playlist(_, id):
+            ChannelPlaylistView(playlist: .init(id: id, title: label))
+        case .subscriptions:
+            SubscriptionsView()
+        case .popular:
+            PopularView()
+        default:
+            EmptyView()
         }
-        .modifier(PlayerOverlayModifier())
     }
 
     func itemButtonAction() {

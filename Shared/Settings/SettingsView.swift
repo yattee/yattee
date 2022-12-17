@@ -10,7 +10,7 @@ struct SettingsView: View {
             case browsing, player, quality, history, sponsorBlock, locations, advanced, help
         }
 
-        @State private var selection: Tabs?
+        @State private var selection: Tabs = .browsing
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -224,10 +224,8 @@ struct SettingsView: View {
     #if os(macOS)
         private var windowHeight: Double {
             switch selection {
-            case nil:
-                return accounts.isEmpty ? 680 : 580
             case .browsing:
-                return 580
+                return 680
             case .player:
                 return 900
             case .quality:

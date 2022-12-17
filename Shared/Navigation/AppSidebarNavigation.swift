@@ -52,6 +52,7 @@ struct AppSidebarNavigation: View {
                 }
             }
         }
+        .modifier(PlayerOverlayModifier())
         .environment(\.navigationStyle, .sidebar)
     }
 
@@ -75,7 +76,7 @@ struct AppSidebarNavigation: View {
                 }
             }
 
-            ToolbarItemGroup(placement: accountsMenuToolbarItemPlacement) {
+            ToolbarItemGroup {
                 AccountViewButton()
             }
 

@@ -574,7 +574,9 @@ final class PlayerModel: ObservableObject {
         closePiP()
 
         prepareCurrentItemForHistory(finished: finished)
-        currentItem = nil
+        withAnimation {
+            currentItem = nil
+        }
         updateNowPlayingInfo()
 
         backend.closeItem()
