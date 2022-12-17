@@ -100,99 +100,82 @@ struct VideoPlayerView: View {
                 Self._printChanges()
             }
         #endif
-
-        #if os(macOS)
-            return GeometryReader { geometry in
-                HSplitView {
-                    content
-                }
-                .onAppear {
-                    playerSize = geometry.size
-                }
-            }
-            .alert(isPresented: $navigation.presentingAlertInVideoPlayer) { navigation.alert }
-            .onOpenURL { url in
-                URLBookmarkModel.shared.saveBookmark(url)
-                OpenURLHandler.shared.handle(url)
-            }
-            .frame(minWidth: 950, minHeight: 700)
-        #else
-            return GeometryReader { geometry in
-                HStack(spacing: 0) {
-                    content
-                        .onAppear {
-                            playerSize = geometry.size
-                        }
-                }
-                .onChange(of: geometry.size) { size in
-                    self.playerSize = size
-                }
-                .onChange(of: fullScreenDetails) { value in
-                    player.backend.setNeedsDrawing(!value)
-                }
-                #if os(iOS)
-                .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
-                .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
-                .onChange(of: player.presentingPlayer) { newValue in
-                    if newValue {
-                        viewDragOffset = 0
-                    } else {
-                        viewDragOffset = Self.hiddenOffset
+        return GeometryReader { geometry in
+            HStack(spacing: 0) {
+                content
+                    .onAppear {
+                        playerSize = geometry.size
                     }
-                }
-                .onAppear {
+            }
+            .onChange(of: geometry.size) { _ in
+                self.playerSize = geometry.size
+            }
+            .onChange(of: fullScreenDetails) { value in
+                player.backend.setNeedsDrawing(!value)
+            }
+            #if os(iOS)
+            .padding(.bottom, playerEdgesIgnoringSafeArea == [.bottom] ? 0 : geometry.safeAreaInsets.bottom)
+            .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
+            .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
+            .onChange(of: player.presentingPlayer) { newValue in
+                if newValue {
                     viewDragOffset = 0
-
-                    Delay.by(0.2) {
-                        configureOrientationUpdatesBasedOnAccelerometer()
-
-                        if let orientationMask = player.lockedOrientation {
-                            Orientation.lockOrientation(
-                                orientationMask,
-                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
-                            )
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown)
-                        }
-                    }
+                } else {
+                    viewDragOffset = Self.hiddenOffset
                 }
-                .onDisappear {
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
+            .onAppear {
+                viewDragOffset = 0
+
+                Delay.by(0.2) {
+                    configureOrientationUpdatesBasedOnAccelerometer()
+
+                    if let orientationMask = player.lockedOrientation {
+                        Orientation.lockOrientation(
+                            orientationMask,
+                            andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
+                        )
                     } else {
                         Orientation.lockOrientation(.allButUpsideDown)
                     }
-                    stopOrientationUpdates()
-                    player.controls.hideOverlays()
                 }
-                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                    guard player.lockedOrientation.isNil else {
-                        return
-                    }
+            }
+            .onDisappear {
+                if Defaults[.lockPortraitWhenBrowsing] {
+                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                } else {
+                    Orientation.lockOrientation(.allButUpsideDown)
+                }
+                stopOrientationUpdates()
+                player.controls.hideOverlays()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                guard player.lockedOrientation.isNil else {
+                    return
+                }
 
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                }
-                .onAnimationCompleted(for: viewDragOffset) {
-                    guard !dragGestureState else { return }
-                    if viewDragOffset == 0 {
-                        player.onPresentPlayer.forEach { $0() }
-                        player.onPresentPlayer = []
-                    } else if viewDragOffset == Self.hiddenOffset {
-                        player.hide(animate: false)
-                    }
-                }
-                #endif
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
-            #if os(iOS)
-            .onChange(of: dragGestureState) { newValue in
-                guard !newValue else { return }
-                onPlayerDragGestureEnded()
+            .onAnimationCompleted(for: viewDragOffset) {
+                guard !dragGestureState else { return }
+                if viewDragOffset == 0 {
+                    player.onPresentPlayer.forEach { $0() }
+                    player.onPresentPlayer = []
+                } else if viewDragOffset == Self.hiddenOffset {
+                    player.hide(animate: false)
+                }
             }
-            .offset(y: playerOffset)
-            .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
-            .backport
-            .persistentSystemOverlays(!fullScreenPlayer)
             #endif
+        }
+        #if os(iOS)
+        .onChange(of: dragGestureState) { newValue in
+            guard !newValue else { return }
+            onPlayerDragGestureEnded()
+        }
+        .offset(y: playerOffset)
+        .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
+        .backport
+        .persistentSystemOverlays(!fullScreenPlayer)
         #endif
     }
 
@@ -287,7 +270,7 @@ struct VideoPlayerView: View {
                 return [.vertical]
             }
 
-            return []
+            return [.bottom]
         }
     #endif
 
@@ -305,58 +288,54 @@ struct VideoPlayerView: View {
                     .ignoresSafeArea()
                 #else
                     GeometryReader { geometry in
-                        player.playerBackendView
-                        #if !os(tvOS)
-                            .modifier(
-                                VideoPlayerSizeModifier(
-                                    geometry: geometry,
-                                    aspectRatio: player.aspectRatio,
-                                    fullScreen: fullScreenPlayer
-                                )
+                        ZStack {
+                            player.playerBackendView
+                        }
+                        .modifier(
+                            VideoPlayerSizeModifier(
+                                geometry: geometry,
+                                aspectRatio: player.aspectRatio,
+                                fullScreen: fullScreenPlayer
                             )
-                            .overlay(playerPlaceholder)
-                        #endif
-                            .frame(maxWidth: fullScreenPlayer ? .infinity : nil, maxHeight: fullScreenPlayer ? .infinity : nil)
-                            .onHover { hovering in
-                                hoveringPlayer = hovering
-                                hovering ? player.controls.show() : player.controls.hide()
-                            }
-                        #if !os(tvOS)
-                            .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
-                        #endif
+                        )
+                        .frame(maxWidth: fullScreenPlayer ? .infinity : nil, maxHeight: fullScreenPlayer ? .infinity : nil)
+                        .onHover { hovering in
+                            hoveringPlayer = hovering
+                            hovering ? player.controls.show() : player.controls.hide()
+                        }
+                        .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
                         #if os(macOS)
-                        .onAppear(perform: {
-                            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
-                                hoverThrottle.execute {
-                                    if !player.currentItem.isNil, hoveringPlayer {
-                                        player.controls.resetTimer()
-                                    }
-                                }
-
-                                return $0
-                            }
-                        })
-                        #endif
-
-                        .background(Color.black)
-
-                        #if !os(tvOS)
-                            if !fullScreenPlayer {
-                                VideoDetails(page: $detailsPage, sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
-                                #if os(iOS)
-                                    .ignoresSafeArea(.all, edges: .bottom)
-                                #endif
-                                    .modifier(VideoDetailsPaddingModifier(
-                                        playerSize: player.playerSize,
-                                        fullScreen: fullScreenDetails
-                                    ))
-                                    .onDisappear {
-                                        if player.presentingPlayer {
-                                            player.setNeedsDrawing(true)
+                            .onAppear(perform: {
+                                NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
+                                    hoverThrottle.execute {
+                                        if !player.currentItem.isNil, hoveringPlayer {
+                                            player.controls.resetTimer()
                                         }
                                     }
-                            }
+
+                                    return $0
+                                }
+                            })
                         #endif
+
+                            .background(Color.black)
+
+                        if !fullScreenPlayer {
+                            VideoDetails(video: player.currentVideo, page: $detailsPage, sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
+                            #if os(iOS)
+                                .ignoresSafeArea(.all, edges: .bottom)
+                            #endif
+                                .modifier(VideoDetailsPaddingModifier(
+                                    playerSize: player.playerSize,
+                                    fullScreen: fullScreenDetails
+                                ))
+                                .onDisappear {
+                                    if player.presentingPlayer {
+                                        player.setNeedsDrawing(true)
+                                    }
+                                }
+                                .transition(.opacity)
+                        }
                     }
                 #endif
             }
@@ -476,7 +455,7 @@ struct VideoPlayerView: View {
                     .foregroundColor(.gray)
                 #endif
             }
-            .background(Color.black)
+            .background(colorScheme == .dark ? Color.black : .white)
             .contentShape(Rectangle())
             .frame(width: player.playerSize.width, height: player.playerSize.height)
         }
@@ -493,7 +472,7 @@ struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
             .onAppear {
-                OutroViewModel.shared.prepareForEmptyPlayerPlaceholder(.init(.fixture))
+                WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(.init(.fixture))
             }
     }
 }
