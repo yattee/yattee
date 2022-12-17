@@ -63,6 +63,10 @@ struct VideoActions: View {
             if player.currentItem != nil {
                 Spacer()
                 actionButton("Close", systemImage: "xmark") {
+//                TODO: setting
+//                    player.pause()
+//                    WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(player.currentItem)
+//                    WatchNextViewModel.shared.open()
                     player.closeCurrentItem()
                 }
             }

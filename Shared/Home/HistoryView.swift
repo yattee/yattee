@@ -33,11 +33,6 @@ struct HistoryView: View {
             visibleWatches
                 .forEach(player.loadHistoryVideoDetails)
         }
-        #if os(tvOS)
-        .padding(.horizontal, 40)
-        #else
-        .padding(.horizontal, 15)
-        #endif
     }
 
     private var visibleWatches: [Watch] {

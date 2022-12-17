@@ -79,6 +79,8 @@ struct VideoPlayerView: View {
             #endif
 
             overlay
+
+            WatchNextView()
         }
         .onAppear {
             if player.musicMode {
@@ -490,6 +492,8 @@ struct VideoPlayerView: View {
 struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
-            .injectFixtureEnvironmentObjects()
+            .onAppear {
+                OutroViewModel.shared.prepareForEmptyPlayerPlaceholder(.init(.fixture))
+            }
     }
 }

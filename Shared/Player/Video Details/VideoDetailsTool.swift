@@ -30,7 +30,7 @@ struct VideoDetailsTool: Identifiable {
         }
         switch page {
         case .info:
-            return video != nil && !video!.isLocal
+            return true
         case .inspector:
             return video == nil || Defaults[.showInspector] == .always || video!.isLocal
         case .chapters:

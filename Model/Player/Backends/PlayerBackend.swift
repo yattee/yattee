@@ -94,34 +94,37 @@ extension PlayerBackend {
     }
 
     func eofPlaybackModeAction() {
-        switch model.playbackMode {
-        case .queue, .shuffle:
-            if Defaults[.closeLastItemOnPlaybackEnd] {
-                model.prepareCurrentItemForHistory(finished: true)
-            }
-
-            if model.queue.isEmpty {
+        let timer = Delay.by(5) {
+            switch model.playbackMode {
+            case .queue, .shuffle:
                 if Defaults[.closeLastItemOnPlaybackEnd] {
-                    #if os(tvOS)
-                        if model.activeBackend == .appleAVPlayer {
-                            model.avPlayerBackend.controller?.dismiss(animated: false)
-                        }
-                    #endif
-                    model.resetQueue()
-                    model.hide()
+                    model.prepareCurrentItemForHistory(finished: true)
                 }
-            } else {
-                model.advanceToNextItem()
+
+                if model.queue.isEmpty {
+                    if Defaults[.closeLastItemOnPlaybackEnd] {
+                        #if os(tvOS)
+                            if model.activeBackend == .appleAVPlayer {
+                                model.avPlayerBackend.controller?.dismiss(animated: false)
+                            }
+                        #endif
+                        model.resetQueue()
+                        model.hide()
+                    }
+                } else {
+                    model.advanceToNextItem()
+                }
+            case .loopOne:
+                model.backend.seek(to: .zero, seekType: .loopRestart) { _ in
+                    self.model.play()
+                }
+            case .related:
+                guard let item = model.autoplayItem else { return }
+                model.resetAutoplay()
+                model.advanceToItem(item)
             }
-        case .loopOne:
-            model.backend.seek(to: .zero, seekType: .loopRestart) { _ in
-                self.model.play()
-            }
-        case .related:
-            guard let item = model.autoplayItem else { return }
-            model.resetAutoplay()
-            model.advanceToItem(item)
         }
+        WatchNextViewModel.shared.prepareForNextItem(model.currentItem, timer: timer)
     }
 
     func updateControls(completionHandler: (() -> Void)? = nil) {

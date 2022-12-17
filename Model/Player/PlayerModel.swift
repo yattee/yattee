@@ -322,6 +322,8 @@ final class PlayerModel: ObservableObject {
     func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
         pause()
 
+        WatchNextViewModel.shared.presentingOutro = false
+
         var changeBackendHandler: (() -> Void)?
 
         if let backend = (live && forceAVPlayerForLiveStreams) ? PlayerBackendType.appleAVPlayer :
@@ -569,7 +571,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
-        controls.hide()
+        controls.presentingControls = false
         pause()
         closePiP()
 

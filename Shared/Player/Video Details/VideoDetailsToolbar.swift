@@ -142,7 +142,7 @@ struct VideoDetailsToolbar: View {
     }
 
     var activeToolID: VideoDetailsTool.ID {
-        activeTool?.id ?? "queue"
+        activeTool?.id ?? "info"
     }
 }
 

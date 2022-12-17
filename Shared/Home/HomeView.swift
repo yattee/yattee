@@ -160,6 +160,11 @@ struct HomeView: View {
                     #endif
 
                     HistoryView(limit: homeHistoryItems)
+                    #if os(tvOS)
+                        .padding(.horizontal, 40)
+                    #else
+                        .padding(.horizontal, 15)
+                    #endif
                         .id(historyID)
                 }
             }

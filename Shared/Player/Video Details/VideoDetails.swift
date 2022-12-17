@@ -8,6 +8,8 @@ struct VideoDetails: View {
         case info, inspector, chapters, comments, related, queue
     }
 
+    var video: Video?
+
     @Binding var page: DetailsPage
     @Binding var sidebarQueue: Bool
     @Binding var fullScreen: Bool
@@ -25,15 +27,11 @@ struct VideoDetails: View {
 
     @ObservedObject private var accounts = AccountsModel.shared
     let comments = CommentsModel.shared
-    @ObservedObject private var player = PlayerModel.shared
+    var player = PlayerModel.shared
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.detailsToolbarPosition) private var detailsToolbarPosition
     @Default(.playerSidebar) private var playerSidebar
-
-    var video: Video? {
-        player.currentVideo
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -46,13 +44,15 @@ struct VideoDetails: View {
                 detailsTogglePlayer: false,
                 detailsToggleFullScreen: true
             )
+            .animation(nil, value: player.currentItem)
 
             VideoActions(video: video)
+                .animation(nil, value: player.currentItem)
 
             ZStack(alignment: .bottom) {
                 currentPage
                     .frame(maxWidth: detailsSize.width)
-                    .transition(.fade)
+                    .animation(nil, value: player.currentItem)
 
                 HStack {
                     if detailsToolbarPosition.needsLeftSpacer { Spacer() }
@@ -68,26 +68,16 @@ struct VideoDetails: View {
                     .offset(y: bottomPadding ? -SafeArea.insets.bottom : 0)
                 #endif
             }
-            .onChange(of: player.currentItem) { newItem in
-                Delay.by(0.2) {
-                    guard let newItem else {
-                        page = sidebarQueue ? .inspector : .queue
-                        return
-                    }
-
-                    if let video = newItem.video {
-                        page = video.isLocal ? .inspector : .info
-                    } else {
-                        page = sidebarQueue ? .inspector : .queue
-                    }
-                }
+            .onChange(of: player.currentItem) { _ in
+                page = .info
             }
         }
         .onAppear {
             if video.isNil ||
                 !VideoDetailsTool.find(for: page)!.isAvailable(for: video!, sidebarQueue: sidebarQueue)
             {
-                page = video == nil ? (sidebarQueue ? .inspector : .queue) : (video!.isLocal ? .inspector : .info)
+                guard let video, video.isLocal else { return }
+                page = .info
             }
 
             guard video != nil, accounts.app.supportsSubscriptions else {
@@ -146,14 +136,14 @@ struct VideoDetails: View {
             }
         }
         .contentShape(Rectangle())
-        .frame(maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     @State private var detailsSize = CGSize.zero
 
     var detailsPage: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            if let video {
+            if let video, player.videoBeingOpened == nil {
                 VStack(alignment: .leading, spacing: 10) {
                     videoProperties
 
@@ -248,7 +238,7 @@ struct VideoDetails: View {
 
 struct VideoDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDetails(page: .constant(.info), sidebarQueue: .constant(true), fullScreen: .constant(false))
+        VideoDetails(video: .fixture, page: .constant(.info), sidebarQueue: .constant(true), fullScreen: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }

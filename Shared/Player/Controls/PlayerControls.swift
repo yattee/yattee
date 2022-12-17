@@ -316,6 +316,9 @@ struct PlayerControls: View {
 
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
+//            TODO: Setting
+//            WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(player.currentItem)
+//            WatchNextViewModel.shared.open()
             player.closeCurrentItem()
         }
         #if os(tvOS)
