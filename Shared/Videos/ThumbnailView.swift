@@ -7,13 +7,19 @@ struct ThumbnailView: View {
     private let thumbnails = ThumbnailsModel.shared
 
     var body: some View {
-        viewForThumbnailExtension
+        if url != nil {
+            viewForThumbnailExtension
+        }
     }
 
     var thumbnailExtension: String? {
-        guard let url else { return nil }
-        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        return urlComponents?.path.components(separatedBy: ".").last
+        guard let url,
+              let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+
+        let pathComponents = urlComponents.path.components(separatedBy: ".")
+        guard pathComponents.count > 1 else { return nil }
+
+        return pathComponents.last
     }
 
     @ViewBuilder var viewForThumbnailExtension: some View {
@@ -24,7 +30,7 @@ struct ThumbnailView: View {
                 asyncImageIfAvailable
             }
         } else {
-            asyncImageIfAvailable
+            webImage
         }
     }
 
