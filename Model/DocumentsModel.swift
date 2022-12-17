@@ -3,22 +3,12 @@ import Foundation
 final class DocumentsModel: ObservableObject {
     static var shared = DocumentsModel()
 
-    @Published private(set) var directoryURL: URL!
     @Published private(set) var refreshID = UUID()
 
     typealias AreInIncreasingOrder = (URL, URL) -> Bool
 
-    init(directoryURL: URL! = nil) {
-        self.directoryURL = directoryURL
-    }
-
     private var fileManager: FileManager {
         .default
-    }
-
-    var directoryLabel: String {
-        guard let directoryURL else { return "Documents" }
-        return displayLabelForDocument(directoryURL)
     }
 
     var sortPredicates: [AreInIncreasingOrder] {
@@ -28,8 +18,8 @@ final class DocumentsModel: ObservableObject {
         ]
     }
 
-    var sortedDirectoryContents: [URL] {
-        directoryContents.sorted { lhs, rhs in
+    func sortedDirectoryContents(_ directoryURL: URL) -> [URL] {
+        directoryContents(directoryURL).sorted { lhs, rhs in
             for predicate in sortPredicates {
                 if !predicate(lhs, rhs), !predicate(rhs, lhs) {
                     continue
@@ -42,9 +32,8 @@ final class DocumentsModel: ObservableObject {
         }
     }
 
-    var directoryContents: [URL] {
-        guard let directoryURL else { return [] }
-        return contents(of: directoryURL)
+    func directoryContents(_ directoryURL: URL) -> [URL] {
+        contents(of: directoryURL)
     }
 
     var documentsDirectory: URL? {
@@ -157,34 +146,13 @@ final class DocumentsModel: ObservableObject {
         )) ?? []
     }
 
-    private func displayLabelForDocument(_ file: URL) -> String {
+    func displayLabelForDocument(_ file: URL) -> String {
         let components = file.absoluteString.components(separatedBy: "/Documents/")
         if components.count == 2 {
             let component = components[1]
             return component.isEmpty ? "Documents" : component.removingPercentEncoding ?? component
         }
         return "Document"
-    }
-
-    var canGoBack: Bool {
-        guard let directoryURL, let documentsDirectory else { return false }
-        return standardizedURL(directoryURL) != documentsDirectory
-    }
-
-    func goToURL(_ url: URL) {
-        directoryURL = url
-    }
-
-    func goBack() {
-        directoryURL = urlToGoBack
-    }
-
-    func goToTop() {
-        directoryURL = documentsDirectory
-    }
-
-    private var urlToGoBack: URL? {
-        directoryURL?.deletingLastPathComponent()
     }
 
     func standardizedURL(_ url: URL) -> URL? {

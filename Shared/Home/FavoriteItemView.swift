@@ -56,7 +56,7 @@ struct FavoriteItemView: View {
     }
 
     func loadCacheAndResource(force: Bool = false) {
-        guard var resource else { return }
+        guard let resource else { return }
 
         var onSuccess: (Entity<Any>) -> Void = { _ in }
         var contentItems = [ContentItem]()

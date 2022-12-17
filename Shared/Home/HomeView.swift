@@ -92,7 +92,16 @@ struct HomeView: View {
                 if homeRecentDocumentsItems > 0 {
                     VStack {
                         HStack {
-                            sectionLabel("Recent Documents")
+                            NavigationLink(destination: DocumentsView()) {
+                                HStack {
+                                    Text("Documents")
+                                        .font(.title3.bold())
+                                    Image(systemName: "chevron.right")
+                                        .imageScale(.small)
+                                }
+                                .lineLimit(1)
+                            }
+                            .padding(.leading, 15)
 
                             Spacer()
 

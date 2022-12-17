@@ -33,17 +33,6 @@ struct PlayerQueueRow: View {
                 return
             }
 
-            #if os(iOS)
-                guard !video.localStreamIsDirectory else {
-                    if let url = video.localStream?.localURL {
-                        withAnimation {
-                            DocumentsModel.shared.goToURL(url)
-                        }
-                    }
-                    return
-                }
-            #endif
-
             if video.localStreamIsFile, let url = video.localStream?.localURL {
                 URLBookmarkModel.shared.saveBookmark(url)
             }
