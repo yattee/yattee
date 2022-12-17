@@ -14,6 +14,7 @@ struct ChannelVideosView: View {
     @State private var contentType = Channel.ContentType.videos
     @StateObject private var contentTypeItems = Store<[ContentItem]>()
 
+    @State private var descriptionExpanded = false
     @StateObject private var store = Store<Channel>()
 
     @Environment(\.colorScheme) private var colorScheme
@@ -68,7 +69,33 @@ struct ChannelVideosView: View {
             #endif
 
             VerticalCells(items: contentItems) {
-                banner
+                if let description = presentedChannel?.description, !description.isEmpty {
+                    Button {
+                        withAnimation(.spring()) {
+                            descriptionExpanded.toggle()
+                        }
+                    } label: {
+                        VStack(alignment: .leading) {
+                            banner
+
+                            ZStack(alignment: .topTrailing) {
+                                Text(description)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .lineLimit(descriptionExpanded ? 50 : 1)
+                                    .multilineTextAlignment(.leading)
+                                #if os(tvOS)
+                                    .foregroundColor(.primary)
+                                #else
+                                    .foregroundColor(.secondary)
+                                #endif
+                            }
+                        }
+                        .padding(.bottom, descriptionExpanded ? 10 : 0)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    banner
+                }
             }
             .environment(\.inChannelView, true)
             .environment(\.listingStyle, channelPlaylistListingStyle)
@@ -383,9 +410,13 @@ struct ChannelVideosView: View {
 
 struct ChannelVideosView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
+        #if os(macOS)
             ChannelVideosView(channel: Video.fixture.channel)
                 .environment(\.navigationStyle, .sidebar)
-        }
+        #else
+            NavigationView {
+                ChannelVideosView(channel: Video.fixture.channel)
+            }
+        #endif
     }
 }

@@ -25,6 +25,7 @@ extension Video {
                 name: "The Channel",
                 bannerURL: URL(string: bannerURL)!,
                 thumbnailURL: URL(string: thumbnailURL)!,
+                description: "The best channel that ever existed.\nThe best channel that ever existed. The best channel that ever existed. The best channel that ever existed. The best channel that ever existed. ",
                 subscriptionsCount: 2300,
                 totalViews: 3_260_378_817,
                 videos: []
