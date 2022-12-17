@@ -228,7 +228,7 @@ struct FavoriteItemView: View {
     private var isVisible: Bool {
         switch item.section {
         case .subscriptions:
-            return accounts.app.supportsSubscriptions
+            return accounts.app.supportsSubscriptions && !accounts.isEmpty && !accounts.current.anonymous
         case .popular:
             return accounts.app.supportsPopular
         case let .channel(appType, _, _):
