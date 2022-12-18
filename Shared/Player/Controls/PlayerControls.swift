@@ -213,15 +213,25 @@ struct PlayerControls: View {
     }
 
     @ViewBuilder var controlsBackground: some View {
-        if player.musicMode,
-           let url = controlsBackgroundURL
-        {
-            ThumbnailView(url: url)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .transition(.opacity)
-                .animation(.default)
-        } else if player.videoForDisplay == nil {
-            Color.black
+        ZStack {
+            if player.musicMode,
+               let url = controlsBackgroundURL
+            {
+                ThumbnailView(url: url)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transition(.opacity)
+                    .animation(.default)
+            } else if player.videoForDisplay == nil {
+                Color.black
+            }
+
+            if model.presentingControls {
+                Rectangle()
+                    .fill(
+                        LinearGradient(stops: gradientStops, startPoint: .top, endPoint: .bottom)
+                    )
+                    .transition(.opacity)
+            }
         }
     }
 
@@ -233,6 +243,15 @@ struct PlayerControls: View {
         }
 
         return nil
+    }
+
+    var gradientStops: [Gradient.Stop] {
+        [
+            Gradient.Stop(color: .black.opacity(0.3), location: 0.0),
+            Gradient.Stop(color: .clear, location: 0.33),
+            Gradient.Stop(color: .clear, location: 0.66),
+            Gradient.Stop(color: .black.opacity(0.3), location: 1)
+        ]
     }
 
     var timeline: some View {
