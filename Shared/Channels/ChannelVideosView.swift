@@ -90,7 +90,7 @@ struct ChannelVideosView: View {
                                 #endif
                             }
                         }
-                        .padding(.bottom, descriptionExpanded ? 10 : 0)
+                        .padding(.bottom, 10)
                     }
                     .buttonStyle(.plain)
                 } else {
