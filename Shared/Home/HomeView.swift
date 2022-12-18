@@ -62,15 +62,19 @@ struct HomeView: View {
                     }
                 #endif
             }
-            #if os(iOS)
-            .padding(.top, RefreshControl.navigationBarTitleDisplayMode == .inline ? 15 : 0)
-            #else
             .padding(.top, 15)
-            #endif
             #if os(tvOS)
-            .padding(.horizontal, 40)
+                .padding(.horizontal, 40)
             #else
-            .padding(.horizontal, 15)
+                .padding(.horizontal, 15)
+            #endif
+
+            QueueView()
+                .padding(.vertical, 15)
+            #if os(tvOS)
+                .padding(.horizontal, 40)
+            #else
+                .padding(.horizontal, 15)
             #endif
 
             if !accounts.current.isNil, showFavoritesInHome {

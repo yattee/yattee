@@ -34,6 +34,10 @@ private struct InQueueListingKey: EnvironmentKey {
     static let defaultValue = false
 }
 
+private struct NoListingDividersKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 enum ListingStyle: String, CaseIterable, Defaults.Serializable {
     case cells
     case list
@@ -113,4 +117,8 @@ extension EnvironmentValues {
         set { self[InQueueListingKey.self] = newValue }
     }
 
+    var noListingDividers: Bool {
+        get { self[NoListingDividersKey.self] }
+        set { self[NoListingDividersKey.self] = newValue }
+    }
 }

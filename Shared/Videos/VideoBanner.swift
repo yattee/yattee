@@ -254,7 +254,7 @@ struct VideoBanner: View {
             PlayingIndicatorView(video: video, height: 10)
                 .frame(width: 12, alignment: .trailing)
                 .padding(.trailing, 3)
-                .padding(.bottom, timeLabel == nil ? 3 : 0)
+                .padding(.bottom, timeLabel == nil ? 3 : -5)
 
             if let timeLabel {
                 Text(timeLabel)

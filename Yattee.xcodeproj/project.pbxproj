@@ -819,6 +819,9 @@
 		37C89322294532220032AFD3 /* PlayerOverlayModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C89321294532220032AFD3 /* PlayerOverlayModifier.swift */; };
 		37C89323294532220032AFD3 /* PlayerOverlayModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C89321294532220032AFD3 /* PlayerOverlayModifier.swift */; };
 		37C89324294532220032AFD3 /* PlayerOverlayModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C89321294532220032AFD3 /* PlayerOverlayModifier.swift */; };
+		37C8E701294FC97D00EEAB14 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C8E700294FC97D00EEAB14 /* QueueView.swift */; };
+		37C8E702294FC97D00EEAB14 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C8E700294FC97D00EEAB14 /* QueueView.swift */; };
+		37C8E703294FC97D00EEAB14 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C8E700294FC97D00EEAB14 /* QueueView.swift */; };
 		37CC3F45270CE30600608308 /* PlayerQueueItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F44270CE30600608308 /* PlayerQueueItem.swift */; };
 		37CC3F46270CE30600608308 /* PlayerQueueItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F44270CE30600608308 /* PlayerQueueItem.swift */; };
 		37CC3F47270CE30600608308 /* PlayerQueueItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC3F44270CE30600608308 /* PlayerQueueItem.swift */; };
@@ -1409,6 +1412,7 @@
 		37C3A250272366440087A57A /* ChannelPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelPlaylistView.swift; sourceTree = "<group>"; };
 		37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorBlockSegment.swift; sourceTree = "<group>"; };
 		37C89321294532220032AFD3 /* PlayerOverlayModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerOverlayModifier.swift; sourceTree = "<group>"; };
+		37C8E700294FC97D00EEAB14 /* QueueView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
 		37CC3F44270CE30600608308 /* PlayerQueueItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueItem.swift; sourceTree = "<group>"; };
 		37CC3F4B270CFE1700608308 /* PlayerQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueView.swift; sourceTree = "<group>"; };
 		37CC3F4F270D010D00608308 /* VideoBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoBanner.swift; sourceTree = "<group>"; };
@@ -2138,6 +2142,7 @@
 			children = (
 				3788AC2626F6840700F6BAA9 /* FavoriteItemView.swift */,
 				37B263192735EAAB00FE0D40 /* FavoriteResourceObserver.swift */,
+				37C8E700294FC97D00EEAB14 /* QueueView.swift */,
 				37A9965D26D6F9B9006E3224 /* HomeView.swift */,
 				377FF88E291A99580028EB0B /* HistoryView.swift */,
 			);
@@ -3028,6 +3033,7 @@
 			files = (
 				37220564294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */,
 				37E6D79C2944AE1A00550C3D /* FeedModel.swift in Sources */,
+				37C8E701294FC97D00EEAB14 /* QueueView.swift in Sources */,
 				374710052755291C00CE0F87 /* SearchTextField.swift in Sources */,
 				37494EA529200B14000DF176 /* DocumentsView.swift in Sources */,
 				374DE88028BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */,
@@ -3458,6 +3464,7 @@
 				372D85DE283841B800FF3C7D /* PiPDelegate.swift in Sources */,
 				37F13B63285E43C000B137E4 /* ControlsOverlay.swift in Sources */,
 				37B81AFD26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */,
+				37C8E702294FC97D00EEAB14 /* QueueView.swift in Sources */,
 				37C0697F2725C8D400F7F6CB /* CMTime+DefaultTimescale.swift in Sources */,
 				37A9965B26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
 				37E6D79D2944AE1A00550C3D /* FeedModel.swift in Sources */,
@@ -3823,6 +3830,7 @@
 				37D4B19926717E1500C925CA /* Video.swift in Sources */,
 				378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */,
 				37169AA82729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
+				37C8E703294FC97D00EEAB14 /* QueueView.swift in Sources */,
 				3754B01728B7F84D009717C8 /* Constants.swift in Sources */,
 				37BC50AE2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37D526E02720AC4400ED2F5E /* VideosAPI.swift in Sources */,

@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentItemView: View {
     let item: ContentItem
     @Environment(\.listingStyle) private var listingStyle
+    @Environment(\.noListingDividers) private var noListingDividers
 
     var body: some View {
         Group {
@@ -25,16 +26,19 @@ struct ContentItemView: View {
         if listingStyle == .cells {
             VideoCell(video: video)
         } else {
-            PlayerQueueRow(item: .init(video))
+            let item = PlayerQueueItem(video)
+            PlayerQueueRow(item: item)
                 .contextMenu {
                     VideoContextMenuView(video: video)
                 }
+                .id(item.id)
             #if os(tvOS)
                 .padding(.horizontal, 30)
             #endif
 
             #if !os(tvOS)
                 Divider()
+                    .opacity(noListingDividers ? 0 : 1)
             #endif
         }
     }
