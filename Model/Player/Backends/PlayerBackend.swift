@@ -94,37 +94,59 @@ extension PlayerBackend {
     }
 
     func eofPlaybackModeAction() {
-        let timer = Delay.by(5) {
+        let loopAction = {
+            model.backend.seek(to: .zero, seekType: .loopRestart) { _ in
+                self.model.play()
+            }
+        }
+
+        guard model.playbackMode != .loopOne else {
+            loopAction()
+            return
+        }
+
+        let action = {
             switch model.playbackMode {
             case .queue, .shuffle:
-                if Defaults[.closeLastItemOnPlaybackEnd] {
-                    model.prepareCurrentItemForHistory(finished: true)
-                }
+                model.prepareCurrentItemForHistory(finished: true)
 
                 if model.queue.isEmpty {
-                    if Defaults[.closeLastItemOnPlaybackEnd] {
-                        #if os(tvOS)
-                            if model.activeBackend == .appleAVPlayer {
-                                model.avPlayerBackend.controller?.dismiss(animated: false)
-                            }
-                        #endif
-                        model.resetQueue()
-                        model.hide()
-                    }
+                    #if os(tvOS)
+                        if model.activeBackend == .appleAVPlayer {
+                            model.avPlayerBackend.controller?.dismiss(animated: false)
+                        }
+                    #endif
+                    model.resetQueue()
+                    model.hide()
                 } else {
                     model.advanceToNextItem()
                 }
             case .loopOne:
-                model.backend.seek(to: .zero, seekType: .loopRestart) { _ in
-                    self.model.play()
-                }
+                loopAction()
             case .related:
                 guard let item = model.autoplayItem else { return }
                 model.resetAutoplay()
                 model.advanceToItem(item)
             }
         }
-        WatchNextViewModel.shared.prepareForNextItem(model.currentItem, timer: timer)
+        let actionAndHideWatchNext: (Bool) -> Void = { delay in
+            WatchNextViewModel.shared.hide()
+            if delay {
+                Delay.by(0.3) {
+                    action()
+                }
+            } else {
+                action()
+            }
+        }
+        if Defaults[.openWatchNextOnFinishedWatching], model.presentingPlayer {
+            let timer = Delay.by(TimeInterval(Defaults[.openWatchNextOnFinishedWatchingDelay]) ?? 5.0) {
+                actionAndHideWatchNext(true)
+            }
+            WatchNextViewModel.shared.finishedWatching(model.currentItem, timer: timer)
+        } else {
+            actionAndHideWatchNext(false)
+        }
     }
 
     func updateControls(completionHandler: (() -> Void)? = nil) {

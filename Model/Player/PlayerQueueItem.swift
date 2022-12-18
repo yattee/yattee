@@ -25,7 +25,7 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     }
 
     init(
-        _ video: Video? = nil,
+        _ video: Video? = .fixture,
         videoID: Video.ID? = nil,
         app: VideosApp? = nil,
         instanceURL: URL? = nil,

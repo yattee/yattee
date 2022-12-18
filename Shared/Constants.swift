@@ -43,4 +43,12 @@ struct Constants {
             true
         #endif
     }
+
+    static var nextSystemImage: String {
+        if #available(iOS 16, macOS 13, tvOS 16, *) {
+            return "film.stack"
+        } else {
+            return "list.and.film"
+        }
+    }
 }

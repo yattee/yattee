@@ -5,7 +5,7 @@ struct VideoDetailsOverlay: View {
     @ObservedObject private var controls = PlayerControlsModel.shared
 
     var body: some View {
-        VideoDetails(video: PlayerModel.shared.currentVideo, fullScreen: fullScreenBinding)
+        VideoDetails(video: controls.player.videoForDisplay, fullScreen: fullScreenBinding)
             .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 

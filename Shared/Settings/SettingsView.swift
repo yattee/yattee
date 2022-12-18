@@ -38,7 +38,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Browsing", systemImage: "list.and.film")
                 }
-                .tag(Optional(Tabs.browsing))
+                .tag(Tabs.browsing)
 
                 Form {
                     PlayerSettings()
@@ -46,7 +46,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Player", systemImage: "play.rectangle")
                 }
-                .tag(Optional(Tabs.player))
+                .tag(Tabs.player)
 
                 Form {
                     QualitySettings()
@@ -54,7 +54,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Quality", systemImage: "4k.tv")
                 }
-                .tag(Optional(Tabs.quality))
+                .tag(Tabs.quality)
 
                 Form {
                     HistorySettings()
@@ -62,7 +62,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("History", systemImage: "clock.arrow.circlepath")
                 }
-                .tag(Optional(Tabs.history))
+                .tag(Tabs.history)
 
                 if !accounts.isEmpty {
                     Form {
@@ -71,7 +71,7 @@ struct SettingsView: View {
                     .tabItem {
                         Label("SponsorBlock", systemImage: "dollarsign.circle")
                     }
-                    .tag(Optional(Tabs.sponsorBlock))
+                    .tag(Tabs.sponsorBlock)
                 }
                 Form {
                     LocationsSettings()
@@ -79,7 +79,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Locations", systemImage: "globe")
                 }
-                .tag(Optional(Tabs.locations))
+                .tag(Tabs.locations)
 
                 Group {
                     AdvancedSettings()
@@ -87,7 +87,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Advanced", systemImage: "wrench.and.screwdriver")
                 }
-                .tag(Optional(Tabs.advanced))
+                .tag(Tabs.advanced)
 
                 Form {
                     Help()
@@ -95,7 +95,7 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Help", systemImage: "questionmark.circle")
                 }
-                .tag(Optional(Tabs.help))
+                .tag(Tabs.help)
             }
             .padding(20)
             .frame(width: 600, height: windowHeight)
@@ -225,9 +225,9 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case .browsing:
-                return 680
+                return 700
             case .player:
-                return 900
+                return 730
             case .quality:
                 return 420
             case .history:

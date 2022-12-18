@@ -9,13 +9,14 @@ struct VideoActions: View {
 
     var video: Video?
 
+    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
 
     var body: some View {
-        HStack {
+        HStack(spacing: 6) {
             if let video {
                 #if !os(tvOS)
-                    if !video.isLocal || video.localStreamIsRemoteURL {
+                    if video.isShareable {
                         ShareButton(contentItem: .init(video: video)) {
                             actionButton("Share", systemImage: "square.and.arrow.up")
                         }
@@ -50,21 +51,29 @@ struct VideoActions: View {
                         Spacer()
                     }
                 }
+            } else {
+                Spacer()
             }
+            actionButton("Next", systemImage: Constants.nextSystemImage) {
+                WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
+            }
+
+            Spacer()
 
             actionButton("Hide", systemImage: "chevron.down") {
                 player.hide(animate: true)
             }
 
             Spacer()
+
             actionButton("Close", systemImage: "xmark") {
-//                TODO: setting
-//                    player.pause()
-//                    WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(player.currentItem)
-//                    WatchNextViewModel.shared.open()
-                player.closeCurrentItem()
+                if openWatchNextOnClose {
+                    player.pause()
+                    WatchNextViewModel.shared.closed(player.currentItem)
+                } else {
+                    player.closeCurrentItem()
+                }
             }
-            .disabled(player.currentItem == nil)
         }
         .padding(.horizontal)
         .multilineTextAlignment(.center)

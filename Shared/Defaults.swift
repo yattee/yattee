@@ -107,8 +107,6 @@ extension Defaults.Keys {
     static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: chargingNonCellularProfileDefault)
     static let forceAVPlayerForLiveStreams = Key<Bool>("forceAVPlayerForLiveStreams", default: true)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: .defaultValue)
-    static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
-    static let detailsToolbarPosition = Key<DetailsToolbarPositionSetting>("detailsToolbarPosition", default: .center)
     static let playerInstanceID = Key<Instance.ID?>("playerInstance")
 
     #if os(iOS)
@@ -142,20 +140,6 @@ extension Defaults.Keys {
     #if !os(macOS)
         static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
     #endif
-    #if os(tvOS)
-        static let closeLastItemOnPlaybackEndDefault = true
-    #else
-        static let closeLastItemOnPlaybackEndDefault = false
-    #endif
-    static let closeLastItemOnPlaybackEnd = Key<Bool>("closeLastItemOnPlaybackEnd", default: closeLastItemOnPlaybackEndDefault)
-
-    #if os(tvOS)
-        static let closePlayerOnItemCloseDefault = true
-    #else
-        static let closePlayerOnItemCloseDefault = false
-    #endif
-    static let closePlayerOnItemClose = Key<Bool>("closePlayerOnItemClose", default: closePlayerOnItemCloseDefault)
-
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
     #if !os(macOS)
@@ -198,7 +182,6 @@ extension Defaults.Keys {
         static let playerDetailsPageButtonLabelStyleDefault = UIDevice.current.userInterfaceIdiom == .phone ? ButtonLabelStyle.iconOnly : .iconAndText
     #endif
     static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: .iconAndText)
-    static let playerDetailsPageButtonLabelStyle = Key<ButtonLabelStyle>("playerDetailsPageButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
@@ -216,6 +199,10 @@ extension Defaults.Keys {
     static let playlistListingStyle = Key<ListingStyle>("playlistListingStyle", default: .cells)
     static let channelPlaylistListingStyle = Key<ListingStyle>("channelPlaylistListingStyle", default: .cells)
     static let searchListingStyle = Key<ListingStyle>("searchListingStyle", default: .cells)
+
+    static let openWatchNextOnFinishedWatching = Key<Bool>("openWatchNextOnFinishedWatching", default: true)
+    static let openWatchNextOnClose = Key<Bool>("openWatchNextOnClose", default: false)
+    static let openWatchNextOnFinishedWatchingDelay = Key<String>("openWatchNextOnFinishedWatchingDelay", default: "5")
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

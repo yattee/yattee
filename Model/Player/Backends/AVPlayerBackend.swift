@@ -531,10 +531,6 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     @objc func itemDidPlayToEndTime() {
-        if Defaults[.closeLastItemOnPlaybackEnd] {
-            model.prepareCurrentItemForHistory(finished: true)
-        }
-
         eofPlaybackModeAction()
     }
 

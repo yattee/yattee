@@ -327,6 +327,10 @@ struct Video: Identifiable, Equatable, Hashable {
         return path.contains(".") ? path.components(separatedBy: ".").last?.uppercased() : nil
     }
 
+    var isShareable: Bool {
+        !isLocal || localStreamIsRemoteURL
+    }
+
     private var localStreamURLComponents: URLComponents? {
         guard let localStream else { return nil }
         return URLComponents(url: localStream.localURL, resolvingAgainstBaseURL: false)

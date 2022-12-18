@@ -26,12 +26,9 @@ struct PlayerControls: View {
         @FocusState private var focusedField: Field?
     #endif
 
-    #if !os(macOS)
-        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
-    #endif
-
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
 
     private let controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -164,6 +161,7 @@ struct PlayerControls: View {
             #if os(tvOS)
                 .onChange(of: model.presentingControls) { newValue in
                     if newValue { focusedField = .play }
+                    else { focusedField = nil }
                 }
                 .onChange(of: focusedField) { _ in model.resetTimer() }
             #else
@@ -222,6 +220,8 @@ struct PlayerControls: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .transition(.opacity)
                 .animation(.default)
+        } else if player.videoForDisplay == nil {
+            Color.black
         }
     }
 
@@ -320,10 +320,12 @@ struct PlayerControls: View {
 
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
-//            TODO: Setting
-//            WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(player.currentItem)
-//            WatchNextViewModel.shared.open()
-            player.closeCurrentItem()
+            if openWatchNextOnClose {
+                player.pause()
+                WatchNextViewModel.shared.closed(player.currentItem)
+            } else {
+                player.closeCurrentItem()
+            }
         }
         #if os(tvOS)
         .focused($focusedField, equals: .close)

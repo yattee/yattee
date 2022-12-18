@@ -126,6 +126,11 @@ struct VideoPlayerView: View {
                 }
             }
             .onAppear {
+                #if os(macOS)
+                    if player.videoForDisplay.isNil {
+                        player.hide()
+                    }
+                #endif
                 viewDragOffset = 0
 
                 Delay.by(0.2) {
@@ -177,6 +182,9 @@ struct VideoPlayerView: View {
         .animation(dragGestureState ? .interactiveSpring(response: 0.05) : .easeOut(duration: 0.2), value: playerOffset)
         .backport
         .persistentSystemOverlays(!fullScreenPlayer)
+        #endif
+        #if os(macOS)
+        .frame(minWidth: 1000, minHeight: 700)
         #endif
     }
 

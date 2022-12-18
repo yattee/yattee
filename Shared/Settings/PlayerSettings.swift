@@ -6,10 +6,6 @@ struct PlayerSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
-    @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
-    @Default(.playerDetailsPageButtonLabelStyle) private var playerDetailsPageButtonLabelStyle
-    @Default(.detailsToolbarPosition) private var detailsToolbarPosition
-    @Default(.showInspector) private var showInspector
     @Default(.playerControlsLayout) private var playerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
@@ -17,7 +13,6 @@ struct PlayerSettings: View {
     @Default(.seekGestureSensitivity) private var seekGestureSensitivity
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
-    @Default(.closeLastItemOnPlaybackEnd) private var closeLastItemOnPlaybackEnd
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
@@ -27,13 +22,16 @@ struct PlayerSettings: View {
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
     @Default(.closePlayerOnOpeningPiP) private var closePlayerOnOpeningPiP
     #if !os(macOS)
-        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
         @Default(.pauseOnEnteringBackground) private var pauseOnEnteringBackground
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) private var closePiPAndOpenPlayerOnEnteringForeground
     #endif
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.systemControlsCommands) private var systemControlsCommands
+
+    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
+    @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
+    @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
 
     @ObservedObject private var accounts = AccountsModel.shared
     private var player = PlayerModel.shared
@@ -73,10 +71,14 @@ struct PlayerSettings: View {
                 pauseOnHidingPlayerToggle
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
-                    closePlayerOnItemCloseToggle
                 #endif
-                closeLastItemOnPlaybackEndToggle
                 systemControlsCommandsPicker
+            }
+
+            Section(header: SettingsHeader(text: "Watch Next")) {
+                openWatchNextOnFinishedWatchingToggle
+                openWatchNextOnFinishedWatchingDelayTextField
+                openWatchNextOnCloseToggle
             }
 
             #if !os(tvOS)
@@ -119,21 +121,6 @@ struct PlayerSettings: View {
             #elseif os(iOS)
                 if idiom == .pad || !accounts.isEmpty {
                     interface
-                }
-            #endif
-
-            #if !os(tvOS)
-                Section(header: SettingsHeader(text: "Video Details").padding(.bottom, videoDetailsHeaderPadding)) {
-                    SettingsHeader(text: "Actions buttons".localized(), secondary: true)
-                    playerActionsButtonLabelStylePicker
-                    SettingsHeader(text: "Pages buttons".localized(), secondary: true)
-                    detailsButtonLabelStylePicker
-
-                    SettingsHeader(text: "Show Inspector".localized(), secondary: true)
-                    showInspectorPicker
-
-                    SettingsHeader(text: "Pages toolbar position".localized(), secondary: true)
-                    detailsToolbarPositionPicker
                 }
             #endif
 
@@ -196,6 +183,33 @@ struct PlayerSettings: View {
         .modifier(SettingsPickerModifier())
     }
 
+    private var openWatchNextOnCloseToggle: some View {
+        Toggle("Open after manual close of video", isOn: $openWatchNextOnClose)
+    }
+
+    private var openWatchNextOnFinishedWatchingToggle: some View {
+        Toggle("Open after watching video", isOn: $openWatchNextOnFinishedWatching)
+    }
+
+    private var openWatchNextOnFinishedWatchingDelayTextField: some View {
+        HStack {
+            Text("Autoplay delay")
+                .frame(minWidth: 140, alignment: .leading)
+            #if !os(iOS)
+                Spacer()
+            #endif
+            TextField("Delay", text: $openWatchNextOnFinishedWatchingDelay)
+            #if !os(iOS)
+                .frame(maxWidth: 100, alignment: .trailing)
+            #endif
+                .labelsHidden()
+            #if !os(macOS)
+                .keyboardType(.numberPad)
+            #endif
+        }
+        .multilineTextAlignment(.trailing)
+    }
+
     private var sidebarPicker: some View {
         Picker("Sidebar", selection: $playerSidebar) {
             #if os(macOS)
@@ -207,39 +221,6 @@ struct PlayerSettings: View {
             #endif
 
             Text("Hide sidebar").tag(PlayerSidebarSetting.never)
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var playerActionsButtonLabelStylePicker: some View {
-        Picker("Video actions buttons", selection: $playerActionsButtonLabelStyle) {
-            Text("Show only icons").tag(ButtonLabelStyle.iconOnly)
-            Text("Show icons and text when space permits").tag(ButtonLabelStyle.iconAndText)
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var detailsButtonLabelStylePicker: some View {
-        Picker("Pages buttons", selection: $playerDetailsPageButtonLabelStyle) {
-            Text("Show only icons").tag(ButtonLabelStyle.iconOnly)
-            Text("Show icons and text when space permits").tag(ButtonLabelStyle.iconAndText)
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var showInspectorPicker: some View {
-        Picker("Inspector visibility", selection: $showInspector) {
-            Text("Always").tag(ShowInspectorSetting.always)
-            Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var detailsToolbarPositionPicker: some View {
-        Picker("Pages toolbar position", selection: $detailsToolbarPosition) {
-            ForEach(DetailsToolbarPositionSetting.allCases, id: \.self) { setting in
-                Text(setting.rawValue.capitalized.localized()).tag(setting)
-            }
         }
         .modifier(SettingsPickerModifier())
     }
@@ -310,15 +291,7 @@ struct PlayerSettings: View {
         private var pauseOnEnteringBackgroundToogle: some View {
             Toggle("Pause when entering background", isOn: $pauseOnEnteringBackground)
         }
-
-        private var closePlayerOnItemCloseToggle: some View {
-            Toggle("Close player when closing video", isOn: $closePlayerOnItemClose)
-        }
     #endif
-
-    private var closeLastItemOnPlaybackEndToggle: some View {
-        Toggle("Close video after playing last in the queue", isOn: $closeLastItemOnPlaybackEnd)
-    }
 
     #if os(iOS)
         private var honorSystemOrientationLockToggle: some View {

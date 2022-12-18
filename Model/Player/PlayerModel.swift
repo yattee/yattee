@@ -80,6 +80,9 @@ final class PlayerModel: ObservableObject {
 
     @Published var playerSize: CGSize = .zero { didSet {
         #if !os(tvOS)
+            #if os(macOS)
+                guard videoForDisplay != nil else { return }
+            #endif
             backend.setSize(playerSize.width, playerSize.height)
         #endif
     }}
@@ -162,7 +165,6 @@ final class PlayerModel: ObservableObject {
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
-        @Default(.closePlayerOnItemClose) private var closePlayerOnItemClose
     #endif
 
     private var currentArtwork: MPMediaItemArtwork?
@@ -324,7 +326,7 @@ final class PlayerModel: ObservableObject {
         pause()
         videoBeingOpened = video
 
-        WatchNextViewModel.shared.presentingOutro = false
+        WatchNextViewModel.shared.hide()
 
         var changeBackendHandler: (() -> Void)?
 

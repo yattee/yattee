@@ -107,7 +107,7 @@ struct OpenVideosModel {
             prepending: playbackMode == .playNow || playbackMode == .playNext
         )
 
-        WatchNextViewModel.shared.presentingOutro = false
+        WatchNextViewModel.shared.hide()
 
         if playbackMode == .playNow || playbackMode == .shuffleAll {
             #if os(iOS)

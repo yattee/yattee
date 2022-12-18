@@ -27,10 +27,9 @@ struct VideoDetails: View {
 
     @ObservedObject private var accounts = AccountsModel.shared
     let comments = CommentsModel.shared
-    var player = PlayerModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
-    @Default(.detailsToolbarPosition) private var detailsToolbarPosition
     @Default(.playerSidebar) private var playerSidebar
 
     var body: some View {
@@ -46,7 +45,7 @@ struct VideoDetails: View {
             )
             .animation(nil, value: player.currentItem)
 
-            VideoActions(video: video)
+            VideoActions(video: player.videoForDisplay)
                 .animation(nil, value: player.currentItem)
 
             detailsPage

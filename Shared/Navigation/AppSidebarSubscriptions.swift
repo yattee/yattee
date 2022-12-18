@@ -15,17 +15,18 @@ struct AppSidebarSubscriptions: View {
                     LazyView(ChannelVideosView(channel: channel))
                 } label: {
                     HStack {
-                        if channel.thumbnailURL != nil {
+                        if channel.thumbnailURLOrCached != nil {
                             ChannelAvatarView(channel: channel, subscribedBadge: false)
                                 .frame(width: Constants.sidebarChannelThumbnailSize, height: Constants.sidebarChannelThumbnailSize)
-
                             Text(channel.name)
                         } else {
                             Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                         }
 
-                        feedCount.unwatchedByChannelText(channel)
+                        Spacer()
                     }
+                    .backport
+                    .badge(feedCount.unwatchedByChannelText(channel))
                 }
                 .contextMenu {
                     if subscriptions.isSubscribing(channel.id) {
