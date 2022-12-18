@@ -60,7 +60,7 @@ struct ControlsBar: View {
         .clipShape(RoundedRectangle(cornerRadius: expansionState == .full || !playerBar ? 0 : 6))
         .overlay(
             RoundedRectangle(cornerRadius: expansionState == .full || !playerBar ? 0 : 6)
-                .stroke(Color("ControlsBorderColor"), lineWidth: playerBar ? 0 : 0.5)
+                .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
         )
         #if os(iOS)
         .background(
@@ -156,7 +156,7 @@ struct ControlsBar: View {
             HStack(spacing: 8) {
                 if !playerBar {
                     Button {
-                        if let video = model.currentVideo, !video.isLocal {
+                        if let video = model.videoForDisplay, !video.isLocal {
                             navigation.openChannel(
                                 video.channel,
                                 navigationStyle: navigationStyle
@@ -164,8 +164,8 @@ struct ControlsBar: View {
                         }
                     } label: {
                         ChannelAvatarView(
-                            channel: model.currentVideo?.channel,
-                            video: model.currentVideo
+                            channel: model.videoForDisplay?.channel,
+                            video: model.videoForDisplay
                         )
                         .frame(width: barHeight - 10, height: barHeight - 10)
                     }
@@ -173,8 +173,8 @@ struct ControlsBar: View {
                     .zIndex(3)
                 } else {
                     ChannelAvatarView(
-                        channel: model.currentVideo?.channel,
-                        video: model.currentVideo
+                        channel: model.videoForDisplay?.channel,
+                        video: model.videoForDisplay
                     )
                     #if !os(tvOS)
                     .highPriorityGesture(playerButtonDoubleTapGesture != .nothing ? doubleTapGesture : nil)
@@ -187,15 +187,15 @@ struct ControlsBar: View {
                 if expansionState == .full {
                     VStack(alignment: .leading, spacing: 0) {
                         let notPlaying = "Not Playing".localized()
-                        Text(model.currentVideo?.displayTitle ?? notPlaying)
+                        Text(model.videoForDisplay?.displayTitle ?? notPlaying)
                             .font(.system(size: 14))
                             .fontWeight(.semibold)
-                            .foregroundColor(model.currentVideo.isNil ? .secondary : .accentColor)
+                            .foregroundColor(model.videoForDisplay.isNil ? .secondary : .accentColor)
                             .fixedSize(horizontal: false, vertical: true)
                             .lineLimit(titleLineLimit)
                             .multilineTextAlignment(.leading)
 
-                        if let video = model.currentVideo, !video.localStreamIsFile {
+                        if let video = model.videoForDisplay, !video.localStreamIsFile {
                             HStack(spacing: 2) {
                                 Text(video.displayAuthor)
                                     .font(.system(size: 12))
@@ -204,7 +204,7 @@ struct ControlsBar: View {
                                     HStack(spacing: 2) {
                                         Image(systemName: "person.2.fill")
 
-                                        if let channel = model.currentVideo?.channel {
+                                        if let channel = model.videoForDisplay?.channel {
                                             if let subscriptions = channel.subscriptionsString {
                                                 Text(subscriptions)
                                             } else {
@@ -248,7 +248,7 @@ struct ControlsBar: View {
             case .togglePlayer:
                 model.togglePlayer()
             case .openChannel:
-                guard let channel = model.currentVideo?.channel else { return }
+                guard let channel = model.videoForDisplay?.channel else { return }
                 navigation.openChannel(channel, navigationStyle: navigationStyle)
             case .togglePlayerVisibility:
                 withAnimation(.spring(response: 0.25)) {
@@ -260,7 +260,7 @@ struct ControlsBar: View {
         }
     #endif
     @ViewBuilder var contextMenu: some View {
-        if let video = model.currentVideo {
+        if let video = model.videoForDisplay {
             Group {
                 Section {
                     if accounts.app.supportsUserPlaylists && accounts.signedIn, !video.isLocal {
@@ -271,7 +271,7 @@ struct ControlsBar: View {
                                 Label("Add to Playlist...", systemImage: "text.badge.plus")
                             }
 
-                            if let playlist = playlists.lastUsed, let video = model.currentVideo {
+                            if let playlist = playlists.lastUsed, let video = model.videoForDisplay {
                                 Button {
                                     playlists.addVideo(playlistID: playlist.id, videoID: video.videoID)
                                 } label: {
@@ -282,7 +282,7 @@ struct ControlsBar: View {
                     }
 
                     #if !os(tvOS)
-                        ShareButton(contentItem: .init(video: model.currentVideo))
+                        ShareButton(contentItem: .init(video: model.videoForDisplay))
                     #endif
 
                     Section {

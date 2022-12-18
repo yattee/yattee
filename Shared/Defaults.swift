@@ -106,7 +106,6 @@ extension Defaults.Keys {
     static let chargingCellularProfile = Key<QualityProfile.ID>("chargingCellularProfile", default: chargingCellularProfileDefault)
     static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: chargingNonCellularProfileDefault)
     static let forceAVPlayerForLiveStreams = Key<Bool>("forceAVPlayerForLiveStreams", default: true)
-    static let videoDetailsPage = Key<VideoDetails.DetailsPage>("videoDetailsPage", default: .queue)
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: .defaultValue)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
     static let detailsToolbarPosition = Key<DetailsToolbarPositionSetting>("detailsToolbarPosition", default: .center)

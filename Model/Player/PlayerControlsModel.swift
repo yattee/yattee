@@ -17,7 +17,7 @@ final class PlayerControlsModel: ObservableObject {
         private(set) var reporter = PassthroughSubject<String, Never>()
     #endif
 
-    private var player: PlayerModel! { .shared }
+    var player: PlayerModel! { .shared }
     private var controlsOverlayModel = ControlOverlaysModel.shared
 
     init(

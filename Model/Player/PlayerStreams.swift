@@ -15,13 +15,13 @@ extension PlayerModel {
         availableStreams.sorted(by: streamsSorter)
     }
 
-    func loadAvailableStreams(_ video: Video) {
+    func loadAvailableStreams(_ video: Video, onCompletion: @escaping (ResponseInfo) -> Void = { _ in }) {
         availableStreams = []
 
         guard let playerInstance else { return }
 
         logger.info("loading streams from \(playerInstance.description)")
-        fetchStreams(playerAPI(video).video(video.videoID), instance: playerInstance, video: video)
+        fetchStreams(playerAPI(video).video(video.videoID), instance: playerInstance, video: video, onCompletion: onCompletion)
     }
 
     private func fetchStreams(

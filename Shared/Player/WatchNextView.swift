@@ -60,7 +60,9 @@ struct WatchNextView: View {
             }
             .padding(.horizontal)
         }
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .navigationTitle("Watch Next")
         #if !os(macOS)
             .toolbar {
@@ -78,7 +80,7 @@ struct WatchNextView: View {
     var closeButton: some View {
         Button {
             player.closeCurrentItem()
-            player.hide(animate: true)
+            player.hide()
             Delay.by(0.8) {
                 model.presentingOutro = false
             }

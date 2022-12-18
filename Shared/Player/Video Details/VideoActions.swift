@@ -52,24 +52,19 @@ struct VideoActions: View {
                 }
             }
 
-            if player.currentItem == nil {
-                Spacer()
-            }
-
             actionButton("Hide", systemImage: "chevron.down") {
                 player.hide(animate: true)
             }
 
-            if player.currentItem != nil {
-                Spacer()
-                actionButton("Close", systemImage: "xmark") {
+            Spacer()
+            actionButton("Close", systemImage: "xmark") {
 //                TODO: setting
 //                    player.pause()
 //                    WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(player.currentItem)
 //                    WatchNextViewModel.shared.open()
-                    player.closeCurrentItem()
-                }
+                player.closeCurrentItem()
             }
+            .disabled(player.currentItem == nil)
         }
         .padding(.horizontal)
         .multilineTextAlignment(.center)

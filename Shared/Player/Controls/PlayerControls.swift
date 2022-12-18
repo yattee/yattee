@@ -106,7 +106,7 @@ struct PlayerControls: View {
 
                                 if playerControlsLayout.displaysTitleLine {
                                     VStack(alignment: .leading) {
-                                        Text(player.currentVideo?.displayTitle ?? "Not Playing")
+                                        Text(player.videoForDisplay?.displayTitle ?? "Not Playing")
                                             .shadow(radius: 10)
                                             .font(.system(size: playerControlsLayout.titleLineFontSize).bold())
                                             .lineLimit(1)
@@ -216,19 +216,23 @@ struct PlayerControls: View {
 
     @ViewBuilder var controlsBackground: some View {
         if player.musicMode,
-           let item = self.player.currentItem,
-           let video = item.video,
+           let url = controlsBackgroundURL
+        {
+            ThumbnailView(url: url)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .animation(.default)
+        }
+    }
+
+    var controlsBackgroundURL: URL? {
+        if let video = player.videoForDisplay,
            let url = thumbnails.best(video)
         {
-            WebImage(url: url, options: [.lowPriority])
-                .resizable()
-                .placeholder {
-                    Rectangle().fill(Color("PlaceholderColor"))
-                }
-                .retryOnAppear(true)
-                .indicator(.activity)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            return url
         }
+
+        return nil
     }
 
     var timeline: some View {
@@ -296,7 +300,7 @@ struct PlayerControls: View {
             "Fullscreen",
             systemImage: player.playingFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
         ) {
-            player.toggleFullscreen(player.playingFullScreen)
+            player.toggleFullscreen(player.playingFullScreen, showControls: false)
         }
         #if !os(tvOS)
         .keyboardShortcut(player.playingFullScreen ? .cancelAction : .defaultAction)

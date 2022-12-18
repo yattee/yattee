@@ -19,7 +19,7 @@ struct PlayerOverlayModifier: ViewModifier {
 
     @ViewBuilder var overlay: some View {
         Group {
-            if player.currentItem != nil {
+            if player.videoForDisplay != nil {
                 ControlsBar(fullScreen: .constant(false), expansionState: $expansionState, playerBar: true)
                     .offset(x: expansionState == .mini && !controlsWhenMinimized ? 10 : 0, y: 0)
                     .transition(.opacity)

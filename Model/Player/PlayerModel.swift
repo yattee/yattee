@@ -108,6 +108,7 @@ final class PlayerModel: ObservableObject {
     @Published var autoplayItem: PlayerQueueItem?
     @Published var autoplayItemSource: Video?
     @Published var advancing = false
+    @Published var closing = false
 
     @Published var returnYouTubeDislike = ReturnYouTubeDislikeAPI()
 
@@ -321,6 +322,7 @@ final class PlayerModel: ObservableObject {
 
     func play(_ video: Video, at time: CMTime? = nil, showingPlayer: Bool = true) {
         pause()
+        videoBeingOpened = video
 
         WatchNextViewModel.shared.presentingOutro = false
 
@@ -571,25 +573,29 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
-        controls.presentingControls = false
         pause()
-        closePiP()
 
-        prepareCurrentItemForHistory(finished: finished)
-        withAnimation {
-            currentItem = nil
+        closing = true
+        controls.presentingControls = false
+
+        self.hide()
+
+        Delay.by(0.8) { [weak self] in
+            guard let self else { return }
+            self.closePiP()
+
+            self.prepareCurrentItemForHistory(finished: finished)
+            withAnimation {
+                self.currentItem = nil
+            }
+            self.updateNowPlayingInfo()
+
+            self.backend.closeItem()
+            self.aspectRatio = VideoPlayerView.defaultAspectRatio
+            self.resetAutoplay()
+            self.closing = false
+            self.playingFullScreen = false
         }
-        updateNowPlayingInfo()
-
-        backend.closeItem()
-        aspectRatio = VideoPlayerView.defaultAspectRatio
-        resetAutoplay()
-
-        exitFullScreen()
-
-        #if !os(macOS)
-            if closePlayerOnItemClose { Delay.by(0.2) { self.hide() } }
-        #endif
     }
 
     func startPiP() {

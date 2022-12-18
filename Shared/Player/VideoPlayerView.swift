@@ -66,7 +66,6 @@ struct VideoPlayerView: View {
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
     @Default(.playerSidebar) var playerSidebar
-    @Default(.videoDetailsPage) var detailsPage
 
     @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -107,6 +106,9 @@ struct VideoPlayerView: View {
                         playerSize = geometry.size
                     }
             }
+            #if os(iOS)
+            .padding(.bottom, fullScreenPlayer ? 0.0001 : geometry.safeAreaInsets.bottom)
+            #endif
             .onChange(of: geometry.size) { _ in
                 self.playerSize = geometry.size
             }
@@ -114,7 +116,6 @@ struct VideoPlayerView: View {
                 player.backend.setNeedsDrawing(!value)
             }
             #if os(iOS)
-            .padding(.bottom, playerEdgesIgnoringSafeArea == [.bottom] ? 0 : geometry.safeAreaInsets.bottom)
             .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
             .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
             .onChange(of: player.presentingPlayer) { newValue in
@@ -321,20 +322,24 @@ struct VideoPlayerView: View {
                             .background(Color.black)
 
                         if !fullScreenPlayer {
-                            VideoDetails(video: player.currentVideo, page: $detailsPage, sidebarQueue: $sidebarQueue, fullScreen: $fullScreenDetails, bottomPadding: detailsNeedBottomPadding)
+                            VideoDetails(
+                                video: player.videoForDisplay,
+                                fullScreen: $fullScreenDetails,
+                                bottomPadding: detailsNeedBottomPadding
+                            )
                             #if os(iOS)
-                                .ignoresSafeArea(.all, edges: .bottom)
+                            .ignoresSafeArea(.all, edges: .bottom)
                             #endif
-                                .modifier(VideoDetailsPaddingModifier(
-                                    playerSize: player.playerSize,
-                                    fullScreen: fullScreenDetails
-                                ))
-                                .onDisappear {
-                                    if player.presentingPlayer {
-                                        player.setNeedsDrawing(true)
-                                    }
+                            .modifier(VideoDetailsPaddingModifier(
+                                playerSize: player.playerSize,
+                                fullScreen: fullScreenDetails
+                            ))
+                            .onDisappear {
+                                if player.presentingPlayer {
+                                    player.setNeedsDrawing(true)
                                 }
-                                .transition(.opacity)
+                            }
+                            .transition(.opacity)
                         }
                     }
                 #endif
@@ -389,7 +394,7 @@ struct VideoPlayerView: View {
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
                         PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
-                            .frame(minWidth: 300)
+                            .frame(width: 350)
                             .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #endif
@@ -471,8 +476,5 @@ struct VideoPlayerView: View {
 struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         VideoPlayerView()
-            .onAppear {
-                WatchNextViewModel.shared.prepareForEmptyPlayerPlaceholder(.init(.fixture))
-            }
     }
 }

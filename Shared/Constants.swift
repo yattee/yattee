@@ -35,4 +35,12 @@ struct Constants {
             6
         #endif
     }
+
+    static var descriptionVisibility: Bool {
+        #if os(iOS)
+            false
+        #else
+            true
+        #endif
+    }
 }

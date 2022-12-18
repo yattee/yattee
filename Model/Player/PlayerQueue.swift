@@ -9,6 +9,10 @@ extension PlayerModel {
         currentItem?.video
     }
 
+    var videoForDisplay: Video? {
+        videoBeingOpened ?? (closing ? nil : currentVideo)
+    }
+
     func play(_ videos: [Video], shuffling: Bool = false) {
         WatchNextViewModel.shared.presentingOutro = false
         playbackMode = shuffling ? .shuffle : .queue
@@ -32,6 +36,8 @@ extension PlayerModel {
         if playingInPictureInPicture, closePiPOnNavigation {
             closePiP()
         }
+
+        videoBeingOpened = video
 
         prepareCurrentItemForHistory()
 
@@ -70,9 +76,8 @@ extension PlayerModel {
                 return
             }
 
-            self.videoBeingOpened = nil
-
             if video.isLocal {
+                self.videoBeingOpened = nil
                 self.availableStreams = video.streams
                 return
             }
@@ -81,8 +86,11 @@ extension PlayerModel {
             let streamsInstance = video.streams.compactMap(\.instance).first
 
             if video.streams.isEmpty || streamsInstance != playerInstance {
-                self.loadAvailableStreams(video)
+                self.loadAvailableStreams(video) { [weak self] _ in
+                    self?.videoBeingOpened = nil
+                }
             } else {
+                self.videoBeingOpened = nil
                 self.availableStreams = self.streamsWithInstance(instance: playerInstance, streams: video.streams)
             }
         }
