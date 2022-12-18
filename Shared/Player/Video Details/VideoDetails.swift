@@ -5,7 +5,24 @@ import SwiftUI
 
 struct VideoDetails: View {
     enum DetailsPage: String, CaseIterable, Defaults.Serializable {
-        case info, inspector, chapters, comments, related, queue
+        case info, comments, chapters, inspector
+
+        var systemImageName: String {
+            switch self {
+            case .info:
+                return "info.circle"
+            case .inspector:
+                return "wand.and.stars"
+            case .comments:
+                return "text.bubble"
+            case .chapters:
+                return "bookmark"
+            }
+        }
+
+        var title: String {
+            rawValue.capitalized.localized()
+        }
     }
 
     var video: Video?
@@ -17,6 +34,7 @@ struct VideoDetails: View {
     @State private var descriptionVisibility = Constants.descriptionVisibility
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
+    @State private var page = DetailsPage.info
 
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
@@ -48,10 +66,7 @@ struct VideoDetails: View {
             VideoActions(video: player.videoForDisplay)
                 .animation(nil, value: player.currentItem)
 
-            detailsPage
-            #if os(iOS)
-            .frame(maxWidth: maxWidth)
-            #endif
+            pageView
         }
         .overlay(GeometryReader { proxy in
             Color.clear
@@ -81,57 +96,143 @@ struct VideoDetails: View {
         ContentItem(video: player.currentVideo)
     }
 
-    var detailsPage: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            if let video {
-                VStack(alignment: .leading, spacing: 10) {
-                    videoProperties
-                    #if os(iOS)
-                    .opacity(descriptionVisibility ? 1 : 0)
-                    #endif
+    var pageMenu: some View {
+        #if os(macOS)
+            pagePicker
+                .labelsHidden()
+                .offset(x: 15, y: 15)
+                .frame(maxWidth: 200)
+        #else
+            Menu {
+                pagePicker
+            } label: {
+                HStack {
+                    Label(page.title, systemImage: page.systemImageName)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .imageScale(.small)
+                }
+                .padding(10)
+                .fixedSize(horizontal: true, vertical: false)
+                .modifier(ControlBackgroundModifier())
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .frame(width: 200, alignment: .leading)
+                .transaction { t in t.animation = nil }
+            }
+            .modifier(SettingsPickerModifier())
+            .offset(x: 15, y: 5)
+        #endif
+    }
 
-                    if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
-                        VStack {
-                            ProgressView()
-                                .progressViewStyle(.circular)
+    var pagePicker: some View {
+        Picker("Page", selection: $page) {
+            ForEach(DetailsPage.allCases, id: \.rawValue) { page in
+                Label(page.title, systemImage: page.systemImageName).tag(page)
+            }
+        }
+    }
+
+    var pageView: some View {
+        ZStack(alignment: .topLeading) {
+            switch page {
+            case .info:
+                ScrollView(.vertical, showsIndicators: false) {
+                    if let video {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                videoProperties
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                #if os(iOS)
+                                    .opacity(descriptionVisibility ? 1 : 0)
+                                #endif
+                            }
+                            .padding(.bottom, 12)
+
+                            if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
+                                VStack {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .opacity(descriptionVisibility ? 1 : 0)
+                            } else if video.description != nil, !video.description!.isEmpty {
+                                VideoDescription(video: video, detailsSize: detailsSize)
+                                #if os(iOS)
+                                    .opacity(descriptionVisibility ? 1 : 0)
+                                    .padding(.bottom, player.playingFullScreen ? 10 : SafeArea.insets.bottom)
+                                #endif
+                            } else if !video.isLocal {
+                                Text("No description")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
-                        .frame(maxWidth: .infinity)
-                        .opacity(descriptionVisibility ? 1 : 0)
-                    } else if video.description != nil, !video.description!.isEmpty {
-                        VideoDescription(video: video, detailsSize: detailsSize)
-                        #if os(iOS)
-                            .opacity(descriptionVisibility ? 1 : 0)
-                            .padding(.bottom, player.playingFullScreen ? 10 : SafeArea.insets.bottom)
-                        #endif
-                    } else if !video.isLocal {
-                        Text("No description")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        .padding(.top, 18)
+                        .padding(.bottom, 60)
                     }
                 }
-                .padding(.top, 10)
-                .padding(.bottom, 60)
+                #if os(iOS)
+                .onAppear {
+                    if fullScreen {
+                        descriptionVisibility = true
+                        return
+                    }
+                    Delay.by(0.4) { withAnimation(.easeIn(duration: 0.25)) { self.descriptionVisibility = true } }
+                }
+                #endif
+                .transition(.opacity)
+                .animation(nil, value: player.currentItem)
+                .padding(.horizontal)
+                #if os(iOS)
+                    .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
+                #endif
+
+            case .inspector:
+                InspectorView(video: video)
+
+            case .chapters:
+                ChaptersView()
+
+            case .comments:
+                CommentsView(embedInScrollView: true)
+                    .onAppear {
+                        comments.loadIfNeeded()
+                    }
             }
+
+            pageMenu
+                .font(.headline)
+                .foregroundColor(.accentColor)
+                .zIndex(1)
+
+            #if !os(tvOS)
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: .init(colors: [fadePlaceholderStartColor, .clear]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .zIndex(0)
+                    .frame(maxHeight: 15)
+            #endif
         }
-        #if os(iOS)
-        .onAppear {
-            if fullScreen {
-                descriptionVisibility = true
-                return
-            }
-            Delay.by(0.4) { withAnimation(.easeIn(duration: 0.25)) { self.descriptionVisibility = true } }
-        }
+    }
+
+    var fadePlaceholderStartColor: Color {
+        #if os(macOS)
+            .secondaryBackground
+        #elseif os(iOS)
+            .background
         #endif
-        .transition(.opacity)
-        .animation(nil, value: player.currentItem)
-        .padding(.horizontal)
     }
 
     @ViewBuilder var videoProperties: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 4) {
+            Spacer()
             publishedDateSection
 
-            Spacer()
+            Text("•")
 
             HStack(spacing: 4) {
                 Image(systemName: "eye")
@@ -173,7 +274,7 @@ struct VideoDetails: View {
                 }
             }
         }
-        .font(.system(size: 12))
+        .font(.caption)
         .foregroundColor(.secondary)
     }
 

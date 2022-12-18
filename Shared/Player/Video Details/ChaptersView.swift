@@ -8,14 +8,10 @@ struct ChaptersView: View {
     var body: some View {
         if let chapters = player.currentVideo?.chapters, !chapters.isEmpty {
             List {
-                Section(header: Text("Chapters")) {
+                Section {
                     ForEach(chapters) { chapter in
                         ChapterView(chapter: chapter)
                     }
-                    Color.clear.frame(height: 50)
-                        .listRowBackground(Color.clear)
-                        .backport
-                        .listRowSeparator(false)
                 }
                 .listRowBackground(Color.clear)
             }

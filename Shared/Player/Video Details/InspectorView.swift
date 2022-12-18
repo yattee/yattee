@@ -53,7 +53,7 @@ struct InspectorView: View {
                     NoCommentsView(text: "Not playing", systemImage: "stop.circle.fill")
                 }
             }
-            .padding(.top, 10)
+            .padding(.top, 60)
             .padding(.bottom, 50)
         }
         .padding(.horizontal)
