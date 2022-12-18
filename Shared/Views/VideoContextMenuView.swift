@@ -8,6 +8,7 @@ struct VideoContextMenuView: View {
 
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inChannelPlaylistView) private var inChannelPlaylistView
+    @Environment(\.inQueueListing) private var inQueueListing
     @Environment(\.navigationStyle) private var navigationStyle
     @Environment(\.currentPlaylistID) private var playlistID
 
@@ -36,6 +37,12 @@ struct VideoContextMenuView: View {
     }
 
     @ViewBuilder var contextMenu: some View {
+        if inQueueListing {
+            if let item = player.queue.first(where: { $0.videoID == video.videoID }) {
+                removeFromQueueButton(item)
+            }
+            removeAllFromQueueButton()
+        }
         if !video.localStreamIsDirectory {
             if saveHistory {
                 Section {
@@ -338,6 +345,22 @@ struct VideoContextMenuView: View {
             playlists.removeVideo(index: video.indexID!, playlistID: playlistID)
         } label: {
             Label("Remove from Playlist", systemImage: "text.badge.minus")
+        }
+    }
+
+    private func removeFromQueueButton(_ item: PlayerQueueItem) -> some View {
+        Button {
+            player.remove(item)
+        } label: {
+            Label("Remove from the queue", systemImage: "trash")
+        }
+    }
+
+    private func removeAllFromQueueButton() -> some View {
+        Button {
+            player.removeQueueItems()
+        } label: {
+            Label("Clear the queue", systemImage: "trash.fill")
         }
     }
 }

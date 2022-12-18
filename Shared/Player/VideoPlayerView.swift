@@ -394,14 +394,14 @@ struct VideoPlayerView: View {
             if !fullScreenPlayer {
                 #if os(iOS)
                     if sidebarQueue {
-                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
+                        PlayerQueueView(sidebarQueue: true)
                             .frame(maxWidth: 350)
                             .background(colorScheme == .dark ? Color.black : Color.white)
                             .transition(.move(edge: .bottom))
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
-                        PlayerQueueView(sidebarQueue: true, fullScreen: $fullScreenDetails)
+                        PlayerQueueView(sidebarQueue: true)
                             .frame(width: 350)
                             .background(colorScheme == .dark ? Color.black : Color.white)
                     }

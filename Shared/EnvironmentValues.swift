@@ -30,6 +30,10 @@ private struct InNavigationViewKey: EnvironmentKey {
     static let defaultValue = true
 }
 
+private struct InQueueListingKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 enum ListingStyle: String, CaseIterable, Defaults.Serializable {
     case cells
     case list
@@ -103,4 +107,10 @@ extension EnvironmentValues {
         get { self[InNavigationViewKey.self] }
         set { self[InNavigationViewKey.self] = newValue }
     }
+
+    var inQueueListing: Bool {
+        get { self[InQueueListingKey.self] }
+        set { self[InQueueListingKey.self] = newValue }
+    }
+
 }

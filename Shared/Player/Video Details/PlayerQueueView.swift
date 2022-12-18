@@ -4,7 +4,6 @@ import SwiftUI
 
 struct PlayerQueueView: View {
     var sidebarQueue: Bool
-    @Binding var fullScreen: Bool
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -138,7 +137,7 @@ struct PlayerQueueView: View {
 struct PlayerQueueView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            PlayerQueueView(sidebarQueue: true, fullScreen: .constant(true))
+            PlayerQueueView(sidebarQueue: true)
         }
         .injectFixtureEnvironmentObjects()
     }

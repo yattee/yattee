@@ -197,22 +197,9 @@ struct WatchNextView: View {
                 let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: model.isAutoplaying ? 1 : 0)
                 if !queueForMoreVideos.isEmpty {
                     ForEach(queueForMoreVideos) { item in
-                        PlayerQueueRow(item: item)
-                            .contextMenu {
-                                removeButton(item)
-                                removeAllButton()
-
-                                if let video = item.video {
-                                    VideoContextMenuView(video: video)
-                                }
-                            }
-                        #if os(tvOS)
-                            .padding(.horizontal, 30)
-                        #endif
-
-                        #if !os(tvOS)
-                            Divider()
-                        #endif
+                        ContentItemView(item: .init(video: item.video))
+                            .environment(\.inQueueListing, true)
+                            .environment(\.listingStyle, .list)
                     }
                 } else if player.playbackMode != .related && player.playbackMode != .loopOne {
                     Label(
@@ -237,22 +224,6 @@ struct WatchNextView: View {
                     HistoryView(limit: 15)
                 }
             }
-        }
-    }
-
-    private func removeButton(_ item: PlayerQueueItem) -> some View {
-        Button {
-            player.remove(item)
-        } label: {
-            Label("Remove from the queue", systemImage: "trash")
-        }
-    }
-
-    private func removeAllButton() -> some View {
-        Button {
-            player.removeQueueItems()
-        } label: {
-            Label("Clear the queue", systemImage: "trash.fill")
         }
     }
 }
