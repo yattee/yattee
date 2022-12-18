@@ -250,10 +250,11 @@ struct VideoBanner: View {
     }
 
     @ViewBuilder private var timeView: some View {
-        VStack(alignment: .trailing, spacing: 2) {
+        VStack(alignment: .trailing) {
             PlayingIndicatorView(video: video, height: 10)
                 .frame(width: 12, alignment: .trailing)
                 .padding(.trailing, 3)
+                .padding(.bottom, timeLabel == nil ? 3 : 0)
 
             if let timeLabel {
                 Text(timeLabel)
