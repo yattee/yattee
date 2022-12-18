@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NoDocumentsView: View {
     var body: some View {
-        VStack(alignment: .center, spacing: 20) {
+        VStack(spacing: 20) {
             HStack {
                 Image(systemName: "doc")
                 Text("No documents")

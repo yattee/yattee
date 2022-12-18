@@ -464,6 +464,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             instanceID: account.instanceID,
             app: .invidious,
             instanceURL: account.instance.apiURL,
+            id: id,
             videoID: videoID,
             title: json["title"].stringValue,
             author: json["author"].stringValue,

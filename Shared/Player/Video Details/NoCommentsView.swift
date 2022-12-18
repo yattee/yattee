@@ -5,7 +5,7 @@ struct NoCommentsView: View {
     var systemImage: String
 
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(spacing: 10) {
             Image(systemName: systemImage)
                 .font(.system(size: 36))
 

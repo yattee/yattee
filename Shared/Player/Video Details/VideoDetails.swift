@@ -120,7 +120,7 @@ struct VideoDetails: View {
                 descriptionVisibility = true
                 return
             }
-            Delay.by(0.3) { withAnimation(.easeOut(duration: 0.2)) { self.descriptionVisibility = true } }
+            Delay.by(0.4) { withAnimation(.easeIn(duration: 0.25)) { self.descriptionVisibility = true } }
         }
         #endif
         .transition(.opacity)

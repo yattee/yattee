@@ -55,7 +55,7 @@ struct VideoDescription: View {
                         Button {
                             NavigationModel.shared.openSearchQuery(keyword)
                         } label: {
-                            HStack(alignment: .center, spacing: 0) {
+                            HStack(spacing: 0) {
                                 Text("#")
                                     .font(.system(size: 14).bold())
 

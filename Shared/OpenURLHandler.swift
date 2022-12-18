@@ -101,7 +101,9 @@ struct OpenURLHandler {
 
         player.videoBeingOpened = Video(app: accounts.current.app!, videoID: id)
 
-        player.playerAPI(player.videoBeingOpened!).video(id)
+        player
+            .playerAPI(player.videoBeingOpened!)
+            .video(id)
             .load()
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
