@@ -235,41 +235,35 @@ struct VideoDetails: View {
             Text("•")
 
             HStack(spacing: 4) {
-                Image(systemName: "eye")
+                if player.videoBeingOpened != nil || video?.viewsCount != nil {
+                    Image(systemName: "eye")
+                }
 
                 if let views = video?.viewsCount {
                     Text(views)
-                } else {
-                    if player.videoBeingOpened == nil {
-                        Text("?")
-                    } else {
-                        Text("1,234M").redacted(reason: .placeholder)
-                    }
+                } else if player.videoBeingOpened != nil {
+                    Text("1,234M").redacted(reason: .placeholder)
                 }
 
-                Image(systemName: "hand.thumbsup")
+                if player.videoBeingOpened != nil || video?.likesCount != nil {
+                    Image(systemName: "hand.thumbsup")
+                }
 
                 if let likes = video?.likesCount {
                     Text(likes)
-                } else {
-                    if player.videoBeingOpened == nil {
-                        Text("?")
-                    } else {
-                        Text("1,234M").redacted(reason: .placeholder)
-                    }
+                } else if player.videoBeingOpened == nil {
+                    Text("1,234M").redacted(reason: .placeholder)
                 }
 
                 if enableReturnYouTubeDislike {
-                    Image(systemName: "hand.thumbsdown")
+                    if player.videoBeingOpened != nil || video?.dislikesCount != nil {
+                        Image(systemName: "hand.thumbsdown")
+                    }
 
                     if let dislikes = video?.dislikesCount {
                         Text(dislikes)
-                    } else {
-                        if player.videoBeingOpened == nil {
-                            Text("?")
-                        } else {
-                            Text("1,234M").redacted(reason: .placeholder)
-                        }
+                    } else if player.videoBeingOpened == nil {
+                        Text("1,234M").redacted(reason: .placeholder)
                     }
                 }
             }
