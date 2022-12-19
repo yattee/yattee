@@ -20,6 +20,7 @@ struct WatchNextView: View {
                             }
                         }
                 }
+                .navigationViewStyle(.stack)
             #else
                 VStack {
                     HStack {
@@ -221,7 +222,7 @@ struct WatchNextView: View {
                     Divider()
                 }
 
-                let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: player.playbackMode == .queue ? 1 : 0)
+                let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: player.playbackMode == .queue && model.isAutoplaying && model.canAutoplay ? 1 : 0)
 
                 if (model.isAutoplaying && model.canAutoplay && !queueForMoreVideos.isEmpty) ||
                     (!model.isAutoplaying && !queueForMoreVideos.isEmpty)

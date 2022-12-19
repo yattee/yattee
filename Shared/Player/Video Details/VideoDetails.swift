@@ -120,6 +120,7 @@ struct VideoDetails: View {
             }
             .modifier(SettingsPickerModifier())
             .offset(x: 15, y: 5)
+            .opacity(descriptionVisibility ? 1 : 0)
         #endif
     }
 
@@ -214,7 +215,7 @@ struct VideoDetails: View {
                         )
                     )
                     .zIndex(0)
-                    .frame(maxHeight: 15)
+                    .frame(maxHeight: 25)
             #endif
         }
     }

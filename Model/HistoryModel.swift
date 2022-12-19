@@ -91,8 +91,6 @@ extension PlayerModel {
             watch.watchedAt = Date()
 
             try? self.backgroundContext.save()
-
-            FeedModel.shared.calculateUnwatchedFeed()
         }
     }
 

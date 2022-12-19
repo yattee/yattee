@@ -21,19 +21,17 @@ struct PlayerOverlayModifier: ViewModifier {
 
     @ViewBuilder var overlay: some View {
         Group {
-            if player.videoForDisplay != nil {
-                ControlsBar(fullScreen: .constant(false), expansionState: $expansionState, playerBar: true)
-                    .offset(x: expansionState == .mini && !controlsWhenMinimized ? 10 : 0, y: 0)
-                    .transition(.opacity)
-                    .frame(maxWidth: maxWidth, alignment: .trailing)
-                    .onAppear {
-                        if playerButtonIsExpanded {
-                            expansionState = .full
-                        }
+            ControlsBar(fullScreen: .constant(false), expansionState: $expansionState, playerBar: true)
+                .offset(x: expansionState == .mini && !controlsWhenMinimized ? 10 : 0, y: 0)
+                .frame(maxWidth: maxWidth, alignment: .trailing)
+                .onAppear {
+                    if playerButtonIsExpanded {
+                        expansionState = .full
                     }
-            }
+                }
+                .animation(.easeIn, value: player.videoForDisplay)
+                .opacity(player.videoForDisplay == nil ? 0 : 1)
         }
-        .animation(.default, value: player.currentItem)
     }
 
     var maxWidth: Double {

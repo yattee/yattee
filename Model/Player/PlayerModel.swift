@@ -664,6 +664,10 @@ final class PlayerModel: ObservableObject {
     }
 
     func handleCurrentItemChange() {
+        if currentItem == nil {
+            FeedModel.shared.calculateUnwatchedFeed()
+        }
+
         #if os(macOS)
             Windows.player.window?.title = windowTitle
         #endif

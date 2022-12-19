@@ -35,7 +35,7 @@ final class WatchNextViewModel: ObservableObject {
     static let shared = WatchNextViewModel()
 
     @Published var item: PlayerQueueItem?
-    @Published private(set) var isPresenting = true
+    @Published private(set) var isPresenting = false
     @Published var reason: PresentationReason?
     @Published var page = Page.queue
 

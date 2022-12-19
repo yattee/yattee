@@ -76,7 +76,7 @@ struct AppSidebarNavigation: View {
                 }
             }
 
-            ToolbarItemGroup {
+            ToolbarItemGroup(placement: accountsMenuToolbarItemPlacement) {
                 AccountViewButton()
             }
 
