@@ -33,6 +33,14 @@ struct PlayerSettings: View {
     @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
     @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
 
+    @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
+    @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
+    @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
+    @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
+    @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
+    @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
+    @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
+    @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
     @ObservedObject private var accounts = AccountsModel.shared
     private var player = PlayerModel.shared
 
@@ -74,6 +82,13 @@ struct PlayerSettings: View {
                 #endif
                 systemControlsCommandsPicker
             }
+
+            #if !os(tvOS)
+                Section(header: SettingsHeader(text: "Actions Buttons")) {
+                    actionButtonToggles
+                }
+                actionButtonNextQueueCountEnabledToggle
+            #endif
 
             Section(header: SettingsHeader(text: "Watch Next")) {
                 openWatchNextOnFinishedWatchingToggle
@@ -208,6 +223,24 @@ struct PlayerSettings: View {
             #endif
         }
         .multilineTextAlignment(.trailing)
+    }
+
+    @ViewBuilder private var actionButtonToggles: some View {
+        actionButtonToggle("Share", $actionButtonShareEnabled)
+        actionButtonToggle("Add to Playlist", $actionButtonAddToPlaylistEnabled)
+        actionButtonToggle("Subscribe/Unsubscribe", $actionButtonSubscribeEnabled)
+        actionButtonToggle("Settings", $actionButtonSettingsEnabled)
+        actionButtonToggle("Watch Next", $actionButtonNextEnabled)
+        actionButtonToggle("Hide player", $actionButtonHideEnabled)
+        actionButtonToggle("Close video", $actionButtonCloseEnabled)
+    }
+
+    private func actionButtonToggle(_ name: String, _ value: Binding<Bool>) -> some View {
+        Toggle(name, isOn: value)
+    }
+
+    var actionButtonNextQueueCountEnabledToggle: some View {
+        Toggle("Show queue items count in Watch Next button label", isOn: $actionButtonNextQueueCountEnabled)
     }
 
     private var sidebarPicker: some View {

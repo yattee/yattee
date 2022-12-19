@@ -21,8 +21,10 @@ struct ShareButton<LabelView: View>: View {
 
     @ViewBuilder var body: some View {
         // TODO: this should work with other content item types
-        if let video = contentItem.video, !video.localStreamIsFile {
-            Menu {
+        Menu {
+            if let video = contentItem.video,
+               !video.localStreamIsFile
+            {
                 if video.localStreamIsRemoteURL {
                     remoteURLAction
                 } else {
@@ -32,14 +34,14 @@ struct ShareButton<LabelView: View>: View {
                         youtubeActions
                     }
                 }
-            } label: {
-                label
             }
-            .menuStyle(.borderlessButton)
-            #if os(macOS)
-                .frame(maxWidth: 60)
-            #endif
+        } label: {
+            label
         }
+        .menuStyle(.borderlessButton)
+        #if os(macOS)
+            .frame(maxWidth: 60)
+        #endif
     }
 
     private var instanceActions: some View {

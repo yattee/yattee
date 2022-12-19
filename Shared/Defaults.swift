@@ -188,6 +188,16 @@ extension Defaults.Keys {
     static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: .iconAndText)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
+    static let actionButtonShareEnabled = Key<Bool>("actionButtonShareEnabled", default: true)
+    static let actionButtonAddToPlaylistEnabled = Key<Bool>("actionButtonAddToPlaylistEnabled", default: true)
+    static let actionButtonSubscribeEnabled = Key<Bool>("actionButtonSubscribeEnabled", default: false)
+    static let actionButtonSettingsEnabled = Key<Bool>("actionButtonSettingsEnabled", default: true)
+    static let actionButtonNextEnabled = Key<Bool>("actionButtonNextEnabled", default: true)
+    static let actionButtonHideEnabled = Key<Bool>("actionButtonHideEnabled", default: false)
+    static let actionButtonCloseEnabled = Key<Bool>("actionButtonCloseEnabled", default: true)
+
+    static let actionButtonNextQueueCountEnabled = Key<Bool>("actionButtonNextQueueCountEnabled", default: true)
+
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)

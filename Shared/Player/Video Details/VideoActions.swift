@@ -2,6 +2,16 @@ import Defaults
 import SwiftUI
 
 struct VideoActions: View {
+    enum Action: String, CaseIterable {
+        case share
+        case addToPlaylist
+        case subscribe
+        case settings
+        case next
+        case hide
+        case close
+    }
+
     @ObservedObject private var accounts = AccountsModel.shared
     var navigation = NavigationModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
@@ -12,75 +22,132 @@ struct VideoActions: View {
     @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
 
+    @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
+    @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
+    @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
+    @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
+    @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
+    @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
+    @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
+    @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
+
     var body: some View {
         HStack(spacing: 6) {
-            if let video {
-                #if !os(tvOS)
-                    if video.isShareable {
-                        ShareButton(contentItem: .init(video: video)) {
-                            actionButton("Share", systemImage: "square.and.arrow.up")
-                        }
-
-                        Spacer()
-                    }
-                #endif
-
-                if !video.isLocal {
-                    if accounts.signedIn, accounts.app.supportsUserPlaylists {
-                        actionButton("Add", systemImage: "text.badge.plus") {
-                            navigation.presentAddToPlaylist(video)
-                        }
-                        Spacer()
-                    }
-                    if accounts.signedIn, accounts.app.supportsSubscriptions {
-                        if subscriptions.isSubscribing(video.channel.id) {
-                            actionButton("Unsubscribe", systemImage: "xmark.circle") {
-                                #if os(tvOS)
-                                    subscriptions.unsubscribe(video.channel.id)
-                                #else
-                                    navigation.presentUnsubscribeAlert(video.channel, subscriptions: subscriptions)
-                                #endif
-                            }
-                        } else {
-                            actionButton("Subscribe", systemImage: "star.circle") {
-                                subscriptions.subscribe(video.channel.id) {
-                                    navigation.sidebarSectionChanged.toggle()
-                                }
-                            }
-                        }
-                        Spacer()
-                    }
-                }
-            } else {
-                Spacer()
-            }
-            actionButton("Next", systemImage: Constants.nextSystemImage) {
-                WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
-            }
-
-            Spacer()
-
-            actionButton("Hide", systemImage: "chevron.down") {
-                player.hide(animate: true)
-            }
-
-            Spacer()
-
-            actionButton("Close", systemImage: "xmark") {
-                if openWatchNextOnClose {
-                    player.pause()
-                    WatchNextViewModel.shared.closed(player.currentItem)
-                } else {
-                    player.closeCurrentItem()
-                }
+            ForEach(Action.allCases, id: \.self) { action in
+                actionBody(action)
+                    .frame(maxWidth: .infinity)
             }
         }
-        .padding(.horizontal)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
         .frame(height: 50)
         .borderBottom(height: 0.5, color: Color("ControlsBorderColor"))
         .foregroundColor(.accentColor)
+    }
+
+    func isVisible(_ action: Action) -> Bool {
+        switch action {
+        case .share:
+            return actionButtonShareEnabled
+        case .addToPlaylist:
+            return actionButtonAddToPlaylistEnabled
+        case .subscribe:
+            return actionButtonSubscribeEnabled
+        case .settings:
+            return actionButtonSettingsEnabled
+        case .next:
+            return actionButtonNextEnabled
+        case .hide:
+            return actionButtonHideEnabled
+        case .close:
+            return actionButtonCloseEnabled
+        }
+    }
+
+    func isActionable(_ action: Action) -> Bool {
+        switch action {
+        case .share:
+            return video?.isShareable ?? false
+        case .addToPlaylist:
+            return !(video?.isLocal ?? true)
+        case .subscribe:
+            return !(video?.isLocal ?? true) && accounts.signedIn && accounts.app.supportsSubscriptions
+        case .settings:
+            return video != nil
+        default:
+            return true
+        }
+    }
+
+    @ViewBuilder func actionBody(_ action: Action) -> some View {
+        if isVisible(action) {
+            Group {
+                switch action {
+                case .share:
+                    ShareButton(contentItem: .init(video: video)) {
+                        actionButton("Share", systemImage: "square.and.arrow.up")
+                    }
+                case .addToPlaylist:
+                    actionButton("Add", systemImage: "text.badge.plus") {
+                        guard let video else { return }
+                        navigation.presentAddToPlaylist(video)
+                    }
+                case .subscribe:
+                    if let channel = video?.channel,
+                       subscriptions.isSubscribing(channel.id)
+                    {
+                        actionButton("Unsubscribe", systemImage: "xmark.circle") {
+                            #if os(tvOS)
+                                subscriptions.unsubscribe(channel.id)
+                            #else
+                                navigation.presentUnsubscribeAlert(channel, subscriptions: subscriptions)
+                            #endif
+                        }
+                    } else {
+                        actionButton("Subscribe", systemImage: "star.circle") {
+                            guard let video else { return }
+
+                            subscriptions.subscribe(video.channel.id) {
+                                navigation.sidebarSectionChanged.toggle()
+                            }
+                        }
+                    }
+                case .settings:
+                    actionButton("Settings", systemImage: "gear") {
+                        withAnimation(ControlOverlaysModel.animation) {
+                            ControlOverlaysModel.shared.show()
+                        }
+                    }
+                case .next:
+                    actionButton(nextLabel, systemImage: Constants.nextSystemImage) {
+                        WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
+                    }
+                case .hide:
+                    actionButton("Hide", systemImage: "chevron.down") {
+                        player.hide(animate: true)
+                    }
+
+                case .close:
+                    actionButton("Close", systemImage: "xmark") {
+                        if openWatchNextOnClose {
+                            player.pause()
+                            WatchNextViewModel.shared.closed(player.currentItem)
+                        } else {
+                            player.closeCurrentItem()
+                        }
+                    }
+                }
+            }
+            .disabled(!isActionable(action))
+        }
+    }
+
+    var nextLabel: String {
+        if actionButtonNextQueueCountEnabled, !player.queue.isEmpty {
+            return "\("Next".localized()) • \(player.queue.count)"
+        }
+
+        return "Next".localized()
     }
 
     func actionButton(
