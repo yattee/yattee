@@ -17,6 +17,7 @@ struct BrowsingSettings: View {
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.showHome) private var showHome
     @Default(.showFavoritesInHome) private var showFavoritesInHome
+    @Default(.showQueueInHome) private var showQueueInHome
     @Default(.showOpenActionsInHome) private var showOpenActionsInHome
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.homeHistoryItems) private var homeHistoryItems
@@ -24,6 +25,9 @@ struct BrowsingSettings: View {
     @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
     @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
     @Default(.playerButtonShowsControlButtonsWhenMinimized) private var playerButtonShowsControlButtonsWhenMinimized
+    @Default(.playerButtonIsExpanded) private var playerButtonIsExpanded
+    @Default(.playerBarMaxWidth) private var playerBarMaxWidth
+    @Default(.expandChannelDescription) private var expandChannelDescription
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -86,6 +90,7 @@ struct BrowsingSettings: View {
                 }
             #endif
             Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
+            Toggle("Show Next in Queue", isOn: $showQueueInHome)
 
             #if os(iOS)
                 HStack {
@@ -157,9 +162,21 @@ struct BrowsingSettings: View {
     #if !os(tvOS)
         private var playerBarSettings: some View {
             Section(header: SettingsHeader(text: "Player Bar".localized()), footer: playerBarFooter) {
+                Toggle("Open expanded", isOn: $playerButtonIsExpanded)
                 Toggle("Always show controls buttons", isOn: $playerButtonShowsControlButtonsWhenMinimized)
                 playerBarGesturePicker("Single tap gesture", selection: $playerButtonSingleTapGesture)
                 playerBarGesturePicker("Double tap gesture", selection: $playerButtonDoubleTapGesture)
+                HStack {
+                    Text("Maximum width expanded")
+                    Spacer()
+                    TextField("Maximum width expanded", text: $playerBarMaxWidth)
+                        .frame(maxWidth: 100, alignment: .trailing)
+                        .multilineTextAlignment(.trailing)
+                        .labelsHidden()
+                    #if !os(macOS)
+                        .keyboardType(.numberPad)
+                    #endif
+                }
             }
         }
 
@@ -205,6 +222,8 @@ struct BrowsingSettings: View {
 
                 Toggle("Show anonymous accounts", isOn: $accountPickerDisplaysAnonymousAccounts)
             }
+
+            Toggle("Open channels with description expanded", isOn: $expandChannelDescription)
         }
     }
 

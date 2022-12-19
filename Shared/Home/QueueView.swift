@@ -8,21 +8,24 @@ struct QueueView: View {
     var body: some View {
         LazyVStack {
             if !items.isEmpty {
-                HStack {
-                    sectionLabel("Next in queue")
-                    Button {
-                        withAnimation {
-                            expanded.toggle()
-                        }
-                    } label: {
+                Button {
+                    withAnimation {
+                        expanded.toggle()
+                    }
+                } label: {
+                    HStack {
+                        sectionLabel(label)
+                        Spacer()
                         Label("Show more", systemImage: expanded ? "chevron.up" : "chevron.down")
                             .animation(nil, value: expanded)
                             .foregroundColor(.accentColor)
                             .imageScale(.large)
                             .labelStyle(.iconOnly)
+                            .opacity(items.count > 1 ? 1 : 0)
                     }
-                    .opacity(items.count > 1 ? 1 : 0)
                 }
+                .disabled(items.count < 2)
+
                 ForEach(limitedItems) { item in
                     ContentItemView(item: .init(video: item.video))
                         .environment(\.listingStyle, .list)
@@ -32,6 +35,15 @@ struct QueueView: View {
                 }
             }
         }
+        .padding(.vertical, items.isEmpty ? 0 : 15)
+    }
+
+    var label: String {
+        if items.count < 2 {
+            return "Next in Queue"
+        }
+
+        return "Next in Queue (\(items.count))"
     }
 
     var limitedItems: [PlayerQueueItem] {

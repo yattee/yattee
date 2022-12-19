@@ -27,6 +27,7 @@ struct HomeView: View {
     @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.showFavoritesInHome) private var showFavoritesInHome
     @Default(.showOpenActionsInHome) private var showOpenActionsInHome
+    @Default(.showQueueInHome) private var showQueueInHome
 
     private var navigation: NavigationModel { .shared }
 
@@ -69,13 +70,14 @@ struct HomeView: View {
                 .padding(.horizontal, 15)
             #endif
 
-            QueueView()
-                .padding(.vertical, 15)
-            #if os(tvOS)
-                .padding(.horizontal, 40)
-            #else
-                .padding(.horizontal, 15)
-            #endif
+            if showQueueInHome {
+                QueueView()
+                #if os(tvOS)
+                    .padding(.horizontal, 40)
+                #else
+                    .padding(.horizontal, 15)
+                #endif
+            }
 
             if !accounts.current.isNil, showFavoritesInHome {
                 #if os(tvOS)

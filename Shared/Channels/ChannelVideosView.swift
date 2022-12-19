@@ -31,6 +31,7 @@ struct ChannelVideosView: View {
     @Namespace private var focusNamespace
 
     @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
+    @Default(.expandChannelDescription) private var expandChannelDescription
 
     var presentedChannel: Channel? {
         store.item ?? channel ?? recents.presentedChannel
@@ -165,6 +166,8 @@ struct ChannelVideosView: View {
         }
         #endif
         .onAppear {
+            descriptionExpanded = expandChannelDescription
+
             if let channel,
                let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey),
                store.item.isNil

@@ -23,6 +23,7 @@ extension Defaults.Keys {
 
     static let showHome = Key<Bool>("showHome", default: true)
     static let showOpenActionsInHome = Key<Bool>("showOpenActionsInHome", default: true)
+    static let showQueueInHome = Key<Bool>("showQueueInHome", default: true)
     static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
     static let showFavoritesInHome = Key<Bool>("showFavoritesInHome", default: true)
     #if os(iOS)
@@ -35,6 +36,8 @@ extension Defaults.Keys {
     static let playerButtonSingleTapGesture = Key<PlayerTapGestureAction>("playerButtonSingleTapGesture", default: .togglePlayer)
     static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .togglePlayerVisibility)
     static let playerButtonShowsControlButtonsWhenMinimized = Key<Bool>("playerButtonShowsControlButtonsWhenMinimized", default: false)
+    static let playerButtonIsExpanded = Key<Bool>("playerButtonIsExpanded", default: false)
+    static let playerBarMaxWidth = Key<String>("playerBarMaxWidth", default: "600")
 
     #if !os(tvOS)
         #if os(macOS)
@@ -48,6 +51,7 @@ extension Defaults.Keys {
     #if os(iOS)
         static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
+    static let expandChannelDescription = Key<Bool>("expandChannelDescription", default: false)
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: false)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
     static let roundedThumbnails = Key<Bool>("roundedThumbnails", default: true)
