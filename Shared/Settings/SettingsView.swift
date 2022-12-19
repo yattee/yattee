@@ -7,7 +7,7 @@ struct SettingsView: View {
 
     #if os(macOS)
         private enum Tabs: Hashable {
-            case browsing, player, quality, history, sponsorBlock, locations, advanced, help
+            case browsing, player, controls, quality, history, sponsorBlock, locations, advanced, help
         }
 
         @State private var selection: Tabs = .browsing
@@ -47,6 +47,14 @@ struct SettingsView: View {
                     Label("Player", systemImage: "play.rectangle")
                 }
                 .tag(Tabs.player)
+
+                Form {
+                    PlayerControlsSettings()
+                }
+                .tabItem {
+                    Label("Controls", systemImage: "hand.tap")
+                }
+                .tag(Tabs.controls)
 
                 Form {
                     QualitySettings()
@@ -98,7 +106,7 @@ struct SettingsView: View {
                 .tag(Tabs.help)
             }
             .padding(20)
-            .frame(width: 600, height: windowHeight)
+            .frame(width: 650, height: windowHeight)
         #else
             NavigationView {
                 settingsList
@@ -136,6 +144,12 @@ struct SettingsView: View {
                         PlayerSettings()
                     } label: {
                         Label("Player", systemImage: "play.rectangle")
+                    }
+
+                    NavigationLink {
+                        PlayerControlsSettings()
+                    } label: {
+                        Label("Controls", systemImage: "hand.tap")
                     }
 
                     NavigationLink {
@@ -225,9 +239,11 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case .browsing:
-                return 700
+                return 820
             case .player:
-                return 730
+                return 450
+            case .controls:
+                return 800
             case .quality:
                 return 420
             case .history:

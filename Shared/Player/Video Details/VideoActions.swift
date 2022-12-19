@@ -84,9 +84,13 @@ struct VideoActions: View {
             Group {
                 switch action {
                 case .share:
-                    ShareButton(contentItem: .init(video: video)) {
-                        actionButton("Share", systemImage: "square.and.arrow.up")
-                    }
+                    #if os(tvOS)
+                        EmptyView()
+                    #else
+                        ShareButton(contentItem: .init(video: video)) {
+                            actionButton("Share", systemImage: "square.and.arrow.up")
+                        }
+                    #endif
                 case .addToPlaylist:
                     actionButton("Add", systemImage: "text.badge.plus") {
                         guard let video else { return }

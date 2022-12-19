@@ -128,7 +128,7 @@ extension Defaults.Keys {
     static let fullScreenPlayerControlsLayout = Key<PlayerControlsLayout>("fullScreenPlayerControlsLayout", default: fullScreenPlayerControlsLayoutDefault)
     static let horizontalPlayerGestureEnabled = Key<Bool>("horizontalPlayerGestureEnabled", default: true)
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
-    static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 20.0)
+    static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 30.0)
     static let showKeywords = Key<Bool>("showKeywords", default: false)
     #if !os(tvOS)
         static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
@@ -201,8 +201,23 @@ extension Defaults.Keys {
     static let actionButtonNextEnabled = Key<Bool>("actionButtonNextEnabled", default: true)
     static let actionButtonHideEnabled = Key<Bool>("actionButtonHideEnabled", default: false)
     static let actionButtonCloseEnabled = Key<Bool>("actionButtonCloseEnabled", default: true)
-
     static let actionButtonNextQueueCountEnabled = Key<Bool>("actionButtonNextQueueCountEnabled", default: true)
+
+    #if os(iOS)
+        static let playerControlsLockOrientationEnabled = Key<Bool>("playerControlsLockOrientationEnabled", default: true)
+    #endif
+    #if os(tvOS)
+        static let playerControlsSettingsEnabledDefault = true
+    #else
+        static let playerControlsSettingsEnabledDefault = false
+    #endif
+    static let playerControlsSettingsEnabled = Key<Bool>("playerControlsSettingsEnabled", default: playerControlsSettingsEnabledDefault)
+    static let playerControlsCloseEnabled = Key<Bool>("playerControlsCloseEnabled", default: true)
+    static let playerControlsRestartEnabled = Key<Bool>("playerControlsRestartEnabled", default: false)
+    static let playerControlsAdvanceToNextEnabled = Key<Bool>("playerControlsAdvanceToNextEnabled", default: false)
+    static let playerControlsPlaybackModeEnabled = Key<Bool>("playerControlsPlaybackModeEnabled", default: false)
+    static let playerControlsNextEnabled = Key<Bool>("playerControlsNextEnabled", default: true)
+    static let playerControlsMusicModeEnabled = Key<Bool>("playerControlsMusicModeEnabled", default: true)
 
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")

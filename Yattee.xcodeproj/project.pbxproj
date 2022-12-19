@@ -873,6 +873,9 @@
 		37D836BC294927E700005E5E /* ChannelsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D836BB294927E700005E5E /* ChannelsCacheModel.swift */; };
 		37D836BD294927E700005E5E /* ChannelsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D836BB294927E700005E5E /* ChannelsCacheModel.swift */; };
 		37D836BE294927E700005E5E /* ChannelsCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D836BB294927E700005E5E /* ChannelsCacheModel.swift */; };
+		37D9BA0629507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
+		37D9BA0729507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
+		37D9BA0829507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
 		37DA0F20291DD6B8009B38CF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 37DA0F1F291DD6B8009B38CF /* Logging */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -1442,6 +1445,7 @@
 		37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsOverlayButton.swift; sourceTree = "<group>"; };
 		37D836BB294927E700005E5E /* ChannelsCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsCacheModel.swift; sourceTree = "<group>"; };
 		37D9169A27388A81002B1BAA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerControlsSettings.swift; sourceTree = "<group>"; };
 		37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStreams.swift; sourceTree = "<group>"; };
 		37DD9DA22785BBC900539416 /* NoCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCommentsView.swift; sourceTree = "<group>"; };
 		37DD9DAF2785D58D00539416 /* RefreshControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RefreshControl.swift; sourceTree = "<group>"; };
@@ -1981,6 +1985,7 @@
 				37484C2426FC83E000287258 /* InstanceForm.swift */,
 				37484C2C26FC844700287258 /* InstanceSettings.swift */,
 				374924D92921050B0017D862 /* LocationsSettings.swift */,
+				37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */,
 				37484C1826FC837400287258 /* PlayerSettings.swift */,
 				374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */,
 				376BE50627347B57009AD608 /* SettingsHeader.swift */,
@@ -3041,6 +3046,7 @@
 				37CEE4BD2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				37C2211D27ADA33300305B41 /* MPVViewController.swift in Sources */,
 				371B7E612759706A00D21217 /* CommentsView.swift in Sources */,
+				37D9BA0629507F69002586BD /* PlayerControlsSettings.swift in Sources */,
 				379DC3D128BA4EB400B09677 /* Seek.swift in Sources */,
 				371B7E6A2759791900D21217 /* CommentsModel.swift in Sources */,
 				37E8B0F027B326F30024006F /* Comparable+Clamped.swift in Sources */,
@@ -3382,6 +3388,7 @@
 				3776925329463C310055EC18 /* PlaylistsCacheModel.swift in Sources */,
 				37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */,
 				37484C3226FCB8F900287258 /* AccountValidator.swift in Sources */,
+				37D9BA0729507F69002586BD /* PlayerControlsSettings.swift in Sources */,
 				378E9C4129455A5800B2D696 /* ChannelsView.swift in Sources */,
 				378AE944274EF00A006A4EE1 /* Color+Background.swift in Sources */,
 				37F49BA426CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
@@ -3809,6 +3816,7 @@
 				37FD43E52704847C0073EE42 /* View+Fixtures.swift in Sources */,
 				37FAE000272ED58000330459 /* EditFavorites.swift in Sources */,
 				37F961A127BD90BB00058149 /* PlayerBackendType.swift in Sources */,
+				37D9BA0829507F69002586BD /* PlayerControlsSettings.swift in Sources */,
 				37599F32272B42810087F250 /* FavoriteItem.swift in Sources */,
 				37E8B0EE27B326C00024006F /* TimelineView.swift in Sources */,
 				3726386E2948A4B80043702D /* Badge+Backport.swift in Sources */,

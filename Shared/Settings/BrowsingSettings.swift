@@ -193,6 +193,8 @@ struct BrowsingSettings: View {
                 Text("Tap and hold channel thumbnail to open context menu with more actions")
             #elseif os(macOS)
                 Text("Right click channel thumbnail to open context menu with more actions")
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 10)
             #endif
         }
     #endif

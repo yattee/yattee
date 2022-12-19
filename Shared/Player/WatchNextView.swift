@@ -35,8 +35,10 @@ struct WatchNextView: View {
                         Spacer()
 
                         HStack {
-                            Text("Mode")
-                                .foregroundColor(.secondary)
+                            #if os(macOS)
+                                Text("Mode")
+                                    .foregroundColor(.secondary)
+                            #endif
 
                             playbackModeControl
 
@@ -267,6 +269,8 @@ struct WatchNextView: View {
                 player.playbackMode = player.playbackMode.next()
             } label: {
                 Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+                    .transaction { t in t.animation = nil }
+                    .frame(minWidth: 350)
             }
         #elseif os(macOS)
             playbackModePicker

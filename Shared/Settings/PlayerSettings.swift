@@ -6,11 +6,7 @@ struct PlayerSettings: View {
     @Default(.playerInstanceID) private var playerInstanceID
 
     @Default(.playerSidebar) private var playerSidebar
-    @Default(.playerControlsLayout) private var playerControlsLayout
-    @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
-    @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
-    @Default(.seekGestureSpeed) private var seekGestureSpeed
-    @Default(.seekGestureSensitivity) private var seekGestureSensitivity
+
     @Default(.showKeywords) private var showKeywords
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
@@ -27,29 +23,12 @@ struct PlayerSettings: View {
     #endif
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
-    @Default(.systemControlsCommands) private var systemControlsCommands
 
     @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
     @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
 
-    @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
-    @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
-    @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
-    @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
-    @Default(.systemControlsSeekDuration) private var systemControlsSeekDuration
-
-    @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
-    @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
-    @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
-    @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
-    @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
-    @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
-    @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
-    @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
-
     @ObservedObject private var accounts = AccountsModel.shared
-    private var player = PlayerModel.shared
 
     #if os(iOS)
         private var idiom: UIUserInterfaceIdiom {
@@ -87,39 +66,13 @@ struct PlayerSettings: View {
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
                 #endif
-                systemControlsCommandsPicker
             }
-
-            Section(header: SettingsHeader(text: "Seeking"), footer: seekingGestureSection) {
-                seekingSection
-            }
-
-            #if !os(tvOS)
-                Section(header: SettingsHeader(text: "Actions Buttons")) {
-                    actionButtonToggles
-                }
-                actionButtonNextQueueCountEnabledToggle
-            #endif
 
             Section(header: SettingsHeader(text: "Watch Next")) {
                 openWatchNextOnFinishedWatchingToggle
                 openWatchNextOnFinishedWatchingDelayTextField
                 openWatchNextOnCloseToggle
             }
-
-            #if !os(tvOS)
-                Section(header: SettingsHeader(text: "Controls".localized()), footer: controlsLayoutFooter) {
-                    horizontalPlayerGestureEnabledToggle
-                    SettingsHeader(text: "Seek gesture sensitivity".localized(), secondary: true)
-                    seekGestureSensitivityPicker
-                    SettingsHeader(text: "Seek gesture speed".localized(), secondary: true)
-                    seekGestureSpeedPicker
-                    SettingsHeader(text: "Regular size".localized(), secondary: true)
-                    playerControlsLayoutPicker
-                    SettingsHeader(text: "Fullscreen size".localized(), secondary: true)
-                    fullScreenPlayerControlsLayoutPicker
-                }
-            #endif
 
             let interface = Section(header: SettingsHeader(text: "Interface".localized())) {
                 #if os(iOS)
@@ -190,25 +143,6 @@ struct PlayerSettings: View {
         .modifier(SettingsPickerModifier())
     }
 
-    private var systemControlsCommandsPicker: some View {
-        func labelText(_ label: String) -> String {
-            #if os(macOS)
-                String(format: "System controls show buttons for %@".localized(), label)
-            #else
-                label
-            #endif
-        }
-
-        return Picker("System controls buttons", selection: $systemControlsCommands) {
-            Text(labelText("10 seconds forwards/backwards".localized())).tag(SystemControlsCommands.seek)
-            Text(labelText("Restart/Play next".localized())).tag(SystemControlsCommands.restartAndAdvanceToNext)
-        }
-        .onChange(of: systemControlsCommands) { _ in
-            player.updateRemoteCommandCenter()
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
     private var openWatchNextOnCloseToggle: some View {
         Toggle("Open after manual close of video", isOn: $openWatchNextOnClose)
     }
@@ -236,61 +170,6 @@ struct PlayerSettings: View {
         .multilineTextAlignment(.trailing)
     }
 
-    @ViewBuilder private var seekingSection: some View {
-        seekingDurationSetting("System controls", $systemControlsSeekDuration)
-            .foregroundColor(systemControlsCommands == .restartAndAdvanceToNext ? .secondary : .primary)
-            .disabled(systemControlsCommands == .restartAndAdvanceToNext)
-        seekingDurationSetting("Controls button: backwards", $buttonBackwardSeekDuration)
-        seekingDurationSetting("Controls button: forwards", $buttonForwardSeekDuration)
-        seekingDurationSetting("Gesture: backwards", $gestureBackwardSeekDuration)
-        seekingDurationSetting("Gesture: fowards", $gestureForwardSeekDuration)
-    }
-
-    private var seekingGestureSection: some View {
-        #if os(iOS)
-            Text("Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart.")
-        #elseif os(macOS)
-            Text("Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart.")
-        #else
-            Text("Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart.")
-        #endif
-    }
-
-    private func seekingDurationSetting(_ name: String, _ value: Binding<String>) -> some View {
-        HStack {
-            Text(name)
-                .frame(minWidth: 140, alignment: .leading)
-            Spacer()
-            TextField("Duration", text: value)
-
-                .frame(maxWidth: 50, alignment: .trailing)
-                .multilineTextAlignment(.trailing)
-
-                .labelsHidden()
-            #if !os(macOS)
-                .keyboardType(.numberPad)
-            #endif
-        }
-    }
-
-    @ViewBuilder private var actionButtonToggles: some View {
-        actionButtonToggle("Share", $actionButtonShareEnabled)
-        actionButtonToggle("Add to Playlist", $actionButtonAddToPlaylistEnabled)
-        actionButtonToggle("Subscribe/Unsubscribe", $actionButtonSubscribeEnabled)
-        actionButtonToggle("Settings", $actionButtonSettingsEnabled)
-        actionButtonToggle("Watch Next", $actionButtonNextEnabled)
-        actionButtonToggle("Hide player", $actionButtonHideEnabled)
-        actionButtonToggle("Close video", $actionButtonCloseEnabled)
-    }
-
-    private func actionButtonToggle(_ name: String, _ value: Binding<Bool>) -> some View {
-        Toggle(name, isOn: value)
-    }
-
-    var actionButtonNextQueueCountEnabledToggle: some View {
-        Toggle("Show queue items count in Watch Next button label", isOn: $actionButtonNextQueueCountEnabled)
-    }
-
     private var sidebarPicker: some View {
         Picker("Sidebar", selection: $playerSidebar) {
             #if os(macOS)
@@ -302,56 +181,6 @@ struct PlayerSettings: View {
             #endif
 
             Text("Hide sidebar").tag(PlayerSidebarSetting.never)
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var horizontalPlayerGestureEnabledToggle: some View {
-        Toggle("Seek with horizontal swipe on video", isOn: $horizontalPlayerGestureEnabled)
-    }
-
-    private var seekGestureSpeedPicker: some View {
-        Picker("Seek gesture speed", selection: $seekGestureSpeed) {
-            ForEach([1, 0.75, 0.66, 0.5, 0.33, 0.25, 0.1], id: \.self) { value in
-                Text(String(format: "%.0f%%", value * 100)).tag(value)
-            }
-        }
-        .disabled(!horizontalPlayerGestureEnabled)
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var seekGestureSensitivityPicker: some View {
-        Picker("Seek gesture sensitivity", selection: $seekGestureSensitivity) {
-            Text("Highest").tag(1.0)
-            Text("High").tag(10.0)
-            Text("Normal").tag(30.0)
-            Text("Low").tag(50.0)
-            Text("Lowest").tag(100.0)
-        }
-        .disabled(!horizontalPlayerGestureEnabled)
-        .modifier(SettingsPickerModifier())
-    }
-
-    @ViewBuilder private var controlsLayoutFooter: some View {
-        #if os(iOS)
-            Text("Large layout is not suitable for all devices and using it may cause controls not to fit on the screen.")
-        #endif
-    }
-
-    private var playerControlsLayoutPicker: some View {
-        Picker("Regular Size", selection: $playerControlsLayout) {
-            ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
-                Text(layout.description).tag(layout.rawValue)
-            }
-        }
-        .modifier(SettingsPickerModifier())
-    }
-
-    private var fullScreenPlayerControlsLayoutPicker: some View {
-        Picker("Fullscreen size", selection: $fullScreenPlayerControlsLayout) {
-            ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
-                Text(layout.description).tag(layout.rawValue)
-            }
         }
         .modifier(SettingsPickerModifier())
     }

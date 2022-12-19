@@ -32,6 +32,17 @@ struct PlayerControls: View {
     @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
     @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
 
+    #if os(iOS)
+        @Default(.playerControlsLockOrientationEnabled) private var playerControlsLockOrientationEnabled
+    #endif
+    @Default(.playerControlsSettingsEnabled) private var playerControlsSettingsEnabled
+    @Default(.playerControlsCloseEnabled) private var playerControlsCloseEnabled
+    @Default(.playerControlsRestartEnabled) private var playerControlsRestartEnabled
+    @Default(.playerControlsAdvanceToNextEnabled) private var playerControlsAdvanceToNextEnabled
+    @Default(.playerControlsPlaybackModeEnabled) private var playerControlsPlaybackModeEnabled
+    @Default(.playerControlsNextEnabled) private var playerControlsNextEnabled
+    @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
+
     private let controlsOverlayModel = ControlOverlaysModel.shared
 
     var playerControlsLayout: PlayerControlsLayout {
@@ -135,17 +146,30 @@ struct PlayerControls: View {
                                     seekBackwardButton
                                     seekForwardButton
                                 #endif
-                                restartVideoButton
-                                advanceToNextItemButton
+                                if playerControlsAdvanceToNextEnabled {
+                                    restartVideoButton
+                                }
+                                if playerControlsAdvanceToNextEnabled {
+                                    advanceToNextItemButton
+                                }
                                 Spacer()
                                 #if os(tvOS)
-                                    settingsButton
+                                    if playerControlsSettingsEnabled {
+                                        settingsButton
+                                    }
                                 #endif
-                                playbackModeButton
+                                if playerControlsPlaybackModeEnabled {
+                                    playbackModeButton
+                                }
+                                if playerControlsNextEnabled {
+                                    watchNextButton
+                                }
                                 #if os(tvOS)
                                     closeVideoButton
                                 #else
-                                    musicModeButton
+                                    if playerControlsMusicModeEnabled {
+                                        musicModeButton
+                                    }
                                 #endif
                             }
                             .zIndex(0)
@@ -306,13 +330,20 @@ struct PlayerControls: View {
 
             pipButton
             #if os(iOS)
-                lockOrientationButton
+                if playerControlsLockOrientationEnabled {
+                    lockOrientationButton
+                }
             #endif
 
             Spacer()
 
-            settingsButton
-            closeVideoButton
+            if playerControlsSettingsEnabled {
+                settingsButton
+            }
+
+            if playerControlsCloseEnabled {
+                closeVideoButton
+            }
         }
     }
 
@@ -387,6 +418,12 @@ struct PlayerControls: View {
         button("Playback Mode", systemImage: player.playbackMode.systemImage) {
             player.playbackMode = player.playbackMode.next()
             model.objectWillChange.send()
+        }
+    }
+
+    var watchNextButton: some View {
+        button("Watch Next", systemImage: Constants.nextSystemImage) {
+            WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
         }
     }
 
