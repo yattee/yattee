@@ -217,15 +217,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var publishedDate: String? {
-        guard let publishedAt else {
-            return (published.isEmpty || published == "0 seconds ago") ? nil : published
-        }
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .none
-
-        return dateFormatter.string(from: publishedAt)
+        (published.isEmpty || published == "0 seconds ago") ? publishedAt?.timeIntervalSince1970.formattedAsRelativeTime() : published
     }
 
     var viewsCount: String? {
