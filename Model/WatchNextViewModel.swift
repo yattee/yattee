@@ -42,7 +42,7 @@ final class WatchNextViewModel: ObservableObject {
     @Published var countdown = 0.0
     var countdownTimer: Timer?
 
-    private var player = PlayerModel.shared
+    var player = PlayerModel.shared
 
     var autoplayTimer: Timer?
 
@@ -129,11 +129,24 @@ final class WatchNextViewModel: ObservableObject {
 
     private func open(reason: PresentationReason) {
         self.reason = reason
-        page = Page.allCases.first { isAvailable($0) } ?? .history
+        setPageAfterOpening()
 
         guard !isPresenting else { return }
         withAnimation(Self.animation) {
             isPresenting = true
+        }
+    }
+
+    private func setPageAfterOpening() {
+        let firstAvailable = Page.allCases.first { isAvailable($0) } ?? .history
+
+        switch reason {
+        case .finishedWatching:
+            page = player.playbackMode == .related ? .queue : firstAvailable
+        case .closed:
+            page = player.playbackMode == .related ? .queue : firstAvailable
+        default:
+            page = firstAvailable
         }
     }
 

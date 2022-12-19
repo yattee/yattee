@@ -87,11 +87,9 @@ struct PlayerQueueView: View {
             ForEach(player.queue) { item in
                 PlayerQueueRow(item: item)
                     .contextMenu {
-                        removeButton(item)
-                        removeAllButton()
-
                         if let video = item.video {
                             VideoContextMenuView(video: video)
+                                .environment(\.inQueueListing, true)
                         }
                     }
             }
@@ -114,22 +112,6 @@ struct PlayerQueueView: View {
                 }
             }
             .transaction { t in t.disablesAnimations = true }
-        }
-    }
-
-    private func removeButton(_ item: PlayerQueueItem) -> some View {
-        Button {
-            player.remove(item)
-        } label: {
-            Label("Remove from the queue", systemImage: "trash")
-        }
-    }
-
-    private func removeAllButton() -> some View {
-        Button {
-            player.removeQueueItems()
-        } label: {
-            Label("Clear the queue", systemImage: "trash.fill")
         }
     }
 }

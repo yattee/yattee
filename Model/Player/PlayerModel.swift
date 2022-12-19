@@ -36,7 +36,7 @@ final class PlayerModel: ObservableObject {
             case .queue:
                 return "Queue"
             case .shuffle:
-                return "Queue, shuffled"
+                return "Queue - shuffled"
             case .loopOne:
                 return "Loop one"
             case .related:

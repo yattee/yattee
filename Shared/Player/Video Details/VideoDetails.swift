@@ -96,13 +96,13 @@ struct VideoDetails: View {
         ContentItem(video: player.currentVideo)
     }
 
-    var pageMenu: some View {
+    @ViewBuilder var pageMenu: some View {
         #if os(macOS)
             pagePicker
                 .labelsHidden()
                 .offset(x: 15, y: 15)
                 .frame(maxWidth: 200)
-        #else
+        #elseif os(iOS)
             Menu {
                 pagePicker
             } label: {
@@ -224,6 +224,8 @@ struct VideoDetails: View {
             .secondaryBackground
         #elseif os(iOS)
             .background
+        #else
+            .clear
         #endif
     }
 

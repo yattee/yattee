@@ -35,8 +35,15 @@ struct WatchNextView: View {
                         Spacer()
 
                         HStack {
-                            if model.isRestartable {
-                                reopenButton
+                            Text("Mode")
+                                .foregroundColor(.secondary)
+
+                            playbackModeControl
+
+                            HStack {
+                                if model.isRestartable {
+                                    reopenButton
+                                }
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -83,6 +90,9 @@ struct WatchNextView: View {
                     #endif
 
                     PlayerQueueRow(item: item)
+
+                    Divider()
+                        .padding(.vertical, 5)
                 }
 
                 moreVideos
@@ -123,6 +133,7 @@ struct WatchNextView: View {
         #else
             Menu {
                 pagePicker
+                playbackModePicker
             } label: {
                 HStack(spacing: 12) {
                     menuLabel
@@ -142,7 +153,7 @@ struct WatchNextView: View {
         HStack {
             Image(systemName: model.page.systemImageName)
                 .imageScale(.small)
-            Text(model.page.title)
+            Text(model.page == .queue ? queueTitle : model.page.title)
                 .font(.headline)
         }
     }
@@ -150,10 +161,17 @@ struct WatchNextView: View {
     var pagePicker: some View {
         Picker("Page", selection: $model.page) {
             ForEach(WatchNextViewModel.Page.allCases, id: \.rawValue) { page in
-                Label(page.title, systemImage: page.systemImageName)
-                    .tag(page)
+                Label(
+                    page == .queue ? queueTitle : page.title,
+                    systemImage: page.systemImageName
+                )
+                .tag(page)
             }
         }
+    }
+
+    var queueTitle: String {
+        "\(WatchNextViewModel.Page.queue.title) • \(player.queue.count)"
     }
 
     @ViewBuilder var hideCloseButton: some View {
@@ -194,14 +212,30 @@ struct WatchNextView: View {
         VStack(spacing: 12) {
             switch model.page {
             case .queue:
-                let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: model.isAutoplaying ? 1 : 0)
+
+                if player.playbackMode == .related, !(model.isAutoplaying && model.canAutoplay) {
+                    autoplaying
+
+                    Divider()
+                }
+
+                let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: player.playbackMode == .queue ? 1 : 0)
+
+                if (model.isAutoplaying && model.canAutoplay && !queueForMoreVideos.isEmpty) ||
+                    (!model.isAutoplaying && !queueForMoreVideos.isEmpty)
+                {
+                    Text("Next in queue")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
                 if !queueForMoreVideos.isEmpty {
                     ForEach(queueForMoreVideos) { item in
                         ContentItemView(item: .init(video: item.video))
                             .environment(\.inQueueListing, true)
                             .environment(\.listingStyle, .list)
                     }
-                } else if player.playbackMode != .related && player.playbackMode != .loopOne {
+                } else {
                     Label(
                         model.isAutoplaying ? "Nothing more in the queue" : "Queue is empty",
                         systemImage: WatchNextViewModel.Page.queue.systemImageName
@@ -224,6 +258,71 @@ struct WatchNextView: View {
                     HistoryView(limit: 15)
                 }
             }
+        }
+    }
+
+    @ViewBuilder var playbackModeControl: some View {
+        #if os(tvOS)
+            Button {
+                player.playbackMode = player.playbackMode.next()
+            } label: {
+                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+            }
+        #elseif os(macOS)
+            playbackModePicker
+                .modifier(SettingsPickerModifier())
+            #if os(macOS)
+                .frame(maxWidth: 150)
+            #endif
+        #else
+            Menu {
+                playbackModePicker
+            } label: {
+                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+            }
+        #endif
+    }
+
+    var playbackModePicker: some View {
+        Picker("Playback Mode", selection: $model.player.playbackMode) {
+            ForEach(PlayerModel.PlaybackMode.allCases, id: \.rawValue) { mode in
+                Label(mode.description, systemImage: mode.systemImage).tag(mode)
+            }
+        }
+        .labelsHidden()
+    }
+
+    @ViewBuilder var autoplaying: some View {
+        Section(header: autoplayingHeader) {
+            if let item = player.autoplayItem {
+                PlayerQueueRow(item: item, autoplay: true)
+            } else {
+                Group {
+                    if player.currentItem.isNil {
+                        Text("Not Playing")
+                    } else {
+                        Text("Finding something to play...")
+                    }
+                }
+                .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    var autoplayingHeader: some View {
+        HStack {
+            Text("Autoplaying Next")
+                .font(.headline)
+            Spacer()
+            Button {
+                player.setRelatedAutoplayItem()
+            } label: {
+                Label("Find Other", systemImage: "arrow.triangle.2.circlepath.circle")
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.accentColor)
+            }
+            .disabled(player.currentItem.isNil)
+            .buttonStyle(.plain)
         }
     }
 }
