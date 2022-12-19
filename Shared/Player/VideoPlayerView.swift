@@ -66,6 +66,8 @@ struct VideoPlayerView: View {
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
     @Default(.playerSidebar) var playerSidebar
+    @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
+    @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
 
     @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -371,10 +373,12 @@ struct VideoPlayerView: View {
                 guard !player.controls.presentingControls else { return }
 
                 if direction == .left {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
+                    let interval = TimeInterval(gestureBackwardSeekDuration) ?? 10
+                    player.backend.seek(relative: .secondsInDefaultTimescale(-interval), seekType: .userInteracted)
                 }
                 if direction == .right {
-                    player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
+                    let interval = TimeInterval(gestureForwardSeekDuration) ?? 10
+                    player.backend.seek(relative: .secondsInDefaultTimescale(interval), seekType: .userInteracted)
                 }
             }
             .onPlayPauseCommand {

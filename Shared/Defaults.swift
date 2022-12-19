@@ -188,6 +188,12 @@ extension Defaults.Keys {
     static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: .iconAndText)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
+
+    static let buttonBackwardSeekDuration = Key<String>("buttonBackwardSeekDuration", default: "10")
+    static let buttonForwardSeekDuration = Key<String>("buttonForwardSeekDuration", default: "10")
+    static let gestureBackwardSeekDuration = Key<String>("gestureBackwardSeekDuration", default: "10")
+    static let gestureForwardSeekDuration = Key<String>("gestureForwardSeekDuration", default: "10")
+    static let systemControlsSeekDuration = Key<String>("systemControlsBackwardSeekDuration", default: "10")
     static let actionButtonShareEnabled = Key<Bool>("actionButtonShareEnabled", default: true)
     static let actionButtonAddToPlaylistEnabled = Key<Bool>("actionButtonAddToPlaylistEnabled", default: true)
     static let actionButtonSubscribeEnabled = Key<Bool>("actionButtonSubscribeEnabled", default: false)

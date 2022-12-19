@@ -162,6 +162,7 @@ final class PlayerModel: ObservableObject {
     @Default(.closePiPOnOpeningPlayer) var closePiPOnOpeningPlayer
     @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
     @Default(.playerRate) var playerRate
+    @Default(.systemControlsSeekDuration) var systemControlsSeekDuration
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
@@ -746,18 +747,19 @@ final class PlayerModel: ObservableObject {
                 UIApplication.shared.beginReceivingRemoteControlEvents()
             #endif
 
-            let preferredIntervals = [NSNumber(10)]
+            let interval = TimeInterval(systemControlsSeekDuration) ?? 10
+            let preferredIntervals = [NSNumber(value: interval)]
 
             skipForwardCommand.preferredIntervals = preferredIntervals
             skipBackwardCommand.preferredIntervals = preferredIntervals
 
             skipForwardCommand.addTarget { [weak self] _ in
-                self?.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
+                self?.backend.seek(relative: .secondsInDefaultTimescale(interval), seekType: .userInteracted)
                 return .success
             }
 
             skipBackwardCommand.addTarget { [weak self] _ in
-                self?.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
+                self?.backend.seek(relative: .secondsInDefaultTimescale(-interval), seekType: .userInteracted)
                 return .success
             }
 

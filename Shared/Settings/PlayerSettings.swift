@@ -33,6 +33,12 @@ struct PlayerSettings: View {
     @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
     @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
 
+    @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
+    @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
+    @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
+    @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
+    @Default(.systemControlsSeekDuration) private var systemControlsSeekDuration
+
     @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
     @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
     @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
@@ -41,6 +47,7 @@ struct PlayerSettings: View {
     @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
     @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
     @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
+
     @ObservedObject private var accounts = AccountsModel.shared
     private var player = PlayerModel.shared
 
@@ -81,6 +88,10 @@ struct PlayerSettings: View {
                     pauseOnEnteringBackgroundToogle
                 #endif
                 systemControlsCommandsPicker
+            }
+
+            Section(header: SettingsHeader(text: "Seeking"), footer: seekingGestureSection) {
+                seekingSection
             }
 
             #if !os(tvOS)
@@ -223,6 +234,43 @@ struct PlayerSettings: View {
             #endif
         }
         .multilineTextAlignment(.trailing)
+    }
+
+    @ViewBuilder private var seekingSection: some View {
+        seekingDurationSetting("System controls", $systemControlsSeekDuration)
+            .foregroundColor(systemControlsCommands == .restartAndAdvanceToNext ? .secondary : .primary)
+            .disabled(systemControlsCommands == .restartAndAdvanceToNext)
+        seekingDurationSetting("Controls button: backwards", $buttonBackwardSeekDuration)
+        seekingDurationSetting("Controls button: forwards", $buttonForwardSeekDuration)
+        seekingDurationSetting("Gesture: backwards", $gestureBackwardSeekDuration)
+        seekingDurationSetting("Gesture: fowards", $gestureForwardSeekDuration)
+    }
+
+    private var seekingGestureSection: some View {
+        #if os(iOS)
+            Text("Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart.")
+        #elseif os(macOS)
+            Text("Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart.")
+        #else
+            Text("Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart.")
+        #endif
+    }
+
+    private func seekingDurationSetting(_ name: String, _ value: Binding<String>) -> some View {
+        HStack {
+            Text(name)
+                .frame(minWidth: 140, alignment: .leading)
+            Spacer()
+            TextField("Duration", text: value)
+
+                .frame(maxWidth: 50, alignment: .trailing)
+                .multilineTextAlignment(.trailing)
+
+                .labelsHidden()
+            #if !os(macOS)
+                .keyboardType(.numberPad)
+            #endif
+        }
     }
 
     @ViewBuilder private var actionButtonToggles: some View {

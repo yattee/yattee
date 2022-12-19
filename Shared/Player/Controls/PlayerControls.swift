@@ -29,6 +29,8 @@ struct PlayerControls: View {
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.openWatchNextOnClose) private var openWatchNextOnClose
+    @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
+    @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
 
     private let controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -398,8 +400,14 @@ struct PlayerControls: View {
             size = playerControlsLayout.bigButtonSize
         #endif
 
-        return button("Seek Backward", systemImage: "gobackward.10", fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor) {
-            player.backend.seek(relative: .secondsInDefaultTimescale(-10), seekType: .userInteracted)
+        let interval = TimeInterval(buttonBackwardSeekDuration) ?? 10
+
+        return button(
+            "Seek Backward",
+            systemImage: Constants.seekIcon("backward", interval),
+            fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor
+        ) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(-interval), seekType: .userInteracted)
         }
         .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
@@ -420,8 +428,14 @@ struct PlayerControls: View {
             size = playerControlsLayout.bigButtonSize
         #endif
 
-        return button("Seek Forward", systemImage: "goforward.10", fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor) {
-            player.backend.seek(relative: .secondsInDefaultTimescale(10), seekType: .userInteracted)
+        let interval = TimeInterval(buttonForwardSeekDuration) ?? 10
+
+        return button(
+            "Seek Forward",
+            systemImage: Constants.seekIcon("forward", interval),
+            fontSize: fontSize, size: size, cornerRadius: 5, background: false, foregroundColor: foregroundColor
+        ) {
+            player.backend.seek(relative: .secondsInDefaultTimescale(interval), seekType: .userInteracted)
         }
         .disabled(player.liveStreamInAVPlayer)
         #if os(tvOS)
