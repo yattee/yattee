@@ -9,11 +9,19 @@ struct PlayerBackendView: View {
     var body: some View {
         ZStack(alignment: .top) {
             Group {
-                switch player.activeBackend {
-                case .mpv:
-                    player.mpvPlayerView
-                case .appleAVPlayer:
-                    player.avPlayerView
+                ZStack {
+                    Group {
+                        switch player.activeBackend {
+                        case .mpv:
+                            player.mpvPlayerView
+                        case .appleAVPlayer:
+                            player.avPlayerView
+                        }
+                    }
+                    .zIndex(0)
+
+                    ControlsGradientView()
+                        .zIndex(1)
                 }
             }
             .overlay(GeometryReader { proxy in

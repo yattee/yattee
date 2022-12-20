@@ -728,6 +728,9 @@
 		37B81AFD26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */; };
 		37B81AFF26D2CA3700675966 /* VideoDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFE26D2CA3700675966 /* VideoDetails.swift */; };
 		37B81B0026D2CA3700675966 /* VideoDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFE26D2CA3700675966 /* VideoDetails.swift */; };
+		37BA221129526A19000DAD1F /* ControlsGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA221029526A18000DAD1F /* ControlsGradientView.swift */; };
+		37BA221229526A19000DAD1F /* ControlsGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA221029526A18000DAD1F /* ControlsGradientView.swift */; };
+		37BA221329526A19000DAD1F /* ControlsGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA221029526A18000DAD1F /* ControlsGradientView.swift */; };
 		37BA793B26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */; };
 		37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */; };
 		37BA793F26DB8F97002A0235 /* ChannelVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */; };
@@ -1374,6 +1377,7 @@
 		37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerSizeModifier.swift; sourceTree = "<group>"; };
 		37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetailsPaddingModifier.swift; sourceTree = "<group>"; };
 		37B81AFE26D2CA3700675966 /* VideoDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetails.swift; sourceTree = "<group>"; };
+		37BA221029526A18000DAD1F /* ControlsGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsGradientView.swift; sourceTree = "<group>"; };
 		37BA793A26DB8EE4002A0235 /* PlaylistVideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistVideosView.swift; sourceTree = "<group>"; };
 		37BA793E26DB8F97002A0235 /* ChannelVideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelVideosView.swift; sourceTree = "<group>"; };
 		37BA794226DBA973002A0235 /* PlaylistsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsModel.swift; sourceTree = "<group>"; };
@@ -1794,6 +1798,7 @@
 				375E45F327B1973400BA7902 /* MPV */,
 				37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */,
 				37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */,
+				37BA221029526A18000DAD1F /* ControlsGradientView.swift */,
 				375F740F289DC35A00747050 /* PlayerBackendView.swift */,
 				374DE87F28BB896C0062BBF2 /* PlayerDragGesture.swift */,
 				3703100127B0713600ECDDAA /* PlayerGestures.swift */,
@@ -3274,6 +3279,7 @@
 				37484C2926FC83FF00287258 /* AccountForm.swift in Sources */,
 				37E70927271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */,
+				37BA221129526A19000DAD1F /* ControlsGradientView.swift in Sources */,
 				377ABC44286E4B74009C986F /* ManifestedInstance.swift in Sources */,
 				37EBD8C627AF26B300F1C24B /* AVPlayerBackend.swift in Sources */,
 				375E45F527B1976B00BA7902 /* MPVOGLView.swift in Sources */,
@@ -3424,6 +3430,7 @@
 				37CC3F51270D010D00608308 /* VideoBanner.swift in Sources */,
 				37F961A027BD90BB00058149 /* PlayerBackendType.swift in Sources */,
 				3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */,
+				37BA221229526A19000DAD1F /* ControlsGradientView.swift in Sources */,
 				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				3752069E285E910600CA655F /* ChapterView.swift in Sources */,
 				37030FF827B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
@@ -3753,6 +3760,7 @@
 				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,
 				3751B4B427836902000B7DF4 /* SearchPage.swift in Sources */,
 				377ABC46286E4B74009C986F /* ManifestedInstance.swift in Sources */,
+				37BA221329526A19000DAD1F /* ControlsGradientView.swift in Sources */,
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
 				37130A61277657300033018A /* PersistenceController.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
