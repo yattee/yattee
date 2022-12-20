@@ -38,16 +38,6 @@ struct ContentView: View {
                 TVNavigationView()
             #endif
         }
-        .onChange(of: accounts.current) { _ in
-            subscriptions.load(force: true)
-            playlists.load(force: true)
-        }
-        .onChange(of: accounts.signedIn) { newValue in
-            guard newValue else { return }
-            subscriptions.load(force: true)
-            playlists.load(force: true)
-        }
-
         #if os(iOS)
         .overlay(videoPlayer)
         .sheet(isPresented: $navigation.presentingShareSheet) {

@@ -110,7 +110,9 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         if account.token.isNil || account.token!.isEmpty {
             updateToken()
         } else {
-            FeedModel.shared.loadResources(force: true)
+            FeedModel.shared.onAccountChange()
+            SubscribedChannelsModel.shared.onAccountChange()
+            PlaylistsModel.shared.onAccountChange()
         }
     }
 

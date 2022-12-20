@@ -108,6 +108,7 @@ final class FeedModel: ObservableObject, CacheModel {
 
     func onAccountChange() {
         reset()
+        error = nil
         loadResources(force: true)
         calculateUnwatchedFeed()
     }

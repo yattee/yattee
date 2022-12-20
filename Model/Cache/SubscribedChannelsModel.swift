@@ -161,4 +161,9 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
     var formattedCacheTime: String {
         getFormattedDate(channelsTime)
     }
+
+    func onAccountChange() {
+        channels = []
+        load(force: true)
+    }
 }

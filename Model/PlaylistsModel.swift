@@ -123,4 +123,10 @@ final class PlaylistsModel: ObservableObject {
     private var resource: Resource? {
         accounts.api.playlists
     }
+
+    func onAccountChange() {
+        error = nil
+        playlists = []
+        load()
+    }
 }

@@ -143,6 +143,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             updateToken()
         } else {
             FeedModel.shared.onAccountChange()
+            SubscribedChannelsModel.shared.onAccountChange()
+            PlaylistsModel.shared.onAccountChange()
         }
     }
 
