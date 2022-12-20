@@ -9,17 +9,19 @@ struct PlayingIndicatorView: View {
     @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
-        HStack(spacing: 2) {
-            bar(low: 0.4)
-                .animation(animation.speed(1.5), value: drawingHeight)
-            bar(low: 0.3)
-                .animation(animation.speed(1.2), value: drawingHeight)
-            bar(low: 0.5)
-                .animation(animation.speed(1.0), value: drawingHeight)
-        }
-        .opacity(player.currentVideo == video && player.isPlaying ? 1 : 0)
-        .onAppear {
-            drawingHeight.toggle()
+        if player.isPlaying && player.currentVideo == video {
+            HStack(spacing: 2) {
+                bar(low: 0.4)
+                    .animation(animation.speed(1.5), value: drawingHeight)
+                bar(low: 0.3)
+                    .animation(animation.speed(1.2), value: drawingHeight)
+                bar(low: 0.5)
+                    .animation(animation.speed(1.0), value: drawingHeight)
+            }
+            .opacity(player.currentVideo == video && player.isPlaying ? 1 : 0)
+            .onAppear {
+                drawingHeight.toggle()
+            }
         }
     }
 

@@ -123,17 +123,14 @@ struct VideoBanner: View {
             #endif
         }
         .fixedSize(horizontal: false, vertical: true)
-        .contentShape(Rectangle())
+
         #if os(tvOS)
             .buttonStyle(.card)
-        #else
+            .padding(.trailing, 10)
+        #elseif os(macOS)
             .buttonStyle(.plain)
         #endif
-        #if os(tvOS)
-        .padding(.trailing, 10)
-        #endif
-        .opacity(contentOpacity)
-        .id(id ?? video?.videoID ?? video?.id)
+            .opacity(contentOpacity)
     }
 
     private var extraAttributes: some View {

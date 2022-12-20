@@ -34,7 +34,7 @@ extension Defaults.Keys {
     static let favorites = Key<[FavoriteItem]>("favorites", default: [])
 
     static let playerButtonSingleTapGesture = Key<PlayerTapGestureAction>("playerButtonSingleTapGesture", default: .togglePlayer)
-    static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .togglePlayerVisibility)
+    static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .nothing)
     static let playerButtonShowsControlButtonsWhenMinimized = Key<Bool>("playerButtonShowsControlButtonsWhenMinimized", default: false)
     static let playerButtonIsExpanded = Key<Bool>("playerButtonIsExpanded", default: false)
     static let playerBarMaxWidth = Key<String>("playerBarMaxWidth", default: "600")

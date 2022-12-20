@@ -133,7 +133,7 @@ struct VideoActions: View {
 
                 case .close:
                     actionButton("Close", systemImage: "xmark") {
-                        if openWatchNextOnClose {
+                        if player.presentingPlayer, openWatchNextOnClose {
                             player.pause()
                             WatchNextViewModel.shared.closed(player.currentItem)
                         } else {

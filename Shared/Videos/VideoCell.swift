@@ -15,8 +15,6 @@ struct VideoCell: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @ObservedObject private var thumbnails = ThumbnailsModel.shared
-
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.roundedThumbnails) private var roundedThumbnails
@@ -445,7 +443,7 @@ struct VideoCell: View {
 
     private var thumbnailImage: some View {
         Group {
-            ThumbnailView(url: thumbnails.best(video))
+            VideoCellThumbnail(video: video)
 
             #if os(tvOS)
                 .frame(minHeight: 320)
@@ -500,6 +498,15 @@ struct VideoCell: View {
                 }
             }
         }
+    }
+}
+
+struct VideoCellThumbnail: View {
+    let video: Video
+    @ObservedObject private var thumbnails = ThumbnailsModel.shared
+
+    var body: some View {
+        ThumbnailView(url: thumbnails.best(video))
     }
 }
 

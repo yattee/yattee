@@ -479,6 +479,5 @@ struct VideoPlayerView_Previews: PreviewProvider {
             Color.red
             VideoPlayerView()
         }
-
     }
 }

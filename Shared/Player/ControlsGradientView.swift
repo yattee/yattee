@@ -23,7 +23,6 @@ struct ControlsGradientView: View {
     }
 }
 
-
 struct ControlsGradientView_Previews: PreviewProvider {
     static var previews: some View {
         ControlsGradientView()

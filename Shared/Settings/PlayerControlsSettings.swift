@@ -52,7 +52,7 @@ struct PlayerControlsSettings: View {
         #elseif os(iOS)
         .listStyle(.insetGrouped)
         #endif
-        .navigationTitle("Player Controls")
+        .navigationTitle("Controls")
     }
 
     @ViewBuilder var sections: some View {
