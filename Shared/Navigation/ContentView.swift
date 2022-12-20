@@ -18,8 +18,6 @@ struct ContentView: View {
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
-    @State private var playerInitialized = false
-
     var playerControls: PlayerControlsModel { .shared }
 
     let persistenceController = PersistenceController.shared
@@ -111,7 +109,6 @@ struct ContentView: View {
                 OpenVideosView()
             }
         )
-        .background(playerViewInitialize)
         .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }
 
@@ -140,18 +137,6 @@ struct ContentView: View {
     var playerView: some View {
         VideoPlayerView()
             .environment(\.navigationStyle, navigationStyle)
-    }
-
-    @ViewBuilder var playerViewInitialize: some View {
-        if !playerInitialized {
-            VideoPlayerView()
-                .scaleEffect(0.00001)
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        playerInitialized = true
-                    }
-                }
-        }
     }
 }
 
