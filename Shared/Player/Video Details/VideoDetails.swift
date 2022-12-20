@@ -118,6 +118,7 @@ struct VideoDetails: View {
                 .frame(width: 200, alignment: .leading)
                 .transaction { t in t.animation = nil }
             }
+            .animation(nil, value: descriptionVisibility)
             .modifier(SettingsPickerModifier())
             .offset(x: 15, y: 5)
             .opacity(descriptionVisibility ? 1 : 0)
