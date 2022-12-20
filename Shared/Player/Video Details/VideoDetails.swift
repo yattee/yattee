@@ -207,16 +207,18 @@ struct VideoDetails: View {
                 .zIndex(1)
 
             #if !os(tvOS)
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            gradient: .init(colors: [fadePlaceholderStartColor, .clear]),
-                            startPoint: .top,
-                            endPoint: .bottom
+                if #available(iOS 15, macOS 12, *) {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: .init(colors: [fadePlaceholderStartColor, .clear]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         )
-                    )
-                    .zIndex(0)
-                    .frame(maxHeight: 22)
+                        .zIndex(0)
+                        .frame(maxHeight: 22)
+                }
             #endif
         }
     }
