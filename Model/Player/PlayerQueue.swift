@@ -166,7 +166,7 @@ extension PlayerModel {
         case .queue, .shuffle:
             return !queue.isEmpty
         case .related:
-            return !autoplayItem.isNil
+            return autoplayItem != nil
         }
     }
 
