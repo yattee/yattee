@@ -13,6 +13,8 @@ struct ControlsBar: View {
     @State private var shareURL: URL?
     @Binding var expansionState: ExpansionState
 
+    @State internal var gestureThrottle = Throttle(interval: 0.25)
+
     var presentingControls = true
     var backgroundEnabled = true
     var borderTop = true
@@ -244,18 +246,20 @@ struct ControlsBar: View {
         }
 
         func gestureAction(_ action: PlayerTapGestureAction) {
-            switch action {
-            case .togglePlayer:
-                model.togglePlayer()
-            case .openChannel:
-                guard let channel = model.videoForDisplay?.channel else { return }
-                navigation.openChannel(channel, navigationStyle: navigationStyle)
-            case .togglePlayerVisibility:
-                withAnimation(.spring(response: 0.25)) {
-                    expansionState = expansionState == .full ? .mini : .full
+            gestureThrottle.execute {
+                switch action {
+                case .togglePlayer:
+                    self.model.togglePlayer()
+                case .openChannel:
+                    guard let channel = self.model.videoForDisplay?.channel else { return }
+                    self.navigation.openChannel(channel, navigationStyle: self.navigationStyle)
+                case .togglePlayerVisibility:
+                    withAnimation(.spring(response: 0.25)) {
+                        self.expansionState = self.expansionState == .full ? .mini : .full
+                    }
+                default:
+                    return
                 }
-            default:
-                return
             }
         }
     #endif
