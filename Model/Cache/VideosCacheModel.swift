@@ -24,7 +24,7 @@ struct VideosCacheModel: CacheModel {
     }
 
     func retrieveVideo(_ cacheKey: String) -> Video? {
-        logger.info("retrieving cache for \(cacheKey)")
+        logger.debug("retrieving cache for \(cacheKey)")
 
         if let json = try? storage?.object(forKey: cacheKey) {
             return Video.from(json)

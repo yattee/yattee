@@ -27,7 +27,7 @@ struct PlaylistsCacheModel: CacheModel {
     }
 
     func retrievePlaylists(account: Account) -> [Playlist] {
-        logger.info("retrieving cache for \(playlistCacheKey(account))")
+        logger.debug("retrieving cache for \(playlistCacheKey(account))")
 
         if let json = try? storage?.object(forKey: playlistCacheKey(account)),
            let playlists = json.dictionaryValue["playlists"]

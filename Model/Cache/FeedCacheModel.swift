@@ -27,7 +27,7 @@ struct FeedCacheModel: CacheModel {
     }
 
     func retrieveFeed(account: Account) -> [Video] {
-        logger.info("retrieving cache for \(account.feedCacheKey)")
+        logger.debug("retrieving cache for \(account.feedCacheKey)")
 
         if let json = try? storage?.object(forKey: account.feedCacheKey),
            let videos = json.dictionaryValue["videos"]

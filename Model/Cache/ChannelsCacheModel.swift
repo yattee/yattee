@@ -18,7 +18,7 @@ struct ChannelsCacheModel: CacheModel {
 
     func store(_ channel: Channel) {
         guard channel.hasExtendedDetails else {
-            logger.warning("not caching \(channel.cacheKey)")
+            logger.debug("not caching \(channel.cacheKey)")
             return
         }
 
@@ -35,7 +35,7 @@ struct ChannelsCacheModel: CacheModel {
     }
 
     func retrieve(_ cacheKey: String) -> Channel? {
-        logger.info("retrieving cache for \(cacheKey)")
+        logger.debug("retrieving cache for \(cacheKey)")
 
         if let json = try? storage?.object(forKey: cacheKey) {
             return Channel.from(json)
