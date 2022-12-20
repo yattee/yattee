@@ -189,7 +189,7 @@ struct WatchNextView: View {
         Button {
             model.hide()
         } label: {
-            Label("Hide", systemImage: "chevron.down")
+            Label("Hide", systemImage: "xmark")
         }
     }
 
