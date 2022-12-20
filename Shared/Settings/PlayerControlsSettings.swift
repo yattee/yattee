@@ -45,6 +45,10 @@ struct PlayerControlsSettings: View {
                 List {
                     sections
                 }
+                #if !os(tvOS)
+                .backport
+                .scrollDismissesKeyboard()
+                #endif
             #endif
         }
         #if os(tvOS)
@@ -208,15 +212,64 @@ struct PlayerControlsSettings: View {
             Text(name)
                 .frame(minWidth: 140, alignment: .leading)
             Spacer()
-            TextField("Duration", text: value)
 
-                .frame(maxWidth: 100, alignment: .trailing)
-                .multilineTextAlignment(.trailing)
+            HStack {
+                #if !os(tvOS)
+                    Button {
+                        var intValue = Int(value.wrappedValue) ?? 10
+                        intValue += 5
+                        if intValue <= 0 {
+                            intValue = 5
+                        }
+                        value.wrappedValue = String(intValue)
+                    } label: {
+                        Label("Plus", systemImage: "plus")
+                            .imageScale(.large)
+                            .padding(7)
+                            .labelStyle(.iconOnly)
+                            .frame(minHeight: 35)
+                            .foregroundColor(.primary)
+                            .contentShape(Rectangle())
+                    }
+                    .background(RoundedRectangle(cornerRadius: 4).stroke(lineWidth: 1))
+                #endif
 
-                .labelsHidden()
-            #if !os(macOS)
-                .keyboardType(.numberPad)
-            #endif
+                #if os(tvOS)
+                    let textFieldWidth = 100.00
+                #else
+                    let textFieldWidth = 30.00
+                #endif
+
+                TextField("Duration", text: value)
+                    .frame(width: textFieldWidth, alignment: .trailing)
+                    .multilineTextAlignment(.center)
+
+                    .labelsHidden()
+                #if !os(macOS)
+                    .keyboardType(.numberPad)
+                #endif
+
+                #if !os(tvOS)
+                    Button {
+                        var intValue = Int(value.wrappedValue) ?? 10
+                        intValue -= 5
+                        if intValue <= 0 {
+                            intValue = 5
+                        }
+                        value.wrappedValue = String(intValue)
+                    } label: {
+                        Label("Minus", systemImage: "minus")
+                            .imageScale(.large)
+                            .padding(7)
+                            .labelStyle(.iconOnly)
+                            .frame(minHeight: 35)
+                            .foregroundColor(.primary)
+                            .contentShape(Rectangle())
+                    }
+                    .background(RoundedRectangle(cornerRadius: 4).stroke(lineWidth: 1))
+                    .buttonStyle(.plain)
+                #endif
+            }
         }
     }
 
