@@ -24,7 +24,7 @@ struct QueueView: View {
                             .opacity(items.count > 1 ? 1 : 0)
                     }
                 }
-                .disabled(items.count < 2)
+                .buttonStyle(.plain)
 
                 ForEach(limitedItems) { item in
                     ContentItemView(item: .init(video: item.video))
