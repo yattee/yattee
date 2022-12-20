@@ -216,7 +216,7 @@ struct VideoDetails: View {
                         )
                     )
                     .zIndex(0)
-                    .frame(maxHeight: 25)
+                    .frame(maxHeight: 22)
             #endif
         }
     }
