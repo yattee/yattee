@@ -56,7 +56,7 @@ struct VideoPlayerView: View {
         @State internal var orientationNotification: Any?
     #endif
 
-    internal var player: PlayerModel! = PlayerModel.shared
+    @ObservedObject internal var player = PlayerModel.shared
 
     #if os(macOS)
         @ObservedObject private var navigation = NavigationModel.shared
@@ -119,7 +119,7 @@ struct VideoPlayerView: View {
             }
             #if os(iOS)
             .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
-            .ignoresSafeArea(.all, edges: playerEdgesIgnoringSafeArea)
+            .ignoresSafeArea(.all, edges: .bottom)
             .onChange(of: player.presentingPlayer) { newValue in
                 if newValue {
                     viewDragOffset = 0
@@ -270,18 +270,6 @@ struct VideoPlayerView: View {
         var playerHeight: Double? {
             let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
             return fullScreenPlayer ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
-        }
-
-        var playerEdgesIgnoringSafeArea: Edge.Set {
-            if let orientation = player.lockedOrientation, orientation.contains(.portrait) {
-                return []
-            }
-
-            if fullScreenPlayer, UIDevice.current.orientation.isLandscape {
-                return [.vertical]
-            }
-
-            return [.bottom]
         }
     #endif
 
@@ -487,6 +475,10 @@ struct VideoPlayerView: View {
 
 struct VideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
-        VideoPlayerView()
+        ZStack {
+            Color.red
+            VideoPlayerView()
+        }
+
     }
 }
