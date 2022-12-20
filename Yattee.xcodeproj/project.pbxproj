@@ -1498,6 +1498,7 @@
 		37FD76FF2932C4DA00D91A5F /* URL+ByReplacingYatteeProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+ByReplacingYatteeProtocol.swift"; sourceTree = "<group>"; };
 		37FEF11227EFD8580033912F /* PlaceholderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderCell.swift; sourceTree = "<group>"; };
 		37FFC43F272734C3009FFD26 /* Throttle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throttle.swift; sourceTree = "<group>"; };
+		37FFCA1029523283005EC13C /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3DA101AD287C30F50027D920 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
 		3DA101AE287C30F50027D920 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
 		3DA101AF287C30F50027D920 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
@@ -2792,6 +2793,7 @@
 				ro,
 				cs,
 				"zh-Hans",
+				ca,
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -3916,6 +3918,7 @@
 				374924DE29211F5F0017D862 /* ro */,
 				370D5E4F292423F400D053A6 /* cs */,
 				3744F85C293CC9B800B09AB9 /* zh-Hans */,
+				37FFCA1029523283005EC13C /* ca */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
