@@ -577,6 +577,7 @@ final class PlayerModel: ObservableObject {
 
     func closeCurrentItem(finished: Bool = false) {
         pause()
+        videoBeingOpened = nil
 
         closing = true
         controls.presentingControls = false
