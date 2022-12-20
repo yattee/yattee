@@ -362,6 +362,7 @@ extension PlayerModel {
                     self.advancing = false
                     self.videoBeingOpened = nil
                     self.currentItem = nil
+                    self.hide()
                 },
                 secondaryButton: retryButton
             )
