@@ -181,11 +181,14 @@ struct WatchNextView: View {
     }
 
     @ViewBuilder var hideCloseButton: some View {
-        if model.isHideable {
-            hideButton
-        } else {
-            closeButton
+        Group {
+            if model.isHideable {
+                hideButton
+            } else {
+                closeButton
+            }
         }
+        .keyboardShortcut(.cancelAction)
     }
 
     var hideButton: some View {
