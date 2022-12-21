@@ -44,6 +44,7 @@ struct PlayerControls: View {
     @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
 
     private let controlsOverlayModel = ControlOverlaysModel.shared
+    private var navigation = NavigationModel.shared
 
     var playerControlsLayout: PlayerControlsLayout {
         player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
@@ -345,7 +346,11 @@ struct PlayerControls: View {
     private var settingsButton: some View {
         button("settings", systemImage: "gearshape") {
             withAnimation(Self.animation) {
-                controlsOverlayModel.toggle()
+                #if os(tvOS)
+                    controlsOverlayModel.toggle()
+                #else
+                    navigation.presentingPlaybackSettings = true
+                #endif
             }
         }
         #if os(tvOS)

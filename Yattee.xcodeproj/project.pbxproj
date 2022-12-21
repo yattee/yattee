@@ -687,6 +687,11 @@
 		37A362BA2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
 		37A362BB2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
 		37A362BC2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
+		37A362BE29537AAA00BDF328 /* PlaybackSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362BD29537AAA00BDF328 /* PlaybackSettings.swift */; };
+		37A362BF29537AAA00BDF328 /* PlaybackSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362BD29537AAA00BDF328 /* PlaybackSettings.swift */; };
+		37A362C229537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */; };
+		37A362C329537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */; };
+		37A362C429537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */; };
 		37A5DBC4285DFF5400CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC3285DFF5400CA4DD1 /* SwiftUIPager */; };
 		37A5DBC6285E06B100CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */; };
 		37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
@@ -1363,6 +1368,8 @@
 		379F141E289ECE7F00DE48B5 /* QualitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualitySettings.swift; sourceTree = "<group>"; };
 		37A2B345294723850050933E /* CacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModel.swift; sourceTree = "<group>"; };
 		37A362B92953707F00BDF328 /* ClearQueueButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearQueueButton.swift; sourceTree = "<group>"; };
+		37A362BD29537AAA00BDF328 /* PlaybackSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSettings.swift; sourceTree = "<group>"; };
+		37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaybackSettingsPresentationDetents+Backport.swift"; sourceTree = "<group>"; };
 		37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBackgroundModifier.swift; sourceTree = "<group>"; };
 		37A81BF8294BD1440081D322 /* WatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchView.swift; sourceTree = "<group>"; };
 		37A9965926D6F8CA006E3224 /* HorizontalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCells.swift; sourceTree = "<group>"; };
@@ -1803,6 +1810,8 @@
 				37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */,
 				37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */,
 				37BA221029526A18000DAD1F /* ControlsGradientView.swift */,
+				37A362BD29537AAA00BDF328 /* PlaybackSettings.swift */,
+				37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */,
 				375F740F289DC35A00747050 /* PlayerBackendView.swift */,
 				374DE87F28BB896C0062BBF2 /* PlayerDragGesture.swift */,
 				3703100127B0713600ECDDAA /* PlayerGestures.swift */,
@@ -3057,6 +3066,7 @@
 				37ECED56289FE166002BC2C9 /* SafeArea.swift in Sources */,
 				37CEE4BD2677B670005A1EFE /* SingleAssetStream.swift in Sources */,
 				37C2211D27ADA33300305B41 /* MPVViewController.swift in Sources */,
+				37A362BE29537AAA00BDF328 /* PlaybackSettings.swift in Sources */,
 				371B7E612759706A00D21217 /* CommentsView.swift in Sources */,
 				37D9BA0629507F69002586BD /* PlayerControlsSettings.swift in Sources */,
 				379DC3D128BA4EB400B09677 /* Seek.swift in Sources */,
@@ -3262,6 +3272,7 @@
 				37141673267A8E10006CA35D /* Country.swift in Sources */,
 				37FEF11327EFD8580033912F /* PlaceholderCell.swift in Sources */,
 				37B2631A2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
+				37A362C229537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */,
 				3748186E26A769D60084E870 /* DetailBadge.swift in Sources */,
 				3744A96028B99ADD005DE0A7 /* PlayerControlsLayout.swift in Sources */,
 				376BE50B27349108009AD608 /* BrowsingSettings.swift in Sources */,
@@ -3451,6 +3462,7 @@
 				3751B4B327836902000B7DF4 /* SearchPage.swift in Sources */,
 				3782B9532755667600990149 /* String+Format.swift in Sources */,
 				37635FE5291EA6CF00C11E79 /* AccentButton.swift in Sources */,
+				37A362C329537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */,
 				378E9C3D2945565500B2D696 /* SubscriptionsView.swift in Sources */,
 				3776ADD7287381240078EBC4 /* Captions.swift in Sources */,
 				37E70924271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
@@ -3579,6 +3591,7 @@
 				371B7E672759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				37BA794426DBA973002A0235 /* PlaylistsModel.swift in Sources */,
+				37A362BF29537AAA00BDF328 /* PlaybackSettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3728,6 +3741,7 @@
 				37A5DBCA285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */,
 				37E80F46287B7AEC00561799 /* PlayerQueueView.swift in Sources */,
 				3786D060294C737300D23E82 /* RequestErrorButton.swift in Sources */,
+				37A362C429537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */,
 				37BDFF1929487B99000C6404 /* PlaylistVideosView.swift in Sources */,
 				37C0698427260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
 				374924DC2921050B0017D862 /* LocationsSettings.swift in Sources */,

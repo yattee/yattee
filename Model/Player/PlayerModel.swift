@@ -95,6 +95,13 @@ final class PlayerModel: ObservableObject {
     @Published var availableStreams = [Stream]() { didSet { handleAvailableStreamsChange() } }
     @Published var streamSelection: Stream? { didSet { rebuildTVMenu() } }
 
+    @Published var captions: Captions? { didSet {
+        mpvBackend.captions = captions
+        if let code = captions?.code {
+            Defaults[.captionsLanguageCode] = code
+        }
+    }}
+
     @Published var queue = [PlayerQueueItem]() { didSet { handleQueueChange() } }
     @Published var currentItem: PlayerQueueItem! { didSet { handleCurrentItemChange() } }
     @Published var videoBeingOpened: Video? { didSet { seek.reset() } }
@@ -666,6 +673,7 @@ final class PlayerModel: ObservableObject {
 
     func handleCurrentItemChange() {
         if currentItem == nil {
+            captions = nil
             FeedModel.shared.calculateUnwatchedFeed()
         }
 

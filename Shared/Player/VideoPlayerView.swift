@@ -406,6 +406,13 @@ struct VideoPlayerView: View {
         #if os(iOS)
         .statusBar(hidden: fullScreenPlayer)
         #endif
+        #if os(macOS)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingPlaybackSettings) {
+                PlaybackSettings()
+            }
+        )
+        #endif
     }
 
     var detailsNeedBottomPadding: Bool {

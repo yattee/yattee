@@ -119,7 +119,11 @@ struct VideoActions: View {
                 case .settings:
                     actionButton("Settings", systemImage: "gear") {
                         withAnimation(ControlOverlaysModel.animation) {
-                            ControlOverlaysModel.shared.show()
+                            #if os(tvOS)
+                                ControlOverlaysModel.shared.show()
+                            #else
+                                navigation.presentingPlaybackSettings = true
+                            #endif
                         }
                     }
                 case .next:

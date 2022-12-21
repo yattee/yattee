@@ -67,6 +67,9 @@ struct AdvancedSettings: View {
                 Text("cache-secs")
                     .frame(minWidth: 140, alignment: .leading)
                 TextField("cache-secs", text: $mpvCacheSecs)
+                #if !os(macOS)
+                    .keyboardType(.URL)
+                #endif
             }
             .multilineTextAlignment(.trailing)
 
@@ -74,6 +77,9 @@ struct AdvancedSettings: View {
                 Text("cache-pause-wait")
                     .frame(minWidth: 140, alignment: .leading)
                 TextField("cache-pause-wait", text: $mpvCachePauseWait)
+                #if !os(macOS)
+                    .keyboardType(.URL)
+                #endif
             }
             .multilineTextAlignment(.trailing)
 

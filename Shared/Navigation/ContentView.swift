@@ -104,6 +104,13 @@ struct ContentView: View {
             }
         )
         #endif
+        #if os(iOS)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingPlaybackSettings) {
+                PlaybackSettings()
+            }
+        )
+        #endif
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingOpenVideos) {
                 OpenVideosView()

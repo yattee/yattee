@@ -207,7 +207,7 @@ struct VideoDetails: View {
                 .zIndex(1)
 
             #if !os(tvOS)
-                if #available(iOS 15, macOS 12, *) {
+                if #available(iOS 16, macOS 13, *) {
                     Rectangle()
                         .fill(
                             LinearGradient(

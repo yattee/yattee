@@ -45,10 +45,6 @@ struct PlayerControlsSettings: View {
                 List {
                     sections
                 }
-                #if !os(tvOS)
-                .backport
-                .scrollDismissesKeyboard()
-                #endif
             #endif
         }
         #if os(tvOS)
@@ -215,23 +211,23 @@ struct PlayerControlsSettings: View {
 
             HStack {
                 #if !os(tvOS)
-                    Button {
-                        var intValue = Int(value.wrappedValue) ?? 10
-                        intValue += 5
-                        if intValue <= 0 {
-                            intValue = 5
+                    Label("Plus", systemImage: "plus")
+                        .imageScale(.large)
+                        .labelStyle(.iconOnly)
+                        .padding(7)
+                        .foregroundColor(.accentColor)
+                    #if os(iOS)
+                        .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
+                    #endif
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            var intValue = Int(value.wrappedValue) ?? 10
+                            intValue += 5
+                            if intValue <= 0 {
+                                intValue = 5
+                            }
+                            value.wrappedValue = String(intValue)
                         }
-                        value.wrappedValue = String(intValue)
-                    } label: {
-                        Label("Plus", systemImage: "plus")
-                            .imageScale(.large)
-                            .padding(7)
-                            .labelStyle(.iconOnly)
-                            .frame(minHeight: 35)
-                            .foregroundColor(.primary)
-                            .contentShape(Rectangle())
-                    }
-                    .background(RoundedRectangle(cornerRadius: 4).stroke(lineWidth: 1))
                 #endif
 
                 #if os(tvOS)
@@ -250,24 +246,24 @@ struct PlayerControlsSettings: View {
                 #endif
 
                 #if !os(tvOS)
-                    Button {
-                        var intValue = Int(value.wrappedValue) ?? 10
-                        intValue -= 5
-                        if intValue <= 0 {
-                            intValue = 5
+                    Label("Minus", systemImage: "minus")
+                        .imageScale(.large)
+                        .labelStyle(.iconOnly)
+                        .padding(7)
+                        .foregroundColor(.accentColor)
+                    #if os(iOS)
+                        .frame(minHeight: 35)
+                        .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
+                    #endif
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            var intValue = Int(value.wrappedValue) ?? 10
+                            intValue -= 5
+                            if intValue <= 0 {
+                                intValue = 5
+                            }
+                            value.wrappedValue = String(intValue)
                         }
-                        value.wrappedValue = String(intValue)
-                    } label: {
-                        Label("Minus", systemImage: "minus")
-                            .imageScale(.large)
-                            .padding(7)
-                            .labelStyle(.iconOnly)
-                            .frame(minHeight: 35)
-                            .foregroundColor(.primary)
-                            .contentShape(Rectangle())
-                    }
-                    .background(RoundedRectangle(cornerRadius: 4).stroke(lineWidth: 1))
-                    .buttonStyle(.plain)
                 #endif
             }
         }

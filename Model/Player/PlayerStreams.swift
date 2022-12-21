@@ -16,6 +16,7 @@ extension PlayerModel {
     }
 
     func loadAvailableStreams(_ video: Video, onCompletion: @escaping (ResponseInfo) -> Void = { _ in }) {
+        captions = nil
         availableStreams = []
 
         guard let playerInstance else { return }
