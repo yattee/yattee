@@ -40,7 +40,9 @@ struct WatchView: View {
         if finished, let watch {
             PlayerModel.shared.removeWatch(watch)
         } else {
-            Watch.markAsWatched(videoID: watch?.videoID ?? videoID, account: AccountsModel.shared.current, duration: watch?.videoDuration ?? duration, context: backgroundContext)
+            if let account = AccountsModel.shared.current {
+                Watch.markAsWatched(videoID: watch?.videoID ?? videoID, account: account, duration: watch?.videoDuration ?? duration, context: backgroundContext)
+            }
         }
 
         FeedModel.shared.calculateUnwatchedFeed()

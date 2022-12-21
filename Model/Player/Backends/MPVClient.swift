@@ -438,6 +438,7 @@ final class MPVClient: ObservableObject {
     }
 
     private func setString(_ name: String, _ value: String) {
+        guard mpv != nil else { return }
         mpv_set_property_string(mpv, name, value)
     }
 

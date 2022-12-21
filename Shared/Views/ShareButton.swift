@@ -47,7 +47,7 @@ struct ShareButton<LabelView: View>: View {
     private var instanceActions: some View {
         Group {
             Button(labelForShareURL(accounts.app.name)) {
-                if let url = player.playerAPI(contentItem.video).shareURL(contentItem) {
+                if let url = player.playerAPI(contentItem.video)?.shareURL(contentItem) {
                     shareAction(url)
                 } else {
                     navigation.presentAlert(
@@ -59,12 +59,16 @@ struct ShareButton<LabelView: View>: View {
 
             if contentItemIsPlayerCurrentVideo {
                 Button(labelForShareURL(accounts.app.name, withTime: true)) {
-                    shareAction(
-                        player.playerAPI(player.currentVideo!).shareURL(
-                            contentItem,
-                            time: player.backend.currentTime
-                        )!
-                    )
+                    if let video = player.videoForDisplay,
+                       let api = player.playerAPI(video)
+                    {
+                        shareAction(
+                            api.shareURL(
+                                contentItem,
+                                time: player.backend.currentTime
+                            )!
+                        )
+                    }
                 }
             }
         }
@@ -93,7 +97,7 @@ struct ShareButton<LabelView: View>: View {
     }
 
     private var contentItemIsPlayerCurrentVideo: Bool {
-        contentItem.contentType == .video && contentItem.video?.videoID == player.currentVideo?.videoID
+        contentItem.contentType == .video && contentItem.video?.videoID == player.videoForDisplay?.videoID
     }
 
     @ViewBuilder private var remoteURLAction: some View {

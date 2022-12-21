@@ -100,7 +100,7 @@ extension PlayerModel {
         InstancesModel.shared.forPlayer ?? accounts.current?.instance ?? InstancesModel.shared.all.first
     }
 
-    func playerAPI(_ video: Video) -> VideosAPI! {
+    func playerAPI(_ video: Video) -> VideosAPI? {
         guard let url = video.instanceURL else { return accounts.api }
         switch video.app {
         case .local:
@@ -181,7 +181,7 @@ extension PlayerModel {
 
         let playTime = currentItem.shouldRestartPlaying ? CMTime.zero : time
         guard let video = newItem.video else { return }
-        playerAPI(video).loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: self.currentItem.video) }) { newItem in
+        playerAPI(video)?.loadDetails(currentItem, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { newItem in
             self.playItem(newItem, at: playTime)
         }
     }
@@ -228,7 +228,7 @@ extension PlayerModel {
         }
 
         if loadDetails {
-            playerAPI(item.video).loadDetails(item, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { [weak self] newItem in
+            playerAPI(item.video)?.loadDetails(item, failureHandler: { self.videoLoadFailureHandler($0, video: video) }) { [weak self] newItem in
                 guard let self else { return }
                 videoDetailsLoadHandler(newItem.video, newItem)
 
