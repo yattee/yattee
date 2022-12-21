@@ -27,6 +27,10 @@ struct SettingsView: View {
     var body: some View {
         settings
             .alert(isPresented: $model.presentingAlert) { model.alert }
+        #if os(iOS)
+            .backport
+            .scrollDismissesKeyboard()
+        #endif
     }
 
     var settings: some View {
