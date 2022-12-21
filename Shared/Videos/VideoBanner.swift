@@ -123,7 +123,6 @@ struct VideoBanner: View {
             #endif
         }
         .fixedSize(horizontal: false, vertical: true)
-
         #if os(tvOS)
             .buttonStyle(.card)
             .padding(.trailing, 10)
@@ -131,6 +130,7 @@ struct VideoBanner: View {
             .buttonStyle(.plain)
         #endif
             .opacity(contentOpacity)
+            .contentShape(Rectangle())
     }
 
     private var extraAttributes: some View {
