@@ -10,7 +10,7 @@ struct PlaybackStatsView: View {
             mpvPlaybackStatRow("Hardware decoder".localized(), player.mpvBackend.hwDecoder)
             mpvPlaybackStatRow("Dropped frames".localized(), String(player.mpvBackend.frameDropCount))
             mpvPlaybackStatRow("Stream FPS".localized(), player.mpvBackend.formattedOutputFps)
-            mpvPlaybackStatRow("Cached time".localized(), String(format: "%.2fs", player.mpvBackend.cacheDuration))
+            mpvPlaybackStatRow("Cached time".localized(), String(format: "%.2fs", networkState.cacheDuration))
         }
         .padding(.top, 2)
         #if os(tvOS)
