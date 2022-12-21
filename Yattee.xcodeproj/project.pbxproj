@@ -684,6 +684,9 @@
 		37A2B346294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
 		37A2B347294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
 		37A2B348294723850050933E /* CacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B345294723850050933E /* CacheModel.swift */; };
+		37A362BA2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
+		37A362BB2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
+		37A362BC2953707F00BDF328 /* ClearQueueButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A362B92953707F00BDF328 /* ClearQueueButton.swift */; };
 		37A5DBC4285DFF5400CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC3285DFF5400CA4DD1 /* SwiftUIPager */; };
 		37A5DBC6285E06B100CA4DD1 /* SwiftUIPager in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5DBC5285E06B100CA4DD1 /* SwiftUIPager */; };
 		37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
@@ -1359,6 +1362,7 @@
 		379DC3D028BA4EB400B09677 /* Seek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seek.swift; sourceTree = "<group>"; };
 		379F141E289ECE7F00DE48B5 /* QualitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualitySettings.swift; sourceTree = "<group>"; };
 		37A2B345294723850050933E /* CacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModel.swift; sourceTree = "<group>"; };
+		37A362B92953707F00BDF328 /* ClearQueueButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearQueueButton.swift; sourceTree = "<group>"; };
 		37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBackgroundModifier.swift; sourceTree = "<group>"; };
 		37A81BF8294BD1440081D322 /* WatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchView.swift; sourceTree = "<group>"; };
 		37A9965926D6F8CA006E3224 /* HorizontalCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalCells.swift; sourceTree = "<group>"; };
@@ -1853,6 +1857,7 @@
 			children = (
 				37635FE3291EA6CF00C11E79 /* AccentButton.swift */,
 				37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */,
+				37A362B92953707F00BDF328 /* ClearQueueButton.swift */,
 				37FB285D272225E800A57617 /* ContentItemView.swift */,
 				372CFD14285F2E2A00B0B54B /* ControlsBar.swift */,
 				3748186D26A769D60084E870 /* DetailBadge.swift */,
@@ -3155,6 +3160,7 @@
 				37A81BF9294BD1440081D322 /* WatchView.swift in Sources */,
 				37EFAC0828C138CD00ED9B89 /* ControlsOverlayModel.swift in Sources */,
 				37F4AD2628613B81004D0F66 /* Color+Debug.swift in Sources */,
+				37A362BA2953707F00BDF328 /* ClearQueueButton.swift in Sources */,
 				3700155F271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				37F13B62285E43C000B137E4 /* ControlsOverlay.swift in Sources */,
 				375E45F827B1AC4700BA7902 /* PlayerControlsModel.swift in Sources */,
@@ -3432,6 +3438,7 @@
 				3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */,
 				37BA221229526A19000DAD1F /* ControlsGradientView.swift in Sources */,
 				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
+				37A362BB2953707F00BDF328 /* ClearQueueButton.swift in Sources */,
 				3752069E285E910600CA655F /* ChapterView.swift in Sources */,
 				37030FF827B0347C00ECDDAA /* MPVPlayerView.swift in Sources */,
 				378E50FC26FE8B9F00F49626 /* Instance.swift in Sources */,
@@ -3751,6 +3758,7 @@
 				375EC95B289EEB8200751258 /* QualityProfileForm.swift in Sources */,
 				371B7E682759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				37BE0BD126A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
+				37A362BC2953707F00BDF328 /* ClearQueueButton.swift in Sources */,
 				37AAF27E26737323007FC770 /* PopularView.swift in Sources */,
 				37E80F45287B7AC000561799 /* ControlsBar.swift in Sources */,
 				3743CA50270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,

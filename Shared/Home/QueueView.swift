@@ -13,25 +13,29 @@ struct QueueView: View {
                         expanded.toggle()
                     }
                 } label: {
-                    HStack {
+                    HStack(spacing: 12) {
                         sectionLabel(label)
                         Spacer()
-                        Label("Show more", systemImage: expanded ? "chevron.up" : "chevron.down")
-                            .animation(nil, value: expanded)
-                            .foregroundColor(.accentColor)
-                            .imageScale(.large)
-                            .labelStyle(.iconOnly)
-                            .opacity(items.count > 1 ? 1 : 0)
+                        ClearQueueButton()
+                        if items.count > 1 {
+                            Label("Show more", systemImage: expanded ? "chevron.up" : "chevron.down")
+                                .animation(nil, value: expanded)
+                                .foregroundColor(.accentColor)
+                                .imageScale(.large)
+                                .labelStyle(.iconOnly)
+                        }
                     }
                 }
                 .buttonStyle(.plain)
 
-                ForEach(limitedItems) { item in
-                    ContentItemView(item: .init(video: item.video))
-                        .environment(\.listingStyle, .list)
-                        .environment(\.inQueueListing, true)
-                        .environment(\.noListingDividers, limit == 1)
-                        .transition(.opacity)
+                LazyVStack(alignment: .leading) {
+                    ForEach(limitedItems) { item in
+                        ContentItemView(item: .init(video: item.video))
+                            .environment(\.listingStyle, .list)
+                            .environment(\.inQueueListing, true)
+                            .environment(\.noListingDividers, limit == 1)
+                            .transition(.opacity)
+                    }
                 }
             }
         }
@@ -46,12 +50,12 @@ struct QueueView: View {
         return "Next in Queue (\(items.count))"
     }
 
-    var limitedItems: [PlayerQueueItem] {
+    var limitedItems: [ContentItem] {
         if let limit {
-            return Array(items.prefix(limit))
+            return Array(items.prefix(limit).map(\.contentItem))
         }
 
-        return items
+        return items.map(\.contentItem)
     }
 
     var items: [PlayerQueueItem] {

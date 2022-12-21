@@ -66,4 +66,12 @@ struct PlayerQueueItem: Hashable, Identifiable, Defaults.Serializable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
+
+    var contentItem: ContentItem {
+        .init(video: contentItemVideo)
+    }
+
+    var contentItemVideo: Video {
+        video ?? Video(app: app ?? .invidious, instanceURL: instanceURL, videoID: videoID, length: videoDuration ?? 0)
+    }
 }

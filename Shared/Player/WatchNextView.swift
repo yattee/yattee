@@ -11,59 +11,62 @@ struct WatchNextView: View {
 
     var body: some View {
         Group {
-            #if os(iOS)
-                NavigationView {
-                    watchNext
-                        .toolbar {
-                            ToolbarItem(placement: .principal) {
-                                watchNextMenu
-                            }
-                        }
-                }
-                .navigationViewStyle(.stack)
-            #else
-                VStack {
-                    HStack {
-                        hideCloseButton
-                            .labelStyle(.iconOnly)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Spacer()
-
-                        watchNextMenu
-                            .frame(maxWidth: .infinity)
-
-                        Spacer()
-
-                        HStack {
-                            #if os(macOS)
-                                Text("Mode")
-                                    .foregroundColor(.secondary)
-                            #endif
-
-                            playbackModeControl
-
-                            HStack {
-                                if model.isRestartable {
-                                    reopenButton
+            if model.isPresenting {
+                #if os(iOS)
+                    NavigationView {
+                        watchNext
+                            .toolbar {
+                                ToolbarItem(placement: .principal) {
+                                    watchNextMenu
                                 }
                             }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                     }
-                    #if os(macOS)
-                    .padding()
-                    #endif
-                    watchNext
-                }
-            #endif
+                    .navigationViewStyle(.stack)
+                #else
+                    VStack {
+                        HStack {
+                            hideCloseButton
+                                .labelStyle(.iconOnly)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Spacer()
+
+                            watchNextMenu
+                                .frame(maxWidth: .infinity)
+
+                            Spacer()
+
+                            HStack {
+                                #if os(macOS)
+                                    Text("Mode")
+                                        .foregroundColor(.secondary)
+                                #endif
+
+                                playbackModeControl
+
+                                HStack {
+                                    if model.isRestartable {
+                                        reopenButton
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        #if os(macOS)
+                        .padding()
+                        #endif
+                        watchNext
+                    }
+                #endif
+            }
         }
+        .transition(.opacity)
+        .zIndex(0)
         #if os(tvOS)
-        .background(Color.background(scheme: colorScheme))
+            .background(Color.background(scheme: colorScheme))
         #else
-        .background(Color.background)
+            .background(Color.background)
         #endif
-        .opacity(model.isPresenting ? 1 : 0)
     }
 
     var watchNext: some View {
@@ -211,6 +214,13 @@ struct WatchNextView: View {
         }
     }
 
+    var queueForMoreVideos: [ContentItem] {
+        guard !player.queue.isEmpty else { return [] }
+
+        let suffix = player.playbackMode == .queue && model.isAutoplaying && model.canAutoplay ? 1 : 0
+        return player.queue.suffix(from: suffix).map(\.contentItem)
+    }
+
     @ViewBuilder var moreVideos: some View {
         VStack(spacing: 12) {
             switch model.page {
@@ -222,21 +232,27 @@ struct WatchNextView: View {
                     Divider()
                 }
 
-                let queueForMoreVideos = player.queue.isEmpty ? [] : player.queue.suffix(from: player.playbackMode == .queue && model.isAutoplaying && model.canAutoplay ? 1 : 0)
-
                 if (model.isAutoplaying && model.canAutoplay && !queueForMoreVideos.isEmpty) ||
                     (!model.isAutoplaying && !queueForMoreVideos.isEmpty)
                 {
-                    Text("Next in queue")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text("Next in queue")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Spacer()
+
+                        ClearQueueButton()
+                    }
                 }
 
                 if !queueForMoreVideos.isEmpty {
-                    ForEach(queueForMoreVideos) { item in
-                        ContentItemView(item: .init(video: item.video))
-                            .environment(\.inQueueListing, true)
-                            .environment(\.listingStyle, .list)
+                    LazyVStack {
+                        ForEach(queueForMoreVideos) { item in
+                            ContentItemView(item: item)
+                                .environment(\.inQueueListing, true)
+                                .environment(\.listingStyle, .list)
+                        }
                     }
                 } else {
                     Label(
