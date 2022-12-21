@@ -9,6 +9,8 @@ struct ThumbnailView: View {
     var body: some View {
         if url != nil {
             viewForThumbnailExtension
+        } else {
+            placeholder
         }
     }
 
