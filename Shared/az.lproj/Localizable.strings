@@ -37,29 +37,29 @@
 "Charging" = "Doldurulur";
 "Clear" = "Təmizlə";
 "Clear All Recents" = "Son Axtarışların Hamısını Sil";
-"Close PiP and open player when application enters foreground" = "Tətbiq ön plana daxil olduqda PiP-i bağlayın və oynadıcını açın";
+"Close PiP and open player when application enters foreground" = "Tətbiq ön plana daxil olduqda PiP-i bağla və oynadıcını aç";
 "Close PiP when player is opened" = "Oynadıcı açıldıqda PiP-i bağla";
 "Close PiP when starting playing other video" = "Digər videonu oynatmağa başlayanda PiP-i bağla";
 "Close player when closing video" = "Video bağlanarkən oynadıcını bağla";
 "Close video after playing last in the queue" = "Növbədəki sonuncunu oynatdıqdan sonra videonu bağla";
 "Comments" = "Şərhlər";
 "Controls" = "Yoxlamalar";
-"Copy %@ link" = "%@ linkini kopyalayın";
-"Copy %@ link with time" = "%@ linkini zamanla kopyalayın";
+"Copy %@ link" = "%@ linkini kopyala";
+"Copy %@ link with time" = "%@ linkini vaxtla kopyala";
 "Could not load locations manifest" = "Məkanlar manifestini yükləmək mümkün olmadı";
 "Country" = "Ölkə";
 "Country Name or Code" = "Ölkə adı və ya kodu";
 "Current: %@\n%@" = "Cari: %@\n%@";
 "Custom Locations" = "Fərdi Məkanlar";
-"Decrease rate" = "Reytinq azalması";
+"Decrease rate" = "Azalma nisbəti";
 "Decreased opacity" = "Azaldılmış qeyri-şəffaflıq";
 "Duration" = "Müddət";
 "Edit" = "Redaktə et";
 "Donations" = "İanələr";
 "Done" = "Bitdi";
-"Edit Quality Profile" = "Keyfiyyət profilini redaktə edin";
+"Edit Quality Profile" = "Keyfiyyət profilini redaktə et";
 "Edit..." = "Redaktə edilir...";
-"Enable logging" = "Girişi aktivləşdirin";
+"Enable logging" = "Girişi aktivləşdir";
 "Fullscreen size" = "Tam ekran ölçüsü";
 "Frontend URL" = "Ön uc URL'i";
 "High" = "Yüksək";
@@ -69,7 +69,7 @@
 "Hour" = "Saat";
 "I am lost" = "Mən uduzdum";
 "I found a bug /" = "Səhv tapdım /";
-"Increase rate" = "Reytinq dərəcəsi";
+"Increase rate" = "Artma nisbəti";
 
 /* SponsorBlock category name */
 "Interaction" = "Qarşılıqlı əlaqə";
@@ -115,10 +115,10 @@
 "Outro" = "Çıxış";
 "Pause when player is closed" = "Oynadıcı bağlandıqda fasilə ver";
 "Play All" = "Hamısını Oynat";
-"Play in PiP" = "PiP-də Oynadın";
+"Play in PiP" = "PiP-də Oynat";
 "Play Last" = "Son oynatma";
-"Play Next" = "Növbətini Oynadın";
-"Playback" = "Oynatma";
+"Play Next" = "Növbətini Oynat";
+"Playback" = "Oynatmaq";
 "Player" = "Oynadıcı";
 "Playlists" = "Pleylistlər";
 "Profiles" = "Profillər";
@@ -126,36 +126,36 @@
 "Quality" = "Keyfiyyət";
 "Proxy videos" = "Proksi videolar";
 "Queue is empty" = "Növbə boşdur";
-"Rate" = "Qiymətləndirmə";
+"Rate" = "Qiymətləndir";
 "Recents" = "Sonuncular";
 "Red" = "Qırmızı";
-"Refresh" = "Yeniləmək";
+"Refresh" = "Yenilə";
 "Regular Size" = "Normal Ölçü";
 "Remove" = "Sil";
 "Remove from history" = "Tarixçədən sil";
-"Remove from the queue" = "Növbədən Çıxart";
+"Remove from the queue" = "Növbədən sil";
 "Reset" = "Sıfırla";
 "Reset search filters" = "Axtarış filtrlərini sıfırla";
 "Resolution" = "Qətnamə";
 "Restart the app to apply the settings above." = "Yuxarıdakı tənzimləmələri tətbiq etmək üçün tətbiqi yenidən başlat.";
-"Restart/Play next" = "Yenidən başlat/Növbətini oynadın";
-"Save" = "Saxlayın";
+"Restart/Play next" = "Yenidən başlat/Növbətini oynat";
+"Save" = "Saxla";
 "Restore default profiles..." = "Defolt profilləri qaytar...";
 "Round corners" = "Dairəvi künclər";
 "Save history of played videos" = "Oynadılan videoların tarixçəsini saxla";
-"Save history of searches, channels and playlists" = "Axtarışların, kanalların və pleylistlərin tarixçəsini saxla";
-"Search" = "Axtar";
+"Save history of searches, channels and playlists" = "Axtarışlar, kanallar və pleylistlərin tarixçəsini saxla";
+"Search" = "Axtarış";
 "Search history is empty" = "Axtarış tarixçəsi boşdur";
 "Search..." = "Axtar...";
 "Sections" = "Bölmələr";
-"Seek gesture speed" = "Jest sürətini axtarın";
+"Seek gesture speed" = "Axtarış jesti sürəti";
 
 /* SponsorBlock category name */
 "Self-promotion" = "Öz reklamı";
-"Seek with horizontal swipe on video" = "Videoda üfüqi sürüşdürmə ilə axtarın";
+"Seek with horizontal swipe on video" = "Videoda üfüqi sürüşdürmə ilə axtar";
 "Settings" = "Tənzimləmələr";
 "Share %@ link with time" = "%@ linkini zamanla paylaşın";
-"Share..." = "Paylaşın...";
+"Share..." = "Paylaş...";
 "Show anonymous accounts" = "Gizli hesabları göstər";
 "Show history" = "Tarixçəni göstər";
 "Show keywords" = "Açar sözləri göstər";
@@ -179,10 +179,10 @@
 "Today" = "Bu gün";
 "Trending" = "Trenddə Olan";
 "unknown" = "naməlum";
-"Unsubscribe" = "Abunəlikdən çıxın";
+"Unsubscribe" = "Abunəlikdən çıx";
 "Upload date" = "Yükləmə tarixi";
 "URL" = "URL";
-"Used to create links from videos, channels and playlists" = "Videolar, kanallar və pleylistlərdən keçidlər yaratmaq üçün istifadə olunur";
+"Used to create links from videos, channels and playlists" = "Videolar, kanallar və pleylistlərdən bağlantılar yaratmaq üçün istifadə olunur";
 
 /* Selected video was played on given date */
 "Watched %@" = "%@ 'da baxılıb";
@@ -206,7 +206,7 @@
 "Button" = "Düymə";
 "Cancel" = "Ləğv et";
 "Buffering stream..." = "Yayım buferlənir...";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Səhvlər və əla xüsusiyyət ideyaları GitHub problemləri izləyicisinə göndərilə bilər. ";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Səhvlər və böyük xüsusiyyət ideyaları GitHub problemləri izləyicisinə göndərilə bilər. ";
 "Captions" = "Altyazılar";
 "Categories to Skip" = "Ötürüləcək Kateqoriyalar";
 "Cellular" = "Mobil";
@@ -217,17 +217,17 @@
 "Clear the queue" = "Növbəni təmizlə";
 "Close" = "Bağla";
 "Delete" = "Sil";
-"Close player when starting PiP" = "PiP-i işə salarkən oynadıcını bağla";
+"Close player when starting PiP" = "PiP-i başladanda oynadıcını bağla";
 "Close Video" = "Videonu Bağla";
 "Contact" = "Əlaqə";
 "Connected successfully (%@)" = "Uğurla qoşuldu (%@)";
-"Find Other" = "Başqalarını tapın";
+"Find Other" = "Başqalarını tap";
 "Connection failed" = "Bağlantı uğursuz oldu";
 "Continue from %@" = "%@ ilə davam et";
 "Continue" = "Davam et";
-"Contributing" = "Töhfə Verin";
-"Create Playlist" = "Pleylist yaradın";
-"Filter: active" = "Filtr: aktivdir";
+"Contributing" = "Töhfə Ver";
+"Create Playlist" = "Pleylist yarat";
+"Filter: active" = "Çeşidləmək: aktivdir";
 "Help" = "Kömək";
 "Highest" = "Ən yüksək";
 
@@ -238,25 +238,25 @@
 "Date" = "Tarix";
 "Discord Server" = "Discord Serveri";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discord və Matrix-də müzakirələr aparılır. Ümumi suallar üçün yaxşı yerdir.";
-"Don't use public locations" = "İctimai yerlərdən istifadə etməyin";
+"Don't use public locations" = "İctimai yerlərdən istifadə etmə";
 "Disabled" = "Qeyri-aktiv";
 "Edit Playlist" = "Pleylisti redaktə et";
 "Error when accessing playlist" = "Pleylistə daxil olan zaman xəta baş verdi";
 "Favorites" = "Sevimlilər";
-"Filter" = "Filtr";
-"Enable Return YouTube Dislike" = "Return YouTube Dislike'ı Aktivləşdirin";
-"Enter fullscreen in landscape" = "Landşaftda tam ekrana daxil olun";
+"Filter" = "Çeşidlə";
+"Enable Return YouTube Dislike" = "Return YouTube Dislike'ı Aktivləşdir";
+"Enter fullscreen in landscape" = "Landşaftda tam ekrana daxil ol";
 "Error" = "Xəta";
 "Highest quality" = "Ən yüksək keyfiyyət";
 "Info" = "Məlumat";
 "Gaming" = "Oyun";
-"Hide sidebar" = "Yan paneli gizlədin";
+"Hide sidebar" = "Yan paneli gizlət";
 "History" = "Tarixçə";
-"I have a feature request" = "Bir xüsusiyyət tələbim var";
+"I have a feature request" = "Xüsusiyyət tələbim var";
 "I like this app!" = "Bu tətbiqi bəyənirəm!";
 "I want to ask a question" = "Mən sual vermək istəyirəm";
-"If you are interested what's coming in future updates, you can track project Milestones." = "Gələcək yeniləmələrdə nə olacağı ilə maraqlanırsınızsa, layihənin mərhələlərini izləyə bilərsiniz.";
-"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Əgər səhv barədə məlumat verirsinizsə, bütün müvafiq təfərrüatları daxil edin (xüsusilə: tətbiq versiyası, istifadə edilmiş cihaz və sistem versiyası, təkrar istehsal addımları).";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Gələcək yeniləmələrdə nə olacağı ilə maraqlanırsınızsa, layihə mərhələlərini izləyə bilərsiniz.";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Əgər səhvi bildirirsinizsə, bütün münasib təfərrüatları daxil edin (xüsusilə: tətbiq versiyası, istifadə edilmiş cihaz və sistem versiyası, təkrar addımlar).";
 "LIVE" = "CANLI";
 "Picture in Picture" = "Şəkil içində Şəkil";
 "Play" = "Oynat";
@@ -265,12 +265,12 @@
 /* Video sort order in search */
 "Views" = "Baxış";
 "Replies" = "Cavablar";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "İstənilən ödənişli və ya pulsuz platforma(lar)da bəyənmək, abunə olmaq və ya onlarla qarşılıqlı əlaqə yaratmaq üçün ətraflı xatırlatmalar (məsələn, videoya klikləyin).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "İstənilən ödənişli və ya pulsuz platforma(lar)da bəyənmək, abunə olmaq və ya onlarla qarşılıqlı əlaqə yaratmaq üçün ətraflı xatırlatmalar (məsələn, videoya kliklə).";
 "Finding something to play..." = "Oynatmaq üçün nəsə tapmaq...";
-"For videos which feature music as the primary content." = "Əsas məzmun kimi musiqini əks etdirən videolar üçün.";
+"For videos which feature music as the primary content." = "Musiqini əsas məzmun kimi göstərən videolar üçün.";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formatlar sadalanan qaydada seçiləcək.\nHLS adaptiv formatdır (qətnamə tənzimləməsi tətbiq edilmir).";
 "Instance of current account" = "Cari hesabın nümunəsi";
-"Issues Tracker" = "Problemlərin İzləyicisi";
+"Issues Tracker" = "Problemlər İzləyici";
 "Loading..." = "Yüklənilir...";
 
 /* Player controls layout size */
@@ -290,7 +290,7 @@
 "Name" = "Ad";
 
 /* SponsorBlock category name */
-"Offtopic in Music Videos" = "Musiqi Videolarında Offtopik";
+"Offtopic in Music Videos" = "Musiqi Videolarında mövzudan kənar";
 "Matrix Channel" = "Matrix Kanalı";
 "Normal" = "Normal";
 "Open Settings" = "Tənzimləmələri Aç";
@@ -303,34 +303,34 @@
 "Play Music" = "Musiqi Çaldır";
 "Play Now" = "İndi Oynat";
 "Playlist" = "Pleylist";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "\"%@\" pleylisti silinəcək.\nOnu geri qaytarmaq olmayacaq.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "\"%@\" pleylisti silinəcək.\nO geri qaytarılmayacaq.";
 "Queue" = "Növbə";
 "Public Locations" = "İctimai Məkanlar";
 "If you want this app to be available in your language, join translation project." = "Bu tətbiqin öz dilinizdə olmasını istəyirsinizsə, tərcümə layihəsinə qoşulun.";
 "Regular size" = "Normal ölçü";
 "Remove from Favorites" = "Sevimlilərdən silin";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Yaradıcı ilə birbaşa əlaqəsi olmayan məhsul və ya xidməti təbliğ edən videonun bir hissəsi. Yaradıcı pul və ya pulsuz məhsullar şəklində ödəniş və ya kompensasiya alacaq.";
-"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Yaradıcının özü ilə birbaşa əlaqəli bir məhsul və ya xidmətin təşviqi. Buraya adətən mallar və ya pul qazanılan platformaların tanıtımı daxildir.";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Yaradıcı ilə birbaşa əlaqəli məhsul və ya xidmətin təşviqi. Buraya adətən mallar və ya pul qazanılan platformaların tanıtımı daxildir.";
 
 /* Video sort order in search */
 "Rating" = "Reytinq";
-"Remove from Playlist" = "Pleylistdən silin";
+"Remove from Playlist" = "Pleylistdən sil";
 "Restart" = "Yenidən başlat";
 "Related" = "Əlaqədar";
 
 /* Video sort order in search */
 "Relevance" = "Uyğunluq";
-"Reset watched status when playing again" = "Yenidən oynadan zaman baxılmış statusu sıfırlayın";
+"Reset watched status when playing again" = "Yenidən oynadan zaman baxılmış statusu sıfırla";
 "Rotate to portrait when exiting fullscreen" = "Tam ekrandan çıxanda portretə fırlat";
 "Select location closest to you:" = "Sizə ən yaxın məkanı seçin:";
-"Seek gesture sensitivity" = "Jest həssaslığını axtar";
+"Seek gesture sensitivity" = "Axtarış jesti həssaslığı";
 "Show account username" = "Hesab istifadəçi adını göstər";
 "Share %@ link" = "%@ linkini paylaşın";
 
 /* Video duration filter in search */
 "Short" = "Qısa";
 "Show channel name" = "Kanal adını göstər";
-"Show video length" = "Videonun uzunluğunu göstər";
+"Show video length" = "Video uzunluğunu göstər";
 "Shuffle All" = "Hamısını qarışdır";
 
 /* SponsorBlock category name */
@@ -366,14 +366,14 @@
 /* Video date filter in search */
 "Week" = "Həftə";
 "Watched" = "Baxıldı";
-"When partially watched video is played" = "Qismən baxılan video oynadılır";
+"When partially watched video is played" = "Qismən baxılan video oynadıldıqda";
 
 /* Selected video is being played */
 "Watching now" = "İndi izlənilir";
 
 /* Video date filter in search */
 "Year" = "İl";
-"You can find information about using Yattee in the Wiki pages." = "Yattee-dən istifadə haqqında məlumatı Viki səhifələrində tapa bilərsiniz.";
+"You can find information about using Yattee in the Wiki pages." = "Yattee istifadə haqqında məlumatı Viki səhifələrində tapa bilərsiniz.";
 "You have no Playlists" = "Pleylistiniz yoxdur";
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "Pleylistiniz yoxdur.\n\nBirini yaratmaq üçün \"Yeni Pleylist\" üzərinə kliklə";
 "You need to create an instance and accounts\nto access %@ section" = "Nümunə və hesablar yaratmalısınız\n%@ bölməsinə daxil olmaq üçün";
@@ -386,21 +386,21 @@
 "Playback queue is empty" = "Oynatma növbəsi boşdur";
 "Playing Next" = "Növbəti Oynadılır";
 "You can switch between profiles in playback settings controls." = "Siz oynatma tənzimləmələri nəzarətlərində profillər arasında keçid edə bilərsiniz.";
-"Add Channels, Playlists and Searches to Favorites using" = "İstifadə edərək: Sevimlilərə Kanallar, Pleylistlər və Axtarışlar əlavə edin";
+"Add Channels, Playlists and Searches to Favorites using" = "İstifadə edərək: Sevimlilərə Kanallar, Pleylistlər və Axtarışlar əlavə et";
 "Make default" = "Defolt edilən";
 "Current Playlist" = "Cari Pleylist";
 "Stream & Player" = "Yayım və Oynadıcı";
 "Statistics" = "Statistika";
-"Hardware decoder" = "Aparat dekoderi";
-"Stream FPS" = "FPS yayımı";
-"Cached time" = "Keşlənmiş zaman";
+"Hardware decoder" = "Cihaz dekoderi";
+"Stream FPS" = "FPS Yayımı";
+"Cached time" = "Keşlənmiş vaxt";
 "Rate & Captions" = "Reytinq və Altyazılar";
 "Dropped frames" = "Düşmüş çərçivələr";
 "Any format" = "İstənilən format";
 "%@ formats" = "%@ formatları";
 "Keep last played video in the queue after restart" = "Yenidən başladıldıqdan sonra sonuncu oynadılan videonu növbədə saxla";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Pleylist boşdur\n\nVideoya toxunub saxla və sonra\n\"Pleylistə əlavə edin\"";
-"Press and hold remote button to open captions and quality menus" = "Altyazıları və keyfiyyətli menyunu açmaq üçün remote düyməsini basıb saxla";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Pleylist boşdur\n\nVideoya toxunub saxla və sonra\n\"Pleylistə əlavə et\"";
+"Press and hold remote button to open captions and quality menus" = "Altyazıları və keyfiyyət menyusunu açmaq üçün remote düyməsini basıb saxla";
 "Comments are disabled" = "Şərhlər deaktiv edilib";
 "No comments" = "Şərhsiz";
 "No chapters information available" = "Bölmələr haqqında məlumat yoxdur";
@@ -415,11 +415,11 @@
 "This video could not be opened" = "Bu videonu açmaq mümkün olmadı";
 "Could not extract playlist ID" = "Pleylist ID-ni çıxarmaq mümkün olmadı";
 "Could not load video" = "Videonu yükləmək mümkün olmadı";
-"No locations available at the moment" = "Hazırda mövcud məkan yoxdur";
+"No locations available at the moment" = "Hazırda mövcud məkanlar yoxdur";
 "Could not refresh Playlists" = "Pleylistləri yeniləmək mümkün olmadı";
 "Visibility" = "Görünüş";
 "It can be changed later in settings. You can use your own locations too." = "Daha sonra tənzimləmələrdə dəyişdirilə bilər. Siz də məkanlarınızdan istifadə edə bilərsiniz.";
-"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Siz cari cihazın vəziyyətinə əsasən avtomatik profil seçimindən istifadə edə və ya onu video oynatma tənzimləmələri nəzarətlərində dəyişə bilərsiniz.";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Siz cari cihaz vəziyyətinə əsasən avtomatik profil seçimindən istifadə edə və ya onu video oynatma tənzimləmələri nəzarətlərində dəyişə bilərsiniz.";
 "Unlisted" = "Siyahıdan kənar";
 "You need to select an account\nto access %@ section" = "Siz hesab seçməlisiniz\n%@ bölməsinə daxil olmaq üçün";
 "Could not refresh Subscriptions" = "Abunəlikləri yeniləmək mümkün olmadı";
@@ -431,3 +431,74 @@
 "For custom locations you can configure Frontend URL in Locations settings" = "Fərdi məkanlar üçün Siz Məkanlar tənzimləmələrində Ön URL-ni konfiqurasiya edə bilərsiniz";
 "Could not create share link" = "Paylaşım bağlantısı yaratmaq mümkün olmadı";
 "Could not extract video ID" = "Video ID-ni çıxarmaq mümkün olmadı";
+"Show Open Videos toolbar button" = "Açıq Videolar alətlər paneli düyməsini göstər";
+"Edit Favorites…" = "Sevimliləri redaktə et…";
+"Live Streams" = "Canlı Yayımlar";
+"Shorts" = "Qısa";
+"Verified" = "Doğrulanıb";
+"Channel" = "Kanal";
+"No documents" = "Sənəd yoxdur";
+"Inspector visibility" = "Yoxlayıcı görünməsi";
+"Are you sure you want to remove this document?" = "Bu sənədi silmək istədiyinizə əminsiniz?";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" bu cihazdan geri dönməz şəkildə silinəcək.";
+"Could not delete document" = "Sənədi silmək alınmadı";
+"Are you sure you want to remove %@ location?" = "%@ məkanını silmək istədiyinizə əminsiniz?";
+"Recent Documents" = "Son Sənədlər";
+"Recent History" = "Son Tarixçə";
+"Show Open Videos quick actions" = "Açıq Videoların sürətli hərəkətlərini göstər";
+"Show Favorites" = "Sevimliləri göstər";
+"Home" = "Ev";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Mac-da Finder\n və ya Windows-da iTunes-dən faylları paylaş";
+"Show Home" = "Evi Göstər";
+"Pages toolbar position" = "Səhifələr alətlər paneli mövqeyi";
+"Show Documents" = "Sənədləri göstər";
+"Video Details" = "Video Təfərrüatları";
+"Show Inspector" = "Yoxlayıcını Göstər";
+"Video actions buttons" = "Video fəaliyyət düymələri";
+"URL to Open" = "Açmaq üçün URL";
+"Enter link to open" = "Açmaq üçün linki daxil et";
+"Show only icons" = "Yalnız nişanları göstər";
+"Video" = "Video";
+"Driver" = "Sürücü";
+"Sample Rate" = "Nümunə Sürəti";
+"Buttons labels" = "Düymələr etiketləri";
+"Files" = "Fayllar";
+"Reload manifest" = "Manifesti yenidən yüklə";
+"Clear Queue before opening" = "Açılışdan əvvəl növbəni təmizlə";
+"Open" = "Açıq";
+"Pages buttons" = "Səhifə düymələri";
+"Could not open Files" = "Faylları açmaq mümkün olmadı";
+"Paste" = "Yapışdır";
+"Open Videos" = "Videoları Aç";
+"Enter links to open, one per line" = "Açmaq üçün keçidləri daxil et, hər cərgədə bir";
+"Playback Mode" = "Oynatma Rejimi";
+"Add" = "Əlavə et";
+"Hide" = "Gizlət";
+"Always" = "Həmişə";
+"Only for local files and URLs" = "Yalnız yerli fayllar və URL-lər üçün";
+"Right" = "Sağ";
+"Channels" = "Kanallar";
+"Open Files" = "Faylları Aç";
+"Share" = "Paylaş";
+"Left" = "Sol";
+"Format" = "Format";
+"Center" = "Mərkəz";
+"Documents" = "Sənədlər";
+"Audio" = "Səs";
+"File" = "Fayl";
+"Codec" = "Kodek";
+"Size" = "Ölçü";
+"FPS" = "FPS";
+"Show icons and text when space permits" = "Yer olsa nişanları və mətni göstər";
+"Could not find any links to open in your clipboard" = "Mübadilə buferinizdə açmaq üçün heç bir keçid tapılmadı";
+"Remove…" = "Sil…";
+"Actions buttons" = "Fəaliyyət düymələri";
+"Show sidebar" = "Yan paneli göstər";
+"Default Profile" = "Defolt Profil";
+"Playback history is empty" = "Oynatma tarixçəsi boşdur";
+"Address" = "Ünvan";
+"Locations Manifest" = "Məkanlar Manifesti";
+"Remove Location" = "Məkanı sil";
+"Open Video" = "Videonu Aç";
+"Copy%@link" = "%@ bağlantısın kopyala";
+"Share%@link" = "%@ bağlantısın paylaş";
