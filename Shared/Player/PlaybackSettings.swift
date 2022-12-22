@@ -43,6 +43,7 @@ struct PlaybackSettings: View {
                         }
                     } label: {
                         Label("Close", systemImage: "xmark")
+                            .imageScale(.large)
                             .padding(.vertical)
 
                         #if os(iOS)

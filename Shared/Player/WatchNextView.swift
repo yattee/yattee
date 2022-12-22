@@ -188,7 +188,9 @@ struct WatchNextView: View {
                 closeButton
             }
         }
+        #if !os(tvOS)
         .keyboardShortcut(.cancelAction)
+        #endif
     }
 
     var hideButton: some View {
