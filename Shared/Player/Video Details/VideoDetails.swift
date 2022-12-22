@@ -31,7 +31,7 @@ struct VideoDetails: View {
     var bottomPadding = false
 
     @State private var detailsSize = CGSize.zero
-    @State private var descriptionVisibility = Constants.descriptionVisibility
+    @State private var detailsVisibility = Constants.detailsVisibility
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
     @State private var page = DetailsPage.info
@@ -67,6 +67,9 @@ struct VideoDetails: View {
                 .animation(nil, value: player.currentItem)
 
             pageView
+            #if os(iOS)
+            .opacity(detailsVisibility ? 1 : 0)
+            #endif
         }
         .overlay(GeometryReader { proxy in
             Color.clear
@@ -118,18 +121,28 @@ struct VideoDetails: View {
                 .frame(width: 200, alignment: .leading)
                 .transaction { t in t.animation = nil }
             }
-            .animation(nil, value: descriptionVisibility)
+            .animation(nil, value: detailsVisibility)
             .modifier(SettingsPickerModifier())
             .offset(x: 15, y: 5)
-            .opacity(descriptionVisibility ? 1 : 0)
         #endif
     }
 
     var pagePicker: some View {
         Picker("Page", selection: $page) {
-            ForEach(DetailsPage.allCases, id: \.rawValue) { page in
+            ForEach(DetailsPage.allCases.filter { pageAvailable($0) }, id: \.rawValue) { page in
                 Label(page.title, systemImage: page.systemImageName).tag(page)
             }
+        }
+    }
+
+    func pageAvailable(_ page: DetailsPage) -> Bool {
+        guard let video else { return false }
+
+        switch page {
+        case .inspector:
+            return true
+        default:
+            return !video.isLocal
         }
     }
 
@@ -143,9 +156,6 @@ struct VideoDetails: View {
                             HStack {
                                 videoProperties
                                     .frame(maxWidth: .infinity, alignment: .trailing)
-                                #if os(iOS)
-                                    .opacity(descriptionVisibility ? 1 : 0)
-                                #endif
                             }
                             .padding(.bottom, 12)
 
@@ -155,11 +165,9 @@ struct VideoDetails: View {
                                         .progressViewStyle(.circular)
                                 }
                                 .frame(maxWidth: .infinity)
-                                .opacity(descriptionVisibility ? 1 : 0)
                             } else if video.description != nil, !video.description!.isEmpty {
                                 VideoDescription(video: video, detailsSize: detailsSize)
                                 #if os(iOS)
-                                    .opacity(descriptionVisibility ? 1 : 0)
                                     .padding(.bottom, player.playingFullScreen ? 10 : SafeArea.insets.bottom)
                                 #endif
                             } else if !video.isLocal {
@@ -172,13 +180,21 @@ struct VideoDetails: View {
                         .padding(.bottom, 60)
                     }
                 }
+                .onAppear {
+                    if video != nil, !pageAvailable(page) {
+                        page = .inspector
+                    }
+                }
                 #if os(iOS)
                 .onAppear {
                     if fullScreen {
-                        descriptionVisibility = true
+                        if let video, video.isLocal {
+                            page = .inspector
+                        }
+                        detailsVisibility = true
                         return
                     }
-                    Delay.by(0.4) { withAnimation(.easeIn(duration: 0.25)) { self.descriptionVisibility = true } }
+                    Delay.by(0.4) { withAnimation(.easeIn(duration: 0.25)) { self.detailsVisibility = true } }
                 }
                 #endif
                 .transition(.opacity)
