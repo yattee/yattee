@@ -29,6 +29,7 @@ struct HistoryView: View {
                 }
             }
         }
+        .animation(nil, value: visibleWatches)
         .onAppear {
             visibleWatches
                 .forEach(player.loadHistoryVideoDetails)

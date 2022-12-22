@@ -80,18 +80,20 @@ struct HomeView: View {
             }
 
             if !accounts.current.isNil, showFavoritesInHome {
-                #if os(tvOS)
-                    ForEach(Defaults[.favorites]) { item in
-                        FavoriteItemView(item: item)
-                    }
-                #else
-                    ForEach(favorites) { item in
-                        FavoriteItemView(item: item)
-                        #if os(macOS)
-                            .workaroundForVerticalScrollingBug()
-                        #endif
-                    }
-                #endif
+                LazyVStack(alignment: .leading) {
+                    #if os(tvOS)
+                        ForEach(Defaults[.favorites]) { item in
+                            FavoriteItemView(item: item)
+                        }
+                    #else
+                        ForEach(favorites) { item in
+                            FavoriteItemView(item: item)
+                            #if os(macOS)
+                                .workaroundForVerticalScrollingBug()
+                            #endif
+                        }
+                    #endif
+                }
             }
 
             #if os(iOS)
