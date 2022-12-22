@@ -25,7 +25,7 @@ struct ThumbnailView: View {
     }
 
     @ViewBuilder var viewForThumbnailExtension: some View {
-        if thumbnailExtension != nil {
+        if AccountsModel.shared.app != .piped, thumbnailExtension != nil {
             if thumbnailExtension == "webp" {
                 webImage
             } else {
