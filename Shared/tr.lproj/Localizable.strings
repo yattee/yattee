@@ -252,3 +252,17 @@
 /* Video sort order in search */
 "Relevance" = "Alaka düzeyi";
 "Playback" = "Oynatma";
+"Search history is empty" = "Arama geçmişi boş";
+"Restart" = "Yeniden başlat";
+"Save" = "Kaydet";
+"Save history of played videos" = "Oynatılan videoların geçmişini kaydet";
+"Rotate to portrait when exiting fullscreen" = "Tam ekrandan çıkarken dikey konuma döndür";
+"Restart/Play next" = "Yeniden başlat/Sıradakini oynat";
+"Search" = "Arama";
+"Search..." = "Ara...";
+"Resolution" = "Çözünürlük";
+"Movies" = "Filmler";
+"Reset watched status when playing again" = "Tekrar oynatırken izlenen durumu sıfırla";
+"Sections" = "Bölümler";
+"Save history of searches, channels and playlists" = "Arama, kanal ve çalma listelerinin geçmişini kaydet";
+"Restore default profiles..." = "Varsayılan profilleri geri yükle...";
