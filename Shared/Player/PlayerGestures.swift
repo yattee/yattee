@@ -10,12 +10,13 @@ struct PlayerGestures: View {
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
+                        model.presentingControls = false
                         let interval = TimeInterval(Defaults[.gestureBackwardSeekDuration]) ?? 10
                         player.backend.seek(relative: .secondsInDefaultTimescale(-interval), seekType: .userInteracted)
                     },
                     anyTapAction: {
+                        singleTapAction()
                         model.update()
                     }
                 )
@@ -23,20 +24,22 @@ struct PlayerGestures: View {
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
+                        model.presentingControls = false
                         player.backend.togglePlay()
-                    }
+                    },
+                    anyTapAction: singleTapAction
                 )
 
             gestureRectangle
                 .tapRecognizer(
                     tapSensitivity: 0.2,
-                    singleTapAction: { singleTapAction() },
                     doubleTapAction: {
+                        model.presentingControls = false
                         let interval = TimeInterval(Defaults[.gestureForwardSeekDuration]) ?? 10
                         player.backend.seek(relative: .secondsInDefaultTimescale(interval), seekType: .userInteracted)
-                    }
+                    },
+                    anyTapAction: singleTapAction
                 )
         }
     }

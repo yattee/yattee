@@ -53,8 +53,8 @@ struct TapRecognizerViewModifier: ViewModifier {
 extension View {
     func tapRecognizer(
         tapSensitivity: Double,
-        singleTapAction: @escaping () -> Void,
-        doubleTapAction: @escaping () -> Void,
+        singleTapAction: @escaping () -> Void = {},
+        doubleTapAction: @escaping () -> Void = {},
         anyTapAction: @escaping () -> Void = {}
     ) -> some View {
         modifier(
