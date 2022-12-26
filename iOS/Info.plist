@@ -56,7 +56,12 @@
 		<true/>
 	</dict>
 	<key>UIApplicationSceneManifest</key>
-	<dict/>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict/>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
