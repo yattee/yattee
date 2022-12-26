@@ -7,7 +7,7 @@ final class MPVOGLView: GLKView {
     private var defaultFBO: GLint?
 
     var mpvGL: UnsafeMutableRawPointer?
-    var queue = DispatchQueue(label: "stream.yattee.opengl", qos: .userInteractive)
+    var queue = DispatchQueue(label: "stream.yattee.opengl")
     var needsDrawing = true
 
     override init(frame: CGRect) {

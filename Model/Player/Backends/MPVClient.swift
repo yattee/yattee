@@ -76,7 +76,7 @@ final class MPVClient: ObservableObject {
             extra_exts: nil
         )
 
-        queue = DispatchQueue(label: "mpv", qos: .userInteractive)
+        queue = DispatchQueue(label: "mpv")
 
         withUnsafeMutablePointer(to: &initParams) { initParams in
             var params = [
