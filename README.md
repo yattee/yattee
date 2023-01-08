@@ -25,6 +25,7 @@
 * [Installation](https://github.com/yattee/yattee/wiki/Installation-Instructions)
 * [Building](https://github.com/yattee/yattee/wiki/Building-instructions)
 * [Features](https://github.com/yattee/yattee/wiki/Features)
+* [FAQ](https://github.com/yattee/yattee/wiki/FAQ)
 * [Screenshots Gallery](https://github.com/yattee/yattee/wiki/Screenshots-Gallery)
 * [Tips](https://github.com/yattee/yattee/wiki/Tips)
 * [Integrations](https://github.com/yattee/yattee/wiki/Integrations)
