@@ -72,14 +72,21 @@ struct FavoriteItemView: View {
                 }
             }
         case let .channel(_, id, name):
-            let channel = Channel(app: .invidious, id: id, name: name)
-            if let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey) {
+            var channel = Channel(app: .invidious, id: id, name: name)
+            if let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey),
+               !cache.videos.isEmpty
+            {
                 contentItems = ContentItem.array(of: cache.videos)
             }
 
             onSuccess = { response in
                 if let channel: Channel = response.typedContent() {
                     ChannelsCacheModel.shared.store(channel)
+                    store.contentItems = ContentItem.array(of: channel.videos)
+                } else if let videos: [Video] = response.typedContent() {
+                    channel.videos = videos
+                    ChannelsCacheModel.shared.store(channel)
+                    store.contentItems = ContentItem.array(of: videos)
                 }
             }
         case let .channelPlaylist(_, id, title):

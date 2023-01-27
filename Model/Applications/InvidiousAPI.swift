@@ -114,7 +114,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("channels/*/latest"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(self.extractVideo)
+            content.json.dictionaryValue["videos"]?.arrayValue.map(self.extractVideo) ?? []
         }
 
         configureTransformer(pathPattern("channels/*/playlists"), requestMethods: [.get]) { (content: Entity<JSON>) -> [ContentItem] in
