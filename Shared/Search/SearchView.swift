@@ -50,7 +50,7 @@ struct SearchView: View {
                     }
                 }
                 .backport
-                .scrollDismissesKeyboard()
+                .scrollDismissesKeyboardInteractively()
             #else
                 ZStack {
                     results

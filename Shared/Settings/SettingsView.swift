@@ -29,7 +29,7 @@ struct SettingsView: View {
             .alert(isPresented: $model.presentingAlert) { model.alert }
         #if os(iOS)
             .backport
-            .scrollDismissesKeyboard()
+            .scrollDismissesKeyboardInteractively()
         #endif
     }
 
