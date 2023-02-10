@@ -1,1 +1,87 @@
 
+
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Anpassad";
+"%@ Channel" = "%@ Kanal";
+"%@ subscribers" = "%@ prenumeranter";
+"%@ Playlist" = "%@ Spellista";
+"Add to Playlist" = "Lägg till i spellista";
+"Add to Playlist..." = "Lägg till i spellista...";
+"Advanced" = "Avancerat";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Alla";
+"Always use AVPlayer for live videos" = "Använd alltid AVPlayer för livevideor";
+"Anonymous" = "Anonym";
+"Are you sure you want to clear history of watched videos?" = "Är du säker att du vill rensa visningshistoriken?";
+"Apply to all" = "Tillämpa på allt";
+"Are you sure you want to clear search history?" = "Är du säker att du vill rensa sökhistoriken?";
+"Are you sure you want to delete playlist?" = "Är du säker att du vill ta bort spellistan?";
+"Are you sure you want to restore default quality profiles?" = "Är du säker att du vill återställa till standard kvalitet profilen?";
+"Based on system color scheme" = "Baserat på enhetens färgschema";
+"Battery" = "Batteri";
+"Blue" = "Blå";
+"Browsing" = "Bläddring";
+"Are you sure you want to unsubscribe from %@?" = "Är su säker att du vill avsluta prenumerationen hos %@?";
+"Automatic" = "Automatisk";
+"Autoplaying Next" = "Autospelar nästa";
+"Badge" = "Märke";
+"Badge & Decreased opacity" = "Märke & minskad opacitet";
+"Badge color" = "Märkesfärg";
+"Buffering stream..." = "Strömmen buffras...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Buggar och bra idéer kan skickas till GitHubs ärendehanterare. ";
+"Button" = "Knapp";
+"Cancel" = "Avbryt";
+"Captions" = "Textning";
+"Categories to Skip" = "Kategorier att hoppa över";
+"Category" = "Kategori";
+"Cellular" = "Mobilnät";
+"Chapters" = "Kapitel";
+"Charging" = "Laddas";
+"Clear" = "Rensa";
+"Clear All" = "Rensa allt";
+"Clear All Recents" = "Rensa alla senaste";
+"Clear History" = "Rensa historik";
+"Clear Search History" = "Rensa sökhistorik";
+"Clear Search History..." = "Rensa sökhistorik...";
+"Clear the queue" = "Rensa kö";
+"Close" = "Stäng";
+"Close PiP and open player when application enters foreground" = "Stäng bild-i-bild och öppna spelaren när programmet är i förgrunden";
+"Close PiP when player is opened" = "Stäng bild-i-bild när spelaren är öppen";
+"Close PiP when starting playing other video" = "Stäng bild-i-bild när en annan video startas";
+"Close player when closing video" = "Stäng spelaren när du stänger videon";
+"Close player when starting PiP" = "Stäng spelaren när du startar bild-i-bild";
+"Close Video" = "Stäng video";
+"Close video after playing last in the queue" = "Stäng videon när den sista spelats i kön";
+"Comments" = "Kommentarer";
+"Connected successfully (%@)" = "Anslutningen lyckades (%@)";
+"Connection failed" = "Anslutningen misslyckades";
+"Contact" = "Kontakt";
+"Continue" = "Fortsätt";
+"Continue from %@" = "Fortsätt från %@";
+"Contributing" = "Bidragande";
+"Controls" = "Kontroller";
+"Copy %@ link" = "Kopiera %@ länk";
+"Copy %@ link with time" = "Kopiera %@ länk med tid";
+"Could not load locations manifest" = "Kunde ej ladda manifestet för platsen";
+"Country" = "Land";
+"Country Name or Code" = "Landsnamn eller kod";
+"Create Playlist" = "Skapa spellista";
+"Current: %@\n%@" = "Nuvarande: %@\n%@";
+"Custom Locations" = "Anpassade platser";
+
+/* Video sort order in search */
+"Date" = "Datum";
+" subscribers" = " prenumeranter";
+"%lld videos" = "%lld videor";
+"Accounts" = "Konton";
+"Accounts are not supported for the application of this instance" = "Konton stöds ej och kan inte tillämpas på denna instans";
+"Add Account" = "Lägg till konto";
+"Add Account..." = "Lägg till konto...";
+"Add Location" = "Lägg till plats";
+"Add Location..." = "Lägg till plats...";
+"Add profile..." = "Lägg till profil...";
+"Add Quality Profile" = "Lägg till kvalitet profil";
+"Add to %@" = "Lägg till i %@";
+"Add to Favorites" = "Lägg till i favoriter";
