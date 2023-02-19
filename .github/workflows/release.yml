@@ -1,0 +1,98 @@
+name: Build and release to TestFlight and GitHub
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+  FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+  ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+  TEAM_ID: ${{ secrets.TEAM_ID }}
+  DEVELOPER_KEY_ID: ${{ secrets.DEVELOPER_KEY_ID }}
+  DEVELOPER_KEY_ISSUER_ID: ${{ secrets.DEVELOPER_KEY_ISSUER_ID }}
+  DEVELOPER_KEY_CONTENT: ${{ secrets.DEVELOPER_KEY_CONTENT }}
+  TEMP_KEYCHAIN_USER: ${{ secrets.TEMP_KEYCHAIN_USER }}
+  TEMP_KEYCHAIN_PASSWORD: ${{ secrets.TEMP_KEYCHAIN_PASSWORD }}
+  DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+  GIT_AUTHORIZATION: ${{ secrets.GIT_AUTHORIZATION }}
+  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+  CERTIFICATES_GIT_URL: ${{ secrets.CERTIFICATES_GIT_URL }}
+  TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
+
+jobs:
+  testflight:
+    strategy:
+      matrix:
+        lane: ['mac beta', 'ios beta', 'tvos beta']
+    name: Releasing ${{ matrix.lane }} version to TestFlight
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+      - name: Replace signing certificate to AppStore
+        run: |
+          sed -i '' 's/match Development/match AppStore/' Yattee.xcodeproj/project.pbxproj
+          sed -i '' 's/iPhone Developer/iPhone Distribution/' Yattee.xcodeproj/project.pbxproj
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: ${{ matrix.lane }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.lane }} build
+          path: fastlane/builds/**/*.ipa
+          if-no-files-found: ignore
+  mac_notarized:
+    name: Build and notarize macOS app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+      - name: Replace signing certificate to Direct with Developer ID
+        run: |
+          sed -i '' 's/match AppStore/match Direct/' Yattee.xcodeproj/project.pbxproj
+          sed -i '' 's/3rd Party Mac Developer Application/Developer ID Application/' Yattee.xcodeproj/project.pbxproj
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: mac build_and_notarize
+      - run: |
+          echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+          echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+      - run: |
+          echo "APP_PATH=fastlane/builds/${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}/macOS/Yattee.app" >> $GITHUB_ENV
+          echo "ZIP_PATH=fastlane/builds/${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}/macOS/Yattee-${{ env.VERSION_NUMBER }}-macOS.zip" >> $GITHUB_ENV
+      - name: ZIP build
+        run: /usr/bin/ditto -c -k --keepParent ${{ env.APP_PATH }} ${{ env.ZIP_PATH }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mac notarized build
+          path: ${{ env.ZIP_PATH }}
+          if-no-files-found: error
+  release:
+    needs: ['testflight', 'mac_notarized']
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+      - run: echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: artifacts
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: artifacts/**/*.ipa,artifacts/**/*.zip
+          commit: main
+          tag: ${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}
+          prerelease: true
+          bodyFile: CHANGELOG.md
+

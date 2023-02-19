@@ -13,6 +13,25 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### bump_build
+
+```sh
+[bundle exec] fastlane bump_build
+```
+
+Bump build number and commit
+
+### bump_version
+
+```sh
+[bundle exec] fastlane bump_version
+```
+
+Bump version number and commit
+
+----
+
+
 ## iOS
 
 ### ios beta
@@ -48,6 +67,14 @@ Push a new beta build to TestFlight
 ```
 
 Push a new beta build to TestFlight
+
+### mac build_and_notarize
+
+```sh
+[bundle exec] fastlane mac build_and_notarize
+```
+
+Build for Developer ID distribution and notarize
 
 ----
 
