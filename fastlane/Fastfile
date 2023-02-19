@@ -15,7 +15,7 @@
 
 DEVELOPER_KEY_ID = ENV['DEVELOPER_KEY_ID']
 DEVELOPER_KEY_ISSUER_ID = ENV['DEVELOPER_KEY_ISSUER_ID']
-DEVELOPER_KEY_FILEPATH = ENV['DEVELOPER_KEY_FILEPATH']
+DEVELOPER_KEY_CONTENT = ENV['DEVELOPER_KEY_CONTENT']
 
 add_extra_platforms(platforms: [:tvos])
 
@@ -29,7 +29,7 @@ platform :ios do
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_filepath: DEVELOPER_KEY_FILEPATH
+      key_content: DEVELOPER_KEY_CONTENT
     )
 
     build = get_build_number(xcodeproj: "Yattee.xcodeproj")
@@ -58,7 +58,7 @@ platform :tvos do
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_filepath: DEVELOPER_KEY_FILEPATH
+      key_content: DEVELOPER_KEY_CONTENT
     )
 
     build = get_build_number(xcodeproj: "Yattee.xcodeproj")
@@ -87,7 +87,7 @@ platform :mac do
     app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_filepath: DEVELOPER_KEY_FILEPATH
+      key_content: DEVELOPER_KEY_CONTENT
     )
 
     build = get_build_number(xcodeproj: "Yattee.xcodeproj")
