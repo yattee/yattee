@@ -166,7 +166,6 @@ struct VideoCell: View {
 
                     HStack(spacing: Constants.channelDetailsStackSpacing) {
                         if !inChannelView,
-                           let video,
                            let url = video.channel.thumbnailURLOrCached,
                            video != .fixture
                         {
@@ -297,7 +296,6 @@ struct VideoCell: View {
                 HStack(spacing: 8) {
                     if channelOnThumbnail,
                        !inChannelView,
-                       let video,
                        let url = video.channel.thumbnailURLOrCached,
                        video != .fixture
                     {
@@ -388,8 +386,7 @@ struct VideoCell: View {
             VStack {
                 HStack(alignment: .top) {
                     if saveHistory,
-                       watchedVideoStyle.isShowingBadge,
-                       let video
+                       watchedVideoStyle.isShowingBadge
                     {
                         WatchView(watch: watch, videoID: video.videoID, duration: video.length)
                     }
