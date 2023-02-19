@@ -16,6 +16,32 @@
 DEVELOPER_KEY_ID = ENV['DEVELOPER_KEY_ID']
 DEVELOPER_KEY_ISSUER_ID = ENV['DEVELOPER_KEY_ISSUER_ID']
 DEVELOPER_KEY_CONTENT = ENV['DEVELOPER_KEY_CONTENT']
+TEAM_ID = ENV['TEAM_ID']
+TEMP_KEYCHAIN_USER = ENV['TEMP_KEYCHAIN_USER']
+TEMP_KEYCHAIN_PASSWORD = ENV['TEMP_KEYCHAIN_PASSWORD']
+DEVELOPER_APP_IDENTIFIER = ENV['DEVELOPER_APP_IDENTIFIER']
+GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
+TESTFLIGHT_EXTERNAL_GROUPS = ENV['TESTFLIGHT_EXTERNAL_GROUPS']
+
+def delete_temp_keychain(name)
+  delete_keychain(
+    name: name
+  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+end
+
+def create_temp_keychain(name, password)
+  create_keychain(
+    name: name,
+    password: password,
+    unlock: false,
+    timeout: 0
+  )
+end
+
+def ensure_temp_keychain(name, password)
+  delete_temp_keychain(name)
+  create_temp_keychain(name, password)
+end
 
 add_extra_platforms(platforms: [:tvos])
 
@@ -23,10 +49,28 @@ before_all do
   update_fastlane
 end
 
+desc "Bump build number and commit"
+lane :bump_build do
+  increment_build_number
+  commit_version_bump(
+    message: "Bump build number to #{get_build_number}"
+  )
+end
+
+desc "Bump version number and commit"
+lane :bump_version do
+  increment_version_number
+  commit_version_bump(
+    message: "Bump version number to #{get_version_number}"
+  )
+end
+
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    app_store_connect_api_key(
+    ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
+
+    api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
       key_content: DEVELOPER_KEY_CONTENT
@@ -38,16 +82,37 @@ platform :ios do
       target: "Yattee (iOS)"
     )
 
+    match(
+      type: 'appstore',
+      platform: 'ios',
+      app_identifier: ["#{DEVELOPER_APP_IDENTIFIER}", "#{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee"],
+      git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
+      readonly: true,
+      keychain_name: TEMP_KEYCHAIN_USER,
+      keychain_password: TEMP_KEYCHAIN_PASSWORD,
+      api_key: api_key
+    )
+
     build_app(
       scheme: "Yattee (iOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/iOS",
       output_name: "Yattee-#{version}-iOS.ipa",
-      xcargs: "-allowProvisioningUpdates"
+      export_options: {
+        provisioningProfiles: {
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}",
+          "#{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee"
+        }
+      }
     )
 
-    altool(
-      altool_app_type: "ios",
-      altool_ipa_path: lane_context[SharedValues::IPA_OUTPUT_PATH]
+    changelog = File.read('../CHANGELOG.md')
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      distribute_external: true,
+      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      changelog: changelog
     )
   end
 end
@@ -55,7 +120,9 @@ end
 platform :tvos do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    app_store_connect_api_key(
+    ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
+
+    api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
       key_content: DEVELOPER_KEY_CONTENT
@@ -67,16 +134,37 @@ platform :tvos do
       target: "Yattee (tvOS)"
     )
 
+    match(
+      type: 'appstore',
+      platform: 'tvos',
+      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
+      readonly: true,
+      keychain_name: TEMP_KEYCHAIN_USER,
+      keychain_password: TEMP_KEYCHAIN_PASSWORD,
+      api_key: api_key
+    )
+
     build_app(
       scheme: "Yattee (tvOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/tvOS",
       output_name: "Yattee-#{version}-tvOS.ipa",
-      xcargs: "-allowProvisioningUpdates"
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER} tvos"
+        }
+      }
     )
 
-    altool(
-      altool_app_type: "tvos",
-      altool_ipa_path: lane_context[SharedValues::IPA_OUTPUT_PATH]
+    changelog = File.read('../CHANGELOG.md')
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      distribute_external: true,
+      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      changelog: changelog
     )
   end
 end
@@ -84,7 +172,9 @@ end
 platform :mac do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    app_store_connect_api_key(
+    ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
+
+    api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
       key_content: DEVELOPER_KEY_CONTENT
@@ -96,16 +186,84 @@ platform :mac do
       target: "Yattee (macOS)"
     )
 
+    match(
+      type: 'appstore',
+      platform: 'macos',
+      additional_cert_types: ['mac_installer_distribution'],
+      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
+      readonly: true,
+      keychain_name: TEMP_KEYCHAIN_USER,
+      keychain_password: TEMP_KEYCHAIN_PASSWORD,
+      api_key: api_key
+    )
+
     build_app(
       scheme: "Yattee (macOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
       output_name: "Yattee-#{version}-macOS.app",
-      xcargs: "-allowProvisioningUpdates"
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER} macos"
+        }
+      }
     )
 
-    altool(
-      altool_app_type: "macos",
-      altool_ipa_path: lane_context[SharedValues::PKG_OUTPUT_PATH]
+    changelog = File.read('../CHANGELOG.md')
+
+    upload_to_testflight(
+      api_key: api_key,
+      pkg: lane_context[SharedValues::PKG_OUTPUT_PATH],
+      distribute_external: true,
+      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      changelog: changelog
+    )
+  end
+
+  desc "Build for Developer ID distribution and notarize"
+  lane :build_and_notarize do
+    ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
+
+    api_key = app_store_connect_api_key(
+      key_id: DEVELOPER_KEY_ID,
+      issuer_id: DEVELOPER_KEY_ISSUER_ID,
+      key_content: DEVELOPER_KEY_CONTENT
+    )
+
+    build = get_build_number(xcodeproj: "Yattee.xcodeproj")
+    version = get_version_number(
+      xcodeproj: "Yattee.xcodeproj",
+      target: "Yattee (macOS)"
+    )
+
+    match(
+      type: 'developer_id',
+      platform: 'macos',
+      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
+      readonly: true,
+      keychain_name: TEMP_KEYCHAIN_USER,
+      keychain_password: TEMP_KEYCHAIN_PASSWORD,
+      api_key: api_key
+    )
+
+    build_mac_app(
+      scheme: "Yattee (macOS)",
+      output_directory: "fastlane/builds/#{version}-#{build}/macOS",
+      output_name: "Yattee",
+      export_method: "developer-id",
+      export_options: {
+        provisioningProfiles: {
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match Direct #{DEVELOPER_APP_IDENTIFIER} macos"
+        }
+      }
+    )
+
+    notarize(
+      package: "fastlane/builds/#{version}-#{build}/macOS/Yattee.app",
+      bundle_id: "#{DEVELOPER_APP_IDENTIFIER}",
+      api_key: api_key,
     )
   end
 end

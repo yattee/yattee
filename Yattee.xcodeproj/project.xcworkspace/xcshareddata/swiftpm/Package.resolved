@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "revision" : "8dd85aee02e39dd280c75eef88ffdb86eed4b07b",
-        "version" : "5.6.2"
+        "revision" : "78424be314842833c04bc3bef5b72e85fff99204",
+        "version" : "5.6.4"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess.git",
       "state" : {
         "branch" : "master",
-        "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
+        "revision" : "ecb18d8ce4d88277cc4fb103973352d91e18c535"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/pinterest/PINCache",
       "state" : {
         "branch" : "master",
-        "revision" : "9ca06045b5aff12ee8c0ef5880aa8469c4896144"
+        "revision" : "97a5dbd3f1e69605bcd4103fdb32ca855887c47a"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pinterest/PINOperation.git",
       "state" : {
-        "revision" : "44d8ca154a4e75a028a5548c31ff3a53b90cef15",
-        "version" : "1.2.1"
+        "revision" : "40504c156a68b20f98f7ddc73a115cbb7893be25",
+        "version" : "1.2.2"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "484bc774e1091f622c4856e576ff957b29403676"
+        "revision" : "554e05a4415fe20add53531c21e593c403685c3d"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
       "state" : {
-        "revision" : "ed288667c909c89127ab1b690113a3e397af3098",
-        "version" : "2.2.1"
+        "revision" : "61fefe9c284fd41ddef77d02749e88f00c305196",
+        "version" : "2.2.2"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "4416805045174938b11edb69a86e9f7dd0699952",
-        "version" : "0.9.1"
+        "revision" : "e6cd1a9d2c976c14a52a040062646b535d0a6337",
+        "version" : "0.10.1"
       }
     },
     {
@@ -138,10 +138,10 @@
     {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
+      "location" : "https://github.com/yattee/swift-log.git",
       "state" : {
-        "revision" : "6fe203dc33195667ce1759bf0182975e4653ba1c",
-        "version" : "1.4.4"
+        "branch" : "main",
+        "revision" : "3f3dc1390a2f116894887c352792dc8d5fa9e875"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "f2616860a41f9d9932da412a8978fec79c06fe24",
-        "version" : "0.1.4"
+        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
+        "version" : "0.2.3"
       }
     },
     {

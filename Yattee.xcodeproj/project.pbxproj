@@ -69,7 +69,6 @@
 		3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205B27D2BAF3007A0CB8 /* SwiftyJSON */; };
 		3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 3703205D27D2BB12007A0CB8 /* SDWebImageWebPCoder */; };
 		3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206127D2BB1B007A0CB8 /* SDWebImagePINPlugin */; };
-		3703206427D2BB30007A0CB8 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206327D2BB30007A0CB8 /* Logging */; };
 		3703206627D2BB35007A0CB8 /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206527D2BB35007A0CB8 /* PINCache */; };
 		3703206827D2BB45007A0CB8 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206727D2BB45007A0CB8 /* Defaults */; };
 		3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206927D2BB49007A0CB8 /* Alamofire */; };
@@ -261,6 +260,7 @@
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
 		3732C9FD28C012E600E7DCAF /* SafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECED55289FE166002BC2C9 /* SafeArea.swift */; };
+		3735C4E729A2D3D70051D251 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3735C4E629A2D3D70051D251 /* Logging */; };
 		3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
 		3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
@@ -555,7 +555,6 @@
 		3774127227387E0B00423605 /* SiestaConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3700155E271B12DD0049C794 /* SiestaConfiguration.swift */; };
 		3774127427387E8500423605 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127327387E8500423605 /* SwiftyJSON */; };
 		3774127627387EA200423605 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127527387EA200423605 /* Siesta */; };
-		3774127827387EB000423605 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127727387EB000423605 /* Logging */; };
 		3774127A27387EBC00423605 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127927387EBC00423605 /* Defaults */; };
 		3774127C27387EC800423605 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127B27387EC800423605 /* Alamofire */; };
 		3776924E294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
@@ -596,7 +595,6 @@
 		377F9F83294417B40043F856 /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = 377F9F82294417B40043F856 /* Cache */; };
 		377F9F85294417FA0043F856 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377F9F84294417FA0043F856 /* SwiftyJSON */; };
 		377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7D4267A080300A6BBAF /* SwiftyJSON */; };
-		377FC7DB267A080300A6BBAF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 377FC7DA267A080300A6BBAF /* Logging */; };
 		377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularView.swift */; };
 		377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AAF27D26737323007FC770 /* PopularView.swift */; };
 		377FC7E2267A084A00A6BBAF /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B18B26717B3800C925CA /* VideoCell.swift */; };
@@ -657,6 +655,9 @@
 		378FFBC628660172009E3FBE /* URLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC328660172009E3FBE /* URLParser.swift */; };
 		378FFBC728660172009E3FBE /* URLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC328660172009E3FBE /* URLParser.swift */; };
 		378FFBC92866018A009E3FBE /* URLParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378FFBC82866018A009E3FBE /* URLParserTests.swift */; };
+		379325D529A265A300181CF1 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 379325D429A265A300181CF1 /* Logging */; };
+		379325D729A265AE00181CF1 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 379325D629A265AE00181CF1 /* Logging */; };
+		379325D929A265B500181CF1 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 379325D829A265B500181CF1 /* Logging */; };
 		3795593627B08538007FF8F4 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
 		3795593727B08538007FF8F4 /* StreamControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795593527B08538007FF8F4 /* StreamControl.swift */; };
 		3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104828D3D10600D5F53C /* SDWebImageSwiftUI */; };
@@ -727,7 +728,6 @@
 		37B767DB2677C3CA0098BAA8 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */; };
 		37B767DC2677C3CA0098BAA8 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */; };
 		37B767DD2677C3CA0098BAA8 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B767DA2677C3CA0098BAA8 /* PlayerModel.swift */; };
-		37B767E02678C5BF0098BAA8 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 37B767DF2678C5BF0098BAA8 /* Logging */; };
 		37B795902771DAE0001CF27B /* OpenURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */; };
 		37B795912771DAE0001CF27B /* OpenURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */; };
 		37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */; };
@@ -887,7 +887,6 @@
 		37D9BA0629507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
 		37D9BA0729507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
 		37D9BA0829507F69002586BD /* PlayerControlsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D9BA0529507F69002586BD /* PlayerControlsSettings.swift */; };
-		37DA0F20291DD6B8009B38CF /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 37DA0F1F291DD6B8009B38CF /* Logging */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C8271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
 		37DD87C9271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -1524,8 +1523,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3735C4E729A2D3D70051D251 /* Logging in Frameworks */,
 				377F9F85294417FA0043F856 /* SwiftyJSON in Frameworks */,
-				37DA0F20291DD6B8009B38CF /* Logging in Frameworks */,
 				377F9F83294417B40043F856 /* Cache in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1555,6 +1554,7 @@
 				37C2212527ADA40A00305B41 /* AudioToolbox.framework in Frameworks */,
 				372AA410286D067B0000B1DC /* Repeat in Frameworks */,
 				37C2212327ADA3F200305B41 /* libiconv.tbd in Frameworks */,
+				379325D529A265A300181CF1 /* Logging in Frameworks */,
 				37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */,
 				37EE6DC528A305AD00BFD632 /* Reachability in Frameworks */,
 				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
@@ -1577,7 +1577,6 @@
 				3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37A5DBC4285DFF5400CA4DD1 /* SwiftUIPager in Frameworks */,
-				377FC7DB267A080300A6BBAF /* Logging in Frameworks */,
 				3736A208286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
 				3736A20E286BB72300C9E5EE /* libass.xcframework in Frameworks */,
@@ -1588,6 +1587,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				379325D729A265AE00181CF1 /* Logging in Frameworks */,
 				372AA414286D06A10000B1DC /* Repeat in Frameworks */,
 				370F4FD227CC16CB001B35DC /* libavformat.59.16.100.dylib in Frameworks */,
 				370F4FD327CC16CB001B35DC /* libass.9.dylib in Frameworks */,
@@ -1610,7 +1610,6 @@
 				370F4FDD27CC16CB001B35DC /* liblcms2.2.dylib in Frameworks */,
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
 				370F4FCB27CC16CB001B35DC /* libxcb.1.1.0.dylib in Frameworks */,
-				3703206427D2BB30007A0CB8 /* Logging in Frameworks */,
 				371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */,
 				370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */,
 				370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */,
@@ -1647,7 +1646,6 @@
 			files = (
 				3774127C27387EC800423605 /* Alamofire in Frameworks */,
 				3774127A27387EBC00423605 /* Defaults in Frameworks */,
-				3774127827387EB000423605 /* Logging in Frameworks */,
 				3774127427387E8500423605 /* SwiftyJSON in Frameworks */,
 				3774127627387EA200423605 /* Siesta in Frameworks */,
 			);
@@ -1670,6 +1668,7 @@
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				371AC0B4294D1C290085989E /* CachedAsyncImage in Frameworks */,
 				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
+				379325D929A265B500181CF1 /* Logging in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
 				3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */,
 				3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
@@ -1693,7 +1692,6 @@
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
 				3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
-				37B767E02678C5BF0098BAA8 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2545,9 +2543,9 @@
 			);
 			name = "Open in Yattee";
 			packageProductDependencies = (
-				37DA0F1F291DD6B8009B38CF /* Logging */,
 				377F9F82294417B40043F856 /* Cache */,
 				377F9F84294417FA0043F856 /* SwiftyJSON */,
+				3735C4E629A2D3D70051D251 /* Logging */,
 			);
 			productName = "Open in Yattee";
 			productReference = 37095E7F291DC85400301883 /* Open in Yattee.appex */;
@@ -2589,7 +2587,6 @@
 			name = "Yattee (iOS)";
 			packageProductDependencies = (
 				377FC7D4267A080300A6BBAF /* SwiftyJSON */,
-				377FC7DA267A080300A6BBAF /* Logging */,
 				37BD07B62698AB2E003EBB87 /* Defaults */,
 				37BD07B82698AB2E003EBB87 /* Siesta */,
 				37BD07C62698B27B003EBB87 /* Introspect */,
@@ -2606,6 +2603,7 @@
 				3797104828D3D10600D5F53C /* SDWebImageSwiftUI */,
 				377F9F73294403770043F856 /* Cache */,
 				371AC0AB294D1A490085989E /* CachedAsyncImage */,
+				379325D429A265A300181CF1 /* Logging */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2633,7 +2631,6 @@
 				3703205B27D2BAF3007A0CB8 /* SwiftyJSON */,
 				3703205D27D2BB12007A0CB8 /* SDWebImageWebPCoder */,
 				3703206127D2BB1B007A0CB8 /* SDWebImagePINPlugin */,
-				3703206327D2BB30007A0CB8 /* Logging */,
 				3703206527D2BB35007A0CB8 /* PINCache */,
 				3703206727D2BB45007A0CB8 /* Defaults */,
 				3703206927D2BB49007A0CB8 /* Alamofire */,
@@ -2644,6 +2641,7 @@
 				3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */,
 				374D11E62943C56300CB4350 /* Cache */,
 				371AC0B1294D1C230085989E /* CachedAsyncImage */,
+				379325D629A265AE00181CF1 /* Logging */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2684,7 +2682,6 @@
 			packageProductDependencies = (
 				3774127327387E8500423605 /* SwiftyJSON */,
 				3774127527387EA200423605 /* Siesta */,
-				3774127727387EB000423605 /* Logging */,
 				3774127927387EBC00423605 /* Defaults */,
 				3774127B27387EC800423605 /* Alamofire */,
 			);
@@ -2709,7 +2706,6 @@
 			name = "Yattee (tvOS)";
 			packageProductDependencies = (
 				37D4B19C2671817900C925CA /* SwiftyJSON */,
-				37B767DF2678C5BF0098BAA8 /* Logging */,
 				372915E32687E33E00F5A35B /* Defaults */,
 				3797757C268922D100DD52A8 /* Siesta */,
 				37BADCA8269A570B009BE4FB /* Alamofire */,
@@ -2723,6 +2719,7 @@
 				3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */,
 				377F9F75294403880043F856 /* Cache */,
 				371AC0B3294D1C290085989E /* CachedAsyncImage */,
+				379325D829A265B500181CF1 /* Logging */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2817,7 +2814,6 @@
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
 				37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
-				37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */,
 				372915E22687E33E00F5A35B /* XCRemoteSwiftPackageReference "Defaults" */,
 				3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */,
 				37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
@@ -2834,6 +2830,7 @@
 				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */,
 				371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
+				379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -3961,8 +3958,12 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
@@ -3977,6 +3978,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stream.yattee.app.Open-in-Yattee";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -3991,8 +3993,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
@@ -4006,6 +4011,8 @@
 				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stream.yattee.app.Open-in-Yattee";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4020,11 +4027,11 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Shared-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -4040,11 +4047,11 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Shared-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -4198,8 +4205,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -4231,6 +4242,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stream.yattee.app";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -4250,8 +4262,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "GLES_SILENCE_DEPRECATION=1";
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4279,6 +4294,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stream.yattee.app";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -4299,10 +4315,13 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 114;
+				CURRENT_PROJECT_VERSION = 135;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -4324,6 +4343,8 @@
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match AppStore stream.yattee.app macos";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = macOS/BridgingHeader.h;
@@ -4339,10 +4360,13 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 114;
+				CURRENT_PROJECT_VERSION = 135;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -4364,6 +4388,8 @@
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match AppStore stream.yattee.app macos";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = macOS/BridgingHeader.h;
@@ -4376,7 +4402,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4384,7 +4410,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4400,7 +4426,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4408,7 +4434,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4426,7 +4452,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4435,7 +4461,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4451,7 +4477,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4460,7 +4486,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4475,9 +4501,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tvOS/Info.plist;
@@ -4499,6 +4528,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "match Development stream.yattee.app tvos";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = tvOS/BridgingHeader.h;
@@ -4513,9 +4544,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 114;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 135;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=appletvos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = tvOS/Info.plist;
@@ -4537,6 +4571,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=appletvos*]" = "match AppStore stream.yattee.app tvos";
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = tvOS/BridgingHeader.h;
@@ -4552,14 +4588,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -4576,14 +4612,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 79;
+				CURRENT_PROJECT_VERSION = 135;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -4794,6 +4830,14 @@
 				kind = branch;
 			};
 		};
+		379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yattee/swift-log.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -4824,14 +4868,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
-			};
-		};
-		37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-log.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 		37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */ = {
@@ -4913,11 +4949,6 @@
 			package = 37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */;
 			productName = SDWebImagePINPlugin;
 		};
-		3703206327D2BB30007A0CB8 /* Logging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
-			productName = Logging;
-		};
 		3703206527D2BB35007A0CB8 /* PINCache */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */;
@@ -4973,6 +5004,11 @@
 			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
+		3735C4E629A2D3D70051D251 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
 		374D11E62943C56300CB4350 /* Cache */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */;
@@ -5007,11 +5043,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
 			productName = Siesta;
-		};
-		3774127727387EB000423605 /* Logging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
-			productName = Logging;
 		};
 		3774127927387EBC00423605 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -5048,9 +5079,19 @@
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
 		};
-		377FC7DA267A080300A6BBAF /* Logging */ = {
+		379325D429A265A300181CF1 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
+			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
+		379325D629A265AE00181CF1 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
+		379325D829A265B500181CF1 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
 		};
 		3797104828D3D10600D5F53C /* SDWebImageSwiftUI */ = {
@@ -5087,11 +5128,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37A5DBC2285DFF5400CA4DD1 /* XCRemoteSwiftPackageReference "SwiftUIPager" */;
 			productName = SwiftUIPager;
-		};
-		37B767DF2678C5BF0098BAA8 /* Logging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
-			productName = Logging;
 		};
 		37BADCA42699FB72009BE4FB /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -5137,11 +5173,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
-		};
-		37DA0F1F291DD6B8009B38CF /* Logging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37B767DE2678C5BF0098BAA8 /* XCRemoteSwiftPackageReference "swift-log" */;
-			productName = Logging;
 		};
 		37E80F42287B7AAF00561799 /* SwiftUIPager */ = {
 			isa = XCSwiftPackageProductDependency;
