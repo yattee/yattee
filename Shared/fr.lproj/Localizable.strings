@@ -81,7 +81,7 @@
 "Open \"Playlists\" tab to create new one" = "Ouvrir l'onglet « Listes de lecture » pour en créer une nouvelle";
 "Open Settings" = "Ouvrir les paramètres";
 "Play Music" = "Lire la musique";
-"Play Next" = "Lire la suivante";
+"Play Next" = "Lire ensuite";
 "Play Now" = "Lire maintenant";
 "Playback" = "Lecture";
 "Player" = "Lecteur";
@@ -438,7 +438,7 @@
 "Buttons labels" = "Étiquettes des boutons";
 "Open" = "Ouvrir";
 "Only for local files and URLs" = "Uniquement pour les fichiers locaux et les URLs";
-"Share" = "Partager";
+"Share" = "Partage";
 "Enter links to open, one per line" = "Entrer les liens à ouvrir, un par ligne";
 "Always" = "Toujours";
 "Channels" = "Chaînes";
