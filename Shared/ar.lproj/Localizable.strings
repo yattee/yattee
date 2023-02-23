@@ -491,3 +491,5 @@
 "Playback history is empty" = "سجل التشغيل فارغ";
 "Copy%@link" = "نسخ الرابط %@";
 "Share%@link" = "مشاركة الرابط %@";
+"Instance of current account" = "مثيل الحساب الحالي";
+"Seek gesture sensitivity" = "إطار حساسية الإيماءات";
