@@ -23,7 +23,7 @@ final class MPVBackend: PlayerBackend {
     var video: Video?
     var captions: Captions? { didSet {
         guard let captions else {
-            client.removeSubs()
+            client?.removeSubs()
             return
         }
         addSubTrack(captions.url)
@@ -536,10 +536,10 @@ final class MPVBackend: PlayerBackend {
 
     func updateNetworkState() {
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.networkState.pausedForCache = self.client.pausedForCache
-            self.networkState.cacheDuration = self.client.cacheDuration
-            self.networkState.bufferingState = self.client.bufferingState
+            guard let self, let client = self.client else { return }
+            self.networkState.pausedForCache = client.pausedForCache
+            self.networkState.cacheDuration = client.cacheDuration
+            self.networkState.bufferingState = client.bufferingState
         }
 
         if !networkState.needsUpdates {
