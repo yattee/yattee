@@ -493,3 +493,12 @@
 "Share%@link" = "مشاركة الرابط %@";
 "Instance of current account" = "مثيل الحساب الحالي";
 "Seek gesture sensitivity" = "إطار حساسية الإيماءات";
+"Video" = "";
+"Audio" = "";
+"Honor orientation lock" = "";
+"Proxy videos" = "";
+"Seek gesture speed" = "";
+"Seek with horizontal swipe on video" = "";
+"System controls show buttons for %@" = "";
+"Wiki" = "";
+"Sample Rate" = "";
