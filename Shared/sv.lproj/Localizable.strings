@@ -111,3 +111,394 @@
 "Find Other" = "Letar annat";
 "Finding something to play..." = "Letar något att spela...";
 "10 seconds forwards/backwards" = "10 sekunder framåt/bakåt";
+"Low" = "";
+
+/* Player controls layout size */
+"Large" = "";
+"Interface" = "";
+"Increase rate" = "";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "";
+"You need to select an account\nto access %@ section" = "";
+"Playlists" = "";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "";
+"Password" = "";
+"Play All" = "";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "";
+"Quality Profile" = "";
+"Popular" = "";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "";
+"Now Playing" = "";
+
+/* Loading stream OSD */
+"Loading streams..." = "";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "";
+"Picture in Picture" = "";
+"Playlist" = "";
+"Queue is empty" = "";
+"Search history is empty" = "";
+"Pause" = "";
+"LIVE" = "";
+"Play Next" = "";
+"Play Music" = "";
+"Channels" = "";
+"Show icons and text when space permits" = "";
+"Instance of current account" = "";
+"You can find information about using Yattee in the Wiki pages." = "";
+"Driver" = "";
+
+/* Selected video has just finished playing */
+"Just watched" = "";
+"Preferred Formats" = "";
+"Play in PiP" = "";
+"Pause when entering background" = "";
+"You need to create an instance and accounts\nto access %@ section" = "";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "";
+"Are you sure you want to remove %@ location?" = "";
+"Trending" = "";
+"Regular Size" = "";
+"Public Manifest" = "";
+"Player" = "";
+"Info" = "";
+"Sort" = "";
+"Unlisted" = "";
+"System controls buttons" = "";
+"Show Open Videos quick actions" = "";
+"Orientation" = "";
+"Not Playing" = "";
+"Restore default profiles..." = "";
+"More info can be found in:" = "";
+"Rate" = "";
+"Restart the app to apply the settings above." = "";
+
+/* Player controls layout size for TV */
+"TV" = "";
+"Recent History" = "";
+"Remove from Favorites" = "";
+"No documents" = "";
+"Play Last" = "";
+"Documents" = "";
+"Could not load video" = "";
+"Could not open playlist" = "";
+"System controls show buttons for %@" = "";
+
+/* SponsorBlock category name */
+"Intro" = "";
+"Next" = "";
+"Sort: %@" = "";
+"Locations" = "";
+"Could not extract video ID" = "";
+"Unsubscribe" = "";
+"Nothing" = "";
+"File" = "";
+"Restart" = "";
+"You have no Playlists" = "";
+
+/* Video date filter in search */
+"Hour" = "";
+"Playback history is empty" = "";
+"Refresh" = "";
+"For custom locations you can configure Frontend URL in Locations settings" = "";
+"Remove" = "";
+"Default Profile" = "";
+"Buttons labels" = "";
+"Public Locations" = "";
+"I like this app!" = "";
+"Current Location" = "";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "";
+"Could not delete document" = "";
+"Video actions buttons" = "";
+"Show anonymous accounts" = "";
+"Show Documents" = "";
+"Center" = "";
+"Not available" = "";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "";
+"SponsorBlock API Instance" = "";
+"Remove Location" = "";
+"Resolution" = "";
+"Show Inspector" = "";
+"Low quality" = "";
+
+/* SponsorBlock category name */
+"Outro" = "";
+"Lock portrait mode" = "";
+"Issues Tracker" = "";
+"Copy%@link" = "";
+"Switch to public locations" = "";
+"Private" = "";
+"Backend" = "";
+"For videos which feature music as the primary content." = "";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "";
+"Frontend URL" = "";
+"Fullscreen size" = "";
+"Gaming" = "";
+"Help" = "";
+"Hide sidebar" = "";
+"High" = "";
+"Highest" = "";
+"Highest quality" = "";
+"History" = "";
+"Honor orientation lock" = "";
+"I am lost" = "";
+"I found a bug /" = "";
+"I have a feature request" = "";
+"I want to ask a question" = "";
+"If you are interested what's coming in future updates, you can track project Milestones." = "";
+
+/* SponsorBlock category name */
+"Interaction" = "";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "";
+"Loading..." = "";
+
+/* Video duration filter in search */
+"Long" = "";
+"Lowest" = "";
+"Mark as watched" = "";
+"Mark video as watched after playing" = "";
+"Mark watched videos with" = "";
+"Matrix Channel" = "";
+"Matrix Chat" = "";
+
+/* Player controls layout size */
+"Medium" = "";
+"Medium quality" = "";
+"Milestones" = "";
+
+/* Video date filter in search */
+"Month" = "";
+"Movies" = "";
+"MPV Documentation" = "";
+"Music" = "";
+"Name" = "";
+"New Playlist" = "";
+"No description" = "";
+"No Playlists" = "";
+"No results" = "";
+"Normal" = "";
+"Only when signed in" = "";
+"Open \"Playlists\" tab to create new one" = "";
+"Open Settings" = "";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "";
+"Opening audio stream..." = "";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "";
+"Pause when player is closed" = "";
+"Play" = "";
+"Play Now" = "";
+"Playback" = "";
+"Profiles" = "";
+"Proxy videos" = "";
+"Quality" = "";
+"Queue" = "";
+
+/* Video sort order in search */
+"Rating" = "";
+"Recents" = "";
+"Red" = "";
+"Regular size" = "";
+"Related" = "";
+
+/* Video sort order in search */
+"Relevance" = "";
+"Remove from history" = "";
+"Remove from Playlist" = "";
+"Remove from the queue" = "";
+"Replies" = "";
+"Reset" = "";
+"Reset search filters" = "";
+"Reset watched status when playing again" = "";
+"Restart/Play next" = "";
+"Rotate to portrait when exiting fullscreen" = "";
+"Round corners" = "";
+"Save history of played videos" = "";
+"Save history of searches, channels and playlists" = "";
+"Search" = "";
+"Search..." = "";
+"Sections" = "";
+"Save" = "";
+"Seek gesture speed" = "";
+"Seek gesture sensitivity" = "";
+"Seek with horizontal swipe on video" = "";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "";
+"Select location closest to you:" = "";
+
+/* SponsorBlock category name */
+"Self-promotion" = "";
+"Settings" = "";
+"Share %@ link" = "";
+"Share %@ link with time" = "";
+"Share..." = "";
+
+/* Video duration filter in search */
+"Short" = "";
+"Show account username" = "";
+"Show channel name" = "";
+"Show history" = "";
+"Show keywords" = "";
+"Show playback statistics" = "";
+"Show progress of watching on thumbnails" = "";
+"Show sidebar when space permits" = "";
+"Show video length" = "";
+"Shuffle" = "";
+"Shuffle All" = "";
+"Sidebar" = "";
+"Sign In Required" = "";
+
+/* Player controls layout size */
+"Small" = "";
+
+/* Player controls layout size */
+"Smaller" = "";
+"Source" = "";
+"SponsorBlock" = "";
+"Subscribe" = "";
+
+/* Subscriptions title */
+"Subscriptions" = "";
+"Switch to other public location" = "";
+"This cannot be reverted" = "";
+
+/* SponsorBlock category name */
+"Sponsor" = "";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "";
+
+/* Video date filter in search */
+"Today" = "";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "";
+"Thumbnails" = "";
+"unknown" = "";
+"Upload date" = "";
+"URL" = "";
+"Used to create links from videos, channels and playlists" = "";
+"Username" = "";
+
+/* Player controls layout size */
+"Very Large" = "";
+"Videos" = "";
+
+/* Video sort order in search */
+"Views" = "";
+"Watched" = "";
+
+/* Selected video was played on given date */
+"Watched %@" = "";
+
+/* Selected video is being played */
+"Watching now" = "";
+
+/* Video date filter in search */
+"Week" = "";
+"Welcome" = "";
+"When partially watched video is played" = "";
+"Wi-Fi" = "";
+"Wiki" = "";
+"Yattee" = "";
+"Yattee %@ (build %@)" = "";
+
+/* Video date filter in search */
+"Year" = "";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "";
+
+
+"Public" = "";
+"Playback queue is empty" = "";
+"Playing Next" = "";
+"You can switch between profiles in playback settings controls." = "";
+"Add Channels, Playlists and Searches to Favorites using" = "";
+"Make default" = "";
+"Visibility" = "";
+"Current Playlist" = "";
+"Stream & Player" = "";
+"Statistics" = "";
+"Hardware decoder" = "";
+"Stream FPS" = "";
+"Cached time" = "";
+"Rate & Captions" = "";
+"Dropped frames" = "";
+"Any format" = "";
+"%@ formats" = "";
+"Keep last played video in the queue after restart" = "";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "";
+"It can be changed later in settings. You can use your own locations too." = "";
+"Press and hold remote button to open captions and quality menus" = "";
+"Comments are disabled" = "";
+"No comments" = "";
+"No chapters information available" = "";
+"Share Logs..." = "";
+"Open logs in Finder" = "";
+"Could not refresh Subscriptions" = "";
+"Could not load streams" = "";
+"Could not open video" = "";
+"Channel could not be found" = "";
+"Could not extract channel information" = "";
+"Could not extract SID from received cookies: %@" = "";
+"Could not update your token." = "";
+"Could not refresh Trending" = "";
+"This URL could not be opened" = "";
+"Could not open channel" = "";
+"Could not refresh Popular" = "";
+"Could not create share link" = "";
+"This video could not be opened" = "";
+"Could not extract playlist ID" = "";
+"No locations available at the moment" = "";
+"Could not refresh Playlists" = "";
+"If you want this app to be available in your language, join translation project." = "";
+"Translations" = "";
+"Recent Documents" = "";
+"Home" = "";
+"Show Home" = "";
+"Show Favorites" = "";
+"Inspector visibility" = "";
+"Edit Favorites…" = "";
+"Show Open Videos toolbar button" = "";
+"Files" = "";
+"Pages toolbar position" = "";
+"Video Details" = "";
+"Reload manifest" = "";
+"Clear Queue before opening" = "";
+"Open" = "";
+"Pages buttons" = "";
+"URL to Open" = "";
+"Enter link to open" = "";
+"Could not open Files" = "";
+"Paste" = "";
+"Open Videos" = "";
+"Enter links to open, one per line" = "";
+"Playback Mode" = "";
+"Add" = "";
+"Hide" = "";
+"Always" = "";
+"Only for local files and URLs" = "";
+"Right" = "";
+"Open Files" = "";
+"Share" = "";
+"Left" = "";
+"Format" = "";
+"Show only icons" = "";
+"Audio" = "";
+"Video" = "";
+"Codec" = "";
+"Size" = "";
+"FPS" = "";
+"Sample Rate" = "";
+"Could not find any links to open in your clipboard" = "";
+"Address" = "";
+"Remove…" = "";
+"Actions buttons" = "";
+"Show sidebar" = "";
+"Locations Manifest" = "";
+"Open Video" = "";
+"Share%@link" = "";
+"Are you sure you want to remove this document?" = "";
+"\"%@\" will be irreversibly removed from this device." = "";
+"Live Streams" = "";
+"Shorts" = "";
+"Verified" = "";
+"Channel" = "";
