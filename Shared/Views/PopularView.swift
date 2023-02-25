@@ -10,6 +10,7 @@ struct PopularView: View {
     @State private var error: RequestError?
 
     @Default(.popularListingStyle) private var popularListingStyle
+    @Default(.hideShorts) private var hideShorts
 
     var resource: Resource? {
         accounts.api.popular
@@ -69,6 +70,10 @@ struct PopularView: View {
             ToolbarItem {
                 ListingStyleButtons(listingStyle: $popularListingStyle)
             }
+
+            ToolbarItem {
+                HideShortsButtons(hide: $hideShorts)
+            }
         }
         #else
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -83,6 +88,10 @@ struct PopularView: View {
         private var popularMenu: some View {
             Menu {
                 ListingStyleButtons(listingStyle: $popularListingStyle)
+
+                Section {
+                    HideShortsButtons(hide: $hideShorts)
+                }
 
                 Section {
                     SettingsButtons()

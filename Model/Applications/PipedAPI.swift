@@ -481,6 +481,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             chapters = extractChapters(from: description)
         }
 
+        let length = details["duration"]?.double ?? 0
+
         return Video(
             instanceID: account.instanceID,
             app: .piped,
@@ -488,13 +490,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             videoID: extractID(from: content),
             title: details["title"]?.string ?? "",
             author: author,
-            length: details["duration"]?.double ?? 0,
+            length: length,
             published: published ?? "",
             views: details["views"]?.int ?? 0,
             description: description,
             channel: Channel(app: .piped, id: channelId, name: author, thumbnailURL: authorThumbnailURL, subscriptionsCount: subscriptionsCount),
             thumbnails: thumbnails,
             live: live,
+            short: details["isShort"]?.bool ?? (length <= Video.shortLength),
             likes: details["likes"]?.int,
             dislikes: details["dislikes"]?.int,
             streams: extractStreams(from: content),

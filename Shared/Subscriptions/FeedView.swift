@@ -10,6 +10,7 @@ struct FeedView: View {
 
     #if os(tvOS)
         @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
+        @Default(.hideShorts) private var hideShorts
     #endif
 
     var videos: [ContentItem] {
@@ -54,6 +55,7 @@ struct FeedView: View {
             #if os(tvOS)
                 SubscriptionsPageButton()
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+                HideShortsButtons(hide: $hideShorts)
             #endif
 
             if showCacheStatus {
@@ -82,6 +84,7 @@ struct FeedView: View {
         .padding(.leading, 30)
         #if os(tvOS)
             .padding(.bottom, 15)
+            .padding(.trailing, 30)
         #endif
     }
 
@@ -94,7 +97,7 @@ struct FeedView: View {
     }
 }
 
-struct SubscriptonsView_Previews: PreviewProvider {
+struct FeedView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             FeedView()

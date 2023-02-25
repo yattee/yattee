@@ -10,6 +10,7 @@ struct TrendingView: View {
     @Default(.trendingCountry) private var country
 
     @Default(.trendingListingStyle) private var trendingListingStyle
+    @Default(.hideShorts) private var hideShorts
 
     @State private var presentingCountrySelection = false
 
@@ -51,6 +52,7 @@ struct TrendingView: View {
                 #endif
             }
             .environment(\.listingStyle, trendingListingStyle)
+            .environment(\.hideShorts, hideShorts)
         }
 
         .toolbar {
@@ -133,6 +135,10 @@ struct TrendingView: View {
             ToolbarItem {
                 ListingStyleButtons(listingStyle: $trendingListingStyle)
             }
+
+            ToolbarItem {
+                HideShortsButtons(hide: $hideShorts)
+            }
         }
         #else
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -181,6 +187,10 @@ struct TrendingView: View {
                 }
 
                 ListingStyleButtons(listingStyle: $trendingListingStyle)
+
+                Section {
+                    HideShortsButtons(hide: $hideShorts)
+                }
 
                 Section {
                     SettingsButtons()

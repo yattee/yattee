@@ -238,6 +238,8 @@ extension Defaults.Keys {
     static let openWatchNextOnFinishedWatching = Key<Bool>("openWatchNextOnFinishedWatching", default: true)
     static let openWatchNextOnClose = Key<Bool>("openWatchNextOnClose", default: false)
     static let openWatchNextOnFinishedWatchingDelay = Key<String>("openWatchNextOnFinishedWatchingDelay", default: "5")
+
+    static let hideShorts = Key<Bool>("hideShorts", default: false)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

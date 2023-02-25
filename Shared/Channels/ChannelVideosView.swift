@@ -32,6 +32,7 @@ struct ChannelVideosView: View {
 
     @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
     @Default(.expandChannelDescription) private var expandChannelDescription
+    @Default(.hideShorts) private var hideShorts
 
     var presentedChannel: Channel? {
         store.item ?? channel ?? recents.presentedChannel
@@ -100,6 +101,7 @@ struct ChannelVideosView: View {
             }
             .environment(\.inChannelView, true)
             .environment(\.listingStyle, channelPlaylistListingStyle)
+            .environment(\.hideShorts, hideShorts)
             #if os(tvOS)
                 .prefersDefaultFocus(in: focusNamespace)
             #endif
@@ -130,6 +132,9 @@ struct ChannelVideosView: View {
                 }
                 ToolbarItem {
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+                }
+                ToolbarItem {
+                    HideShortsButtons(hide: $hideShorts)
                 }
                 ToolbarItem {
                     contentTypePicker
@@ -271,6 +276,10 @@ struct ChannelVideosView: View {
                     }
 
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+
+                    Section {
+                        HideShortsButtons(hide: $hideShorts)
+                    }
                 }
             } label: {
                 HStack(spacing: 12) {

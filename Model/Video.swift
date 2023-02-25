@@ -5,6 +5,8 @@ import SwiftUI
 import SwiftyJSON
 
 struct Video: Identifiable, Equatable, Hashable {
+    static let shortLength = 61.0
+
     enum VideoID {
         static func isValid(_ id: Video.ID) -> Bool {
             isYouTube(id) || isPeerTube(id)
@@ -40,6 +42,7 @@ struct Video: Identifiable, Equatable, Hashable {
 
     var live: Bool
     var upcoming: Bool
+    var short: Bool
 
     var streams = [Stream]()
 
@@ -74,6 +77,7 @@ struct Video: Identifiable, Equatable, Hashable {
         indexID: String? = nil,
         live: Bool = false,
         upcoming: Bool = false,
+        short: Bool = false,
         publishedAt: Date? = nil,
         likes: Int? = nil,
         dislikes: Int? = nil,
@@ -101,6 +105,7 @@ struct Video: Identifiable, Equatable, Hashable {
         self.indexID = indexID
         self.live = live
         self.upcoming = upcoming
+        self.short = short
         self.publishedAt = publishedAt
         self.likes = likes
         self.dislikes = dislikes
@@ -154,6 +159,7 @@ struct Video: Identifiable, Equatable, Hashable {
             "indexID": indexID ?? "",
             "live": live,
             "upcoming": upcoming,
+            "short": short,
             "publishedAt": publishedAt
         ]
     }
@@ -180,6 +186,7 @@ struct Video: Identifiable, Equatable, Hashable {
             indexID: json["indexID"].stringValue,
             live: json["live"].boolValue,
             upcoming: json["upcoming"].boolValue,
+            short: json["short"].boolValue,
             publishedAt: dateFormatter.date(from: json["publishedAt"].stringValue)
         )
     }

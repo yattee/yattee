@@ -11,10 +11,10 @@ extension Backport where Content: View {
     }
 
     @ViewBuilder func scrollDismissesKeyboardInteractively() -> some View {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, *) {
-                content.scrollDismissesKeyboard(.interactively)
-            } else {
-                content
-            }
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, *) {
+            content.scrollDismissesKeyboard(.interactively)
+        } else {
+            content
         }
+    }
 }

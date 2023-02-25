@@ -66,6 +66,10 @@ private struct ScrollViewBottomPaddingKey: EnvironmentKey {
     static let defaultValue: Double = 30
 }
 
+private struct HideShortsKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 extension EnvironmentValues {
     var inChannelView: Bool {
         get { self[InChannelViewKey.self] }
@@ -120,5 +124,10 @@ extension EnvironmentValues {
     var noListingDividers: Bool {
         get { self[NoListingDividersKey.self] }
         set { self[NoListingDividersKey.self] = newValue }
+    }
+
+    var hideShorts: Bool {
+        get { self[HideShortsKey.self] }
+        set { self[HideShortsKey.self] = newValue }
     }
 }

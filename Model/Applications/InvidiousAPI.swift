@@ -461,6 +461,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         let description = json["description"].stringValue
+        let length = json["lengthSeconds"].doubleValue
 
         return Video(
             instanceID: account.instanceID,
@@ -470,7 +471,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             videoID: videoID,
             title: json["title"].stringValue,
             author: json["author"].stringValue,
-            length: json["lengthSeconds"].doubleValue,
+            length: length,
             published: published,
             views: json["viewCount"].intValue,
             description: description,
@@ -480,6 +481,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             indexID: indexID,
             live: json["liveNow"].boolValue,
             upcoming: json["isUpcoming"].boolValue,
+            short: length <= Video.shortLength,
             publishedAt: publishedAt,
             likes: json["likeCount"].int,
             dislikes: json["dislikeCount"].int,

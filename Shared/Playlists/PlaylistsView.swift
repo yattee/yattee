@@ -24,6 +24,7 @@ struct PlaylistsView: View {
 
     @Default(.playlistListingStyle) private var playlistListingStyle
     @Default(.showCacheStatus) private var showCacheStatus
+    @Default(.hideShorts) private var hideShorts
 
     var items: [ContentItem] {
         var videos = currentPlaylist?.videos ?? []
@@ -95,6 +96,7 @@ struct PlaylistsView: View {
                         }
                         .environment(\.currentPlaylistID, currentPlaylist?.id)
                         .environment(\.listingStyle, playlistListingStyle)
+                        .environment(\.hideShorts, hideShorts)
                     }
                 }
             }
@@ -167,6 +169,9 @@ struct PlaylistsView: View {
             ToolbarItem {
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
             }
+            ToolbarItem {
+                HideShortsButtons(hide: $hideShorts)
+            }
         }
         #else
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -233,6 +238,10 @@ struct PlaylistsView: View {
                 }
 
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
+
+                Section {
+                    HideShortsButtons(hide: $hideShorts)
+                }
 
                 Section {
                     SettingsButtons()

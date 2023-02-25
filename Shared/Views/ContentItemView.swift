@@ -5,21 +5,32 @@ struct ContentItemView: View {
     let item: ContentItem
     @Environment(\.listingStyle) private var listingStyle
     @Environment(\.noListingDividers) private var noListingDividers
+    @Environment(\.hideShorts) private var hideShorts
 
-    var body: some View {
-        Group {
-            switch item.contentType {
-            case .video:
-                videoItem(item.video)
-            case .channel:
-                channelItem(item.channel)
-            case .playlist:
-                playlistItem(item.playlist)
-            default:
-                placeholderItem()
+    @ViewBuilder var body: some View {
+        if itemVisible {
+            Group {
+                switch item.contentType {
+                case .video:
+                    videoItem(item.video)
+                case .channel:
+                    channelItem(item.channel)
+                case .playlist:
+                    playlistItem(item.playlist)
+                default:
+                    placeholderItem()
+                }
             }
+            .id(item.cacheKey)
         }
-        .id(item.cacheKey)
+    }
+
+    var itemVisible: Bool {
+        guard hideShorts, item.contentType == .video, let video = item.video else {
+            return true
+        }
+
+        return !video.short
     }
 
     @ViewBuilder func videoItem(_ video: Video) -> some View {

@@ -30,6 +30,7 @@ struct SearchView: View {
     @Default(.saveRecents) private var saveRecents
     @Default(.showHome) private var showHome
     @Default(.searchListingStyle) private var searchListingStyle
+    @Default(.hideShorts) private var hideShorts
 
     private var videos = [Video]()
 
@@ -70,10 +71,12 @@ struct SearchView: View {
             #endif
         }
         .environment(\.listingStyle, searchListingStyle)
+        .environment(\.hideShorts, hideShorts)
         .toolbar {
             #if os(macOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
                     ListingStyleButtons(listingStyle: $searchListingStyle)
+                    HideShortsButtons(hide: $hideShorts)
                     FavoriteButton(item: favoriteItem)
                         .id(favoriteItem?.id)
 
@@ -209,6 +212,10 @@ struct SearchView: View {
                 }
 
                 ListingStyleButtons(listingStyle: $searchListingStyle)
+
+                Section {
+                    HideShortsButtons(hide: $hideShorts)
+                }
 
                 Section {
                     SettingsButtons()

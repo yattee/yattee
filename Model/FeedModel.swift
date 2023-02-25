@@ -1,5 +1,6 @@
 import Cache
 import CoreData
+import Defaults
 import Foundation
 import Siesta
 import SwiftyJSON
@@ -237,6 +238,10 @@ final class FeedModel: ObservableObject, CacheModel {
         let watches = watchFetchRequestResult(videos, context: backgroundContext)
         let watchesIDs = watches.map(\.videoID)
         let unwatched = videos.filter { video in
+            if Defaults[.hideShorts], video.short {
+                return false
+            }
+
             if !watchesIDs.contains(video.videoID) {
                 return true
             }

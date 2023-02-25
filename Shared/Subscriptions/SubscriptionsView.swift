@@ -10,6 +10,7 @@ struct SubscriptionsView: View {
 
     @Default(.subscriptionsViewPage) private var subscriptionsViewPage
     @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
+    @Default(.hideShorts) private var hideShorts
 
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
@@ -27,6 +28,7 @@ struct SubscriptionsView: View {
             }
         }
         .environment(\.listingStyle, subscriptionsListingStyle)
+        .environment(\.hideShorts, hideShorts)
 
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -44,6 +46,10 @@ struct SubscriptionsView: View {
         .toolbar {
             ToolbarItem {
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+            }
+
+            ToolbarItem {
+                HideShortsButtons(hide: $hideShorts)
             }
 
             ToolbarItem {
@@ -71,6 +77,10 @@ struct SubscriptionsView: View {
 
                 if subscriptionsViewPage == .feed {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+                }
+
+                Section {
+                    HideShortsButtons(hide: $hideShorts)
                 }
 
                 playUnwatchedButton
