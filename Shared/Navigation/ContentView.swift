@@ -25,10 +25,14 @@ struct ContentView: View {
     var body: some View {
         Group {
             #if os(iOS)
-                if horizontalSizeClass == .compact {
+                if Constants.isIPhone {
                     AppTabNavigation()
                 } else {
-                    AppSidebarNavigation()
+                    if horizontalSizeClass == .compact {
+                        AppTabNavigation()
+                    } else {
+                        AppSidebarNavigation()
+                    }
                 }
             #elseif os(macOS)
                 AppSidebarNavigation()
