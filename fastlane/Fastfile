@@ -13,6 +13,7 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
+APP_NAME = ENV['APP_NAME']
 DEVELOPER_KEY_ID = ENV['DEVELOPER_KEY_ID']
 DEVELOPER_KEY_ISSUER_ID = ENV['DEVELOPER_KEY_ISSUER_ID']
 DEVELOPER_KEY_CONTENT = ENV['DEVELOPER_KEY_CONTENT']
@@ -22,6 +23,11 @@ TEMP_KEYCHAIN_PASSWORD = ENV['TEMP_KEYCHAIN_PASSWORD']
 DEVELOPER_APP_IDENTIFIER = ENV['DEVELOPER_APP_IDENTIFIER']
 GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
 TESTFLIGHT_EXTERNAL_GROUPS = ENV['TESTFLIGHT_EXTERNAL_GROUPS']
+
+AS_CONNECT_BUILD_VERSION_FILENAME = 'AS_CONNECT_BUILD_VERSION'
+AS_CONNECT_BUILD_VERSION_PATH = "../#{AS_CONNECT_BUILD_VERSION_FILENAME}"
+
+XCODEPROJ = "#{APP_NAME}.xcodeproj"
 
 def delete_temp_keychain(name)
   delete_keychain(
@@ -51,17 +57,38 @@ end
 
 desc "Bump build number and commit"
 lane :bump_build do
-  increment_build_number
-  commit_version_bump(
-    message: "Bump build number to #{get_build_number}"
-  )
+  as_connect_build_version = File.read(AS_CONNECT_BUILD_VERSION_PATH).to_i
+  build = get_build_number(xcodeproj: XCODEPROJ).to_i
+
+  puts "AS Connect build version: #{as_connect_build_version}"
+  puts "Current build number: #{build}"
+
+  if build <= as_connect_build_version
+    new_build_number = as_connect_build_version + 1
+
+    increment_build_number
+    actual_build_number = get_build_number(xcodeproj: XCODEPROJ).to_i
+
+    puts "Bumped build number to #{actual_build_number}"
+
+    File.open(AS_CONNECT_BUILD_VERSION_PATH, 'w+') { |file| file.write("#{new_build_number}\n") }
+
+    commit_version_bump(
+      message: "Bump build number to #{get_build_number(xcodeproj: XCODEPROJ)}",
+      include: [AS_CONNECT_BUILD_VERSION_FILENAME],
+      xcodeproj: XCODEPROJ
+    )
+  else
+    puts "Current build number is higher than App Store Connect build version"
+  end
 end
 
 desc "Bump version number and commit"
 lane :bump_version do
   increment_version_number
   commit_version_bump(
-    message: "Bump version number to #{get_version_number}"
+    message: "Bump version number to #{get_version_number}",
+    xcodeproj: XCODEPROJ
   )
 end
 
@@ -76,16 +103,16 @@ platform :ios do
       key_content: DEVELOPER_KEY_CONTENT
     )
 
-    build = get_build_number(xcodeproj: "Yattee.xcodeproj")
+    build = get_build_number(xcodeproj: XCODEPROJ)
     version = get_version_number(
-      xcodeproj: "Yattee.xcodeproj",
-      target: "Yattee (iOS)"
+      xcodeproj: XCODEPROJ,
+      target: "#{APP_NAME} (iOS)"
     )
 
     match(
       type: 'appstore',
       platform: 'ios',
-      app_identifier: ["#{DEVELOPER_APP_IDENTIFIER}", "#{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee"],
+      app_identifier: ["#{DEVELOPER_APP_IDENTIFIER}", "#{DEVELOPER_APP_IDENTIFIER}.Open-in-#{APP_NAME}"],
       git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
       readonly: true,
       keychain_name: TEMP_KEYCHAIN_USER,
@@ -94,13 +121,13 @@ platform :ios do
     )
 
     build_app(
-      scheme: "Yattee (iOS)",
+      scheme: "#{APP_NAME} (iOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/iOS",
-      output_name: "Yattee-#{version}-iOS.ipa",
+      output_name: "#{APP_NAME}-#{version}-iOS.ipa",
       export_options: {
         provisioningProfiles: {
           "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}",
-          "#{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}.Open-in-Yattee"
+          "#{DEVELOPER_APP_IDENTIFIER}.Open-in-#{APP_NAME}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}.Open-in-#{APP_NAME}"
         }
       }
     )
@@ -128,10 +155,10 @@ platform :tvos do
       key_content: DEVELOPER_KEY_CONTENT
     )
 
-    build = get_build_number(xcodeproj: "Yattee.xcodeproj")
+    build = get_build_number(xcodeproj: XCODEPROJ)
     version = get_version_number(
-      xcodeproj: "Yattee.xcodeproj",
-      target: "Yattee (tvOS)"
+      xcodeproj: XCODEPROJ,
+      target: "#{APP_NAME} (tvOS)"
     )
 
     match(
@@ -146,9 +173,9 @@ platform :tvos do
     )
 
     build_app(
-      scheme: "Yattee (tvOS)",
+      scheme: "#{APP_NAME} (tvOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/tvOS",
-      output_name: "Yattee-#{version}-tvOS.ipa",
+      output_name: "#{APP_NAME}-#{version}-tvOS.ipa",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
@@ -180,10 +207,10 @@ platform :mac do
       key_content: DEVELOPER_KEY_CONTENT
     )
 
-    build = get_build_number(xcodeproj: "Yattee.xcodeproj")
+    build = get_build_number(xcodeproj: XCODEPROJ)
     version = get_version_number(
-      xcodeproj: "Yattee.xcodeproj",
-      target: "Yattee (macOS)"
+      xcodeproj: XCODEPROJ,
+      target: "#{APP_NAME} (macOS)"
     )
 
     match(
@@ -199,9 +226,9 @@ platform :mac do
     )
 
     build_app(
-      scheme: "Yattee (macOS)",
+      scheme: "#{APP_NAME} (macOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
-      output_name: "Yattee-#{version}-macOS.app",
+      output_name: "#{APP_NAME}-#{version}-macOS.app",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
@@ -231,10 +258,10 @@ platform :mac do
       key_content: DEVELOPER_KEY_CONTENT
     )
 
-    build = get_build_number(xcodeproj: "Yattee.xcodeproj")
+    build = get_build_number(xcodeproj: XCODEPROJ)
     version = get_version_number(
-      xcodeproj: "Yattee.xcodeproj",
-      target: "Yattee (macOS)"
+      xcodeproj: XCODEPROJ,
+      target: "#{APP_NAME} (macOS)"
     )
 
     match(
@@ -249,9 +276,9 @@ platform :mac do
     )
 
     build_mac_app(
-      scheme: "Yattee (macOS)",
+      scheme: "#{APP_NAME} (macOS)",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
-      output_name: "Yattee",
+      output_name: "#{APP_NAME}",
       export_method: "developer-id",
       export_options: {
         provisioningProfiles: {
@@ -261,7 +288,7 @@ platform :mac do
     )
 
     notarize(
-      package: "fastlane/builds/#{version}-#{build}/macOS/Yattee.app",
+      package: "fastlane/builds/#{version}-#{build}/macOS/#{APP_NAME}.app",
       bundle_id: "#{DEVELOPER_APP_IDENTIFIER}",
       api_key: api_key,
     )

@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 env:
+  APP_NAME: Yattee
   FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
   FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
   ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
@@ -22,7 +23,29 @@ env:
   TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
 
 jobs:
+  bump_build:
+    name: Bump build number
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: bump_build
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GIT_AUTHORIZATION }}
+          branch: ${{ github.ref }}
   testflight:
+    needs: bump_build
     strategy:
       matrix:
         lane: ['mac beta', 'ios beta', 'tvos beta']
@@ -47,6 +70,7 @@ jobs:
           path: fastlane/builds/**/*.ipa
           if-no-files-found: ignore
   mac_notarized:
+    needs: bump_build
     name: Build and notarize macOS app
     runs-on: macos-latest
     steps:
@@ -76,7 +100,7 @@ jobs:
           path: ${{ env.ZIP_PATH }}
           if-no-files-found: error
   release:
-    needs: ['testflight', 'mac_notarized']
+    needs: ['bump_build', 'testflight', 'mac_notarized']
     name: Create GitHub release
     runs-on: ubuntu-latest
     steps:
