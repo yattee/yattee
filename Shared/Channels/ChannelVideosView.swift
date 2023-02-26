@@ -63,6 +63,8 @@ struct ChannelVideosView: View {
                         viewsLabel
 
                         subscriptionToggleButton
+                        favoriteButton
+                            .labelStyle(.iconOnly)
                     }
                     contentTypePicker
                         .pickerStyle(.automatic)
@@ -159,9 +161,7 @@ struct ChannelVideosView: View {
                 }
 
                 ToolbarItem {
-                    if let presentedChannel {
-                        FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, presentedChannel.id, presentedChannel.name)))
-                    }
+                    favoriteButton
                 }
 
                 ToolbarItem {
@@ -208,6 +208,12 @@ struct ChannelVideosView: View {
             } else {
                 content
             }
+        }
+    }
+
+    @ViewBuilder var favoriteButton: some View {
+        if let presentedChannel {
+            FavoriteButton(item: FavoriteItem(section: .channel(accounts.app.appType.rawValue, presentedChannel.id, presentedChannel.name)))
         }
     }
 
