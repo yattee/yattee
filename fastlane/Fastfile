@@ -24,9 +24,6 @@ DEVELOPER_APP_IDENTIFIER = ENV['DEVELOPER_APP_IDENTIFIER']
 GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
 TESTFLIGHT_EXTERNAL_GROUPS = ENV['TESTFLIGHT_EXTERNAL_GROUPS']
 
-AS_CONNECT_BUILD_VERSION_FILENAME = 'AS_CONNECT_BUILD_VERSION'
-AS_CONNECT_BUILD_VERSION_PATH = "../#{AS_CONNECT_BUILD_VERSION_FILENAME}"
-
 XCODEPROJ = "#{APP_NAME}.xcodeproj"
 
 def delete_temp_keychain(name)
@@ -57,30 +54,12 @@ end
 
 desc "Bump build number and commit"
 lane :bump_build do
-  as_connect_build_version = File.read(AS_CONNECT_BUILD_VERSION_PATH).to_i
-  build = get_build_number(xcodeproj: XCODEPROJ).to_i
+  increment_build_number(xcodeproj: XCODEPROJ)
 
-  puts "AS Connect build version: #{as_connect_build_version}"
-  puts "Current build number: #{build}"
-
-  if build <= as_connect_build_version
-    new_build_number = as_connect_build_version + 1
-
-    increment_build_number
-    actual_build_number = get_build_number(xcodeproj: XCODEPROJ).to_i
-
-    puts "Bumped build number to #{actual_build_number}"
-
-    File.open(AS_CONNECT_BUILD_VERSION_PATH, 'w+') { |file| file.write("#{new_build_number}\n") }
-
-    commit_version_bump(
-      message: "Bump build number to #{get_build_number(xcodeproj: XCODEPROJ)}",
-      include: [AS_CONNECT_BUILD_VERSION_FILENAME],
-      xcodeproj: XCODEPROJ
-    )
-  else
-    puts "Current build number is higher than App Store Connect build version"
-  end
+  commit_version_bump(
+    message: "Bump build number to #{get_build_number(xcodeproj: XCODEPROJ)}",
+    xcodeproj: XCODEPROJ
+  )
 end
 
 desc "Bump version number and commit"
