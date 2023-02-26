@@ -20,29 +20,7 @@ env:
   TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
 
 jobs:
-  bump_build:
-    name: Bump build number
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure git
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
-          bundler-cache: true
-      - uses: maierj/fastlane-action@v3.0.0
-        with:
-          lane: bump_build
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GIT_AUTHORIZATION }}
-          branch: ${{ github.ref }}
   testflight:
-    needs: bump_build
     strategy:
       matrix:
         lane: ['mac beta', 'ios beta', 'tvos beta']
@@ -50,8 +28,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: main
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0'
@@ -69,13 +45,10 @@ jobs:
           path: fastlane/builds/**/*.ipa
           if-no-files-found: ignore
   mac_notarized:
-    needs: bump_build
     name: Build and notarize macOS app
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: main
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0'
@@ -101,21 +74,16 @@ jobs:
           path: ${{ env.ZIP_PATH }}
           if-no-files-found: error
   release:
-    needs: ['bump_build', 'testflight', 'mac_notarized']
+    needs: ['testflight', 'mac_notarized']
     name: Create GitHub release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: main
       - run: echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
       - run: echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
       - uses: actions/download-artifact@v3
         with:
           path: artifacts
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: artifacts
       - uses: ncipollo/release-action@v1
         with:
           artifacts: artifacts/**/*.ipa,artifacts/**/*.zip
