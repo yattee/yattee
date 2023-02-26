@@ -1,0 +1,31 @@
+name: Bump build number
+on:
+  workflow_dispatch:
+
+jobs:
+  bump_build:
+    name: Bump build number
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: bump_build
+      - run: echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GIT_AUTHORIZATION }}
+          branch: actions/bump-build-to-${{ env.BUILD_NUMBER }}
+          base: main
+          title: Bump build number to ${{ env.BUILD_NUMBER }}
+
+
