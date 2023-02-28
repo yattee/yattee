@@ -322,12 +322,16 @@ struct ChannelVideosView: View {
         Picker("Content type", selection: $contentType) {
             if let channel = presentedChannel {
                 ForEach(Channel.ContentType.allCases, id: \.self) { type in
-                    if type == .videos || type == .playlists || channel.hasData(for: type) {
+                    if typeAvailable(type) {
                         Label(type.description, systemImage: type.systemImage).tag(type)
                     }
                 }
             }
         }
+    }
+
+    private func typeAvailable(_ type: Channel.ContentType) -> Bool {
+        type.alwaysAvailable || (presentedChannel?.hasData(for: type) ?? false)
     }
 
     private var resource: Resource? {

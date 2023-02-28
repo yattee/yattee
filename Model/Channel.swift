@@ -62,6 +62,10 @@ struct Channel: Identifiable, Hashable {
                 return "person.3"
             }
         }
+
+        var alwaysAvailable: Bool {
+            self == .videos || self == .playlists
+        }
     }
 
     struct Tab: Identifiable, Hashable {
