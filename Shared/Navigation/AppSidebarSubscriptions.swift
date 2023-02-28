@@ -8,6 +8,8 @@ struct AppSidebarSubscriptions: View {
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
 
+    @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
+
     var body: some View {
         Section(header: Text("Subscriptions")) {
             ForEach(subscriptions.all) { channel in
@@ -26,7 +28,7 @@ struct AppSidebarSubscriptions: View {
                         Spacer()
                     }
                     .backport
-                    .badge(feedCount.unwatchedByChannelText(channel))
+                    .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
                 }
                 .contextMenu {
                     if subscriptions.isSubscribing(channel.id) {

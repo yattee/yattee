@@ -13,6 +13,7 @@ struct AppTabNavigation: View {
     @Default(.showDocuments) private var showDocuments
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.visibleSections) private var visibleSections
+    @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
 
     let persistenceController = PersistenceController.shared
 
@@ -95,7 +96,7 @@ struct AppTabNavigation: View {
         }
         .tag(TabSelection.subscriptions)
         .backport
-        .badge(feedCount.unwatchedText)
+        .badge(showUnwatchedFeedBadges ? feedCount.unwatchedText : nil)
     }
 
     private var subscriptionsVisible: Bool {

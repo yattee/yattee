@@ -12,6 +12,7 @@ struct Sidebar: View {
     #if os(iOS)
         @Default(.showDocuments) private var showDocuments
     #endif
+    @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
 
     var body: some View {
         ScrollViewReader { scrollView in
@@ -79,7 +80,7 @@ struct Sidebar: View {
                             .accessibility(label: Text("Subscriptions"))
                     }
                     .backport
-                    .badge(feedCount.unwatchedText)
+                    .badge(showUnwatchedFeedBadges ? feedCount.unwatchedText : nil)
                     .contextMenu {
                         playUnwatchedButton
                         toggleWatchedButton

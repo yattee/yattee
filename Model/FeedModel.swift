@@ -115,7 +115,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     func calculateUnwatchedFeed() {
-        guard let account = accounts.current, accounts.signedIn else { return }
+        guard let account = accounts.current, accounts.signedIn, Defaults[.showUnwatchedFeedBadges] else { return }
         let feed = cacheModel.retrieveFeed(account: account)
         backgroundContext.perform { [weak self] in
             guard let self else { return }

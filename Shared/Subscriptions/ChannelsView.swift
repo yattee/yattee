@@ -9,6 +9,7 @@ struct ChannelsView: View {
     @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
 
     @Default(.showCacheStatus) private var showCacheStatus
+    @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
 
     var body: some View {
         List {
@@ -26,7 +27,7 @@ struct ChannelsView: View {
                             }
                         }
                         .backport
-                        .badge(feedCount.unwatchedByChannelText(channel))
+                        .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
                     }
                     .contextMenu {
                         if subscriptions.isSubscribing(channel.id) {

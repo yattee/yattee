@@ -7,6 +7,7 @@ struct BrowsingSettings: View {
         @Default(.roundedThumbnails) private var roundedThumbnails
     #endif
     @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
+    @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
     #if os(iOS)
         @Default(.homeRecentDocumentsItems) private var homeRecentDocumentsItems
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
@@ -223,6 +224,12 @@ struct BrowsingSettings: View {
                 #endif
 
                 Toggle("Show anonymous accounts", isOn: $accountPickerDisplaysAnonymousAccounts)
+                Toggle("Show unwatched feed badges", isOn: $showUnwatchedFeedBadges)
+                    .onChange(of: showUnwatchedFeedBadges) { newValue in
+                        if newValue {
+                            FeedModel.shared.calculateUnwatchedFeed()
+                        }
+                    }
             }
 
             Toggle("Open channels with description expanded", isOn: $expandChannelDescription)
