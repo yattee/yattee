@@ -21,27 +21,27 @@ struct ShareButton<LabelView: View>: View {
 
     @ViewBuilder var body: some View {
         // TODO: this should work with other content item types
-        Menu {
-            if let video = contentItem.video,
-               !video.localStreamIsFile
-            {
-                if video.localStreamIsRemoteURL {
-                    remoteURLAction
-                } else {
-                    instanceActions
-                    Divider()
-                    if !accounts.isEmpty {
-                        youtubeActions
+        if let video = contentItem.video {
+            Menu {
+                if !video.localStreamIsFile {
+                    if video.localStreamIsRemoteURL {
+                        remoteURLAction
+                    } else {
+                        instanceActions
+                        Divider()
+                        if !accounts.isEmpty {
+                            youtubeActions
+                        }
                     }
                 }
+            } label: {
+                label
             }
-        } label: {
-            label
+            .menuStyle(.borderlessButton)
+            #if os(macOS)
+                .frame(maxWidth: 60)
+            #endif
         }
-        .menuStyle(.borderlessButton)
-        #if os(macOS)
-            .frame(maxWidth: 60)
-        #endif
     }
 
     private var instanceActions: some View {
