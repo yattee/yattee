@@ -110,12 +110,12 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
         if let json = try? storage?.object(forKey: channelsCacheKey(account)),
            let channels = json.dictionaryValue["channels"]
         {
-            return channels.arrayValue.map { json in
+            return channels.arrayValue.compactMap { json in
                 let channel = Channel.from(json)
                 if !channel.hasExtendedDetails,
                    let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey)
                 {
-                    return cache
+                    return cache.channel
                 }
 
                 return channel

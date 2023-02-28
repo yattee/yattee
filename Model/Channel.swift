@@ -11,6 +11,15 @@ struct Channel: Identifiable, Hashable {
         case shorts
         case channels
 
+        static func from(_ name: String) -> Self? {
+            let rawValueMatch = allCases.first { $0.rawValue == name }
+            guard rawValueMatch.isNil else { return rawValueMatch! }
+
+            if name == "streams" { return .livestreams }
+
+            return nil
+        }
+
         var id: String {
             rawValue
         }
@@ -110,7 +119,6 @@ struct Channel: Identifiable, Hashable {
     }
 
     func hasData(for contentType: ContentType) -> Bool {
-        guard contentType != .videos, contentType != .playlists else { return true }
         return tabs.contains { $0.contentType == contentType }
     }
 
@@ -132,7 +140,7 @@ struct Channel: Identifiable, Hashable {
     }
 
     var thumbnailURLOrCached: URL? {
-        thumbnailURL ?? ChannelsCacheModel.shared.retrieve(cacheKey)?.thumbnailURL
+        thumbnailURL ?? ChannelsCacheModel.shared.retrieve(cacheKey)?.channel?.thumbnailURL
     }
 
     var json: JSON {

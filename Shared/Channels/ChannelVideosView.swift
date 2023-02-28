@@ -11,11 +11,12 @@ struct ChannelVideosView: View {
     @State private var shareURL: URL?
     @State private var subscriptionToggleButtonDisabled = false
 
+    @State private var page: ChannelPage?
     @State private var contentType = Channel.ContentType.videos
     @StateObject private var contentTypeItems = Store<[ContentItem]>()
 
     @State private var descriptionExpanded = false
-    @StateObject private var store = Store<Channel>()
+    @StateObject private var store = Store<ChannelPage>()
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -35,14 +36,10 @@ struct ChannelVideosView: View {
     @Default(.hideShorts) private var hideShorts
 
     var presentedChannel: Channel? {
-        store.item ?? channel ?? recents.presentedChannel
+        store.item?.channel ?? channel ?? recents.presentedChannel
     }
 
     var contentItems: [ContentItem] {
-        guard contentType != .videos else {
-            return ContentItem.array(of: presentedChannel?.videos ?? [])
-        }
-
         return contentTypeItems.collection
     }
 
@@ -101,6 +98,7 @@ struct ChannelVideosView: View {
                     banner
                 }
             }
+            .environment(\.loadMoreContentHandler) { loadNextPage() }
             .environment(\.inChannelView, true)
             .environment(\.listingStyle, channelPlaylistListingStyle)
             .environment(\.hideShorts, hideShorts)
@@ -180,14 +178,10 @@ struct ChannelVideosView: View {
                 store.replace(cache)
             }
 
-            resource?.loadIfNeeded()?.onSuccess { response in
-                if let channel: Channel = response.typedContent() {
-                    ChannelsCacheModel.shared.store(channel)
-                }
-            }
+            load()
         }
         .onChange(of: contentType) { _ in
-            resource?.load()
+            load()
         }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -218,7 +212,7 @@ struct ChannelVideosView: View {
     }
 
     var thumbnail: some View {
-        ChannelAvatarView(channel: store.item)
+        ChannelAvatarView(channel: store.item?.channel)
         #if os(tvOS)
             .frame(width: 80, height: 80, alignment: .trailing)
         #else
@@ -238,7 +232,7 @@ struct ChannelVideosView: View {
 
     var subscriptionsLabel: some View {
         Group {
-            if let subscribers = store.item?.subscriptionsString {
+            if let subscribers = store.item?.channel?.subscriptionsString {
                 HStack(spacing: 0) {
                     Text(subscribers)
                     Image(systemName: "person.2.fill")
@@ -257,7 +251,7 @@ struct ChannelVideosView: View {
 
     var viewsLabel: some View {
         HStack(spacing: 0) {
-            if let views = store.item?.totalViewsString {
+            if let views = store.item?.channel?.totalViewsString {
                 Text(views)
 
                 Image(systemName: "eye.fill")
@@ -328,7 +322,7 @@ struct ChannelVideosView: View {
         Picker("Content type", selection: $contentType) {
             if let channel = presentedChannel {
                 ForEach(Channel.ContentType.allCases, id: \.self) { type in
-                    if channel.hasData(for: type) {
+                    if type == .videos || type == .playlists || channel.hasData(for: type) {
                         Label(type.description, systemImage: type.systemImage).tag(type)
                     }
                 }
@@ -341,11 +335,11 @@ struct ChannelVideosView: View {
 
         let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
         let resource = accounts.api.channel(channel.id, contentType: contentType, data: data)
+
         if contentType == .videos {
             resource.addObserver(store)
-        } else {
-            resource.addObserver(contentTypeItems)
         }
+        resource.addObserver(contentTypeItems)
 
         return resource
     }
@@ -422,6 +416,42 @@ struct ChannelVideosView: View {
             feed.markChannelAsUnwatched(channel.id)
         } label: {
             Label("Mark channel feed as unwatched", systemImage: "checkmark.circle")
+        }
+    }
+
+    func load() {
+        resource?.load().onSuccess { response in
+            if let page: ChannelPage = response.typedContent() {
+                if let channel = page.channel {
+                    ChannelsCacheModel.shared.store(channel)
+                }
+                self.page = page
+                self.contentTypeItems.replace(page.results)
+            }
+        }
+        .onFailure { error in
+            navigation.presentAlert(title: "Could not load channel data", message: error.userMessage)
+        }
+    }
+
+    func loadNextPage() {
+        guard let channel = presentedChannel, let pageToLoad = page, !pageToLoad.last else {
+            return
+        }
+
+        var next = pageToLoad.nextPage
+        if contentType == .videos, !pageToLoad.last {
+            next = next ?? ""
+        }
+
+        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        accounts.api.channel(channel.id, contentType: contentType, data: data, page: next).load().onSuccess { response in
+            if let page: ChannelPage = response.typedContent() {
+                self.page = page
+                let keys = self.contentTypeItems.collection.map(\.cacheKey)
+                let items = self.contentTypeItems.collection + page.results.filter { !keys.contains($0.cacheKey) }
+                self.contentTypeItems.replace(items)
+            }
         }
     }
 }

@@ -74,9 +74,10 @@ struct FavoriteItemView: View {
         case let .channel(_, id, name):
             var channel = Channel(app: .invidious, id: id, name: name)
             if let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey),
-               !cache.videos.isEmpty
+               let cacheChannel = cache.channel,
+               !cacheChannel.videos.isEmpty
             {
-                contentItems = ContentItem.array(of: cache.videos)
+                contentItems = ContentItem.array(of: cacheChannel.videos)
             }
 
             onSuccess = { response in

@@ -8,7 +8,7 @@ protocol VideosAPI {
 
     static func withAnonymousAccountForInstanceURL(_ url: URL) -> Self
 
-    func channel(_ id: String, contentType: Channel.ContentType, data: String?) -> Resource
+    func channel(_ id: String, contentType: Channel.ContentType, data: String?, page: String?) -> Resource
     func channelByName(_ name: String) -> Resource?
     func channelByUsername(_ username: String) -> Resource?
     func channelVideos(_ id: String) -> Resource
@@ -72,8 +72,8 @@ protocol VideosAPI {
 }
 
 extension VideosAPI {
-    func channel(_ id: String, contentType: Channel.ContentType, data: String? = nil) -> Resource {
-        channel(id, contentType: contentType, data: data)
+    func channel(_ id: String, contentType: Channel.ContentType, data: String? = nil, page: String? = nil) -> Resource {
+        channel(id, contentType: contentType, data: data, page: page)
     }
 
     func loadDetails(

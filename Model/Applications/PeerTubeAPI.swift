@@ -284,7 +284,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
             .onCompletion { _ in onCompletion() }
     }
 
-    func channel(_ id: String, contentType: Channel.ContentType, data _: String?) -> Resource {
+    func channel(_ id: String, contentType: Channel.ContentType, data _: String?, page _: String?) -> Resource {
         if contentType == .playlists {
             return resource(baseURL: account.url, path: basePathAppending("channels/\(id)/playlists"))
         }

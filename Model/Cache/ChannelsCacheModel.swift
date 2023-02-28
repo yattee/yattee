@@ -34,11 +34,11 @@ struct ChannelsCacheModel: CacheModel {
         store(channel)
     }
 
-    func retrieve(_ cacheKey: String) -> Channel? {
+    func retrieve(_ cacheKey: String) -> ChannelPage? {
         logger.debug("retrieving cache for \(cacheKey)")
 
         if let json = try? storage?.object(forKey: cacheKey) {
-            return Channel.from(json)
+            return ChannelPage(channel: Channel.from(json))
         }
 
         return nil

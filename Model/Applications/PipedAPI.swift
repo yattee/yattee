@@ -6,6 +6,7 @@ import SwiftyJSON
 final class PipedAPI: Service, ObservableObject, VideosAPI {
     static var disallowedVideoCodecs = ["av01"]
     static var authorizedEndpoints = ["subscriptions", "subscribe", "unsubscribe", "user/playlists"]
+    static var contentItemsKeys = ["items", "content", "relatedStreams"]
 
     @Published var account: Account!
 
@@ -40,8 +41,25 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             $0.headers["Authorization"] = self.account.token
         }
 
-        configureTransformer(pathPattern("channel/*")) { (content: Entity<JSON>) -> Channel? in
-            self.extractChannel(from: content.json)
+        configureTransformer(pathPattern("channel/*")) { (content: Entity<JSON>) -> ChannelPage in
+            let nextPage = content.json.dictionaryValue["nextpage"]?.string
+            let channel = self.extractChannel(from: content.json)
+            return ChannelPage(
+                results: self.extractContentItems(from: self.contentItemsDictionary(from: content.json)),
+                channel: channel,
+                nextPage: nextPage,
+                last: nextPage.isNil
+            )
+        }
+
+        configureTransformer(pathPattern("/nextpage/channel/*")) { (content: Entity<JSON>) -> ChannelPage in
+            let nextPage = content.json.dictionaryValue["nextpage"]?.string
+            return ChannelPage(
+                results: self.extractContentItems(from: self.contentItemsDictionary(from: content.json)),
+                channel: self.extractChannel(from: content.json),
+                nextPage: nextPage,
+                last: nextPage.isNil
+            )
         }
 
         configureTransformer(pathPattern("channels/tabs*")) { (content: Entity<JSON>) -> [ContentItem] in
@@ -159,13 +177,23 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         resource(baseURL: account.url, path: "login")
     }
 
-    func channel(_ id: String, contentType: Channel.ContentType, data: String?) -> Resource {
-        if contentType == .videos {
-            return resource(baseURL: account.url, path: "channel/\(id)")
+    func channel(_ id: String, contentType: Channel.ContentType, data: String?, page: String?) -> Resource {
+        let path = page.isNil ? "channel" : "nextpage/channel"
+
+        var channel: Siesta.Resource
+
+        if contentType == .videos || data.isNil {
+            channel = resource(baseURL: account.url, path: "\(path)/\(id)")
+        } else {
+            channel = resource(baseURL: account.url, path: "channels/tabs")
+                .withParam("data", data)
         }
 
-        return resource(baseURL: account.url, path: "channels/tabs")
-            .withParam("data", data)
+        if let page, !page.isEmpty {
+            channel = channel.withParam("nextpage", page)
+        }
+
+        return channel
     }
 
     func channelByName(_ name: String) -> Resource? {
@@ -699,5 +727,15 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
             return Chapter(title: title, image: image, start: start)
         }
+    }
+
+    private func contentItemsDictionary(from content: JSON) -> JSON {
+        if let key = Self.contentItemsKeys.first(where: { content.dictionaryValue.keys.contains($0) }),
+           let items = content.dictionaryValue[key]
+        {
+            return items
+        }
+
+        return .null
     }
 }

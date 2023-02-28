@@ -109,17 +109,22 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.map(self.extractChannel)
         }
 
-        configureTransformer(pathPattern("channels/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> Channel in
-            self.extractChannel(from: content.json)
+        configureTransformer(pathPattern("channels/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPage in
+            self.extractChannelPage(from: content.json, forceNotLast: true)
+        }
+
+        configureTransformer(pathPattern("channels/*/videos"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPage in
+            self.extractChannelPage(from: content.json)
         }
 
         configureTransformer(pathPattern("channels/*/latest"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             content.json.dictionaryValue["videos"]?.arrayValue.map(self.extractVideo) ?? []
         }
 
-        configureTransformer(pathPattern("channels/*/playlists"), requestMethods: [.get]) { (content: Entity<JSON>) -> [ContentItem] in
-            let playlists = (content.json.dictionaryValue["playlists"]?.arrayValue ?? []).compactMap { self.extractChannelPlaylist(from: $0) }
-            return ContentItem.array(of: playlists)
+        ["latest", "playlists", "streams", "shorts", "channels", "videos"].forEach { type in
+            configureTransformer(pathPattern("channels/*/\(type)"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPage in
+                self.extractChannelPage(from: content.json)
+            }
         }
 
         configureTransformer(pathPattern("playlists/*"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPlaylist in
@@ -266,11 +271,18 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             .onCompletion { _ in onCompletion() }
     }
 
-    func channel(_ id: String, contentType: Channel.ContentType, data _: String?) -> Resource {
-        if contentType == .playlists {
-            return resource(baseURL: account.url, path: basePathAppending("channels/\(id)/playlists"))
+    func channel(_ id: String, contentType: Channel.ContentType, data _: String?, page: String?) -> Resource {
+        if page.isNil, contentType == .videos {
+            return resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
         }
-        return resource(baseURL: account.url, path: basePathAppending("channels/\(id)"))
+
+        var resource = resource(baseURL: account.url, path: basePathAppending("channels/\(id)/\(contentType.invidiousID)"))
+
+        if let page, !page.isEmpty {
+            resource = resource.withParam("continuation", page)
+        }
+
+        return resource
     }
 
     func channelByName(_: String) -> Resource? {
@@ -504,6 +516,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             thumbnailURL = "\(accountUrlComponents.scheme ?? "https"):\(thumbnailURL)"
         }
 
+        let tabs = json["tabs"].arrayValue.compactMap { name in
+            if let name = name.string, let type = Channel.ContentType.from(name) {
+                return Channel.Tab(contentType: type, data: "")
+            }
+
+            return nil
+        }
+
         return Channel(
             app: .invidious,
             id: json["authorId"].stringValue,
@@ -514,7 +534,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             subscriptionsCount: json["subCount"].int,
             subscriptionsText: json["subCountText"].string,
             totalViews: json["totalViews"].int,
-            videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(extractVideo) ?? []
+            videos: json.dictionaryValue["latestVideos"]?.arrayValue.map(extractVideo) ?? [],
+            tabs: tabs
         )
     }
 
@@ -550,6 +571,33 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
             return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
         }
+    }
+
+    private static var contentItemsKeys = ["items", "videos", "latestVideos", "playlists", "relatedChannels"]
+
+    private func extractChannelPage(from json: JSON, forceNotLast: Bool = false) -> ChannelPage {
+        let nextPage = json.dictionaryValue["continuation"]?.string
+        var contentItems = [ContentItem]()
+
+        var items = [ContentItem]()
+
+        if let key = Self.contentItemsKeys.first(where: { json.dictionaryValue.keys.contains($0) }),
+           let items = json.dictionaryValue[key]
+        {
+            contentItems = extractContentItems(from: items)
+        }
+
+        var last = false
+        if !forceNotLast {
+            last = nextPage?.isEmpty ?? true
+        }
+
+        return ChannelPage(
+            results: contentItems,
+            channel: extractChannel(from: json),
+            nextPage: nextPage,
+            last: last
+        )
     }
 
     private func extractStreams(from json: JSON) -> [Stream] {
@@ -666,6 +714,35 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 code: details["language_code"].stringValue,
                 url: url
             )
+        }
+    }
+
+    private func extractContentItems(from json: JSON) -> [ContentItem] {
+        json.arrayValue.compactMap { extractContentItem(from: $0) }
+    }
+
+    private func extractContentItem(from json: JSON) -> ContentItem? {
+        let type = json.dictionaryValue["type"]?.string
+
+        if type == "channel" {
+            return ContentItem(channel: extractChannel(from: json))
+        } else if type == "playlist" {
+            return ContentItem(playlist: extractChannelPlaylist(from: json))
+        } else if type == "video" {
+            return ContentItem(video: extractVideo(from: json))
+        }
+
+        return nil
+    }
+}
+
+extension Channel.ContentType {
+    var invidiousID: String {
+        switch self {
+        case .livestreams:
+            return "streams"
+        default:
+            return rawValue
         }
     }
 }
