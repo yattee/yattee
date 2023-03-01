@@ -4,7 +4,7 @@
 "Accounts" = "Konten";
 "Add Account" = "Konto hinzufügen";
 "Add Location" = "Ort hinzufügen";
-"Add Location..." = "Ort hinzufügen...";
+"Add Location..." = "Ort hinzufügen …";
 "Add to Playlist" = "Zur Wiedergabeliste hinzufügen";
 "Backend" = "Backend";
 "Badge color" = "Abzeichen Farbe";
@@ -73,11 +73,11 @@
 "%@ subscribers" = "%@ Abonnenten";
 " subscribers" = " Abonnenten";
 "%@ Playlist" = "%@ Wiedergabeliste";
-"Add Account..." = "Konto hinzufügen...";
-"Add profile..." = "Profil hinzufügen...";
+"Add Account..." = "Konto hinzufügen …";
+"Add profile..." = "Profil hinzufügen …";
 "Add to Favorites" = "Zu den Favoriten hinzufügen";
 "Add Quality Profile" = "Qualitätsprofil hinzufügen";
-"Add to Playlist..." = "Zur Wiedergabeliste hinzufügen...";
+"Add to Playlist..." = "Zur Wiedergabeliste hinzufügen …";
 "Automatic" = "Automatisch";
 "Clear Search History" = "Suchverlauf löschen";
 "Continue" = "Fortsetzen";
@@ -111,7 +111,7 @@
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Alle";
-"Always use AVPlayer for live videos" = "Verwende immer AVPlayer für Live-Videos";
+"Always use AVPlayer for live videos" = "Immer AVPlayer für Live-Videos nutzen";
 "Anonymous" = "Anonym";
 
 /* Video date filter in search
@@ -502,3 +502,41 @@
 "Shorts" = "Shorts";
 "Verified" = "Verifiziert";
 "Channel" = "Kanal";
+"Short videos: visible" = "Kurze Videos: sichtbar";
+"Player Bar" = "Spielerleiste";
+"Short videos: hidden" = "Kurze Videos: versteckt";
+"Play all unwatched" = "Alle ungesehen abspielen";
+"Double tap gesture" = "Doppeltippgeste";
+"Clear all" = "Alles löschen";
+"Hide player" = "Spieler ausblenden";
+"Close video" = "Video schließen";
+"Total size: %@" = "Gesamtgröße: %@";
+"Show cache status" = "Cachestatus anzeigen";
+"Maximum feed items" = "Maximale Feed-Elemente";
+"Mark channel feed as watched" = "Kanal-Feed als angesehen markieren";
+"Controls button: forwards" = "Steuertaste: vorwärts";
+"Open expanded" = "Erweitert öffnen";
+"Mark channel feed as unwatched" = "Kanal-Feed als ungesehen markieren";
+"System controls" = "Systemsteuerung";
+"Gesture: fowards" = "Geste: vorwärts";
+"Controls Buttons" = "Steuerelemente Tasten";
+"Controls button: backwards" = "Steuertaste: rückwärts";
+"Tap and hold channel thumbnail to open context menu with more actions" = "Tippen und halten Sie die Kanal-Miniaturansicht, um das Kontextmenü mit weiteren Aktionen zu öffnen";
+"Always show controls buttons" = "Steuerungsschaltflächen immer einblenden";
+"Show unwatched feed badges" = "Ungeöffnete Feed-Badges anzeigen";
+"Maximum width expanded" = "Maximalbreite erweitert";
+"Right click channel thumbnail to open context menu with more actions" = "Klicken Sie mit der rechten Maustaste auf die Miniaturansicht des Kanals, um das Kontextmenü mit weiteren Aktionen zu öffnen";
+"Gesture: backwards" = "Geste: rückwärts";
+"Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Gesteneinstellungen steuern das Überspringungsintervall für Doppeltippgesten auf der linken/rechten Seite des Players. Das Ändern der Einstellungen der Systemsteuerung erfordert einen Neustart.";
+"Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Gesteneinstellungen steuern das Überspringungsintervall für Doppelklicks auf der linken/rechten Seite des Players. Das Ändern der Einstellungen der Systemsteuerung erfordert einen Neustart.";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Gesteneinstellungen steuern das Überspringungsintervall für die Pfeiltasten der Fernbedienung (für Siri Remote der 2. Generation oder neuer). Das Ändern der Einstellungen der Systemsteuerung erfordert einen Neustart.";
+"Actions Buttons" = "Aktionen-Schaltflächen";
+"Play next item" = "Nächstes Element abspielen";
+"Lock orientation" = "Ausrichtung sperren";
+"Music Mode" = "Musikmodus";
+"Open channels with description expanded" = "Offene Kanäle mit erweiterter Beschreibung";
+"Cache" = "Cache";
+"Subscribe/Unsubscribe" = "Abonnieren/abbestellen";
+"Are you sure you want to clear cache?" = "Möchten Sie den Cache wirklich löschen?";
+"Single tap gesture" = "Einmalige Antippen-Geste";
+"Seeking" = "Suchend";
