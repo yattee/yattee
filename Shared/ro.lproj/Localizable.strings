@@ -532,3 +532,11 @@
 "Lock orientation" = "Blocare orientare";
 "Music Mode" = "Modul Muzică";
 "Close video" = "Închideți video";
+"Seeking" = "Căutarea";
+"Total size: %@" = "Marimea totala: %@";
+"Open channels with description expanded" = "Deschideți canale cu descrierea extinsă";
+"Cache" = "Cache";
+"Subscribe/Unsubscribe" = "Abonează-te/Dezabonează-te";
+"Show cache status" = "Afișați starea cache-ului";
+"Maximum feed items" = "Numărul maxim de articole de feed";
+"Are you sure you want to clear cache?" = "Sigur doriți să ștergeți memoria cache?";
