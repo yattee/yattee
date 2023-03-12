@@ -88,6 +88,12 @@ struct FavoriteItemView: View {
                     channel.videos = videos
                     ChannelsCacheModel.shared.store(channel)
                     store.contentItems = ContentItem.array(of: videos)
+                } else if let channelPage: ChannelPage = response.typedContent() {
+                    if let channel = channelPage.channel {
+                        ChannelsCacheModel.shared.store(channel)
+                    }
+
+                    store.contentItems = channelPage.results
                 }
             }
         case let .channelPlaylist(_, id, title):
