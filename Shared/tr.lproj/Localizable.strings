@@ -339,7 +339,7 @@
 "Show Open Videos toolbar button" = "";
 "Sample Rate" = "";
 "Private" = "";
-"Browsing" = "";
+"Browsing" = "Gezinti";
 "Documents" = "";
 "FPS" = "";
 "Only for local files and URLs" = "";
@@ -398,7 +398,7 @@
 /* Loading stream OSD */
 "Opening %@ stream..." = "";
 "Clear Queue before opening" = "";
-"Copy %@ link with time" = "";
+"Copy %@ link with time" = "Bağlantıyı %@ zaman ile kopyala";
 "Show Inspector" = "";
 "Make default" = "";
 "Are you sure you want to remove %@ location?" = "";
@@ -414,7 +414,7 @@
 "Week" = "";
 "Sidebar" = "";
 "Show only icons" = "";
-"Current: %@\n%@" = "";
+"Current: %@\n%@" = "Şuan: %@\n%@";
 "Show anonymous accounts" = "";
 "Could not open playlist" = "";
 "Round corners" = "";
@@ -428,8 +428,8 @@
 
 /* Player controls layout size */
 "Very Large" = "";
-"Continue from %@" = "";
-"Copy %@ link" = "";
+"Continue from %@" = "% devam et";
+"Copy %@ link" = "Bağlantıyı %@ kopyala";
 "Seek gesture sensitivity" = "";
 "Show keywords" = "";
 "Wiki" = "";
@@ -453,7 +453,7 @@
 "This video could not be opened" = "";
 "Could not extract playlist ID" = "";
 "Could not load video" = "";
-"Decreased opacity" = "";
+"Decreased opacity" = "Düşük şeffaflık";
 "Shuffle All" = "";
 "Share %@ link with time" = "";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "";
