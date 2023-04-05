@@ -496,9 +496,9 @@
 "Video" = "";
 "Audio" = "";
 "Honor orientation lock" = "";
-"Proxy videos" = "";
-"Seek gesture speed" = "";
-"Seek with horizontal swipe on video" = "";
-"System controls show buttons for %@" = "";
-"Wiki" = "";
+"Proxy videos" = "توكيل الفيديوهات";
+"Seek gesture speed" = "سرعة بحث الإيماءة";
+"Seek with horizontal swipe on video" = "للبحث بالتمرير الأفقي على الفيديو";
+"System controls show buttons for %@" = "تعرض ضوابط النظام أزرارًا لـ %@";
+"Wiki" = "ويكي";
 "Sample Rate" = "";
