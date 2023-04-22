@@ -44,20 +44,13 @@ struct SubscriptionsView: View {
         #endif
         #if os(macOS)
         .toolbar {
-            ToolbarItem {
+            ToolbarItemGroup {
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
-            }
-
-            ToolbarItem {
                 HideShortsButtons(hide: $hideShorts)
-            }
-
-            ToolbarItem {
                 toggleWatchedButton
-            }
-
-            ToolbarItem {
+                    .id(feed.watchedId)
                 playUnwatchedButton
+                    .id(feed.watchedId)
             }
         }
         #endif

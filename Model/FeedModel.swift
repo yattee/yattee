@@ -11,6 +11,7 @@ final class FeedModel: ObservableObject, CacheModel {
     @Published var isLoading = false
     @Published var videos = [Video]()
     @Published private var page = 1
+    @Published var watchedUUID = UUID()
 
     private var feedCount = UnwatchedFeedCountModel.shared
     private var cacheModel = FeedCacheModel.shared
@@ -115,7 +116,7 @@ final class FeedModel: ObservableObject, CacheModel {
     }
 
     func calculateUnwatchedFeed() {
-        guard let account = accounts.current, accounts.signedIn, Defaults[.showUnwatchedFeedBadges] else { return }
+        guard let account = accounts.current, accounts.signedIn else { return }
         let feed = cacheModel.retrieveFeed(account: account)
         backgroundContext.perform { [weak self] in
             guard let self else { return }
@@ -132,20 +133,15 @@ final class FeedModel: ObservableObject, CacheModel {
 
                 let byChannel = Dictionary(grouping: unwatched) { $0.channel.id }.mapValues(\.count)
                 self.feedCount.unwatchedByChannel[account] = byChannel
+                self.watchedUUID = UUID()
             }
         }
     }
 
     func markAllFeedAsWatched() {
-        guard let account = accounts.current, accounts.signedIn else { return }
-
         let mark = { [weak self] in
-            self?.backgroundContext.perform { [weak self] in
-                guard let self else { return }
-                self.videos.forEach { Watch.markAsWatched(videoID: $0.videoID, account: account, duration: $0.length, context: self.backgroundContext) }
-
-                self.calculateUnwatchedFeed()
-            }
+            guard let self else { return }
+            self.markVideos(self.videos, watched: true, watchedAt: Date(timeIntervalSince1970: 0))
         }
 
         if videos.isEmpty {
@@ -211,14 +207,14 @@ final class FeedModel: ObservableObject, CacheModel {
         }
     }
 
-    func markVideos(_ videos: [Video], watched: Bool) {
+    func markVideos(_ videos: [Video], watched: Bool, watchedAt: Date? = nil) {
         guard accounts.signedIn, let account = accounts.current else { return }
 
         backgroundContext.perform { [weak self] in
             guard let self else { return }
 
             if watched {
-                videos.forEach { Watch.markAsWatched(videoID: $0.videoID, account: account, duration: $0.length, context: self.backgroundContext) }
+                videos.forEach { Watch.markAsWatched(videoID: $0.videoID, account: account, duration: $0.length, watchedAt: watchedAt, context: self.backgroundContext) }
             } else {
                 let watches = self.watchFetchRequestResult(videos, context: self.backgroundContext)
                 watches.forEach { self.backgroundContext.delete($0) }
@@ -262,6 +258,10 @@ final class FeedModel: ObservableObject, CacheModel {
     var canPlayUnwatchedFeed: Bool {
         guard let account = accounts.current, accounts.signedIn else { return false }
         return (feedCount.unwatched[account] ?? 0) > 0
+    }
+
+    var watchedId: String {
+        watchedUUID.uuidString
     }
 
     var feedTime: Date? {

@@ -14,7 +14,7 @@ extension Watch {
         NSFetchRequest<Watch>(entityName: "Watch")
     }
 
-    @nonobjc class func markAsWatched(videoID: String, account: Account, duration: Double, context: NSManagedObjectContext) {
+    @nonobjc class func markAsWatched(videoID: String, account: Account, duration: Double, watchedAt: Date? = nil, context: NSManagedObjectContext) {
         let watchFetchRequest = Watch.fetchRequest()
         watchFetchRequest.predicate = NSPredicate(format: "videoID = %@", videoID as String)
 
@@ -36,7 +36,7 @@ extension Watch {
 
             watch.videoDuration = duration
             watch.stoppedAt = duration
-            watch.watchedAt = Date()
+            watch.watchedAt = watchedAt ?? .init()
 
             try? context.save()
         }
