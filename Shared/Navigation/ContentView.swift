@@ -120,6 +120,15 @@ struct ContentView: View {
                 OpenVideosView()
             }
         )
+        #if !os(macOS)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingChannelSheet) {
+                NavigationView {
+                    ChannelVideosView(channel: navigation.channelPresentedInSheet, showCloseButton: true)
+                }
+            }
+        )
+        #endif
         .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
     }
 

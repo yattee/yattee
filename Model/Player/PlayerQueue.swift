@@ -15,6 +15,8 @@ extension PlayerModel {
 
     func play(_ videos: [Video], shuffling: Bool = false) {
         WatchNextViewModel.shared.hide()
+        navigation.presentingChannelSheet = false
+
         playbackMode = shuffling ? .shuffle : .queue
 
         videos.forEach { enqueueVideo($0, loadDetails: false) }
@@ -33,6 +35,8 @@ extension PlayerModel {
     }
 
     func playNow(_ video: Video, at time: CMTime? = nil) {
+        navigation.presentingChannelSheet = false
+
         if playingInPictureInPicture, closePiPOnNavigation {
             closePiP()
         }
@@ -56,6 +60,7 @@ extension PlayerModel {
         comments.reset()
         stream = nil
         WatchNextViewModel.shared.hide()
+        navigation.presentingChannelSheet = false
 
         withAnimation {
             aspectRatio = VideoPlayerView.defaultAspectRatio
@@ -176,6 +181,7 @@ extension PlayerModel {
         remove(newItem)
 
         WatchNextViewModel.shared.hide()
+        navigation.presentingChannelSheet = false
         currentItem = newItem
         currentItem.playbackTime = time
 
@@ -219,9 +225,12 @@ extension PlayerModel {
         let item = PlayerQueueItem(video, playbackTime: atTime)
 
         if play {
+            navigation.presentingChannelSheet = false
+
             withAnimation {
                 aspectRatio = VideoPlayerView.defaultAspectRatio
                 WatchNextViewModel.shared.hide()
+                navigation.presentingChannelSheet = false
                 currentItem = item
             }
             videoBeingOpened = video

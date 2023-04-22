@@ -6,6 +6,7 @@ import SwiftUI
 struct ChannelVideosView: View {
     var channel: Channel?
     var showCloseButton = false
+    var inNavigationView = true
 
     @State private var presentingShareSheet = false
     @State private var shareURL: URL?
@@ -119,24 +120,28 @@ struct ChannelVideosView: View {
                     Button {
                         withAnimation(Constants.overlayAnimation) {
                             navigation.presentingChannel = false
+                            navigation.presentingChannelSheet = false
                         }
                     } label: {
                         Label("Close", systemImage: "xmark")
                     }
+                    #if !os(macOS)
                     .buttonStyle(.plain)
+                    #endif
                 }
             }
-            #if !os(iOS)
+            #if os(macOS)
                 ToolbarItem(placement: .navigation) {
                     thumbnail
                 }
-                ToolbarItem {
+                ToolbarItemGroup {
+                    if !inNavigationView {
+                        Text(navigationTitle)
+                            .fontWeight(.bold)
+                    }
+
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
-                }
-                ToolbarItem {
                     HideShortsButtons(hide: $hideShorts)
-                }
-                ToolbarItem {
                     contentTypePicker
                 }
 
@@ -160,10 +165,12 @@ struct ChannelVideosView: View {
 
                 ToolbarItem {
                     favoriteButton
+                        .labelStyle(.iconOnly)
                 }
 
                 ToolbarItem {
                     toggleWatchedButton
+                        .labelStyle(.iconOnly)
                 }
             #endif
         }
@@ -234,14 +241,14 @@ struct ChannelVideosView: View {
         Group {
             if let subscribers = store.item?.channel?.subscriptionsString {
                 HStack(spacing: 0) {
-                    Text(subscribers)
                     Image(systemName: "person.2.fill")
+                    Text(subscribers)
                 }
             } else if store.item.isNil {
                 HStack(spacing: 0) {
+                    Image(systemName: "person.2.fill")
                     Text("1234")
                         .redacted(reason: .placeholder)
-                    Image(systemName: "person.2.fill")
                 }
             }
         }
@@ -252,10 +259,10 @@ struct ChannelVideosView: View {
     var viewsLabel: some View {
         HStack(spacing: 0) {
             if let views = store.item?.channel?.totalViewsString {
-                Text(views)
-
                 Image(systemName: "eye.fill")
                     .imageScale(.small)
+
+                Text(views)
             }
         }
         .foregroundColor(.secondary)
@@ -328,6 +335,7 @@ struct ChannelVideosView: View {
                 }
             }
         }
+        .labelsHidden()
     }
 
     private func typeAvailable(_ type: Channel.ContentType) -> Bool {
@@ -463,7 +471,7 @@ struct ChannelVideosView: View {
 struct ChannelVideosView_Previews: PreviewProvider {
     static var previews: some View {
         #if os(macOS)
-            ChannelVideosView(channel: Video.fixture.channel)
+            ChannelVideosView(channel: Video.fixture.channel, showCloseButton: true, inNavigationView: false)
                 .environment(\.navigationStyle, .sidebar)
         #else
             NavigationView {

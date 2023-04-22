@@ -108,6 +108,7 @@ struct OpenVideosModel {
         )
 
         WatchNextViewModel.shared.hide()
+        NavigationModel.shared.presentingChannelSheet = false
 
         if playbackMode == .playNow || playbackMode == .shuffleAll {
             #if os(iOS)

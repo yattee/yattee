@@ -13,7 +13,7 @@ struct PlayerQueueView: View {
     @Default(.saveHistory) private var saveHistory
 
     var body: some View {
-        List {
+        Group {
             Group {
                 if player.playbackMode == .related {
                     autoplaying
@@ -34,15 +34,6 @@ struct PlayerQueueView: View {
                 .listRowSeparator(false)
         }
         .environment(\.inNavigationView, false)
-        #if os(macOS)
-            .listStyle(.inset)
-        #elseif os(iOS)
-            .listStyle(.grouped)
-            .backport
-            .scrollContentBackground(false)
-        #else
-            .listStyle(.plain)
-        #endif
     }
 
     @ViewBuilder var autoplaying: some View {
@@ -65,6 +56,8 @@ struct PlayerQueueView: View {
     var autoplayingHeader: some View {
         HStack {
             Text("Autoplaying Next")
+                .foregroundColor(.secondary)
+                .font(.caption)
             Spacer()
             Button {
                 player.setRelatedAutoplayItem()
@@ -78,7 +71,7 @@ struct PlayerQueueView: View {
     }
 
     var playingNext: some View {
-        Section(header: Text("Queue")) {
+        Section(header: queueHeader) {
             if player.queue.isEmpty {
                 Text("Queue is empty")
                     .foregroundColor(.secondary)
@@ -94,6 +87,15 @@ struct PlayerQueueView: View {
                     }
             }
         }
+    }
+
+    var queueHeader: some View {
+        Text("Queue".localized())
+        #if !os(macOS)
+            .foregroundColor(.secondary)
+            .font(.caption)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        #endif
     }
 
     private var visibleWatches: [Watch] {

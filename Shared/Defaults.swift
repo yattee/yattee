@@ -241,6 +241,7 @@ extension Defaults.Keys {
     static let openWatchNextOnFinishedWatchingDelay = Key<String>("openWatchNextOnFinishedWatchingDelay", default: "5")
 
     static let hideShorts = Key<Bool>("hideShorts", default: false)
+    static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {

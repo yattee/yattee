@@ -335,6 +335,7 @@ final class PlayerModel: ObservableObject {
         videoBeingOpened = video
 
         WatchNextViewModel.shared.hide()
+        navigation.presentingChannelSheet = false
 
         var changeBackendHandler: (() -> Void)?
 

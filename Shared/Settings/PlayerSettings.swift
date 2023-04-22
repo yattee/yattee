@@ -27,6 +27,7 @@ struct PlayerSettings: View {
     @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
     @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
+    @Default(.showInspector) private var showInspector
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -67,6 +68,12 @@ struct PlayerSettings: View {
                     pauseOnEnteringBackgroundToogle
                 #endif
             }
+
+            #if !os(tvOS)
+                Section(header: SettingsHeader(text: "Inspector".localized())) {
+                    inspectorVisibilityPicker
+                }
+            #endif
 
             Section(header: SettingsHeader(text: "Watch Next")) {
                 openWatchNextOnFinishedWatchingToggle
@@ -235,6 +242,14 @@ struct PlayerSettings: View {
             Toggle("Close PiP and open player when application enters foreground", isOn: $closePiPAndOpenPlayerOnEnteringForeground)
         }
     #endif
+
+    private var inspectorVisibilityPicker: some View {
+        Picker("Visibility", selection: $showInspector) {
+            Text("Always").tag(ShowInspectorSetting.always)
+            Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
+        }
+        .labelsHidden()
+    }
 }
 
 struct PlayerSettings_Previews: PreviewProvider {

@@ -5,9 +5,9 @@ struct RelatedView: View {
     @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
-        List {
-            if let related = player.currentVideo?.related {
-                Section(header: Text("Related")) {
+        LazyVStack {
+            if let related = player.videoForDisplay?.related {
+                Section(header: header) {
                     ForEach(related) { video in
                         PlayerQueueRow(item: PlayerQueueItem(video))
                             .listRowBackground(Color.clear)
@@ -32,6 +32,15 @@ struct RelatedView: View {
             .scrollContentBackground(false)
         #else
             .listStyle(.plain)
+        #endif
+    }
+
+    var header: some View {
+        Text("Related")
+        #if !os(macOS)
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
         #endif
     }
 }

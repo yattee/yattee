@@ -84,6 +84,9 @@ final class NavigationModel: ObservableObject {
     @Published var presentingAccounts = false
     @Published var presentingWelcomeScreen = false
 
+    @Published var presentingChannelSheet = false
+    @Published var channelPresentedInSheet: Channel!
+
     @Published var presentingShareSheet = false
     @Published var shareURL: URL?
 
@@ -103,7 +106,6 @@ final class NavigationModel: ObservableObject {
 
         hideKeyboard()
         let presentingPlayer = player.presentingPlayer
-        player.hide()
         presentingChannel = false
 
         #if os(macOS)
@@ -113,20 +115,30 @@ final class NavigationModel: ObservableObject {
         let recent = RecentItem(from: channel)
         recents.add(RecentItem(from: channel))
 
-        if navigationStyle == .sidebar {
-            sidebarSectionChanged.toggle()
-            tabSelection = .recentlyOpened(recent.tag)
-        } else {
-            var delay = 0.0
+        let navigateToChannel = {
             #if os(iOS)
-                if presentingPlayer { delay = 1.0 }
+                self.player.hide()
             #endif
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+
+            if navigationStyle == .sidebar {
+                self.sidebarSectionChanged.toggle()
+                self.tabSelection = .recentlyOpened(recent.tag)
+            } else {
                 withAnimation(Constants.overlayAnimation) {
                     self.presentingChannel = true
                 }
             }
         }
+
+        #if os(iOS)
+            if presentingPlayer {
+                presentChannelInSheet(channel)
+            } else {
+                navigateToChannel()
+            }
+        #else
+            navigateToChannel()
+        #endif
     }
 
     func openChannelPlaylist(_ playlist: ChannelPlaylist, navigationStyle: NavigationStyle) {
@@ -272,6 +284,11 @@ final class NavigationModel: ObservableObject {
     func presentShareSheet(_ url: URL) {
         shareURL = url
         presentingShareSheet = true
+    }
+
+    func presentChannelInSheet(_ channel: Channel) {
+        channelPresentedInSheet = channel
+        presentingChannelSheet = true
     }
 }
 

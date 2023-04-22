@@ -92,6 +92,14 @@ struct VideoPlayerView: View {
         .onChange(of: playerSidebar) { _ in
             updateSidebarQueue()
         }
+        #if os(macOS)
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingChannelSheet) {
+                ChannelVideosView(channel: navigation.channelPresentedInSheet, showCloseButton: true, inNavigationView: false)
+                    .frame(minWidth: 1000, minHeight: 700)
+            }
+        )
+        #endif
     }
 
     var videoPlayer: some View {
@@ -323,7 +331,7 @@ struct VideoPlayerView: View {
                             VideoDetails(
                                 video: player.videoForDisplay,
                                 fullScreen: $fullScreenDetails,
-                                bottomPadding: detailsNeedBottomPadding
+                                sidebarQueue: $sidebarQueue
                             )
                             #if os(iOS)
                             .ignoresSafeArea(.all, edges: .bottom)
@@ -386,16 +394,29 @@ struct VideoPlayerView: View {
             if !fullScreenPlayer {
                 #if os(iOS)
                     if sidebarQueue {
-                        PlayerQueueView(sidebarQueue: true)
-                            .frame(maxWidth: 350)
-                            .background(colorScheme == .dark ? Color.black : Color.white)
-                            .transition(.move(edge: .bottom))
+                        List {
+                            PlayerQueueView(sidebarQueue: true)
+                        }
+                        #if os(macOS)
+                        .listStyle(.inset)
+                        #elseif os(iOS)
+                        .listStyle(.grouped)
+                        .backport
+                        .scrollContentBackground(false)
+                        #else
+                        .listStyle(.plain)
+                        #endif
+                        .frame(maxWidth: 350)
+                        .background(colorScheme == .dark ? Color.black : Color.white)
+                        .transition(.move(edge: .bottom))
                     }
                 #elseif os(macOS)
                     if Defaults[.playerSidebar] != .never {
-                        PlayerQueueView(sidebarQueue: true)
-                            .frame(width: 350)
-                            .background(colorScheme == .dark ? Color.black : Color.white)
+                        List {
+                            PlayerQueueView(sidebarQueue: true)
+                        }
+                        .frame(maxWidth: 350)
+                        .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #endif
             }
@@ -412,14 +433,6 @@ struct VideoPlayerView: View {
                 PlaybackSettings()
             }
         )
-        #endif
-    }
-
-    var detailsNeedBottomPadding: Bool {
-        #if os(iOS)
-            return true
-        #else
-            return false
         #endif
     }
 

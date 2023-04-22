@@ -25,7 +25,6 @@ struct CommentsView: View {
                             .borderBottom(height: comment != last ? 0.5 : 0, color: Color("ControlsBorderColor"))
                     }
                 }
-                .padding(.top, 55)
 
                 if embedInScrollView {
                     ScrollView(.vertical, showsIndicators: false) {
