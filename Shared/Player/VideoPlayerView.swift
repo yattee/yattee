@@ -129,8 +129,6 @@ struct VideoPlayerView: View {
             .onChange(of: player.presentingPlayer) { newValue in
                 if newValue {
                     viewDragOffset = 0
-                } else {
-                    viewDragOffset = Self.hiddenOffset
                 }
             }
             .onAppear {
