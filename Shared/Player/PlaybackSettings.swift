@@ -63,6 +63,13 @@ struct PlaybackSettings: View {
                 }
 
                 HStack {
+                    controlsHeader("Playback Mode")
+                    Spacer()
+                    playbackModeControl
+                }
+                .padding(.vertical, 10)
+
+                HStack {
                     controlsHeader("Rate")
                     Spacer()
                     HStack(spacing: rateButtonsSpacing) {
@@ -77,7 +84,6 @@ struct PlaybackSettings: View {
                         #endif
                     }
                 }
-
                 if player.activeBackend == .mpv {
                     HStack {
                         controlsHeader("Captions")
@@ -279,6 +285,40 @@ struct PlaybackSettings: View {
         #else
             8
         #endif
+    }
+
+    @ViewBuilder var playbackModeControl: some View {
+        #if os(tvOS)
+            Button {
+                player.playbackMode = player.playbackMode.next()
+            } label: {
+                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+                    .transaction { t in t.animation = nil }
+                    .frame(minWidth: 350)
+            }
+        #elseif os(macOS)
+            playbackModePicker
+                .modifier(SettingsPickerModifier())
+            #if os(macOS)
+                .frame(maxWidth: 150)
+            #endif
+        #else
+            Menu {
+                playbackModePicker
+            } label: {
+                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+            }
+            .transaction { t in t.animation = .none }
+        #endif
+    }
+
+    var playbackModePicker: some View {
+        Picker("Playback Mode", selection: $player.playbackMode) {
+            ForEach(PlayerModel.PlaybackMode.allCases, id: \.rawValue) { mode in
+                Label(mode.description, systemImage: mode.systemImage).tag(mode)
+            }
+        }
+        .labelsHidden()
     }
 
     @ViewBuilder private var qualityProfileButton: some View {
