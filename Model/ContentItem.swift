@@ -31,15 +31,15 @@ struct ContentItem: Identifiable {
     var id: String = UUID().uuidString
 
     static func array(of videos: [Video]) -> [ContentItem] {
-        videos.map { ContentItem(video: $0) }
+        videos.map { Self(video: $0) }
     }
 
     static func array(of playlists: [ChannelPlaylist]) -> [ContentItem] {
-        playlists.map { ContentItem(playlist: $0) }
+        playlists.map { Self(playlist: $0) }
     }
 
     static func array(of channels: [Channel]) -> [ContentItem] {
-        channels.map { ContentItem(channel: $0) }
+        channels.map { Self(channel: $0) }
     }
 
     static func < (lhs: ContentItem, rhs: ContentItem) -> Bool {

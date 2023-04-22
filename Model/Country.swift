@@ -234,6 +234,8 @@ extension Country {
         }
     }
 
+    // swiftlint:enable switch_case_on_newline
+
     var flag: String {
         let unicodeScalars = rawValue
             .unicodeScalars

@@ -16,7 +16,7 @@ struct DocumentsView: View {
 
                     Group {
                         if model.isDirectory(standardizedURL) {
-                            NavigationLink(destination: DocumentsView(directoryURL: url)) {
+                            NavigationLink(destination: Self(directoryURL: url)) {
                                 VideoBanner(video: video)
                             }
                         } else {

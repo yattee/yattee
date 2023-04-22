@@ -91,7 +91,9 @@ struct Channel: Identifiable, Hashable {
     var subscriptionsText: String?
 
     var totalViews: Int?
-    var verified: Bool? // swiftlint:disable discouraged_optional_boolean
+    // swiftlint:disable discouraged_optional_boolean
+    var verified: Bool?
+    // swiftlint:enable discouraged_optional_boolean
 
     var videos = [Video]()
     var tabs = [Tab]()

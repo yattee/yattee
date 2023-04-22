@@ -4,7 +4,7 @@ import Logging
 import SwiftyJSON
 
 struct PlaylistsCacheModel: CacheModel {
-    static let shared = PlaylistsCacheModel()
+    static let shared = Self()
     static let limit = 30
     let logger = Logger(label: "stream.yattee.cache.playlists")
 

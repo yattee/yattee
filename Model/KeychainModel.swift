@@ -2,7 +2,7 @@ import Foundation
 import KeychainAccess
 
 struct KeychainModel {
-    static var shared = KeychainModel()
+    static var shared = Self()
 
     var keychain = Keychain(service: "stream.yattee.app")
 

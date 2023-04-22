@@ -327,7 +327,7 @@ struct ChannelVideosView: View {
 
     private var contentTypePicker: some View {
         Picker("Content type", selection: $contentType) {
-            if let channel = presentedChannel {
+            if presentedChannel != nil {
                 ForEach(Channel.ContentType.allCases, id: \.self) { type in
                     if typeAvailable(type) {
                         Label(type.description, systemImage: type.systemImage).tag(type)
@@ -432,18 +432,20 @@ struct ChannelVideosView: View {
     }
 
     func load() {
-        resource?.load().onSuccess { response in
-            if let page: ChannelPage = response.typedContent() {
-                if let channel = page.channel {
-                    ChannelsCacheModel.shared.store(channel)
+        resource?
+            .load()
+            .onSuccess { response in
+                if let page: ChannelPage = response.typedContent() {
+                    if let channel = page.channel {
+                        ChannelsCacheModel.shared.store(channel)
+                    }
+                    self.page = page
+                    self.contentTypeItems.replace(page.results)
                 }
-                self.page = page
-                self.contentTypeItems.replace(page.results)
             }
-        }
-        .onFailure { error in
-            navigation.presentAlert(title: "Could not load channel data", message: error.userMessage)
-        }
+            .onFailure { error in
+                navigation.presentAlert(title: "Could not load channel data", message: error.userMessage)
+            }
     }
 
     func loadNextPage() {

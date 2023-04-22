@@ -46,7 +46,7 @@ final class NavigationModel: ObservableObject {
             case .search:
                 return "search"
             #if os(tvOS)
-                case .settings: // swiftlint:disable:this switch_case_alignment
+                case .settings:
                     return "settings"
             #endif
             default:

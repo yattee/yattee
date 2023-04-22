@@ -24,7 +24,7 @@ final class AccountsModel: ObservableObject {
             return nil
         }
 
-        return AccountsModel.find(id)
+        return Self.find(id)
     }
 
     var any: Account? {

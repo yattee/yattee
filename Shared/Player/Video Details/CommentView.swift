@@ -204,7 +204,7 @@ struct CommentView: View {
         Group {
             let last = comments.replies.last
             ForEach(comments.replies) { comment in
-                CommentView(comment: comment, repliesID: $repliesID)
+                Self(comment: comment, repliesID: $repliesID)
                 #if os(tvOS)
                     .focusable()
                 #endif

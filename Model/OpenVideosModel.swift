@@ -37,7 +37,7 @@ struct OpenVideosModel {
         }
     }
 
-    static let shared = OpenVideosModel()
+    static let shared = Self()
     var player: PlayerModel! = .shared
     var logger = Logger(label: "stream.yattee.open-videos")
 

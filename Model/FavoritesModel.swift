@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 
 struct FavoritesModel {
-    static let shared = FavoritesModel()
+    static let shared = Self()
 
     @Default(.showFavoritesInHome) var showFavoritesInHome
     @Default(.favorites) var all

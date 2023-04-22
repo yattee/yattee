@@ -5,7 +5,7 @@ import Logging
 import SwiftyJSON
 
 struct FeedCacheModel: CacheModel {
-    static let shared = FeedCacheModel()
+    static let shared = Self()
     let logger = Logger(label: "stream.yattee.cache.feed")
 
     static let diskConfig = DiskConfig(name: "feed")

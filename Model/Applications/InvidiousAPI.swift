@@ -579,8 +579,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         let nextPage = json.dictionaryValue["continuation"]?.string
         var contentItems = [ContentItem]()
 
-        var items = [ContentItem]()
-
         if let key = Self.contentItemsKeys.first(where: { json.dictionaryValue.keys.contains($0) }),
            let items = json.dictionaryValue[key]
         {

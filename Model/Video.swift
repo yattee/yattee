@@ -117,7 +117,7 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     static func local(_ url: URL) -> Video {
-        Video(
+        Self(
             app: .local,
             videoID: url.absoluteString,
             streams: [.init(localURL: url)]
@@ -167,7 +167,7 @@ struct Video: Identifiable, Equatable, Hashable {
     static func from(_ json: JSON) -> Self {
         let dateFormatter = ISO8601DateFormatter()
 
-        return Video(
+        return Self(
             instanceID: json["instanceID"].stringValue,
             app: .init(rawValue: json["app"].stringValue) ?? AccountsModel.shared.current.app ?? .local,
             instanceURL: URL(string: json["instanceURL"].stringValue) ?? AccountsModel.shared.current.instance.apiURL,

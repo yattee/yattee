@@ -4,7 +4,7 @@ import Logging
 import SwiftyJSON
 
 struct BaseCacheModel {
-    static var shared = BaseCacheModel()
+    static var shared = Self()
 
     static let jsonToDataTransformer: (JSON) -> Data = { try! $0.rawData() }
     static let jsonFromDataTransformer: (Data) -> JSON = { try! JSON(data: $0) }

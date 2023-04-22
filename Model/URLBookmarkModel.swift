@@ -3,7 +3,7 @@ import Logging
 
 struct URLBookmarkModel {
     static let bookmarkPrefix = "urlbookmark-"
-    static var shared = URLBookmarkModel()
+    static var shared = Self()
 
     var logger = Logger(label: "stream.yattee.url-bookmark")
 

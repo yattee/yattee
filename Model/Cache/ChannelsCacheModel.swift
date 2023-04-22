@@ -4,7 +4,7 @@ import Logging
 import SwiftyJSON
 
 struct ChannelsCacheModel: CacheModel {
-    static let shared = ChannelsCacheModel()
+    static let shared = Self()
     let logger = Logger(label: "stream.yattee.cache.channels")
 
     static let diskConfig = DiskConfig(name: "channels")

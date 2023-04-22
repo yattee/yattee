@@ -4,7 +4,7 @@ import Logging
 import SwiftyJSON
 
 struct BookmarksCacheModel {
-    static var shared = BookmarksCacheModel()
+    static var shared = Self()
     let logger = Logger(label: "stream.yattee.cache")
 
     static let bookmarksGroup = "group.stream.yattee.app.bookmarks"

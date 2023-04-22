@@ -13,7 +13,7 @@ final class InstancesModel: ObservableObject {
             return nil
         }
 
-        return InstancesModel.shared.find(id)
+        return Self.shared.find(id)
     }
 
     var lastUsed: Instance? {
@@ -21,7 +21,7 @@ final class InstancesModel: ObservableObject {
             return nil
         }
 
-        return InstancesModel.shared.find(id)
+        return Self.shared.find(id)
     }
 
     func find(_ id: Instance.ID?) -> Instance? {

@@ -25,7 +25,7 @@ struct ChannelPlaylist: Identifiable {
     }
 
     static func from(_ json: JSON) -> Self {
-        ChannelPlaylist(
+        Self(
             id: json["id"].stringValue,
             title: json["title"].stringValue,
             thumbnailURL: json["thumbnailURL"].url,

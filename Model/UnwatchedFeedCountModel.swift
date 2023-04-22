@@ -32,4 +32,5 @@ final class UnwatchedFeedCountModel: ObservableObject {
         }
         return nil
     }
+    // swiftlint:enable empty_count
 }

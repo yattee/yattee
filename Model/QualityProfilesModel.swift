@@ -6,7 +6,7 @@ import Foundation
 #endif
 
 struct QualityProfilesModel {
-    static let shared = QualityProfilesModel()
+    static let shared = Self()
 
     #if os(tvOS)
         var tvOSProfile: QualityProfile? {
