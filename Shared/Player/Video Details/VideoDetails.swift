@@ -160,6 +160,7 @@ struct VideoDetails: View {
     @State private var subscribed = false
     @State private var subscriptionToggleButtonDisabled = false
     @State private var page = DetailsPage.info
+    @State private var descriptionExpanded = false
 
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
@@ -175,6 +176,7 @@ struct VideoDetails: View {
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showInspector) private var showInspector
+    @Default(.expandVideoDescription) private var expandVideoDescription
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -281,7 +283,9 @@ struct VideoDetails: View {
                                     }
                                     .frame(maxWidth: .infinity)
                                 } else if let description = video.description, !description.isEmpty {
-                                    VideoDescription(video: video, detailsSize: detailsSize)
+                                    Section(header: descriptionHeader) {
+                                        VideoDescription(video: video, detailsSize: detailsSize, expand: $descriptionExpanded)
+                                    }
                                 } else if !video.isLocal {
                                     Text("No description")
                                         .font(.caption)
@@ -344,6 +348,20 @@ struct VideoDetails: View {
                 page = .info
             }
         }
+    }
+
+    var descriptionHeader: some View {
+        HStack {
+            Text("Description".localized())
+
+            if !expandVideoDescription, !descriptionExpanded {
+                Spacer()
+                Image(systemName: "arrow.up.and.down")
+                    .imageScale(.small)
+            }
+        }
+        .font(.caption)
+        .foregroundColor(.secondary)
     }
 }
 

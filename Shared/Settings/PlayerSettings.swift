@@ -8,6 +8,7 @@ struct PlayerSettings: View {
     @Default(.playerSidebar) private var playerSidebar
 
     @Default(.showKeywords) private var showKeywords
+    @Default(.expandVideoDescription) private var expandVideoDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
@@ -85,6 +86,9 @@ struct PlayerSettings: View {
 
                 if !accounts.isEmpty {
                     keywordsToggle
+                    #if !os(tvOS)
+                        expandVideoDescriptionToggle
+                    #endif
                     returnYouTubeDislikeToggle
                 }
             }
@@ -160,6 +164,10 @@ struct PlayerSettings: View {
         Toggle("Show keywords", isOn: $showKeywords)
     }
 
+    private var expandVideoDescriptionToggle: some View {
+        Toggle("Open video description expanded", isOn: $expandVideoDescription)
+    }
+
     private var returnYouTubeDislikeToggle: some View {
         Toggle("Enable Return YouTube Dislike", isOn: $enableReturnYouTubeDislike)
     }
@@ -212,7 +220,9 @@ struct PlayerSettings: View {
             Text("Always").tag(ShowInspectorSetting.always)
             Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
         }
+        #if os(macOS)
         .labelsHidden()
+        #endif
     }
 }
 

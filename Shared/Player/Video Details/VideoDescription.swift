@@ -6,27 +6,54 @@ import Foundation
 import SwiftUI
 
 struct VideoDescription: View {
+    static let collapsedLines = 5
+
     private var search: SearchModel { .shared }
     @Default(.showKeywords) private var showKeywords
+    @Default(.expandVideoDescription) private var expandVideoDescription
 
     var video: Video
     var detailsSize: CGSize?
+    @Binding var expand: Bool
 
     var description: String {
         video.description ?? ""
     }
 
     var body: some View {
+        Group {
+            if !expandVideoDescription && !expand {
+                Button {
+                    expand = true
+                } label: {
+                    descriptionView
+                }
+                .buttonStyle(.plain)
+            } else {
+                descriptionView
+            }
+        }
+        .id(video.videoID)
+    }
+
+    var descriptionView: some View {
         VStack {
             #if os(iOS)
-                ActiveLabelDescriptionRepresentable(description: description, detailsSize: detailsSize)
+                ActiveLabelDescriptionRepresentable(
+                    description: description,
+                    detailsSize: detailsSize,
+                    expand: shouldExpand
+                )
             #else
                 textDescription
             #endif
 
             keywords
         }
-        .id(video.videoID)
+    }
+
+    var shouldExpand: Bool {
+        expandVideoDescription || expand
     }
 
     @ViewBuilder var textDescription: some View {
@@ -34,14 +61,18 @@ struct VideoDescription: View {
             Group {
                 if #available(macOS 12, *) {
                     Text(description)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
                     #if !os(tvOS)
                         .textSelection(.enabled)
                     #endif
                 } else {
                     Text(description)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .multilineTextAlignment(.leading)
             .font(.system(size: 14))
             .lineSpacing(3)
         #endif
@@ -89,6 +120,7 @@ struct VideoDescription: View {
     struct ActiveLabelDescriptionRepresentable: UIViewRepresentable {
         var description: String
         var detailsSize: CGSize?
+        var expand: Bool
 
         @State private var label = ActiveLabel()
 
@@ -103,12 +135,12 @@ struct VideoDescription: View {
 
         func updateUIView(_: UIViewType, context _: Context) {
             updatePreferredMaxLayoutWidth()
+            updateNumberOfLines()
         }
 
         func customizeLabel() {
             label.customize { label in
                 label.enabledTypes = [.url, .timestamp]
-                label.numberOfLines = 0
                 label.text = description
                 label.contentMode = .scaleAspectFill
                 label.font = .systemFont(ofSize: 14)
@@ -119,10 +151,15 @@ struct VideoDescription: View {
                 label.handleURLTap(urlTapHandler(_:))
                 label.handleTimestampTap(timestampTapHandler(_:))
             }
+            updateNumberOfLines()
         }
 
         func updatePreferredMaxLayoutWidth() {
             label.preferredMaxLayoutWidth = (detailsSize?.width ?? 330) - 30
+        }
+
+        func updateNumberOfLines() {
+            label.numberOfLines = expand ? 0 : VideoDescription.collapsedLines
         }
 
         func urlTapHandler(_ url: URL) {
@@ -156,7 +193,7 @@ struct VideoDescription: View {
 
 struct VideoDescription_Previews: PreviewProvider {
     static var previews: some View {
-        VideoDescription(video: .fixture)
+        VideoDescription(video: .fixture, expand: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }

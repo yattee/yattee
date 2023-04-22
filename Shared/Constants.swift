@@ -13,6 +13,14 @@ struct Constants {
         #endif
     }
 
+    static var isIPad: Bool {
+        #if os(iOS)
+            UIDevice.current.userInterfaceIdiom == .pad
+        #else
+            false
+        #endif
+    }
+
     static var progressViewScale: Double {
         #if os(macOS)
             0.4
