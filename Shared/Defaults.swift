@@ -201,6 +201,12 @@ extension Defaults.Keys {
     static let actionButtonSettingsEnabled = Key<Bool>("actionButtonSettingsEnabled", default: true)
     static let actionButtonHideEnabled = Key<Bool>("actionButtonHideEnabled", default: false)
     static let actionButtonCloseEnabled = Key<Bool>("actionButtonCloseEnabled", default: true)
+    static let actionButtonFullScreenEnabled = Key<Bool>("actionButtonFullScreenEnabled", default: false)
+    static let actionButtonPipEnabled = Key<Bool>("actionButtonPipEnabled", default: false)
+    static let actionButtonLockOrientationEnabled = Key<Bool>("actionButtonLockOrientationEnabled", default: false)
+    static let actionButtonRestartEnabled = Key<Bool>("actionButtonRestartEnabled", default: false)
+    static let actionButtonAdvanceToNextItemEnabled = Key<Bool>("actionButtonAdvanceToNextItemEnabled", default: false)
+    static let actionButtonMusicModeEnabled = Key<Bool>("actionButtonMusicModeEnabled", default: true)
 
     #if os(iOS)
         static let playerControlsLockOrientationEnabled = Key<Bool>("playerControlsLockOrientationEnabled", default: true)
@@ -215,7 +221,7 @@ extension Defaults.Keys {
     static let playerControlsRestartEnabled = Key<Bool>("playerControlsRestartEnabled", default: false)
     static let playerControlsAdvanceToNextEnabled = Key<Bool>("playerControlsAdvanceToNextEnabled", default: false)
     static let playerControlsPlaybackModeEnabled = Key<Bool>("playerControlsPlaybackModeEnabled", default: false)
-    static let playerControlsMusicModeEnabled = Key<Bool>("playerControlsMusicModeEnabled", default: true)
+    static let playerControlsMusicModeEnabled = Key<Bool>("playerControlsMusicModeEnabled", default: false)
 
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")

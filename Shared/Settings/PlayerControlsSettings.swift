@@ -18,6 +18,12 @@ struct PlayerControlsSettings: View {
     @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
     @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
     @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
+    @Default(.actionButtonFullScreenEnabled) private var actionButtonFullScreenEnabled
+    @Default(.actionButtonPipEnabled) private var actionButtonPipEnabled
+    @Default(.actionButtonLockOrientationEnabled) private var actionButtonLockOrientationEnabled
+    @Default(.actionButtonRestartEnabled) private var actionButtonRestartEnabled
+    @Default(.actionButtonAdvanceToNextItemEnabled) private var actionButtonAdvanceToNextItemEnabled
+    @Default(.actionButtonMusicModeEnabled) private var actionButtonMusicModeEnabled
     @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
 
     #if os(iOS)
@@ -211,6 +217,7 @@ struct PlayerControlsSettings: View {
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
+                        .accessibilityAddTraits(.isButton)
                     #if os(iOS)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                     #endif
@@ -246,6 +253,7 @@ struct PlayerControlsSettings: View {
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
+                        .accessibilityAddTraits(.isButton)
                     #if os(iOS)
                         .frame(minHeight: 35)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
@@ -265,12 +273,24 @@ struct PlayerControlsSettings: View {
     }
 
     @ViewBuilder private var actionButtonToggles: some View {
-        Toggle("Share", isOn: $actionButtonShareEnabled)
-        Toggle("Add to Playlist", isOn: $actionButtonAddToPlaylistEnabled)
-        Toggle("Subscribe/Unsubscribe", isOn: $actionButtonSubscribeEnabled)
-        Toggle("Settings", isOn: $actionButtonSettingsEnabled)
-        Toggle("Hide player", isOn: $actionButtonHideEnabled)
-        Toggle("Close video", isOn: $actionButtonCloseEnabled)
+        Group {
+            Toggle("Share", isOn: $actionButtonShareEnabled)
+            Toggle("Add to Playlist", isOn: $actionButtonAddToPlaylistEnabled)
+            Toggle("Subscribe/Unsubscribe", isOn: $actionButtonSubscribeEnabled)
+            Toggle("Settings", isOn: $actionButtonSettingsEnabled)
+            Toggle("Fullscreen", isOn: $actionButtonFullScreenEnabled)
+            Toggle("Picture in Picture", isOn: $actionButtonPipEnabled)
+        }
+        Group {
+            #if os(iOS)
+                Toggle("Lock orientation", isOn: $actionButtonLockOrientationEnabled)
+            #endif
+            Toggle("Restart", isOn: $actionButtonRestartEnabled)
+            Toggle("Play next item", isOn: $actionButtonAdvanceToNextItemEnabled)
+            Toggle("Music Mode", isOn: $actionButtonMusicModeEnabled)
+            Toggle("Hide player", isOn: $actionButtonHideEnabled)
+            Toggle("Close video", isOn: $actionButtonCloseEnabled)
+        }
     }
 
     @ViewBuilder private var controlButtonToggles: some View {
@@ -283,9 +303,9 @@ struct PlayerControlsSettings: View {
         #endif
         Toggle("Restart", isOn: $playerControlsRestartEnabled)
         Toggle("Play next item", isOn: $playerControlsAdvanceToNextEnabled)
-        Toggle("Playback mode", isOn: $playerControlsPlaybackModeEnabled)
+        Toggle("Playback Mode", isOn: $playerControlsPlaybackModeEnabled)
         #if !os(tvOS)
-            Toggle("Music mode", isOn: $playerControlsMusicModeEnabled)
+            Toggle("Music Mode", isOn: $playerControlsMusicModeEnabled)
         #endif
     }
 }

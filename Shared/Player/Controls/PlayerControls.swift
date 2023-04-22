@@ -329,7 +329,7 @@ struct PlayerControls: View {
     var fullscreenButton: some View {
         button(
             "Fullscreen",
-            systemImage: player.playingFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+            systemImage: player.fullscreenImage
         ) {
             player.toggleFullscreen(player.playingFullScreen, showControls: false)
         }
@@ -367,28 +367,13 @@ struct PlayerControls: View {
     }
 
     private var pipButton: some View {
-        let image = player.transitioningToPiP ? "pip.fill" : player.pipController?.isPictureInPictureActive ?? false ? "pip.exit" : "pip.enter"
-        return button("PiP", systemImage: image) {
-            (player.pipController?.isPictureInPictureActive ?? false) ? player.closePiP() : player.startPiP()
-        }
-        .disabled(!player.pipPossible)
+        button("PiP", systemImage: player.pipImage, action: player.togglePiPAction)
+            .disabled(!player.pipPossible)
     }
 
     #if os(iOS)
         private var lockOrientationButton: some View {
-            button("Lock Rotation", systemImage: player.lockedOrientation.isNil ? "lock.rotation.open" : "lock.rotation", active: !player.lockedOrientation.isNil) {
-                if player.lockedOrientation.isNil {
-                    let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
-                    player.lockedOrientation = orientationMask
-                    let orientation = OrientationTracker.shared.currentInterfaceOrientation
-                    Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
-                    // iOS 16 workaround
-                    Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
-                } else {
-                    player.lockedOrientation = nil
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                }
-            }
+            button("Lock Rotation", systemImage: player.lockOrientationImage, active: !player.lockedOrientation.isNil, action: player.lockOrientationAction)
         }
     #endif
 
@@ -456,9 +441,7 @@ struct PlayerControls: View {
     }
 
     private var restartVideoButton: some View {
-        button("Restart video", systemImage: "backward.end.fill", cornerRadius: 5) {
-            player.backend.seek(to: 0.0, seekType: .userInteracted)
-        }
+        button("Restart video", systemImage: "backward.end.fill", cornerRadius: 5, action: player.replayAction)
     }
 
     private var togglePlayButton: some View {

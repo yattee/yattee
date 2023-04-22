@@ -664,6 +664,46 @@ final class PlayerModel: ObservableObject {
         backend.closePiP()
     }
 
+    var pipImage: String {
+        transitioningToPiP ? "pip.fill" : pipController?.isPictureInPictureActive ?? false ? "pip.exit" : "pip.enter"
+    }
+
+    var fullscreenImage: String {
+        playingFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+    }
+
+    func toggleFullScreenAction() {
+        toggleFullscreen(playingFullScreen, showControls: false)
+    }
+
+    func togglePiPAction() {
+        (pipController?.isPictureInPictureActive ?? false) ? closePiP() : startPiP()
+    }
+
+    #if os(iOS)
+        var lockOrientationImage: String {
+            lockedOrientation.isNil ? "lock.rotation.open" : "lock.rotation"
+        }
+
+        func lockOrientationAction() {
+            if lockedOrientation.isNil {
+                let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
+                lockedOrientation = orientationMask
+                let orientation = OrientationTracker.shared.currentInterfaceOrientation
+                Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
+                // iOS 16 workaround
+                Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
+            } else {
+                lockedOrientation = nil
+                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+            }
+        }
+    #endif
+
+    func replayAction() {
+        backend.seek(to: 0.0, seekType: .userInteracted)
+    }
+
     func handleQueueChange() {
         Defaults[.queue] = queue
 

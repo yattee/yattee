@@ -257,7 +257,7 @@ struct VideoDetails: View {
 
         switch page {
         case .queue:
-            return !player.queue.isEmpty
+            return !sidebarQueue && player.isAdvanceToNextItemAvailable
         default:
             return !video.isLocal
         }
