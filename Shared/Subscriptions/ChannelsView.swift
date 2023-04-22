@@ -7,6 +7,7 @@ struct ChannelsView: View {
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
+    private var navigation = NavigationModel.shared
 
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
@@ -15,19 +16,31 @@ struct ChannelsView: View {
         List {
             Section(header: header) {
                 ForEach(subscriptions.all) { channel in
-                    NavigationLink(destination: ChannelVideosView(channel: channel)) {
-                        HStack {
-                            if let url = channel.thumbnailURLOrCached {
-                                ThumbnailView(url: url)
-                                    .frame(width: 35, height: 35)
-                                    .clipShape(RoundedRectangle(cornerRadius: 35))
-                                Text(channel.name)
-                            } else {
-                                Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
-                            }
+                    let label = HStack {
+                        if let url = channel.thumbnailURLOrCached {
+                            ThumbnailView(url: url)
+                                .frame(width: 35, height: 35)
+                                .clipShape(RoundedRectangle(cornerRadius: 35))
+                            Text(channel.name)
+                        } else {
+                            Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
                         }
-                        .backport
-                        .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
+                    }
+                    .backport
+                    .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
+
+                    Group {
+                        #if os(tvOS)
+                            Button {
+                                navigation.openChannel(channel, navigationStyle: .tab)
+                            } label: {
+                                label
+                            }
+                        #else
+                            NavigationLink(destination: ChannelVideosView(channel: channel)) {
+                                label
+                            }
+                        #endif
                     }
                     .contextMenu {
                         if subscriptions.isSubscribing(channel.id) {
