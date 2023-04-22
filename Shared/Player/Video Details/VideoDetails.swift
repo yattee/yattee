@@ -264,72 +264,65 @@ struct VideoDetails: View {
     }
 
     var pageView: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack {
-                    pageMenu
-                        .id("top")
-                        .padding(5)
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack {
+                pageMenu
+                    .padding(5)
 
-                    switch page {
-                    case .info:
-                        Group {
-                            if let video {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
-                                        VStack {
-                                            ProgressView()
-                                                .progressViewStyle(.circular)
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                    } else if let description = video.description, !description.isEmpty {
-                                        VideoDescription(video: video, detailsSize: detailsSize)
-                                    } else if !video.isLocal {
-                                        Text("No description")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                switch page {
+                case .info:
+                    Group {
+                        if let video {
+                            VStack(alignment: .leading, spacing: 10) {
+                                if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
+                                    VStack {
+                                        ProgressView()
+                                            .progressViewStyle(.circular)
                                     }
-
-                                    if video.isLocal || showInspector == .always {
-                                        InspectorView(video: player.videoForDisplay)
-                                    }
-
-                                    if !sidebarQueue,
-                                       !(player.videoForDisplay?.related.isEmpty ?? true)
-                                    {
-                                        RelatedView()
-                                            .padding(.top, 20)
-                                    }
+                                    .frame(maxWidth: .infinity)
+                                } else if let description = video.description, !description.isEmpty {
+                                    VideoDescription(video: video, detailsSize: detailsSize)
+                                } else if !video.isLocal {
+                                    Text("No description")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
-                                .padding(.bottom, 60)
+
+                                if video.isLocal || showInspector == .always {
+                                    InspectorView(video: player.videoForDisplay)
+                                }
+
+                                if !sidebarQueue,
+                                   !(player.videoForDisplay?.related.isEmpty ?? true)
+                                {
+                                    RelatedView()
+                                        .padding(.top, 20)
+                                }
                             }
+                            .padding(.bottom, 60)
                         }
-                        .onChange(of: player.currentVideo?.cacheKey) { _ in
-                            proxy.scrollTo("top")
+                    }
+                    .onAppear {
+                        if video != nil, !pageAvailable(page) {
                             page = .info
                         }
-                        .onAppear {
-                            if video != nil, !pageAvailable(page) {
-                                page = .info
-                            }
-                        }
-                        .transition(.opacity)
-                        .animation(nil, value: player.currentItem)
-                        .padding(.horizontal)
-                        #if os(iOS)
-                            .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
-                        #endif
-
-                    case .queue:
-                        PlayerQueueView(sidebarQueue: false)
-                            .padding(.horizontal)
-
-                    case .comments:
-                        CommentsView(embedInScrollView: false)
-                            .onAppear {
-                                comments.loadIfNeeded()
-                            }
                     }
+                    .transition(.opacity)
+                    .animation(nil, value: player.currentItem)
+                    .padding(.horizontal)
+                    #if os(iOS)
+                        .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
+                    #endif
+
+                case .queue:
+                    PlayerQueueView(sidebarQueue: false)
+                        .padding(.horizontal)
+
+                case .comments:
+                    CommentsView(embedInScrollView: false)
+                        .onAppear {
+                            comments.loadIfNeeded()
+                        }
                 }
             }
         }

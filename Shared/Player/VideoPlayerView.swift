@@ -343,6 +343,7 @@ struct VideoPlayerView: View {
                                     player.setNeedsDrawing(true)
                                 }
                             }
+                            .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
                         }
                     }

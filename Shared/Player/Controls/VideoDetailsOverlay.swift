@@ -7,6 +7,7 @@ struct VideoDetailsOverlay: View {
     var body: some View {
         VideoDetails(video: controls.player.videoForDisplay, fullScreen: fullScreenBinding, sidebarQueue: .constant(false))
             .clipShape(RoundedRectangle(cornerRadius: 4))
+            .id(controls.player.currentVideo?.cacheKey)
     }
 
     var fullScreenBinding: Binding<Bool> {
