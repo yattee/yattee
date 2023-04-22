@@ -16,6 +16,7 @@ struct BrowsingSettings: View {
     @Default(.thumbnailsQuality) private var thumbnailsQuality
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
+    @Default(.showToggleWatchedStatusButton) private var showToggleWatchedStatusButton
     @Default(.showHome) private var showHome
     @Default(.showFavoritesInHome) private var showFavoritesInHome
     @Default(.showQueueInHome) private var showQueueInHome
@@ -244,6 +245,9 @@ struct BrowsingSettings: View {
             #endif
             Toggle("Show channel name", isOn: $channelOnThumbnail)
             Toggle("Show video length", isOn: $timeOnThumbnail)
+            #if !os(tvOS)
+                Toggle("Show toggle watch status button", isOn: $showToggleWatchedStatusButton)
+            #endif
         }
     }
 

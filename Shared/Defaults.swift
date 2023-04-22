@@ -52,6 +52,7 @@ extension Defaults.Keys {
         static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
     #endif
     static let showUnwatchedFeedBadges = Key<Bool>("showUnwatchedFeedBadges", default: false)
+    static let showToggleWatchedStatusButton = Key<Bool>("showToggleWatchedStatusButton", default: false)
     static let expandChannelDescription = Key<Bool>("expandChannelDescription", default: false)
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: false)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)

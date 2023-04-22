@@ -8,21 +8,28 @@ struct WatchView: View {
     var duration: Double
 
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
+    @Default(.showToggleWatchedStatusButton) private var showToggleWatchedStatusButton
 
     var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
     var body: some View {
-        #if os(tvOS)
+        if showToggleWatchedStatusButton {
+            #if os(tvOS)
+                if finished {
+                    image
+                }
+            #else
+                Button(action: toggleWatch) {
+                    image
+                }
+                .opacity(finished ? 1 : 0.4)
+                .buttonStyle(.plain)
+            #endif
+        } else {
             if finished {
                 image
             }
-        #else
-            Button(action: toggleWatch) {
-                image
-            }
-            .opacity(finished ? 1 : 0.4)
-            .buttonStyle(.plain)
-        #endif
+        }
     }
 
     var image: some View {
