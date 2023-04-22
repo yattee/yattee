@@ -51,7 +51,7 @@ extension Watch {
     @NSManaged var appName: String?
     @NSManaged var instanceURL: URL?
 
-    var app: VideosApp! {
+    var app: VideosApp? {
         guard let appName else { return nil }
         return .init(rawValue: appName)
     }

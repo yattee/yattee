@@ -32,9 +32,11 @@ struct YatteeApp: App {
 
     @State private var configured = false
 
+    @StateObject private var accounts = AccountsModel.shared
     @StateObject private var comments = CommentsModel.shared
     @StateObject private var instances = InstancesModel.shared
     @StateObject private var menu = MenuModel.shared
+    @StateObject private var navigation = NavigationModel.shared
     @StateObject private var networkState = NetworkStateModel.shared
     @StateObject private var player = PlayerModel.shared
     @StateObject private var playlists = PlaylistsModel.shared
