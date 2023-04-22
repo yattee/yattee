@@ -170,7 +170,7 @@ struct ChannelPlaylistView: View {
         #if os(iOS)
             .navigationBarTrailing
         #else
-            .automatic
+                .automatic
         #endif
     }
 

@@ -280,7 +280,7 @@ enum PlayerSidebarSetting: String, CaseIterable, Defaults.Serializable {
         #if os(macOS)
             .always
         #else
-            .whenFits
+                .whenFits
         #endif
     }
 }

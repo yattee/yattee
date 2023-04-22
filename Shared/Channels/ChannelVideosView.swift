@@ -40,7 +40,7 @@ struct ChannelVideosView: View {
     }
 
     var contentItems: [ContentItem] {
-        return contentTypeItems.collection
+        contentTypeItems.collection
     }
 
     var body: some View {

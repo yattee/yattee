@@ -223,7 +223,7 @@ struct VideoPlayerView: View {
                     #endif
 
                     #if !os(tvOS)
-                        if !fullScreenPlayer && sidebarQueue {
+                        if !fullScreenPlayer, sidebarQueue {
                             Spacer()
                         }
                     #endif

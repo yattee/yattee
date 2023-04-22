@@ -54,13 +54,13 @@ final class SponsorBlockAPI: ObservableObject {
                 "still frame or clip which are also seen in other videos by the same creator.").localized()
 
         case "outro":
-            return ("Typically near or at the end of the video when the credits pop up and/or endcards are shown.").localized()
+            return "Typically near or at the end of the video when the credits pop up and/or endcards are shown.".localized()
 
         case "interaction":
-            return ("Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).").localized()
+            return "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).".localized()
 
         case "music_offtopic":
-            return ("For videos which feature music as the primary content.").localized()
+            return "For videos which feature music as the primary content.".localized()
 
         default:
             return nil

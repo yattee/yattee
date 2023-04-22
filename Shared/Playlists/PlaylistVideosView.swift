@@ -107,7 +107,7 @@ struct PlaylistVideosView: View {
         #if os(iOS)
             .navigationBarTrailing
         #else
-            .automatic
+                .automatic
         #endif
     }
 }

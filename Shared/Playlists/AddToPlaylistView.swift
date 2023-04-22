@@ -118,7 +118,7 @@ struct AddToPlaylistView: View {
         #if os(tvOS)
             .trailing
         #else
-            .center
+                .center
         #endif
     }
 
