@@ -63,14 +63,14 @@ struct PlaybackSettings: View {
                 }
 
                 HStack {
-                    controlsHeader("Playback Mode")
+                    controlsHeader("Playback Mode".localized())
                     Spacer()
                     playbackModeControl
                 }
                 .padding(.vertical, 10)
 
                 HStack {
-                    controlsHeader("Rate")
+                    controlsHeader("Rate".localized())
                     Spacer()
                     HStack(spacing: rateButtonsSpacing) {
                         decreaseRateButton
@@ -86,7 +86,7 @@ struct PlaybackSettings: View {
                 }
                 if player.activeBackend == .mpv {
                     HStack {
-                        controlsHeader("Captions")
+                        controlsHeader("Captions".localized())
                         Spacer()
                         captionsButton
                         #if os(tvOS)
@@ -292,7 +292,7 @@ struct PlaybackSettings: View {
             Button {
                 player.playbackMode = player.playbackMode.next()
             } label: {
-                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+                Label(player.playbackMode.description.localized(), systemImage: player.playbackMode.systemImage)
                     .transaction { t in t.animation = nil }
                     .frame(minWidth: 350)
             }
@@ -306,7 +306,7 @@ struct PlaybackSettings: View {
             Menu {
                 playbackModePicker
             } label: {
-                Label(player.playbackMode.description, systemImage: player.playbackMode.systemImage)
+                Label(player.playbackMode.description.localized(), systemImage: player.playbackMode.systemImage)
             }
             .transaction { t in t.animation = .none }
         #endif
@@ -315,7 +315,7 @@ struct PlaybackSettings: View {
     var playbackModePicker: some View {
         Picker("Playback Mode", selection: $player.playbackMode) {
             ForEach(PlayerModel.PlaybackMode.allCases, id: \.rawValue) { mode in
-                Label(mode.description, systemImage: mode.systemImage).tag(mode)
+                Label(mode.description.localized(), systemImage: mode.systemImage).tag(mode)
             }
         }
         .labelsHidden()
@@ -437,7 +437,7 @@ struct PlaybackSettings: View {
 
     @ViewBuilder private var captionsPicker: some View {
         let captions = player.currentVideo?.captions ?? []
-        Picker("Captions", selection: $player.captions) {
+        Picker("Captions".localized(), selection: $player.captions) {
             if captions.isEmpty {
                 Text("Not available")
             } else {

@@ -166,8 +166,8 @@ struct BrowsingSettings: View {
             Section(header: SettingsHeader(text: "Player Bar".localized()), footer: playerBarFooter) {
                 Toggle("Open expanded", isOn: $playerButtonIsExpanded)
                 Toggle("Always show controls buttons", isOn: $playerButtonShowsControlButtonsWhenMinimized)
-                playerBarGesturePicker("Single tap gesture", selection: $playerButtonSingleTapGesture)
-                playerBarGesturePicker("Double tap gesture", selection: $playerButtonDoubleTapGesture)
+                playerBarGesturePicker("Single tap gesture".localized(), selection: $playerButtonSingleTapGesture)
+                playerBarGesturePicker("Double tap gesture".localized(), selection: $playerButtonDoubleTapGesture)
                 HStack {
                     Text("Maximum width expanded")
                     Spacer()
@@ -185,7 +185,7 @@ struct BrowsingSettings: View {
         func playerBarGesturePicker(_ label: String, selection: Binding<PlayerTapGestureAction>) -> some View {
             Picker(label, selection: selection) {
                 ForEach(PlayerTapGestureAction.allCases, id: \.rawValue) { action in
-                    Text(action.label).tag(action)
+                    Text(action.label.localized()).tag(action)
                 }
             }
         }

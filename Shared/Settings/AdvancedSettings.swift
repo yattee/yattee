@@ -137,12 +137,13 @@ struct AdvancedSettings: View {
         HStack {
             Text("Maximum feed items")
                 .frame(minWidth: 200, alignment: .leading)
+                .multilineTextAlignment(.leading)
             TextField("Limit", text: $feedCacheSize)
+                .multilineTextAlignment(.trailing)
             #if !os(macOS)
                 .keyboardType(.numberPad)
             #endif
         }
-        .multilineTextAlignment(.trailing)
     }
 
     private var showCacheStatusToggle: some View {
@@ -167,7 +168,7 @@ struct AdvancedSettings: View {
     }
 
     var cacheSize: some View {
-        Text(String(format: "Total size: %@", BaseCacheModel.shared.totalSizeFormatted))
+        Text(String(format: "Total size: %@".localized(), BaseCacheModel.shared.totalSizeFormatted))
             .foregroundColor(.secondary)
     }
 }
