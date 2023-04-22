@@ -28,7 +28,6 @@ struct PlayerControls: View {
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
-    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
     @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
 
@@ -40,7 +39,6 @@ struct PlayerControls: View {
     @Default(.playerControlsRestartEnabled) private var playerControlsRestartEnabled
     @Default(.playerControlsAdvanceToNextEnabled) private var playerControlsAdvanceToNextEnabled
     @Default(.playerControlsPlaybackModeEnabled) private var playerControlsPlaybackModeEnabled
-    @Default(.playerControlsNextEnabled) private var playerControlsNextEnabled
     @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
 
     private let controlsOverlayModel = ControlOverlaysModel.shared
@@ -161,9 +159,6 @@ struct PlayerControls: View {
                                 #endif
                                 if playerControlsPlaybackModeEnabled {
                                     playbackModeButton
-                                }
-                                if playerControlsNextEnabled {
-                                    watchNextButton
                                 }
                                 #if os(tvOS)
                                     closeVideoButton
@@ -360,12 +355,7 @@ struct PlayerControls: View {
 
     private var closeVideoButton: some View {
         button("Close", systemImage: "xmark") {
-            if openWatchNextOnClose {
-                player.pause()
-                WatchNextViewModel.shared.closed(player.currentItem)
-            } else {
-                player.closeCurrentItem()
-            }
+            player.closeCurrentItem()
         }
         #if os(tvOS)
         .focused($focusedField, equals: .close)
@@ -406,12 +396,6 @@ struct PlayerControls: View {
         button("Playback Mode", systemImage: player.playbackMode.systemImage) {
             player.playbackMode = player.playbackMode.next()
             model.objectWillChange.send()
-        }
-    }
-
-    var watchNextButton: some View {
-        button("Watch Next", systemImage: Constants.nextSystemImage) {
-            WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
         }
     }
 

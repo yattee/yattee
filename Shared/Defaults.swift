@@ -199,10 +199,8 @@ extension Defaults.Keys {
     static let actionButtonAddToPlaylistEnabled = Key<Bool>("actionButtonAddToPlaylistEnabled", default: true)
     static let actionButtonSubscribeEnabled = Key<Bool>("actionButtonSubscribeEnabled", default: false)
     static let actionButtonSettingsEnabled = Key<Bool>("actionButtonSettingsEnabled", default: true)
-    static let actionButtonNextEnabled = Key<Bool>("actionButtonNextEnabled", default: true)
     static let actionButtonHideEnabled = Key<Bool>("actionButtonHideEnabled", default: false)
     static let actionButtonCloseEnabled = Key<Bool>("actionButtonCloseEnabled", default: true)
-    static let actionButtonNextQueueCountEnabled = Key<Bool>("actionButtonNextQueueCountEnabled", default: true)
 
     #if os(iOS)
         static let playerControlsLockOrientationEnabled = Key<Bool>("playerControlsLockOrientationEnabled", default: true)
@@ -217,7 +215,6 @@ extension Defaults.Keys {
     static let playerControlsRestartEnabled = Key<Bool>("playerControlsRestartEnabled", default: false)
     static let playerControlsAdvanceToNextEnabled = Key<Bool>("playerControlsAdvanceToNextEnabled", default: false)
     static let playerControlsPlaybackModeEnabled = Key<Bool>("playerControlsPlaybackModeEnabled", default: false)
-    static let playerControlsNextEnabled = Key<Bool>("playerControlsNextEnabled", default: true)
     static let playerControlsMusicModeEnabled = Key<Bool>("playerControlsMusicModeEnabled", default: true)
 
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
@@ -235,11 +232,6 @@ extension Defaults.Keys {
     static let playlistListingStyle = Key<ListingStyle>("playlistListingStyle", default: .cells)
     static let channelPlaylistListingStyle = Key<ListingStyle>("channelPlaylistListingStyle", default: .cells)
     static let searchListingStyle = Key<ListingStyle>("searchListingStyle", default: .cells)
-
-    static let openWatchNextOnFinishedWatching = Key<Bool>("openWatchNextOnFinishedWatching", default: true)
-    static let openWatchNextOnClose = Key<Bool>("openWatchNextOnClose", default: false)
-    static let openWatchNextOnFinishedWatchingDelay = Key<String>("openWatchNextOnFinishedWatchingDelay", default: "5")
-
     static let hideShorts = Key<Bool>("hideShorts", default: false)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
 }

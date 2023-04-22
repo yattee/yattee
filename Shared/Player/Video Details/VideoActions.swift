@@ -7,7 +7,6 @@ struct VideoActions: View {
         case addToPlaylist
         case subscribe
         case settings
-        case next
         case hide
         case close
     }
@@ -19,17 +18,14 @@ struct VideoActions: View {
 
     var video: Video?
 
-    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
     @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
 
     @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
     @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
     @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
     @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
-    @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
     @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
     @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
-    @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
 
     var body: some View {
         HStack(spacing: 6) {
@@ -55,8 +51,6 @@ struct VideoActions: View {
             return actionButtonSubscribeEnabled
         case .settings:
             return actionButtonSettingsEnabled
-        case .next:
-            return actionButtonNextEnabled
         case .hide:
             return actionButtonHideEnabled
         case .close:
@@ -126,10 +120,6 @@ struct VideoActions: View {
                             #endif
                         }
                     }
-                case .next:
-                    actionButton(nextLabel, systemImage: Constants.nextSystemImage) {
-                        WatchNextViewModel.shared.userInteractedOpen(player.currentItem)
-                    }
                 case .hide:
                     actionButton("Hide", systemImage: "chevron.down") {
                         player.hide(animate: true)
@@ -137,25 +127,12 @@ struct VideoActions: View {
 
                 case .close:
                     actionButton("Close", systemImage: "xmark") {
-                        if player.presentingPlayer, openWatchNextOnClose {
-                            player.pause()
-                            WatchNextViewModel.shared.closed(player.currentItem)
-                        } else {
-                            player.closeCurrentItem()
-                        }
+                        player.closeCurrentItem()
                     }
                 }
             }
             .disabled(!isActionable(action))
         }
-    }
-
-    var nextLabel: String {
-        if actionButtonNextQueueCountEnabled, !player.queue.isEmpty {
-            return "\("Next".localized()) • \(player.queue.count)"
-        }
-
-        return "Next".localized()
     }
 
     func actionButton(

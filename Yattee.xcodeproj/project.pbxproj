@@ -220,12 +220,6 @@
 		371F2F1A269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
 		371F2F1C269B43D300E4A7AB /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371F2F19269B43D300E4A7AB /* NavigationModel.swift */; };
-		37220560294BE2C700E0D176 /* WatchNextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722055F294BE2C700E0D176 /* WatchNextView.swift */; };
-		37220561294BE2C700E0D176 /* WatchNextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722055F294BE2C700E0D176 /* WatchNextView.swift */; };
-		37220562294BE2C700E0D176 /* WatchNextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722055F294BE2C700E0D176 /* WatchNextView.swift */; };
-		37220564294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37220563294BEB2800E0D176 /* WatchNextViewModel.swift */; };
-		37220565294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37220563294BEB2800E0D176 /* WatchNextViewModel.swift */; };
-		37220566294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37220563294BEB2800E0D176 /* WatchNextViewModel.swift */; };
 		3722AEBC274DA396005EA4D6 /* Badge+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */; };
 		3722AEBE274DA401005EA4D6 /* Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBD274DA401005EA4D6 /* Backport.swift */; };
 		3726386E2948A4B80043702D /* Badge+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */; };
@@ -1197,8 +1191,6 @@
 		371CC76F29468BDC00979C1A /* SettingsButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButtons.swift; sourceTree = "<group>"; };
 		371CC7732946963000979C1A /* ListingStyleButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListingStyleButtons.swift; sourceTree = "<group>"; };
 		371F2F19269B43D300E4A7AB /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
-		3722055F294BE2C700E0D176 /* WatchNextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNextView.swift; sourceTree = "<group>"; };
-		37220563294BEB2800E0D176 /* WatchNextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNextViewModel.swift; sourceTree = "<group>"; };
 		3722AEBB274DA396005EA4D6 /* Badge+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Badge+Backport.swift"; sourceTree = "<group>"; };
 		3722AEBD274DA401005EA4D6 /* Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backport.swift; sourceTree = "<group>"; };
 		3722AEBF274DAEB8005EA4D6 /* Tint+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tint+Backport.swift"; sourceTree = "<group>"; };
@@ -1833,7 +1825,6 @@
 				374924E629215FB60017D862 /* TapRecognizerViewModifier.swift */,
 				37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */,
 				37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */,
-				3722055F294BE2C700E0D176 /* WatchNextView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2429,7 +2420,6 @@
 				37F5E8B5291BE9D0006C15F5 /* URLBookmarkModel.swift */,
 				37D4B19626717E1500C925CA /* Video.swift */,
 				3784CDDE27772EE40055BBF2 /* Watch.swift */,
-				37220563294BEB2800E0D176 /* WatchNextViewModel.swift */,
 				37130A59277657090033018A /* Yattee.xcdatamodeld */,
 			);
 			path = Model;
@@ -3072,7 +3062,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37220564294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */,
 				37E6D79C2944AE1A00550C3D /* FeedModel.swift in Sources */,
 				37C8E701294FC97D00EEAB14 /* QueueView.swift in Sources */,
 				374710052755291C00CE0F87 /* SearchTextField.swift in Sources */,
@@ -3137,7 +3126,6 @@
 				37484C1926FC837400287258 /* PlayerSettings.swift in Sources */,
 				3711403F26B206A6005B3555 /* SearchModel.swift in Sources */,
 				3729037E2739E47400EA99F6 /* MenuCommands.swift in Sources */,
-				37220560294BE2C700E0D176 /* WatchNextView.swift in Sources */,
 				37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37EBD8C427AF0DA800F1C24B /* PlayerBackend.swift in Sources */,
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
@@ -3513,7 +3501,6 @@
 				376578862685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37A9965F26D6F9B9006E3224 /* HomeView.swift in Sources */,
 				37F4AE7326828F0900BD60EA /* VerticalCells.swift in Sources */,
-				37220561294BE2C700E0D176 /* WatchNextView.swift in Sources */,
 				37001560271B12DD0049C794 /* SiestaConfiguration.swift in Sources */,
 				372D85DE283841B800FF3C7D /* PiPDelegate.swift in Sources */,
 				37F13B63285E43C000B137E4 /* ControlsOverlay.swift in Sources */,
@@ -3606,7 +3593,6 @@
 				373CFAF02697A78B003CB2C6 /* AddToPlaylistView.swift in Sources */,
 				3763495226DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
 				370015AA28BBAE7F000149FD /* ProgressBar.swift in Sources */,
-				37220565294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */,
 				371B7E672759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				3769C02F2779F18600DDB3EA /* PlaceholderProgressView.swift in Sources */,
 				37BA794426DBA973002A0235 /* PlaylistsModel.swift in Sources */,
@@ -3703,7 +3689,6 @@
 				37F4AE7426828F0900BD60EA /* VerticalCells.swift in Sources */,
 				376578872685429C00D4EA09 /* CaseIterable+Next.swift in Sources */,
 				37BDFF1D29487C5A000C6404 /* ChannelListItem.swift in Sources */,
-				37220562294BE2C700E0D176 /* WatchNextView.swift in Sources */,
 				37D4B1802671650A00C925CA /* YatteeApp.swift in Sources */,
 				3748187026A769D60084E870 /* DetailBadge.swift in Sources */,
 				3741A32C27E7EFFD00D266D1 /* PlayerControls.swift in Sources */,
@@ -3913,7 +3898,6 @@
 				37484C1B26FC837400287258 /* PlayerSettings.swift in Sources */,
 				372915E82687E3B900F5A35B /* Defaults.swift in Sources */,
 				37BAB54C269B39FD00E75ED1 /* TVNavigationView.swift in Sources */,
-				37220566294BEB2800E0D176 /* WatchNextViewModel.swift in Sources */,
 				3718B9A62921A9BE0003DB2E /* PreferenceKeys.swift in Sources */,
 				3797758D2689345500DD52A8 /* Store.swift in Sources */,
 				37484C2F26FC844700287258 /* InstanceSettings.swift in Sources */,

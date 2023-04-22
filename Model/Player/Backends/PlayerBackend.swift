@@ -105,47 +105,27 @@ extension PlayerBackend {
             return
         }
 
-        let action = {
-            switch model.playbackMode {
-            case .queue, .shuffle:
-                model.prepareCurrentItemForHistory(finished: true)
+        switch model.playbackMode {
+        case .queue, .shuffle:
+            model.prepareCurrentItemForHistory(finished: true)
 
-                if model.queue.isEmpty {
-                    #if os(tvOS)
-                        if model.activeBackend == .appleAVPlayer {
-                            model.avPlayerBackend.controller?.dismiss(animated: false)
-                        }
-                    #endif
-                    model.resetQueue()
-                    model.hide()
-                } else {
-                    model.advanceToNextItem()
-                }
-            case .loopOne:
-                loopAction()
-            case .related:
-                guard let item = model.autoplayItem else { return }
-                model.resetAutoplay()
-                model.advanceToItem(item)
-            }
-        }
-        let actionAndHideWatchNext: (Bool) -> Void = { delay in
-            WatchNextViewModel.shared.hide()
-            if delay {
-                Delay.by(0.3) {
-                    action()
-                }
+            if model.queue.isEmpty {
+                #if os(tvOS)
+                    if model.activeBackend == .appleAVPlayer {
+                        model.avPlayerBackend.controller?.dismiss(animated: false)
+                    }
+                #endif
+                model.resetQueue()
+                model.hide()
             } else {
-                action()
+                model.advanceToNextItem()
             }
-        }
-        if Defaults[.openWatchNextOnFinishedWatching], model.presentingPlayer {
-            let timer = Delay.by(TimeInterval(Defaults[.openWatchNextOnFinishedWatchingDelay]) ?? 5.0) {
-                actionAndHideWatchNext(true)
-            }
-            WatchNextViewModel.shared.finishedWatching(model.currentItem, timer: timer)
-        } else {
-            actionAndHideWatchNext(false)
+        case .loopOne:
+            loopAction()
+        case .related:
+            guard let item = model.autoplayItem else { return }
+            model.resetAutoplay()
+            model.advanceToItem(item)
         }
     }
 

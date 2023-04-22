@@ -15,12 +15,10 @@ struct PlayerControlsSettings: View {
     @Default(.systemControlsSeekDuration) private var systemControlsSeekDuration
     @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
     @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
-    @Default(.actionButtonNextEnabled) private var actionButtonNextEnabled
     @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
     @Default(.actionButtonAddToPlaylistEnabled) private var actionButtonAddToPlaylistEnabled
     @Default(.actionButtonSettingsEnabled) private var actionButtonSettingsEnabled
     @Default(.actionButtonHideEnabled) private var actionButtonHideEnabled
-    @Default(.actionButtonNextQueueCountEnabled) private var actionButtonNextQueueCountEnabled
 
     #if os(iOS)
         @Default(.playerControlsLockOrientationEnabled) private var playerControlsLockOrientationEnabled
@@ -30,7 +28,6 @@ struct PlayerControlsSettings: View {
     @Default(.playerControlsRestartEnabled) private var playerControlsRestartEnabled
     @Default(.playerControlsAdvanceToNextEnabled) private var playerControlsAdvanceToNextEnabled
     @Default(.playerControlsPlaybackModeEnabled) private var playerControlsPlaybackModeEnabled
-    @Default(.playerControlsNextEnabled) private var playerControlsNextEnabled
     @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
 
     private var player = PlayerModel.shared
@@ -109,8 +106,6 @@ struct PlayerControlsSettings: View {
         Section(header: SettingsHeader(text: "Actions Buttons")) {
             actionButtonToggles
         }
-
-        actionButtonNextQueueCountEnabledToggle
     }
 
     private var systemControlsCommandsPicker: some View {
@@ -274,7 +269,6 @@ struct PlayerControlsSettings: View {
         Toggle("Add to Playlist", isOn: $actionButtonAddToPlaylistEnabled)
         Toggle("Subscribe/Unsubscribe", isOn: $actionButtonSubscribeEnabled)
         Toggle("Settings", isOn: $actionButtonSettingsEnabled)
-        Toggle("Watch Next", isOn: $actionButtonNextEnabled)
         Toggle("Hide player", isOn: $actionButtonHideEnabled)
         Toggle("Close video", isOn: $actionButtonCloseEnabled)
     }
@@ -289,15 +283,10 @@ struct PlayerControlsSettings: View {
         #endif
         Toggle("Restart", isOn: $playerControlsRestartEnabled)
         Toggle("Play next item", isOn: $playerControlsAdvanceToNextEnabled)
-        Toggle("Watch Next", isOn: $playerControlsNextEnabled)
         Toggle("Playback mode", isOn: $playerControlsPlaybackModeEnabled)
         #if !os(tvOS)
             Toggle("Music mode", isOn: $playerControlsMusicModeEnabled)
         #endif
-    }
-
-    var actionButtonNextQueueCountEnabledToggle: some View {
-        Toggle("Count of items in queue in Watch Next button", isOn: $actionButtonNextQueueCountEnabled)
     }
 }
 

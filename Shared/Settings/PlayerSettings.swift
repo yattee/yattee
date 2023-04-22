@@ -24,9 +24,6 @@ struct PlayerSettings: View {
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
 
-    @Default(.openWatchNextOnClose) private var openWatchNextOnClose
-    @Default(.openWatchNextOnFinishedWatching) private var openWatchNextOnFinishedWatching
-    @Default(.openWatchNextOnFinishedWatchingDelay) private var openWatchNextOnFinishedWatchingDelay
     @Default(.showInspector) private var showInspector
 
     @ObservedObject private var accounts = AccountsModel.shared
@@ -74,12 +71,6 @@ struct PlayerSettings: View {
                     inspectorVisibilityPicker
                 }
             #endif
-
-            Section(header: SettingsHeader(text: "Watch Next")) {
-                openWatchNextOnFinishedWatchingToggle
-                openWatchNextOnFinishedWatchingDelayTextField
-                openWatchNextOnCloseToggle
-            }
 
             let interface = Section(header: SettingsHeader(text: "Interface".localized())) {
                 #if os(iOS)
@@ -148,33 +139,6 @@ struct PlayerSettings: View {
             }
         }
         .modifier(SettingsPickerModifier())
-    }
-
-    private var openWatchNextOnCloseToggle: some View {
-        Toggle("Open after manual close of video", isOn: $openWatchNextOnClose)
-    }
-
-    private var openWatchNextOnFinishedWatchingToggle: some View {
-        Toggle("Open after watching video", isOn: $openWatchNextOnFinishedWatching)
-    }
-
-    private var openWatchNextOnFinishedWatchingDelayTextField: some View {
-        HStack {
-            Text("Autoplay delay")
-                .frame(minWidth: 140, alignment: .leading)
-            #if !os(iOS)
-                Spacer()
-            #endif
-            TextField("Delay", text: $openWatchNextOnFinishedWatchingDelay)
-            #if !os(iOS)
-                .frame(maxWidth: 100, alignment: .trailing)
-            #endif
-                .labelsHidden()
-            #if !os(macOS)
-                .keyboardType(.numberPad)
-            #endif
-        }
-        .multilineTextAlignment(.trailing)
     }
 
     private var sidebarPicker: some View {

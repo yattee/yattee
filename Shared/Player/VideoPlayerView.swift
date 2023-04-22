@@ -80,8 +80,6 @@ struct VideoPlayerView: View {
             #endif
 
             overlay
-
-            WatchNextView()
         }
         .onAppear {
             if player.musicMode {

@@ -107,7 +107,6 @@ struct OpenVideosModel {
             prepending: playbackMode == .playNow || playbackMode == .playNext
         )
 
-        WatchNextViewModel.shared.hide()
         NavigationModel.shared.presentingChannelSheet = false
 
         if playbackMode == .playNow || playbackMode == .shuffleAll {

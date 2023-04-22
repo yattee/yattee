@@ -57,7 +57,7 @@ struct InspectorView: View {
     }
 
     var header: some View {
-        Text("Inspector")
+        Text("Inspector".localized())
             .font(.caption)
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
