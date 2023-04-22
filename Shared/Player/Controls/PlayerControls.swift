@@ -181,7 +181,7 @@ struct PlayerControls: View {
                             #endif
                         }
                     }
-                    .opacity(model.presentingControls ? 1 : 0)
+                    .opacity(model.presentingControls && !player.availableStreams.isEmpty ? 1 : 0)
                 }
             }
             .frame(maxWidth: .infinity)

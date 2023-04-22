@@ -348,7 +348,7 @@ struct VideoCell: View {
             DetailBadge(text: video.author, style: .prominent)
                 .foregroundColor(.primary)
         } else {
-            Text(video.channel.name)
+            Text(verbatim: video.channel.name)
                 .fontWeight(.semibold)
                 .foregroundColor(.secondary)
         }
@@ -473,7 +473,7 @@ struct VideoCell: View {
     }
 
     private func videoDetail(_ text: String, lineLimit: Int = 1) -> some View {
-        Text(text)
+        Text(verbatim: text)
             .fontWeight(.bold)
             .lineLimit(lineLimit)
             .truncationMode(.middle)
