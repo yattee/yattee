@@ -5,24 +5,32 @@ import SwiftUI
 struct ChaptersView: View {
     @ObservedObject private var player = PlayerModel.shared
 
+    var chapters: [Chapter] {
+        player.videoForDisplay?.chapters ?? []
+    }
+
     var body: some View {
-        if let chapters = player.currentVideo?.chapters, !chapters.isEmpty {
-            List {
-                Section {
-                    ForEach(chapters) { chapter in
-                        ChapterView(chapter: chapter)
+        if !chapters.isEmpty {
+            #if os(tvOS)
+                List {
+                    Section {
+                        ForEach(chapters) { chapter in
+                            ChapterView(chapter: chapter)
+                        }
                     }
+                    .listRowBackground(Color.clear)
                 }
-                .listRowBackground(Color.clear)
-            }
-            #if os(macOS)
-            .listStyle(.inset)
-            #elseif os(iOS)
-            .listStyle(.grouped)
-            .backport
-            .scrollContentBackground(false)
+                .listStyle(.plain)
             #else
-            .listStyle(.plain)
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 20) {
+                        ForEach(chapters) { chapter in
+                            ChapterView(chapter: chapter)
+                        }
+                    }
+                    .padding(.horizontal, 15)
+                }
+                .frame(minHeight: ChapterView.thumbnailHeight + 100)
             #endif
         } else {
             NoCommentsView(text: "No chapters information available".localized(), systemImage: "xmark.circle.fill")

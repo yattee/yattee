@@ -561,6 +561,48 @@ struct SearchView: View {
             searchSortOrder.rawValue
         ))
     }
+
+    var shouldDisplayHeader: Bool {
+        #if os(tvOS)
+            !state.query.isEmpty
+        #else
+            false
+        #endif
+    }
+
+    var header: some View {
+        HStack {
+            clearButton
+
+            #if os(tvOS)
+                if accounts.app.supportsSearchFilters {
+                    filtersHorizontalStack
+                }
+            #endif
+            FavoriteButton(item: favoriteItem)
+                .id(favoriteItem?.id)
+                .labelStyle(.iconOnly)
+                .font(.system(size: 25))
+
+            Spacer()
+            ListingStyleButtons(listingStyle: $searchListingStyle)
+            HideShortsButtons(hide: $hideShorts)
+        }
+        .labelStyle(.iconOnly)
+        .padding(.leading, 30)
+        .padding(.bottom, 15)
+        .padding(.trailing, 30)
+    }
+
+    var clearButton: some View {
+        Button {
+            state.queryText = ""
+        } label: {
+            Label("Clear", systemImage: "xmark")
+                .labelStyle(.iconOnly)
+        }
+        .font(.caption)
+    }
 }
 
 struct SearchView_Previews: PreviewProvider {

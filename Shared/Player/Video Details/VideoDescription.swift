@@ -50,6 +50,7 @@ struct VideoDescription: View {
 
             keywords
         }
+        .contentShape(Rectangle())
     }
 
     var shouldExpand: Bool {

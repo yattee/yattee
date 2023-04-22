@@ -412,7 +412,7 @@ struct VideoPlayerView: View {
                         List {
                             PlayerQueueView(sidebarQueue: true)
                         }
-                        .frame(maxWidth: 350)
+                        .frame(maxWidth: 450)
                         .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #endif
@@ -431,6 +431,7 @@ struct VideoPlayerView: View {
             }
         )
         #endif
+        .ignoresSafeArea(edges: .horizontal)
     }
 
     var fullScreenPlayer: Bool {

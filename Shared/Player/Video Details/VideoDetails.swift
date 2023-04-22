@@ -285,21 +285,37 @@ struct VideoDetails: View {
                                 } else if let description = video.description, !description.isEmpty {
                                     Section(header: descriptionHeader) {
                                         VideoDescription(video: video, detailsSize: detailsSize, expand: $descriptionExpanded)
+                                            .padding(.horizontal)
                                     }
                                 } else if !video.isLocal {
                                     Text("No description")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
+                                        .padding(.horizontal)
                                 }
 
-                                if video.isLocal || showInspector == .always {
+                                if player.videoBeingOpened.isNil,
+                                   !video.isLocal,
+                                   !video.chapters.isEmpty
+                                {
+                                    Section(header: chaptersHeader) {
+                                        ChaptersView()
+                                    }
+                                }
+
+                                if player.videoBeingOpened.isNil,
+                                   video.isLocal || showInspector == .always
+                                {
                                     InspectorView(video: player.videoForDisplay)
+                                        .padding(.horizontal)
                                 }
 
-                                if !sidebarQueue,
+                                if player.videoBeingOpened.isNil,
+                                   !sidebarQueue,
                                    !(player.videoForDisplay?.related.isEmpty ?? true)
                                 {
                                     RelatedView()
+                                        .padding(.horizontal)
                                         .padding(.top, 20)
                                 }
                             }
@@ -313,7 +329,6 @@ struct VideoDetails: View {
                     }
                     .transition(.opacity)
                     .animation(nil, value: player.currentItem)
-                    .padding(.horizontal)
                     #if os(iOS)
                         .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
                     #endif
@@ -360,8 +375,16 @@ struct VideoDetails: View {
                     .imageScale(.small)
             }
         }
+        .padding(.horizontal)
         .font(.caption)
         .foregroundColor(.secondary)
+    }
+
+    var chaptersHeader: some View {
+        Text("Chapters".localized())
+            .padding(.horizontal)
+            .font(.caption)
+            .foregroundColor(.secondary)
     }
 }
 

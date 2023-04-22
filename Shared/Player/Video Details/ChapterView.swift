@@ -11,23 +11,51 @@ struct ChapterView: View {
         Button {
             player.backend.seek(to: chapter.start, seekType: .userInteracted)
         } label: {
-            HStack(spacing: 12) {
-                if !chapter.image.isNil {
-                    smallImage(chapter)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(chapter.title)
-                        .font(.headline)
-                    Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
-                        .font(.system(.subheadline).monospacedDigit())
-                        .foregroundColor(.secondary)
-                }
+            Group {
+                #if os(tvOS)
+                    horizontalChapter
+                #else
+                    verticalChapter
+                #endif
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    var horizontalChapter: some View {
+        HStack(spacing: 12) {
+            if !chapter.image.isNil {
+                smallImage(chapter)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chapter.title)
+                    .font(.headline)
+                Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
+                    .font(.system(.subheadline).monospacedDigit())
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    var verticalChapter: some View {
+        VStack(spacing: 12) {
+            if !chapter.image.isNil {
+                smallImage(chapter)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chapter.title)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .font(.headline)
+                Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
+                    .font(.system(.subheadline).monospacedDigit())
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: Self.thumbnailWidth, alignment: .leading)
+        }
     }
 
     @ViewBuilder func smallImage(_ chapter: Chapter) -> some View {
@@ -37,21 +65,20 @@ struct ChapterView: View {
                 ProgressView()
             }
             .indicator(.activity)
+            .frame(width: Self.thumbnailWidth, height: Self.thumbnailHeight)
         #if os(tvOS)
-            .frame(width: thumbnailWidth, height: 140)
             .mask(RoundedRectangle(cornerRadius: 12))
         #else
-            .frame(width: thumbnailWidth, height: 60)
             .mask(RoundedRectangle(cornerRadius: 6))
         #endif
     }
 
-    private var thumbnailWidth: Double {
-        #if os(tvOS)
-            250
-        #else
-            100
-        #endif
+    static var thumbnailWidth: Double {
+        250
+    }
+
+    static var thumbnailHeight: Double {
+        thumbnailWidth / 1.7777
     }
 }
 
