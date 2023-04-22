@@ -103,9 +103,9 @@ struct VideoDetails: View {
                         Image(systemName: "hand.thumbsup")
                     }
 
-                    if let likes = video?.likesCount {
+                    if let likes = video?.likesCount, !likes.isEmpty {
                         Text(likes)
-                    } else if model.videoBeingOpened == nil {
+                    } else {
                         Text("1,234M").redacted(reason: .placeholder)
                     }
 
@@ -114,9 +114,9 @@ struct VideoDetails: View {
                             Image(systemName: "hand.thumbsdown")
                         }
 
-                        if let dislikes = video?.dislikesCount {
+                        if let dislikes = video?.dislikesCount, !dislikes.isEmpty {
                             Text(dislikes)
-                        } else if model.videoBeingOpened == nil {
+                        } else {
                             Text("1,234M").redacted(reason: .placeholder)
                         }
                     }
