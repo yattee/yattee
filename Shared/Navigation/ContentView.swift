@@ -8,19 +8,12 @@ import Siesta
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
     @ObservedObject private var player = PlayerModel.shared
-    private var playlists = PlaylistsModel.shared
-    private var subscriptions = SubscribedChannelsModel.shared
 
     #if os(iOS)
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
-
-    var playerControls: PlayerControlsModel { .shared }
-
-    let persistenceController = PersistenceController.shared
 
     var body: some View {
         Group {

@@ -5,7 +5,6 @@ import SwiftUI
 #endif
 
 struct AppSidebarNavigation: View {
-    @ObservedObject private var accounts = AccountsModel.shared
     private var navigation: NavigationModel { .shared }
 
     #if os(iOS)

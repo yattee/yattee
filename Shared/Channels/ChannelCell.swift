@@ -37,12 +37,6 @@ struct ChannelCell: View {
         .buttonStyle(.plain)
     }
 
-    var label: some View {
-        labelContent
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-    }
-
     var labelContent: some View {
         VStack {
             WebImage(url: channel.thumbnailURL, options: [.lowPriority])

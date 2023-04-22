@@ -9,8 +9,6 @@ struct FavoriteItemView: View {
     @Environment(\.navigationStyle) private var navigationStyle
     @StateObject private var store = FavoriteResourceObserver()
 
-    @Default(.favorites) private var favorites
-
     @ObservedObject private var accounts = AccountsModel.shared
     private var playlists = PlaylistsModel.shared
     private var favoritesModel = FavoritesModel.shared

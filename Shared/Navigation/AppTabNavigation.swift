@@ -6,7 +6,6 @@ struct AppTabNavigation: View {
     @ObservedObject private var navigation = NavigationModel.shared
     private var player = PlayerModel.shared
     @ObservedObject private var feed = FeedModel.shared
-    @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
     @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
 
     @Default(.showHome) private var showHome

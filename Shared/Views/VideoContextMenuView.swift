@@ -23,7 +23,6 @@ struct VideoContextMenuView: View {
     @Default(.saveHistory) private var saveHistory
 
     private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
-    private var viewContext: NSManagedObjectContext = PersistenceController.shared.container.viewContext
 
     init(video: Video) {
         self.video = video

@@ -6,13 +6,9 @@ struct ChannelPlaylistView: View {
     var playlist: ChannelPlaylist?
     var showCloseButton = false
 
-    @State private var presentingShareSheet = false
-    @State private var shareURL: URL?
-
     @StateObject private var store = Store<ChannelPlaylist>()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.navigationStyle) private var navigationStyle
     @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
     @Default(.hideShorts) private var hideShorts
 

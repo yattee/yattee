@@ -61,14 +61,6 @@ struct Constants {
         #endif
     }
 
-    static var nextSystemImage: String {
-        if #available(iOS 16, macOS 13, tvOS 16, *) {
-            return "film.stack"
-        } else {
-            return "list.and.film"
-        }
-    }
-
     static func seekIcon(_ type: String, _ interval: TimeInterval) -> String {
         let interval = Int(interval)
         let allVersions = [10, 15, 30, 45, 60, 75, 90]

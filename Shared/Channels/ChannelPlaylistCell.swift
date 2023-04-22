@@ -6,8 +6,6 @@ struct ChannelPlaylistCell: View {
 
     @Environment(\.navigationStyle) private var navigationStyle
 
-    var navigation = NavigationModel.shared
-
     var body: some View {
         if navigationStyle == .tab {
             NavigationLink(destination: ChannelPlaylistView(playlist: playlist)) { cell }

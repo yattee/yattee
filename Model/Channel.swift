@@ -33,21 +33,6 @@ struct Channel: Identifiable, Hashable {
             }
         }
 
-        var contentItemType: ContentItem.ContentType {
-            switch self {
-            case .videos:
-                return .video
-            case .playlists:
-                return .playlist
-            case .livestreams:
-                return .video
-            case .shorts:
-                return .video
-            case .channels:
-                return .channel
-            }
-        }
-
         var systemImage: String {
             switch self {
             case .videos:

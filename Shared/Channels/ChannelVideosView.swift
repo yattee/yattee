@@ -21,10 +21,6 @@ struct ChannelVideosView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    #if os(iOS)
-        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    #endif
-
     @ObservedObject private var accounts = AccountsModel.shared
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
@@ -145,30 +141,22 @@ struct ChannelVideosView: View {
                     contentTypePicker
                 }
 
-                ToolbarItem {
+                ToolbarItemGroup {
                     HStack(spacing: 3) {
                         subscriptionsLabel
                         viewsLabel
                     }
-                }
 
-                ToolbarItem {
                     if let contentItem = presentedChannel?.contentItem {
                         ShareButton(contentItem: contentItem)
                     }
-                }
 
-                ToolbarItem {
                     subscriptionToggleButton
                         .layoutPriority(2)
-                }
 
-                ToolbarItem {
                     favoriteButton
                         .labelStyle(.iconOnly)
-                }
 
-                ToolbarItem {
                     toggleWatchedButton
                         .labelStyle(.iconOnly)
                 }

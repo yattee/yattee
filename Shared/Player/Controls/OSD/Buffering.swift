@@ -6,10 +6,6 @@ struct Buffering: View {
     var reason = "Buffering stream...".localized()
     var state: String?
 
-    #if os(iOS)
-        @Environment(\.verticalSizeClass) private var verticalSizeClass
-    #endif
-
     @ObservedObject private var player = PlayerModel.shared
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout

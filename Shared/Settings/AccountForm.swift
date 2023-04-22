@@ -16,7 +16,6 @@ struct AccountForm: View {
     @State private var validationDebounce = Debounce()
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.openURL) private var openURL
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {

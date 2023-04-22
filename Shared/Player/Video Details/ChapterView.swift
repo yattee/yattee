@@ -23,40 +23,43 @@ struct ChapterView: View {
         .buttonStyle(.plain)
     }
 
-    var horizontalChapter: some View {
-        HStack(spacing: 12) {
-            if !chapter.image.isNil {
-                smallImage(chapter)
-            }
+    #if os(tvOS)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.title)
-                    .font(.headline)
-                Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
-                    .font(.system(.subheadline).monospacedDigit())
-                    .foregroundColor(.secondary)
+        var horizontalChapter: some View {
+            HStack(spacing: 12) {
+                if !chapter.image.isNil {
+                    smallImage(chapter)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(chapter.title)
+                        .font(.headline)
+                    Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
+                        .font(.system(.subheadline).monospacedDigit())
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    #else
+        var verticalChapter: some View {
+            VStack(spacing: 12) {
+                if !chapter.image.isNil {
+                    smallImage(chapter)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(chapter.title)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .font(.headline)
+                    Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
+                        .font(.system(.subheadline).monospacedDigit())
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: Self.thumbnailWidth, alignment: .leading)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    var verticalChapter: some View {
-        VStack(spacing: 12) {
-            if !chapter.image.isNil {
-                smallImage(chapter)
-            }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(chapter.title)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .font(.headline)
-                Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
-                    .font(.system(.subheadline).monospacedDigit())
-                    .foregroundColor(.secondary)
-            }
-            .frame(maxWidth: Self.thumbnailWidth, alignment: .leading)
-        }
-    }
+    #endif
 
     @ViewBuilder func smallImage(_ chapter: Chapter) -> some View {
         WebImage(url: chapter.image, options: [.lowPriority])

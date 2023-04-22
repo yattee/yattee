@@ -72,10 +72,12 @@ extension Defaults.Keys {
         static let qualityProfilesDefault = UIDevice.current.userInterfaceIdiom == .pad ? [
             hd2160pMPVProfile,
             hd1080pMPVProfile,
+            hd720pMPVProfile,
             hd720pAVPlayerProfile,
             sd360pAVPlayerProfile
         ] : [
             hd1080pMPVProfile,
+            hd720pMPVProfile,
             hd720pAVPlayerProfile,
             sd360pAVPlayerProfile
         ]
@@ -88,6 +90,7 @@ extension Defaults.Keys {
         static let qualityProfilesDefault = [
             hd2160pMPVProfile,
             hd1080pMPVProfile,
+            hd720pMPVProfile,
             hd720pAVPlayerProfile
         ]
         static let batteryCellularProfileDefault = hd1080pMPVProfile.id
@@ -98,6 +101,7 @@ extension Defaults.Keys {
         static let qualityProfilesDefault = [
             hd2160pMPVProfile,
             hd1080pMPVProfile,
+            hd720pMPVProfile,
             hd720pAVPlayerProfile
         ]
         static let batteryCellularProfileDefault = hd1080pMPVProfile.id
@@ -138,9 +142,6 @@ extension Defaults.Keys {
         static let expandVideoDescriptionDefault = true
     #endif
     static let expandVideoDescription = Key<Bool>("expandVideoDescription", default: expandVideoDescriptionDefault)
-    #if !os(tvOS)
-        static let commentsPlacement = Key<CommentsPlacement>("commentsPlacement", default: .separate)
-    #endif
 
     #if os(tvOS)
         static let pauseOnHidingPlayerDefault = true
@@ -348,12 +349,6 @@ enum WatchedVideoBadgeColor: String, Defaults.Serializable {
 enum WatchedVideoPlayNowBehavior: String, Defaults.Serializable {
     case `continue`, restart
 }
-
-#if !os(tvOS)
-    enum CommentsPlacement: String, CaseIterable, Defaults.Serializable {
-        case info, separate
-    }
-#endif
 
 enum ButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
     case iconOnly, iconAndText

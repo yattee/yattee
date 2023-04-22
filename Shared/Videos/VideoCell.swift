@@ -140,7 +140,7 @@ struct VideoCell: View {
     private var contentOpacity: Double {
         guard saveHistory,
               !watch.isNil,
-              watchedVideoStyle == .decreasedOpacity || watchedVideoStyle == .both
+              watchedVideoStyle.isDecreasingOpacity
         else {
             return 1
         }

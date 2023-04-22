@@ -9,7 +9,6 @@ struct AdvancedSettings: View {
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
 
-    @State private var countries = [String]()
     @State private var filesToShare = [MPVClient.logFile]
     @State private var presentingShareSheet = false
 

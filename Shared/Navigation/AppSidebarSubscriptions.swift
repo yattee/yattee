@@ -6,7 +6,6 @@ struct AppSidebarSubscriptions: View {
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
-    @ObservedObject private var accounts = AccountsModel.shared
 
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
 

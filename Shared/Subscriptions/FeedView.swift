@@ -4,7 +4,6 @@ import SwiftUI
 
 struct FeedView: View {
     @ObservedObject private var feed = FeedModel.shared
-    @ObservedObject private var accounts = AccountsModel.shared
 
     @Default(.showCacheStatus) private var showCacheStatus
 

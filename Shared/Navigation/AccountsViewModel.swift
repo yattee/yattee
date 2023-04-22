@@ -29,8 +29,4 @@ final class AccountsViewModel: ObservableObject {
     var currentAccount: Account? { AccountsModel.shared.current }
 
     var instances: [Instance] { InstancesModel.shared.all }
-
-    func accountsOfInstance(_ instance: Instance) -> [Account] {
-        accounts.filter { $0.instance.apiURL == instance.apiURL }.sorted { $0.name < $1.name }
-    }
 }

@@ -140,15 +140,4 @@ final class AccountsModel: ObservableObject {
             KeychainModel.shared.getAccountKey(account, "password")
         )
     }
-
-    static func removeDefaultsCredentials(_ account: Account) {
-        if let accountIndex = Defaults[.accounts].firstIndex(where: { $0.id == account.id }) {
-            var account = Defaults[.accounts][accountIndex]
-            account.name = ""
-            account.username = ""
-            account.password = nil
-
-            Defaults[.accounts][accountIndex] = account
-        }
-    }
 }

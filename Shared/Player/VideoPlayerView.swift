@@ -53,7 +53,6 @@ struct VideoPlayerView: View {
         @State internal var isVerticalDrag = false
         @State internal var viewDragOffset = Self.hiddenOffset
         @State internal var orientationObserver: Any?
-        @State internal var orientationNotification: Any?
     #endif
 
     @ObservedObject internal var player = PlayerModel.shared

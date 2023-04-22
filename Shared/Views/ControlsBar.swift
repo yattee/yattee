@@ -17,8 +17,6 @@ struct ControlsBar: View {
 
     var presentingControls = true
     var backgroundEnabled = true
-    var borderTop = true
-    var borderBottom = true
     var detailsTogglePlayer = true
     var detailsToggleFullScreen = false
     var playerBar = false
