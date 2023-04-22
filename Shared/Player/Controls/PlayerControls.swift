@@ -145,7 +145,7 @@ struct PlayerControls: View {
                                     seekBackwardButton
                                     seekForwardButton
                                 #endif
-                                if playerControlsAdvanceToNextEnabled {
+                                if playerControlsRestartEnabled {
                                     restartVideoButton
                                 }
                                 if playerControlsAdvanceToNextEnabled {
