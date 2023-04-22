@@ -7,7 +7,9 @@ struct KeychainModel {
     var keychain = Keychain(service: "stream.yattee.app")
 
     func updateAccountKey(_ account: Account, _ key: String, _ value: String) {
-        keychain[accountKey(account, key)] = value
+        DispatchQueue.global(qos: .background).async {
+            keychain[accountKey(account, key)] = value
+        }
     }
 
     func getAccountKey(_ account: Account, _ key: String) -> String? {
@@ -19,8 +21,10 @@ struct KeychainModel {
     }
 
     func removeAccountKeys(_ account: Account) {
-        try? keychain.remove(accountKey(account, "token"))
-        try? keychain.remove(accountKey(account, "username"))
-        try? keychain.remove(accountKey(account, "password"))
+        DispatchQueue.global(qos: .background).async {
+            try? keychain.remove(accountKey(account, "token"))
+            try? keychain.remove(accountKey(account, "username"))
+            try? keychain.remove(accountKey(account, "password"))
+        }
     }
 }
