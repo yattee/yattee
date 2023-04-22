@@ -60,29 +60,13 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         instanceID.isNil
     }
 
-    var shortUsername: String {
-        let (username, _) = credentials
-
-        guard let username,
-              username.count > 10
-        else {
-            return username ?? ""
-        }
-
-        let index = username.index(username.startIndex, offsetBy: 11)
-        return String(username[..<index])
-    }
-
     var description: String {
         guard !isPublic else {
             return name
         }
 
-        guard !name.isEmpty else {
-            return shortUsername
-        }
-
-        return name
+        let (username, _) = credentials
+        return username ?? name
     }
 
     var urlHost: String {
