@@ -163,7 +163,9 @@ struct OpenURLHandler {
         resource
             .load()
             .onSuccess { response in
-                if let channel: Channel = response.typedContent() {
+                if let page: ChannelPage = response.typedContent(),
+                   let channel = page.channel
+                {
                     DispatchQueue.main.async {
                         NavigationModel.shared.openChannel(
                             channel,

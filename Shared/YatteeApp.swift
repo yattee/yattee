@@ -110,7 +110,6 @@ struct YatteeApp: App {
                     .onDisappear { player.presentingPlayer = false }
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.navigationStyle, .sidebar)
-
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
             }
             .handlesExternalEvents(matching: Set(["player", "*"]))
