@@ -17,7 +17,7 @@ struct HideShortsButtons: View {
                 }
             }
             #if os(tvOS)
-            .font(.caption2)
+            .font(.caption)
             .imageScale(.small)
             #endif
         }

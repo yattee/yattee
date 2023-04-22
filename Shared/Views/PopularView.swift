@@ -21,7 +21,7 @@ struct PopularView: View {
     }
 
     var body: some View {
-        VerticalCells(items: videos)
+        VerticalCells(items: videos) { if shouldDisplayHeader { header } }
             .onAppear {
                 resource?.addObserver(store)
                 resource?.loadIfNeeded()?
@@ -116,6 +116,36 @@ struct PopularView: View {
             }
         }
     #endif
+
+    var shouldDisplayHeader: Bool {
+        #if os(tvOS)
+            true
+        #else
+            false
+        #endif
+    }
+
+    var header: some View {
+        HStack {
+            Spacer()
+            ListingStyleButtons(listingStyle: $popularListingStyle)
+            HideShortsButtons(hide: $hideShorts)
+
+            Button {
+                resource?.load()
+                    .onFailure { self.error = $0 }
+                    .onSuccess { _ in self.error = nil }
+            } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+                    .labelStyle(.iconOnly)
+                    .imageScale(.small)
+                    .font(.caption)
+            }
+        }
+        .padding(.leading, 30)
+        .padding(.bottom, 15)
+        .padding(.trailing, 30)
+    }
 }
 
 struct PopularView_Previews: PreviewProvider {

@@ -63,41 +63,17 @@ struct PlaylistsView: View {
 
     var body: some View {
         SignInRequiredView(title: "Playlists".localized()) {
-            Section {
-                VStack {
-                    #if os(tvOS)
-                        toolbar
-                    #endif
-                    if currentPlaylist != nil, items.isEmpty {
-                        hintText("Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"".localized())
-                    } else if model.all.isEmpty {
-                        hintText("You have no playlists\n\nTap on \"New Playlist\" to create one".localized())
-                    } else {
-                        Group {
-                            #if os(tvOS)
-                                HorizontalCells(items: items)
-                                    .padding(.top, 40)
-                                Spacer()
-                            #else
-                                VerticalCells(items: items) {
-                                    if showCacheStatus {
-                                        HStack {
-                                            Spacer()
+            VStack {
+                VerticalCells(items: items, allowEmpty: true) { if shouldDisplayHeader { header } }
+                    .environment(\.scrollViewBottomPadding, 70)
+                    .environment(\.currentPlaylistID, currentPlaylist?.id)
+                    .environment(\.listingStyle, playlistListingStyle)
+                    .environment(\.hideShorts, hideShorts)
 
-                                            CacheStatusHeader(
-                                                refreshTime: cache.getFormattedPlaylistTime(account: accounts.current),
-                                                isLoading: model.isLoading
-                                            )
-                                        }
-                                    }
-                                }
-                                .environment(\.scrollViewBottomPadding, 70)
-                            #endif
-                        }
-                        .environment(\.currentPlaylistID, currentPlaylist?.id)
-                        .environment(\.listingStyle, playlistListingStyle)
-                        .environment(\.hideShorts, hideShorts)
-                    }
+                if currentPlaylist != nil, items.isEmpty {
+                    hintText("Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"".localized())
+                } else if model.all.isEmpty {
+                    hintText("You have no playlists\n\nTap on \"New Playlist\" to create one".localized())
                 }
             }
         }
@@ -268,37 +244,6 @@ struct PlaylistsView: View {
         }
     #endif
 
-    #if os(tvOS)
-        var toolbar: some View {
-            HStack {
-                if model.isEmpty {
-                    Text("No Playlists")
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("Current Playlist")
-                        .foregroundColor(.secondary)
-
-                    selectPlaylistButton
-                }
-
-                if let playlist = currentPlaylist {
-                    editPlaylistButton
-
-                    FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
-                        .labelStyle(.iconOnly)
-
-                    playButtons
-                }
-
-                Spacer()
-
-                newPlaylistButton
-                    .padding(.leading, 40)
-            }
-            .labelStyle(.iconOnly)
-        }
-    #endif
-
     func hintText(_ text: String) -> some View {
         VStack {
             Spacer()
@@ -341,12 +286,15 @@ struct PlaylistsView: View {
 
     var selectPlaylistButton: some View {
         #if os(tvOS)
-            Button(currentPlaylist?.title ?? "Select playlist") {
+            Button {
                 guard currentPlaylist != nil else {
                     return
                 }
 
                 selectedPlaylistID = model.all.next(after: currentPlaylist!)?.id ?? ""
+            } label: {
+                Text(currentPlaylist?.title ?? "Select playlist")
+                    .frame(maxWidth: .infinity)
             }
             .lineLimit(1)
             .contextMenu {
@@ -404,6 +352,64 @@ struct PlaylistsView: View {
             }
         }
         return model.find(id: selectedPlaylistID) ?? model.all.first
+    }
+
+    var shouldDisplayHeader: Bool {
+        #if os(tvOS)
+            true
+        #else
+            showCacheStatus
+        #endif
+    }
+
+    var header: some View {
+        HStack {
+            if model.isEmpty {
+                Text("No Playlists")
+                    .foregroundColor(.secondary)
+            } else {
+                selectPlaylistButton
+            }
+
+            if let playlist = currentPlaylist {
+                editPlaylistButton
+
+                FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
+                    .labelStyle(.iconOnly)
+
+                playButtons
+            }
+
+            newPlaylistButton
+
+            Spacer()
+
+            ListingStyleButtons(listingStyle: $playlistListingStyle)
+            HideShortsButtons(hide: $hideShorts)
+
+            if let account = accounts.current, showCacheStatus {
+                CacheStatusHeader(
+                    refreshTime: cache.getFormattedPlaylistTime(account: account),
+                    isLoading: model.isLoading
+                )
+            }
+
+            Button {
+                model.load(force: true)
+                loadResource()
+            } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+                    .labelStyle(.iconOnly)
+            }
+        }
+        .labelStyle(.iconOnly)
+        .font(.caption)
+        .imageScale(.small)
+        .padding(.leading, 30)
+        #if os(tvOS)
+            .padding(.bottom, 15)
+            .padding(.trailing, 30)
+        #endif
     }
 }
 

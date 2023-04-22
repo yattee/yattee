@@ -242,7 +242,7 @@ extension Defaults.Keys {
     static let subscriptionsListingStyle = Key<ListingStyle>("subscriptionsListingStyle", default: .cells)
     static let popularListingStyle = Key<ListingStyle>("popularListingStyle", default: .cells)
     static let trendingListingStyle = Key<ListingStyle>("trendingListingStyle", default: .cells)
-    static let playlistListingStyle = Key<ListingStyle>("playlistListingStyle", default: .cells)
+    static let playlistListingStyle = Key<ListingStyle>("playlistListingStyle", default: .list)
     static let channelPlaylistListingStyle = Key<ListingStyle>("channelPlaylistListingStyle", default: .cells)
     static let searchListingStyle = Key<ListingStyle>("searchListingStyle", default: .cells)
     static let hideShorts = Key<Bool>("hideShorts", default: false)

@@ -12,7 +12,7 @@ struct ListingStyleButtons: View {
             } label: {
                 Label(listingStyle.rawValue.capitalized, systemImage: listingStyle.systemImage)
                 #if os(tvOS)
-                    .font(.caption2)
+                    .font(.caption)
                     .imageScale(.small)
                 #endif
             }

@@ -236,27 +236,12 @@ struct SearchView: View {
             if showRecentQueries {
                 recentQueries
             } else {
-                #if os(tvOS)
-                    ScrollView(.vertical, showsIndicators: false) {
-                        HStack(spacing: 0) {
-                            if accounts.app.supportsSearchFilters {
-                                filtersHorizontalStack
-                            }
-
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem?.id)
-                                .labelStyle(.iconOnly)
-                                .font(.system(size: 25))
-                        }
-
-                        HorizontalCells(items: state.store.collection)
-                            .environment(\.loadMoreContentHandler) { state.loadNextPage() }
+                VerticalCells(items: state.store.collection, allowEmpty: state.query.isEmpty) {
+                    if shouldDisplayHeader {
+                        header
                     }
-                    .edgesIgnoringSafeArea(.horizontal)
-                #else
-                    VerticalCells(items: state.store.collection, allowEmpty: state.query.isEmpty)
-                        .environment(\.loadMoreContentHandler) { state.loadNextPage() }
-                #endif
+                }
+                .environment(\.loadMoreContentHandler) { state.loadNextPage() }
 
                 if noResults {
                     Text("No results")

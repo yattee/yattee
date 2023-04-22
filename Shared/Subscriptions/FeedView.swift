@@ -68,16 +68,13 @@ struct FeedView: View {
             }
 
             #if os(tvOS)
-                if !showCacheStatus {
-                    Spacer()
-                }
                 Button {
                     feed.loadResources(force: true)
                 } label: {
                     Label("Refresh", systemImage: "arrow.clockwise")
                         .labelStyle(.iconOnly)
                         .imageScale(.small)
-                        .font(.caption2)
+                        .font(.caption)
                 }
             #endif
         }

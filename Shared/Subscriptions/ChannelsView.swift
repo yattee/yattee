@@ -111,7 +111,7 @@ struct ChannelsView: View {
                     Label("Refresh", systemImage: "arrow.clockwise")
                         .labelStyle(.iconOnly)
                         .imageScale(.small)
-                        .font(.caption2)
+                        .font(.caption)
                 }
 
             #endif

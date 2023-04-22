@@ -26,7 +26,7 @@ struct VerticalCells<Header: View>: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
-            LazyVGrid(columns: columns, alignment: .center) {
+            LazyVGrid(columns: adaptiveItem, alignment: .center) {
                 Section(header: header) {
                     ForEach(contentItems) { item in
                         ContentItemView(item: item)
@@ -56,14 +56,6 @@ struct VerticalCells<Header: View>: View {
         if items.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
             loadMoreContentHandler()
         }
-    }
-
-    var columns: [GridItem] {
-        #if os(tvOS)
-            contentItems.count < 3 ? Array(repeating: GridItem(.fixed(500)), count: [contentItems.count, 1].max()!) : adaptiveItem
-        #else
-            adaptiveItem
-        #endif
     }
 
     var adaptiveItem: [GridItem] {

@@ -10,7 +10,7 @@ struct SubscriptionsPageButton: View {
         } label: {
             Text(subscriptionsViewPage.rawValue.capitalized)
                 .frame(maxWidth: .infinity)
-                .font(.caption2)
+                .font(.caption)
         }
     }
 }
