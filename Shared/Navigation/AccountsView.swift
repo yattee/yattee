@@ -84,6 +84,9 @@ struct AccountsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        #if os(tvOS)
+            .padding(.horizontal, 50)
+        #endif
     }
 
     var closeButton: some View {
