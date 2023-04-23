@@ -1,6 +1,6 @@
 
 
-"Shuffle All" = "Randomizar tudo";
+"Shuffle All" = "Embaralhar tudo";
 "Regular Size" = "Tamanho Normal";
 "%@ subscribers" = "%@ inscritos";
 " subscribers" = " inscritos";
@@ -364,7 +364,7 @@
 "Categories to Skip" = "Categorias para Pular";
 "Restart the app to apply the settings above." = "Reinicie o app para aplicar os ajustes acima.";
 "Related" = "Relacionados";
-"Shuffle" = "Randomizar";
+"Shuffle" = "Embaralhar";
 "Could not refresh Trending" = "Não pôde atualizar Em Alta";
 "Add Account..." = "Adicionar Conta…";
 "Add profile..." = "Adicionar perfil…";
@@ -540,3 +540,24 @@
 "Subscribe/Unsubscribe" = "Inscrever/Desinscrever";
 "Are you sure you want to clear cache?" = "Tem certeza que deseja limpar o cache?";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "As configurações de gesto controlam o intervalo de pulo para o clique duplo no lado direito/esquerdo do player. Mudar as configurações dos controles do sistema requer reinício.";
+"Loop one" = "Um em loop";
+"List" = "Lista";
+"Do nothing" = "Fazer nada";
+"Toggle size" = "Alternar tamanho";
+"Toggle player" = "Alternar player";
+"Show Next in Queue" = "Mostrar Próximo na Fila";
+"Feed" = "Feed";
+"Show toggle watch status button" = "Mostrar botão de mudar status de assistir";
+"Queue - shuffled" = "Fila - embaralhado";
+"Playback Settings" = "Configurações de Playback";
+"Fullscreen" = "Tela cheia";
+"Lock" = "Travar";
+"Description" = "Descrição";
+"Mark all as watched" = "Marcar todos como vistos";
+"Next in Queue" = "Próximo na Fila";
+"Cells" = "Células";
+"Autoplay next" = "Tocar automaticamente próximo";
+"Open channel" = "Abrir canal";
+"Inspector" = "Inspetor";
+"Mark all as unwatched" = "Marcar todos como não vistos";
+"Open video description expanded" = "Abrir descrição do vídeo expandida";
