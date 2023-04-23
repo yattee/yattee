@@ -1,4 +1,4 @@
-## Build 140
+## Build 141
 * Improved player layout
   - Video titles can now span multiple lines for readability
   - Channel details and video dates/likes/dislikes displayed below title
@@ -27,6 +27,7 @@
 * Fixed issue where account username would get truncated
 * Fixed issue where marking all feed videos as watched/unwatched would not refresh actions in Subscriptions menu
 * Fixed issue where closing channel would require multiple back presses
+* Fixed issue with controls being clipped (regression from build 140)
 * Other minor changes and improvements
 
 ### Previous Builds
