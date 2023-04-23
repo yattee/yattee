@@ -104,7 +104,7 @@
 "Play Last" = "Reda ultimul";
 "Player" = "Player";
 "Playlist" = "Playlist";
-"Popular" = "Popular";
+"Popular" = "Populare";
 "Queue" = "Coadă";
 "Replies" = "Răspunsuri";
 "Search..." = "Căutare...";
@@ -265,7 +265,7 @@
 "Rate" = "Rată";
 
 /* Video sort order in search */
-"Rating" = "Rating";
+"Rating" = "Evaluare";
 "Refresh" = "Reîmprospăta";
 "Proxy videos" = "Videoclipuri Proxy";
 "Public Manifest" = "Manifest public";
@@ -314,7 +314,7 @@
 "Show anonymous accounts" = "Afișați conturi anonime";
 "Show channel name" = "Afișează numele canalului";
 "Show video length" = "Afișează durata videoclipului";
-"Shuffle" = "Shuffle";
+"Shuffle" = "Amestecă";
 "Show keywords" = "Afișați cuvintele cheie";
 "Sort" = "Fel";
 
@@ -437,7 +437,7 @@
 "Show Open Videos quick actions" = "Afișați acțiuni rapide pentru videoclipuri deschise";
 "Show Favorites" = "Afișează favoritele";
 "Home" = "Acasă";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Partajați fișiere din Finder pe un Mac sau iTunes pe Windows";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Partajează fișierele din Finder pe un Mac\nsau iTunes pe Windows";
 "Show Home" = "Arată Acasă";
 "Pages toolbar position" = "Poziția barei de instrumente a paginilor";
 "URL to Open" = "URL-ul pentru a deschide";
@@ -465,7 +465,7 @@
 "Right" = "Dreapta";
 "Channels" = "Canale";
 "Open Files" = "Deschideți Fișiere";
-"Share" = "Share";
+"Share" = "Trimite";
 "Show icons and text when space permits" = "Afișați pictograme și text atunci când spațiul permite";
 "Left" = "Stânga";
 "Format" = "Format";
@@ -540,3 +540,26 @@
 "Show cache status" = "Afișați starea cache-ului";
 "Maximum feed items" = "Numărul maxim de articole de feed";
 "Are you sure you want to clear cache?" = "Sigur doriți să ștergeți memoria cache?";
+"List" = "Listă";
+"Cells" = "Celule";
+"Toggle size" = "Comutare dimensiune";
+"Toggle player" = "Comutați player-ul";
+"Do nothing" = "Nu face nimic";
+"Show Next in Queue" = "Afișează următorul din coadă";
+"Feed" = "Abonări";
+"Show toggle watch status button" = "Afișează butonul de comutare a statului de urmărire";
+"Next in Queue" = "Următorul în coadă";
+"Open channel" = "Deschide canalul";
+"Inspector" = "Inspector";
+"Open video description expanded" = "Deschide descrierea videoclipului extinsă";
+"Mark all as unwatched" = "Marcați totul ca nevizionat";
+"Mark all as watched" = "Marcați toate ca vizionate";
+"Queue - shuffled" = "Coadă - amestecată";
+"Playback Settings" = "Setări de redare";
+"Replay" = "Reluare";
+"Fullscreen" = "Ecran complet";
+"Lock" = "Lacăt";
+"Description" = "Descriere";
+"Loop one" = "Buclă unu";
+"Autoplay next" = "Urmează redarea automată";
+"Stream" = "Flux";
