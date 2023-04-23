@@ -295,8 +295,8 @@ struct Video: Identifiable, Equatable, Hashable {
     }
 
     var localStreamIsRemoteURL: Bool {
-        guard let localStream else { return false }
-        return !localStream.localURL.isFileURL
+        guard let url = localStream?.localURL else { return false }
+        return url.isFileURL
     }
 
     var localStreamIsDirectory: Bool {
