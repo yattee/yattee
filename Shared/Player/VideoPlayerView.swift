@@ -430,7 +430,6 @@ struct VideoPlayerView: View {
             }
         )
         #endif
-        .ignoresSafeArea(edges: .horizontal)
     }
 
     var fullScreenPlayer: Bool {
