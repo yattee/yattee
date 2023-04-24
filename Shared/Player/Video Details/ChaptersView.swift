@@ -9,6 +9,10 @@ struct ChaptersView: View {
         player.videoForDisplay?.chapters ?? []
     }
 
+    var chaptersHaveImages: Bool {
+        chapters.allSatisfy { $0.image != nil }
+    }
+
     var body: some View {
         if !chapters.isEmpty {
             #if os(tvOS)
@@ -22,15 +26,24 @@ struct ChaptersView: View {
                 }
                 .listStyle(.plain)
             #else
-                ScrollView(.horizontal) {
-                    LazyHStack(spacing: 20) {
+                if chaptersHaveImages {
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 20) {
+                            ForEach(chapters) { chapter in
+                                ChapterView(chapter: chapter)
+                            }
+                        }
+                        .padding(.horizontal, 15)
+                    }
+                    .frame(minHeight: ChapterView.thumbnailHeight + 100)
+                } else {
+                    Section {
                         ForEach(chapters) { chapter in
                             ChapterView(chapter: chapter)
                         }
                     }
-                    .padding(.horizontal, 15)
+                    .padding(.horizontal)
                 }
-                .frame(minHeight: ChapterView.thumbnailHeight + 100)
             #endif
         } else {
             NoCommentsView(text: "No chapters information available".localized(), systemImage: "xmark.circle.fill")
