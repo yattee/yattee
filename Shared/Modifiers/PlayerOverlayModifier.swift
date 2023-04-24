@@ -30,8 +30,14 @@ struct PlayerOverlayModifier: ViewModifier {
                     }
                 }
                 .animation(.easeIn, value: player.videoForDisplay)
-                .opacity(player.videoForDisplay == nil ? 0 : 1)
+                .opacity(opacity)
         }
+    }
+
+    var opacity: Double {
+        guard !player.closing else { return 0 }
+
+        return player.videoForDisplay == nil ? 0 : 1
     }
 
     var maxWidth: Double {

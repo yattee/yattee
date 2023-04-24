@@ -10,7 +10,7 @@ extension PlayerModel {
     }
 
     var videoForDisplay: Video? {
-        videoBeingOpened ?? (closing ? nil : currentVideo)
+        videoBeingOpened ?? currentVideo
     }
 
     func play(_ videos: [Video], shuffling: Bool = false) {
