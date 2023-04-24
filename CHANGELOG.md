@@ -1,4 +1,8 @@
-## Build 141
+## Build 142
+* Fixed chapters layout when there are no images available
+* Other minor fixes
+
+### Previous Builds
 * Improved player layout
   - Video titles can now span multiple lines for readability
   - Channel details and video dates/likes/dislikes displayed below title
@@ -22,15 +26,6 @@
 * Changed layout to vertical and added configuration buttons for remaining views on tvOS (Popular, Trending, Playlists, Search)
 * Simplified animation on closing player
 * Removed "Watch Next" view
-* Fixed reported crashes
-* Fixed issues with opening channel URLs
-* Fixed issue where account username would get truncated
-* Fixed issue where marking all feed videos as watched/unwatched would not refresh actions in Subscriptions menu
-* Fixed issue where closing channel would require multiple back presses
-* Fixed issue with controls being clipped (regression from build 140)
-* Other minor changes and improvements
-
-### Previous Builds
 * Added pagination/infinite scroll for channel contents (Invidious and Piped)
 * Added support for channel tabs for Invidious (previously available only for Piped)
 * Added filter to hide Short videos, available via view menu/toolbar button
@@ -38,4 +33,9 @@
 * Added browsing setting: "Show unwatched feed badges"
 * Fixed reported crashes
 * Fixed issue where channels in Favorites would not refresh contents
+* Fixed issues with opening channel URLs
+* Fixed issue where account username would get truncated
+* Fixed issue where marking all feed videos as watched/unwatched would not refresh actions in Subscriptions menu
+* Fixed issue where closing channel would require multiple back presses
+* Fixed issue with controls being clipped (regression from build 140)
 * Other minor changes and improvements
