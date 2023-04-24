@@ -96,8 +96,16 @@ struct VideoActions: View {
             return !(video?.isLocal ?? true) && accounts.signedIn && accounts.app.supportsSubscriptions
         case .settings:
             return video != nil
+        case .fullScreen:
+            return video != nil
+        case .pip:
+            return video != nil
         case .advanceToNextItem:
             return player.isAdvanceToNextItemAvailable
+        case .restart:
+            return video != nil
+        case .musicMode:
+            return video != nil
         default:
             return true
         }
