@@ -96,7 +96,7 @@ struct VideoDetails: View {
                     if let views = video?.viewsCount {
                         Text(views)
                     } else if model.videoBeingOpened != nil {
-                        Text("1,234M").redacted(reason: .placeholder)
+                        Text("123").redacted(reason: .placeholder)
                     }
 
                     if model.videoBeingOpened != nil || video?.likesCount != nil {
@@ -106,7 +106,7 @@ struct VideoDetails: View {
                     if let likes = video?.likesCount, !likes.isEmpty {
                         Text(likes)
                     } else {
-                        Text("1,234M").redacted(reason: .placeholder)
+                        Text("123").redacted(reason: .placeholder)
                     }
 
                     if enableReturnYouTubeDislike {
@@ -117,7 +117,7 @@ struct VideoDetails: View {
                         if let dislikes = video?.dislikesCount, !dislikes.isEmpty {
                             Text(dislikes)
                         } else {
-                            Text("1,234M").redacted(reason: .placeholder)
+                            Text("123").redacted(reason: .placeholder)
                         }
                     }
                 }
@@ -134,7 +134,7 @@ struct VideoDetails: View {
                         if let published = video.publishedDate {
                             Text(published)
                         } else {
-                            Text("1 century ago").redacted(reason: .placeholder)
+                            Text("1 wk ago").redacted(reason: .placeholder)
                         }
                     }
                 }
