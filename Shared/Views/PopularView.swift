@@ -76,7 +76,7 @@ struct PopularView: View {
             }
         }
         #else
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                     resource?.loadIfNeeded()?
                         .onFailure { self.error = $0 }
                         .onSuccess { _ in self.error = nil }

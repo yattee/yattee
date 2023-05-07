@@ -62,7 +62,7 @@ struct PlayerControls: View {
                     }
                 }
             #else
-                    .offset(y: 2)
+                .offset(y: 2)
             #endif
 
             VStack {

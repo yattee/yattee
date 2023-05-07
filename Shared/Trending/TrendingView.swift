@@ -79,7 +79,7 @@ struct TrendingView: View {
             TrendingCountry(selectedCountry: $country)
         }
         #else
-                .sheet(isPresented: $presentingCountrySelection) {
+        .sheet(isPresented: $presentingCountrySelection) {
                     TrendingCountry(selectedCountry: $country)
                     #if os(macOS)
                         .frame(minWidth: 400, minHeight: 400)
@@ -128,7 +128,7 @@ struct TrendingView: View {
             }
         }
         #else
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                     resource.loadIfNeeded()?
                         .onFailure { self.error = $0 }
                         .onSuccess { _ in self.error = nil }

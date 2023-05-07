@@ -44,7 +44,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
         #if os(iOS)
             fullScreen ? .fill : .fit
         #else
-                .fit
+            .fit
         #endif
     }
 

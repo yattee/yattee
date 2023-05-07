@@ -167,7 +167,7 @@ struct SearchView: View {
             }
         }
         #else
-                .ignoresSafeArea(.keyboard, edges: .bottom)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
                 .navigationTitle("Search")
         #endif
         #if os(iOS)
@@ -260,7 +260,7 @@ struct SearchView: View {
         #if os(iOS)
             accounts.app.supportsSearchFilters || favorites.isEnabled ? .bottomBar : .automatic
         #else
-                .automatic
+            .automatic
         #endif
     }
 

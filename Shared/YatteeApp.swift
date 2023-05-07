@@ -61,7 +61,7 @@ struct YatteeApp: App {
                     }
                 )
             #else
-                    .onReceive(
+                .onReceive(
                         NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
                     ) { _ in
                         player.handleEnterForeground()

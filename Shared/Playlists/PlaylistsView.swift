@@ -150,7 +150,7 @@ struct PlaylistsView: View {
             }
         }
         #else
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                     model.load()
                     loadResource()
                 }

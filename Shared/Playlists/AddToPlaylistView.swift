@@ -48,7 +48,7 @@ struct AddToPlaylistView: View {
         #if os(tvOS)
             600
         #else
-                .infinity
+            .infinity
         #endif
     }
 
@@ -115,7 +115,7 @@ struct AddToPlaylistView: View {
         #if os(tvOS)
             .trailing
         #else
-                .center
+            .center
         #endif
     }
 
