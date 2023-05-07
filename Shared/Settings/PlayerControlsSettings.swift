@@ -212,19 +212,20 @@ struct PlayerControlsSettings: View {
 
             HStack {
                 #if !os(tvOS)
-                    Label("Plus", systemImage: "plus")
+                    Label("Minus", systemImage: "minus")
                         .imageScale(.large)
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
                         .accessibilityAddTraits(.isButton)
                     #if os(iOS)
+                        .frame(minHeight: 35)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                     #endif
                         .contentShape(Rectangle())
                         .onTapGesture {
                             var intValue = Int(value.wrappedValue) ?? 10
-                            intValue += 5
+                            intValue -= 5
                             if intValue <= 0 {
                                 intValue = 5
                             }
@@ -248,20 +249,19 @@ struct PlayerControlsSettings: View {
                 #endif
 
                 #if !os(tvOS)
-                    Label("Minus", systemImage: "minus")
+                    Label("Plus", systemImage: "plus")
                         .imageScale(.large)
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
                         .accessibilityAddTraits(.isButton)
                     #if os(iOS)
-                        .frame(minHeight: 35)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                     #endif
                         .contentShape(Rectangle())
                         .onTapGesture {
                             var intValue = Int(value.wrappedValue) ?? 10
-                            intValue -= 5
+                            intValue += 5
                             if intValue <= 0 {
                                 intValue = 5
                             }
