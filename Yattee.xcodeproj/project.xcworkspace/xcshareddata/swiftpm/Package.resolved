@@ -96,7 +96,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "a549e9992293e5be2b3fab2df110ad5ac61f6661"
+        "revision" : "09f0fdd1890b7c9420109bc7b45dcee91b66b7de"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
       "state" : {
-        "revision" : "61fefe9c284fd41ddef77d02749e88f00c305196",
-        "version" : "2.2.2"
+        "revision" : "e837c37d45449fbd3b4745c10c5b5274e73edead",
+        "version" : "2.2.3"
       }
     },
     {
