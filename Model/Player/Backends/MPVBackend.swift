@@ -280,7 +280,7 @@ final class MPVBackend: PlayerBackend {
             self.stop()
 
             DispatchQueue.main.async { [weak self] in
-                guard let self else {
+                guard let self, let client = self.client else {
                     return
                 }
 
@@ -296,7 +296,7 @@ final class MPVBackend: PlayerBackend {
                         }
                     }
 
-                    self.client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
+                    client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
                         self?.isLoadingVideo = true
                     }
                 } else {
@@ -308,7 +308,7 @@ final class MPVBackend: PlayerBackend {
                     let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                     let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 
-                    self.client?.loadFile(fileToLoad, audio: audioTrack, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
+                    client.loadFile(fileToLoad, audio: audioTrack, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
                         self?.isLoadingVideo = true
                         self?.pause()
                     }
