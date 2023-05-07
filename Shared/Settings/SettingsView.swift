@@ -243,7 +243,7 @@ struct SettingsView: View {
         private var windowHeight: Double {
             switch selection {
             case .browsing:
-                return 840
+                return 880
             case .player:
                 return 450
             case .controls:
