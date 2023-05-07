@@ -4,6 +4,8 @@ import SDWebImageSwiftUI
 import SwiftUI
 
 struct VideoDetails: View {
+    static let pageMenuID = "pageMenu"
+
     struct TitleView: View {
         @ObservedObject private var model = PlayerModel.shared
         @State private var titleSize = CGSize.zero
@@ -170,12 +172,15 @@ struct VideoDetails: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @ObservedObject private var accounts = AccountsModel.shared
-    let comments = CommentsModel.shared
+    @ObservedObject private var comments = CommentsModel.shared
     @ObservedObject private var player = PlayerModel.shared
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showInspector) private var showInspector
+    #if !os(tvOS)
+        @Default(.showScrollToTopInComments) private var showScrollToTopInComments
+    #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
 
     var body: some View {
@@ -211,7 +216,10 @@ struct VideoDetails: View {
                 .animation(nil, value: player.currentItem)
                 .frame(minWidth: 0, maxWidth: .infinity)
 
-            pageView
+            ScrollViewReader { proxy in
+                pageView
+                    .overlay(scrollToTopButton(proxy), alignment: .bottomTrailing)
+            }
             #if os(iOS)
             .opacity(detailsVisibility ? 1 : 0)
             #endif
@@ -266,9 +274,10 @@ struct VideoDetails: View {
     }
 
     var pageView: some View {
-        ScrollView(.vertical, showsIndicators: false) {
+        ScrollView(.vertical) {
             LazyVStack {
                 pageMenu
+                    .id(Self.pageMenuID)
                     .padding(5)
 
                 switch page {
@@ -319,7 +328,6 @@ struct VideoDetails: View {
                                         .padding(.top, 20)
                                 }
                             }
-                            .padding(.bottom, 60)
                         }
                     }
                     .onAppear {
@@ -338,12 +346,13 @@ struct VideoDetails: View {
                         .padding(.horizontal)
 
                 case .comments:
-                    CommentsView(embedInScrollView: false)
+                    CommentsView()
                         .onAppear {
                             comments.loadIfNeeded()
                         }
                 }
             }
+            .padding(.bottom, 60)
         }
         #if os(iOS)
         .onAppear {
@@ -363,6 +372,30 @@ struct VideoDetails: View {
                 page = .info
             }
         }
+    }
+
+    @ViewBuilder func scrollToTopButton(_ proxy: ScrollViewProxy) -> some View {
+        #if !os(tvOS)
+            if showScrollToTopInComments,
+               page == .comments,
+               comments.loaded,
+               comments.all.count > 3
+            {
+                Button {
+                    withAnimation {
+                        proxy.scrollTo(Self.pageMenuID)
+                    }
+                } label: {
+                    Label("Scroll to top", systemImage: "arrow.up")
+                        .padding(8)
+                        .foregroundColor(.white)
+                        .background(Circle().opacity(0.8).foregroundColor(.accentColor))
+                }
+                .padding()
+                .labelStyle(.iconOnly)
+                .buttonStyle(.plain)
+            }
+        #endif
     }
 
     var descriptionHeader: some View {

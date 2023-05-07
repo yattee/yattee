@@ -8,6 +8,9 @@ struct PlayerSettings: View {
     @Default(.playerSidebar) private var playerSidebar
 
     @Default(.showKeywords) private var showKeywords
+    #if !os(tvOS)
+        @Default(.showScrollToTopInComments) private var showScrollToTopInComments
+    #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     #if os(iOS)
@@ -86,6 +89,11 @@ struct PlayerSettings: View {
 
                 if !accounts.isEmpty {
                     keywordsToggle
+
+                    #if !os(tvOS)
+                        showScrollToTopInCommentsToggle
+                    #endif
+
                     #if !os(tvOS)
                         expandVideoDescriptionToggle
                     #endif
@@ -159,6 +167,12 @@ struct PlayerSettings: View {
         }
         .modifier(SettingsPickerModifier())
     }
+
+    #if !os(tvOS)
+        private var showScrollToTopInCommentsToggle: some View {
+            Toggle("Show scroll to top button in comments", isOn: $showScrollToTopInComments)
+        }
+    #endif
 
     private var keywordsToggle: some View {
         Toggle("Show keywords", isOn: $showKeywords)

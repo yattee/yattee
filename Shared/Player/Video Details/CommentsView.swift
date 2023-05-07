@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct CommentsView: View {
-    var embedInScrollView = false
     @State private var repliesID: Comment.ID?
 
     @ObservedObject private var comments = CommentsModel.shared
@@ -16,7 +15,7 @@ struct CommentsView: View {
                 PlaceholderProgressView()
             } else {
                 let last = comments.all.last
-                let commentsStack = LazyVStack {
+                LazyVStack {
                     ForEach(comments.all) { comment in
                         CommentView(comment: comment, repliesID: $repliesID)
                             .onAppear {
@@ -24,15 +23,6 @@ struct CommentsView: View {
                             }
                             .borderBottom(height: comment != last ? 0.5 : 0, color: Color("ControlsBorderColor"))
                     }
-                }
-
-                if embedInScrollView {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        commentsStack
-                        Color.clear.frame(height: 50)
-                    }
-                } else {
-                    commentsStack
                 }
             }
         }
