@@ -457,7 +457,7 @@
 "Video Details" = "تفاصيل الفيديو";
 "Clear Queue before opening" = "مسح قائمة الانتظار قبل الفتح";
 "Current: %@\n%@" = "الحالي: %@\n%@";
-"Thumbnails" = "الصور المصغرة";
+"Thumbnails" = "المعاينات";
 "Show Open Videos toolbar button" = "إظهار زر الفيديوهات المفتوحة في شريط الأدوات";
 "URL to Open" = "الرابط المراد فتحه";
 "Enter link to open" = "أدخل الرابط للفتح";
@@ -502,3 +502,4 @@
 "System controls show buttons for %@" = "تعرض ضوابط النظام أزرارًا لـ %@";
 "Wiki" = "ويكي";
 "Sample Rate" = "";
+"Short videos: visible" = "مقاطع الفيديو القصيرة: مرئية";
