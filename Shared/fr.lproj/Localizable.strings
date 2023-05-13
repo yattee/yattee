@@ -1,23 +1,23 @@
 
 
 " subscribers" = " abonnés";
-"Add Location..." = "Ajouter un emplacement…";
+"Add Location..." = "Ajouter une instance…";
 "Add profile..." = "Ajouter un profil…";
 "Add Quality Profile" = "Ajouter un profil de qualité";
 "Delete" = "Supprimer";
-"%@ Playlist" = "%@ liste de lecture";
+"%@ Playlist" = "Liste de lecture %@";
 "%@ subscribers" = "%@ abonnés";
-"%@ Channel" = "%@ chaîne";
-"10 seconds forwards/backwards" = "10 secondes en avant/en arrière";
+"%@ Channel" = "Chaîne %@";
+"10 seconds forwards/backwards" = "10 secondes en avant/arrière";
 "Accounts" = "Comptes";
 "%lld videos" = "%lld vidéos";
 "Accounts are not supported for the application of this instance" = "Les comptes ne sont pas pris en charge pour l'application de cette instance";
 "Add to Playlist" = "Ajouter à la liste de lecture";
-"Add to Favorites" = "Ajouter aux Favoris";
+"Add to Favorites" = "Ajouter aux favoris";
 "Add Account" = "Ajouter un compte";
 "Add to %@" = "Ajouter à %@";
 "Are you sure you want to clear search history?" = "Êtes-vous sûr de vouloir effacer l'historique des recherches ?";
-"Add Location" = "Ajouter un emplacement";
+"Add Location" = "Ajouter une instance";
 "Add to Playlist..." = "Ajouter à la liste de lecture…";
 "Add Account..." = "Ajouter un compte…";
 "Advanced" = "Avancé";
@@ -108,7 +108,7 @@
 "Unlisted" = "Non listée";
 "Current Playlist" = "Liste de lecture actuelle";
 "Now Playing" = "En lecture";
-"Current Location" = "Emplacement actuel";
+"Current Location" = "Instance actuelle";
 "Private" = "Privée";
 "Playback queue is empty" = "La file d'attente de lecture est vide";
 "Playing Next" = "Lecture suivante";
@@ -133,7 +133,7 @@
 "Clear Search History" = "Effacer l'historique de recherche";
 "Clear Search History..." = "Effacer l'historique des recherches…";
 "Clear the queue" = "Effacer la file d'attente";
-"Connection failed" = "La connexion a échoué";
+"Connection failed" = "Échec de la connexion";
 "Comments" = "Commentaires";
 "Continue" = "Continuer";
 "Contributing" = "Contribuer";
@@ -230,7 +230,7 @@
 "Sort: %@" = "Trier : %@";
 "Subscribe" = "S'abonner";
 "Sort" = "Trier";
-"It can be changed later in settings. You can use your own locations too." = "Peut être modifié ultérieurement dans les paramètres. Vous pouvez également utiliser vos propres emplacements.";
+"It can be changed later in settings. You can use your own locations too." = "Peut être modifié ultérieurement dans les paramètres. Vous pouvez également utiliser vos propres instances.";
 "For videos which feature music as the primary content." = "Pour les vidéos qui n'utilisent que la musique comme contenu principal.";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Les formats seront sélectionnés dans l'ordre de la liste.\nL'HLS est un format adaptatif (le paramètre de résolution ne s'applique pas).";
 "MPV Documentation" = "Documentation de MPV";
@@ -245,25 +245,25 @@
 "Blue" = "Bleu";
 "Browsing" = "Navigation";
 "Buffering stream..." = "Mise en tampon du flux...";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Les bugs ainsi que des idées de fonctionnalités peuvent être envoyés sur GitHub. ";
-"Close PiP and open player when application enters foreground" = "Ferme l'IDI et ouvre le lecteur vidéo lorsque l'application passe au premier plan";
-"Close PiP when player is opened" = "Ferme l'IDI can le lecteur vidéo est ouvert";
-"Close PiP when starting playing other video" = "Ferme l'IDI quand une autre vidéo est commencée";
-"Close player when closing video" = "Ferme le lecteur quand la vidéo est arrêtée";
-"Close player when starting PiP" = "Ferme le lecteur lors que le mode PiP est lancé";
-"Close video after playing last in the queue" = "Ferme la vidéo après avoir lu la dernière de la file d'attente";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Les bugs et les idées de fonctionnalités peuvent être envoyés via GitHub. ";
+"Close PiP and open player when application enters foreground" = "Ferme l'IDI et ouvre le lecteur lorsque l'application passe au premier plan";
+"Close PiP when player is opened" = "Ferme l'IDI lorsque le lecteur est ouvert";
+"Close PiP when starting playing other video" = "Fermer l'IDI lors de la lecture d'une autre vidéo";
+"Close player when closing video" = "Fermer le lecteur lors de la fermeture de la vidéo";
+"Close player when starting PiP" = "Fermer le lecteur au lancement de l'IDI";
+"Close video after playing last in the queue" = "Fermer la vidéo après la dernière lecture de la file d'attente";
 "Controls" = "Contrôles";
 "Could not load locations manifest" = "Impossible de charger le manifeste des instances";
-"Custom Locations" = "Instances personalisées";
+"Custom Locations" = "Instances personnalisées";
 
 /* Video sort order in search */
 "Date" = "Date";
 "Decreased opacity" = "Opacité diminuée";
 "Discord Server" = "Serveur Discord";
-"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. Ce sont de bons endroits pour poser des questions généraliste.";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Les discussions ont lieu sur Discord et Matrix. Ce sont de bons endroits pour poser des questions génériques.";
 "Don't use public locations" = "Ne pas utiliser d'instances publiques";
-"Enable Return YouTube Dislike" = "Activer le retour du bouton dislike de Youtube";
-"Enter fullscreen in landscape" = "Entrer en mode plein écran lors de la rotation en mode paysage";
+"Enable Return YouTube Dislike" = "Activer Return YouTube Dislike";
+"Enter fullscreen in landscape" = "Entrer en plein écran en mode paysage";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Rappel d'aimer la vidéo, de s'abonner ou d'intéragir avec le créateur sur une plateforme gratuite ou payante.";
 "Frontend URL" = "URL frontale";
 "Public Locations" = "Instances publiques";
@@ -408,7 +408,7 @@
 "Could not extract video ID" = "Impossible d'extraire l'ID de la vidéo";
 "This video could not be opened" = "Cette vidéo ne peut pas être ouverte";
 "Could not extract playlist ID" = "Impossible d'extraire l'ID de la liste de lecture";
-"No locations available at the moment" = "Aucune instances disponible pour le moment";
+"No locations available at the moment" = "Aucune instance disponible pour le moment";
 "Could not refresh Playlists" = "Impossible de rafraîchir les listes de lectures";
 
 /* Video date filter in search
@@ -467,14 +467,14 @@
 "Could not delete document" = "Impossible de supprimer le document";
 "Could not find any links to open in your clipboard" = "Aucun lien à ouvrir n'a pu être trouvé dans votre presse-papiers";
 "Center" = "Centre";
-"Locations Manifest" = "Manifest de l'emplacement";
+"Locations Manifest" = "Manifeste de l'instance";
 "Actions buttons" = "Boutons d’action";
 "Sample Rate" = "Taux d'échantillonnage";
 "FPS" = "FPS";
 "Remove…" = "Supprimer…";
 "Live Streams" = "Diffusions en direct";
 "\"%@\" will be irreversibly removed from this device." = "\"%@\" sera irréversiblement supprimé de cet appareil.";
-"Remove Location" = "Supprimer l’emplacement";
+"Remove Location" = "Supprimer l'instance";
 "Open Video" = "Ouvrir la vidéo";
 "Video actions buttons" = "Boutons d'action vidéo";
 "Documents" = "Documents";
@@ -489,7 +489,7 @@
 "Driver" = "Driver";
 "Show Open Videos quick actions" = "Actions rapides Afficher les vidéos ouvertes";
 "Format" = "Format";
-"Are you sure you want to remove %@ location?" = "Êtes-vous sûr de vouloir supprimer l'emplacement %@ ?";
+"Are you sure you want to remove %@ location?" = "Êtes-vous sûr de vouloir supprimer l'instance %@ ?";
 "Show only icons" = "Afficher seulement les icônes";
 "Audio" = "Audio";
 "Share files from Finder on a Mac\nor iTunes on Windows" = "Partager des fichiers depuis Finder sur Mac\nou iTunes sur Windows";
