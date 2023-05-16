@@ -144,7 +144,7 @@ struct HomeView: View {
                             navigation.presentAlert(
                                 Alert(
                                     title: Text("Are you sure you want to clear history of watched videos?"),
-                                    message: Text("It cannot be reverted"),
+                                    message: Text("This cannot be reverted"),
                                     primaryButton: .destructive(Text("Clear All")) {
                                         PlayerModel.shared.removeHistory()
                                         historyID = UUID()
