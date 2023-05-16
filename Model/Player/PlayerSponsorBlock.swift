@@ -95,6 +95,8 @@ extension PlayerModel {
 
     func resetSegments() {
         resetLastSegment()
-        restoredSegments = []
+        DispatchQueue.main.async { [weak self] in
+            self?.restoredSegments = []
+        }
     }
 }

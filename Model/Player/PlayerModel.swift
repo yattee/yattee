@@ -459,12 +459,16 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        streamSelection = stream
-        playStream(
-            stream,
-            of: currentVideo,
-            preservingTime: !currentItem.playbackTime.isNil
-        )
+        DispatchQueue.global(qos: .userInitiated).async {
+            DispatchQueue.main.async {
+                self.streamSelection = stream
+            }
+            self.playStream(
+                stream,
+                of: currentVideo,
+                preservingTime: !self.currentItem.playbackTime.isNil
+            )
+        }
     }
 
     private func handlePresentationChange() {

@@ -222,7 +222,9 @@ final class MPVBackend: PlayerBackend {
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading: Bool) {
         #if !os(macOS)
             if model.presentingPlayer {
-                UIApplication.shared.isIdleTimerDisabled = true
+                DispatchQueue.main.async {
+                    UIApplication.shared.isIdleTimerDisabled = true
+                }
             }
         #endif
 
