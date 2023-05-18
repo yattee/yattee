@@ -89,14 +89,6 @@ struct VideoPlayerView: View {
         .onChange(of: playerSidebar) { _ in
             updateSidebarQueue()
         }
-        #if os(macOS)
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingChannelSheet) {
-                ChannelVideosView(channel: navigation.channelPresentedInSheet, showCloseButton: true, inNavigationView: false)
-                    .frame(minWidth: 1000, minHeight: 700)
-            }
-        )
-        #endif
     }
 
     var videoPlayer: some View {
@@ -189,7 +181,7 @@ struct VideoPlayerView: View {
         .persistentSystemOverlays(!fullScreenPlayer)
         #endif
         #if os(macOS)
-        .frame(minWidth: 1000, minHeight: 700)
+        .frame(minWidth: 1100, minHeight: 700)
         #endif
     }
 
