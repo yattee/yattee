@@ -563,3 +563,10 @@
 "Fullscreen" = "Vollbildmodus";
 "Lock" = "Sperre";
 "Description" = "Beschreibung";
+"Seek" = "Suchen";
+"Enter account credentials to connect..." = "Geben Sie die Kontozugangsdaten ein, um eine Verbindung herzustellen...";
+"Show scroll to top button in comments" = "Schaltfläche Nach oben scrollen in Kommentaren anzeigen";
+"Enter location address to connect..." = "Geben Sie die Internetadresse ein, um eine Verbindung herzustellen...";
+"Opened File" = "Geöffnete Datei";
+"File Extension" = "Dateierweiterung";
+"Opening file..." = "Datei öffnen...";
