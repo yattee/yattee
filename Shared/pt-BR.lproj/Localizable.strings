@@ -191,9 +191,9 @@
 "Round corners" = "Bordas arredondadas";
 "Save" = "Salvar";
 "Restart/Play next" = "Reiniciar/Tocar próximo";
-"Seek gesture sensitivity" = "Sensitividade do gesto de busca";
-"Seek gesture speed" = "Velocidade do gesto de busca";
-"Seek with horizontal swipe on video" = "Buscar com deslize horizontal no vídeo";
+"Seek gesture sensitivity" = "Sensitividade do gesto de vasculhar";
+"Seek gesture speed" = "Velocidade do gesto de vasculhar";
+"Seek with horizontal swipe on video" = "Vasculhar com deslize horizontal no vídeo";
 "Proxy videos" = "Proxy de vídeos";
 "Rate" = "Taxa";
 
@@ -531,7 +531,7 @@
 "Player Bar" = "Barra do Player";
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "As configurações de gesto controlam o intervalo de pulo para o gesto de dois toques no lado esquerdo/direito do player. Mudar as configurações dos controles do sistema requer reinício.";
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "As configurações de gesto controlam o intervalo de pulo para os botões de seta do controle remoto (para Siri Remote de 2ª geração ou posteriores). Mudar as configurações dos controles do sistema requer reinício.";
-"Seeking" = "Busca";
+"Seeking" = "Vasculhação";
 "Show unwatched feed badges" = "Mostrar ícone de feed não visto";
 "Clear all" = "Limpar tudo";
 "Gesture: backwards" = "Gesto: para trás";
@@ -563,3 +563,10 @@
 "Open video description expanded" = "Abrir descrição do vídeo expandida";
 "Replay" = "Replay";
 "Stream" = "Stream";
+"Show scroll to top button in comments" = "Mostrar botão de voltar ao topo nos comentários";
+"Enter location address to connect..." = "Insira o endereço da localização para conectar…";
+"Seek" = "Vasculhar";
+"Enter account credentials to connect..." = "Insira as credenciais da conta para conectar…";
+"Opened File" = "Arquivo Aberto";
+"File Extension" = "Extensão do Arquivo";
+"Opening file..." = "Abrindo arquivo…";
