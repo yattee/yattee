@@ -67,9 +67,9 @@
 "I am lost" = "Я загубився";
 "I found a bug /" = "Я знайшов баг /";
 "I have a feature request" = "В мене є пропозиція";
-"I like this app!" = "Мені подобається цей додаток!";
+"I like this app!" = "Мені подобається цей застосунок!";
 "I want to ask a question" = "Хочу задати питання";
-"If you are interested what's coming in future updates, you can track project Milestones." = "Якщо вам цікаво, що буде в наступних оновленнях, ви можете відстежувати етапи проекту.";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Якщо вам цікаво, що буде в наступних оновленнях, ви можете відстежувати етапи проєкту.";
 "Increase rate" = "Підвищити якість";
 "Info" = "Інфо";
 "Instance of current account" = "Экземпляр поточного акаунта";
@@ -197,7 +197,7 @@
 "Help" = "Допомога";
 "Related" = "Схожі";
 "Honor orientation lock" = "Блокування орієнтації";
-"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Якщо ви повідомляєте про помилку, вказуйте всі відповідні деталі (особливо: версію програми, використовуваний пристрій, версію системи і кроки для відтворення).";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Якщо ви повідомляєте про помилку, вказуйте всі відповідні деталі (особливо: версію застосунку, використовуваний пристрій, версію системи і кроки для відтворення).";
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Просування продукту або послуги, які безпосередньо пов'язані з самим автором. Зазвичай це стосується товарів або просування монетизованих платформ.";
 "Red" = "Червоний";
 "Refresh" = "Поновити";
@@ -229,7 +229,7 @@
 "Clear Search History" = "Очистити історію пошуку";
 "Clear Search History..." = "Очистити історію пошуку...";
 "Clear the queue" = "Очистити чергу";
-"Close PiP and open player when application enters foreground" = "Закрийте PiP і відкрийте плеєр, коли програма відкриється";
+"Close PiP and open player when application enters foreground" = "Закрийте PiP і відкрийте плеєр, коли застосунок відкриється";
 "Close player when closing video" = "Закрийте плеєр, коли зупините відео";
 "Close player when starting PiP" = "Закрийте плеєр при старті PiP";
 "Close Video" = "Закрити відео";
@@ -411,14 +411,14 @@
 "Share %@ link with time" = "Поділитися посиланням %@ з часом";
 "Reset watched status when playing again" = "Скинути статус перегляду при повторному відкритті";
 "Show account username" = "Відображати імʼя акаунту";
-"Restart the app to apply the settings above." = "Перезапустіть додаток, щоб застосувати нові налаштування.";
+"Restart the app to apply the settings above." = "Перезапустіть застосунок, щоб застосувати нові налаштування.";
 "Show anonymous accounts" = "Показувати анонімні акаунти";
 "Show channel name" = "Показувати назву каналу";
 "Sign In Required" = "Необхідно увійти в систему";
 "It can be changed later in settings. You can use your own locations too." = "Пізніше це можна змінити в налаштуваннях. Ви також можете використовувати власні локації.";
 "System controls buttons" = "Кнопки керування системою";
-"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приємно це чути. Створювати додатки, якими хочуть користуватися інші люди, дуже приємно. Ви можете розглянути можливість пожертвувати кошти на проект або допомогти, взявши участь у розробці нових функцій.";
-"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Це не можна буде скасувати. Можливо, вам доведеться переключитися між режимами перегляду або перезапустити програму, щоб побачити зміни.";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приємно це чути. Створювати застосунки, якими хочуть користуватися інші люди, дуже приємно. Ви можете розглянути можливість пожертвувати кошти на проєкт або допомогти, взявши участь у розробці нових функцій.";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Це не можна буде скасувати. Можливо, вам доведеться перемкнутися між режимами перегляду або перезапустити застосунок, щоб побачити зміни.";
 "Keep last played video in the queue after restart" = "Залишати останнє проглянуте відео в черзі після перезапуску";
 "Could not load streams" = "Не вдалося загрузити трансляції";
 "Could not open video" = "Не вдалося відкрити відео";
@@ -430,7 +430,7 @@
 "Could not load video" = "Не вдалося завантажити відео";
 "No locations available at the moment" = "Зараз немає доступних API (локацій)";
 "Could not refresh Playlists" = "Не вдалося поновити плейлисти";
-"If you want this app to be available in your language, join translation project." = "Ви можете змінити або створити свій переклад на сторінці проекту.";
+"If you want this app to be available in your language, join translation project." = "Ви можете змінити або створити свій переклад на сторінці проєкту.";
 "No documents" = "Немає документів";
 "Are you sure you want to remove this document?" = "Ви впевнені, що бажаєте видалити цей документ?";
 "Recent Documents" = "Нещодавні документи";
@@ -563,3 +563,7 @@
 "Loop one" = "Цикл один";
 "Autoplay next" = "Автовідтворення далі";
 "Stream" = "Потік";
+"Enter account credentials to connect..." = "Введіть облікові дані для з'єднання...";
+"Seek" = "Шукати";
+"Show scroll to top button in comments" = "Показати кнопку прокрутки вгору в коментарях";
+"Enter location address to connect..." = "Введіть адресу розташування для з'єднання...";
