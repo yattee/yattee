@@ -73,7 +73,7 @@ struct PlayerControlsSettings: View {
             }
         #endif
 
-        Section(header: SettingsHeader(text: "Seeking"), footer: seekingGestureSection) {
+        Section(header: SettingsHeader(text: "Seeking".localized()), footer: seekingGestureSection) {
             systemControlsCommandsPicker
 
             seekingSection
@@ -103,13 +103,13 @@ struct PlayerControlsSettings: View {
     }
 
     var controlsButtonsSection: some View {
-        Section(header: SettingsHeader(text: "Controls Buttons")) {
+        Section(header: SettingsHeader(text: "Controls Buttons".localized())) {
             controlButtonToggles
         }
     }
 
     @ViewBuilder var actionsButtonsSection: some View {
-        Section(header: SettingsHeader(text: "Actions Buttons")) {
+        Section(header: SettingsHeader(text: "Actions Buttons".localized())) {
             actionButtonToggles
         }
     }
@@ -206,7 +206,7 @@ struct PlayerControlsSettings: View {
 
     private func seekingDurationSetting(_ name: String, _ value: Binding<String>) -> some View {
         HStack {
-            Text(name)
+            Text(name.localized())
                 .frame(minWidth: 140, alignment: .leading)
             Spacer()
 
