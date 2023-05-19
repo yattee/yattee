@@ -42,7 +42,7 @@ final class ShareViewController: SLComposeServiceViewController {
                         self.open(url: url)
                     }
 
-                    self.extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                    self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
                 }
             }
         }
