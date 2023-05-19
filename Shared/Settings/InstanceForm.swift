@@ -99,8 +99,12 @@ struct InstanceForm: View {
     }
 
     @ViewBuilder var validationStatus: some View {
-        if !url.isEmpty {
-            Section {
+        Section {
+            if url.isEmpty {
+                Text("Enter location address to connect...")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.secondary)
+            } else {
                 AccountValidationStatus(
                     app: $app,
                     isValid: $isValid,

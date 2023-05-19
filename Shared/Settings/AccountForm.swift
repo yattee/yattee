@@ -94,8 +94,12 @@ struct AccountForm: View {
     }
 
     @ViewBuilder var validationStatus: some View {
-        if !username.isEmpty && !password.isEmpty {
-            Section {
+        Section {
+            if username.isEmpty || password.isEmpty {
+                Text("Enter account credentials to connect...")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.secondary)
+            } else {
                 AccountValidationStatus(
                     app: .constant(instance.app),
                     isValid: $isValid,
