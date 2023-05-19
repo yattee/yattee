@@ -1,4 +1,4 @@
-## Build 147
+## Build 148
 * Fixed issue where keyboard would be dismissed on iOS during typing location address/account credentials
 * Localizations updates and fixes
 * Other minor changes and fixes
