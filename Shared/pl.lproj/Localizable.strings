@@ -568,3 +568,6 @@
 "Seek" = "Przewijanie";
 "Enter account credentials to connect..." = "Wprowadź dane logowania do konta, aby połączyć...";
 "Enter location address to connect..." = "Wprowadź adres lokalizacji, aby połączyć...";
+"Opened File" = "Otwarty plik";
+"File Extension" = "Rozszerzenie pliku";
+"Opening file..." = "Otwieranie pliku...";
