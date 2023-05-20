@@ -18,9 +18,9 @@ struct ContentView: View {
     @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
 
     var body: some View {
-        Group {
-            #if os(iOS)
-                GeometryReader { proxy in
+        GeometryReader { proxy in
+            Group {
+                #if os(iOS)
                     Group {
                         if Constants.isIPhone {
                             AppTabNavigation()
@@ -32,17 +32,19 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .onAppear {
-                        SafeAreaModel.shared.safeArea = proxy.safeAreaInsets
-                    }
-                    .onChange(of: proxy.safeAreaInsets) { newValue in
-                        SafeAreaModel.shared.safeArea = newValue
-                    }
-                }
-            #elseif os(macOS)
-                AppSidebarNavigation()
-            #elseif os(tvOS)
-                TVNavigationView()
+                #elseif os(macOS)
+                    AppSidebarNavigation()
+                #elseif os(tvOS)
+                    TVNavigationView()
+                #endif
+            }
+            #if !os(macOS)
+            .onAppear {
+                SafeAreaModel.shared.safeArea = proxy.safeAreaInsets
+            }
+            .onChange(of: proxy.safeAreaInsets) { newValue in
+                SafeAreaModel.shared.safeArea = newValue
+            }
             #endif
         }
         #if os(iOS)
@@ -135,7 +137,9 @@ struct ContentView: View {
         )
         #endif
         .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
-        .statusBarHidden(player.playingFullScreen)
+        #if os(iOS)
+            .statusBarHidden(player.playingFullScreen)
+        #endif
     }
 
     var navigationStyle: NavigationStyle {

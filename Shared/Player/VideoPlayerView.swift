@@ -104,65 +104,67 @@ struct VideoPlayerView: View {
                     }
             }
             .ignoresSafeArea(.all, edges: .bottom)
-            .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
-            .onChange(of: geometry.size) { _ in
-                self.playerSize = geometry.size
-            }
-            .onChange(of: fullScreenDetails) { value in
-                player.backend.setNeedsDrawing(!value)
-            }
             #if os(iOS)
-            .onChange(of: player.presentingPlayer) { newValue in
-                if newValue {
-                    viewDragOffset = 0
+                .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
+            #endif
+                .onChange(of: geometry.size) { _ in
+                    self.playerSize = geometry.size
                 }
-            }
-            .onAppear {
-                #if os(macOS)
-                    if player.videoForDisplay.isNil {
-                        player.hide()
+                .onChange(of: fullScreenDetails) { value in
+                    player.backend.setNeedsDrawing(!value)
+                }
+            #if os(iOS)
+                .onChange(of: player.presentingPlayer) { newValue in
+                    if newValue {
+                        viewDragOffset = 0
                     }
-                #endif
-                viewDragOffset = 0
+                }
+                .onAppear {
+                    #if os(macOS)
+                        if player.videoForDisplay.isNil {
+                            player.hide()
+                        }
+                    #endif
+                    viewDragOffset = 0
 
-                Delay.by(0.2) {
-                    orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
+                    Delay.by(0.2) {
+                        orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
 
-                    if let orientationMask = player.lockedOrientation {
-                        Orientation.lockOrientation(
-                            orientationMask,
-                            andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
-                        )
+                        if let orientationMask = player.lockedOrientation {
+                            Orientation.lockOrientation(
+                                orientationMask,
+                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
+                            )
+                        } else {
+                            Orientation.lockOrientation(.allButUpsideDown)
+                        }
+                    }
+                }
+                .onDisappear {
+                    if Defaults[.lockPortraitWhenBrowsing] {
+                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
                     } else {
                         Orientation.lockOrientation(.allButUpsideDown)
                     }
+                    orientationModel.stopOrientationUpdates()
+                    player.controls.hideOverlays()
                 }
-            }
-            .onDisappear {
-                if Defaults[.lockPortraitWhenBrowsing] {
-                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                } else {
-                    Orientation.lockOrientation(.allButUpsideDown)
-                }
-                orientationModel.stopOrientationUpdates()
-                player.controls.hideOverlays()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                guard player.lockedOrientation.isNil else {
-                    return
-                }
+                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                    guard player.lockedOrientation.isNil else {
+                        return
+                    }
 
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-            }
-            .onAnimationCompleted(for: viewDragOffset) {
-                guard !dragGestureState else { return }
-                if viewDragOffset == 0 {
-                    player.onPresentPlayer.forEach { $0() }
-                    player.onPresentPlayer = []
-                } else if viewDragOffset == Self.hiddenOffset {
-                    player.hide(animate: false)
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
                 }
-            }
+                .onAnimationCompleted(for: viewDragOffset) {
+                    guard !dragGestureState else { return }
+                    if viewDragOffset == 0 {
+                        player.onPresentPlayer.forEach { $0() }
+                        player.onPresentPlayer = []
+                    } else if viewDragOffset == Self.hiddenOffset {
+                        player.hide(animate: false)
+                    }
+                }
             #endif
         }
         #if os(iOS)
@@ -326,7 +328,9 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
+            #if os(iOS)
             .background(BackgroundBlackView().edgesIgnoringSafeArea(.all))
+            #endif
             .background(((colorScheme == .dark || fullScreenPlayer) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
@@ -426,7 +430,11 @@ struct VideoPlayerView: View {
             return true
         }
 
-        return !avPlayerUsesSystemControls || verticalSizeClass == .compact
+        #if os(iOS)
+            return !avPlayerUsesSystemControls || verticalSizeClass == .compact
+        #else
+            return !avPlayerUsesSystemControls
+        #endif
     }
 
     var fullScreenPlayer: Bool {
@@ -495,15 +503,17 @@ struct VideoPlayerView_Previews: PreviewProvider {
     }
 }
 
-struct BackgroundBlackView: UIViewRepresentable {
-    func makeUIView(context _: Context) -> UIView {
-        let view = UIView()
-        DispatchQueue.main.async {
-            view.superview?.superview?.backgroundColor = .black
-            view.superview?.superview?.layer.removeAllAnimations()
+#if os(iOS)
+    struct BackgroundBlackView: UIViewRepresentable {
+        func makeUIView(context _: Context) -> UIView {
+            let view = UIView()
+            DispatchQueue.main.async {
+                view.superview?.superview?.backgroundColor = .black
+                view.superview?.superview?.layer.removeAllAnimations()
+            }
+            return view
         }
-        return view
-    }
 
-    func updateUIView(_: UIView, context _: Context) {}
-}
+        func updateUIView(_: UIView, context _: Context) {}
+    }
+#endif

@@ -4,9 +4,9 @@ import SwiftUI
 struct PlayerBackendView: View {
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+        @ObservedObject private var safeAreaModel = SafeAreaModel.shared
     #endif
     @ObservedObject private var player = PlayerModel.shared
-    @ObservedObject private var safeAreaModel = SafeAreaModel.shared
 
     @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
 
@@ -36,9 +36,6 @@ struct PlayerBackendView: View {
                         }
                     }
                     .zIndex(0)
-
-                    ControlsGradientView()
-                        .zIndex(1)
                 }
             }
             .overlay(GeometryReader { proxy in

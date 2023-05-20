@@ -427,16 +427,18 @@ enum FullScreenRotationSetting: String, CaseIterable, Defaults.Serializable {
     case landscapeLeft
     case landscapeRight
 
-    var interaceOrientation: UIInterfaceOrientation {
-        switch self {
-        case .landscapeLeft:
-            return .landscapeLeft
-        case .landscapeRight:
-            return .landscapeRight
-        default:
-            return .portrait
+    #if os(iOS)
+        var interaceOrientation: UIInterfaceOrientation {
+            switch self {
+            case .landscapeLeft:
+                return .landscapeLeft
+            case .landscapeRight:
+                return .landscapeRight
+            default:
+                return .portrait
+            }
         }
-    }
+    #endif
 
     var isRotating: Bool {
         self != .disabled

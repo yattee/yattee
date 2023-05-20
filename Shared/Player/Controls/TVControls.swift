@@ -4,6 +4,7 @@ import SwiftUI
 struct TVControls: UIViewRepresentable {
     var model: PlayerControlsModel!
     var player: PlayerModel { .shared }
+    var safeArea: SafeAreaModel { .shared }
     var thumbnails: ThumbnailsModel { .shared }
 
     @State private var direction = ""
@@ -32,10 +33,10 @@ struct TVControls: UIViewRepresentable {
 
         let controls = UIHostingController(rootView: PlayerControls())
         controls.view.frame = .init(
-            origin: .init(x: SafeArea.insets.left, y: SafeArea.insets.top),
+            origin: .init(x: safeArea.safeArea.leading, y: safeArea.safeArea.top),
             size: .init(
-                width: UIScreen.main.bounds.width - SafeArea.horizontalInsets,
-                height: UIScreen.main.bounds.height - SafeArea.verticalInset
+                width: UIScreen.main.bounds.width - safeArea.horizontalInsets,
+                height: UIScreen.main.bounds.height - safeArea.verticalInsets
             )
         )
 

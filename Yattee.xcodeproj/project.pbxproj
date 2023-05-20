@@ -725,6 +725,9 @@
 		37B795912771DAE0001CF27B /* OpenURLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */; };
 		37B7CFE92A19603B001B0564 /* ToolbarBackground+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7CFE82A19603B001B0564 /* ToolbarBackground+Backport.swift */; };
 		37B7CFEB2A1960EC001B0564 /* ToolbarColorScheme+Backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7CFEA2A1960EC001B0564 /* ToolbarColorScheme+Backport.swift */; };
+		37B7CFEC2A197844001B0564 /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
+		37B7CFEE2A19789F001B0564 /* MacOSPiPDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7CFED2A19789F001B0564 /* MacOSPiPDelegate.swift */; };
+		37B7CFEF2A197A08001B0564 /* SafeAreaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3142A18F7630059A470 /* SafeAreaModel.swift */; };
 		37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */; };
 		37B81AFA26D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */; };
 		37B81AFC26D2C9C900675966 /* VideoDetailsPaddingModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */; };
@@ -781,7 +784,6 @@
 		37BE0BD326A1D4780092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
 		37BE0BD426A1D47D0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */; };
 		37BE0BD726A1D4A90092E2DB /* AppleAVPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */; };
-		37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */; };
 		37C069782725962F00F7F6CB /* ScreenSaverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069772725962F00F7F6CB /* ScreenSaverManager.swift */; };
 		37C0697A2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */; };
 		37C0697B2725C09E00F7F6CB /* PlayerQueueItemBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */; };
@@ -888,7 +890,6 @@
 		37DCD3112A18E8150059A470 /* OrientationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3102A18E8150059A470 /* OrientationModel.swift */; };
 		37DCD3152A18F7630059A470 /* SafeAreaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3142A18F7630059A470 /* SafeAreaModel.swift */; };
 		37DCD3172A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */; };
-		37DCD3182A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */; };
 		37DCD3192A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */; };
 		37DCD31A2A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */; };
 		37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */; };
@@ -1387,6 +1388,7 @@
 		37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenURLHandler.swift; sourceTree = "<group>"; };
 		37B7CFE82A19603B001B0564 /* ToolbarBackground+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolbarBackground+Backport.swift"; sourceTree = "<group>"; };
 		37B7CFEA2A1960EC001B0564 /* ToolbarColorScheme+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolbarColorScheme+Backport.swift"; sourceTree = "<group>"; };
+		37B7CFED2A19789F001B0564 /* MacOSPiPDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MacOSPiPDelegate.swift; sourceTree = "<group>"; };
 		37B81AF826D2C9A700675966 /* VideoPlayerSizeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerSizeModifier.swift; sourceTree = "<group>"; };
 		37B81AFB26D2C9C900675966 /* VideoDetailsPaddingModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetailsPaddingModifier.swift; sourceTree = "<group>"; };
 		37B81AFE26D2CA3700675966 /* VideoDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetails.swift; sourceTree = "<group>"; };
@@ -1409,7 +1411,6 @@
 		37BE0BCE26A0E2D50092E2DB /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD226A1D4780092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
 		37BE0BD526A1D4A90092E2DB /* AppleAVPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerViewController.swift; sourceTree = "<group>"; };
-		37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAVPlayerView.swift; sourceTree = "<group>"; };
 		37C069772725962F00F7F6CB /* ScreenSaverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSaverManager.swift; sourceTree = "<group>"; };
 		37C069792725C09E00F7F6CB /* PlayerQueueItemBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueItemBridge.swift; sourceTree = "<group>"; };
 		37C0697D2725C8D400F7F6CB /* CMTime+DefaultTimescale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMTime+DefaultTimescale.swift"; sourceTree = "<group>"; };
@@ -2222,8 +2223,8 @@
 			isa = PBXGroup;
 			children = (
 				374C0542272496E4009BDDBE /* AppDelegate.swift */,
-				37BE0BDB26A2367F0092E2DB /* AppleAVPlayerView.swift */,
 				37FD43DB270470B70073EE42 /* InstancesSettings.swift */,
+				37B7CFED2A19789F001B0564 /* MacOSPiPDelegate.swift */,
 				3751BA7D27E63F1D007B1A60 /* MPVOGLView.swift */,
 				37F7AB5428A951B200FB46B5 /* Power.swift */,
 				37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */,
@@ -3349,11 +3350,11 @@
 				37D836BD294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
 				3727B74B27872B880021C15E /* VisualEffectBlur-macOS.swift in Sources */,
 				374710062755291C00CE0F87 /* SearchTextField.swift in Sources */,
+				37B7CFEC2A197844001B0564 /* AppleAVPlayerView.swift in Sources */,
 				37F0F4EB286F397E00C06C2E /* SettingsModel.swift in Sources */,
 				378AE93F274EDFB5006A4EE1 /* Tint+Backport.swift in Sources */,
 				37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */,
 				37737786276F9858000521C1 /* Windows.swift in Sources */,
-				37BE0BDC26A2367F0092E2DB /* AppleAVPlayerView.swift in Sources */,
 				3786D05F294C737300D23E82 /* RequestErrorButton.swift in Sources */,
 				3743CA53270F284F00E4D32B /* View+Borders.swift in Sources */,
 				37599F39272B4D740087F250 /* FavoriteButton.swift in Sources */,
@@ -3418,6 +3419,7 @@
 				37B81B0026D2CA3700675966 /* VideoDetails.swift in Sources */,
 				3752069A285E8DD300CA655F /* Chapter.swift in Sources */,
 				373EBD69291F252D002ADB9C /* EditFavorites.swift in Sources */,
+				37B7CFEE2A19789F001B0564 /* MacOSPiPDelegate.swift in Sources */,
 				37484C1A26FC837400287258 /* PlayerSettings.swift in Sources */,
 				3776925329463C310055EC18 /* PlaylistsCacheModel.swift in Sources */,
 				37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */,
@@ -3573,7 +3575,6 @@
 				3711404026B206A6005B3555 /* SearchModel.swift in Sources */,
 				37484C2A26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37BE0BD026A0E2D50092E2DB /* VideoPlayerView.swift in Sources */,
-				37DCD3182A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */,
 				373CFAEC26975CBF003CB2C6 /* PlaylistFormView.swift in Sources */,
 				37D2E0D528B67EFC00F64D52 /* Delay.swift in Sources */,
 				37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
@@ -3752,6 +3753,7 @@
 				3786D060294C737300D23E82 /* RequestErrorButton.swift in Sources */,
 				37A362C429537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift in Sources */,
 				37BDFF1929487B99000C6404 /* PlaylistVideosView.swift in Sources */,
+				37B7CFEF2A197A08001B0564 /* SafeAreaModel.swift in Sources */,
 				37C0698427260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
 				374924DC2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				37D6025B28C17375009E8D98 /* PlaybackStatsView.swift in Sources */,
