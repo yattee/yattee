@@ -3,7 +3,7 @@ import SwiftUI
 
 extension VideoPlayerView {
     var playerDragGesture: some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+        DragGesture(minimumDistance: 30, coordinateSpace: .global)
         #if os(iOS)
             .updating($dragGestureOffset) { value, state, _ in
                 guard isVerticalDrag else { return }
@@ -36,7 +36,12 @@ extension VideoPlayerView {
                     }
                 #endif
 
-                if !isVerticalDrag, horizontalPlayerGestureEnabled, abs(horizontalDrag) > seekGestureSensitivity, !isHorizontalDrag {
+                if !isVerticalDrag,
+                   horizontalPlayerGestureEnabled,
+                   abs(horizontalDrag) > seekGestureSensitivity,
+                   !isHorizontalDrag,
+                   player.activeBackend == .mpv || !avPlayerUsesSystemControls
+                {
                     isHorizontalDrag = true
                     player.seek.onSeekGestureStart()
                     viewDragOffset = 0
@@ -80,6 +85,16 @@ extension VideoPlayerView {
             player.seek.onSeekGestureEnd()
         }
 
+        if viewDragOffset > 60,
+           player.playingFullScreen
+        {
+            #if os(iOS)
+                player.lockedOrientation = nil
+            #endif
+            player.exitFullScreen(showControls: false)
+            viewDragOffset = 0
+            return
+        }
         isVerticalDrag = false
 
         guard player.presentingPlayer,

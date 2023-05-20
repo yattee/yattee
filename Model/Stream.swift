@@ -176,6 +176,10 @@ class Stream: Equatable, Hashable, Identifiable {
         localURL != nil
     }
 
+    var isHLS: Bool {
+        hlsURL != nil
+    }
+
     var quality: String {
         guard localURL.isNil else { return "Opened File" }
         return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
@@ -229,8 +233,14 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(videoAsset?.url)
-        hasher.combine(audioAsset?.url)
-        hasher.combine(hlsURL)
+        if let url = videoAsset?.url {
+            hasher.combine(url)
+        }
+        if let url = audioAsset?.url {
+            hasher.combine(url)
+        }
+        if let url = hlsURL {
+            hasher.combine(url)
+        }
     }
 }

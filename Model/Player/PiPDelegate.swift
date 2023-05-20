@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 
 final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
-    var player: PlayerModel!
+    var player: PlayerModel { .shared }
 
     func pictureInPictureController(
         _: AVPictureInPictureController,
@@ -16,19 +16,17 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
     func pictureInPictureControllerWillStartPictureInPicture(_: AVPictureInPictureController) {}
 
     func pictureInPictureControllerDidStartPictureInPicture(_: AVPictureInPictureController) {
-        guard let player else { return }
+        player.play()
 
         player.playingInPictureInPicture = true
         player.avPlayerBackend.startPictureInPictureOnPlay = false
         player.avPlayerBackend.startPictureInPictureOnSwitch = false
         player.controls.objectWillChange.send()
 
-        if Defaults[.closePlayerOnOpeningPiP] { Delay.by(0.1) { player.hide() } }
+        if Defaults[.closePlayerOnOpeningPiP] { Delay.by(0.1) { self.player.hide() } }
     }
 
     func pictureInPictureControllerDidStopPictureInPicture(_: AVPictureInPictureController) {
-        guard let player else { return }
-
         player.playingInPictureInPicture = false
         player.controls.objectWillChange.send()
     }
@@ -39,6 +37,8 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         _: AVPictureInPictureController,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
+        let wasPlaying = player.isPlaying
+
         var delay = 0.0
         #if os(iOS)
             if !player.presentingPlayer {
@@ -50,7 +50,7 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         #endif
 
         if !player.currentItem.isNil, !player.musicMode {
-            player?.show()
+            player.show()
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
@@ -58,6 +58,11 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
                 self?.player.playingInPictureInPicture = false
             }
 
+            if wasPlaying {
+                Delay.by(1) {
+                    self?.player.play()
+                }
+            }
             completionHandler(true)
         }
     }

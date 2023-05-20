@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 struct PlayerBackendView: View {
@@ -6,6 +7,8 @@ struct PlayerBackendView: View {
     #endif
     @ObservedObject private var player = PlayerModel.shared
     @ObservedObject private var safeAreaModel = SafeAreaModel.shared
+
+    @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -16,7 +19,20 @@ struct PlayerBackendView: View {
                         case .mpv:
                             player.mpvPlayerView
                         case .appleAVPlayer:
-                            player.avPlayerView
+                            #if os(tvOS)
+                                AppleAVPlayerView()
+                            #else
+                                if avPlayerUsesSystemControls,
+                                   !player.playingInPictureInPicture,
+                                   !player.avPlayerBackend.isStartingPiP
+                                {
+                                    AppleAVPlayerView()
+                                } else if !avPlayerUsesSystemControls ||
+                                    player.avPlayerBackend.isStartingPiP
+                                {
+                                    AppleAVPlayerLayerView()
+                                }
+                            #endif
                         }
                     }
                     .zIndex(0)
@@ -31,17 +47,16 @@ struct PlayerBackendView: View {
                     .onChange(of: proxy.size) { _ in player.playerSize = proxy.size }
                     .onChange(of: player.controls.presentingOverlays) { _ in player.playerSize = proxy.size }
             })
-            #if os(iOS)
-            .padding(.top, player.playingFullScreen && verticalSizeClass == .regular ? 20 : 0)
-            #endif
 
             #if !os(tvOS)
-                PlayerGestures()
-                PlayerControls()
-                #if os(iOS)
-                    .padding(.top, controlsTopPadding)
-                    .padding(.bottom, controlsBottomPadding)
-                #endif
+                if player.activeBackend == .mpv || !avPlayerUsesSystemControls {
+                    PlayerGestures()
+                    PlayerControls()
+                    #if os(iOS)
+                        .padding(.top, controlsTopPadding)
+                        .padding(.bottom, controlsBottomPadding)
+                    #endif
+                }
             #else
                 hiddenControlsButton
             #endif

@@ -132,6 +132,7 @@ extension Defaults.Keys {
 
     static let playerControlsLayout = Key<PlayerControlsLayout>("playerControlsLayout", default: playerControlsLayoutDefault)
     static let fullScreenPlayerControlsLayout = Key<PlayerControlsLayout>("fullScreenPlayerControlsLayout", default: fullScreenPlayerControlsLayoutDefault)
+    static let avPlayerUsesSystemControls = Key<Bool>("avPlayerUsesSystemControls", default: true)
     static let horizontalPlayerGestureEnabled = Key<Bool>("horizontalPlayerGestureEnabled", default: true)
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
     static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 30.0)

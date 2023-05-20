@@ -2,6 +2,8 @@ import Defaults
 import SwiftUI
 
 struct PlayerControlsSettings: View {
+    @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
+
     @Default(.systemControlsCommands) private var systemControlsCommands
     @Default(.playerControlsLayout) private var playerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
@@ -61,6 +63,9 @@ struct PlayerControlsSettings: View {
     @ViewBuilder var sections: some View {
         #if !os(tvOS)
             Section(header: SettingsHeader(text: "Controls".localized()), footer: controlsLayoutFooter) {
+                #if !os(tvOS)
+                    avPlayerUsesSystemControlsToggle
+                #endif
                 horizontalPlayerGestureEnabledToggle
                 SettingsHeader(text: "Seek gesture sensitivity".localized(), secondary: true)
                 seekGestureSensitivityPicker
@@ -141,6 +146,10 @@ struct PlayerControlsSettings: View {
 
     private var horizontalPlayerGestureEnabledToggle: some View {
         Toggle("Seek with horizontal swipe on video", isOn: $horizontalPlayerGestureEnabled)
+    }
+
+    private var avPlayerUsesSystemControlsToggle: some View {
+        Toggle("Use system controls with AVPlayer", isOn: $avPlayerUsesSystemControls)
     }
 
     private var seekGestureSensitivityPicker: some View {

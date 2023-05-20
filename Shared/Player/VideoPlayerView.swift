@@ -64,6 +64,7 @@ struct VideoPlayerView: View {
     @Default(.playerSidebar) var playerSidebar
     @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
     @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
+    @Default(.avPlayerUsesSystemControls) internal var avPlayerUsesSystemControls
 
     @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
 
@@ -98,12 +99,12 @@ struct VideoPlayerView: View {
         return GeometryReader { geometry in
             HStack(spacing: 0) {
                 content
-                    .ignoresSafeArea(.all, edges: .bottom)
-                    .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
                     .onAppear {
                         playerSize = geometry.size
                     }
             }
+            .ignoresSafeArea(.all, edges: .bottom)
+            .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
             .onChange(of: geometry.size) { _ in
                 self.playerSize = geometry.size
             }
@@ -279,7 +280,8 @@ struct VideoPlayerView: View {
                                 VideoPlayerSizeModifier(
                                     geometry: geometry,
                                     aspectRatio: player.aspectRatio,
-                                    fullScreen: fullScreenPlayer
+                                    fullScreen: fullScreenPlayer,
+                                    detailsHiddenInFullScreen: detailsHiddenInFullScreen
                                 )
                             )
                             .onHover { hovering in
@@ -303,15 +305,12 @@ struct VideoPlayerView: View {
 
                             .background(Color.black)
 
-                        if !fullScreenPlayer {
+                        if !detailsHiddenInFullScreen {
                             VideoDetails(
                                 video: player.videoForDisplay,
                                 fullScreen: $fullScreenDetails,
                                 sidebarQueue: $sidebarQueue
                             )
-                            #if os(iOS)
-                            .ignoresSafeArea(.all, edges: .bottom)
-                            #endif
                             .modifier(VideoDetailsPaddingModifier(
                                 playerSize: player.playerSize,
                                 fullScreen: fullScreenDetails
@@ -369,7 +368,7 @@ struct VideoPlayerView: View {
                 }
             }
             #endif
-            if !fullScreenPlayer {
+            if !detailsHiddenInFullScreen {
                 #if os(iOS)
                     if sidebarQueue {
                         List {
@@ -404,6 +403,12 @@ struct VideoPlayerView: View {
         }
         #if os(iOS)
         .statusBar(hidden: fullScreenPlayer)
+        .backport
+        .toolbarBackground(colorScheme == .light ? .white : .black)
+        .backport
+        .toolbarBackgroundVisibility(true)
+        .backport
+        .toolbarColorScheme(colorScheme)
         #endif
         #if os(macOS)
         .background(
@@ -412,6 +417,16 @@ struct VideoPlayerView: View {
             }
         )
         #endif
+    }
+
+    var detailsHiddenInFullScreen: Bool {
+        guard fullScreenPlayer else { return false }
+
+        if player.activeBackend == .mpv {
+            return true
+        }
+
+        return !avPlayerUsesSystemControls || verticalSizeClass == .compact
     }
 
     var fullScreenPlayer: Bool {

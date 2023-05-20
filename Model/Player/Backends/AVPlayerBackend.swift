@@ -1,4 +1,4 @@
-import AVFoundation
+import AVKit
 import Defaults
 import Foundation
 import Logging
@@ -6,6 +6,7 @@ import MediaPlayer
 #if !os(macOS)
     import UIKit
 #endif
+import SwiftUI
 
 final class AVPlayerBackend: PlayerBackend {
     static let assetKeysToLoad = ["tracks", "playable", "duration"]
@@ -84,6 +85,10 @@ final class AVPlayerBackend: PlayerBackend {
     private(set) var playerLayer = AVPlayerLayer()
     #if os(tvOS)
         var controller: AppleAVPlayerViewController?
+    #elseif os(iOS)
+        var controller = AVPlayerViewController() { didSet {
+            controller.player = avPlayer
+        }}
     #endif
     var startPictureInPictureOnPlay = false
     var startPictureInPictureOnSwitch = false
@@ -108,6 +113,9 @@ final class AVPlayerBackend: PlayerBackend {
         addPlayerTimeControlStatusObserver()
 
         playerLayer.player = avPlayer
+        #if os(iOS)
+            controller.player = avPlayer
+        #endif
     }
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
@@ -469,10 +477,6 @@ final class AVPlayerBackend: PlayerBackend {
 
             switch playerItem.status {
             case .readyToPlay:
-                if self.model.playingInPictureInPicture {
-                    self.startPictureInPictureOnSwitch = false
-                    self.startPictureInPictureOnPlay = false
-                }
                 if self.model.activeBackend == .appleAVPlayer,
                    self.isAutoplaying(playerItem)
                 {
@@ -487,17 +491,21 @@ final class AVPlayerBackend: PlayerBackend {
                         self.model.play()
                     }
                 } else if self.startPictureInPictureOnPlay {
-                    self.startPictureInPictureOnPlay = false
                     self.model.stream = self.stream
                     self.model.streamSelection = self.stream
 
                     if self.model.activeBackend != .appleAVPlayer {
                         self.startPictureInPictureOnSwitch = true
                         let seconds = self.model.mpvBackend.currentTime?.seconds ?? 0
-                        self.seek(to: seconds, seekType: .backendSync) { _ in
+                        self.seek(to: seconds, seekType: .backendSync) { finished in
+                            guard finished else { return }
                             DispatchQueue.main.async {
                                 self.model.pause()
                                 self.model.changeActiveBackend(from: .mpv, to: .appleAVPlayer, changingStream: false)
+
+                                Delay.by(3) {
+                                    self.startPictureInPictureOnPlay = false
+                                }
                             }
                         }
                     }
@@ -688,13 +696,16 @@ final class AVPlayerBackend: PlayerBackend {
 
     func didChangeTo() {
         if startPictureInPictureOnSwitch {
-            startPictureInPictureOnSwitch = false
             tryStartingPictureInPicture()
         } else if model.musicMode {
             startMusicMode()
         } else {
             stopMusicMode()
         }
+    }
+
+    var isStartingPiP: Bool {
+        startPictureInPictureOnPlay || startPictureInPictureOnSwitch
     }
 
     func tryStartingPictureInPicture() {
@@ -712,6 +723,32 @@ final class AVPlayerBackend: PlayerBackend {
                 }
             }
         }
+
+        Delay.by(5) {
+            self.startPictureInPictureOnSwitch = false
+        }
+    }
+
+    func setPlayerInLayer(_ playerIsPresented: Bool) {
+        if playerIsPresented {
+            bindPlayerToLayer()
+        } else {
+            removePlayerFromLayer()
+        }
+    }
+
+    func removePlayerFromLayer() {
+        playerLayer.player = nil
+        #if os(iOS)
+            controller.player = nil
+        #endif
+    }
+
+    func bindPlayerToLayer() {
+        playerLayer.player = avPlayer
+        #if os(iOS)
+            controller.player = avPlayer
+        #endif
     }
 
     func getTimeUpdates() {}

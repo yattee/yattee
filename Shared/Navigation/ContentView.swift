@@ -15,6 +15,8 @@ struct ContentView: View {
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
+    @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
+
     var body: some View {
         Group {
             #if os(iOS)
@@ -133,6 +135,7 @@ struct ContentView: View {
         )
         #endif
         .alert(isPresented: $navigation.presentingAlert) { navigation.alert }
+        .statusBarHidden(player.playingFullScreen)
     }
 
     var navigationStyle: NavigationStyle {
@@ -150,9 +153,11 @@ struct ContentView: View {
             playerView
                 .transition(.asymmetric(insertion: .identity, removal: .opacity))
                 .zIndex(3)
-        } else if player.activeBackend == .appleAVPlayer {
+        } else if player.activeBackend == .appleAVPlayer,
+                  avPlayerUsesSystemControls || player.avPlayerBackend.isStartingPiP
+        {
             #if os(iOS)
-                playerView.offset(y: UIScreen.main.bounds.height)
+                AppleAVPlayerLayerView().offset(y: UIScreen.main.bounds.height)
             #endif
         }
     }

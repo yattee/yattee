@@ -4,8 +4,8 @@ import SwiftUI
 struct VideoPlayerSizeModifier: ViewModifier {
     let geometry: GeometryProxy
     let aspectRatio: Double?
-    let minimumHeightLeft: Double
     let fullScreen: Bool
+    var detailsHiddenInFullScreen = true
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -14,26 +14,31 @@ struct VideoPlayerSizeModifier: ViewModifier {
     init(
         geometry: GeometryProxy,
         aspectRatio: Double? = nil,
-        minimumHeightLeft: Double? = nil,
-        fullScreen: Bool = false
+        fullScreen: Bool = false,
+        detailsHiddenInFullScreen: Bool = false
     ) {
         self.geometry = geometry
         self.aspectRatio = aspectRatio ?? VideoPlayerView.defaultAspectRatio
-        self.minimumHeightLeft = minimumHeightLeft ?? VideoPlayerView.defaultMinimumHeightLeft
         self.fullScreen = fullScreen
+        self.detailsHiddenInFullScreen = detailsHiddenInFullScreen
     }
 
     func body(content: Content) -> some View {
         content
-            .frame(width: geometry.size.width)
+            .frame(maxWidth: geometry.size.width)
             .frame(maxHeight: maxHeight)
+
         #if !os(macOS)
-            .aspectRatio(fullScreen ? nil : usedAspectRatio, contentMode: usedAspectRatioContentMode)
+            .aspectRatio(ratio, contentMode: usedAspectRatioContentMode)
         #endif
     }
 
+    var ratio: CGFloat? {
+        fullScreen ? detailsHiddenInFullScreen ? nil : usedAspectRatio : usedAspectRatio
+    }
+
     var usedAspectRatio: Double {
-        guard let aspectRatio, aspectRatio > 0, aspectRatio < VideoPlayerView.defaultAspectRatio else {
+        guard let aspectRatio, aspectRatio > 0 else {
             return VideoPlayerView.defaultAspectRatio
         }
 
@@ -50,15 +55,13 @@ struct VideoPlayerSizeModifier: ViewModifier {
 
     var maxHeight: Double {
         guard !fullScreen else {
-            return .infinity
+            if detailsHiddenInFullScreen {
+                return geometry.size.height
+            } else {
+                return geometry.size.width / usedAspectRatio
+            }
         }
 
-        #if os(iOS)
-            let height = verticalSizeClass == .regular ? geometry.size.height - minimumHeightLeft : .infinity
-        #else
-            let height = geometry.size.height - minimumHeightLeft
-        #endif
-
-        return [height, 0].max()!
+        return max(geometry.size.height - VideoPlayerView.defaultMinimumHeightLeft, 0)
     }
 }

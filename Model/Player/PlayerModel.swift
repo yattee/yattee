@@ -49,7 +49,6 @@ final class PlayerModel: ObservableObject {
 
     let logger = Logger(label: "stream.yattee.app")
 
-    var avPlayerView = AppleAVPlayerView()
     var playerItem: AVPlayerItem?
 
     var mpvPlayerView = MPVPlayerView()
@@ -153,6 +152,9 @@ final class PlayerModel: ObservableObject {
     @Published var playingInPictureInPicture = false
     var pipController: AVPictureInPictureController?
     var pipDelegate = PiPDelegate()
+    #if !os(macOS)
+        var appleAVPlayerViewControllerDelegate = AppleAVPlayerViewControllerDelegate()
+    #endif
 
     var playerError: Error? { didSet {
         if let error = playerError {
@@ -164,6 +166,7 @@ final class PlayerModel: ObservableObject {
     @Default(.saveLastPlayed) var saveLastPlayed
     @Default(.lastPlayed) var lastPlayed
     @Default(.qualityProfiles) var qualityProfiles
+    @Default(.avPlayerUsesSystemControls) var avPlayerUsesSystemControls
     @Default(.forceAVPlayerForLiveStreams) var forceAVPlayerForLiveStreams
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
@@ -187,16 +190,17 @@ final class PlayerModel: ObservableObject {
             mpvBackend.client = mpvController.client
         #endif
 
-        Defaults[.activeBackend] = .mpv
         playbackMode = Defaults[.playbackMode]
 
         guard pipController.isNil else { return }
-        pipController = .init(playerLayer: avPlayerBackend.playerLayer)
-        let pipDelegate = PiPDelegate()
-        pipDelegate.player = self
 
-        self.pipDelegate = pipDelegate
+        pipController = .init(playerLayer: avPlayerBackend.playerLayer)
         pipController?.delegate = pipDelegate
+        #if os(iOS)
+            if #available(iOS 14.2, *) {
+                pipController?.canStartPictureInPictureAutomaticallyFromInline = true
+            }
+        #endif
         currentRate = playerRate
     }
 
@@ -475,6 +479,12 @@ final class PlayerModel: ObservableObject {
     private func handlePresentationChange() {
         backend.setNeedsDrawing(presentingPlayer)
 
+        #if os(iOS)
+            if presentingPlayer, activeBackend == .appleAVPlayer, avPlayerUsesSystemControls, Constants.isIPhone {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
+        #endif
+
         controls.hide()
 
         #if !os(macOS)
@@ -542,10 +552,15 @@ final class PlayerModel: ObservableObject {
             self.stream = stream
             streamSelection = stream
 
+            self.upgradeToStream(stream, force: true)
+
             return
         }
 
-        if !backend.canPlay(stream) || (to == .mpv && !stream.hlsURL.isNil) {
+        if !backend.canPlay(stream) ||
+            (to == .mpv && stream.isHLS) ||
+            (to == .appleAVPlayer && !stream.isHLS)
+        {
             guard let preferredStream = streamByQualityProfile else {
                 return
             }
@@ -631,8 +646,8 @@ final class PlayerModel: ObservableObject {
         if avPlayerBackend.video == video {
             if activeBackend != .appleAVPlayer {
                 avPlayerBackend.startPictureInPictureOnSwitch = true
-                changeActiveBackend(from: activeBackend, to: .appleAVPlayer)
             }
+            changeActiveBackend(from: activeBackend, to: .appleAVPlayer)
         } else {
             avPlayerBackend.startPictureInPictureOnPlay = true
             playStream(stream, of: video, preservingTime: true, upgrading: true, withBackend: avPlayerBackend)
@@ -882,7 +897,7 @@ final class PlayerModel: ObservableObject {
     #else
         func handleEnterForeground() {
             setNeedsDrawing(presentingPlayer)
-            avPlayerBackend.playerLayer.player = avPlayerBackend.avPlayer
+            avPlayerBackend.bindPlayerToLayer()
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
@@ -896,7 +911,7 @@ final class PlayerModel: ObservableObject {
             if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
                 pause()
             } else if !playingInPictureInPicture {
-                avPlayerBackend.playerLayer.player = nil
+                avPlayerBackend.removePlayerFromLayer()
             }
         }
     #endif
@@ -919,6 +934,13 @@ final class PlayerModel: ObservableObject {
         #if os(tvOS)
             guard activeBackend == .mpv else { return }
         #endif
+
+        #if os(iOS)
+            if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                return
+            }
+        #endif
+
         guard let video = currentItem?.video else {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = .none
             return
@@ -986,13 +1008,23 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if playingFullScreen {
+                if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                    avPlayerBackend.controller.enterFullScreen(animated: true)
+                }
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
+                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     // not sure why but first rotation call is ignore so doing rotate to same orientation first
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotateToLandscapeOnEnterFullScreen.interaceOrientation)
+                    Delay.by(delay) {
+                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+                    }
                 }
             } else {
+                if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                    avPlayerBackend.controller.exitFullScreen(animated: true)
+                }
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
             }
