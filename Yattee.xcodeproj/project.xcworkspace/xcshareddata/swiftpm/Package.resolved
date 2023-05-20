@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "revision" : "78424be314842833c04bc3bef5b72e85fff99204",
-        "version" : "5.6.4"
+        "revision" : "bc268c28fb170f494de9e9927c371b8342979ece",
+        "version" : "5.7.1"
       }
     },
     {
@@ -24,7 +24,7 @@
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
         "branch" : "master",
-        "revision" : "eeaf771d8d2e8247fbd6da2e27c986d99803fb1f"
+        "revision" : "d048bf404a5c8362c6cf840c2096d5777975cd27"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "09f0fdd1890b7c9420109bc7b45dcee91b66b7de"
+        "revision" : "7f9fb5d43ecd4aa714c00746f54873f354403438"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
-        "version" : "0.2.3"
+        "revision" : "5b3f3996c7a2a84d5f4ba0e03cd7d584154778f2",
+        "version" : "0.3.1"
       }
     },
     {
