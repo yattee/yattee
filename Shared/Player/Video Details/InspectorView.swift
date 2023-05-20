@@ -15,7 +15,7 @@ struct InspectorView: View {
 
                             videoDetailRow("Format", value: player.mpvBackend.videoFormat)
                             videoDetailRow("Codec", value: player.mpvBackend.videoCodec)
-                            videoDetailRow("Hardware Decoder", value: player.mpvBackend.hwDecoder)
+                            videoDetailRow("Hardware decoder", value: player.mpvBackend.hwDecoder)
                             videoDetailRow("Driver", value: player.mpvBackend.currentVo)
                             videoDetailRow("Size", value: player.formattedSize)
                             videoDetailRow("FPS", value: player.mpvBackend.formattedOutputFps)

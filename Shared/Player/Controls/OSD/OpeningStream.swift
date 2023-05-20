@@ -24,7 +24,7 @@ struct OpeningStream: View {
 
         if let selection = player.streamSelection {
             if selection.isLocal {
-                return "Opening file..."
+                return "Opening file...".localized()
             } else {
                 return String(format: "Opening %@ stream...".localized(), selection.shortQuality)
             }
