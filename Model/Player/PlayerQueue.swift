@@ -88,7 +88,7 @@ extension PlayerModel {
             guard let playerInstance = self.playerInstance else { return }
             let streamsInstance = video.streams.compactMap(\.instance).first
 
-            if video.streams.isEmpty || streamsInstance != playerInstance {
+            if video.streams.isEmpty || streamsInstance.isNil || streamsInstance!.apiURLString != playerInstance.apiURLString {
                 self.loadAvailableStreams(video) { [weak self] _ in
                     self?.videoBeingOpened = nil
                 }

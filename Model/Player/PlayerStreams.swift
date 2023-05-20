@@ -41,7 +41,7 @@ extension PlayerModel {
                         self.logger.info("ignoring loaded streams from \(instance.description) as current video has changed")
                         return
                     }
-                    self.availableStreams += self.streamsWithInstance(instance: instance, streams: video.streams)
+                    self.availableStreams = self.streamsWithInstance(instance: instance, streams: video.streams)
                 } else {
                     self.logger.critical("no streams available from \(instance.description)")
                 }
