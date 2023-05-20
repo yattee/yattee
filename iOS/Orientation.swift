@@ -31,7 +31,7 @@ struct Orientation {
         logger.info("rotating to \(orientationString)")
 
         if #available(iOS 16, *) {
-            guard let windowScene = SafeArea.scene else { return }
+            guard let windowScene = Self.scene else { return }
             let rotateOrientationMask = rotateOrientation == .portrait ? UIInterfaceOrientationMask.portrait :
                 rotateOrientation == .landscapeLeft ? .landscapeLeft :
                 rotateOrientation == .landscapeRight ? .landscapeRight :
@@ -45,5 +45,12 @@ struct Orientation {
         }
 
         UINavigationController.attemptRotationToDeviceOrientation()
+    }
+
+    private static var scene: UIWindowScene? {
+        UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first
     }
 }

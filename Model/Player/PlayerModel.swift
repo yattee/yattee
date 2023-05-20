@@ -129,6 +129,7 @@ final class PlayerModel: ObservableObject {
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
         @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
+        @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
     var accounts: AccountsModel { .shared }
@@ -981,24 +982,21 @@ final class PlayerModel: ObservableObject {
             Windows.player.toggleFullScreen()
         #endif
 
+        playingFullScreen = !isFullScreen
+
         #if os(iOS)
-            if !playingFullScreen {
-                playingFullScreen = true
-                Orientation.lockOrientation(.allButUpsideDown)
+            if playingFullScreen {
+                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+                if currentVideoIsLandscape {
+                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotateToLandscapeOnEnterFullScreen.interaceOrientation)
+                }
             } else {
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
-                // TODO: rework to move view before rotating
-                if SafeArea.insets.left > 0 {
-                    Delay.by(0.15) {
-                        self.playingFullScreen = false
-                    }
-                } else {
-                    self.playingFullScreen = false
-                }
             }
-        #else
-            playingFullScreen = !isFullScreen
+
         #endif
     }
 
@@ -1034,6 +1032,12 @@ final class PlayerModel: ObservableObject {
                 self.aspectRatio = self.backend.aspectRatio
             }
         #endif
+    }
+
+    var currentVideoIsLandscape: Bool {
+        guard currentVideo != nil else { return false }
+
+        return aspectRatio > 1
     }
 
     var formattedSize: String {

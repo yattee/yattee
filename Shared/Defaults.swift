@@ -189,6 +189,10 @@ extension Defaults.Keys {
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
         static let rotateToPortraitOnExitFullScreen = Key<Bool>("rotateToPortraitOnExitFullScreen", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>(
+            "rotateToLandscapeOnEnterFullScreen",
+            default: UIDevice.current.userInterfaceIdiom == .phone ? .landscapeRight : .disabled
+        )
     #endif
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
@@ -414,5 +418,26 @@ enum PlayerTapGestureAction: String, CaseIterable, Defaults.Serializable {
         case .nothing:
             return "Do nothing"
         }
+    }
+}
+
+enum FullScreenRotationSetting: String, CaseIterable, Defaults.Serializable {
+    case disabled
+    case landscapeLeft
+    case landscapeRight
+
+    var interaceOrientation: UIInterfaceOrientation {
+        switch self {
+        case .landscapeLeft:
+            return .landscapeLeft
+        case .landscapeRight:
+            return .landscapeRight
+        default:
+            return .portrait
+        }
+    }
+
+    var isRotating: Bool {
+        self != .disabled
     }
 }

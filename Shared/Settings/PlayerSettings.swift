@@ -17,6 +17,7 @@ struct PlayerSettings: View {
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
+        @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
     @Default(.closePiPOnOpeningPlayer) private var closePiPOnOpeningPlayer
@@ -118,8 +119,9 @@ struct PlayerSettings: View {
                     if idiom == .pad {
                         enterFullscreenInLandscapeToggle
                     }
-                    rotateToPortraitOnExitFullScreenToggle
                     honorSystemOrientationLockToggle
+                    rotateToPortraitOnExitFullScreenToggle
+                    rotateToLandscapeOnEnterFullScreenPicker
                 }
             #endif
 
@@ -208,6 +210,15 @@ struct PlayerSettings: View {
 
         private var rotateToPortraitOnExitFullScreenToggle: some View {
             Toggle("Rotate to portrait when exiting fullscreen", isOn: $rotateToPortraitOnExitFullScreen)
+        }
+
+        private var rotateToLandscapeOnEnterFullScreenPicker: some View {
+            Picker("Rotate when entering fullscreen on landscape video", selection: $rotateToLandscapeOnEnterFullScreen) {
+                Text("Landscape left").tag(FullScreenRotationSetting.landscapeRight)
+                Text("Landscape right").tag(FullScreenRotationSetting.landscapeLeft)
+                Text("No rotation").tag(FullScreenRotationSetting.disabled)
+            }
+            .modifier(SettingsPickerModifier())
         }
     #endif
 

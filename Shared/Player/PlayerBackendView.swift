@@ -5,6 +5,7 @@ struct PlayerBackendView: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
     @ObservedObject private var player = PlayerModel.shared
+    @ObservedObject private var safeAreaModel = SafeAreaModel.shared
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -55,19 +56,17 @@ struct PlayerBackendView: View {
             guard player.playingFullScreen else { return 0 }
 
             if UIDevice.current.userInterfaceIdiom != .pad {
-                return verticalSizeClass == .compact ? SafeArea.insets.top : 0
+                return verticalSizeClass == .compact ? safeAreaModel.safeArea.top : 0
             } else {
-                return SafeArea.insets.top.isZero ? SafeArea.insets.bottom : SafeArea.insets.top
+                return safeAreaModel.safeArea.top.isZero ? safeAreaModel.safeArea.bottom : safeAreaModel.safeArea.top
             }
         }
 
         var controlsBottomPadding: Double {
-            guard player.playingFullScreen else { return 0 }
-
             if UIDevice.current.userInterfaceIdiom != .pad {
-                return player.playingFullScreen && verticalSizeClass == .compact ? SafeArea.insets.bottom : 0
+                return player.playingFullScreen || verticalSizeClass == .compact ? safeAreaModel.safeArea.bottom : 0
             } else {
-                return player.playingFullScreen ? SafeArea.insets.bottom : 0
+                return player.playingFullScreen ? safeAreaModel.safeArea.bottom : 0
             }
         }
     #endif

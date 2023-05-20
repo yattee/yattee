@@ -5,7 +5,7 @@ import SwiftUI
 #if os(iOS)
     struct AppleAVPlayerView: UIViewRepresentable {
         func makeUIView(context _: Context) -> some UIView {
-            PlayerLayerView(frame: .zero)
+            PlayerLayerView()
         }
 
         func updateUIView(_: UIViewType, context _: Context) {}

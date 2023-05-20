@@ -18,13 +18,23 @@ struct ContentView: View {
     var body: some View {
         Group {
             #if os(iOS)
-                if Constants.isIPhone {
-                    AppTabNavigation()
-                } else {
-                    if horizontalSizeClass == .compact {
-                        AppTabNavigation()
-                    } else {
-                        AppSidebarNavigation()
+                GeometryReader { proxy in
+                    Group {
+                        if Constants.isIPhone {
+                            AppTabNavigation()
+                        } else {
+                            if horizontalSizeClass == .compact {
+                                AppTabNavigation()
+                            } else {
+                                AppSidebarNavigation()
+                            }
+                        }
+                    }
+                    .onAppear {
+                        SafeAreaModel.shared.safeArea = proxy.safeAreaInsets
+                    }
+                    .onChange(of: proxy.safeAreaInsets) { newValue in
+                        SafeAreaModel.shared.safeArea = newValue
                     }
                 }
             #elseif os(macOS)

@@ -1,8 +1,18 @@
 import Defaults
 import Foundation
+import Repeat
 import SwiftUI
 
-extension VideoPlayerView {
+final class OrientationModel {
+    static var shared = OrientationModel()
+
+    var orientation = UIInterfaceOrientation.portrait
+    var lastOrientation: UIInterfaceOrientation?
+    var orientationDebouncer = Debouncer(.milliseconds(300))
+    internal var orientationObserver: Any?
+
+    private var player = PlayerModel.shared
+
     func configureOrientationUpdatesBasedOnAccelerometer() {
         let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
         if currentOrientation.isLandscape,
@@ -15,8 +25,8 @@ extension VideoPlayerView {
            player.presentingPlayer
         {
             DispatchQueue.main.async {
-                player.controls.presentingControls = false
-                player.enterFullScreen(showControls: false)
+                self.player.controls.presentingControls = false
+                self.player.enterFullScreen(showControls: false)
             }
 
             player.onPresentPlayer.append {
@@ -30,42 +40,42 @@ extension VideoPlayerView {
             queue: .main
         ) { _ in
             guard !Defaults[.honorSystemOrientationLock],
-                  player.presentingPlayer,
-                  !player.playingInPictureInPicture,
-                  player.lockedOrientation.isNil
+                  self.player.presentingPlayer,
+                  !self.player.playingInPictureInPicture,
+                  self.player.lockedOrientation.isNil
             else {
                 return
             }
 
             let orientation = OrientationTracker.shared.currentInterfaceOrientation
 
-            guard lastOrientation != orientation else {
+            guard self.lastOrientation != orientation else {
                 return
             }
 
-            lastOrientation = orientation
+            self.lastOrientation = orientation
 
             DispatchQueue.main.async {
                 guard Defaults[.enterFullscreenInLandscape],
-                      player.presentingPlayer
+                      self.player.presentingPlayer
                 else {
                     return
                 }
 
-                orientationDebouncer.callback = {
+                self.orientationDebouncer.callback = {
                     DispatchQueue.main.async {
                         if orientation.isLandscape {
-                            player.controls.presentingControls = false
-                            player.enterFullScreen(showControls: false)
+                            self.player.controls.presentingControls = false
+                            self.player.enterFullScreen(showControls: false)
                             Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                         } else {
-                            player.exitFullScreen(showControls: false)
+                            self.player.exitFullScreen(showControls: false)
                             Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                         }
                     }
                 }
 
-                orientationDebouncer.call()
+                self.orientationDebouncer.call()
             }
         }
     }
@@ -73,5 +83,13 @@ extension VideoPlayerView {
     func stopOrientationUpdates() {
         guard let observer = orientationObserver else { return }
         NotificationCenter.default.removeObserver(observer)
+    }
+
+    func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
+        if let rotateOrientation {
+            self.orientation = rotateOrientation
+            lastOrientation = rotateOrientation
+        }
+        Orientation.lockOrientation(orientation, andRotateTo: rotateOrientation)
     }
 }

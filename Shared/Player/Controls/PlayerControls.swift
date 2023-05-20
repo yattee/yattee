@@ -13,6 +13,7 @@ struct PlayerControls: View {
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+        @ObservedObject private var safeAreaModel = SafeAreaModel.shared
     #elseif os(tvOS)
         enum Field: Hashable {
             case seekOSD
@@ -229,7 +230,7 @@ struct PlayerControls: View {
         guard player.playerSize.height.isFinite else { return 200 }
         var inset = 0.0
         #if os(iOS)
-            inset = SafeArea.insets.bottom
+            inset = safeAreaModel.safeArea.bottom
         #endif
         return [player.playerSize.height - inset, 500].min()!
     }

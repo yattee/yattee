@@ -37,10 +37,8 @@ struct VideoPlayerView: View {
 
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
-
-        @State internal var orientation = UIInterfaceOrientation.portrait
-        @State internal var lastOrientation: UIInterfaceOrientation?
-        @State internal var orientationDebouncer = Debouncer(.milliseconds(300))
+        @ObservedObject private var safeAreaModel = SafeAreaModel.shared
+        private var orientationModel = OrientationModel.shared
     #elseif os(macOS)
         var hoverThrottle = Throttle(interval: 0.5)
         var mouseLocation: CGPoint { NSEvent.mouseLocation }
@@ -52,7 +50,6 @@ struct VideoPlayerView: View {
         @State internal var isHorizontalDrag = false
         @State internal var isVerticalDrag = false
         @State internal var viewDragOffset = Self.hiddenOffset
-        @State internal var orientationObserver: Any?
     #endif
 
     @ObservedObject internal var player = PlayerModel.shared
@@ -101,13 +98,12 @@ struct VideoPlayerView: View {
         return GeometryReader { geometry in
             HStack(spacing: 0) {
                 content
+                    .ignoresSafeArea(.all, edges: .bottom)
+                    .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
                     .onAppear {
                         playerSize = geometry.size
                     }
             }
-            #if os(iOS)
-            .padding(.bottom, fullScreenPlayer ? 0.0001 : geometry.safeAreaInsets.bottom)
-            #endif
             .onChange(of: geometry.size) { _ in
                 self.playerSize = geometry.size
             }
@@ -115,8 +111,6 @@ struct VideoPlayerView: View {
                 player.backend.setNeedsDrawing(!value)
             }
             #if os(iOS)
-            .frame(width: playerWidth.isNil ? nil : Double(playerWidth!), height: playerHeight.isNil ? nil : Double(playerHeight!))
-            .ignoresSafeArea(.all, edges: .bottom)
             .onChange(of: player.presentingPlayer) { newValue in
                 if newValue {
                     viewDragOffset = 0
@@ -131,7 +125,7 @@ struct VideoPlayerView: View {
                 viewDragOffset = 0
 
                 Delay.by(0.2) {
-                    configureOrientationUpdatesBasedOnAccelerometer()
+                    orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
 
                     if let orientationMask = player.lockedOrientation {
                         Orientation.lockOrientation(
@@ -149,7 +143,7 @@ struct VideoPlayerView: View {
                 } else {
                     Orientation.lockOrientation(.allButUpsideDown)
                 }
-                stopOrientationUpdates()
+                orientationModel.stopOrientationUpdates()
                 player.controls.hideOverlays()
             }
             .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
@@ -258,13 +252,10 @@ struct VideoPlayerView: View {
             dragGestureState && !isHorizontalDrag ? dragGestureOffset.height : viewDragOffset
         }
 
-        var playerWidth: Double? {
-            fullScreenPlayer ? (UIScreen.main.bounds.size.width - SafeArea.insets.left - SafeArea.insets.right) : nil
-        }
-
         var playerHeight: Double? {
             let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
-            return fullScreenPlayer ? UIScreen.main.bounds.size.height - (OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait ? (SafeArea.insets.top + SafeArea.insets.bottom) : 0) : nil
+            let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait
+            return fullScreenPlayer ? UIScreen.main.bounds.size.height - (isPortrait ? safeAreaModel.safeArea.top + safeAreaModel.safeArea.bottom : 0) : nil
         }
     #endif
 
@@ -282,22 +273,20 @@ struct VideoPlayerView: View {
                     .ignoresSafeArea()
                 #else
                     GeometryReader { geometry in
-                        ZStack {
-                            player.playerBackendView
-                        }
-                        .modifier(
-                            VideoPlayerSizeModifier(
-                                geometry: geometry,
-                                aspectRatio: player.aspectRatio,
-                                fullScreen: fullScreenPlayer
+                        player.playerBackendView
+
+                            .modifier(
+                                VideoPlayerSizeModifier(
+                                    geometry: geometry,
+                                    aspectRatio: player.aspectRatio,
+                                    fullScreen: fullScreenPlayer
+                                )
                             )
-                        )
-                        .frame(maxWidth: fullScreenPlayer ? .infinity : nil, maxHeight: fullScreenPlayer ? .infinity : nil)
-                        .onHover { hovering in
-                            hoveringPlayer = hovering
-                            hovering ? player.controls.show() : player.controls.hide()
-                        }
-                        .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
+                            .onHover { hovering in
+                                hoveringPlayer = hovering
+                                hovering ? player.controls.show() : player.controls.hide()
+                            }
+                            .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
                         #if os(macOS)
                             .onAppear(perform: {
                                 NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
@@ -338,6 +327,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             }
+            .background(BackgroundBlackView().edgesIgnoringSafeArea(.all))
             .background(((colorScheme == .dark || fullScreenPlayer) ? Color.black : Color.white).edgesIgnoringSafeArea(.all))
             #if os(macOS)
                 .frame(minWidth: 650)
@@ -488,4 +478,17 @@ struct VideoPlayerView_Previews: PreviewProvider {
             VideoPlayerView()
         }
     }
+}
+
+struct BackgroundBlackView: UIViewRepresentable {
+    func makeUIView(context _: Context) -> UIView {
+        let view = UIView()
+        DispatchQueue.main.async {
+            view.superview?.superview?.backgroundColor = .black
+            view.superview?.superview?.layer.removeAllAnimations()
+        }
+        return view
+    }
+
+    func updateUIView(_: UIView, context _: Context) {}
 }
