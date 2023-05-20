@@ -563,3 +563,10 @@
 "Toggle player" = "Activer le lecteur";
 "Fullscreen" = "Plein écran";
 "Lock" = "Verrouiller";
+"Enter account credentials to connect..." = "Entrez les informations d'identification du compte pour vous connecter...";
+"Seek" = "Défiler";
+"Show scroll to top button in comments" = "Afficher le bouton de retour en haut de la page dans les commentaires";
+"Opened File" = "Fichier ouvert";
+"Opening file..." = "Ouverture du fichier...";
+"Enter location address to connect..." = "Saisir l'adresse de l'instance pour se connecter...";
+"File Extension" = "Extension de fichier";
