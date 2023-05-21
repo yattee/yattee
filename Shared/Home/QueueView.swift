@@ -44,10 +44,10 @@ struct QueueView: View {
 
     var label: String {
         if items.count < 2 {
-            return "Next in Queue"
+            return "Next in Queue".localized()
         }
 
-        return "Next in Queue (\(items.count))"
+        return "Next in Queue".localized() + " (\(items.count))"
     }
 
     var limitedItems: [ContentItem] {
