@@ -475,7 +475,7 @@ final class AVPlayerBackend: PlayerBackend {
                 return
             }
 
-            isLoadingVideo = false
+            self.isLoadingVideo = false
 
             switch playerItem.status {
             case .readyToPlay:
