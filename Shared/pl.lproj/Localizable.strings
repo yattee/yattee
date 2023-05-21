@@ -576,3 +576,7 @@
 "Browse without account" = "Przeglądanie bez konta";
 "Use system controls with AVPlayer" = "Użyj systemowych kontrolek z AVPlayer";
 "Close video and player on end" = "Zamknij wideo i odtwarzacz po zakończeniu";
+"Rotate when entering fullscreen on landscape video" = "Obróć podczas przechodzenia do trybu pełnoekranowego w poziomym wideo";
+"Landscape right" = "Obrót w prawo";
+"No rotation" = "Brak rotacji";
+"Landscape left" = "Obrót w lewo";

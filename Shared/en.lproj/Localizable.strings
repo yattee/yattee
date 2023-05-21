@@ -573,3 +573,7 @@
 "Browse without account" = "Browse without account";
 "Close video and player on end" = "Close video and player on end";
 "Use system controls with AVPlayer" = "Use system controls with AVPlayer";
+"Rotate when entering fullscreen on landscape video" = "Rotate when entering fullscreen on landscape video";
+"Landscape left" = "Landscape left";
+"Landscape right" = "Landscape right";
+"No rotation" = "No rotation";
