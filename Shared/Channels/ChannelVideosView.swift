@@ -66,7 +66,7 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            VerticalCells(items: contentItems) {
+            VerticalCells(items: contentItems, edgesIgnoringSafeArea: .init()) {
                 if let description = presentedChannel?.description, !description.isEmpty {
                     Button {
                         withAnimation(.spring()) {

@@ -12,11 +12,13 @@ struct VerticalCells<Header: View>: View {
 
     var items = [ContentItem]()
     var allowEmpty = false
+    var edgesIgnoringSafeArea = Edge.Set.horizontal
 
     let header: Header?
-    init(items: [ContentItem], allowEmpty: Bool = false, @ViewBuilder header: @escaping () -> Header? = { nil }) {
+    init(items: [ContentItem], allowEmpty: Bool = false, edgesIgnoringSafeArea: Edge.Set = .horizontal, @ViewBuilder header: @escaping () -> Header? = { nil }) {
         self.items = items
         self.allowEmpty = allowEmpty
+        self.edgesIgnoringSafeArea = edgesIgnoringSafeArea
         self.header = header()
     }
 
@@ -40,7 +42,7 @@ struct VerticalCells<Header: View>: View {
             #endif
         }
         .animation(nil)
-        .edgesIgnoringSafeArea(.horizontal)
+        .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
         #if os(macOS)
             .background(Color.secondaryBackground)
             .frame(minWidth: 360)
