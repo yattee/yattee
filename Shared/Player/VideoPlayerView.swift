@@ -140,13 +140,6 @@ struct VideoPlayerView: View {
                         }
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                    guard player.lockedOrientation.isNil else {
-                        return
-                    }
-
-                    Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                }
                 .onAnimationCompleted(for: viewDragOffset) {
                     guard !dragGestureState else { return }
                     if viewDragOffset == 0 {
