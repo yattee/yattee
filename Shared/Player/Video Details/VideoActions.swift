@@ -91,7 +91,7 @@ struct VideoActions: View {
         case .share:
             return video?.isShareable ?? false
         case .addToPlaylist:
-            return !(video?.isLocal ?? true)
+            return !(video?.isLocal ?? true) && accounts.signedIn
         case .subscribe:
             return !(video?.isLocal ?? true) && accounts.signedIn && accounts.app.supportsSubscriptions
         case .settings:
