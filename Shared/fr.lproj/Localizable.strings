@@ -24,7 +24,7 @@
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Tout";
-"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr de vouloir effacer l'historique des vidéos regardées ?";
+"Are you sure you want to clear history of watched videos?" = "Êtes-vous sûr de vouloir effacer l'historique des vidéos visionnées ?";
 "Are you sure you want to delete playlist?" = "Êtes-vous sûr de vouloir supprimer la liste de lecture ?";
 "Are you sure you want to restore default quality profiles?" = "Êtes-vous sûr de vouloir restaurer les profils de qualité par défaut ?";
 "Are you sure you want to unsubscribe from %@?" = "Êtes-vous sûr de vouloir vous désabonner de %@ ?";
@@ -57,7 +57,7 @@
 "Info" = "Informations";
 
 /* Selected video has just finished playing */
-"Just watched" = "Regardée à l'instant";
+"Just watched" = "Visionnée à l'instant";
 
 /* Player controls layout size */
 "Large" = "Grands";
@@ -117,7 +117,7 @@
 "Clear History" = "Effacer l'historique";
 "Edit" = "Modifier";
 "Low quality" = "Qualité basse";
-"Mark watched videos with" = "Marquer les vidéos regardées avec";
+"Mark watched videos with" = "Marquer les vidéos visionnées avec";
 "Button" = "Bouton";
 "Category" = "Catégorie";
 "Chapters" = "Chapitres";
@@ -154,7 +154,7 @@
 "Lowest" = "La plus basse";
 "Filter" = "Filtre";
 "Find Other" = "En trouver un autre";
-"Mark as watched" = "Marquer comme regardée";
+"Mark as watched" = "Marquer comme visionnée";
 "More info can be found in:" = "Vous trouverez plus d'informations dans :";
 "Duration" = "Durée";
 "Edit Playlist" = "Modifier la liste de lecture";
@@ -168,7 +168,7 @@
 
 /* Subscriptions title */
 "Subscriptions" = "Abonnements";
-"Mark video as watched after playing" = "Marquer la vidéo comme regardée après la lecture";
+"Mark video as watched after playing" = "Marquer la vidéo comme visionnée après la lecture";
 
 /* Player controls layout size */
 "Medium" = "Moyens";
@@ -195,7 +195,7 @@
 "Search" = "Recherche";
 
 /* Selected video was played on given date */
-"Watched %@" = "Regardée %@";
+"Watched %@" = "Visionnée %@";
 "Remove from the queue" = "Retirer de la file d'attente";
 "Queue" = "File d'attente";
 "Refresh" = "Actualiser";
@@ -206,7 +206,7 @@
 "Replies" = "Réponses";
 "Save" = "Enregistrer";
 "Save history of played videos" = "Enregistrer l'historique des vidéos lues";
-"Watched" = "Regardée";
+"Watched" = "Visionnée";
 "Save history of searches, channels and playlists" = "Enregistrer l'historique des recherches, chaînes et listes de lecture";
 "Sections" = "Sections";
 
@@ -308,7 +308,7 @@
 "This cannot be reverted" = "Vous ne pourrez pas revenir en arrière";
 "Switch to public locations" = "Passer à des instances publiques";
 "System controls buttons" = "Boutons de contrôle système";
-"System controls show buttons for %@" = "Montrer les boutons du contrôle système pour %@";
+"System controls show buttons for %@" = "Montrer les boutons de contrôle système pour %@";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Vous ne pourrez pas revenir en arrière. Vous devrez changer de vue ou redémarrer l'application pour voir les changements.";
 "unknown" = "inconnu";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "Ces informations sont traitées uniquement sur votre appareil et utilisées pour vous connecter au serveur dans un pays spécifique.";
@@ -508,8 +508,8 @@
 "Show cache status" = "Montrer l'état du cache";
 "Cache" = "Cache";
 "Maximum feed items" = "Nombre maximal d'éléments du flux";
-"Open channels with description expanded" = "Ouvrir les chaînes avec la description complète";
-"Are you sure you want to clear cache?" = "Voulez-vous vraiment vider le cache ?";
+"Open channels with description expanded" = "Ouvrir les chaînes avec la description déployée";
+"Are you sure you want to clear cache?" = "Êtes-vous sûr de vouloir vider le cache ?";
 "Right click channel thumbnail to open context menu with more actions" = "Effectuez un clic droit sur la miniature d'une chaîne pour ouvrir un menu contextuel avec plus d'actions";
 "Play next item" = "Lire l'élément suivant";
 "Lock orientation" = "Verrouiller l'orientation";
@@ -521,9 +521,9 @@
 "Music Mode" = "Mode Musique";
 "Gesture: fowards" = "Geste : en avant";
 "Short videos: visible" = "Shorts : visibles";
-"Mark channel feed as watched" = "Marquer le flux de chaînes comme regardé";
+"Mark channel feed as watched" = "Marquer le flux de chaîne comme visionné";
 "Short videos: hidden" = "Shorts : masqués";
-"Mark channel feed as unwatched" = "Marquer le flux de chaînes comme non regardé";
+"Mark channel feed as unwatched" = "Marquer le flux de chaîne comme non visionné";
 "Play all unwatched" = "Lire toutes les vidéos non visionnées";
 "Player Bar" = "Barre de lecture";
 "Double tap gesture" = "Geste de double pression";
@@ -532,7 +532,7 @@
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Les paramètres gestuels contrôlent l'intervalle de saut pour le geste de double pression sur le côté gauche/droit du lecteur. La modification des paramètres de commandes du système nécessite un redémarrage.";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Les paramètres gestuels contrôlent l'intervalle de saut pour le double clic sur le côté gauche/droit du lecteur. La modification des paramètres de commandes du système nécessite un redémarrage.";
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Les paramètres gestuels contrôlent l'intervalle de saut pour les boutons fléchés de la télécommande (pour la télécommande Siri de 2e génération ou plus récente). La modification des paramètres de commandes du système nécessite un redémarrage.";
-"Open expanded" = "Ouvrir en grand";
+"Open expanded" = "Ouvrir déployée";
 "Single tap gesture" = "Geste de simple pression";
 "Maximum width expanded" = "Largeur maximale déployée";
 "Show unwatched feed badges" = "Afficher les badges de flux non visionnés";
@@ -548,9 +548,9 @@
 "Show Next in Queue" = "Afficher \"Suivantes dans la file\"";
 "Next in Queue" = "Suivantes dans la file";
 "Do nothing" = "Ne rien faire";
-"Open video description expanded" = "Ouvrir la description de la vidéo";
-"Mark all as unwatched" = "Marquer toutes comme non regardées";
-"Mark all as watched" = "Marquer toutes comme regardées";
+"Open video description expanded" = "Ouvrir la description de la vidéo déployée";
+"Mark all as unwatched" = "Marquer toutes comme non visionnées";
+"Mark all as watched" = "Marquer toutes comme visionnées";
 "Queue - shuffled" = "File d'attente - mélangée";
 "Replay" = "Replay";
 "Description" = "Description";
@@ -564,9 +564,9 @@
 "Fullscreen" = "Plein écran";
 "Lock" = "Verrouiller";
 "Enter account credentials to connect..." = "Entrez les informations d'identification du compte pour vous connecter...";
-"Seek" = "Défiler";
+"Seek" = "Recherche";
 "Show scroll to top button in comments" = "Afficher le bouton de retour en haut de la page dans les commentaires";
 "Opened File" = "Fichier ouvert";
 "Opening file..." = "Ouverture du fichier...";
-"Enter location address to connect..." = "Saisir l'adresse de l'instance pour se connecter...";
+"Enter location address to connect..." = "Entrez l'adresse de l'instance pour se connecter...";
 "File Extension" = "Extension de fichier";
