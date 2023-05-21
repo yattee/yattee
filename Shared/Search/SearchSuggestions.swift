@@ -59,9 +59,6 @@ struct SearchSuggestions: View {
                 #endif
             }
         }
-        #if os(iOS)
-        .padding(.bottom, 90)
-        #endif
         #if os(macOS)
         .buttonStyle(.link)
         #endif
