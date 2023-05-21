@@ -206,6 +206,7 @@ struct VideoActions: View {
                         .foregroundColor(active ? Color("AppRedColor") : .secondary)
                         .font(.caption2)
                         .allowsTightening(true)
+                        .lineLimit(1)
                 }
             }
             .padding(.horizontal, playerActionsButtonLabelStyle.text ? 6 : 12)
