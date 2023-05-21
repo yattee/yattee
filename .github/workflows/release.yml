@@ -23,7 +23,9 @@ jobs:
   testflight:
     strategy:
       matrix:
-        lane: ['mac beta', 'ios beta', 'tvos beta']
+        # disabled mac beta lane
+        # lane: ['mac beta', 'ios beta', 'tvos beta']
+        lane: ['ios beta', 'tvos beta']
     name: Releasing ${{ matrix.lane }} version to TestFlight
     runs-on: macos-latest
     steps:
