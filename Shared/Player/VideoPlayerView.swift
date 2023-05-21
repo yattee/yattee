@@ -140,15 +140,6 @@ struct VideoPlayerView: View {
                         }
                     }
                 }
-                .onDisappear {
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                    } else {
-                        Orientation.lockOrientation(.allButUpsideDown)
-                    }
-                    orientationModel.stopOrientationUpdates()
-                    player.controls.hideOverlays()
-                }
                 .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
                     guard player.lockedOrientation.isNil else {
                         return

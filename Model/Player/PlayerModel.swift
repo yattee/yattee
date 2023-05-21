@@ -486,6 +486,7 @@ final class PlayerModel: ObservableObject {
         #endif
 
         controls.hide()
+        controls.hideOverlays()
 
         #if !os(macOS)
             UIApplication.shared.isIdleTimerDisabled = presentingPlayer
@@ -501,6 +502,18 @@ final class PlayerModel: ObservableObject {
             DispatchQueue.main.async { [weak self] in
                 self?.pause()
             }
+        }
+
+        if !presentingPlayer {
+            #if os(iOS)
+                if Defaults[.lockPortraitWhenBrowsing] {
+                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                } else {
+                    Orientation.lockOrientation(.allButUpsideDown)
+                }
+
+                OrientationModel.shared.stopOrientationUpdates()
+            #endif
         }
     }
 
@@ -1024,6 +1037,7 @@ final class PlayerModel: ObservableObject {
             } else {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
                     avPlayerBackend.controller.exitFullScreen(animated: true)
+                    avPlayerBackend.controller.dismiss(animated: true)
                 }
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
