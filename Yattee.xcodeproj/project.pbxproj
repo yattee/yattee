@@ -205,6 +205,7 @@
 		371B7E6A2759791900D21217 /* CommentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E692759791900D21217 /* CommentsModel.swift */; };
 		371B7E6B2759791900D21217 /* CommentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E692759791900D21217 /* CommentsModel.swift */; };
 		371B7E6C2759791900D21217 /* CommentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B7E692759791900D21217 /* CommentsModel.swift */; };
+		371B88F82A1A310100D57683 /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3782B9512755667600990149 /* String+Format.swift */; };
 		371CC76829466ED000979C1A /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76729466ED000979C1A /* AccountsView.swift */; };
 		371CC76929466ED000979C1A /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76729466ED000979C1A /* AccountsView.swift */; };
 		371CC76A29466ED000979C1A /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371CC76729466ED000979C1A /* AccountsView.swift */; };
@@ -3057,6 +3058,7 @@
 				378FFBC728660172009E3FBE /* URLParser.swift in Sources */,
 				37C0C0FF28665EAC007F6F78 /* VideosApp.swift in Sources */,
 				378FFBC92866018A009E3FBE /* URLParserTests.swift in Sources */,
+				371B88F82A1A310100D57683 /* String+Format.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
