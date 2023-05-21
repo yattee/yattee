@@ -38,9 +38,7 @@ final class AVPlayerBackend: PlayerBackend {
         !avPlayer.currentItem.isNil
     }
 
-    var isLoadingVideo: Bool {
-        model.currentItem == nil || model.time == nil || !model.time!.isValid
-    }
+    var isLoadingVideo = false
 
     var isPlaying: Bool {
         avPlayer.timeControlStatus == .playing
@@ -138,6 +136,8 @@ final class AVPlayerBackend: PlayerBackend {
         preservingTime: Bool,
         upgrading _: Bool
     ) {
+        isLoadingVideo = true
+
         if let url = stream.singleAssetURL {
             model.logger.info("playing stream with one asset\(stream.kind == .hls ? " (HLS)" : ""): \(url)")
 
@@ -474,6 +474,8 @@ final class AVPlayerBackend: PlayerBackend {
             guard let self else {
                 return
             }
+
+            isLoadingVideo = false
 
             switch playerItem.status {
             case .readyToPlay:

@@ -32,6 +32,17 @@ extension PlayerModel {
         }
     }
 
+    var playerItemEndTimeWithSegments: CMTime? {
+        if let duration = playerItemDuration,
+           let segment = sponsorBlock.segments.last,
+           segment.endTime.seconds >= duration.seconds - 3
+        {
+            return segment.endTime
+        }
+
+        return playerItemDuration
+    }
+
     private func skip(_ segment: Segment, at time: CMTime) {
         if let duration = playerItemDuration, segment.endTime.seconds >= duration.seconds - 3 {
             logger.error("segment end time is: \(segment.end) when player item duration is: \(duration.seconds)")

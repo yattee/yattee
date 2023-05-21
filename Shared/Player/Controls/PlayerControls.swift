@@ -42,6 +42,8 @@ struct PlayerControls: View {
     @Default(.playerControlsPlaybackModeEnabled) private var playerControlsPlaybackModeEnabled
     @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
 
+    @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
+
     private let controlsOverlayModel = ControlOverlaysModel.shared
     private var navigation = NavigationModel.shared
 
@@ -49,22 +51,28 @@ struct PlayerControls: View {
         player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
     }
 
+    var showControls: Bool {
+        player.activeBackend == .mpv || !avPlayerUsesSystemControls
+    }
+
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Seek()
-                .zIndex(4)
-                .transition(.opacity)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-            #if os(tvOS)
-                .focused($focusedField, equals: .seekOSD)
-                .onChange(of: player.seek.lastSeekTime) { _ in
-                    if !model.presentingControls {
-                        focusedField = .seekOSD
+            if showControls {
+                Seek()
+                    .zIndex(4)
+                    .transition(.opacity)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                #if os(tvOS)
+                    .focused($focusedField, equals: .seekOSD)
+                    .onChange(of: player.seek.lastSeekTime) { _ in
+                        if !model.presentingControls {
+                            focusedField = .seekOSD
+                        }
                     }
-                }
-            #else
-                .offset(y: 2)
-            #endif
+                #else
+                    .offset(y: 2)
+                #endif
+            }
 
             VStack {
                 ZStack {
@@ -78,106 +86,108 @@ struct PlayerControls: View {
                     }
                     .offset(y: playerControlsLayout.osdVerticalOffset + 5)
 
-                    Section {
-                        #if !os(tvOS)
-                            HStack {
-                                seekBackwardButton
-                                Spacer()
-                                togglePlayButton
-                                Spacer()
-                                seekForwardButton
-                            }
-                            .font(.system(size: playerControlsLayout.bigButtonFontSize))
-                        #endif
-
-                        ZStack(alignment: .bottom) {
-                            VStack(spacing: 4) {
-                                #if !os(tvOS)
-                                    buttonsBar
-
-                                    HStack {
-                                        if !player.currentVideo.isNil, player.playingFullScreen {
-                                            Button {
-                                                withAnimation(Self.animation) {
-                                                    model.presentingDetailsOverlay = true
-                                                }
-                                            } label: {
-                                                ControlsBar(fullScreen: $model.presentingDetailsOverlay, expansionState: .constant(.full), presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                                    .frame(maxWidth: 300, alignment: .leading)
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-                                        Spacer()
-                                    }
-                                #endif
-
-                                Spacer()
-
-                                if playerControlsLayout.displaysTitleLine {
-                                    VStack(alignment: .leading) {
-                                        Text(player.videoForDisplay?.displayTitle ?? "Not Playing")
-                                            .shadow(radius: 10)
-                                            .font(.system(size: playerControlsLayout.titleLineFontSize).bold())
-                                            .lineLimit(1)
-
-                                        Text(player.currentVideo?.displayAuthor ?? "")
-                                            .fontWeight(.semibold)
-                                            .shadow(radius: 10)
-                                            .foregroundColor(.init(white: 0.8))
-                                            .font(.system(size: playerControlsLayout.authorLineFontSize))
-                                            .lineLimit(1)
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .offset(y: -40)
-                                }
-
-                                timeline
-                                    .padding(.bottom, 2)
-                            }
-                            .zIndex(1)
-                            .padding(.top, 2)
-                            .transition(.opacity)
-
-                            HStack(spacing: playerControlsLayout.buttonsSpacing) {
-                                #if os(tvOS)
-                                    togglePlayButton
+                    if showControls {
+                        Section {
+                            #if !os(tvOS)
+                                HStack {
                                     seekBackwardButton
+                                    Spacer()
+                                    togglePlayButton
+                                    Spacer()
                                     seekForwardButton
-                                #endif
-                                if playerControlsRestartEnabled {
-                                    restartVideoButton
                                 }
-                                if playerControlsAdvanceToNextEnabled {
-                                    advanceToNextItemButton
-                                }
-                                Spacer()
-                                #if os(tvOS)
-                                    if playerControlsSettingsEnabled {
-                                        settingsButton
+                                .font(.system(size: playerControlsLayout.bigButtonFontSize))
+                            #endif
+
+                            ZStack(alignment: .bottom) {
+                                VStack(spacing: 4) {
+                                    #if !os(tvOS)
+                                        buttonsBar
+
+                                        HStack {
+                                            if !player.currentVideo.isNil, player.playingFullScreen {
+                                                Button {
+                                                    withAnimation(Self.animation) {
+                                                        model.presentingDetailsOverlay = true
+                                                    }
+                                                } label: {
+                                                    ControlsBar(fullScreen: $model.presentingDetailsOverlay, expansionState: .constant(.full), presentingControls: false, detailsTogglePlayer: false, detailsToggleFullScreen: false)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                        .frame(maxWidth: 300, alignment: .leading)
+                                                }
+                                                .buttonStyle(.plain)
+                                            }
+                                            Spacer()
+                                        }
+                                    #endif
+
+                                    Spacer()
+
+                                    if playerControlsLayout.displaysTitleLine {
+                                        VStack(alignment: .leading) {
+                                            Text(player.videoForDisplay?.displayTitle ?? "Not Playing")
+                                                .shadow(radius: 10)
+                                                .font(.system(size: playerControlsLayout.titleLineFontSize).bold())
+                                                .lineLimit(1)
+
+                                            Text(player.currentVideo?.displayAuthor ?? "")
+                                                .fontWeight(.semibold)
+                                                .shadow(radius: 10)
+                                                .foregroundColor(.init(white: 0.8))
+                                                .font(.system(size: playerControlsLayout.authorLineFontSize))
+                                                .lineLimit(1)
+                                        }
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .offset(y: -40)
                                     }
-                                #endif
-                                if playerControlsPlaybackModeEnabled {
-                                    playbackModeButton
+
+                                    timeline
+                                        .padding(.bottom, 2)
                                 }
+                                .zIndex(1)
+                                .padding(.top, 2)
+                                .transition(.opacity)
+
+                                HStack(spacing: playerControlsLayout.buttonsSpacing) {
+                                    #if os(tvOS)
+                                        togglePlayButton
+                                        seekBackwardButton
+                                        seekForwardButton
+                                    #endif
+                                    if playerControlsRestartEnabled {
+                                        restartVideoButton
+                                    }
+                                    if playerControlsAdvanceToNextEnabled {
+                                        advanceToNextItemButton
+                                    }
+                                    Spacer()
+                                    #if os(tvOS)
+                                        if playerControlsSettingsEnabled {
+                                            settingsButton
+                                        }
+                                    #endif
+                                    if playerControlsPlaybackModeEnabled {
+                                        playbackModeButton
+                                    }
+                                    #if os(tvOS)
+                                        closeVideoButton
+                                    #else
+                                        if playerControlsMusicModeEnabled {
+                                            musicModeButton
+                                        }
+                                    #endif
+                                }
+                                .zIndex(0)
                                 #if os(tvOS)
-                                    closeVideoButton
+                                    .offset(y: -playerControlsLayout.timelineHeight - 30)
                                 #else
-                                    if playerControlsMusicModeEnabled {
-                                        musicModeButton
-                                    }
+                                    .offset(y: -playerControlsLayout.timelineHeight - 5)
                                 #endif
                             }
-                            .zIndex(0)
-                            #if os(tvOS)
-                                .offset(y: -playerControlsLayout.timelineHeight - 30)
-                            #else
-                                .offset(y: -playerControlsLayout.timelineHeight - 5)
-                            #endif
                         }
+                        .opacity(model.presentingControls && !player.availableStreams.isEmpty ? 1 : 0)
                     }
-                    .opacity(model.presentingControls && !player.availableStreams.isEmpty ? 1 : 0)
                 }
             }
             .frame(maxWidth: .infinity)

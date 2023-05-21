@@ -48,12 +48,12 @@ struct PlayerBackendView: View {
             #if !os(tvOS)
                 if player.activeBackend == .mpv || !avPlayerUsesSystemControls {
                     PlayerGestures()
-                    PlayerControls()
-                    #if os(iOS)
-                        .padding(.top, controlsTopPadding)
-                        .padding(.bottom, controlsBottomPadding)
-                    #endif
                 }
+                PlayerControls()
+                #if os(iOS)
+                    .padding(.top, controlsTopPadding)
+                    .padding(.bottom, controlsBottomPadding)
+                #endif
             #else
                 hiddenControlsButton
             #endif
