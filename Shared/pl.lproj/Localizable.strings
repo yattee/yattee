@@ -568,3 +568,11 @@
 "Seek" = "Przewijanie";
 "Enter account credentials to connect..." = "Wprowadź dane logowania do konta, aby połączyć...";
 "Enter location address to connect..." = "Wprowadź adres lokalizacji, aby połączyć...";
+"Opened File" = "Otwarty plik";
+"File Extension" = "Rozszerzenie pliku";
+"Opening file..." = "Otwieranie pliku...";
+"Public account" = "Konto publiczne";
+"Your Accounts" = "Twoje konta";
+"Browse without account" = "Przeglądanie bez konta";
+"Use system controls with AVPlayer" = "Użyj systemowych kontrolek z AVPlayer";
+"Close video and player on end" = "Zamknij wideo i odtwarzacz po zakończeniu";

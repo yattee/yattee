@@ -565,3 +565,11 @@
 "Enter account credentials to connect..." = "Enter account credentials to connect...";
 "Enter location address to connect..." = "Enter location address to connect...";
 "Seek" = "Seek";
+"Opened File" = "Opened File";
+"File Extension" = "File Extension";
+"Opening file..." = "Opening file...";
+"Public account" = "Public account";
+"Your Accounts" = "Your Accounts";
+"Browse without account" = "Browse without account";
+"Close video and player on end" = "Close video and player on end";
+"Use system controls with AVPlayer" = "Use system controls with AVPlayer";
