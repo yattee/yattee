@@ -236,7 +236,15 @@ struct VideoPlayerView: View {
         }
 
         var playerOffset: Double {
-            dragGestureState && !isHorizontalDrag ? dragGestureOffset.height : viewDragOffset
+            dragGestureState && !isHorizontalDrag ? dragGestureOffset.height : dragOffset
+        }
+
+        var dragOffset: Double {
+            if viewDragOffset.isZero || viewDragOffset == Self.hiddenOffset {
+                return viewDragOffset
+            }
+
+            return player.presentingPlayer ? 0 : Self.hiddenOffset
         }
 
         var playerHeight: Double? {

@@ -17,7 +17,8 @@ extension VideoPlayerView {
             }
             .onChanged { value in
                 guard player.presentingPlayer,
-                      !controlsOverlayModel.presenting else { return }
+                      !controlsOverlayModel.presenting,
+                      dragGestureState else { return }
 
                 if player.controls.presentingControls, !player.musicMode {
                     player.controls.presentingControls = false
