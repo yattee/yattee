@@ -1023,6 +1023,7 @@ final class PlayerModel: ObservableObject {
             if playingFullScreen {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
                     avPlayerBackend.controller.enterFullScreen(animated: true)
+                    return
                 }
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
@@ -1038,6 +1039,7 @@ final class PlayerModel: ObservableObject {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
                     avPlayerBackend.controller.exitFullScreen(animated: true)
                     avPlayerBackend.controller.dismiss(animated: true)
+                    return
                 }
                 let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)

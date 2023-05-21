@@ -4,6 +4,11 @@ import SwiftUI
 
 #if !os(macOS)
     final class AppleAVPlayerViewControllerDelegate: NSObject, AVPlayerViewControllerDelegate {
+        #if os(iOS)
+            @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
+            @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
+        #endif
+
         var player: PlayerModel { .shared }
 
         func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
@@ -11,9 +16,18 @@ import SwiftUI
         }
 
         func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-            Delay.by(0.5) { [weak self] in
-                self?.player.playingFullScreen = true
-            }
+            #if os(iOS)
+                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+                if PlayerModel.shared.currentVideoIsLandscape {
+                    let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
+                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
+                    Delay.by(delay) {
+                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+                    }
+                }
+            #endif
         }
 
         func playerViewController(_: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
