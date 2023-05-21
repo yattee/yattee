@@ -102,7 +102,7 @@ struct ContentView: View {
         }
         .onOpenURL { url in
             URLBookmarkModel.shared.saveBookmark(url)
-            OpenURLHandler.shared.handle(url)
+            OpenURLHandler(navigationStyle: navigationStyle).handle(url)
         }
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {

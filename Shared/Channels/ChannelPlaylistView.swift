@@ -85,7 +85,6 @@ struct ChannelPlaylistView: View {
             }
         }
         #endif
-        #if os(macOS)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 if showCloseButton {
@@ -97,7 +96,9 @@ struct ChannelPlaylistView: View {
                     .buttonStyle(.plain)
                 }
             }
-
+        }
+        #if os(macOS)
+        .toolbar {
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)

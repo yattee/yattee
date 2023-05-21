@@ -4,7 +4,6 @@ import Siesta
 
 struct OpenURLHandler {
     static var firstHandle = true
-    static var shared = Self()
     static let yatteeProtocol = "yattee://"
 
     var accounts: AccountsModel { .shared }
@@ -12,7 +11,7 @@ struct OpenURLHandler {
     var recents: RecentsModel { .shared }
     var player: PlayerModel { .shared }
     var search: SearchModel { .shared }
-    var navigationStyle = NavigationStyle.sidebar
+    var navigationStyle: NavigationStyle
 
     func handle(_ url: URL) {
         if accounts.current.isNil {
