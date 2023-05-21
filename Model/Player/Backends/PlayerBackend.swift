@@ -110,13 +110,15 @@ extension PlayerBackend {
             model.prepareCurrentItemForHistory(finished: true)
 
             if model.queue.isEmpty {
-                #if os(tvOS)
-                    if model.activeBackend == .appleAVPlayer {
-                        model.avPlayerBackend.controller?.dismiss(animated: false)
-                    }
-                #endif
-                model.resetQueue()
-                model.hide()
+                if Defaults[.closeVideoOnEOF] {
+                    #if os(tvOS)
+                        if model.activeBackend == .appleAVPlayer {
+                            model.avPlayerBackend.controller?.dismiss(animated: false)
+                        }
+                    #endif
+                    model.resetQueue()
+                    model.hide()
+                }
             } else {
                 model.advanceToNextItem()
             }

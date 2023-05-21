@@ -13,6 +13,7 @@ struct PlayerSettings: View {
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
+    @Default(.closeVideoOnEOF) private var closeVideoOnEOF
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
@@ -66,6 +67,7 @@ struct PlayerSettings: View {
                     sourcePicker
                 }
                 pauseOnHidingPlayerToggle
+                closeVideoOnEOFToggle
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
                 #endif
@@ -190,6 +192,10 @@ struct PlayerSettings: View {
 
     private var pauseOnHidingPlayerToggle: some View {
         Toggle("Pause when player is closed", isOn: $pauseOnHidingPlayer)
+    }
+
+    private var closeVideoOnEOFToggle: some View {
+        Toggle("Close video and player on end", isOn: $closeVideoOnEOF)
     }
 
     #if !os(macOS)
