@@ -66,7 +66,7 @@ struct ChannelVideosView: View {
                 .frame(maxWidth: .infinity)
             #endif
 
-            VerticalCells(items: contentItems, edgesIgnoringSafeArea: .init()) {
+            VerticalCells(items: contentItems, edgesIgnoringSafeArea: verticalCellsEdgesIgnoringSafeArea) {
                 if let description = presentedChannel?.description, !description.isEmpty {
                     Button {
                         withAnimation(.spring()) {
@@ -198,6 +198,14 @@ struct ChannelVideosView: View {
                 content
             }
         }
+    }
+
+    var verticalCellsEdgesIgnoringSafeArea: Edge.Set {
+        #if os(tvOS)
+            return .horizontal
+        #else
+            return .init()
+        #endif
     }
 
     @ViewBuilder var favoriteButton: some View {
