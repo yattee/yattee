@@ -15,6 +15,7 @@ struct VideoBanner: View {
     @Default(.watchedVideoStyle) private var watchedVideoStyle
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.timeOnThumbnail) private var timeOnThumbnail
+    @Default(.roundedThumbnails) private var roundedThumbnails
 
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inNavigationView) private var inNavigationView
@@ -133,6 +134,14 @@ struct VideoBanner: View {
             .contentShape(Rectangle())
     }
 
+    private var thumbnailRoundingCornerRadius: Double {
+        #if os(tvOS)
+            return Double(12)
+        #else
+            return Double(roundedThumbnails ? 6 : 0)
+        #endif
+    }
+
     private var extraAttributes: some View {
         HStack(spacing: 16) {
             if let video {
@@ -187,11 +196,7 @@ struct VideoBanner: View {
             }
         }
         .frame(width: thumbnailWidth, height: thumbnailHeight)
-        #if os(tvOS)
-            .mask(RoundedRectangle(cornerRadius: 12))
-        #else
-            .mask(RoundedRectangle(cornerRadius: 6))
-        #endif
+        .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
     }
 
     private var contentOpacity: Double {
