@@ -31,7 +31,9 @@ final class PiPDelegate: NSObject, AVPictureInPictureControllerDelegate {
         player.controls.objectWillChange.send()
     }
 
-    func pictureInPictureControllerWillStopPictureInPicture(_: AVPictureInPictureController) {}
+    func pictureInPictureControllerWillStopPictureInPicture(_: AVPictureInPictureController) {
+        player.show()
+    }
 
     func pictureInPictureController(
         _: AVPictureInPictureController,

@@ -143,14 +143,12 @@ import SwiftUI
     }
 #else
     struct AppleAVPlayerView: NSViewRepresentable {
-        @State private var pictureInPictureDelegate = MacOSPiPDelegate()
-
         func makeNSView(context _: Context) -> some NSView {
             let view = AVPlayerView()
             view.player = PlayerModel.shared.avPlayerBackend.avPlayer
             view.showsFullScreenToggleButton = true
             view.allowsPictureInPicturePlayback = true
-            view.pictureInPictureDelegate = pictureInPictureDelegate
+            view.pictureInPictureDelegate = MacOSPiPDelegate.shared
             return view
         }
 

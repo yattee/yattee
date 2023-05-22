@@ -28,6 +28,7 @@ struct PlayerBackendView: View {
                                 {
                                     AppleAVPlayerView()
                                 } else if !avPlayerUsesSystemControls ||
+                                    player.playingInPictureInPicture ||
                                     player.avPlayerBackend.isStartingPiP
                                 {
                                     AppleAVPlayerLayerView()
