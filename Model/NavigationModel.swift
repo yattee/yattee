@@ -136,6 +136,10 @@ final class NavigationModel: ObservableObject {
             } else {
                 navigateToChannel()
             }
+        #elseif os(tvOS)
+            Delay.by(0.01) {
+                navigateToChannel()
+            }
         #else
             navigateToChannel()
         #endif
