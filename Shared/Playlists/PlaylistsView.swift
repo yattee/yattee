@@ -364,28 +364,32 @@ struct PlaylistsView: View {
 
     var header: some View {
         HStack {
-            if model.isEmpty {
-                Text("No Playlists")
-                    .foregroundColor(.secondary)
-            } else {
-                selectPlaylistButton
-            }
+            #if os(tvOS)
+                if model.isEmpty {
+                    Text("No Playlists")
+                        .foregroundColor(.secondary)
+                } else {
+                    selectPlaylistButton
+                }
 
-            if let playlist = currentPlaylist {
-                editPlaylistButton
+                if let playlist = currentPlaylist {
+                    editPlaylistButton
 
-                FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
-                    .labelStyle(.iconOnly)
+                    FavoriteButton(item: FavoriteItem(section: .playlist(accounts.current.id, playlist.id)))
+                        .labelStyle(.iconOnly)
 
-                playButtons
-            }
+                    playButtons
+                }
 
-            newPlaylistButton
+                newPlaylistButton
 
-            Spacer()
+                Spacer()
 
-            ListingStyleButtons(listingStyle: $playlistListingStyle)
-            HideShortsButtons(hide: $hideShorts)
+                ListingStyleButtons(listingStyle: $playlistListingStyle)
+                HideShortsButtons(hide: $hideShorts)
+            #else
+                Spacer()
+            #endif
 
             if let account = accounts.current, showCacheStatus {
                 CacheStatusHeader(
@@ -394,19 +398,21 @@ struct PlaylistsView: View {
                 )
             }
 
-            Button {
-                model.load(force: true)
-                loadResource()
-            } label: {
-                Label("Refresh", systemImage: "arrow.clockwise")
-                    .labelStyle(.iconOnly)
-            }
+            #if os(tvOS)
+                Button {
+                    model.load(force: true)
+                    loadResource()
+                } label: {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                        .labelStyle(.iconOnly)
+                }
+            #endif
         }
         .labelStyle(.iconOnly)
         .font(.caption)
         .imageScale(.small)
-        .padding(.leading, 30)
         #if os(tvOS)
+            .padding(.leading, 30)
             .padding(.bottom, 15)
             .padding(.trailing, 30)
         #endif
