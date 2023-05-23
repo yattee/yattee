@@ -16,6 +16,7 @@ struct HistorySettings: View {
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
     @Default(.resetWatchedStatusOnPlaying) private var resetWatchedStatusOnPlaying
+    @Default(.showToggleWatchedStatusButton) private var showToggleWatchedStatusButton
 
     var body: some View {
         Group {
@@ -75,6 +76,8 @@ struct HistorySettings: View {
                     .padding(.top, 1)
                     #endif
                     watchedVideoBadgeColorPicker
+                    showToggleWatchedStatusButtonToggle
+                        .disabled(watchedVideoStyle != .badge)
                 }
 
                 #if os(macOS)
@@ -109,6 +112,12 @@ struct HistorySettings: View {
             .disabled(!saveHistory)
             .modifier(SettingsPickerModifier())
         }
+    }
+
+    @ViewBuilder private var showToggleWatchedStatusButtonToggle: some View {
+        #if !os(tvOS)
+            Toggle("Show toggle watch status button", isOn: $showToggleWatchedStatusButton)
+        #endif
     }
 
     private var watchedVideoBadgeColorPicker: some View {
