@@ -1,7 +1,7 @@
 
 
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "形式は一覧の順に選択されます。\nHLS は適応的な形式です (解像度設定が適用されない)。";
-"Save history of searches, channels and playlists" = "検索、チャンネル、プレイリストの履歴を保存";
+"Save history of searches, channels and playlists" = "検索、チャンネル、再生リストの履歴を保存";
 "Statistics" = "統計";
 "Apply to all" = "これをすべてに適用";
 "Reload manifest" = "マニフェストを再読込";
@@ -14,14 +14,14 @@
 "Accounts are not supported for the application of this instance" = "このインスタンスはアカウントに対応していません";
 "%lld videos" = "本の動画";
 "%@ Channel" = "%@ チャンネル";
-"%@ Playlist" = "%@ プレイリスト";
+"%@ Playlist" = "%@ 再生リスト";
 "Add Location" = "場所を追加";
 "Add Location..." = "場所を追加...";
 "Advanced" = "高度";
 "Add to Favorites" = "お気に入りに追加";
 "Add to %@" = "%@に追加";
-"Are you sure you want to clear history of watched videos?" = "視聴済み動画の履歴を消去しますか？";
-"Are you sure you want to delete playlist?" = "プレイリストを消去しますか？";
+"Are you sure you want to clear history of watched videos?" = "視聴した動画の履歴を消去しますか？";
+"Are you sure you want to delete playlist?" = "再生リストを削除しますか？";
 "Backend" = "バックエンド";
 "Badge color" = "バッジの色";
 "Badge" = "バッジ";
@@ -42,7 +42,7 @@
 "Continue" = "続き";
 "Continue from %@" = "%@から続ける";
 "Comments" = "コメント";
-"Create Playlist" = "プレイリストの作成";
+"Create Playlist" = "再生リストの作成";
 "Could not load locations manifest" = "場所のマニフェストが読み込めません";
 "Copy %@ link" = "%@ リンクをコピー";
 "Copy %@ link with time" = "%@ リンクを時間指定でコピー";
@@ -55,13 +55,13 @@
 "Discord Server" = "Discord のサーバー";
 "Duration" = "長さ";
 "Edit" = "編集";
-"Edit Playlist" = "プレイリストを編集";
+"Edit Playlist" = "再生リストを編集";
 "Donations" = "寄付";
 "Don't use public locations" = "公開された場所を使用しない";
 "Enable logging" = "ログ記録を有効化";
 "Enable Return YouTube Dislike" = "低評価を表示(Return YouTube Dislike)";
 "Error" = "エラー";
-"Error when accessing playlist" = "プレイリストのアクセス時にエラー";
+"Error when accessing playlist" = "再生リストのアクセス時にエラー";
 "Enter fullscreen in landscape" = "横向きなら全画面にする";
 "Favorites" = "お気に入り";
 "Filter" = "絞り込み";
@@ -105,13 +105,13 @@
 "Not available" = "利用できません";
 
 /* SponsorBlock category name */
-"Offtopic in Music Videos" = "音楽動画で脱線した内容";
+"Offtopic in Music Videos" = "音楽動画の脱線した内容";
 "Only when signed in" = "ログイン時のみ";
 "Orientation" = "向き";
-"Opening audio stream..." = "音声ストリームを開始中...";
+"Opening audio stream..." = "音声ストリーム 開始中...";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "%@ ストリームを開始中...";
+"Opening %@ stream..." = "%@ ストリーム 開始中...";
 
 /* SponsorBlock category name */
 "Outro" = "終了シーン";
@@ -122,7 +122,7 @@
 "Profiles" = "プロファイル";
 "Popular" = "人気";
 "Public Manifest" = "公開のマニフェスト";
-"Queue" = "再生待ち";
+"Queue" = "再生キュー";
 "Red" = "赤";
 "Recents" = "最近";
 "Rate" = "速度";
@@ -146,7 +146,7 @@
 "Search..." = "検索...";
 "Select location closest to you:" = "あなたの場所に近い場所を選択:";
 "Share %@ link" = "%@ リンクを共有";
-"Share %@ link with time" = "%@ リンクを時間指定で共有";
+"Share %@ link with time" = "%@ リンク 時間指定で共有";
 "Show playback statistics" = "再生データの統計を表示";
 "Show progress of watching on thumbnails" = "サムネイル上に進行状態を表示";
 "Show sidebar when space permits" = "空きがあればサイドバーを表示";
@@ -173,7 +173,7 @@
 /* Video sort order in search */
 "Views" = "視聴回数";
 "Watched" = "視聴済み";
-"Used to create links from videos, channels and playlists" = "動画、チャンネル、プレイリストからのリンク作成に使用";
+"Used to create links from videos, channels and playlists" = "動画、チャンネル、再生リストからのリンク作成に使用";
 "When partially watched video is played" = "一部視聴済みの動画の再生時";
 
 /* Selected video was played on given date */
@@ -181,12 +181,12 @@
 "Welcome" = "ようこそ";
 "Yattee" = "Yattee";
 "Yattee %@ (build %@)" = "Yattee %@ (ビルド %@)";
-"You have no playlists\n\nTap on \"New Playlist\" to create one" = "プレイリストなし\n\n作成には「新規プレイリスト」をタップ";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "再生リストなし\n\n作成には「新規再生リスト」をタップ";
 "Private" = "非公開";
 "Unlisted" = "限定公開";
 "Current Location" = "現在の場所";
 "You can switch between profiles in playback settings controls." = "再生設定の制御からプロファイルを切り替えできます。";
-"Add Channels, Playlists and Searches to Favorites using" = "チャンネル、プレイリスト、検索をお気に入りにするには";
+"Add Channels, Playlists and Searches to Favorites using" = "チャンネル、再生リスト、検索をお気に入りにするには";
 "Stream FPS" = "ストリーム FPS";
 "Dropped frames" = "フレーム落ち";
 "Keep last played video in the queue after restart" = "再起動しても再生待ちの最後の動画を維持";
@@ -195,12 +195,12 @@
 "Could not refresh Subscriptions" = "登録チャンネルを更新できません";
 "Could not load streams" = "ストリームを開けません";
 "Could not refresh Popular" = "人気を更新できません";
-"Could not open playlist" = "プレイリストを開けません";
+"Could not open playlist" = "再生リストを開けません";
 "This video could not be opened" = "この動画を開けません";
-"Could not extract playlist ID" = "プレイリストの ID を抽出できません";
+"Could not extract playlist ID" = "再生リストの ID を抽出できません";
 "Could not load video" = "動画を読み込めません";
 "Translations" = "翻訳";
-"Could not refresh Playlists" = "プレイリストを更新できません";
+"Could not refresh Playlists" = "再生リストを更新できません";
 "No locations available at the moment" = "現時点で利用可能な場所がありません";
 "Show Open Videos quick actions" = "クイック操作に動画を開くを表示";
 "Show Documents" = "文書を表示";
@@ -260,7 +260,7 @@
 "Share files from Finder on a Mac\nor iTunes on Windows" = "Mac の Finder か Windows の\niTunes からファイルを登録";
 "Show only icons" = "アイコンのみ表示";
 "Sample Rate" = "サンプルレート";
-"Playback history is empty" = "再生履歴は空です";
+"Playback history is empty" = "再生履歴なし";
 "Clear All Recents" = "最近の項目をすべて消去";
 "Matrix Chat" = "Matrix のチャット";
 "Settings" = "設定";
@@ -317,14 +317,14 @@
 /* Player controls layout size */
 "Small" = "小";
 "URL" = "URL";
-"Playing Next" = "次を再生";
+"Playing Next" = "次に再生";
 "Playback Mode" = "再生モード";
 "Play Now" = "今すぐ再生";
-"Play Next" = "次を再生";
+"Play Next" = "次に再生";
 "Play Last" = "最後に再生";
 "Play" = "再生";
-"Playlist" = "プレイリスト";
-"Playlists" = "プレイリスト";
+"Playlist" = "再生リスト";
+"Playlists" = "再生リスト";
 "Picture in Picture" = "ピクチャーインピクチャー";
 "Shuffle" = "シャッフル";
 "Sidebar" = "サイドバー";
@@ -368,7 +368,7 @@
 "Normal" = "通常";
 "No results" = "結果なし";
 "10 seconds forwards/backwards" = "10秒進む/戻る";
-"No Playlists" = "プレイリストなし";
+"No Playlists" = "再生リストなし";
 "Next" = "次";
 "No description" = "説明なし";
 "Low" = "低";
@@ -378,7 +378,7 @@
 "Very Large" = "巨大";
 "Add Account" = "アカウントを追加";
 "Seek gesture speed" = "シークのジェスチャー速度";
-"New Playlist" = "新規プレイリスト";
+"New Playlist" = "新規再生リスト";
 "Lowest" = "最低";
 "Low quality" = "低品質";
 "Regular Size" = "通常時のサイズ";
@@ -419,15 +419,15 @@
 "Any" = "すべて";
 "Could not create share link" = "共有リンクを作成できません";
 "Could not extract video ID" = "動画 ID を抽出できません";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "プレイリストなし\n\n動画をタップし続け\n「プレイリストに追加」";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "再生リストなし\n\n動画をタップし続け\n「再生リストに追加」";
 "Could not open channel" = "チャンネルを開けません";
 "Wi-Fi" = "Wi-Fi";
-"You have no Playlists" = "プレイリストなし";
-"Current Playlist" = "現在のプレイリスト";
+"You have no Playlists" = "再生リストなし";
+"Current Playlist" = "現在の再生リスト";
 "Could not extract channel information" = "チャンネル情報を抽出できません";
 "Shorts" = "ショート";
-"Add to Playlist" = "プレイリストに追加";
-"Add to Playlist..." = "プレイリストに追加...";
+"Add to Playlist" = "再生リストに追加";
+"Add to Playlist..." = "再生リストに追加...";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "すべて";
@@ -499,13 +499,13 @@
 "Disabled" = "無効化";
 "Chapters" = "チャプター";
 "Clear Search History..." = "検索履歴を消去...";
-"Open \"Playlists\" tab to create new one" = "新たに「プレイリスト」タブを開く";
+"Open \"Playlists\" tab to create new one" = "「再生リスト」タブを開いて新規作成";
 
 
 "Public" = "公開";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "プレイリスト「%@」を削除します。\n元に戻せません。";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "再生リスト「%@」を削除します。\n元に戻せません。";
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "作成者と直接関係する商品やサービスを宣伝すること。通常、商品や収益化されたプラットフォームの宣伝が含まれます。";
-"Remove from Playlist" = "プレイリストから除去";
+"Remove from Playlist" = "再生リストから除去";
 "Reset" = "初期化";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "動画の冒頭で、同じ作成者の他の動画でも見られるアニメーション、静止画やクリップを含む部分。";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "この情報は、この端末上でのみ処理され、指定した国のサーバーに接続するために使用されます。";
@@ -558,3 +558,22 @@
 "Playback Settings" = "再生設定";
 "Autoplay next" = "次を自動再生";
 "Stream" = "ストリーム";
+"Inspector visibility" = "詳細情報の表示";
+"Show Inspector" = "ファイルの詳細情報の表示";
+"Enter account credentials to connect..." = "接続用の認証情報を入力...";
+"Seek" = "シーク";
+"Enter location address to connect..." = "接続先のインスタンスを入力...";
+"Show scroll to top button in comments" = "コメント欄に「上に戻る」表示";
+"Opened File" = "開いたファイル";
+"File Extension" = "ファイル拡張子";
+"Opening file..." = "ファイルを読み込み中...";
+"Your Accounts" = "使用するアカウント";
+"Public account" = "公開アカウント";
+"Browse without account" = "アカウントなしで閲覧";
+"Rotate when entering fullscreen on landscape video" = "横長動画を全画面にしたら回転するか";
+"No rotation" = "回転なし";
+"Close video and player on end" = "終了時に動画をプレイヤーを閉じる";
+"Use system controls with AVPlayer" = "AVPlayer のシステム制御を使用";
+"Show Next in Queue" = "「次の再生キュー」を表示";
+"Next in Queue" = "次の再生キュー";
+"Inspector" = "ファイルの詳細情報";
