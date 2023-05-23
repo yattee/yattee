@@ -37,14 +37,22 @@ struct VideoBanner: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .trailing, spacing: 2) {
-                smallThumbnail
+            ZStack(alignment: .bottom) {
+                VStack(alignment: .trailing, spacing: 2) {
+                    smallThumbnail
 
-                if !timeOnThumbnail, let timeLabel {
-                    Text(timeLabel)
-                        .font(.caption.monospacedDigit())
-                        .foregroundColor(.secondary)
+                    if !timeOnThumbnail, let timeLabel {
+                        Text(timeLabel)
+                            .font(.caption.monospacedDigit())
+                            .foregroundColor(.secondary)
+                    }
                 }
+                .layoutPriority(1)
+
+                ProgressView(value: watch?.progress ?? 44, total: 100)
+                    .frame(maxHeight: 4)
+                    .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
+                    .opacity(watch?.isShowingProgress ?? false ? 1 : 0)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -193,6 +201,7 @@ struct VideoBanner: View {
 
             if timeOnThumbnail {
                 timeView
+                    .offset(y: watch?.isShowingProgress ?? false ? -4 : 0)
             }
         }
         .frame(width: thumbnailWidth, height: thumbnailHeight)
@@ -279,7 +288,7 @@ struct VideoBanner: View {
 
 struct VideoBanner_Previews: PreviewProvider {
     static var previews: some View {
-        VStack(spacing: 2) {
+        ScrollView {
             VideoBanner(video: Video.fixture, playbackTime: CMTime(seconds: 400, preferredTimescale: 10000))
             VideoBanner(video: Video.fixtureUpcomingWithoutPublishedOrViews)
             VideoBanner(video: .local(URL(string: "https://apple.com/a/directory/of/video+that+has+very+long+title+that+will+likely.mp4")!))

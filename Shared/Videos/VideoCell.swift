@@ -359,10 +359,6 @@ struct VideoCell: View {
             (!timeOnThumbnail && !videoDuration.isNil)
     }
 
-    private var showProgressView: Bool {
-        saveHistory && showWatchingProgress && ((watch?.finished ?? false) || watch?.progress ?? 0 > 0)
-    }
-
     private var thumbnail: some View {
         ZStack(alignment: .leading) {
             ZStack(alignment: .bottomLeading) {
@@ -380,7 +376,7 @@ struct VideoCell: View {
                 #else
                 .offset(x: 0, y: -3)
                 #endif
-                .opacity(showProgressView ? 1 : 0)
+                .opacity(watch?.isShowingProgress ?? false ? 1 : 0)
             }
 
             VStack {

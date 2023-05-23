@@ -7,6 +7,7 @@ import Foundation
 final class Watch: NSManagedObject, Identifiable {
     @Default(.watchedThreshold) private var watchedThreshold
     @Default(.saveHistory) private var saveHistory
+    @Default(.showWatchingProgress) private var showWatchingProgress
 }
 
 extension Watch {
@@ -101,5 +102,9 @@ extension Watch {
         }
 
         return Video(app: app ?? AccountsModel.shared.current?.app ?? .local, instanceURL: instanceURL, videoID: videoID)
+    }
+
+    var isShowingProgress: Bool {
+        saveHistory && showWatchingProgress && (finished || progress > 0)
     }
 }
