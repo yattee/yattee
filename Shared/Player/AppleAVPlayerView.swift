@@ -42,7 +42,7 @@ import SwiftUI
                     #if os(iOS)
                         self.player.lockedOrientation = nil
 
-                        if Defaults[.rotateToPortraitOnExitFullScreen] {
+                        if Constants.isIPhone {
                             Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                         }
 

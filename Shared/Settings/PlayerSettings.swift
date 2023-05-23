@@ -17,7 +17,6 @@ struct PlayerSettings: View {
     #if os(iOS)
         @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
-        @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
@@ -122,7 +121,6 @@ struct PlayerSettings: View {
                         enterFullscreenInLandscapeToggle
                     }
                     honorSystemOrientationLockToggle
-                    rotateToPortraitOnExitFullScreenToggle
                     rotateToLandscapeOnEnterFullScreenPicker
                 }
             #endif
@@ -212,10 +210,6 @@ struct PlayerSettings: View {
 
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
-        }
-
-        private var rotateToPortraitOnExitFullScreenToggle: some View {
-            Toggle("Rotate to portrait when exiting fullscreen", isOn: $rotateToPortraitOnExitFullScreen)
         }
 
         private var rotateToLandscapeOnEnterFullScreenPicker: some View {

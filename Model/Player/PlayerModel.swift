@@ -127,7 +127,6 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
-        @Default(.rotateToPortraitOnExitFullScreen) private var rotateToPortraitOnExitFullScreen
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
@@ -1041,7 +1040,7 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.dismiss(animated: true)
                     return
                 }
-                let rotationOrientation = rotateToPortraitOnExitFullScreen ? UIInterfaceOrientation.portrait : nil
+                let rotationOrientation = Constants.isIPhone ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
             }
 

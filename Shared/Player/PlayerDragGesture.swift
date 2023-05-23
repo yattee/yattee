@@ -69,7 +69,7 @@ extension VideoPlayerView {
                 {
                     player.exitFullScreen(showControls: false)
                     #if os(iOS)
-                        if Defaults[.rotateToPortraitOnExitFullScreen] {
+                        if Constants.isIPhone {
                             Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                         }
                     #endif
