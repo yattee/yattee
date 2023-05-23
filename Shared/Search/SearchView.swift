@@ -30,7 +30,6 @@ struct SearchView: View {
     @Default(.saveRecents) private var saveRecents
     @Default(.showHome) private var showHome
     @Default(.searchListingStyle) private var searchListingStyle
-    @Default(.hideShorts) private var hideShorts
 
     private var videos = [Video]()
 
@@ -71,13 +70,12 @@ struct SearchView: View {
             #endif
         }
         .environment(\.listingStyle, searchListingStyle)
-        .environment(\.hideShorts, hideShorts)
         .toolbar {
             #if os(macOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
                     ListingStyleButtons(listingStyle: $searchListingStyle)
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                     FavoriteButton(item: favoriteItem)
                         .id(favoriteItem?.id)
 
@@ -216,7 +214,7 @@ struct SearchView: View {
 
                 Section {
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                 }
 
                 Section {
@@ -574,7 +572,7 @@ struct SearchView: View {
             Spacer()
             ListingStyleButtons(listingStyle: $searchListingStyle)
             HideWatchedButtons()
-            HideShortsButtons(hide: $hideShorts)
+            HideShortsButtons()
         }
         .labelStyle(.iconOnly)
         .padding(.leading, 30)

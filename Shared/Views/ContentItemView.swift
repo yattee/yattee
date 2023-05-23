@@ -6,7 +6,7 @@ struct ContentItemView: View {
     let item: ContentItem
     @Environment(\.listingStyle) private var listingStyle
     @Environment(\.noListingDividers) private var noListingDividers
-    @Environment(\.hideShorts) private var hideShorts
+    @Default(.hideShorts) private var hideShorts
     @Default(.hideWatched) private var hideWatched
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>

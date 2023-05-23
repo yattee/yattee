@@ -10,7 +10,6 @@ struct TrendingView: View {
     @Default(.trendingCountry) private var country
 
     @Default(.trendingListingStyle) private var trendingListingStyle
-    @Default(.hideShorts) private var hideShorts
 
     @State private var presentingCountrySelection = false
 
@@ -41,7 +40,6 @@ struct TrendingView: View {
         Section {
             VerticalCells(items: trending) { if shouldDisplayHeader { header } }
                 .environment(\.listingStyle, trendingListingStyle)
-                .environment(\.hideShorts, hideShorts)
         }
 
         .toolbar {
@@ -128,7 +126,7 @@ struct TrendingView: View {
             }
 
             ToolbarItem {
-                HideShortsButtons(hide: $hideShorts)
+                HideShortsButtons()
             }
         }
         #else
@@ -179,7 +177,7 @@ struct TrendingView: View {
 
                 Section {
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                 }
 
                 Section {
@@ -253,7 +251,7 @@ struct TrendingView: View {
             Spacer()
             ListingStyleButtons(listingStyle: $trendingListingStyle)
             HideWatchedButtons()
-            HideShortsButtons(hide: $hideShorts)
+            HideShortsButtons()
 
             Button {
                 resource.load()

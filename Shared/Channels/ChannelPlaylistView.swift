@@ -10,7 +10,6 @@ struct ChannelPlaylistView: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @Default(.channelPlaylistListingStyle) private var channelPlaylistListingStyle
-    @Default(.hideShorts) private var hideShorts
 
     @ObservedObject private var accounts = AccountsModel.shared
     var player = PlayerModel.shared
@@ -103,7 +102,7 @@ struct ChannelPlaylistView: View {
                 HStack {
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                     ShareButton(contentItem: contentItem)
 
                     favoriteButton
@@ -133,7 +132,7 @@ struct ChannelPlaylistView: View {
 
                 Section {
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                 }
 
                 Section {

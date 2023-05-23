@@ -10,7 +10,6 @@ struct PopularView: View {
     @State private var error: RequestError?
 
     @Default(.popularListingStyle) private var popularListingStyle
-    @Default(.hideShorts) private var hideShorts
 
     var resource: Resource? {
         accounts.api.popular
@@ -76,7 +75,7 @@ struct PopularView: View {
             }
 
             ToolbarItem {
-                HideShortsButtons(hide: $hideShorts)
+                HideShortsButtons()
             }
         }
         #else
@@ -95,7 +94,7 @@ struct PopularView: View {
 
                 Section {
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                 }
 
                 Section {
@@ -135,7 +134,7 @@ struct PopularView: View {
             Spacer()
             ListingStyleButtons(listingStyle: $popularListingStyle)
             HideWatchedButtons()
-            HideShortsButtons(hide: $hideShorts)
+            HideShortsButtons()
 
             Button {
                 resource?.load()

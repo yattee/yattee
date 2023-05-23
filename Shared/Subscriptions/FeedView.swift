@@ -9,7 +9,6 @@ struct FeedView: View {
 
     #if os(tvOS)
         @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
-        @Default(.hideShorts) private var hideShorts
     #endif
 
     var videos: [ContentItem] {
@@ -55,7 +54,7 @@ struct FeedView: View {
                 SubscriptionsPageButton()
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
                 HideWatchedButtons()
-                HideShortsButtons(hide: $hideShorts)
+                HideShortsButtons()
             #endif
 
             if showCacheStatus {

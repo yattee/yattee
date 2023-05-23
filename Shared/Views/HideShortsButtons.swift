@@ -1,14 +1,15 @@
+import Defaults
 import SwiftUI
 
 struct HideShortsButtons: View {
-    @Binding var hide: Bool
+    @Default(.hideShorts) private var hideShorts
 
     var body: some View {
         Button {
-            hide.toggle()
+            hideShorts.toggle()
         } label: {
             Group {
-                if hide {
+                if hideShorts {
                     Label("Short videos: hidden", systemImage: "bolt.slash.fill")
                         .help("Short videos: hidden")
                 } else {
@@ -27,7 +28,7 @@ struct HideShortsButtons: View {
 struct HideShortsButtons_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            HideShortsButtons(hide: .constant(true))
+            HideShortsButtons()
         }
     }
 }

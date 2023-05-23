@@ -24,7 +24,6 @@ struct PlaylistsView: View {
 
     @Default(.playlistListingStyle) private var playlistListingStyle
     @Default(.showCacheStatus) private var showCacheStatus
-    @Default(.hideShorts) private var hideShorts
 
     var items: [ContentItem] {
         var videos = currentPlaylist?.videos ?? []
@@ -68,7 +67,6 @@ struct PlaylistsView: View {
                     .environment(\.scrollViewBottomPadding, 70)
                     .environment(\.currentPlaylistID, currentPlaylist?.id)
                     .environment(\.listingStyle, playlistListingStyle)
-                    .environment(\.hideShorts, hideShorts)
 
                 if currentPlaylist != nil, items.isEmpty {
                     hintText("Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"".localized())
@@ -149,7 +147,7 @@ struct PlaylistsView: View {
                 HideWatchedButtons()
             }
             ToolbarItem {
-                HideShortsButtons(hide: $hideShorts)
+                HideShortsButtons()
             }
         }
         #else
@@ -220,7 +218,7 @@ struct PlaylistsView: View {
 
                 Section {
                     HideWatchedButtons()
-                    HideShortsButtons(hide: $hideShorts)
+                    HideShortsButtons()
                 }
 
                 Section {
@@ -391,7 +389,7 @@ struct PlaylistsView: View {
 
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
                 HideWatchedButtons()
-                HideShortsButtons(hide: $hideShorts)
+                HideShortsButtons()
             #else
                 Spacer()
             #endif
