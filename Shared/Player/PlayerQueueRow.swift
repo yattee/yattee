@@ -7,22 +7,17 @@ struct PlayerQueueRow: View {
     let item: PlayerQueueItem
     var history = false
     var autoplay = false
+    var watch: Watch?
 
     private var player = PlayerModel.shared
 
     @Default(.closePiPOnNavigation) var closePiPOnNavigation
 
-    @FetchRequest private var watchRequest: FetchedResults<Watch>
-
-    init(item: PlayerQueueItem, history: Bool = false, autoplay: Bool = false) {
+    init(item: PlayerQueueItem, history: Bool = false, autoplay: Bool = false, watch: Watch? = nil) {
         self.item = item
         self.history = history
         self.autoplay = autoplay
-        _watchRequest = FetchRequest<Watch>(
-            entity: Watch.entity(),
-            sortDescriptors: [],
-            predicate: NSPredicate(format: "videoID = %@", item.videoID)
-        )
+        self.watch = watch
     }
 
     var body: some View {
@@ -78,10 +73,6 @@ struct PlayerQueueRow: View {
         #else
         .buttonStyle(.plain)
         #endif
-    }
-
-    private var watch: Watch? {
-        watchRequest.first
     }
 
     private var watchStoppedAt: CMTime? {

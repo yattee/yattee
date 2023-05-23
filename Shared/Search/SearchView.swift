@@ -76,6 +76,7 @@ struct SearchView: View {
             #if os(macOS)
                 ToolbarItemGroup(placement: toolbarPlacement) {
                     ListingStyleButtons(listingStyle: $searchListingStyle)
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                     FavoriteButton(item: favoriteItem)
                         .id(favoriteItem?.id)
@@ -214,6 +215,7 @@ struct SearchView: View {
                 ListingStyleButtons(listingStyle: $searchListingStyle)
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 
@@ -571,6 +573,7 @@ struct SearchView: View {
 
             Spacer()
             ListingStyleButtons(listingStyle: $searchListingStyle)
+            HideWatchedButtons()
             HideShortsButtons(hide: $hideShorts)
         }
         .labelStyle(.iconOnly)

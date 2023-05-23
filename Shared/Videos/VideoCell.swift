@@ -6,6 +6,7 @@ import SwiftUI
 struct VideoCell: View {
     var id: String?
     private var video: Video
+    private var watch: Watch?
 
     @Environment(\.horizontalCells) private var horizontalCells
     @Environment(\.inChannelView) private var inChannelView
@@ -27,12 +28,10 @@ struct VideoCell: View {
     private var navigation: NavigationModel { .shared }
     private var player: PlayerModel { .shared }
 
-    @FetchRequest private var watchRequest: FetchedResults<Watch>
-
-    init(id: String? = nil, video: Video) {
+    init(id: String? = nil, video: Video, watch: Watch? = nil) {
         self.id = id
         self.video = video
-        _watchRequest = video.watchFetchRequest
+        self.watch = watch
     }
 
     var body: some View {
@@ -105,10 +104,6 @@ struct VideoCell: View {
 
     private var playNowContinues: Bool {
         watchedVideoPlayNowBehavior == .continue
-    }
-
-    private var watch: Watch? {
-        watchRequest.first
     }
 
     private var finished: Bool {

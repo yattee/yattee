@@ -102,6 +102,7 @@ struct ChannelPlaylistView: View {
             ToolbarItem(placement: playlistButtonsPlacement) {
                 HStack {
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                     ShareButton(contentItem: contentItem)
 
@@ -131,6 +132,7 @@ struct ChannelPlaylistView: View {
                 ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 

@@ -137,6 +137,7 @@ struct ChannelVideosView: View {
                     }
 
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                     contentTypePicker
                 }
@@ -281,6 +282,7 @@ struct ChannelVideosView: View {
                     ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
 
                     Section {
+                        HideWatchedButtons()
                         HideShortsButtons(hide: $hideShorts)
                     }
                 }

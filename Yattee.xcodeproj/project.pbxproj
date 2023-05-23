@@ -550,6 +550,9 @@
 		3774127627387EA200423605 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127527387EA200423605 /* Siesta */; };
 		3774127A27387EBC00423605 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127927387EBC00423605 /* Defaults */; };
 		3774127C27387EC800423605 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3774127B27387EC800423605 /* Alamofire */; };
+		37758C0B2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */; };
+		37758C0C2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */; };
+		37758C0D2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */; };
 		3776924E294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
 		3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
 		37769250294630110055EC18 /* ChannelAvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776924D294630110055EC18 /* ChannelAvatarView.swift */; };
@@ -1327,6 +1330,7 @@
 		37732FEF2703A26300F04329 /* AccountValidationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountValidationStatus.swift; sourceTree = "<group>"; };
 		37732FF32703D32400F04329 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		37737785276F9858000521C1 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
+		37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideWatchedButtons.swift; sourceTree = "<group>"; };
 		3776924D294630110055EC18 /* ChannelAvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelAvatarView.swift; sourceTree = "<group>"; };
 		3776925129463C310055EC18 /* PlaylistsCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsCacheModel.swift; sourceTree = "<group>"; };
 		377692552946476F0055EC18 /* ChannelPlaylistsCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelPlaylistsCacheModel.swift; sourceTree = "<group>"; };
@@ -1876,6 +1880,7 @@
 				3748186D26A769D60084E870 /* DetailBadge.swift */,
 				37599F37272B4D740087F250 /* FavoriteButton.swift */,
 				379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */,
+				37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */,
 				37152EE926EFEB95004FB96D /* LazyView.swift */,
 				371CC7732946963000979C1A /* ListingStyleButtons.swift */,
 				37030FF627B0347C00ECDDAA /* MPVPlayerView.swift */,
@@ -3131,6 +3136,7 @@
 				37F64FE426FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37EBD8C427AF0DA800F1C24B /* PlayerBackend.swift in Sources */,
 				376A33E02720CAD6000C1D6B /* VideosApp.swift in Sources */,
+				37758C0B2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */,
 				374AB3DB28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */,
 				37D836BC294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
@@ -3443,6 +3449,7 @@
 				37F7AB5528A951B200FB46B5 /* Power.swift in Sources */,
 				372CFD16285F2E2A00B0B54B /* ControlsBar.swift in Sources */,
 				37FFC441272734C3009FFD26 /* Throttle.swift in Sources */,
+				37758C0C2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */,
 				37169AA72729E2CC0011DE61 /* AccountsBridge.swift in Sources */,
 				379EF9E129AA585F009FE6C6 /* HideShortsButtons.swift in Sources */,
 				37BA793C26DB8EE4002A0235 /* PlaylistVideosView.swift in Sources */,
@@ -3832,6 +3839,7 @@
 				372D85DF283842EC00FF3C7D /* PiPDelegate.swift in Sources */,
 				378E9C3A294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				372D85E0283842EE00FF3C7D /* PlayerLayerView.swift in Sources */,
+				37758C0D2A1D1C8B001FD900 /* HideWatchedButtons.swift in Sources */,
 				37CEE4C32677B697005A1EFE /* Stream.swift in Sources */,
 				37F64FE626FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
 				37DCD3192A191A180059A470 /* AVPlayerViewController+FullScreen.swift in Sources */,

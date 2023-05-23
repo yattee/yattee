@@ -54,6 +54,7 @@ struct FeedView: View {
             #if os(tvOS)
                 SubscriptionsPageButton()
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+                HideWatchedButtons()
                 HideShortsButtons(hide: $hideShorts)
             #endif
 

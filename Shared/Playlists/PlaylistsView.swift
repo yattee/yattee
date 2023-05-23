@@ -146,6 +146,9 @@ struct PlaylistsView: View {
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
             }
             ToolbarItem {
+                HideWatchedButtons()
+            }
+            ToolbarItem {
                 HideShortsButtons(hide: $hideShorts)
             }
         }
@@ -216,6 +219,7 @@ struct PlaylistsView: View {
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 
@@ -386,6 +390,7 @@ struct PlaylistsView: View {
                 Spacer()
 
                 ListingStyleButtons(listingStyle: $playlistListingStyle)
+                HideWatchedButtons()
                 HideShortsButtons(hide: $hideShorts)
             #else
                 Spacer()

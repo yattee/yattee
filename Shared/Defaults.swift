@@ -256,6 +256,7 @@ extension Defaults.Keys {
     static let channelPlaylistListingStyle = Key<ListingStyle>("channelPlaylistListingStyle", default: .cells)
     static let searchListingStyle = Key<ListingStyle>("searchListingStyle", default: .cells)
     static let hideShorts = Key<Bool>("hideShorts", default: false)
+    static let hideWatched = Key<Bool>("hideWatched", default: false)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
 }
 

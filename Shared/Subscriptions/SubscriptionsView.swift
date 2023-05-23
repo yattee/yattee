@@ -46,6 +46,7 @@ struct SubscriptionsView: View {
         .toolbar {
             ToolbarItemGroup {
                 ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+                HideWatchedButtons()
                 HideShortsButtons(hide: $hideShorts)
                 toggleWatchedButton
                     .id(feed.watchedId)
@@ -73,6 +74,7 @@ struct SubscriptionsView: View {
                 }
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 

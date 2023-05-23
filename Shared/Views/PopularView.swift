@@ -72,6 +72,10 @@ struct PopularView: View {
             }
 
             ToolbarItem {
+                HideWatchedButtons()
+            }
+
+            ToolbarItem {
                 HideShortsButtons(hide: $hideShorts)
             }
         }
@@ -90,6 +94,7 @@ struct PopularView: View {
                 ListingStyleButtons(listingStyle: $popularListingStyle)
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 
@@ -129,6 +134,7 @@ struct PopularView: View {
         HStack {
             Spacer()
             ListingStyleButtons(listingStyle: $popularListingStyle)
+            HideWatchedButtons()
             HideShortsButtons(hide: $hideShorts)
 
             Button {

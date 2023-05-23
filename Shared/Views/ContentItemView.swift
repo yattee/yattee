@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import SwiftUI
 
@@ -6,6 +7,18 @@ struct ContentItemView: View {
     @Environment(\.listingStyle) private var listingStyle
     @Environment(\.noListingDividers) private var noListingDividers
     @Environment(\.hideShorts) private var hideShorts
+    @Default(.hideWatched) private var hideWatched
+
+    @FetchRequest private var watchRequest: FetchedResults<Watch>
+
+    init(item: ContentItem) {
+        self.item = item
+        if item.contentType == .video, let video = item.video {
+            _watchRequest = video.watchFetchRequest
+        } else {
+            _watchRequest = Video.fixture.watchFetchRequest
+        }
+    }
 
     @ViewBuilder var body: some View {
         if itemVisible {
@@ -26,6 +39,10 @@ struct ContentItemView: View {
     }
 
     var itemVisible: Bool {
+        if hideWatched, watch?.finished ?? false {
+            return false
+        }
+
         guard hideShorts, item.contentType == .video, let video = item.video else {
             return true
         }
@@ -35,10 +52,10 @@ struct ContentItemView: View {
 
     @ViewBuilder func videoItem(_ video: Video) -> some View {
         if listingStyle == .cells {
-            VideoCell(video: video)
+            VideoCell(video: video, watch: watch)
         } else {
             let item = PlayerQueueItem(video)
-            PlayerQueueRow(item: item)
+            PlayerQueueRow(item: item, watch: watch)
                 .contextMenu {
                     VideoContextMenuView(video: video)
                 }
@@ -98,5 +115,9 @@ struct ContentItemView: View {
                 Divider()
             #endif
         }
+    }
+
+    private var watch: Watch? {
+        watchRequest.first
     }
 }

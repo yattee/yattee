@@ -124,6 +124,10 @@ struct TrendingView: View {
             }
 
             ToolbarItem {
+                HideWatchedButtons()
+            }
+
+            ToolbarItem {
                 HideShortsButtons(hide: $hideShorts)
             }
         }
@@ -174,6 +178,7 @@ struct TrendingView: View {
                 ListingStyleButtons(listingStyle: $trendingListingStyle)
 
                 Section {
+                    HideWatchedButtons()
                     HideShortsButtons(hide: $hideShorts)
                 }
 
@@ -247,6 +252,7 @@ struct TrendingView: View {
 
             Spacer()
             ListingStyleButtons(listingStyle: $trendingListingStyle)
+            HideWatchedButtons()
             HideShortsButtons(hide: $hideShorts)
 
             Button {
