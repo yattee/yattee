@@ -8,6 +8,12 @@ struct HistoryView: View {
 
     @ObservedObject private var player = PlayerModel.shared
 
+    @State private var visibleWatches = [Watch]()
+
+    init(limit: Int = 10) {
+        self.limit = limit
+    }
+
     var body: some View {
         LazyVStack {
             if visibleWatches.isEmpty {
@@ -30,14 +36,13 @@ struct HistoryView: View {
             }
         }
         .animation(nil, value: visibleWatches)
-        .onAppear {
-            visibleWatches
-                .forEach(player.loadHistoryVideoDetails)
-        }
+        .onAppear(perform: reloadVisibleWatches)
+        .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
     }
 
-    private var visibleWatches: [Watch] {
-        Array(watches.filter { $0.videoID != player.currentVideo?.videoID }.prefix(limit))
+    func reloadVisibleWatches() {
+        visibleWatches = Array(watches.filter { $0.videoID != player.currentVideo?.videoID }.prefix(limit))
+        visibleWatches.forEach(player.loadHistoryVideoDetails)
     }
 }
 
