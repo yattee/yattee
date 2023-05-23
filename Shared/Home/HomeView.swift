@@ -200,7 +200,12 @@ struct HomeView: View {
         .frame(minWidth: 360)
         #endif
         #if os(iOS)
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                homeMenu
+            }
+        }
         #endif
         #if !os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -220,16 +225,40 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundColor(.secondary)
     }
+
+#if os(iOS)
+        var homeMenu: some View {
+            Menu {
+                Section {
+                    HideWatchedButtons()
+                    HideShortsButtons()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Text("Home")
+                        .foregroundColor(.primary)
+                        .font(.headline)
+
+                    Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.small)
+                }
+                .transaction { t in t.animation = nil }
+            }
+        }
+    #endif
 }
 
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         TabView {
-            HomeView()
-                .injectFixtureEnvironmentObjects()
-                .tabItem {
-                    Label("Home", systemImage: "house")
-                }
+            NavigationView {
+                HomeView()
+                    .injectFixtureEnvironmentObjects()
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
+            }
         }
     }
 }
