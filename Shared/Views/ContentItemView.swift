@@ -59,7 +59,7 @@ struct ContentItemView: View {
                 .contextMenu {
                     VideoContextMenuView(video: video)
                 }
-                .id(item.id)
+                .id(item.contentItem.cacheKey)
             #if os(tvOS)
                 .padding(.horizontal, 30)
             #endif
