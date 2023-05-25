@@ -570,3 +570,12 @@
 "Opening file..." = "Ouverture du fichier...";
 "Enter location address to connect..." = "Entrez l'adresse de l'instance pour se connecter...";
 "File Extension" = "Extension de fichier";
+"Public account" = "Compte publique";
+"Your Accounts" = "Vos comptes";
+"Browse without account" = "Naviguer sans compte";
+"Close video and player on end" = "Fermer la vidéo et le lecteur à la fin";
+"Rotate when entering fullscreen on landscape video" = "Rotation à l'entrée en plein écran sur une vidéo en paysage";
+"Landscape left" = "Paysage gauche";
+"Landscape right" = "Paysage droit";
+"No rotation" = "Aucune rotation";
+"Use system controls with AVPlayer" = "Utiliser les contrôles du système avec AVPlayer";

@@ -580,3 +580,13 @@
 "Landscape right" = "Obrót w prawo";
 "No rotation" = "Brak rotacji";
 "Landscape left" = "Obrót w lewo";
+"Available" = "Dostępne";
+"Startup section" = "Sekcja startowa";
+"Home Settings" = "Ustawienia strony głównej";
+"Watched: hidden" = "Obejrzane: ukryte";
+"Watched: visible" = "Obejrzane: widoczne";
+"No videos to show" = "Brak wideo do pokazania";
+"(watched and shorts hidden)" = "(obejrzane i krótkie ukryte)";
+"(shorts hidden)" = "(krótkie ukryte)";
+"Disable filters" = "Wyłącz filtry";
+"(watched hidden)" = "(obejrzane ukryte)";

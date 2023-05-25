@@ -570,3 +570,12 @@
 "Opened File" = "Fișier deschis";
 "Opening file..." = "Deschiderea fișierului...";
 "File Extension" = "Extensie fișier";
+"Use system controls with AVPlayer" = "Utilizați controalele de sistem cu AVPlayer";
+"Rotate when entering fullscreen on landscape video" = "Rotiți când intrați pe ecran complet în videoclipul peisaj";
+"Landscape left" = "Peisaj stânga";
+"Landscape right" = "Peisaj dreapta";
+"No rotation" = "Fără rotație";
+"Public account" = "Cont public";
+"Your Accounts" = "Conturi tale";
+"Browse without account" = "Navigați fără cont";
+"Close video and player on end" = "Închideți videoclipul și player-ul la sfârșit";

@@ -570,3 +570,12 @@
 "Opened File" = "Arquivo Aberto";
 "File Extension" = "Extensão do Arquivo";
 "Opening file..." = "Abrindo arquivo…";
+"Browse without account" = "Navegar sem uma conta";
+"Rotate when entering fullscreen on landscape video" = "Girar quando entrar no modo tela cheia em vídeo em paisagem";
+"Landscape left" = "Paisagem à esquerda";
+"Landscape right" = "Paisagem à direita";
+"No rotation" = "Sem rotação";
+"Public account" = "Conta pública";
+"Close video and player on end" = "Fechar vídeo e player ao final";
+"Your Accounts" = "Suas Contas";
+"Use system controls with AVPlayer" = "Usar controles do sistema com o AVPlayer";
