@@ -64,7 +64,6 @@ struct PlaylistsView: View {
         SignInRequiredView(title: "Playlists".localized()) {
             VStack {
                 VerticalCells(items: items, allowEmpty: true) { if shouldDisplayHeader { header } }
-                    .environment(\.scrollViewBottomPadding, 70)
                     .environment(\.currentPlaylistID, currentPlaylist?.id)
                     .environment(\.listingStyle, playlistListingStyle)
 

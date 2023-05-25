@@ -62,10 +62,6 @@ private struct LoadMoreContentHandler: EnvironmentKey {
     static let defaultValue: LoadMoreContentHandlerType = {}
 }
 
-private struct ScrollViewBottomPaddingKey: EnvironmentKey {
-    static let defaultValue: Double = 30
-}
-
 extension EnvironmentValues {
     var inChannelView: Bool {
         get { self[InChannelViewKey.self] }
@@ -95,11 +91,6 @@ extension EnvironmentValues {
     var loadMoreContentHandler: LoadMoreContentHandlerType {
         get { self[LoadMoreContentHandler.self] }
         set { self[LoadMoreContentHandler.self] = newValue }
-    }
-
-    var scrollViewBottomPadding: Double {
-        get { self[ScrollViewBottomPaddingKey.self] }
-        set { self[ScrollViewBottomPaddingKey.self] = newValue }
     }
 
     var listingStyle: ListingStyle {

@@ -24,25 +24,19 @@ struct HistoryView: View {
                     }.foregroundColor(.secondary)
                 }
             } else {
-                ForEach(visibleWatches, id: \.videoID) { watch in
-                    let video = player.historyVideo(watch.videoID) ?? watch.video
-
-                    ContentItemView(item: .init(video: video))
-                        .environment(\.listingStyle, .list)
-                        .contextMenu {
-                            VideoContextMenuView(video: video)
-                        }
-                }
+                ListView(items: contentItems, limit: limit)
             }
         }
         .animation(nil, value: visibleWatches)
-        .onAppear(perform: reloadVisibleWatches)
         .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
+    }
+
+    var contentItems: [ContentItem] {
+        visibleWatches.map { .init(video: player.historyVideo($0.videoID) ?? $0.video) }
     }
 
     func reloadVisibleWatches() {
         visibleWatches = Array(watches.filter { $0.videoID != player.currentVideo?.videoID }.prefix(limit))
-        visibleWatches.forEach(player.loadHistoryVideoDetails)
     }
 }
 

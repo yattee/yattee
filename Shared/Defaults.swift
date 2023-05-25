@@ -28,7 +28,6 @@ extension Defaults.Keys {
     static let showFavoritesInHome = Key<Bool>("showFavoritesInHome", default: true)
     #if os(iOS)
         static let showDocuments = Key<Bool>("showDocuments", default: false)
-        static let homeRecentDocumentsItems = Key<Int>("homeRecentDocumentsItems", default: 3)
     #endif
     static let homeHistoryItems = Key<Int>("homeHistoryItems", default: 10)
     static let favorites = Key<[FavoriteItem]>("favorites", default: [])
@@ -258,6 +257,7 @@ extension Defaults.Keys {
     static let hideShorts = Key<Bool>("hideShorts", default: false)
     static let hideWatched = Key<Bool>("hideWatched", default: false)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
+    static let widgetsSettings = Key<[WidgetSettings]>("widgetsSettings", default: [])
 }
 
 enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
@@ -444,4 +444,61 @@ enum FullScreenRotationSetting: String, CaseIterable, Defaults.Serializable {
     var isRotating: Bool {
         self != .disabled
     }
+}
+
+struct WidgetSettings: Defaults.Serializable {
+    static let defaultLimit = 10
+    static let maxLimit: [WidgetListingStyle: Int] = [
+        .horizontalCells: 50,
+        .list: 50
+    ]
+
+    static var bridge = WidgetSettingsBridge()
+
+    var id: String
+    var listingStyle = WidgetListingStyle.horizontalCells
+    var limit = Self.defaultLimit
+
+    var viewID: String {
+        "\(id)-\(listingStyle.rawValue)-\(limit)"
+    }
+
+    static func maxLimit(_ style: WidgetListingStyle) -> Int {
+        Self.maxLimit[style] ?? Self.defaultLimit
+    }
+}
+
+struct WidgetSettingsBridge: Defaults.Bridge {
+    typealias Value = WidgetSettings
+    typealias Serializable = [String: String]
+
+    func serialize(_ value: Value?) -> Serializable? {
+        guard let value else { return nil }
+
+        return [
+            "id": value.id,
+            "listingStyle": value.listingStyle.rawValue,
+            "limit": String(value.limit)
+        ]
+    }
+
+    func deserialize(_ object: Serializable?) -> Value? {
+        guard let object, let id = object["id"], !id.isEmpty else { return nil }
+        var listingStyle = WidgetListingStyle.horizontalCells
+        if let style = object["listingStyle"] {
+            listingStyle = WidgetListingStyle(rawValue: style) ?? .horizontalCells
+        }
+        let limit = Int(object["limit"] ?? "\(WidgetSettings.defaultLimit)") ?? WidgetSettings.defaultLimit
+
+        return Value(
+            id: id,
+            listingStyle: listingStyle,
+            limit: limit
+        )
+    }
+}
+
+enum WidgetListingStyle: String, CaseIterable, Defaults.Serializable {
+    case horizontalCells
+    case list
 }

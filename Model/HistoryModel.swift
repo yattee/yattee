@@ -10,18 +10,21 @@ extension PlayerModel {
         historyVideos.first { $0.videoID == id }
     }
 
-    func loadHistoryVideoDetails(_ watch: Watch) {
+    func loadHistoryVideoDetails(_ watch: Watch, onCompletion: @escaping () -> Void = {}) {
         guard historyVideo(watch.videoID).isNil else {
+            onCompletion()
             return
         }
 
         if !Video.VideoID.isValid(watch.videoID), let url = URL(string: watch.videoID) {
             historyVideos.append(.local(url))
+            onCompletion()
             return
         }
 
         if let video = VideosCacheModel.shared.retrieveVideo(watch.video.cacheKey) {
             historyVideos.append(video)
+            onCompletion()
             return
         }
 
@@ -35,6 +38,7 @@ extension PlayerModel {
                 if let video: Video = response.typedContent() {
                     VideosCacheModel.shared.storeVideo(video)
                     self.historyVideos.append(video)
+                    onCompletion()
                 }
             }
             .onCompletion { _ in
@@ -107,13 +111,19 @@ extension PlayerModel {
             try? self.context.save()
 
             FeedModel.shared.calculateUnwatchedFeed()
+            WatchModel.shared.watchesChanged()
         }
     }
 
     func removeAllWatches() {
         let watchesFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Watch")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: watchesFetchRequest)
-        _ = try? context.execute(deleteRequest)
-        _ = try? context.save()
+
+        do {
+            try context.executeAndMergeChanges(deleteRequest)
+            try context.save()
+        } catch let error as NSError {
+            logger.info(.init(stringLiteral: error.localizedDescription))
+        }
     }
 }

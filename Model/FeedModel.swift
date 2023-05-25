@@ -223,6 +223,7 @@ final class FeedModel: ObservableObject, CacheModel {
             try? self.backgroundContext.save()
 
             self.calculateUnwatchedFeed()
+            WatchModel.shared.watchesChanged()
         }
     }
 

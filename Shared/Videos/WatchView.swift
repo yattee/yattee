@@ -53,6 +53,7 @@ struct WatchView: View {
         }
 
         FeedModel.shared.calculateUnwatchedFeed()
+        WatchModel.shared.watchesChanged()
     }
 
     var imageSystemName: String {

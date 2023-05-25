@@ -28,15 +28,8 @@ struct QueueView: View {
                 }
                 .buttonStyle(.plain)
 
-                LazyVStack(alignment: .leading) {
-                    ForEach(limitedItems) { item in
-                        ContentItemView(item: .init(video: item.video))
-                            .environment(\.listingStyle, .list)
-                            .environment(\.inQueueListing, true)
-                            .environment(\.noListingDividers, limit == 1)
-                            .transition(.opacity)
-                    }
-                }
+                ListView(items: items, limit: limit)
+                    .environment(\.inQueueListing, true)
             }
         }
         .padding(.vertical, items.isEmpty ? 0 : 15)
@@ -50,16 +43,8 @@ struct QueueView: View {
         return "Next in Queue".localized() + " (\(items.count))"
     }
 
-    var limitedItems: [ContentItem] {
-        if let limit {
-            return Array(items.prefix(limit).map(\.contentItem))
-        }
-
-        return items.map(\.contentItem)
-    }
-
-    var items: [PlayerQueueItem] {
-        player.queue
+    var items: [ContentItem] {
+        player.queue.map(\.contentItem)
     }
 
     var limit: Int? {

@@ -73,6 +73,37 @@ struct ContentView: View {
                 AccountsView()
             }
         )
+        .background(
+            EmptyView().sheet(isPresented: $navigation.presentingHomeSettings) {
+                #if os(macOS)
+                    VStack(alignment: .leading) {
+                        Button("Done") {
+                            navigation.presentingHomeSettings = false
+                        }
+                        .padding()
+                        .keyboardShortcut(.cancelAction)
+
+                        HomeSettings()
+                    }
+                    .frame(width: 500, height: 800)
+                #else
+                    NavigationView {
+                        HomeSettings()
+                        #if os(iOS)
+                            .toolbar {
+                                ToolbarItem(placement: .navigation) {
+                                    Button {
+                                        navigation.presentingHomeSettings = false
+                                    } label: {
+                                        Text("Done")
+                                    }
+                                }
+                            }
+                        #endif
+                    }
+                #endif
+            }
+        )
         #if !os(tvOS)
         .fileImporter(
             isPresented: $navigation.presentingFileImporter,

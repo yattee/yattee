@@ -5,6 +5,9 @@ struct AccentButton: View {
     var imageSystemName: String?
     var maxWidth: CGFloat? = .infinity
     var bold = true
+    var verticalPadding = 10.0
+    var horizontalPadding = 10.0
+    var minHeight = 45.0
     var action: () -> Void = {}
 
     var body: some View {
@@ -18,9 +21,9 @@ struct AccentButton: View {
                         .fontWeight(bold ? .bold : .regular)
                 }
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 10)
-            .frame(minHeight: 45)
+            .padding(.vertical, verticalPadding)
+            .padding(.horizontal, horizontalPadding)
+            .frame(minHeight: minHeight)
             .frame(maxWidth: maxWidth)
             .contentShape(Rectangle())
         }

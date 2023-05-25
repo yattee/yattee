@@ -3,6 +3,7 @@ import Foundation
 
 struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
     enum Section: Codable, Equatable, Defaults.Serializable {
+        case history
         case subscriptions
         case popular
         case trending(String, String?)
@@ -13,6 +14,8 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
 
         var label: String {
             switch self {
+            case .history:
+                return "History"
             case .subscriptions:
                 return "Subscriptions"
             case .popular:
@@ -50,4 +53,8 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
 
     var id = UUID().uuidString
     var section: Section
+
+    var widgetSettingsKey: String {
+        "favorites-\(id)"
+    }
 }

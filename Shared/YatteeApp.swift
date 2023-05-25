@@ -47,6 +47,7 @@ struct YatteeApp: App {
 
     let persistenceController = PersistenceController.shared
 
+    var favorites: FavoritesModel { .shared }
     var playerControls: PlayerControlsModel { .shared }
 
     var body: some Scene {
@@ -180,5 +181,22 @@ struct YatteeApp: App {
         #endif
 
         URLBookmarkModel.shared.refreshAll()
+
+        migrateHomeHistoryItems()
+    }
+
+    func migrateHomeHistoryItems() {
+        guard Defaults[.homeHistoryItems] > 0 else { return }
+
+        if favorites.addableItems().contains(where: { $0.section == .history }) {
+            let historyItem = FavoriteItem(section: .history)
+            favorites.add(historyItem)
+            favorites.setListingStyle(.list, historyItem)
+            favorites.setLimit(Defaults[.homeHistoryItems], historyItem)
+
+            print("migrated home history items: \(favorites.limit(historyItem))")
+        }
+
+        Defaults[.homeHistoryItems] = -1
     }
 }

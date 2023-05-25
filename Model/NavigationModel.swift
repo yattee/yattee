@@ -83,6 +83,7 @@ final class NavigationModel: ObservableObject {
     @Published var presentingSettings = false
     @Published var presentingAccounts = false
     @Published var presentingWelcomeScreen = false
+    @Published var presentingHomeSettings = false
 
     @Published var presentingChannelSheet = false
     @Published var channelPresentedInSheet: Channel!

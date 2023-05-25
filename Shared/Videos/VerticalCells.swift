@@ -6,7 +6,6 @@ struct VerticalCells<Header: View>: View {
         @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
 
-    @Environment(\.scrollViewBottomPadding) private var scrollViewBottomPadding
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
     @Environment(\.listingStyle) private var listingStyle
 
@@ -15,14 +14,25 @@ struct VerticalCells<Header: View>: View {
     var edgesIgnoringSafeArea = Edge.Set.horizontal
 
     let header: Header?
-    init(items: [ContentItem], allowEmpty: Bool = false, edgesIgnoringSafeArea: Edge.Set = .horizontal, @ViewBuilder header: @escaping () -> Header? = { nil }) {
+
+    @State private var gridSize = CGSize.zero
+
+    init(
+        items: [ContentItem],
+        allowEmpty: Bool = false,
+        edgesIgnoringSafeArea: Edge.Set = .horizontal,
+        @ViewBuilder header: @escaping () -> Header? = { nil }
+    ) {
         self.items = items
         self.allowEmpty = allowEmpty
         self.edgesIgnoringSafeArea = edgesIgnoringSafeArea
         self.header = header()
     }
 
-    init(items: [ContentItem], allowEmpty: Bool = false) where Header == EmptyView {
+    init(
+        items: [ContentItem],
+        allowEmpty: Bool = false
+    ) where Header == EmptyView {
         self.init(items: items, allowEmpty: allowEmpty) { EmptyView() }
     }
 
@@ -37,9 +47,6 @@ struct VerticalCells<Header: View>: View {
                 }
             }
             .padding()
-            #if !os(tvOS)
-                Color.clear.padding(.bottom, scrollViewBottomPadding)
-            #endif
         }
         .animation(nil)
         .edgesIgnoringSafeArea(edgesIgnoringSafeArea)

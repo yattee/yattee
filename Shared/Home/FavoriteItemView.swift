@@ -13,6 +13,16 @@ struct FavoriteItemView: View {
     private var playlists = PlaylistsModel.shared
     private var favoritesModel = FavoritesModel.shared
     private var navigation = NavigationModel.shared
+    @ObservedObject private var player = PlayerModel.shared
+    @ObservedObject private var watchModel = WatchModel.shared
+
+    @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
+    var watches: FetchedResults<Watch>
+    @State private var visibleWatches = [Watch]()
+
+    @Default(.hideShorts) private var hideShorts
+    @Default(.hideWatched) private var hideWatched
+    @Default(.widgetsSettings) private var widgetsSettings
 
     init(item: FavoriteItem) {
         self.item = item
@@ -23,13 +33,7 @@ struct FavoriteItemView: View {
             if isVisible {
                 VStack(alignment: .leading, spacing: 2) {
                     itemControl
-                        .contextMenu {
-                            Button {
-                                favoritesModel.remove(item)
-                            } label: {
-                                Label("Remove from Favorites", systemImage: "trash")
-                            }
-                        }
+                        .contextMenu { contextMenu }
                         .contentShape(Rectangle())
                     #if os(tvOS)
                         .padding(.leading, 40)
@@ -37,20 +41,173 @@ struct FavoriteItemView: View {
                         .padding(.leading, 15)
                     #endif
 
-                    HorizontalCells(items: store.contentItems)
+                    if limitedItems.isEmpty, !(resource?.isLoading ?? false) {
+                        VStack(alignment: .leading) {
+                            Text(emptyItemsText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundColor(.secondary)
+
+                            if hideShorts || hideWatched {
+                                AccentButton(text: "Disable filters", maxWidth: nil, verticalPadding: 0, minHeight: 30) {
+                                    hideShorts = false
+                                    hideWatched = false
+                                    reloadVisibleWatches()
+                                }
+                            }
+                        }
+                        .padding(.vertical, 10)
+                        #if os(tvOS)
+                            .padding(.horizontal, 40)
+                        #else
+                            .padding(.horizontal, 15)
+                        #endif
+                    } else {
+                        Group {
+                            switch widgetListingStyle {
+                            case .horizontalCells:
+                                HorizontalCells(items: limitedItems)
+                            case .list:
+                                ListView(items: limitedItems)
+                                    .padding(.vertical, 10)
+                                #if os(tvOS)
+                                    .padding(.leading, 40)
+                                #else
+                                    .padding(.leading, 15)
+                                #endif
+                            }
+                        }
                         .environment(\.inChannelView, inChannelView)
+                    }
                 }
                 .contentShape(Rectangle())
+
                 .onAppear {
-                    resource?.addObserver(store)
-                    loadCacheAndResource()
+                    if item.section == .history {
+                        reloadVisibleWatches()
+                    } else {
+                        resource?.addObserver(store)
+                        loadCacheAndResource()
+                    }
                 }
+                .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
+                .onChange(of: hideShorts) { _ in reloadVisibleWatches() }
+                .onChange(of: hideWatched) { _ in reloadVisibleWatches() }
             }
         }
+        .id(watchModel.historyToken)
         .onChange(of: accounts.current) { _ in
             resource?.addObserver(store)
             loadCacheAndResource(force: true)
         }
+        .onChange(of: watchModel.historyToken) { _ in
+            Delay.by(0.5) {
+                reloadVisibleWatches()
+            }
+        }
+        .onAppear {
+            Defaults.observe(.widgetsSettings) { _ in
+                watchModel.watchesChanged()
+            }
+            .tieToLifetime(of: accounts)
+        }
+    }
+
+    var emptyItemsText: String {
+        var filterText = ""
+        if hideShorts && hideWatched {
+            filterText = "(watched and shorts hidden)"
+        } else if hideShorts {
+            filterText = "(shorts hidden)"
+        } else if hideWatched {
+            filterText = "(watched hidden)"
+        }
+
+        return "No videos to show".localized() + " " + filterText.localized()
+    }
+
+    var contextMenu: some View {
+        Group {
+            if item.section == .history {
+                Section {
+                    Button {
+                        navigation.presentAlert(
+                            Alert(
+                                title: Text("Are you sure you want to clear history of watched videos?"),
+                                message: Text("This cannot be reverted"),
+                                primaryButton: .destructive(Text("Clear All")) {
+                                    PlayerModel.shared.removeHistory()
+                                    visibleWatches = []
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        )
+                    } label: {
+                        Label("Clear History", systemImage: "trash")
+                    }
+                }
+            }
+
+            Button {
+                favoritesModel.remove(item)
+            } label: {
+                Label("Remove from Favorites", systemImage: "trash")
+            }
+
+            #if os(tvOS)
+                Button("Cancel", role: .cancel) {}
+            #endif
+        }
+    }
+
+    func reloadVisibleWatches() {
+        guard item.section == .history else { return }
+
+        visibleWatches = []
+
+        let watches = Array(
+            watches
+                .filter { $0.videoID != player.currentVideo?.videoID && itemVisible(.init(video: $0.video)) }
+                .prefix(favoritesModel.limit(item))
+        )
+        let last = watches.last
+        watches.forEach { watch in
+            player.loadHistoryVideoDetails(watch) {
+                guard let video = player.historyVideo(watch.videoID), itemVisible(.init(video: video)) else { return }
+                visibleWatches.append(watch)
+                guard watch == last else { return }
+                visibleWatches.sort { $0.watchedAt ?? Date() > $1.watchedAt ?? Date() }
+            }
+        }
+    }
+
+    var limitedItems: [ContentItem] {
+        var items: [ContentItem]
+        if item.section == .history {
+            items = visibleWatches.map { ContentItem(video: player.historyVideo($0.videoID) ?? $0.video) }
+        } else {
+            items = store.contentItems.filter { itemVisible($0) }
+        }
+        return Array(items.prefix(favoritesModel.limit(item)))
+    }
+
+    func itemVisible(_ item: ContentItem) -> Bool {
+        if hideWatched, watch(item)?.finished ?? false {
+            return false
+        }
+
+        guard hideShorts, item.contentType == .video, let video = item.video else {
+            return true
+        }
+
+        return !video.short
+    }
+
+    func watch(_ item: ContentItem) -> Watch? {
+        watches.first { $0.videoID == item.video.videoID }
+    }
+
+    var widgetListingStyle: WidgetListingStyle {
+        favoritesModel.listingStyle(item)
     }
 
     func loadCacheAndResource(force: Bool = false) {
@@ -127,6 +284,10 @@ struct FavoriteItemView: View {
         }
     }
 
+    var navigatableItem: Bool {
+        item.section != .history
+    }
+
     var inChannelView: Bool {
         switch item.section {
         case .channel:
@@ -138,15 +299,20 @@ struct FavoriteItemView: View {
 
     var itemControl: some View {
         VStack {
-            #if os(tvOS)
-                itemButton
-            #else
-                if itemIsNavigationLink {
-                    itemNavigationLink
-                } else {
+            if navigatableItem {
+                #if os(tvOS)
                     itemButton
-                }
-            #endif
+                #else
+                    if itemIsNavigationLink {
+                        itemNavigationLink
+                    } else {
+                        itemButton
+                    }
+                #endif
+            } else {
+                itemLabel
+                    .foregroundColor(.secondary)
+            }
         }
     }
 
@@ -220,6 +386,8 @@ struct FavoriteItemView: View {
             navigation.openSearchQuery(text)
         case let .playlist(_, id):
             navigation.tabSelection = .playlist(id)
+        case .history:
+            print("should not happen")
         }
     }
 
@@ -227,8 +395,10 @@ struct FavoriteItemView: View {
         HStack {
             Text(label)
                 .font(.title3.bold())
-            Image(systemName: "chevron.right")
-                .imageScale(.small)
+            if navigatableItem {
+                Image(systemName: "chevron.right")
+                    .imageScale(.small)
+            }
         }
         .lineLimit(1)
         .padding(.trailing, 10)
@@ -255,6 +425,8 @@ struct FavoriteItemView: View {
 
     private var resource: Resource? {
         switch item.section {
+        case .history:
+            return nil
         case .subscriptions:
             if accounts.app.supportsSubscriptions {
                 return accounts.api.feed(1)

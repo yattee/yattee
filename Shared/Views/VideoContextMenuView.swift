@@ -160,6 +160,7 @@ struct VideoContextMenuView: View {
         Button {
             Watch.markAsWatched(videoID: video.videoID, account: accounts.current, duration: video.length, context: backgroundContext)
             FeedModel.shared.calculateUnwatchedFeed()
+            WatchModel.shared.watchesChanged()
         } label: {
             Label("Mark as watched", systemImage: "checkmark.circle.fill")
         }

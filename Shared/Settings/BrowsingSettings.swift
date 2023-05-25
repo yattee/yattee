@@ -9,19 +9,13 @@ struct BrowsingSettings: View {
     @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
     #if os(iOS)
-        @Default(.homeRecentDocumentsItems) private var homeRecentDocumentsItems
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
         @Default(.showDocuments) private var showDocuments
     #endif
     @Default(.thumbnailsQuality) private var thumbnailsQuality
     @Default(.channelOnThumbnail) private var channelOnThumbnail
     @Default(.timeOnThumbnail) private var timeOnThumbnail
-    @Default(.showHome) private var showHome
-    @Default(.showFavoritesInHome) private var showFavoritesInHome
-    @Default(.showQueueInHome) private var showQueueInHome
-    @Default(.showOpenActionsInHome) private var showOpenActionsInHome
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
-    @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.visibleSections) private var visibleSections
     @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
     @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
@@ -32,12 +26,11 @@ struct BrowsingSettings: View {
 
     @ObservedObject private var accounts = AccountsModel.shared
 
-    @State private var homeHistoryItemsText = ""
     #if os(iOS)
         @State private var homeRecentDocumentsItemsText = ""
     #endif
     #if os(macOS)
-        @State private var presentingEditFavoritesSheet = false
+        @State private var presentingHomeSettingsSheet = false
     #endif
 
     var body: some View {
@@ -83,79 +76,32 @@ struct BrowsingSettings: View {
         }
     }
 
-    private var homeSettings: some View {
-        Section(header: SettingsHeader(text: "Home".localized())) {
-            #if !os(tvOS)
-                if !accounts.isEmpty {
-                    Toggle("Show Home", isOn: $showHome)
-                }
-            #endif
-            Toggle("Show Open Videos quick actions", isOn: $showOpenActionsInHome)
-            Toggle("Show Next in Queue", isOn: $showQueueInHome)
-
-            #if os(iOS)
-                HStack {
-                    Text("Recent Documents")
-                    TextField("Recent Documents", text: $homeRecentDocumentsItemsText)
-                        .multilineTextAlignment(.trailing)
-                        .labelsHidden()
-                    #if !os(macOS)
-                        .keyboardType(.numberPad)
-                    #endif
-                        .onAppear {
-                            homeRecentDocumentsItemsText = String(homeRecentDocumentsItems)
-                        }
-                        .onChange(of: homeRecentDocumentsItemsText) { newValue in
-                            homeRecentDocumentsItems = Int(newValue) ?? 3
-                        }
-                }
-            #endif
-
-            HStack {
-                Text("Recent History")
-                TextField("Recent History", text: $homeHistoryItemsText)
-                    .multilineTextAlignment(.trailing)
-                    .labelsHidden()
-                #if !os(macOS)
-                    .keyboardType(.numberPad)
-                #endif
-                    .onAppear {
-                        homeHistoryItemsText = String(homeHistoryItems)
+    @ViewBuilder private var homeSettings: some View {
+        if !accounts.isEmpty {
+            Section(header: SettingsHeader(text: "Home".localized())) {
+                #if os(macOS)
+                    Button {
+                        presentingHomeSettingsSheet = true
+                    } label: {
+                        Text("Home Settings")
                     }
-                    .onChange(of: homeHistoryItemsText) { newValue in
-                        homeHistoryItems = Int(newValue) ?? 10
-                    }
-            }
-
-            if !accounts.isEmpty {
-                Toggle("Show Favorites", isOn: $showFavoritesInHome)
-
-                Group {
-                    #if os(macOS)
-                        Button {
-                            presentingEditFavoritesSheet = true
-                        } label: {
-                            Text("Edit Favorites…")
-                        }
-                        .sheet(isPresented: $presentingEditFavoritesSheet) {
-                            VStack(alignment: .leading) {
-                                Button("Done") {
-                                    presentingEditFavoritesSheet = false
-                                }
-                                .padding()
-                                .keyboardShortcut(.cancelAction)
-
-                                EditFavorites()
+                    .sheet(isPresented: $presentingHomeSettingsSheet) {
+                        VStack(alignment: .leading) {
+                            Button("Done") {
+                                presentingHomeSettingsSheet = false
                             }
-                            .frame(width: 500, height: 300)
+                            .padding()
+                            .keyboardShortcut(.cancelAction)
+
+                            HomeSettings()
                         }
-                    #else
-                        NavigationLink(destination: LazyView(EditFavorites())) {
-                            Text("Edit Favorites…")
-                        }
-                    #endif
-                }
-                .disabled(!showFavoritesInHome)
+                        .frame(width: 500, height: 800)
+                    }
+                #else
+                    NavigationLink(destination: LazyView(HomeSettings())) {
+                        Text("Home Settings")
+                    }
+                #endif
             }
         }
     }
