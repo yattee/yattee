@@ -316,6 +316,8 @@ struct VideoPlayerView: View {
                             }
                             .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
+                        } else {
+                            VStack {}
                         }
                     }
                 #endif
@@ -392,6 +394,8 @@ struct VideoPlayerView: View {
                         .background(colorScheme == .dark ? Color.black : Color.white)
                     }
                 #endif
+            } else {
+                VStack {}
             }
         }
         .onChange(of: fullScreenPlayer) { newValue in
