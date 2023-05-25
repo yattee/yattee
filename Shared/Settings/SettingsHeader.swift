@@ -10,10 +10,10 @@ struct SettingsHeader: View {
                 if secondary {
                     EmptyView()
                 } else {
-                    Text(text)
+                    Text(text.localized())
                 }
             #else
-                Text(text)
+                Text(text.localized())
             #endif
         }
         #if os(tvOS)
