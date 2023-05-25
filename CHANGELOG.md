@@ -1,4 +1,28 @@
-## Build 150
+## Build 151
+* Improved Home
+  - Added menu with view options on iOS and toolbar buttons on macOS/tvOS
+  - Added Home Settings
+  - Moved settings from Browsing to Home Settings
+  - Enhanced Favorites management: select listing type and videos limit for each element
+  - Select listing type for History just like for Favorites
+* Added view option to hide watched videos
+* Added Browsing setting "Startup section"
+* Added feed/channels list segmented picker in Subscriptions and moved view options menu on iOS
+* Thumbnails in list view respect "Round corners" setting
+* Added watching progress indicator to list view
+* Moved "Show toggle watch status button" to History settings
+* Removed "Rotate to portrait when exiting fullscreen" setting - it is instead automatically decided depending on device type
+* Fixed channels view layout on tvOS
+* Fixed channels and playlists navigation on tvOS
+* Fixed issue where controls were not visible when music mode was enabled
+* Fixed issue with closing Picture in Picture on macOS
+* Fixed issue where playing video with AVPlayer would cause it to be immediately marked as watched
+* Fixed issue with playlists view showing duplicated buttons when "Show cache status" is enabled
+* Fixed issue where navigating to channel from list view in Playlists and Search would immediately go back
+* Fixed issue where first URL would fail to open
+* Other minor fixes and improvements
+
+## Previous Builds
 * Added support for AVPlayer native system controls on iOS and macOS
   - Use system features such as AirPlay, subtitles switching (Piped with HLS), text detection and copy and more
   - Added Controls setting: "Use system controls with AVPlayer"
