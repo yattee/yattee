@@ -72,16 +72,16 @@ struct SubscriptionsView: View {
             Menu {
                 if subscriptionsViewPage == .feed {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+
+                    Section {
+                        HideWatchedButtons()
+                        HideShortsButtons()
+                    }
+
+                    playUnwatchedButton
+
+                    toggleWatchedButton
                 }
-
-                Section {
-                    HideWatchedButtons()
-                    HideShortsButtons()
-                }
-
-                playUnwatchedButton
-
-                toggleWatchedButton
 
                 Section {
                     SettingsButtons()
