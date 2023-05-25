@@ -14,6 +14,13 @@ struct OpenURLHandler {
     var navigationStyle: NavigationStyle
 
     func handle(_ url: URL) {
+        if Self.firstHandle {
+            Self.firstHandle = false
+
+            Delay.by(1) { handle(url) }
+            return
+        }
+
         if accounts.current.isNil {
             accounts.setCurrent(accounts.any)
         }
@@ -99,7 +106,8 @@ struct OpenURLHandler {
         #endif
 
         let video = Video(app: accounts.current.app!, videoID: id)
-        player.videoBeingOpened = video
+        player.videoBeingOpened = .init(app: accounts.current.app!, videoID: id, title: "Loading video...")
+        player.show()
 
         player
             .playerAPI(video)?
@@ -108,8 +116,9 @@ struct OpenURLHandler {
             .onSuccess { response in
                 if let video: Video = response.typedContent() {
                     let time = parser.time.isNil ? nil : CMTime.secondsInDefaultTimescale(TimeInterval(parser.time!))
-                    self.player.playNow(video, at: time)
-                    self.player.show()
+                    Delay.by(0.5) {
+                        self.player.playNow(video, at: time)
+                    }
                 } else {
                     navigation.presentAlert(title: "Error", message: "This video could not be opened")
                 }
