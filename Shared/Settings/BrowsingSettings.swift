@@ -17,6 +17,7 @@ struct BrowsingSettings: View {
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.visibleSections) private var visibleSections
+    @Default(.startupSection) private var startupSection
     @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
     @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
     @Default(.playerButtonShowsControlButtonsWhenMinimized) private var playerButtonShowsControlButtonsWhenMinimized
@@ -50,7 +51,7 @@ struct BrowsingSettings: View {
             #endif
         }
         #if os(tvOS)
-        .frame(maxWidth: 1000)
+        .frame(maxWidth: 1200)
         #else
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         #endif
@@ -60,25 +61,28 @@ struct BrowsingSettings: View {
     private var sections: some View {
         Group {
             homeSettings
+            if !accounts.isEmpty {
+                startupSectionPicker
+                visibleSectionsSettings
+            }
             let interface = interfaceSettings
             #if os(tvOS)
                 if !accounts.isEmpty {
                     interface
                 }
             #else
-                playerBarSettings
                 interface
+                playerBarSettings
             #endif
             if !accounts.isEmpty {
                 thumbnailsSettings
-                visibleSectionsSettings
             }
         }
     }
 
     @ViewBuilder private var homeSettings: some View {
         if !accounts.isEmpty {
-            Section(header: SettingsHeader(text: "Home".localized())) {
+            Section {
                 #if os(macOS)
                     Button {
                         presentingHomeSettingsSheet = true
@@ -204,37 +208,28 @@ struct BrowsingSettings: View {
 
     private var visibleSectionsSettings: some View {
         Section(header: SettingsHeader(text: "Sections".localized())) {
-            #if os(macOS)
-                let list = ForEach(VisibleSection.allCases, id: \.self) { section in
-                    MultiselectRow(
-                        title: section.title,
-                        selected: visibleSections.contains(section)
-                    ) { value in
-                        toggleSection(section, value: value)
-                    }
+            ForEach(VisibleSection.allCases, id: \.self) { section in
+                MultiselectRow(
+                    title: section.title,
+                    selected: visibleSections.contains(section)
+                ) { value in
+                    toggleSection(section, value: value)
                 }
+            }
+        }
+    }
 
-                Group {
-                    if #available(macOS 12.0, *) {
-                        list
-                            .listStyle(.inset(alternatesRowBackgrounds: true))
-                    } else {
-                        list
-                            .listStyle(.inset)
-                    }
-
-                    Spacer()
-                }
-            #else
-                ForEach(VisibleSection.allCases, id: \.self) { section in
-                    MultiselectRow(
-                        title: section.title,
-                        selected: visibleSections.contains(section)
-                    ) { value in
-                        toggleSection(section, value: value)
-                    }
-                }
+    private var startupSectionPicker: some View {
+        Group {
+            #if os(tvOS)
+                SettingsHeader(text: "Startup section".localized())
             #endif
+            Picker("Startup section", selection: $startupSection) {
+                ForEach(StartupSection.allCases, id: \.rawValue) { section in
+                    Text(section.label).tag(section)
+                }
+            }
+            .modifier(SettingsPickerModifier())
         }
     }
 

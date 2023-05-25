@@ -185,6 +185,7 @@ extension Defaults.Keys {
     static let trendingCountry = Key<Country>("trendingCountry", default: .us)
 
     static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.subscriptions, .trending, .playlists])
+    static let startupSection = Key<StartupSection>("startupSection", default: .home)
 
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
@@ -337,6 +338,31 @@ enum VisibleSection: String, CaseIterable, Comparable, Defaults.Serializable {
 
     static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.sortOrder < rhs.sortOrder
+    }
+}
+
+enum StartupSection: String, CaseIterable, Defaults.Serializable {
+    case home, subscriptions, popular, trending, playlists, search
+
+    var label: String {
+        rawValue.capitalized.localized()
+    }
+
+    var tabSelection: TabSelection {
+        switch self {
+        case .home:
+            return .home
+        case .subscriptions:
+            return .subscriptions
+        case .popular:
+            return .popular
+        case .trending:
+            return .trending
+        case .playlists:
+            return .playlists
+        case .search:
+            return .search
+        }
     }
 }
 
