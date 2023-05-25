@@ -31,7 +31,16 @@ struct SubscriptionsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    subscriptionsMenu
+                    HStack {
+                        Picker("Page", selection: $subscriptionsViewPage) {
+                            Label("Feed", systemImage: "film").tag(Page.feed)
+                            Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
+                        }
+                        .pickerStyle(.segmented)
+
+                        subscriptionsMenu
+                    }
+                    .frame(maxWidth: 500)
                 }
 
                 ToolbarItem {
@@ -61,11 +70,6 @@ struct SubscriptionsView: View {
     #if os(iOS)
         var subscriptionsMenu: some View {
             Menu {
-                Picker("Page", selection: $subscriptionsViewPage) {
-                    Label("Feed", systemImage: "film").tag(Page.feed)
-                    Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
-                }
-
                 if subscriptionsViewPage == .feed {
                     ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
                 }
@@ -84,12 +88,9 @@ struct SubscriptionsView: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    menuLabel
-                        .foregroundColor(.primary)
-
                     Image(systemName: "chevron.down.circle.fill")
                         .foregroundColor(.accentColor)
-                        .imageScale(.small)
+                        .imageScale(.large)
                 }
                 .transaction { t in t.animation = nil }
             }
