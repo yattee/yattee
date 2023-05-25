@@ -590,3 +590,5 @@
 "(shorts hidden)" = "(krótkie ukryte)";
 "Disable filters" = "Wyłącz filtry";
 "(watched hidden)" = "(obejrzane ukryte)";
+"Limit" = "Limit";
+"Are you sure you want to remove %@ from Favorites?" = "Czy na pewno chcesz usunąć element: %@ z Ulubionych?";
