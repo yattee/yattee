@@ -387,7 +387,7 @@ final class PlayerModel: ObservableObject {
         if !upgrading, !video.isLocal {
             resetSegments()
 
-            DispatchQueue.main.async { [weak self] in
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 self?.sponsorBlock.loadSegments(
                     videoID: video.videoID,
                     categories: Defaults[.sponsorBlockCategories]
@@ -407,15 +407,19 @@ final class PlayerModel: ObservableObject {
             resetSegments()
         }
 
-        (withBackend ?? backend).playStream(
-            stream,
-            of: video,
-            preservingTime: preservingTime,
-            upgrading: upgrading
-        )
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.25) {
+            (withBackend ?? self.backend).playStream(
+                stream,
+                of: video,
+                preservingTime: preservingTime,
+                upgrading: upgrading
+            )
+        }
 
         if !upgrading {
-            updateCurrentArtwork()
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
+                self.updateCurrentArtwork()
+            }
         }
     }
 
