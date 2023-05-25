@@ -52,7 +52,7 @@ struct PlayerControls: View {
     }
 
     var showControls: Bool {
-        player.activeBackend == .mpv || !avPlayerUsesSystemControls
+        player.activeBackend == .mpv || !avPlayerUsesSystemControls || player.musicMode
     }
 
     var body: some View {
