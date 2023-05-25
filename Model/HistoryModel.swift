@@ -69,7 +69,7 @@ extension PlayerModel {
 
             let watch: Watch!
 
-            let duration = self.playerTime.duration.seconds
+            let duration = activeBackend == .mpv ? self.playerTime.duration.seconds : avPlayerBackend.playerItemDuration?.seconds ?? 0
 
             if results?.isEmpty ?? true {
                 watch = Watch(context: self.backgroundContext)
