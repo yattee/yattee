@@ -44,10 +44,16 @@ struct VideoDetails: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
-                        Text(model.videoForDisplay?.channel.name ?? "Yattee")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
+                        if let name = model.videoForDisplay?.channel.name, !name.isEmpty {
+                            Text(name)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                        } else if model.videoBeingOpened != nil {
+                            Text("Yattee")
+                                .font(.subheadline)
+                                .redacted(reason: .placeholder)
+                        }
 
                         if let video, !video.isLocal {
                             Group {
