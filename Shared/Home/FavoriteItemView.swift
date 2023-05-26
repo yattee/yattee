@@ -23,6 +23,7 @@ struct FavoriteItemView: View {
     @Default(.hideShorts) private var hideShorts
     @Default(.hideWatched) private var hideWatched
     @Default(.widgetsSettings) private var widgetsSettings
+    @Default(.visibleSections) private var visibleSections
 
     init(item: FavoriteItem) {
         self.item = item
@@ -285,7 +286,18 @@ struct FavoriteItemView: View {
     }
 
     var navigatableItem: Bool {
-        item.section != .history
+        switch item.section {
+        case .history:
+            return false
+        case .trending:
+            return visibleSections.contains(.trending)
+        case .subscriptions:
+            return visibleSections.contains(.subscriptions) && accounts.signedIn
+        case .popular:
+            return visibleSections.contains(.popular) && accounts.app.supportsPopular
+        default:
+            return true
+        }
     }
 
     var inChannelView: Bool {
