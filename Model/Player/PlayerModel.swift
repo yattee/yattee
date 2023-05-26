@@ -626,6 +626,7 @@ final class PlayerModel: ObservableObject {
     func closeCurrentItem(finished: Bool = false) {
         pause()
         videoBeingOpened = nil
+        advancing = false
         forceBackendOnPlay = nil
 
         closing = true

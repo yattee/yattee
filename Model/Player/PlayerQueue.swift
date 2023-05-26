@@ -364,10 +364,7 @@ extension PlayerModel {
                 message: Text(message),
                 primaryButton: .cancel { [weak self] in
                     guard let self else { return }
-                    self.advancing = false
-                    self.videoBeingOpened = nil
-                    self.currentItem = nil
-                    self.hide()
+                    self.closeCurrentItem()
                 },
                 secondaryButton: retryButton
             )
