@@ -579,3 +579,15 @@
 "Your Accounts" = "Conturi tale";
 "Browse without account" = "Navigați fără cont";
 "Close video and player on end" = "Închideți videoclipul și player-ul la sfârșit";
+"Available" = "Disponibil";
+"Startup section" = "Secțiunea de pornire";
+"Watched: hidden" = "Vizionat: ascuns";
+"Watched: visible" = "Vizionat: vizibil";
+"Disable filters" = "Dezactivează filtrele";
+"Home Settings" = "Setări de acasă";
+"(watched and shorts hidden)" = "(vizionat și shorts ascunse)";
+"No videos to show" = "fără videoclipuri de afișat";
+"(watched hidden)" = "(vizionat ascuns)";
+"(shorts hidden)" = "(shorts ascunse)";
+"Limit" = "Limită";
+"Are you sure you want to remove %@ from Favorites?" = "Sigur doriți să eliminați %@ din Favorite?";
