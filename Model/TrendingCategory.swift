@@ -41,4 +41,8 @@ enum TrendingCategory: String, CaseIterable, Identifiable, Defaults.Serializable
     var controlLabel: String {
         id == "default" ? "All".localized() : title
     }
+
+    var type: String {
+        rawValue.capitalized
+    }
 }
