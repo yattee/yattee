@@ -37,6 +37,7 @@ struct SubscriptionsView: View {
                             Label("Channels", systemImage: "person.3.fill").tag(Page.channels)
                         }
                         .pickerStyle(.segmented)
+                        .labelStyle(.titleOnly)
 
                         subscriptionsMenu
                     }
