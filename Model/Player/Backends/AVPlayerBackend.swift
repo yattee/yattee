@@ -333,6 +333,10 @@ final class AVPlayerBackend: PlayerBackend {
                     return
                 }
 
+                if self.model.musicMode {
+                    startMusicMode()
+                }
+
                 if !preservingTime,
                    !self.model.transitioningToPiP,
                    let segment = self.model.sponsorBlock.segments.first,
