@@ -333,6 +333,7 @@ struct SearchView: View {
         NavigationLink(destination: recentItemNavigationLinkDestination(item)) {
             recentItemLabel(item)
         }
+        .contextMenu { recentItemContextMenu(item) }
     }
 
     @ViewBuilder private func recentItemNavigationLinkDestination(_ item: RecentItem) -> some View {
@@ -393,7 +394,11 @@ struct SearchView: View {
         } label: {
             recentItemLabel(item)
         }
-        .contextMenu {
+        .contextMenu { recentItemContextMenu(item) }
+    }
+
+    private func recentItemContextMenu(_ item: RecentItem) -> some View {
+        Group {
             removeButton(item)
 
             #if os(tvOS)
