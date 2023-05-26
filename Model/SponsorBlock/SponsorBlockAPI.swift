@@ -75,7 +75,7 @@ final class SponsorBlockAPI: ObservableObject {
 
         self.videoID = videoID
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             self?.requestSegments(categories: categories, completionHandler: completionHandler)
         }
     }
