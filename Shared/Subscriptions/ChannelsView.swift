@@ -11,20 +11,28 @@ struct ChannelsView: View {
 
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
+    @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
+
+    @State private var channelLinkActive = false
+    @State private var channelForLink: Channel?
 
     var body: some View {
         List {
             Section(header: header) {
-                ForEach(subscriptions.all) { channel in
+                ForEach(channels) { channel in
                     let label = HStack {
                         if let url = channel.thumbnailURLOrCached {
                             ThumbnailView(url: url)
                                 .frame(width: 35, height: 35)
                                 .clipShape(RoundedRectangle(cornerRadius: 35))
-                            Text(channel.name)
                         } else {
-                            Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
+                            Image(systemName: RecentsModel.symbolSystemImage(channel.name))
+                                .imageScale(.large)
+                                .foregroundColor(.accentColor)
+                                .frame(width: 35, height: 35)
                         }
+                        Text(channel.name)
+                            .lineLimit(1)
                     }
                     .backport
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
@@ -37,9 +45,15 @@ struct ChannelsView: View {
                                 label
                             }
                         #else
-                            NavigationLink(destination: ChannelVideosView(channel: channel)) {
+                            Button {
+                                channelForLink = channel
+                                channelLinkActive = channelForLink != nil
+                            } label: {
                                 label
+                                    .contentShape(Rectangle())
+                                    .foregroundColor(.primary)
                             }
+                            .buttonStyle(.plain)
                         #endif
                     }
                     .contextMenu {
@@ -63,6 +77,9 @@ struct ChannelsView: View {
                     .listRowSeparator(false)
             }
         }
+        .background(
+            NavigationLink(destination: ChannelVideosView(channel: channelForLink), isActive: $channelLinkActive, label: EmptyView.init)
+        )
         .onAppear {
             subscriptions.load()
         }
@@ -97,6 +114,10 @@ struct ChannelsView: View {
         #if os(tvOS)
         .padding(.horizontal, 30)
         #endif
+    }
+
+    var channels: [Channel] {
+        keepChannelsWithUnwatchedFeedOnTop ? subscriptions.allByUnwatchedCount : subscriptions.all
     }
 
     var header: some View {

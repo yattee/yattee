@@ -23,6 +23,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
     @Published var error: RequestError?
 
     var accounts: AccountsModel { .shared }
+    var unwatchedFeedCount: UnwatchedFeedCountModel { .shared }
 
     var resource: Resource? {
         accounts.api.subscriptions
@@ -30,6 +31,19 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
 
     var all: [Channel] {
         channels.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
+    var allByUnwatchedCount: [Channel] {
+        if let account = accounts.current {
+            return all.sorted { c1, c2 in
+                let c1HasUnwatched = (unwatchedFeedCount.unwatchedByChannel[account]?[c1.id] ?? -1) > 0
+                let c2HasUnwatched = (unwatchedFeedCount.unwatchedByChannel[account]?[c2.id] ?? -1) > 0
+                let nameIncreasing = c1.name.lowercased() < c2.name.lowercased()
+
+                return c1HasUnwatched ? (c2HasUnwatched ? nameIncreasing : true) : (c2HasUnwatched ? false : nameIncreasing)
+            }
+        }
+        return all
     }
 
     func subscribe(_ channelID: String, onSuccess: @escaping () -> Void = {}) {

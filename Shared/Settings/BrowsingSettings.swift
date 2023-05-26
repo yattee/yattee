@@ -8,6 +8,7 @@ struct BrowsingSettings: View {
     #endif
     @Default(.accountPickerDisplaysAnonymousAccounts) private var accountPickerDisplaysAnonymousAccounts
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
+    @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
     #if os(iOS)
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
         @Default(.showDocuments) private var showDocuments
@@ -180,9 +181,11 @@ struct BrowsingSettings: View {
                             FeedModel.shared.calculateUnwatchedFeed()
                         }
                     }
+
+                Toggle("Open channels with description expanded", isOn: $expandChannelDescription)
             }
 
-            Toggle("Open channels with description expanded", isOn: $expandChannelDescription)
+            Toggle("Keep channels with unwatched videos on top of subscriptions list", isOn: $keepChannelsWithUnwatchedFeedOnTop)
         }
     }
 
