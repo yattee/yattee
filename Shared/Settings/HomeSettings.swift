@@ -124,6 +124,8 @@ struct FavoriteItemEditor: View {
 
     @State private var presentingRemoveAlert = false
 
+    @Default(.favorites) private var favorites
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -132,13 +134,13 @@ struct FavoriteItemEditor: View {
                 Spacer()
 
                 HStack(spacing: 10) {
-                    FavoriteItemEditorButton {
+                    FavoriteItemEditorButton(color: model.canMoveUp(item) ? .accentColor : .secondary) {
                         Label("Move Up", systemImage: "arrow.up")
                     } onTapGesture: {
                         model.moveUp(item)
                     }
 
-                    FavoriteItemEditorButton {
+                    FavoriteItemEditorButton(color: model.canMoveDown(item) ? .accentColor : .secondary) {
                         Label("Move Down", systemImage: "arrow.down")
                     } onTapGesture: {
                         model.moveDown(item)
