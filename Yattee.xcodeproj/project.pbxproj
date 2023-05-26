@@ -686,6 +686,9 @@
 		379DC3D128BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D228BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D328BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
+		379E7C332A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
+		379E7C342A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
+		379E7C362A2105B900AF8118 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 379E7C352A2105B900AF8118 /* Introspect */; };
 		379EF9E029AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
 		379EF9E129AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
 		379EF9E229AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
@@ -1386,6 +1389,7 @@
 		379ACB502A1F8DB000E01914 /* HomeSettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSettingsButton.swift; sourceTree = "<group>"; };
 		379B0252287A1CDF001015B5 /* OrientationTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrientationTracker.swift; sourceTree = "<group>"; };
 		379DC3D028BA4EB400B09677 /* Seek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seek.swift; sourceTree = "<group>"; };
+		379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusableSearchTextField.swift; sourceTree = "<group>"; };
 		379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = HideShortsButtons.swift; sourceTree = "<group>"; };
 		379F141E289ECE7F00DE48B5 /* QualitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualitySettings.swift; sourceTree = "<group>"; };
 		37A2B345294723850050933E /* CacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModel.swift; sourceTree = "<group>"; };
@@ -1626,6 +1630,7 @@
 				37F7AB5228A94EB900FB46B5 /* IOKit.framework in Frameworks */,
 				370F4FDF27CC16CB001B35DC /* libxcb-shape.0.0.0.dylib in Frameworks */,
 				370F4FE127CC16CB001B35DC /* libuchardet.0.0.7.dylib in Frameworks */,
+				379E7C362A2105B900AF8118 /* Introspect in Frameworks */,
 				370F4FDB27CC16CB001B35DC /* libswscale.6.4.100.dylib in Frameworks */,
 				370F4FDC27CC16CB001B35DC /* libavutil.57.17.100.dylib in Frameworks */,
 				370F4FE327CC16CB001B35DC /* libbrotlicommon.1.dylib in Frameworks */,
@@ -2187,6 +2192,7 @@
 		3782B95527557A2400990149 /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */,
 				3782B94E27553A6700990149 /* SearchSuggestions.swift */,
 				374710042755291C00CE0F87 /* SearchTextField.swift */,
 				37AAF27F26737550007FC770 /* SearchView.swift */,
@@ -2686,6 +2692,7 @@
 				374D11E62943C56300CB4350 /* Cache */,
 				371AC0B1294D1C230085989E /* CachedAsyncImage */,
 				379325D629A265AE00181CF1 /* Logging */,
+				379E7C352A2105B900AF8118 /* Introspect */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -3122,6 +3129,7 @@
 				374924DA2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				378FFBC428660172009E3FBE /* URLParser.swift in Sources */,
 				3784B23D2728B85300B09468 /* ShareButton.swift in Sources */,
+				379E7C332A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */,
 				37EAD86B267B9C5600D9E01B /* SponsorBlockAPI.swift in Sources */,
 				3743CA52270F284F00E4D32B /* View+Borders.swift in Sources */,
 				3763495126DFF59D00B9A393 /* AppSidebarRecents.swift in Sources */,
@@ -3440,6 +3448,7 @@
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
 				374924DB2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
+				379E7C342A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */,
 				37F5C7E12A1E2AF300927B73 /* ListView.swift in Sources */,
 				37192D5828B179D60012EEDD /* ChaptersView.swift in Sources */,
 				3784CDE327772EE40055BBF2 /* Watch.swift in Sources */,
@@ -5165,6 +5174,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */;
 			productName = ActiveLabel;
+		};
+		379E7C352A2105B900AF8118 /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
 		};
 		37BADCA42699FB72009BE4FB /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;

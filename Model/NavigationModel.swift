@@ -63,7 +63,9 @@ final class NavigationModel: ObservableObject {
         }
     }
 
-    @Published var tabSelection: TabSelection!
+    @Published var tabSelection: TabSelection! { didSet {
+        if oldValue == tabSelection { multipleTapHandler() }
+    }}
 
     @Published var presentingAddToPlaylist = false
     @Published var videoToAddToPlaylist: Video!
@@ -294,6 +296,15 @@ final class NavigationModel: ObservableObject {
     func presentChannelInSheet(_ channel: Channel) {
         channelPresentedInSheet = channel
         presentingChannelSheet = true
+    }
+
+    func multipleTapHandler() {
+        switch tabSelection {
+        case .search:
+            self.search.focused = true
+        default:
+            print("not implemented")
+        }
     }
 }
 

@@ -39,7 +39,9 @@ final class RecentsModel: ObservableObject {
 
     func addQuery(_ query: String) {
         if !query.isEmpty {
-            NavigationModel.shared.tabSelection = .search
+            if NavigationModel.shared.tabSelection != .search {
+                NavigationModel.shared.tabSelection = .search
+            }
             add(.init(from: query))
         }
     }
