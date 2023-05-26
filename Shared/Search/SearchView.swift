@@ -244,22 +244,12 @@ struct SearchView: View {
             if showRecentQueries {
                 recentQueries
             } else {
-                VerticalCells(items: state.store.collection, allowEmpty: state.query.isEmpty) {
+                VerticalCells(items: state.store.collection, isLoading: state.isLoading) {
                     if shouldDisplayHeader {
                         header
                     }
                 }
                 .environment(\.loadMoreContentHandler) { state.loadNextPage() }
-
-                if noResults {
-                    Text("No results")
-
-                    if searchFiltersActive {
-                        Button("Reset search filters", action: resetFilters)
-                    }
-
-                    Spacer()
-                }
             }
         }
     }
@@ -278,12 +268,6 @@ struct SearchView: View {
 
     private var filtersActive: Bool {
         searchDuration != .any || searchDate != .any
-    }
-
-    private func resetFilters() {
-        searchSortOrder = .relevance
-        searchDate = .any
-        searchDuration = .any
     }
 
     private var noResults: Bool {

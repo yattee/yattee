@@ -20,7 +20,7 @@ struct PopularView: View {
     }
 
     var body: some View {
-        VerticalCells(items: videos) { if shouldDisplayHeader { header } }
+        VerticalCells(items: videos, isLoading: resource?.isLoading ?? false) { if shouldDisplayHeader { header } }
             .onAppear {
                 resource?.addObserver(store)
                 resource?.loadIfNeeded()?

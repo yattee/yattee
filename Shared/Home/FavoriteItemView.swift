@@ -42,21 +42,9 @@ struct FavoriteItemView: View {
                         .padding(.leading, 15)
                     #endif
 
-                    if limitedItems.isEmpty, !(resource?.isLoading ?? false) {
-                        VStack(alignment: .leading) {
-                            Text(emptyItemsText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.secondary)
-
-                            if hideShorts || hideWatched {
-                                AccentButton(text: "Disable filters", maxWidth: nil, verticalPadding: 0, minHeight: 30) {
-                                    hideShorts = false
-                                    hideWatched = false
-                                    reloadVisibleWatches()
-                                }
-                            }
-                        }
-                        .padding(.vertical, 10)
+                    if limitedItems.isEmpty {
+                        EmptyItems(isLoading: resource?.isLoading ?? false) { reloadVisibleWatches() }
+                            .padding(.vertical, 10)
                         #if os(tvOS)
                             .padding(.horizontal, 40)
                         #else
@@ -111,19 +99,6 @@ struct FavoriteItemView: View {
             }
             .tieToLifetime(of: accounts)
         }
-    }
-
-    var emptyItemsText: String {
-        var filterText = ""
-        if hideShorts && hideWatched {
-            filterText = "(watched and shorts hidden)"
-        } else if hideShorts {
-            filterText = "(shorts hidden)"
-        } else if hideWatched {
-            filterText = "(watched hidden)"
-        }
-
-        return "No videos to show".localized() + " " + filterText.localized()
     }
 
     var contextMenu: some View {
