@@ -198,6 +198,7 @@ extension Defaults.Keys {
     #endif
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
+    static let showPlayNowInBackendContextMenu = Key<Bool>("showPlayNowInBackendContextMenu", default: false)
 
     #if os(macOS)
         static let playerDetailsPageButtonLabelStyleDefault = ButtonLabelStyle.iconAndText

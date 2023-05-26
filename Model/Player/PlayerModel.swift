@@ -55,6 +55,7 @@ final class PlayerModel: ObservableObject {
 
     @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
+    @Published var forceBackendOnPlay: PlayerBackendType?
 
     var avPlayerBackend = AVPlayerBackend()
     var mpvBackend = MPVBackend()
@@ -416,6 +417,10 @@ final class PlayerModel: ObservableObject {
             )
         }
 
+        DispatchQueue.main.async {
+            self.forceBackendOnPlay = nil
+        }
+
         if !upgrading {
             DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.5) {
                 self.updateCurrentArtwork()
@@ -452,7 +457,7 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        if let backend = (live && forceAVPlayerForLiveStreams) ? PlayerBackendType.appleAVPlayer : qualityProfile?.backend,
+        if let backend = forceBackendOnPlay ?? ((live && forceAVPlayerForLiveStreams) ? PlayerBackendType.appleAVPlayer : qualityProfile?.backend),
            backend != activeBackend,
            backend == .appleAVPlayer || !(avPlayerBackend.startPictureInPictureOnPlay || playingInPictureInPicture)
         {
@@ -621,6 +626,7 @@ final class PlayerModel: ObservableObject {
     func closeCurrentItem(finished: Bool = false) {
         pause()
         videoBeingOpened = nil
+        forceBackendOnPlay = nil
 
         closing = true
         controls.presentingControls = false

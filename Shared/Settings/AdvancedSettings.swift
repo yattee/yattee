@@ -8,6 +8,7 @@ struct AdvancedSettings: View {
     @Default(.mpvEnableLogging) private var mpvEnableLogging
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
+    @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
 
     @State private var filesToShare = [MPVClient.logFile]
     @State private var presentingShareSheet = false
@@ -56,6 +57,10 @@ struct AdvancedSettings: View {
     }
 
     @ViewBuilder var advancedSettings: some View {
+        Section(header: SettingsHeader(text: "Advanced")) {
+            showPlayNowInBackendButtonsToggle
+        }
+
         Section(header: SettingsHeader(text: "MPV"), footer: mpvFooter) {
             showMPVPlaybackStatsToggle
             #if !os(tvOS)
@@ -113,6 +118,10 @@ struct AdvancedSettings: View {
             }
         }
         .foregroundColor(.secondary)
+    }
+
+    var showPlayNowInBackendButtonsToggle: some View {
+        Toggle("Show video context menu options to force selected backend", isOn: $showPlayNowInBackendContextMenu)
     }
 
     var showMPVPlaybackStatsToggle: some View {

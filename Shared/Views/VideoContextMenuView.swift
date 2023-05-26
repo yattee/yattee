@@ -21,6 +21,7 @@ struct VideoContextMenuView: View {
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
     @Default(.saveHistory) private var saveHistory
+    @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
 
     private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
@@ -69,6 +70,14 @@ struct VideoContextMenuView: View {
                     playNowInPictureInPictureButton
                     playNowInMusicMode
                 #endif
+            }
+
+            if showPlayNowInBackendContextMenu {
+                Section {
+                    ForEach(PlayerBackendType.allCases, id: \.self) { backend in
+                        playNowInBackendButton(backend)
+                    }
+                }
             }
 
             Section {
@@ -184,6 +193,20 @@ struct VideoContextMenuView: View {
             player.play(video)
         } label: {
             Label("Play Now", systemImage: "play")
+        }
+    }
+
+    private func playNowInBackendButton(_ backend: PlayerBackendType) -> some View {
+        Button {
+            if player.musicMode {
+                player.toggleMusicMode()
+            }
+
+            player.forceBackendOnPlay = backend
+
+            player.play(video)
+        } label: {
+            Label("Play Now in \(backend.label)", systemImage: "play")
         }
     }
 
