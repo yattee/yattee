@@ -27,9 +27,11 @@ struct AccentButton: View {
             .frame(maxWidth: maxWidth)
             .contentShape(Rectangle())
         }
+        #if !os(tvOS)
         .foregroundColor(.accentColor)
         .buttonStyle(.plain)
         .background(buttonBackground)
+        #endif
     }
 
     var buttonBackground: some View {
@@ -40,6 +42,11 @@ struct AccentButton: View {
 
 struct OpenVideosButton_Previews: PreviewProvider {
     static var previews: some View {
-        AccentButton(text: "Open Videos", imageSystemName: "play.circle.fill")
+        VStack {
+            AccentButton(text: "Open Videos", imageSystemName: "play.circle.fill")
+                .padding(.horizontal, 100)
+            AccentButton(text: "Open Videos", imageSystemName: "play.circle.fill")
+                .padding(.horizontal, 100)
+        }
     }
 }

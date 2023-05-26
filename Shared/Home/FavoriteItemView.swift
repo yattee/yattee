@@ -321,7 +321,9 @@ struct FavoriteItemView: View {
             itemLabel
                 .foregroundColor(.accentColor)
         }
+        #if !os(tvOS)
         .buttonStyle(.plain)
+        #endif
     }
 
     var itemNavigationLink: some View {
