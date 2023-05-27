@@ -202,7 +202,7 @@
 "Translations" = "翻訳";
 "Could not refresh Playlists" = "再生リストを更新できません";
 "No locations available at the moment" = "現時点で利用可能な場所がありません";
-"Show Open Videos quick actions" = "クイック操作に動画を開くを表示";
+"Show Open Videos quick actions" = "動画を開くクイック操作を表示";
 "Show Documents" = "文書を表示";
 "Pages toolbar position" = "ページのツールバー位置";
 "Buttons labels" = "ボタンのラベル";
@@ -513,9 +513,9 @@
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "クレジットのポップアップやエンドカードが表示される、映像の最後のあたりに表示されます。";
 "Verified" = "認証済み";
 "Mark channel feed as unwatched" = "チャンネルフィードを未視聴にする";
-"Open expanded" = "展開時に";
+"Open expanded" = "展開したまま開く";
 "Short videos: hidden" = "ショート動画: 非表示";
-"Player Bar" = "プレイヤーのバー";
+"Player Bar" = "プレイヤーバー";
 "Play all unwatched" = "未視聴をすべて再生";
 "Double tap gesture" = "ダブルタップ";
 "Single tap gesture" = "シングルタップ";
@@ -531,7 +531,7 @@
 "Switch to public locations" = "公開された場所に切り替え";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。";
 "Proxy videos" = "動画閲覧にプロキシ使用";
-"Sections" = "表示部分";
+"Sections" = "表示する部分";
 "System controls show buttons for %@" = "システム制御「%@」用のボタンを表示";
 "You need to create an instance and accounts\nto access %@ section" = "%@ セクションの利用には\nインスタンスとアカウントの作成が必要";
 "You need to select an account\nto access %@ section" = "%@ セクションの利用には\nアカウントの選択が必要";
@@ -577,3 +577,14 @@
 "Show Next in Queue" = "「次の再生キュー」を表示";
 "Next in Queue" = "次の再生キュー";
 "Inspector" = "ファイルの詳細情報";
+"Available" = "選択候補";
+"Startup section" = "起動時の表示";
+"Home Settings" = "ホームの設定";
+"Watched: hidden" = "視聴済み: 隠す";
+"Watched: visible" = "視聴済み: 表示";
+"No videos to show" = "表示する動画なし";
+"(watched and shorts hidden)" = "(視聴済み/ショート非表示)";
+"(shorts hidden)" = "(ショート非表示)";
+"(watched hidden)" = "(視聴済み非表示)";
+"Disable filters" = "絞り込み解除";
+"Are you sure you want to remove %@ from Favorites?" = "お気に入りから %@ を除去しますか？";
