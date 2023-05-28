@@ -579,3 +579,15 @@
 "Landscape left" = "Querformat links";
 "Landscape right" = "Querformat rechts";
 "No rotation" = "Keine Drehung";
+"Available" = "Verfügbar";
+"Startup section" = "Bereich Startup";
+"Home Settings" = "Startseite Einstellungen";
+"Watched: hidden" = "Beobachtet: versteckt";
+"(watched and shorts hidden)" = "(beobachtet und shorts versteckt)";
+"Watched: visible" = "Beobachtet: sichtbar";
+"No videos to show" = "Keine Videos zu zeigen";
+"(watched hidden)" = "(versteckt beobachtet)";
+"(shorts hidden)" = "(shorts versteckt)";
+"Disable filters" = "Filter deaktivieren";
+"Limit" = "Grenze";
+"Are you sure you want to remove %@ from Favorites?" = "Möchten Sie %@ wirklich aus den Favoriten entfernen?";
