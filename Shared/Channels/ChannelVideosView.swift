@@ -4,7 +4,7 @@ import Siesta
 import SwiftUI
 
 struct ChannelVideosView: View {
-    var channel: Channel?
+    var channel: Channel
     var showCloseButton = false
     var inNavigationView = true
 
@@ -32,7 +32,7 @@ struct ChannelVideosView: View {
     @Default(.expandChannelDescription) private var expandChannelDescription
 
     var presentedChannel: Channel? {
-        store.item?.channel ?? channel ?? recents.presentedChannel
+        store.item?.channel ?? channel
     }
 
     var contentItems: [ContentItem] {
@@ -165,10 +165,7 @@ struct ChannelVideosView: View {
         .onAppear {
             descriptionExpanded = expandChannelDescription
 
-            if let channel,
-               let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey),
-               store.item.isNil
-            {
+            if let cache = ChannelsCacheModel.shared.retrieve(channel.cacheKey), store.item.isNil {
                 store.replace(cache)
             }
 

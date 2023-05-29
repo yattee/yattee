@@ -176,9 +176,9 @@ struct AppTabNavigation: View {
     }
 
     @ViewBuilder private var channelView: some View {
-        if navigation.presentingChannel {
+        if navigation.presentingChannel, let channel = recents.presentedChannel {
             NavigationView {
-                ChannelVideosView(showCloseButton: true)
+                ChannelVideosView(channel: channel, showCloseButton: true)
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .environment(\.inChannelView, true)

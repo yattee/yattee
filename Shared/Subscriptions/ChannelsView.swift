@@ -78,7 +78,7 @@ struct ChannelsView: View {
             }
         }
         .background(
-            NavigationLink(destination: ChannelVideosView(channel: channelForLink), isActive: $channelLinkActive, label: EmptyView.init)
+            NavigationLink(destination: ChannelVideosView(channel: channelForLink ?? Video.fixture.channel), isActive: $channelLinkActive, label: EmptyView.init)
         )
         .onAppear {
             subscriptions.load()
