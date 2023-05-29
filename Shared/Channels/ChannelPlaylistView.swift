@@ -3,7 +3,7 @@ import Siesta
 import SwiftUI
 
 struct ChannelPlaylistView: View {
-    var playlist: ChannelPlaylist?
+    var playlist: ChannelPlaylist
     var showCloseButton = false
 
     @StateObject private var store = Store<ChannelPlaylist>()
@@ -19,15 +19,7 @@ struct ChannelPlaylistView: View {
         ContentItem.array(of: store.item?.videos ?? [])
     }
 
-    private var presentedPlaylist: ChannelPlaylist? {
-        playlist ?? recents.presentedPlaylist
-    }
-
     private var resource: Resource? {
-        guard let playlist = presentedPlaylist else {
-            return nil
-        }
-
         let resource = accounts.api.channelPlaylist(playlist.id)
         resource?.addObserver(store)
 
@@ -38,21 +30,19 @@ struct ChannelPlaylistView: View {
         VStack(alignment: .leading) {
             #if os(tvOS)
                 HStack {
-                    if let playlist = presentedPlaylist {
-                        ThumbnailView(url: store.item?.thumbnailURL ?? playlist.thumbnailURL)
-                            .frame(width: 140, height: 80)
-                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                    ThumbnailView(url: store.item?.thumbnailURL ?? playlist.thumbnailURL)
+                        .frame(width: 140, height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 2))
 
-                        Text(playlist.title)
-                            .font(.headline)
-                            .frame(alignment: .leading)
-                            .lineLimit(1)
+                    Text(playlist.title)
+                        .font(.headline)
+                        .frame(alignment: .leading)
+                        .lineLimit(1)
 
-                        Spacer()
+                    Spacer()
 
-                        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
-                            .labelStyle(.iconOnly)
-                    }
+                    FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
+                        .labelStyle(.iconOnly)
 
                     playButtons
                         .labelStyle(.iconOnly)
@@ -63,9 +53,7 @@ struct ChannelPlaylistView: View {
         }
         .environment(\.listingStyle, channelPlaylistListingStyle)
         .onAppear {
-            if let playlist = presentedPlaylist,
-               let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist)
-            {
+            if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist) {
                 store.replace(cache)
             }
             resource?.loadIfNeeded()?.onSuccess { response in
@@ -111,14 +99,12 @@ struct ChannelPlaylistView: View {
                 }
             }
         }
-        .navigationTitle(label)
+        .navigationTitle(playlist.title)
         #endif
     }
 
     @ViewBuilder private var favoriteButton: some View {
-        if let playlist = presentedPlaylist {
-            FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
-        }
+        FavoriteButton(item: FavoriteItem(section: .channelPlaylist(accounts.app.appType.rawValue, playlist.id, playlist.title)))
     }
 
     #if os(iOS)
@@ -140,13 +126,13 @@ struct ChannelPlaylistView: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    if let url = store.item?.thumbnailURL ?? playlist?.thumbnailURL {
+                    if let url = store.item?.thumbnailURL ?? playlist.thumbnailURL {
                         ThumbnailView(url: url)
                             .frame(width: 60, height: 30)
                             .clipShape(RoundedRectangle(cornerRadius: 2))
                     }
 
-                    Text(label)
+                    Text(playlist.title)
                         .font(.headline)
                         .foregroundColor(.primary)
 
@@ -159,10 +145,6 @@ struct ChannelPlaylistView: View {
             }
         }
     #endif
-
-    private var label: String {
-        presentedPlaylist?.title ?? ""
-    }
 
     private var playlistButtonsPlacement: ToolbarItemPlacement {
         #if os(iOS)

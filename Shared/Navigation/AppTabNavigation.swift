@@ -7,6 +7,7 @@ struct AppTabNavigation: View {
     private var player = PlayerModel.shared
     @ObservedObject private var feed = FeedModel.shared
     @ObservedObject private var feedCount = UnwatchedFeedCountModel.shared
+    private var recents = RecentsModel.shared
 
     @Default(.showHome) private var showHome
     @Default(.showDocuments) private var showDocuments
@@ -189,9 +190,9 @@ struct AppTabNavigation: View {
     }
 
     @ViewBuilder private var playlistView: some View {
-        if navigation.presentingPlaylist {
+        if navigation.presentingPlaylist, let playlist = recents.presentedPlaylist {
             NavigationView {
-                ChannelPlaylistView(showCloseButton: true)
+                ChannelPlaylistView(playlist: playlist, showCloseButton: true)
             }
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .id("channelPlaylist")
