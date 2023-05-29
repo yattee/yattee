@@ -236,16 +236,11 @@ final class PlayerModel: ObservableObject {
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.exitFullScreen(showControls: false)
+            Delay.by(0.3) {
+                self?.exitFullScreen(showControls: false)
+            }
         }
 
-        #if os(iOS)
-            if Defaults[.lockPortraitWhenBrowsing] {
-                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-            } else {
-                Orientation.lockOrientation(.allButUpsideDown)
-            }
-        #endif
         #if os(macOS)
             Windows.player.hide()
         #endif
