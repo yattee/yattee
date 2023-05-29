@@ -334,7 +334,7 @@ final class AVPlayerBackend: PlayerBackend {
                 }
 
                 if self.model.musicMode {
-                    startMusicMode()
+                    self.startMusicMode()
                 }
 
                 if !preservingTime,
