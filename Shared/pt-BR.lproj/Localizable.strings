@@ -579,3 +579,15 @@
 "Close video and player on end" = "Fechar vídeo e player ao final";
 "Your Accounts" = "Suas Contas";
 "Use system controls with AVPlayer" = "Usar controles do sistema com o AVPlayer";
+"Available" = "Disponível";
+"Startup section" = "Seção ao iniciar";
+"Home Settings" = "Ajustes da tela Início";
+"Watched: hidden" = "Assistidos: ocultos";
+"Watched: visible" = "Assistidos: visíveis";
+"Disable filters" = "Desativar filtros";
+"(watched hidden)" = "(assistidos ocultos)";
+"(shorts hidden)" = "(shorts ocultos)";
+"Limit" = "Limite";
+"Are you sure you want to remove %@ from Favorites?" = "Tem certeza que deseja remover %@ dos Favoritos?";
+"No videos to show" = "Nenhum vídeo para mostrar";
+"(watched and shorts hidden)" = "(assistidos e shorts ocultos)";
