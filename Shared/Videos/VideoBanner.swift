@@ -37,22 +37,22 @@ struct VideoBanner: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            ZStack(alignment: .bottom) {
-                VStack(alignment: .trailing, spacing: 2) {
+            VStack(alignment: .trailing, spacing: 2) {
+                ZStack(alignment: .bottom) {
                     smallThumbnail
+                        .layoutPriority(1)
 
-                    if !timeOnThumbnail, let timeLabel {
-                        Text(timeLabel)
-                            .font(.caption.monospacedDigit())
-                            .foregroundColor(.secondary)
-                    }
+                    ProgressView(value: watch?.progress ?? 44, total: 100)
+                        .frame(maxHeight: 4)
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
+                        .opacity(watch?.isShowingProgress ?? false ? 1 : 0)
                 }
-                .layoutPriority(1)
 
-                ProgressView(value: watch?.progress ?? 44, total: 100)
-                    .frame(maxHeight: 4)
-                    .progressViewStyle(LinearProgressViewStyle(tint: Color("AppRedColor")))
-                    .opacity(watch?.isShowingProgress ?? false ? 1 : 0)
+                if !timeOnThumbnail, let timeLabel {
+                    Text(timeLabel)
+                        .font(.caption.monospacedDigit())
+                        .foregroundColor(.secondary)
+                }
             }
 
             VStack(alignment: .leading, spacing: 2) {
