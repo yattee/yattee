@@ -1,4 +1,18 @@
-## Build 151
+## Build 152
+* Tapping second time on search tab button focuses the input field and selects entered query text (iOS)
+* Added Browsing setting "Keep channels with unwatched videos on top of subscriptions list"
+* Improved buttons and layout on tvOS
+* Fixed issue with trending categories (Invidious) not working when using non-English language
+* Fixed issue with search query suggestions not being displayed properly in some languages
+* Changed subscriptions page picker label from icon to text
+* Views will display information if there is no videos to show instead of always showing placeholders
+* Fixed AVPlayer issue with music mode playing video track
+* Added remove context menu option for all types of recent items in Search
+* Added advanced setting "Show video context menu options to force selected backend"
+* Fixed reported crashes
+* Other minor fixes and improvements
+
+## Previous Builds
 * Improved Home
   - Added menu with view options on iOS and toolbar buttons on macOS/tvOS
   - Added Home Settings
@@ -20,9 +34,7 @@
 * Fixed issue with playlists view showing duplicated buttons when "Show cache status" is enabled
 * Fixed issue where navigating to channel from list view in Playlists and Search would immediately go back
 * Fixed issue where first URL would fail to open
-* Other minor fixes and improvements
 
-## Previous Builds
 * Added support for AVPlayer native system controls on iOS and macOS
   - Use system features such as AirPlay, subtitles switching (Piped with HLS), text detection and copy and more
   - Added Controls setting: "Use system controls with AVPlayer"
