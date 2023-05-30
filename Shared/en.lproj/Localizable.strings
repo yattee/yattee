@@ -589,6 +589,5 @@
 "Disable filters" = "Disable filters";
 "Limit" = "Limit";
 "Are you sure you want to remove %@ from Favorites?" = "Are you sure you want to remove %@ from Favorites?";
-"Play now in MPV" = "Play now in MPV";
 "Keep channels with unwatched videos on top of subscriptions list" = "Keep channels with unwatched videos on top of subscriptions list";
 "Show video context menu options to force selected backend" = "Show video context menu options to force selected backend";
