@@ -582,7 +582,7 @@
 "Landscape left" = "Obrót w lewo";
 "Available" = "Dostępne";
 "Startup section" = "Sekcja startowa";
-"Home Settings" = "Ustawienia strony głównej";
+"Home Settings" = "Ustawienia głównej";
 "Watched: hidden" = "Obejrzane: ukryte";
 "Watched: visible" = "Obejrzane: widoczne";
 "No videos to show" = "Brak wideo do pokazania";
@@ -592,3 +592,7 @@
 "(watched hidden)" = "(obejrzane ukryte)";
 "Limit" = "Limit";
 "Are you sure you want to remove %@ from Favorites?" = "Czy na pewno chcesz usunąć element: %@ z Ulubionych?";
+"Play Now in AVPlayer" = "Odtwórz teraz w AVPlayerze";
+"Play Now in MPV" = "Odtwórz teraz w MPV";
+"Keep channels with unwatched videos on top of subscriptions list" = "Kanały z nieobejrzanymi filmami na górze listy subskrypcji";
+"Show video context menu options to force selected backend" = "Pokaż opcje menu kontekstowego wideo, aby wymusić wybrany silnik";
