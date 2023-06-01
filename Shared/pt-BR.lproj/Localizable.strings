@@ -591,3 +591,7 @@
 "Are you sure you want to remove %@ from Favorites?" = "Tem certeza que deseja remover %@ dos Favoritos?";
 "No videos to show" = "Nenhum vídeo para mostrar";
 "(watched and shorts hidden)" = "(assistidos e shorts ocultos)";
+"Show video context menu options to force selected backend" = "Mostrar opções do menu contextual do vídeo para forçar o backend selecionado";
+"Keep channels with unwatched videos on top of subscriptions list" = "Manter canais com vídeos não vistos no topo da lista de inscrições";
+"Play Now in AVPlayer" = "Tocar Agora no AVPlayer";
+"Play Now in MPV" = "Tocar Agora em MPV";
