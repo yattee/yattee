@@ -591,3 +591,7 @@
 "Disable filters" = "Filter deaktivieren";
 "Limit" = "Grenze";
 "Are you sure you want to remove %@ from Favorites?" = "Möchten Sie %@ wirklich aus den Favoriten entfernen?";
+"Play Now in MPV" = "Jetzt im MPV abspielen";
+"Keep channels with unwatched videos on top of subscriptions list" = "Kanäle mit ungesehenen Videos oben in der Abonnementliste halten";
+"Show video context menu options to force selected backend" = "Video-Kontextmenüoptionen anzeigen, um die Auswahl des Backends zu erzwingen";
+"Play Now in AVPlayer" = "Jetzt in AVPlayer abspielen";
