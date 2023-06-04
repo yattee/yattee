@@ -510,7 +510,7 @@
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "動画の冒頭で、同じ作成者の他の動画でも見られるアニメーション、静止画やクリップを含む部分。";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "この情報は、この端末上でのみ処理され、指定した国のサーバーに接続するために使用されます。";
 "Videos" = "動画";
-"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "クレジットのポップアップやエンドカードが表示される、映像の最後のあたりに表示されます。";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "クレジットのポップアップや終了シーンが表示される、映像の最後のあたりに表示されます。";
 "Verified" = "認証済み";
 "Mark channel feed as unwatched" = "チャンネルフィードを未視聴にする";
 "Open expanded" = "展開したまま開く";
