@@ -488,7 +488,7 @@ final class AVPlayerBackend: PlayerBackend {
                 if self.model.activeBackend == .appleAVPlayer,
                    self.isAutoplaying(playerItem)
                 {
-                    if model.aspectRatio != aspectRatio {
+                    if self.model.aspectRatio != self.aspectRatio {
                         self.model.updateAspectRatio()
                     }
 
@@ -644,7 +644,7 @@ final class AVPlayerBackend: PlayerBackend {
                 self.model.objectWillChange.send()
 
                 if player.rate != Float(self.model.currentRate) {
-                    if model.avPlayerUsesSystemControls {
+                    if self.model.avPlayerUsesSystemControls {
                         self.model.currentRate = Double(player.rate)
                     } else {
                         player.rate = Float(self.model.currentRate)
