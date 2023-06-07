@@ -61,7 +61,7 @@ struct FavoriteItemView: View {
                                 #if os(tvOS)
                                     .padding(.leading, 40)
                                 #else
-                                    .padding(.leading, 15)
+                                    .padding(.horizontal, 15)
                                 #endif
                             }
                         }
