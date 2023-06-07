@@ -96,7 +96,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "7f9fb5d43ecd4aa714c00746f54873f354403438"
+        "revision" : "90aa750c92973005f086263e44c6224a1456bb12"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/lorenzofiamingo/swiftui-cached-async-image",
       "state" : {
         "branch" : "main",
-        "revision" : "f94be38411297c71aa8df69c6875127e6d8d7a92"
+        "revision" : "2abb11839f80ebb07a58ac5e146a1da664260c16"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "5b3f3996c7a2a84d5f4ba0e03cd7d584154778f2",
-        "version" : "0.3.1"
+        "revision" : "c29b50a475120fdfa22573622464a7346aaf99a4",
+        "version" : "0.6.0"
       }
     },
     {
