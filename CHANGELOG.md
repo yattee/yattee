@@ -1,4 +1,16 @@
-## Build 152
+## Build 153
+* Fixed issue with AVPlayer not always using full width
+* Fixed issue with layout when switching backend while in fullscreen
+* Fixed issue with updating watched time on closing video
+* Fixed issue with adjusting AVPlayer playback rate when using system controls
+* Fixed issue where comments would load indefinitely
+* Improved Home buttons layout on tvOS
+* Reverted change to placeholders as were causing issues to properly display loading status, will be revisited in future
+* Fixed performance issue with swiping back to subscribed channels list
+* Fixed reported crashes
+* Other minor fixes and improvements
+
+## Previous Builds
 * Tapping second time on search tab button focuses the input field and selects entered query text (iOS)
 * Added Browsing setting "Keep channels with unwatched videos on top of subscriptions list"
 * Improved buttons and layout on tvOS
@@ -10,9 +22,7 @@
 * Added remove context menu option for all types of recent items in Search
 * Added advanced setting "Show video context menu options to force selected backend"
 * Fixed reported crashes
-* Other minor fixes and improvements
 
-## Previous Builds
 * Improved Home
   - Added menu with view options on iOS and toolbar buttons on macOS/tvOS
   - Added Home Settings
