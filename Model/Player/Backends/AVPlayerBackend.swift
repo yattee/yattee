@@ -353,9 +353,11 @@ final class AVPlayerBackend: PlayerBackend {
                         }
 
                         self.model.lastSkipped = segment
+                        self.model.handleOnPlayStream(stream)
                         self.model.play()
                     }
                 } else {
+                    self.model.handleOnPlayStream(stream)
                     self.model.play()
                 }
             }
@@ -486,7 +488,9 @@ final class AVPlayerBackend: PlayerBackend {
                 if self.model.activeBackend == .appleAVPlayer,
                    self.isAutoplaying(playerItem)
                 {
-                    self.model.updateAspectRatio()
+                    if model.aspectRatio != aspectRatio {
+                        self.model.updateAspectRatio()
+                    }
 
                     if self.startPictureInPictureOnPlay,
                        let controller = self.model.pipController,
@@ -708,6 +712,17 @@ final class AVPlayerBackend: PlayerBackend {
         } else {
             stopMusicMode()
         }
+
+        #if os(iOS)
+            ControlOverlaysModel.shared.hide()
+            model.navigation.presentingPlaybackSettings = false
+
+            if model.playingFullScreen {
+                model.onPlayStream.append { _ in
+                    self.controller.enterFullScreen(animated: true)
+                }
+            }
+        #endif
     }
 
     var isStartingPiP: Bool {

@@ -267,9 +267,11 @@ final class MPVBackend: PlayerBackend {
 
                         self.model.lastSkipped = segment
                         self.play()
+                        self.model.handleOnPlayStream(stream)
                     }
                 } else {
                     self.play()
+                    self.model.handleOnPlayStream(stream)
                 }
             }
         }

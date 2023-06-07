@@ -182,6 +182,7 @@ final class PlayerModel: ObservableObject {
     private var currentArtwork: MPMediaItemArtwork?
 
     var onPresentPlayer = [() -> Void]()
+    var onPlayStream = [(Stream) -> Void]()
     private var remoteCommandCenterConfigured = false
 
     init() {
@@ -1092,5 +1093,12 @@ final class PlayerModel: ObservableObject {
     var formattedSize: String {
         guard let videoWidth = backend?.videoWidth, let videoHeight = backend?.videoHeight else { return "unknown" }
         return "\(String(format: "%.2f", videoWidth))\u{d7}\(String(format: "%.2f", videoHeight))"
+    }
+
+    func handleOnPlayStream(_ stream: Stream) {
+        backend.setRate(currentRate)
+
+        onPlayStream.forEach { $0(stream) }
+        onPlayStream.removeAll()
     }
 }
