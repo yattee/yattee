@@ -46,11 +46,11 @@ extension PlayerModel {
             }
     }
 
-    func updateWatch(finished: Bool = false) {
+    func updateWatch(finished: Bool = false, time: CMTime? = nil) {
         guard let currentVideo, saveHistory else { return }
 
         let id = currentVideo.videoID
-        let time = backend.currentTime
+        let time = time ?? backend.currentTime
         let seconds = time?.seconds ?? 0
         let duration = playerTime.duration.seconds
         if seconds < 3 {
@@ -63,7 +63,7 @@ extension PlayerModel {
         let results = try? backgroundContext.fetch(watchFetchRequest)
 
         backgroundContext.perform { [weak self] in
-            guard let self, finished || self.backend.isPlaying else {
+            guard let self, finished || time != nil || self.backend.isPlaying else {
                 return
             }
 

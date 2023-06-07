@@ -257,7 +257,7 @@ extension PlayerModel {
                 if let video = currentVideo, !historyVideos.contains(where: { $0 == video }) {
                     historyVideos.append(video)
                 }
-                updateWatch(finished: finished)
+                updateWatch(finished: finished, time: backend.currentTime)
             }
 
             if let video = currentItem.video,

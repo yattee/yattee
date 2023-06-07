@@ -425,7 +425,7 @@ final class MPVBackend: PlayerBackend {
         }
 
         timeObserverThrottle.execute {
-            self.model.updateWatch()
+            self.model.updateWatch(time: self.currentTime)
         }
     }
 

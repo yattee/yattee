@@ -612,7 +612,7 @@ final class AVPlayerBackend: PlayerBackend {
             }
 
             self.timeObserverThrottle.execute {
-                self.model.updateWatch()
+                self.model.updateWatch(time: self.currentTime)
             }
         }
     }
@@ -656,7 +656,7 @@ final class AVPlayerBackend: PlayerBackend {
             #endif
 
             self.timeObserverThrottle.execute {
-                self.model.updateWatch()
+                self.model.updateWatch(time: self.currentTime)
             }
         }
     }

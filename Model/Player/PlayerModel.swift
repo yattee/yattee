@@ -624,13 +624,14 @@ final class PlayerModel: ObservableObject {
         closing = true
         controls.presentingControls = false
 
+        self.prepareCurrentItemForHistory(finished: finished)
+
         self.hide()
 
         Delay.by(0.8) { [weak self] in
             guard let self else { return }
             self.closePiP()
 
-            self.prepareCurrentItemForHistory(finished: finished)
             withAnimation {
                 self.currentItem = nil
             }
