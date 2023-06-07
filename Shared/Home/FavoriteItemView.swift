@@ -204,7 +204,8 @@ struct FavoriteItemView: View {
     }
 
     func watch(_ item: ContentItem) -> Watch? {
-        watches.first { $0.videoID == item.video.videoID }
+        guard let id = item.video?.videoID else { return nil }
+        return watches.first { $0.videoID == id }
     }
 
     var widgetListingStyle: WidgetListingStyle {
