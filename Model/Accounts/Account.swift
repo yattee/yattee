@@ -53,7 +53,7 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
     }
 
     var instance: Instance! {
-        Defaults[.instances].first { $0.id == instanceID } ?? Instance(app: app ?? .invidious, name: urlString, apiURLString: urlString)
+        InstancesModel.shared.find(instanceID) ?? Instance(app: app ?? .invidious, name: urlString, apiURLString: urlString)
     }
 
     var isPublic: Bool {
