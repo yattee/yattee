@@ -69,6 +69,7 @@ final class CommentsModel: ObservableObject {
     }
 
     func loadNextPage() {
+        guard nextPageAvailable else { return }
         load(page: nextPage)
     }
 
