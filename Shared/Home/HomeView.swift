@@ -32,23 +32,8 @@ struct HomeView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack {
-                HStack {
-                    #if os(tvOS)
-                        Group {
-                            if showOpenActionsInHome {
-                                AccentButton(text: "Open Video", imageSystemName: "globe") {
-                                    NavigationModel.shared.presentingOpenVideos = true
-                                }
-                            }
-                            AccentButton(text: "Locations", imageSystemName: "globe") {
-                                NavigationModel.shared.presentingAccounts = true
-                            }
-
-                            AccentButton(text: "Settings", imageSystemName: "gear") {
-                                NavigationModel.shared.presentingSettings = true
-                            }
-                        }
-                    #else
+                #if !os(tvOS)
+                    HStack {
                         if showOpenActionsInHome {
                             AccentButton(text: "Files", imageSystemName: "folder") {
                                 NavigationModel.shared.presentingFileImporter = true
@@ -61,16 +46,36 @@ struct HomeView: View {
                             }
                             .frame(maxWidth: 40)
                         }
-                    #endif
-                }
+                    }
+                #endif
 
                 #if os(tvOS)
                     HStack {
+                        if showOpenActionsInHome {
+                            Button {
+                                NavigationModel.shared.presentingOpenVideos = true
+                            } label: {
+                                Label("Open Video", systemImage: "globe")
+                            }
+                        }
+                        Button {
+                            NavigationModel.shared.presentingAccounts = true
+                        } label: {
+                            Label("Locations", systemImage: "globe")
+                        }
                         Spacer()
                         HideWatchedButtons()
                         HideShortsButtons()
-                        HomeSettingsButton()
+                        Button {
+                            NavigationModel.shared.presentingSettings = true
+                        } label: {
+                            Label("Settings", systemImage: "gear")
+                        }
                     }
+                    #if os(tvOS)
+                    .font(.caption)
+                    .imageScale(.small)
+                    #endif
                 #endif
             }
             .padding(.top, 15)
