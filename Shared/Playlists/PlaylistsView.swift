@@ -63,11 +63,13 @@ struct PlaylistsView: View {
     var body: some View {
         SignInRequiredView(title: "Playlists".localized()) {
             VStack {
-                VerticalCells(items: items, isLoading: resource?.isLoading ?? false) { if shouldDisplayHeader { header } }
+                VerticalCells(items: items, allowEmpty: true) { if shouldDisplayHeader { header } }
                     .environment(\.currentPlaylistID, currentPlaylist?.id)
                     .environment(\.listingStyle, playlistListingStyle)
 
-                if model.all.isEmpty {
+                if currentPlaylist != nil, items.isEmpty {
+                    hintText("Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"".localized())
+                } else if model.all.isEmpty {
                     hintText("You have no playlists\n\nTap on \"New Playlist\" to create one".localized())
                 }
             }

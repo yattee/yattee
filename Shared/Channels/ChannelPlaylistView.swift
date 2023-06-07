@@ -15,14 +15,15 @@ struct ChannelPlaylistView: View {
     var player = PlayerModel.shared
     @ObservedObject private var recents = RecentsModel.shared
 
-    @State private var isLoading = false
-
     private var items: [ContentItem] {
         ContentItem.array(of: store.item?.videos ?? [])
     }
 
     private var resource: Resource? {
-        accounts.api.channelPlaylist(playlist.id)
+        let resource = accounts.api.channelPlaylist(playlist.id)
+        resource?.addObserver(store)
+
+        return resource
     }
 
     var body: some View {
@@ -47,7 +48,7 @@ struct ChannelPlaylistView: View {
                         .labelStyle(.iconOnly)
                 }
             #endif
-            VerticalCells(items: items, isLoading: isLoading)
+            VerticalCells(items: items)
                 .environment(\.inChannelPlaylistView, true)
         }
         .environment(\.listingStyle, channelPlaylistListingStyle)
@@ -55,16 +56,11 @@ struct ChannelPlaylistView: View {
             if let cache = ChannelPlaylistsCacheModel.shared.retrievePlaylist(playlist) {
                 store.replace(cache)
             }
-            isLoading = true
-            resource?
-                .load()
-                .onSuccess { response in
-                    if let playlist: ChannelPlaylist = response.typedContent() {
-                        ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist)
-                        store.replace(playlist)
-                    }
+            resource?.loadIfNeeded()?.onSuccess { response in
+                if let playlist: ChannelPlaylist = response.typedContent() {
+                    ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist)
                 }
-                .onCompletion { _ in isLoading = false }
+            }
         }
         #if os(tvOS)
         .background(Color.background(scheme: colorScheme))

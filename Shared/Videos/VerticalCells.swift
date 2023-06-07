@@ -10,7 +10,7 @@ struct VerticalCells<Header: View>: View {
     @Environment(\.listingStyle) private var listingStyle
 
     var items = [ContentItem]()
-    var isLoading: Bool
+    var allowEmpty = false
     var edgesIgnoringSafeArea = Edge.Set.horizontal
 
     let header: Header?
@@ -19,47 +19,31 @@ struct VerticalCells<Header: View>: View {
 
     init(
         items: [ContentItem],
-        isLoading: Bool,
+        allowEmpty: Bool = false,
         edgesIgnoringSafeArea: Edge.Set = .horizontal,
         @ViewBuilder header: @escaping () -> Header? = { nil }
     ) {
         self.items = items
-        self.isLoading = isLoading
+        self.allowEmpty = allowEmpty
         self.edgesIgnoringSafeArea = edgesIgnoringSafeArea
         self.header = header()
     }
 
     init(
         items: [ContentItem],
-        isLoading: Bool
+        allowEmpty: Bool = false
     ) where Header == EmptyView {
-        self.init(items: items, isLoading: isLoading) { EmptyView() }
+        self.init(items: items, allowEmpty: allowEmpty) { EmptyView() }
     }
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: scrollViewShowsIndicators) {
-            Group {
-                LazyVGrid(columns: adaptiveItem, alignment: .center) {
-                    Section(header: header) {
-                        ForEach(contentItems) { item in
-                            ContentItemView(item: item)
-                                .onAppear { loadMoreContentItemsIfNeeded(current: item) }
-                        }
+            LazyVGrid(columns: adaptiveItem, alignment: .center) {
+                Section(header: header) {
+                    ForEach(contentItems) { item in
+                        ContentItemView(item: item)
+                            .onAppear { loadMoreContentItemsIfNeeded(current: item) }
                     }
-                }
-                .overlay(
-                    GeometryReader { proxy in
-                        Color.clear
-                            .onAppear {
-                                gridSize = proxy.size
-                            }
-                            .onChange(of: proxy.size) { newValue in
-                                gridSize = newValue
-                            }
-                    }
-                )
-                if !isLoading && gridSize.height < 50 {
-                    EmptyItems()
                 }
             }
             .padding()
@@ -73,7 +57,7 @@ struct VerticalCells<Header: View>: View {
     }
 
     var contentItems: [ContentItem] {
-        items.isEmpty && isLoading ? (ContentItem.placeholders) : items.sorted { $0 < $1 }
+        items.isEmpty ? (allowEmpty ? items : ContentItem.placeholders) : items.sorted { $0 < $1 }
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {
@@ -120,7 +104,7 @@ struct VerticalCells<Header: View>: View {
 
 struct VeticalCells_Previews: PreviewProvider {
     static var previews: some View {
-        VerticalCells(items: ContentItem.array(of: Array(repeating: Video.fixture, count: 30)), isLoading: false)
+        VerticalCells(items: ContentItem.array(of: Array(repeating: Video.fixture, count: 30)))
             .injectFixtureEnvironmentObjects()
     }
 }

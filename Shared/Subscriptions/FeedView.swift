@@ -16,7 +16,7 @@ struct FeedView: View {
     }
 
     var body: some View {
-        VerticalCells(items: videos, isLoading: feed.isLoading) { if shouldDisplayHeader { header } }
+        VerticalCells(items: videos) { if shouldDisplayHeader { header } }
             .environment(\.loadMoreContentHandler) { feed.loadNextPage() }
             .onAppear {
                 feed.loadResources()

@@ -690,9 +690,6 @@
 		379DC3D128BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D228BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379DC3D328BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
-		379E7C2F2A20AF0A00AF8118 /* EmptyItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C2E2A20AF0A00AF8118 /* EmptyItems.swift */; };
-		379E7C302A20AF0A00AF8118 /* EmptyItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C2E2A20AF0A00AF8118 /* EmptyItems.swift */; };
-		379E7C312A20AF0A00AF8118 /* EmptyItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C2E2A20AF0A00AF8118 /* EmptyItems.swift */; };
 		379E7C332A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
 		379E7C342A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
 		379E7C362A2105B900AF8118 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 379E7C352A2105B900AF8118 /* Introspect */; };
@@ -1397,7 +1394,6 @@
 		379ACB502A1F8DB000E01914 /* HomeSettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSettingsButton.swift; sourceTree = "<group>"; };
 		379B0252287A1CDF001015B5 /* OrientationTracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrientationTracker.swift; sourceTree = "<group>"; };
 		379DC3D028BA4EB400B09677 /* Seek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seek.swift; sourceTree = "<group>"; };
-		379E7C2E2A20AF0A00AF8118 /* EmptyItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyItems.swift; sourceTree = "<group>"; };
 		379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusableSearchTextField.swift; sourceTree = "<group>"; };
 		379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = HideShortsButtons.swift; sourceTree = "<group>"; };
 		379F141E289ECE7F00DE48B5 /* QualitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualitySettings.swift; sourceTree = "<group>"; };
@@ -1911,7 +1907,6 @@
 				37FB285D272225E800A57617 /* ContentItemView.swift */,
 				372CFD14285F2E2A00B0B54B /* ControlsBar.swift */,
 				3748186D26A769D60084E870 /* DetailBadge.swift */,
-				379E7C2E2A20AF0A00AF8118 /* EmptyItems.swift */,
 				37599F37272B4D740087F250 /* FavoriteButton.swift */,
 				379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */,
 				37758C0A2A1D1C8B001FD900 /* HideWatchedButtons.swift */,
@@ -3190,7 +3185,6 @@
 				374AB3DB28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				37192D5728B179D60012EEDD /* ChaptersView.swift in Sources */,
 				37D836BC294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
-				379E7C2F2A20AF0A00AF8118 /* EmptyItems.swift in Sources */,
 				37B81AF926D2C9A700675966 /* VideoPlayerSizeModifier.swift in Sources */,
 				37C0698227260B2100F7F6CB /* ThumbnailsModel.swift in Sources */,
 				37BC50A82778A84700510953 /* HistorySettings.swift in Sources */,
@@ -3501,7 +3495,6 @@
 				37599F35272B44000087F250 /* FavoritesModel.swift in Sources */,
 				376527BC285F60F700102284 /* PlayerTimeModel.swift in Sources */,
 				37F64FE526FE70A60081B69E /* RedrawOnModifier.swift in Sources */,
-				379E7C302A20AF0A00AF8118 /* EmptyItems.swift in Sources */,
 				377ABC45286E4B74009C986F /* ManifestedInstance.swift in Sources */,
 				3795593727B08538007FF8F4 /* StreamControl.swift in Sources */,
 				37772E0E2A216F8600608BD9 /* String+ReplacingHTMLEntities.swift in Sources */,
@@ -3796,7 +3789,6 @@
 				37C3A24727235DA70087A57A /* ChannelPlaylist.swift in Sources */,
 				3788AC2926F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */,
-				379E7C312A20AF0A00AF8118 /* EmptyItems.swift in Sources */,
 				3718B9A52921A97F0003DB2E /* InspectorView.swift in Sources */,
 				37E70925271CD43000D34DDE /* WelcomeScreen.swift in Sources */,
 				376BE50D27349108009AD608 /* BrowsingSettings.swift in Sources */,

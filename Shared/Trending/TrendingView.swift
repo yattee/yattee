@@ -22,51 +22,62 @@ struct TrendingView: View {
     }
 
     @State private var error: RequestError?
-    @State private var resource: Resource?
-    @State private var isLoading = false
 
     init(_ videos: [Video] = [Video]()) {
         self.videos = videos
     }
 
-    var body: some View {
-        VerticalCells(items: trending, isLoading: isLoading) { if shouldDisplayHeader { header } }
-            .environment(\.listingStyle, trendingListingStyle)
-            .toolbar {
-                ToolbarItem {
-                    RequestErrorButton(error: error)
-                }
-                #if os(macOS)
-                    ToolbarItemGroup {
-                        if let favoriteItem {
-                            FavoriteButton(item: favoriteItem)
-                                .id(favoriteItem.id)
-                        }
+    var resource: Resource {
+        let newResource: Resource
 
-                        categoryButton
-                        countryButton
+        newResource = accounts.api.trending(country: country, category: category)
+        newResource.addObserver(store)
+
+        return newResource
+    }
+
+    var body: some View {
+        Section {
+            VerticalCells(items: trending) { if shouldDisplayHeader { header } }
+                .environment(\.listingStyle, trendingListingStyle)
+        }
+
+        .toolbar {
+            ToolbarItem {
+                RequestErrorButton(error: error)
+            }
+            #if os(macOS)
+                ToolbarItemGroup {
+                    if let favoriteItem {
+                        FavoriteButton(item: favoriteItem)
+                            .id(favoriteItem.id)
                     }
-                #endif
-            }
-            .onChange(of: category) { _ in updateResource() }
-            .onChange(of: country) { _ in updateResource() }
-            .onChange(of: accounts.current) { _ in updateResource() }
-            .onChange(of: resource) { _ in
-                isLoading = true
-                resource?.load()
-                    .onFailure { self.error = $0 }
-                    .onSuccess { _ in self.error = nil }
-                    .onCompletion { _ in self.isLoading = false }
-            }
-            .onAppear { updateResource()
-            }
+
+                    categoryButton
+                    countryButton
+                }
+            #endif
+        }
+        .onChange(of: resource) { _ in
+            resource.load()
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
+            updateFavoriteItem()
+        }
+        .onAppear {
+            resource.loadIfNeeded()?
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
+
+            updateFavoriteItem()
+        }
 
         #if os(tvOS)
-            .fullScreenCover(isPresented: $presentingCountrySelection) {
-                TrendingCountry(selectedCountry: $country)
-            }
+        .fullScreenCover(isPresented: $presentingCountrySelection) {
+            TrendingCountry(selectedCountry: $country)
+        }
         #else
-            .sheet(isPresented: $presentingCountrySelection) {
+        .sheet(isPresented: $presentingCountrySelection) {
                     TrendingCountry(selectedCountry: $country)
                     #if os(macOS)
                         .frame(minWidth: 400, minHeight: 400)
@@ -74,11 +85,9 @@ struct TrendingView: View {
                 }
                 .background(
                     Button("Refresh") {
-                        isLoading = true
-                        resource?.load()
+                        resource.load()
                             .onFailure { self.error = $0 }
                             .onSuccess { _ in self.error = nil }
-                            .onCompletion { _ in self.isLoading = false }
                     }
                     .keyboardShortcut("r")
                     .opacity(0)
@@ -87,18 +96,16 @@ struct TrendingView: View {
         #endif
         #if os(iOS)
         .refreshControl { refreshControl in
-            resource?.load().onCompletion { _ in
+            resource.load().onCompletion { _ in
                 refreshControl.endRefreshing()
             }
         }
         .backport
         .refreshable {
             DispatchQueue.main.async {
-                isLoading = true
-                resource?.load()
+                resource.load()
                     .onFailure { self.error = $0 }
                     .onSuccess { _ in self.error = nil }
-                    .onCompletion { _ in self.isLoading = false }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -124,13 +131,9 @@ struct TrendingView: View {
         }
         #else
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    let request = resource?.loadIfNeeded()
-                    if request != nil {
-                        isLoading = true
-                    }
-                    request?.onFailure { self.error = $0 }
+                    resource.loadIfNeeded()?
+                        .onFailure { self.error = $0 }
                         .onSuccess { _ in self.error = nil }
-                        .onCompletion { _ in self.isLoading = false }
                 }
         #endif
     }
@@ -222,7 +225,7 @@ struct TrendingView: View {
     private var countryButton: some View {
         Button(action: {
             presentingCountrySelection.toggle()
-            resource?.removeObservers(ownedBy: store)
+            resource.removeObservers(ownedBy: store)
         }) {
             #if os(iOS)
                 Label("Country", systemImage: "flag")
@@ -231,13 +234,6 @@ struct TrendingView: View {
 
             #endif
         }
-    }
-
-    private func updateResource() {
-        let resource = accounts.api.trending(country: country, category: category)
-        resource.addObserver(store)
-        self.resource = resource
-        updateFavoriteItem()
     }
 
     private func updateFavoriteItem() {
@@ -258,7 +254,7 @@ struct TrendingView: View {
             HideShortsButtons()
 
             Button {
-                resource?.load()
+                resource.load()
                     .onFailure { self.error = $0 }
                     .onSuccess { _ in self.error = nil }
             } label: {

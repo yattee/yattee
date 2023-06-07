@@ -70,7 +70,7 @@ struct PlaylistVideosView: View {
     }
 
     var body: some View {
-        VerticalCells(items: contentItems, isLoading: resource?.isLoading ?? false)
+        VerticalCells(items: contentItems)
             .onAppear {
                 guard contentItems.isEmpty else { return }
                 loadResource()
