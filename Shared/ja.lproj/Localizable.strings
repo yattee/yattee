@@ -510,7 +510,7 @@
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "動画の冒頭で、同じ作成者の他の動画でも見られるアニメーション、静止画やクリップを含む部分。";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "この情報は、この端末上でのみ処理され、指定した国のサーバーに接続するために使用されます。";
 "Videos" = "動画";
-"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "クレジットのポップアップやエンドカードが表示される、映像の最後のあたりに表示されます。";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "クレジットのポップアップや終了シーンが表示される、映像の最後のあたりに表示されます。";
 "Verified" = "認証済み";
 "Mark channel feed as unwatched" = "チャンネルフィードを未視聴にする";
 "Open expanded" = "展開したまま開く";
@@ -588,3 +588,7 @@
 "(watched hidden)" = "(視聴済み非表示)";
 "Disable filters" = "絞り込み解除";
 "Are you sure you want to remove %@ from Favorites?" = "お気に入りから %@ を除去しますか？";
+"Show video context menu options to force selected backend" = "強制的にバックエンドを選択するための動画のコンテキストメニューを表示";
+"Play Now in AVPlayer" = "AVPlayer で今すぐ再生";
+"Play Now in MPV" = "MPV で今すぐ再生";
+"Keep channels with unwatched videos on top of subscriptions list" = "未視聴の動画があるチャンネルをチャンネル一覧の上部に維持";

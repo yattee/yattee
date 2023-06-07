@@ -591,3 +591,7 @@
 "(shorts hidden)" = "(shorts ascunse)";
 "Limit" = "Limită";
 "Are you sure you want to remove %@ from Favorites?" = "Sigur doriți să eliminați %@ din Favorite?";
+"Keep channels with unwatched videos on top of subscriptions list" = "Păstrați canalele cu videoclipuri nevăzute în partea de sus a listei de abonamente";
+"Play Now in AVPlayer" = "Redă acum în AVPlayer";
+"Play Now in MPV" = "Redă acum în MPV";
+"Show video context menu options to force selected backend" = "Afișați opțiunile din meniul contextual video pentru a forța backend-ul selectat";

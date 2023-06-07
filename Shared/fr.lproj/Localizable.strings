@@ -591,3 +591,7 @@
 "(watched hidden)" = "(regardées masquées)";
 "Limit" = "Limite";
 "Are you sure you want to remove %@ from Favorites?" = "Êtes-vous sûr de vouloir supprimer %@ des favoris ?";
+"Keep channels with unwatched videos on top of subscriptions list" = "Conserver les chaînes dont les vidéos n'ont pas été visionnées en haut de la liste des abonnements";
+"Show video context menu options to force selected backend" = "Afficher les options contextuelles de la vidéo pour forcer la sélection du backend";
+"Play Now in AVPlayer" = "Lire maintenant dans AVPlayer";
+"Play Now in MPV" = "Lire maintenant dans MPV";
