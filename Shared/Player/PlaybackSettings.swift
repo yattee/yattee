@@ -69,21 +69,24 @@ struct PlaybackSettings: View {
                 }
                 .padding(.vertical, 10)
 
-                HStack {
-                    controlsHeader("Rate".localized())
-                    Spacer()
-                    HStack(spacing: rateButtonsSpacing) {
-                        decreaseRateButton
-                        #if os(tvOS)
-                        .focused($focusedField, equals: .decreaseRate)
-                        #endif
-                        rateButton
-                        increaseRateButton
-                        #if os(tvOS)
-                        .focused($focusedField, equals: .increaseRate)
-                        #endif
+                if player.activeBackend == .mpv || !player.avPlayerUsesSystemControls {
+                    HStack {
+                        controlsHeader("Rate".localized())
+                        Spacer()
+                        HStack(spacing: rateButtonsSpacing) {
+                            decreaseRateButton
+                            #if os(tvOS)
+                            .focused($focusedField, equals: .decreaseRate)
+                            #endif
+                            rateButton
+                            increaseRateButton
+                            #if os(tvOS)
+                            .focused($focusedField, equals: .increaseRate)
+                            #endif
+                        }
                     }
                 }
+
                 if player.activeBackend == .mpv {
                     HStack {
                         controlsHeader("Captions".localized())

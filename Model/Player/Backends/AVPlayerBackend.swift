@@ -160,7 +160,7 @@ final class AVPlayerBackend: PlayerBackend {
             return
         }
 
-        avPlayer.play()
+        avPlayer.playImmediately(atRate: Float(model.currentRate))
         model.objectWillChange.send()
     }
 
@@ -642,8 +642,13 @@ final class AVPlayerBackend: PlayerBackend {
 
             if player.timeControlStatus == .playing {
                 self.model.objectWillChange.send()
+
                 if player.rate != Float(self.model.currentRate) {
-                    player.rate = Float(self.model.currentRate)
+                    if model.avPlayerUsesSystemControls {
+                        self.model.currentRate = Double(player.rate)
+                    } else {
+                        player.rate = Float(self.model.currentRate)
+                    }
                 }
             }
 
