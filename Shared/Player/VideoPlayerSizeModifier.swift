@@ -25,7 +25,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .frame(maxWidth: geometry.size.width)
+            .frame(width: geometry.size.width)
             .frame(maxHeight: maxHeight)
 
         #if !os(macOS)

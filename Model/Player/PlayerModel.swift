@@ -1079,7 +1079,9 @@ final class PlayerModel: ObservableObject {
 
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                self.aspectRatio = self.backend.aspectRatio
+                withAnimation {
+                    self.aspectRatio = self.backend.aspectRatio
+                }
             }
         #endif
     }
