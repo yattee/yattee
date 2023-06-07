@@ -382,7 +382,7 @@ struct VideoPlayerView: View {
                         .listStyle(.plain)
                         #endif
                         .frame(maxWidth: 350)
-                        .background(colorScheme == .dark ? Color.black : Color.white)
+                        .background((colorScheme == .dark ? Color.black : Color.white).ignoresSafeArea())
                         .transition(.move(edge: .bottom))
                     }
                 #elseif os(macOS)
