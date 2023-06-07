@@ -15,8 +15,8 @@ import SwiftUI
             false
         }
 
-        func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-            #if os(iOS)
+        #if os(iOS)
+            func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
@@ -27,34 +27,40 @@ import SwiftUI
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
-            #endif
-        }
+            }
 
-        func playerViewController(_: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-            let wasPlaying = player.isPlaying
-            coordinator.animate(alongsideTransition: nil) { context in
-                #if os(iOS)
+            func playerViewController(_: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+                let wasPlaying = player.isPlaying
+                coordinator.animate(alongsideTransition: nil) { context in
                     if wasPlaying {
                         self.player.play()
                     }
-                #endif
-                if !context.isCancelled {
-                    #if os(iOS)
-                        self.player.lockedOrientation = nil
+                    if !context.isCancelled {
+                        #if os(iOS)
+                            self.player.lockedOrientation = nil
 
-                        if Constants.isIPhone {
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                        }
+                            if Constants.isIPhone {
+                                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                            }
 
-                        if wasPlaying {
-                            self.player.play()
-                        }
+                            if wasPlaying {
+                                self.player.play()
+                            }
 
-                        self.player.playingFullScreen = false
-                    #endif
+                            self.player.playingFullScreen = false
+                        #endif
+                    }
                 }
             }
-        }
+
+            func playerViewController(_: AVPlayerViewController, restoreUserInterfaceForFullScreenExitWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+                withAnimation(nil) {
+                    player.presentingPlayer = true
+                }
+
+                completionHandler(true)
+            }
+        #endif
 
         func playerViewControllerWillStartPictureInPicture(_: AVPlayerViewController) {}
 
@@ -85,14 +91,6 @@ import SwiftUI
                     }
                 }
             }
-        }
-
-        func playerViewController(_: AVPlayerViewController, restoreUserInterfaceForFullScreenExitWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-            withAnimation(nil) {
-                player.presentingPlayer = true
-            }
-
-            completionHandler(true)
         }
     }
 #endif

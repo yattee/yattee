@@ -93,15 +93,17 @@ extension AppleAVPlayerViewController: AVPlayerViewControllerDelegate {
 
     func playerViewControllerDidEndDismissalTransition(_: AVPlayerViewController) {}
 
-    func playerViewController(
-        _: AVPlayerViewController,
-        willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
-    ) {}
+    #if os(iOS)
+        func playerViewController(
+            _: AVPlayerViewController,
+            willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
+        ) {}
 
-    func playerViewController(
-        _: AVPlayerViewController,
-        willEndFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
-    ) {}
+        func playerViewController(
+            _: AVPlayerViewController,
+            willEndFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator
+        ) {}
+    #endif
 
     func playerViewController(
         _: AVPlayerViewController,
