@@ -719,10 +719,10 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         #if os(iOS)
-            ControlOverlaysModel.shared.hide()
-            model.navigation.presentingPlaybackSettings = false
-
             if model.playingFullScreen {
+                ControlOverlaysModel.shared.hide()
+                model.navigation.presentingPlaybackSettings = false
+
                 model.onPlayStream.append { _ in
                     self.controller.enterFullScreen(animated: true)
                 }
