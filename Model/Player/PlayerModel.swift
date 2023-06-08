@@ -183,6 +183,7 @@ final class PlayerModel: ObservableObject {
 
     var onPresentPlayer = [() -> Void]()
     var onPlayStream = [(Stream) -> Void]()
+    var rateToRestore: Float?
     private var remoteCommandCenterConfigured = false
 
     init() {
@@ -542,6 +543,9 @@ final class PlayerModel: ObservableObject {
         if !self.backend.canPlayAtRate(currentRate) {
             currentRate = self.backend.suggestedPlaybackRates.last { $0 < currentRate } ?? 1.0
         }
+
+        self.rateToRestore = Float(currentRate)
+
         self.backend.didChangeTo()
 
         if wasPlaying {
