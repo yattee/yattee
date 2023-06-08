@@ -1,4 +1,8 @@
-## Build 153
+## Build 154
+* Fixed issue where AVPlayer would pause playing on exiting fullscreen
+* Fixed issue with empty button appearing on subscriptions list on tvOS
+
+## Previous Builds
 * Fixed issue with AVPlayer not always using full width
 * Fixed issue with layout when switching backend while in fullscreen
 * Fixed issue with updating watched time on closing video
@@ -8,9 +12,7 @@
 * Reverted change to placeholders as were causing issues to properly display loading status, will be revisited in future
 * Fixed performance issue with swiping back to subscribed channels list
 * Fixed reported crashes
-* Other minor fixes and improvements
 
-## Previous Builds
 * Tapping second time on search tab button focuses the input field and selects entered query text (iOS)
 * Added Browsing setting "Keep channels with unwatched videos on top of subscriptions list"
 * Improved buttons and layout on tvOS
