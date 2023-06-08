@@ -77,9 +77,11 @@ struct ChannelsView: View {
                     .listRowSeparator(false)
             }
         }
+        #if !os(tvOS)
         .background(
             NavigationLink(destination: ChannelVideosView(channel: channelForLink ?? Video.fixture.channel), isActive: $channelLinkActive, label: EmptyView.init)
         )
+        #endif
         .onAppear {
             subscriptions.load()
         }
