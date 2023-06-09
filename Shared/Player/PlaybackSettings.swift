@@ -28,13 +28,7 @@ struct PlaybackSettings: View {
     #endif
 
     var body: some View {
-        #if DEBUG
-            // TODO: remove
-            if #available(iOS 15.0, macOS 12.0, *) {
-                Self._printChanges()
-            }
-        #endif
-        return ScrollView {
+        ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Button {

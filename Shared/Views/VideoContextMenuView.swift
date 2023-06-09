@@ -20,7 +20,6 @@ struct VideoContextMenuView: View {
 
     @FetchRequest private var watchRequest: FetchedResults<Watch>
 
-    @Default(.saveHistory) private var saveHistory
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
 
     private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
@@ -44,7 +43,7 @@ struct VideoContextMenuView: View {
             removeAllFromQueueButton()
         }
         if !video.localStreamIsDirectory {
-            if saveHistory {
+            if Defaults[.saveHistory] {
                 Section {
                     if let watchedAtString {
                         Text(watchedAtString)
@@ -72,7 +71,7 @@ struct VideoContextMenuView: View {
                 #endif
             }
 
-            if showPlayNowInBackendContextMenu {
+            if Defaults[.showPlayNowInBackendContextMenu] {
                 Section {
                     ForEach(PlayerBackendType.allCases, id: \.self) { backend in
                         playNowInBackendButton(backend)

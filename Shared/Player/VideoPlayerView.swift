@@ -90,13 +90,7 @@ struct VideoPlayerView: View {
     }
 
     var videoPlayer: some View {
-        #if DEBUG
-            // TODO: remove
-            if #available(iOS 15.0, macOS 12.0, *) {
-                Self._printChanges()
-            }
-        #endif
-        return GeometryReader { geometry in
+        GeometryReader { geometry in
             HStack(spacing: 0) {
                 content
                     .onAppear {
