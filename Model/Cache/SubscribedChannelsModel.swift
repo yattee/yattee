@@ -70,10 +70,10 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            let request = force ? resource?.load() : resource?.loadIfNeeded()
+            let request = force ? self.resource?.load() : self.resource?.loadIfNeeded()
             guard request != nil else { return }
 
-            loadCachedChannels(account)
+            self.loadCachedChannels(account)
 
             self.isLoading = true
 
