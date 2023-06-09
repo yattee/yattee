@@ -1,8 +1,11 @@
-## Build 154
+## Build 155
+* Fixed reported crashes
+* Minor performance improvements
+
+## Previous Builds
 * Fixed issue where AVPlayer would pause playing on exiting fullscreen
 * Fixed issue with empty button appearing on subscriptions list on tvOS
 
-## Previous Builds
 * Fixed issue with AVPlayer not always using full width
 * Fixed issue with layout when switching backend while in fullscreen
 * Fixed issue with updating watched time on closing video
