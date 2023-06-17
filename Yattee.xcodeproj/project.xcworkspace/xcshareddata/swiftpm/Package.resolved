@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "7087a82a3d23cbace8e4bb12cd0df054c7f2356a",
-        "version" : "0.11.0"
+        "revision" : "76565bc46ce878736910e9167ca4321fd0889845",
+        "version" : "0.12.0"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "c29b50a475120fdfa22573622464a7346aaf99a4",
-        "version" : "0.6.0"
+        "revision" : "84196bab1c7f05ad8c3c2a5bfb3058b1211e189f",
+        "version" : "0.6.1"
       }
     },
     {
