@@ -174,7 +174,11 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func togglePlay() {
-        isPlaying ? pause() : play()
+        if isPlaying {
+            pause()
+        } else {
+            play()
+        }
     }
 
     func stop() {
@@ -414,9 +418,8 @@ final class AVPlayerBackend: PlayerBackend {
     private func playerItem(_: Stream) -> AVPlayerItem? {
         if let asset {
             return AVPlayerItem(asset: asset)
-        } else {
-            return AVPlayerItem(asset: composition)
         }
+        return AVPlayerItem(asset: composition)
     }
 
     private func attachMetadata() {

@@ -471,9 +471,8 @@ final class MPVClient: ObservableObject {
             let data = Data(bufPtr)
             if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
                 return String(data: data[0 ... lastIndex], encoding: .isoLatin1)!
-            } else {
-                return String(data: data, encoding: .isoLatin1)!
             }
+            return String(data: data, encoding: .isoLatin1)!
         }
     }
 }

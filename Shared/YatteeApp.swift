@@ -98,7 +98,7 @@ struct YatteeApp: App {
                         HostingWindowFinder { window in
                             Windows.playerWindow = window
 
-                            NotificationCenter.default.addObserver(
+                            NotificationCenter.default.addObserver( // swiftlint:disable:this discarded_notification_center_observer
                                 forName: NSWindow.willExitFullScreenNotification,
                                 object: window,
                                 queue: OperationQueue.main

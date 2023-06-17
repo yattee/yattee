@@ -62,7 +62,8 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     var formatsDescription: String {
         if formats.count == Format.allCases.count {
             return "Any format".localized()
-        } else if formats.count <= 3 {
+        }
+        if formats.count <= 3 {
             return formats.map(\.description).joined(separator: ", ")
         }
 

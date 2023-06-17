@@ -14,7 +14,7 @@ final class PlayerControlsModel: ObservableObject {
     var timer: Timer?
 
     #if os(tvOS)
-        private(set) var reporter = PassthroughSubject<String, Never>()
+        private(set) var reporter = PassthroughSubject<String, Never>() // swiftlint:disable:this private_subject
     #endif
 
     var player: PlayerModel! { .shared }
@@ -106,7 +106,11 @@ final class PlayerControlsModel: ObservableObject {
     }
 
     func toggle() {
-        presentingControls ? hide() : show()
+        if presentingControls {
+            hide()
+        } else {
+            show()
+        }
     }
 
     func resetTimer() {

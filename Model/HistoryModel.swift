@@ -52,7 +52,6 @@ extension PlayerModel {
         let id = currentVideo.videoID
         let time = time ?? backend.currentTime
         let seconds = time?.seconds ?? 0
-        let duration = playerTime.duration.seconds
         if seconds < 3 {
             return
         }

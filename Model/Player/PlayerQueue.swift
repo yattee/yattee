@@ -328,13 +328,13 @@ extension PlayerModel {
         }
 
         playerAPI(video)?
-            .loadDetails(item, completionHandler: { [weak self] newItem in
+            .loadDetails(item, failureHandler: nil) { [weak self] newItem in
                 guard let self else { return }
 
                 replaceQueueItem(newItem)
 
                 self.logger.info("LOADED queue details: \(videoID)")
-            })
+            }
     }
 
     private func videoLoadFailureHandler(_ error: RequestError, video: Video? = nil) {

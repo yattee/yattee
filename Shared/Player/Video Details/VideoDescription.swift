@@ -177,7 +177,8 @@ struct VideoDescription: View {
                     {
                         player.backend.seek(to: Double(time), seekType: .userInteracted)
                         return
-                    } else if destination != nil {
+                    }
+                    if destination != nil {
                         urlToOpen = yatteeURL
                     }
                 }

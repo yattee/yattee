@@ -338,7 +338,8 @@ struct ChannelVideosView: View {
     private var resource: Resource? {
         guard let channel = presentedChannel else { return nil }
 
-        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        let tabData = channel.tabs.first { $0.contentType == contentType }?.data
+        let data = contentType != .videos ? tabData : nil
         let resource = accounts.api.channel(channel.id, contentType: contentType, data: data)
 
         if contentType == .videos {
@@ -451,7 +452,8 @@ struct ChannelVideosView: View {
             next = next ?? ""
         }
 
-        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        let tabData = channel.tabs.first { $0.contentType == contentType }?.data
+        let data = contentType != .videos ? tabData : nil
         accounts.api.channel(channel.id, contentType: contentType, data: data, page: next).load().onSuccess { response in
             if let page: ChannelPage = response.typedContent() {
                 self.page = page

@@ -253,11 +253,11 @@ struct VideoBanner: View {
     private var timeLabel: String? {
         if let watch, let watchStoppedAtLabel, let videoDurationLabel, !watch.finished {
             return "\(watchStoppedAtLabel) / \(videoDurationLabel)"
-        } else if let videoDurationLabel {
-            return videoDurationLabel
-        } else {
-            return nil
         }
+        if let videoDurationLabel {
+            return videoDurationLabel
+        }
+        return nil
     }
 
     @ViewBuilder private var timeView: some View {

@@ -193,8 +193,11 @@ struct PlayerControls: View {
             .frame(maxWidth: .infinity)
             #if os(tvOS)
                 .onChange(of: model.presentingControls) { newValue in
-                    if newValue { focusedField = .play }
-                    else { focusedField = nil }
+                    if newValue {
+                        focusedField = .play
+                    } else {
+                        focusedField = nil
+                    }
                 }
                 .onChange(of: focusedField) { _ in model.resetTimer() }
             #else

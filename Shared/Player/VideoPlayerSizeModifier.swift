@@ -33,7 +33,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
         #endif
     }
 
-    var ratio: CGFloat? {
+    var ratio: CGFloat? { // swiftlint:disable:this no_cgfloat
         fullScreen ? detailsHiddenInFullScreen ? nil : usedAspectRatio : usedAspectRatio
     }
 
@@ -57,9 +57,9 @@ struct VideoPlayerSizeModifier: ViewModifier {
         guard !fullScreen else {
             if detailsHiddenInFullScreen {
                 return geometry.size.height
-            } else {
-                return geometry.size.width / usedAspectRatio
             }
+
+            return geometry.size.width / usedAspectRatio
         }
 
         return max(geometry.size.height - VideoPlayerView.defaultMinimumHeightLeft, 0)

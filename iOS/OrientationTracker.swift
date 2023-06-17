@@ -79,14 +79,16 @@ public class OrientationTracker {
         let threshold = 0.55
         if accelerometerData.acceleration.x >= threshold {
             return .landscapeLeft
-        } else if accelerometerData.acceleration.x <= -threshold {
-            return .landscapeRight
-        } else if accelerometerData.acceleration.y <= -threshold {
-            return .portrait
-        } else if accelerometerData.acceleration.y >= threshold {
-            return .portraitUpsideDown
-        } else {
-            return currentDeviceOrientation
         }
+        if accelerometerData.acceleration.x <= -threshold {
+            return .landscapeRight
+        }
+        if accelerometerData.acceleration.y <= -threshold {
+            return .portrait
+        }
+        if accelerometerData.acceleration.y >= threshold {
+            return .portraitUpsideDown
+        }
+        return currentDeviceOrientation
     }
 }

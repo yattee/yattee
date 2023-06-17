@@ -33,7 +33,7 @@ struct FeedView: View {
             }
         #endif
         #if !os(tvOS)
-        .background(
+            .background(
             Button("Refresh") {
                 feed.loadResources(force: true)
             }
@@ -42,8 +42,8 @@ struct FeedView: View {
         )
         #endif
         #if !os(macOS)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            feed.loadResources()
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                feed.loadResources()
         }
         #endif
     }

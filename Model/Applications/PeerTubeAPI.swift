@@ -392,7 +392,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
     }
 
     func search(_ query: SearchQuery, page _: String?) -> Resource {
-        var resource = resource(baseURL: account.url, path: basePathAppending("search/videos"))
+        resource(baseURL: account.url, path: basePathAppending("search/videos"))
             .withParam("search", query.query)
 //            .withParam("sort_by", query.sortBy.parameter)
 //            .withParam("type", "all")
@@ -409,7 +409,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
 //            resource = resource.withParam("page", page)
 //        }
 
-        return resource
+//        return resource
     }
 
     func searchSuggestions(query: String) -> Resource {

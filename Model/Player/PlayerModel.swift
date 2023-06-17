@@ -717,7 +717,11 @@ final class PlayerModel: ObservableObject {
     }
 
     func togglePiPAction() {
-        (pipController?.isPictureInPictureActive ?? false) ? closePiP() : startPiP()
+        if pipController?.isPictureInPictureActive ?? false {
+            closePiP()
+        } else {
+            startPiP()
+        }
     }
 
     #if os(iOS)
@@ -812,12 +816,12 @@ final class PlayerModel: ObservableObject {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 guard let self else { return }
-                self.playerAPI(item.video)?.loadDetails(item, completionHandler: { newItem in
+                self.playerAPI(item.video)?.loadDetails(item, failureHandler: nil) { newItem in
                     guard newItem.videoID == self.autoplayItem?.videoID else { return }
                     self.autoplayItem = newItem
                     self.updateRemoteCommandCenter()
                     self.controls.objectWillChange.send()
-                })
+                }
             }
         }
     }

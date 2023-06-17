@@ -45,7 +45,8 @@ final class InstancesManifest: Service, ObservableObject {
 
         instancesList?.load().onSuccess { response in
             if let instances: [ManifestedInstance] = response.typedContent() {
-                guard let instance = instances.filter { $0.country == country }.randomElement() else { return }
+                let countryInstances = instances.filter { $0.country == country }
+                guard let instance = countryInstances.randomElement() else { return }
                 let account = instance.anonymousAccount
                 AccountsModel.shared.publicAccount = account
                 if asCurrent {

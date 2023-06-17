@@ -47,7 +47,7 @@ struct TVControls: UIViewRepresentable {
 
     func updateUIView(_: UIView, context _: Context) {}
 
-    func makeCoordinator() -> TVControls.Coordinator {
+    func makeCoordinator() -> Self.Coordinator {
         Coordinator(controlsArea)
     }
 

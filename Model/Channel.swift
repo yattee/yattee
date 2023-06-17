@@ -110,7 +110,7 @@ struct Channel: Identifiable, Hashable {
     }
 
     func hasData(for contentType: ContentType) -> Bool {
-        return tabs.contains { $0.contentType == contentType }
+        tabs.contains { $0.contentType == contentType }
     }
 
     var cacheKey: String {

@@ -65,9 +65,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
                 if type == "channel" {
                     return ContentItem(channel: self.extractChannel(from: json))
-                } else if type == "playlist" {
+                }
+                if type == "playlist" {
                     return ContentItem(playlist: self.extractChannelPlaylist(from: json))
-                } else if type == "video" {
+                }
+                if type == "video" {
                     return ContentItem(video: self.extractVideo(from: json))
                 }
 
@@ -724,9 +726,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         if type == "channel" {
             return ContentItem(channel: extractChannel(from: json))
-        } else if type == "playlist" {
+        }
+        if type == "playlist" {
             return ContentItem(playlist: extractChannelPlaylist(from: json))
-        } else if type == "video" {
+        }
+        if type == "video" {
             return ContentItem(video: extractVideo(from: json))
         }
 

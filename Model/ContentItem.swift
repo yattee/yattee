@@ -15,7 +15,7 @@ struct ContentItem: Identifiable {
             }
         }
 
-        static func < (lhs: ContentType, rhs: ContentType) -> Bool {
+        static func < (lhs: Self, rhs: Self) -> Bool {
             lhs.sortOrder < rhs.sortOrder
         }
     }
@@ -30,19 +30,19 @@ struct ContentItem: Identifiable {
 
     var id: String = UUID().uuidString
 
-    static func array(of videos: [Video]) -> [ContentItem] {
+    static func array(of videos: [Video]) -> [Self] {
         videos.map { Self(video: $0) }
     }
 
-    static func array(of playlists: [ChannelPlaylist]) -> [ContentItem] {
+    static func array(of playlists: [ChannelPlaylist]) -> [Self] {
         playlists.map { Self(playlist: $0) }
     }
 
-    static func array(of channels: [Channel]) -> [ContentItem] {
+    static func array(of channels: [Channel]) -> [Self] {
         channels.map { Self(channel: $0) }
     }
 
-    static func < (lhs: ContentItem, rhs: ContentItem) -> Bool {
+    static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.contentType < rhs.contentType
     }
 

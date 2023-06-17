@@ -17,7 +17,11 @@ struct FavoritesModel {
     }
 
     func toggle(_ item: FavoriteItem) {
-        contains(item) ? remove(item) : add(item)
+        if contains(item) {
+            remove(item)
+        } else {
+            add(item)
+        }
     }
 
     func add(_ item: FavoriteItem) {

@@ -83,7 +83,7 @@ struct Video: Identifiable, Equatable, Hashable {
         dislikes: Int? = nil,
         keywords: [String] = [],
         streams: [Stream] = [],
-        related: [Video] = [],
+        related: [Self] = [],
         chapters: [Chapter] = [],
         captions: [Captions] = []
     ) {
@@ -116,7 +116,7 @@ struct Video: Identifiable, Equatable, Hashable {
         self.captions = captions
     }
 
-    static func local(_ url: URL) -> Video {
+    static func local(_ url: URL) -> Self {
         Self(
             app: .local,
             videoID: url.absoluteString,
@@ -249,7 +249,7 @@ struct Video: Identifiable, Equatable, Hashable {
         thumbnails.first { $0.quality == quality }?.url
     }
 
-    static func == (lhs: Video, rhs: Video) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         let videoIDIsEqual = lhs.videoID == rhs.videoID
 
         if !lhs.indexID.isNil, !rhs.indexID.isNil {
