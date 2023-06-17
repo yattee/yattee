@@ -483,7 +483,7 @@
 "Are you sure you want to remove this document?" = "Êtes-vous sûr de vouloir supprimer ce document ?";
 "Left" = "Gauche";
 "Shorts" = "Shorts";
-"Copy%@link" = "Copier le lien %@";
+"Copy%@link" = "Copier le lien%@";
 "Verified" = "Vérifiée";
 "Show sidebar" = "Afficher la barre latérale";
 "Driver" = "Driver";
@@ -501,7 +501,7 @@
 "Codec" = "Codec";
 "Default Profile" = "Profil par défaut";
 "Playback history is empty" = "L'historique de lecture est vide";
-"Share%@link" = "Partager le lien %@";
+"Share%@link" = "Partager le lien%@";
 "Clear all" = "Tout effacer";
 "Hide player" = "Masquer le lecteur";
 "Close video" = "Fermer la vidéo";

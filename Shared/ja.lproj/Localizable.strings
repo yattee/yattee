@@ -588,7 +588,10 @@
 "(watched hidden)" = "(視聴済み非表示)";
 "Disable filters" = "絞り込み解除";
 "Are you sure you want to remove %@ from Favorites?" = "お気に入りから %@ を除去しますか？";
-"Show video context menu options to force selected backend" = "強制的にバックエンドを選択するための動画のコンテキストメニューを表示";
+"Show video context menu options to force selected backend" = "強制的にバックエンドを選択するコンテキストメニューを動画に表示";
 "Play Now in AVPlayer" = "AVPlayer で今すぐ再生";
 "Play Now in MPV" = "MPV で今すぐ再生";
 "Keep channels with unwatched videos on top of subscriptions list" = "未視聴の動画があるチャンネルをチャンネル一覧の上部に維持";
+"Limit" = "上限";
+"Landscape left" = "左を下に横長";
+"Landscape right" = "右を下に横長";

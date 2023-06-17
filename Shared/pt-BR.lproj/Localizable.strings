@@ -57,8 +57,8 @@
 "Current: %@\n%@" = "Atual: %@\n%@";
 
 /* Locations settings, custom instance is selected as current */
-"Custom" = "Customizado";
-"Custom Locations" = "Localizações customizadas";
+"Custom" = "Personalizado";
+"Custom Locations" = "Localizações personalizadas";
 "Decreased opacity" = "Opacidade reduzida";
 "Delete" = "Deletar";
 "Disabled" = "Desativado";
@@ -251,7 +251,7 @@
 "Watching now" = "Assistindo agora";
 "This cannot be reverted" = "Isso não pode ser revertido";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Isso não pode ser revertido. Talvez você precise mudar de visualização ou reiniciar o app para ver mudanças.";
-"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Isso removerá todos os perfis customizados e retornará aos valores padrão. Isso não pode ser revertido.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Isso removerá todos os perfis personalizados e retornará aos valores padrão. Isso não pode ser revertido.";
 "System controls buttons" = "Botões de controle do sistema";
 "System controls show buttons for %@" = "Controles do sistema mostram botões para %@";
 
@@ -327,7 +327,7 @@
 
 /* Video date filter in search */
 "Year" = "Ano";
-"You can find information about using Yattee in the Wiki pages." = "Você pode encontrar informações sobre como usar o Yatte nas páginas da Wiki.";
+"You can find information about using Yattee in the Wiki pages." = "Você pode encontrar informações sobre como usar o Yattee nas páginas da Wiki.";
 "You have no Playlists" = "Você não tem playlists";
 "Videos" = "Vídeos";
 
@@ -353,7 +353,7 @@
 "Show video length" = "Mostrar tamanho do vídeo";
 "Sort: %@" = "Organizar: %@";
 "Could not extract channel information" = "Não pôde extrair informação do canal";
-"For custom locations you can configure Frontend URL in Locations settings" = "Para localizações customizadas você pode configurar URL do frontend nas configurações de localização";
+"For custom locations you can configure Frontend URL in Locations settings" = "Para localizações personalizadas você pode configurar URL do frontend nas configurações de localização";
 "Add Location" = "Adicionar Localização";
 "Add Location..." = "Adicionar Localização…";
 "For videos which feature music as the primary content." = "Para vídeos que têm música como conteúdo principal.";
