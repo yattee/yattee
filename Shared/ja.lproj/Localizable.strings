@@ -177,7 +177,7 @@
 "When partially watched video is played" = "一部視聴済みの動画の再生時";
 
 /* Selected video was played on given date */
-"Watched %@" = "視聴日 %@";
+"Watched %@" = "前回の視聴 %@";
 "Welcome" = "ようこそ";
 "Yattee" = "Yattee";
 "Yattee %@ (build %@)" = "Yattee %@ (ビルド %@)";
