@@ -2,6 +2,7 @@ import CoreMedia
 import Defaults
 import Foundation
 import Logging
+import MPVKit
 #if !os(macOS)
     import Siesta
     import UIKit
@@ -72,8 +73,7 @@ final class MPVClient: ObservableObject {
         let api = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
         var initParams = mpv_opengl_init_params(
             get_proc_address: getProcAddress,
-            get_proc_address_ctx: nil,
-            extra_exts: nil
+            get_proc_address_ctx: nil
         )
 
         queue = DispatchQueue(label: "mpv")
