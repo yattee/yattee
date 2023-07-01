@@ -7,19 +7,8 @@ struct ControlBackgroundModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if enabled {
-            if #available(iOS 15, macOS 12, *) {
-                content
-                    .background(.thinMaterial)
-            } else {
-                content
-                #if os(macOS)
-                .background(VisualEffectBlur(material: .hudWindow))
-                #elseif os(iOS)
-                .background(VisualEffectBlur(blurStyle: .systemThinMaterial).edgesIgnoringSafeArea(edgesIgnoringSafeArea))
-                #else
+            content
                 .background(.thinMaterial)
-                #endif
-            }
         } else {
             content
         }

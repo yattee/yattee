@@ -34,8 +34,9 @@ struct ChannelsView: View {
                         Text(channel.name)
                             .lineLimit(1)
                     }
-                    .backport
+                    #if !os(tvOS)
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
+                    #endif
 
                     Group {
                         #if os(tvOS)
@@ -73,8 +74,9 @@ struct ChannelsView: View {
 
                 Color.clear.padding(.bottom, 50)
                     .listRowBackground(Color.clear)
-                    .backport
-                    .listRowSeparator(false)
+                #if os(iOS)
+                    .listRowSeparator(.hidden)
+                #endif
             }
         }
         #if !os(tvOS)
@@ -89,12 +91,6 @@ struct ChannelsView: View {
             subscriptions.load(force: true)
         }
         #if os(iOS)
-        .refreshControl { refreshControl in
-            subscriptions.load(force: true) {
-                refreshControl.endRefreshing()
-            }
-        }
-        .backport
         .refreshable {
             await subscriptions.load(force: true)
         }

@@ -26,7 +26,6 @@ struct AppSidebarSubscriptions: View {
 
                         Spacer()
                     }
-                    .backport
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
                 }
                 .contextMenu {

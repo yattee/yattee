@@ -59,23 +59,15 @@ struct VideoDescription: View {
 
     @ViewBuilder var textDescription: some View {
         #if !os(iOS)
-            Group {
-                if #available(macOS 12, *) {
-                    Text(description)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
-                    #if !os(tvOS)
-                        .textSelection(.enabled)
-                    #endif
-                } else {
-                    Text(description)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
-                }
-            }
-            .multilineTextAlignment(.leading)
-            .font(.system(size: 14))
-            .lineSpacing(3)
+            Text(description)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
+            #if !os(tvOS)
+                .textSelection(.enabled)
+            #endif
+                .multilineTextAlignment(.leading)
+                .font(.system(size: 14))
+                .lineSpacing(3)
         #endif
     }
 

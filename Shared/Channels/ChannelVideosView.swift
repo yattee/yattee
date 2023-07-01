@@ -40,7 +40,7 @@ struct ChannelVideosView: View {
     }
 
     var body: some View {
-        let content = VStack {
+        VStack {
             #if os(tvOS)
                 VStack {
                     HStack(spacing: 24) {
@@ -181,19 +181,12 @@ struct ChannelVideosView: View {
         .navigationTitle(navigationTitle)
         #endif
 
-        return Group {
-            if #available(macOS 12.0, *) {
-                content
-                #if os(tvOS)
-                .background(Color.background(scheme: colorScheme))
-                #endif
-                #if !os(iOS)
-                .focusScope(focusNamespace)
-                #endif
-            } else {
-                content
-            }
-        }
+        #if os(tvOS)
+        .background(Color.background(scheme: colorScheme))
+        #endif
+        #if !os(iOS)
+        .focusScope(focusNamespace)
+        #endif
     }
 
     var verticalCellsEdgesIgnoringSafeArea: Edge.Set {

@@ -38,7 +38,7 @@ struct InstancesSettings: View {
             if !selectedInstance.isNil, selectedInstance.app.supportsAccounts {
                 SettingsHeader(text: "Accounts".localized())
 
-                let list = List(selection: $selectedAccount) {
+                List(selection: $selectedAccount) {
                     if selectedInstanceAccounts.isEmpty {
                         Text("You have no accounts for this location")
                             .foregroundColor(.secondary)
@@ -69,13 +69,7 @@ struct InstancesSettings: View {
                         .tag(account)
                     }
                 }
-
-                if #available(macOS 12.0, *) {
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list
-                }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
             }
 
             if selectedInstance != nil, selectedInstance.app.hasFrontendURL {

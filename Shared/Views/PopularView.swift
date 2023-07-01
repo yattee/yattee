@@ -47,14 +47,6 @@ struct PopularView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .refreshControl { refreshControl in
-            resource?.load().onCompletion { _ in
-                refreshControl.endRefreshing()
-            }
-            .onFailure { self.error = $0 }
-            .onSuccess { _ in self.error = nil }
-        }
-        .backport
         .refreshable {
             DispatchQueue.main.async {
                 resource?.load()
@@ -62,7 +54,7 @@ struct PopularView: View {
                     .onSuccess { _ in self.error = nil }
             }
         }
-        .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
+        .navigationBarTitleDisplayMode(.inline)
         #endif
         #if os(macOS)
         .toolbar {

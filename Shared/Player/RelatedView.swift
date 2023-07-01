@@ -18,8 +18,9 @@ struct RelatedView: View {
 
                     Color.clear.padding(.bottom, 50)
                         .listRowBackground(Color.clear)
-                        .backport
-                        .listRowSeparator(false)
+                    #if os(iOS)
+                        .listRowSeparator(.hidden)
+                    #endif
                 }
             }
         }

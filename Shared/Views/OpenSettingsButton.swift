@@ -8,7 +8,7 @@ struct OpenSettingsButton: View {
     #endif
 
     var body: some View {
-        let button = Button {
+        Button {
             presentationMode.wrappedValue.dismiss()
 
             #if os(macOS)
@@ -20,13 +20,7 @@ struct OpenSettingsButton: View {
             Label("Open Settings", systemImage: "gearshape.2")
         }
         .buttonStyle(.plain)
-
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-            button
-                .buttonStyle(.borderedProminent)
-        } else {
-            button
-        }
+        .buttonStyle(.borderedProminent)
     }
 }
 

@@ -91,13 +91,6 @@ struct PlaylistsView: View {
             loadResource()
         }
         #if os(iOS)
-        .refreshControl { refreshControl in
-            model.load(force: true) {
-                model.reloadPlaylists.toggle()
-                refreshControl.endRefreshing()
-            }
-        }
-        .backport
         .refreshable {
             DispatchQueue.main.async {
                 model.load(force: true) { model.reloadPlaylists.toggle() }

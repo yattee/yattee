@@ -95,6 +95,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
         }
     }
 
+
     func loadCachedChannels(_ account: Account) {
         let cache = getChannels(account: account)
         if !cache.isEmpty {
