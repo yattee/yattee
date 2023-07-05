@@ -502,3 +502,13 @@
 "Shorts" = "短视频";
 "Verified" = "已验证";
 "Channel" = "频道";
+"Open expanded" = "展开";
+"Mark channel feed as watched" = "关注频道种子";
+"Short videos: visible" = "短视频：可见";
+"Player Bar" = "播放栏";
+"Short videos: hidden" = "短视频：隐藏";
+"Mark channel feed as unwatched" = "取消关注频道种子";
+"Play all unwatched" = "观看所有未观看视频";
+"Double tap gesture" = "双击手势";
+"Tap and hold channel thumbnail to open context menu with more actions" = "点击并按住频道缩略图以打开包含更多操作的上下文菜单";
+"Always show controls buttons" = "始终显示控制按钮";
