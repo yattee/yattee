@@ -16,7 +16,7 @@ struct AppSidebarSubscriptions: View {
 
     var body: some View {
         Section(header: Text("Subscriptions")) {
-            ForEach(subscriptions.all) { channel in
+            ForEach(channels) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
                     LazyView(ChannelVideosView(channel: channel))
                 } label: {
@@ -43,6 +43,10 @@ struct AppSidebarSubscriptions: View {
                 .id("channel\(channel.id)")
             }
         }
+    }
+
+    var channels: [Channel] {
+        keepChannelsWithUnwatchedFeedOnTop ? subscriptions.allByUnwatchedCount : subscriptions.all
     }
 }
 
