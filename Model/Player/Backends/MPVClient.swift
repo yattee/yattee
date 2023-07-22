@@ -86,7 +86,7 @@ final class MPVClient: ObservableObject {
             ]
 
             if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
-                puts("failed to initialize mpv GL context")
+                print("failed to initialize mpv GL context")
                 exit(1)
             }
 
