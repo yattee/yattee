@@ -19,19 +19,14 @@ struct ChannelAvatarView: View {
                         ThumbnailView(url: url)
                     } else {
                         ZStack {
-                            Color(white: 0.6)
-                                .opacity(0.5)
+                            Color("PlaceholderColor")
 
-                            Group {
-                                if let video, video.isLocal {
-                                    Image(systemName: video.localStreamImageSystemName)
-                                } else {
-                                    Image(systemName: "play.rectangle")
-                                }
+                            if let video, video.isLocal {
+                                Image(systemName: video.localStreamImageSystemName)
+                                    .foregroundColor(.accentColor)
+                                    .font(.system(size: 20))
+                                    .contentShape(Rectangle())
                             }
-                            .foregroundColor(.accentColor)
-                            .font(.system(size: 20))
-                            .contentShape(Rectangle())
                         }
                         .onAppear(perform: updateURL)
                     }
