@@ -103,7 +103,9 @@ struct TimelineView: View {
 
                 .foregroundColor(.white)
             }
+            #if os(tvOS)
             .frame(maxHeight: 300, alignment: .bottom)
+            #endif
             .offset(x: thumbTooltipOffset)
             .overlay(GeometryReader { proxy in
                 Color.clear
@@ -114,8 +116,9 @@ struct TimelineView: View {
                         tooltipSize = proxy.size
                     }
             })
-
+            #if os(tvOS)
             .frame(height: 80)
+            #endif
             .opacity(dragging ? 1 : 0)
             .animation(.easeOut, value: thumbTooltipOffset)
             HStack(spacing: 4) {
@@ -161,14 +164,6 @@ struct TimelineView: View {
                             self.size = size
                         }
                 })
-                .frame(maxHeight: playerControlsLayout.timelineHeight)
-                #if !os(tvOS)
-                    .gesture(DragGesture(minimumDistance: 0).onEnded { value in
-                        let target = (value.location.x / size.width) * units
-                        self.playerTime.currentTime = .secondsInDefaultTimescale(target)
-                        player.backend.seek(to: target, seekType: .userInteracted)
-                    })
-                #endif
 
                 durationView
                     .shadow(radius: 3)
@@ -177,8 +172,14 @@ struct TimelineView: View {
                     .frame(minWidth: 30, alignment: .trailing)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
             }
-            #if !os(tvOS)
-            .highPriorityGesture(
+
+            .font(.system(size: playerControlsLayout.timeFontSize).monospacedDigit())
+            .zIndex(2)
+            .foregroundColor(.white)
+        }
+        .contentShape(Rectangle())
+        #if !os(tvOS)
+            .gesture(
                 DragGesture(minimumDistance: 5, coordinateSpace: .global)
                     .onChanged { value in
                         if !dragging {
@@ -210,11 +211,7 @@ struct TimelineView: View {
                         controls.resetTimer()
                     }
             )
-            #endif
-            .font(.system(size: playerControlsLayout.timeFontSize).monospacedDigit())
-            .zIndex(2)
-            .foregroundColor(.white)
-        }
+        #endif
     }
 
     @ViewBuilder var durationView: some View {
