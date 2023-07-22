@@ -85,7 +85,6 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                     self.error = nil
                     if let channels: [Channel] = resource.typedContent() {
                         self.channels = channels
-                        channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
                         self.storeChannels(account: account, channels: channels)
                         FeedModel.shared.calculateUnwatchedFeed()
                         onSuccess()
@@ -94,7 +93,6 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
                 .onFailure { self.error = $0 }
         }
     }
-
 
     func loadCachedChannels(_ account: Account) {
         let cache = getChannels(account: account)
@@ -106,16 +104,18 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
     }
 
     func storeChannels(account: Account, channels: [Channel]) {
-        let date = iso8601DateFormatter.string(from: Date())
-        logger.info("caching channels \(channelsDateCacheKey(account)) -- \(date)")
+        DispatchQueue.global(qos: .background).async {
+            let date = self.iso8601DateFormatter.string(from: Date())
+            self.logger.info("caching channels \(self.channelsDateCacheKey(account)) -- \(date)")
 
-        channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
+            channels.forEach { ChannelsCacheModel.shared.storeIfMissing($0) }
 
-        let dateObject: JSON = ["date": date]
-        let channelsObject: JSON = ["channels": channels.map(\.json).map(\.object)]
+            let dateObject: JSON = ["date": date]
+            let channelsObject: JSON = ["channels": channels.map(\.json).map(\.object)]
 
-        try? storage?.setObject(dateObject, forKey: channelsDateCacheKey(account))
-        try? storage?.setObject(channelsObject, forKey: channelsCacheKey(account))
+            try? self.storage?.setObject(dateObject, forKey: self.channelsDateCacheKey(account))
+            try? self.storage?.setObject(channelsObject, forKey: self.channelsCacheKey(account))
+        }
     }
 
     func getChannels(account: Account) -> [Channel] {

@@ -16,6 +16,7 @@ struct VideoBanner: View {
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.timeOnThumbnail) private var timeOnThumbnail
     @Default(.roundedThumbnails) private var roundedThumbnails
+    @Default(.showChannelAvatarInVideosListing) private var showChannelAvatarInVideosListing
 
     @Environment(\.inChannelView) private var inChannelView
     @Environment(\.inNavigationView) private var inNavigationView
@@ -85,10 +86,9 @@ struct VideoBanner: View {
                                     if !inChannelView, !video.isLocal || video.localStreamIsRemoteURL {
                                         ChannelLinkView(channel: video.channel) {
                                             HStack(spacing: Constants.channelDetailsStackSpacing) {
-                                                if let url = video.channel.thumbnailURLOrCached, video != .fixture {
-                                                    ThumbnailView(url: url)
+                                                if video != .fixture, showChannelAvatarInVideosListing {
+                                                    ChannelAvatarView(channel: video.channel)
                                                         .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
-                                                        .clipShape(Circle())
                                                 }
 
                                                 channelLabel

@@ -25,6 +25,8 @@ struct BrowsingSettings: View {
     @Default(.playerButtonIsExpanded) private var playerButtonIsExpanded
     @Default(.playerBarMaxWidth) private var playerBarMaxWidth
     @Default(.expandChannelDescription) private var expandChannelDescription
+    @Default(.showChannelAvatarInChannelsLists) private var showChannelAvatarInChannelsLists
+    @Default(.showChannelAvatarInVideosListing) private var showChannelAvatarInVideosListing
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -186,6 +188,9 @@ struct BrowsingSettings: View {
             }
 
             Toggle("Keep channels with unwatched videos on top of subscriptions list", isOn: $keepChannelsWithUnwatchedFeedOnTop)
+
+            Toggle("Show channel avatars in channels lists", isOn: $showChannelAvatarInChannelsLists)
+            Toggle("Show channel avatars in videos lists", isOn: $showChannelAvatarInVideosListing)
         }
     }
 

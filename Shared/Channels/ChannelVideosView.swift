@@ -205,6 +205,7 @@ struct ChannelVideosView: View {
 
     var thumbnail: some View {
         ChannelAvatarView(channel: store.item?.channel)
+            .id("channel-avatar-\(store.item?.channel?.id ?? "")")
         #if os(tvOS)
             .frame(width: 80, height: 80, alignment: .trailing)
         #else

@@ -50,6 +50,8 @@ struct RecentNavigationLink<DestinationContent: View>: View {
     var recents = RecentsModel.shared
     @ObservedObject private var navigation = NavigationModel.shared
 
+    @Default(.showChannelAvatarInChannelsLists) private var showChannelAvatarInChannelsLists
+
     var recent: RecentItem
     var systemImage: String?
     let destination: DestinationContent
@@ -71,9 +73,10 @@ struct RecentNavigationLink<DestinationContent: View>: View {
             HStack {
                 if recent.type == .channel,
                    let channel = recent.channel,
-                   channel.thumbnailURLOrCached != nil
+                   showChannelAvatarInChannelsLists
                 {
                     ChannelAvatarView(channel: channel, subscribedBadge: false)
+                        .id("channel-avatar-\(channel.id)")
                         .frame(width: Constants.sidebarChannelThumbnailSize, height: Constants.sidebarChannelThumbnailSize)
 
                     Text(channel.name)

@@ -148,6 +148,9 @@ extension Defaults.Keys {
     #endif
     static let expandVideoDescription = Key<Bool>("expandVideoDescription", default: expandVideoDescriptionDefault)
 
+    static let showChannelAvatarInChannelsLists = Key<Bool>("showChannelAvatarInChannelsLists", default: true)
+    static let showChannelAvatarInVideosListing = Key<Bool>("showChannelAvatarInVideosListing", default: true)
+
     #if os(tvOS)
         static let pauseOnHidingPlayerDefault = true
     #else

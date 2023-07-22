@@ -12,6 +12,7 @@ struct ChannelsView: View {
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
     @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
+    @Default(.showChannelAvatarInChannelsLists) private var showChannelAvatarInChannelsLists
 
     @State private var channelLinkActive = false
     @State private var channelForLink: Channel?
@@ -21,10 +22,9 @@ struct ChannelsView: View {
             Section(header: header) {
                 ForEach(channels) { channel in
                     let label = HStack {
-                        if let url = channel.thumbnailURLOrCached {
-                            ThumbnailView(url: url)
+                        if showChannelAvatarInChannelsLists {
+                            ChannelAvatarView(channel: channel, subscribedBadge: false)
                                 .frame(width: 35, height: 35)
-                                .clipShape(RoundedRectangle(cornerRadius: 35))
                         } else {
                             Image(systemName: RecentsModel.symbolSystemImage(channel.name))
                                 .imageScale(.large)
