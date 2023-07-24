@@ -593,3 +593,5 @@
 "Show video context menu options to force selected backend" = "Show video context menu options to force selected backend";
 "Play Now in MPV" = "Play Now in MPV";
 "Play Now in AVPlayer" = "Play Now in AVPlayer";
+"Show channel avatars in videos lists" = "Show channel avatars in videos lists";
+"Show channel avatars in channels lists" = "Show channel avatars in channels lists";
