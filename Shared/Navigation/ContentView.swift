@@ -131,10 +131,6 @@ struct ContentView: View {
 
             NavigationModel.shared.presentingOpenVideos = false
         }
-        .onOpenURL { url in
-            URLBookmarkModel.shared.saveBookmark(url)
-            OpenURLHandler(navigationStyle: navigationStyle).handle(url)
-        }
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
                 AddToPlaylistView(video: navigation.videoToAddToPlaylist)
@@ -173,16 +169,6 @@ struct ContentView: View {
         #endif
     }
 
-    var navigationStyle: NavigationStyle {
-        #if os(iOS)
-            return horizontalSizeClass == .compact ? .tab : .sidebar
-        #elseif os(tvOS)
-            return .tab
-        #else
-            return .sidebar
-        #endif
-    }
-
     @ViewBuilder var videoPlayer: some View {
         if player.presentingPlayer {
             playerView
@@ -199,7 +185,6 @@ struct ContentView: View {
 
     var playerView: some View {
         VideoPlayerView()
-            .environment(\.navigationStyle, navigationStyle)
     }
 }
 

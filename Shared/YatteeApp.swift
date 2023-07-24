@@ -28,6 +28,7 @@ struct YatteeApp: App {
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #elseif os(iOS)
         @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
     @State private var configured = false
@@ -55,6 +56,7 @@ struct YatteeApp: App {
             ContentView()
                 .onAppear(perform: configure)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.navigationStyle, navigationStyle)
             #if os(macOS)
                 .background(
                     HostingWindowFinder { window in
@@ -75,6 +77,12 @@ struct YatteeApp: App {
             #endif
             #if os(iOS)
             .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
+            #endif
+            #if !os(tvOS)
+            .onOpenURL { url in
+                URLBookmarkModel.shared.saveBookmark(url)
+                OpenURLHandler(navigationStyle: navigationStyle).handle(url)
+            }
             #endif
         }
         #if os(iOS)
@@ -114,6 +122,10 @@ struct YatteeApp: App {
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.navigationStyle, .sidebar)
                     .handlesExternalEvents(preferring: Set(["player", "*"]), allowing: Set(["player", "*"]))
+                    .onOpenURL { url in
+                        URLBookmarkModel.shared.saveBookmark(url)
+                        OpenURLHandler(navigationStyle: navigationStyle).handle(url)
+                    }
             }
             .handlesExternalEvents(matching: Set(["player", "*"]))
 
@@ -199,5 +211,15 @@ struct YatteeApp: App {
         }
 
         Defaults[.homeHistoryItems] = -1
+    }
+
+    var navigationStyle: NavigationStyle {
+        #if os(iOS)
+            return horizontalSizeClass == .compact ? .tab : .sidebar
+        #elseif os(tvOS)
+            return .tab
+        #else
+            return .sidebar
+        #endif
     }
 }
