@@ -60,6 +60,10 @@ struct Account: Defaults.Serializable, Hashable, Identifiable {
         instanceID.isNil
     }
 
+    var isPublicAddedToCustom: Bool {
+        InstancesModel.shared.findByURLString(urlString) != nil
+    }
+
     var description: String {
         guard !isPublic else {
             return name

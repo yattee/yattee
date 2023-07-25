@@ -32,6 +32,12 @@ final class InstancesModel: ObservableObject {
         return Defaults[.instances].first { $0.id == id }
     }
 
+    func findByURLString(_ urlString: String?) -> Instance? {
+        guard let urlString else { return nil }
+
+        return Defaults[.instances].first { $0.apiURLString == urlString }
+    }
+
     func accounts(_ id: Instance.ID?) -> [Account] {
         Defaults[.accounts].filter { $0.instanceID == id }
     }

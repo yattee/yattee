@@ -371,6 +371,9 @@
 		3763C989290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
 		3763C98A290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
 		3763C98B290C7A50004D3B5F /* OpenVideosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763C988290C7A50004D3B5F /* OpenVideosView.swift */; };
+		3764188A2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376418892A6FE32D008DDCC1 /* AddPublicInstanceButton.swift */; };
+		3764188B2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376418892A6FE32D008DDCC1 /* AddPublicInstanceButton.swift */; };
+		3764188C2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376418892A6FE32D008DDCC1 /* AddPublicInstanceButton.swift */; };
 		37648B69286CF5F1003D330B /* TVControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37648B68286CF5F1003D330B /* TVControls.swift */; };
 		376527BB285F60F700102284 /* PlayerTimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376527BA285F60F700102284 /* PlayerTimeModel.swift */; };
 		376527BC285F60F700102284 /* PlayerTimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376527BA285F60F700102284 /* PlayerTimeModel.swift */; };
@@ -1146,6 +1149,7 @@
 		3763495026DFF59D00B9A393 /* AppSidebarRecents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSidebarRecents.swift; sourceTree = "<group>"; };
 		37635FE3291EA6CF00C11E79 /* AccentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccentButton.swift; sourceTree = "<group>"; };
 		3763C988290C7A50004D3B5F /* OpenVideosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenVideosView.swift; sourceTree = "<group>"; };
+		376418892A6FE32D008DDCC1 /* AddPublicInstanceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPublicInstanceButton.swift; sourceTree = "<group>"; };
 		37648B68286CF5F1003D330B /* TVControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVControls.swift; sourceTree = "<group>"; };
 		376527BA285F60F700102284 /* PlayerTimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTimeModel.swift; sourceTree = "<group>"; };
 		376578842685429C00D4EA09 /* CaseIterable+Next.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaseIterable+Next.swift"; sourceTree = "<group>"; };
@@ -1730,6 +1734,7 @@
 				37484C2826FC83FF00287258 /* AccountForm.swift */,
 				37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */,
 				37732FEF2703A26300F04329 /* AccountValidationStatus.swift */,
+				376418892A6FE32D008DDCC1 /* AddPublicInstanceButton.swift */,
 				37F0F4ED286F734400C06C2E /* AdvancedSettings.swift */,
 				376BE50A27349108009AD608 /* BrowsingSettings.swift */,
 				37579D5C27864F5F00FD0B98 /* Help.swift */,
@@ -2954,6 +2959,7 @@
 				371CC7742946963000979C1A /* ListingStyleButtons.swift in Sources */,
 				3788AC2726F6840700F6BAA9 /* FavoriteItemView.swift in Sources */,
 				375DFB5826F9DA010013F468 /* InstancesModel.swift in Sources */,
+				3764188A2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */,
 				3751BA8327E6914F007B1A60 /* ReturnYouTubeDislikeAPI.swift in Sources */,
 				373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */,
 				37F5E8BA291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
@@ -3252,6 +3258,7 @@
 				374924E4292141320017D862 /* InspectorView.swift in Sources */,
 				375168D72700FDB8008F96A6 /* Debounce.swift in Sources */,
 				37D526DF2720AC4400ED2F5E /* VideosAPI.swift in Sources */,
+				3764188B2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */,
 				377F9F802944175F0043F856 /* FeedCacheModel.swift in Sources */,
 				373C8FE5275B955100CB5936 /* CommentsPage.swift in Sources */,
 				37D4B0E52671614900C925CA /* YatteeApp.swift in Sources */,
@@ -3563,6 +3570,7 @@
 				37141675267A8E10006CA35D /* Country.swift in Sources */,
 				370F500C27CC1821001B35DC /* MPVViewController.swift in Sources */,
 				3782B9542755667600990149 /* String+Format.swift in Sources */,
+				3764188C2A6FE32D008DDCC1 /* AddPublicInstanceButton.swift in Sources */,
 				37D836BE294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
 				37152EEC26EFEB95004FB96D /* LazyView.swift in Sources */,
 				371AC0A1294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,

@@ -93,6 +93,7 @@ struct LocationsSettings: View {
                 ForEach(instances) { instance in
                     AccountsNavigationLink(instance: instance)
                 }
+                AddPublicInstanceButton()
                 addInstanceButton
             #endif
         }
