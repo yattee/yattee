@@ -10,6 +10,7 @@ struct ChannelAvatarView: View {
     @ObservedObject private var subscribedChannels = SubscribedChannelsModel.shared
 
     @State private var url: URL?
+    @State private var loaded = false
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -19,13 +20,20 @@ struct ChannelAvatarView: View {
                         ThumbnailView(url: url)
                     } else {
                         ZStack {
-                            Color("PlaceholderColor")
+                            if loaded {
+                                Image(systemName: "person.circle")
+                                    .imageScale(.large)
+                                    .foregroundColor(.accentColor)
+                            } else {
+                                Color("PlaceholderColor")
+                            }
 
                             if let video, video.isLocal {
                                 Image(systemName: video.localStreamImageSystemName)
                                     .foregroundColor(.accentColor)
                                     .font(.system(size: 20))
                                     .contentShape(Rectangle())
+                                    .imageScale(.small)
                             }
                         }
                         .onAppear(perform: updateURL)
@@ -47,10 +55,10 @@ struct ChannelAvatarView: View {
                     #endif
                         .clipShape(Circle())
                         .foregroundColor(.secondary)
+                        .imageScale(.small)
                 }
             }
         }
-        .imageScale(.small)
     }
 
     func updateURL() {
@@ -60,6 +68,7 @@ struct ChannelAvatarView: View {
                     self.url = url
                 }
             }
+            self.loaded = true
         }
     }
 }

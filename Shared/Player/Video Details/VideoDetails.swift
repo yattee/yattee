@@ -41,7 +41,7 @@ struct VideoDetails: View {
                         )
                     } else {
                         Circle()
-                            .foregroundColor(Color(white: 0.6).opacity(0.5))
+                            .foregroundColor(Color("PlaceholderColor"))
                     }
                 }
                 .frame(width: 40, height: 40)
