@@ -188,6 +188,9 @@ struct SettingsView: View {
                         Label("Advanced", systemImage: "wrench.and.screwdriver")
                     }
                 }
+                #if os(tvOS)
+                .padding(.horizontal, 20)
+                #endif
 
                 Section(footer: helpFooter) {
                     NavigationLink {
@@ -196,6 +199,9 @@ struct SettingsView: View {
                         Label("Help", systemImage: "questionmark.circle")
                     }
                 }
+                #if os(tvOS)
+                .padding(.horizontal, 20)
+                #endif
 
                 #if !os(tvOS)
                     Section(header: Text("Contact"), footer: versionString) {
