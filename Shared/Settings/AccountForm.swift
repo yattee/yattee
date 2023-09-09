@@ -81,6 +81,10 @@ struct AccountForm: View {
 
     @ViewBuilder var formFields: some View {
         TextField("Username", text: $username)
+        #if !os(macOS)
+            .autocapitalization(.none)
+        #endif
+            .disableAutocorrection(true)
         SecureField("Password", text: $password)
 
         #if os(tvOS)
