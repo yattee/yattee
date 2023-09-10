@@ -119,6 +119,20 @@ struct SettingsView: View {
         #endif
     }
 
+    struct SettingsLabel: LabelStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            #if os(tvOS)
+                Label {
+                    configuration.title.padding(.leading, 10)
+                } icon: {
+                    configuration.icon
+                }
+            #else
+                Label(configuration)
+            #endif
+        }
+    }
+
     #if !os(macOS)
         var settingsList: some View {
             List {
@@ -141,51 +155,51 @@ struct SettingsView: View {
                     NavigationLink {
                         BrowsingSettings()
                     } label: {
-                        Label("Browsing", systemImage: "list.and.film")
+                        Label("Browsing", systemImage: "list.and.film").labelStyle(SettingsLabel())
                     }
 
                     NavigationLink {
                         PlayerSettings()
                     } label: {
-                        Label("Player", systemImage: "play.rectangle")
+                        Label("Player", systemImage: "play.rectangle").labelStyle(SettingsLabel())
                     }
 
                     NavigationLink {
                         PlayerControlsSettings()
                     } label: {
-                        Label("Controls", systemImage: "hand.tap")
+                        Label("Controls", systemImage: "hand.tap").labelStyle(SettingsLabel())
                     }
 
                     NavigationLink {
                         QualitySettings()
                     } label: {
-                        Label("Quality", systemImage: "4k.tv")
+                        Label("Quality", systemImage: "4k.tv").labelStyle(SettingsLabel())
                     }
 
                     NavigationLink {
                         HistorySettings()
                     } label: {
-                        Label("History", systemImage: "clock.arrow.circlepath")
+                        Label("History", systemImage: "clock.arrow.circlepath").labelStyle(SettingsLabel())
                     }
 
                     if !accounts.isEmpty {
                         NavigationLink {
                             SponsorBlockSettings()
                         } label: {
-                            Label("SponsorBlock", systemImage: "dollarsign.circle")
+                            Label("SponsorBlock", systemImage: "dollarsign.circle").labelStyle(SettingsLabel())
                         }
                     }
 
                     NavigationLink {
                         LocationsSettings()
                     } label: {
-                        Label("Locations", systemImage: "globe")
+                        Label("Locations", systemImage: "globe").labelStyle(SettingsLabel())
                     }
 
                     NavigationLink {
                         AdvancedSettings()
                     } label: {
-                        Label("Advanced", systemImage: "wrench.and.screwdriver")
+                        Label("Advanced", systemImage: "wrench.and.screwdriver").labelStyle(SettingsLabel())
                     }
                 }
 
@@ -193,7 +207,7 @@ struct SettingsView: View {
                     NavigationLink {
                         Help()
                     } label: {
-                        Label("Help", systemImage: "questionmark.circle")
+                        Label("Help", systemImage: "questionmark.circle").labelStyle(SettingsLabel())
                     }
                 }
 
