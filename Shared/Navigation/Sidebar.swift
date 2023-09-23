@@ -147,7 +147,9 @@ struct Sidebar: View {
         }
     }
 
-    private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection) {
+    private func scrollScrollViewToItem(scrollView: ScrollViewProxy, for selection: TabSelection!) {
+        guard let selection else { return }
+
         if case .recentlyOpened = selection {
             scrollView.scrollTo("recentlyOpened")
             return

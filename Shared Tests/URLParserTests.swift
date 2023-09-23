@@ -39,6 +39,7 @@ final class URLParserTests: XCTestCase {
         "https://www.youtube.com/playlist?list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU": "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
         "https://www.youtube.com/watch?v=playlist&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU": "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
         "youtube.com/watch?v=playlist&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU": "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
+        "https://www.youtube.com/watch?v=ZyhrYis509A&list=PL7DA3D097D6FDBC02": "PL7DA3D097D6FDBC02",
         "/watch?v=playlist&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU": "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
         "watch?v=playlist&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU": "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
         "playlist?list=ABCDE": "ABCDE"

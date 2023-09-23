@@ -39,7 +39,10 @@ struct URLParser {
         if hasAnyOfPrefixes(path, ["popular"]) { return .popular }
         if hasAnyOfPrefixes(path, ["trending"]) { return .trending }
 
-        if hasAnyOfPrefixes(path, Self.prefixes[.playlist]!) || queryItemValue("v") == "playlist" {
+        if hasAnyOfPrefixes(path, Self.prefixes[.playlist]!) ||
+            queryItemValue("v") == "playlist" ||
+            !(queryItemValue("list")?.isEmpty ?? false)
+        {
             return .playlist
         }
         if hasAnyOfPrefixes(path, Self.prefixes[.channel]!) {
