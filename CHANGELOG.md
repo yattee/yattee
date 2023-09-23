@@ -1,4 +1,4 @@
-## Build 158
+## Build 159
 * Added button in Location settings to add current used public location to "Custom Locations"
 * Updated mpv and dependencies (using mpvkit library, mpv 0.36.0, ffmpeg 6.0)
 * Fixed handling playlist links
