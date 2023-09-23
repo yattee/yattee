@@ -4,9 +4,9 @@ import Defaults
 import Foundation
 import Logging
 import MediaPlayer
+import MPVKit
 import Repeat
 import SwiftUI
-import MPVKit
 
 final class MPVBackend: PlayerBackend {
     static var timeUpdateInterval = 0.5
@@ -464,6 +464,13 @@ final class MPVBackend: PlayerBackend {
             startClientUpdates()
             onFileLoaded = nil
 
+        case MPV_EVENT_PROPERTY_CHANGE:
+            let dataOpaquePtr = OpaquePointer(event.pointee.data)
+            if let property = UnsafePointer<mpv_event_property>(dataOpaquePtr)?.pointee {
+                let propertyName = String(cString: property.name)
+                handlePropertyChange(propertyName, property)
+            }
+
         case MPV_EVENT_PLAYBACK_RESTART:
             isLoadingVideo = false
             isSeeking = false
@@ -582,6 +589,24 @@ final class MPVBackend: PlayerBackend {
             startMusicMode()
         } else {
             stopMusicMode()
+        }
+    }
+
+    private func handlePropertyChange(_ name: String, _ property: mpv_event_property) {
+        switch name {
+        case "pause":
+            if let paused = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee {
+                if paused {
+                    DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
+                } else {
+                    isLoadingVideo = false
+                    isSeeking = false
+                }
+                isPlaying = !paused
+                networkStateTimer.start()
+            }
+        default:
+            logger.info("MPV backend received unhandled property: \(name)")
         }
     }
 }

@@ -107,9 +107,8 @@ final class MPVClient: ObservableObject {
             #endif
         }
 
-        queue!.async {
-            mpv_set_wakeup_callback(self.mpv, wakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
-        }
+        mpv_set_wakeup_callback(mpv, wakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+        mpv_observe_property(mpv, 0, "pause", MPV_FORMAT_FLAG)
     }
 
     func readEvents() {
@@ -431,6 +430,7 @@ final class MPVClient: ObservableObject {
     }
 
     func getString(_ name: String) -> String? {
+        guard mpv != nil else { return nil }
         let cstr = mpv_get_property_string(mpv, name)
         let str: String? = cstr == nil ? nil : String(cString: cstr!)
         mpv_free(cstr)

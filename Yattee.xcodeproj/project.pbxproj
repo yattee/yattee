@@ -72,6 +72,8 @@
 		3703206627D2BB35007A0CB8 /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206527D2BB35007A0CB8 /* PINCache */; };
 		3703206827D2BB45007A0CB8 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206727D2BB45007A0CB8 /* Defaults */; };
 		3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206927D2BB49007A0CB8 /* Alamofire */; };
+		3704BDFF2ABF260C00370FF7 /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3704BDFE2ABF260C00370FF7 /* MPVKit */; };
+		3704BE012ABF263E00370FF7 /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3704BE002ABF263E00370FF7 /* MPVKit */; };
 		3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B17F267B4DFB00704544 /* TrendingCountry.swift */; };
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
@@ -1444,6 +1446,7 @@
 				375B8AB728B583BD00397B31 /* KeychainAccess in Frameworks */,
 				3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */,
 				37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */,
+				3704BDFF2ABF260C00370FF7 /* MPVKit in Frameworks */,
 				3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1489,6 +1492,7 @@
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
 				3772003B27E8EEC800CB2475 /* libbz2.tbd in Frameworks */,
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
+				3704BE012ABF263E00370FF7 /* MPVKit in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
 			);
@@ -2338,6 +2342,7 @@
 				371AC0B1294D1C230085989E /* CachedAsyncImage */,
 				379325D629A265AE00181CF1 /* Logging */,
 				379E7C352A2105B900AF8118 /* Introspect */,
+				3704BDFE2ABF260C00370FF7 /* MPVKit */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2415,6 +2420,7 @@
 				377F9F75294403880043F856 /* Cache */,
 				371AC0B3294D1C290085989E /* CachedAsyncImage */,
 				379325D829A265B500181CF1 /* Logging */,
+				3704BE002ABF263E00370FF7 /* MPVKit */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -4043,7 +4049,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv/macOS/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.5;
@@ -4086,7 +4091,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Vendor/mpv/macOS/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.5;
@@ -4664,6 +4668,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		3704BDFE2ABF260C00370FF7 /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
+		};
+		3704BE002ABF263E00370FF7 /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
 		};
 		371AC0AB294D1A490085989E /* CachedAsyncImage */ = {
 			isa = XCSwiftPackageProductDependency;

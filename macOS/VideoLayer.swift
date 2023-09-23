@@ -1,4 +1,5 @@
 import Cocoa
+import MPVKit
 import OpenGL.GL
 import OpenGL.GL3
 
