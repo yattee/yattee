@@ -62,6 +62,12 @@ final class RecentsModel: ObservableObject {
         return nil
     }
 
+    var presentedItem: RecentItem? {
+        guard let recent = items.last else { return nil }
+
+        return recent
+    }
+
     static func symbolSystemImage(_ name: String) -> String {
         let firstLetter = name.first?.lowercased()
         let regex = #"^[a-z0-9]$"#
