@@ -6,6 +6,7 @@ import Logging
 import MediaPlayer
 import Repeat
 import SwiftUI
+import MPVKit
 
 final class MPVBackend: PlayerBackend {
     static var timeUpdateInterval = 0.5
@@ -470,17 +471,6 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded?()
             startClientUpdates()
             onFileLoaded = nil
-
-        case MPV_EVENT_PAUSE:
-            DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
-            isPlaying = false
-            networkStateTimer.start()
-
-        case MPV_EVENT_UNPAUSE:
-            isPlaying = true
-            isLoadingVideo = false
-            isSeeking = false
-            networkStateTimer.start()
 
         case MPV_EVENT_VIDEO_RECONFIG:
             model.updateAspectRatio()

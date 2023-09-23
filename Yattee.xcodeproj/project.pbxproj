@@ -89,60 +89,6 @@
 		370F4FA927CC163A001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
 		370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EBD8C327AF0DA800F1C24B /* PlayerBackend.swift */; };
 		370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E45F727B1AC4700BA7902 /* PlayerControlsModel.swift */; };
-		370F4FC927CC16CB001B35DC /* libssl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FAE27CC16CA001B35DC /* libssl.3.dylib */; };
-		370F4FCA27CC16CB001B35DC /* libXau.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FAF27CC16CA001B35DC /* libXau.6.dylib */; };
-		370F4FCB27CC16CB001B35DC /* libxcb.1.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */; };
-		370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB127CC16CA001B35DC /* libxcb-xfixes.0.0.0.dylib */; };
-		370F4FCD27CC16CB001B35DC /* libfribidi.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB227CC16CA001B35DC /* libfribidi.0.dylib */; };
-		370F4FCE27CC16CB001B35DC /* libswresample.4.3.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB327CC16CA001B35DC /* libswresample.4.3.100.dylib */; };
-		370F4FCF27CC16CB001B35DC /* libavdevice.59.4.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB427CC16CA001B35DC /* libavdevice.59.4.100.dylib */; };
-		370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB527CC16CA001B35DC /* libharfbuzz.0.dylib */; };
-		370F4FD127CC16CB001B35DC /* libavfilter.8.24.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB627CC16CA001B35DC /* libavfilter.8.24.100.dylib */; };
-		370F4FD227CC16CB001B35DC /* libavformat.59.16.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB727CC16CA001B35DC /* libavformat.59.16.100.dylib */; };
-		370F4FD327CC16CB001B35DC /* libass.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB827CC16CA001B35DC /* libass.9.dylib */; };
-		370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB927CC16CA001B35DC /* libfreetype.6.dylib */; };
-		370F4FD527CC16CB001B35DC /* libfontconfig.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBA27CC16CA001B35DC /* libfontconfig.1.dylib */; };
-		370F4FD627CC16CB001B35DC /* libbrotlidec.1.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBB27CC16CA001B35DC /* libbrotlidec.1.0.9.dylib */; };
-		370F4FD727CC16CB001B35DC /* libharfbuzz-subset.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBC27CC16CA001B35DC /* libharfbuzz-subset.0.dylib */; };
-		370F4FD827CC16CB001B35DC /* libcrypto.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBD27CC16CA001B35DC /* libcrypto.3.dylib */; };
-		370F4FD927CC16CB001B35DC /* libxcb-shm.0.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBE27CC16CA001B35DC /* libxcb-shm.0.0.0.dylib */; };
-		370F4FDA27CC16CB001B35DC /* libmpv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBF27CC16CB001B35DC /* libmpv.dylib */; };
-		370F4FDB27CC16CB001B35DC /* libswscale.6.4.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC027CC16CB001B35DC /* libswscale.6.4.100.dylib */; };
-		370F4FDC27CC16CB001B35DC /* libavutil.57.17.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC127CC16CB001B35DC /* libavutil.57.17.100.dylib */; };
-		370F4FDD27CC16CB001B35DC /* liblcms2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC227CC16CB001B35DC /* liblcms2.2.dylib */; };
-		370F4FDE27CC16CB001B35DC /* libavcodec.59.18.100.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC327CC16CB001B35DC /* libavcodec.59.18.100.dylib */; };
-		370F4FDF27CC16CB001B35DC /* libxcb-shape.0.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC427CC16CB001B35DC /* libxcb-shape.0.0.0.dylib */; };
-		370F4FE027CC16CB001B35DC /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC527CC16CB001B35DC /* libX11.6.dylib */; };
-		370F4FE127CC16CB001B35DC /* libuchardet.0.0.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC627CC16CB001B35DC /* libuchardet.0.0.7.dylib */; };
-		370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC727CC16CB001B35DC /* libXdmcp.6.dylib */; };
-		370F4FE327CC16CB001B35DC /* libbrotlicommon.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC827CC16CB001B35DC /* libbrotlicommon.1.dylib */; };
-		370F4FE627CC1756001B35DC /* libass.9.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB827CC16CA001B35DC /* libass.9.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FE727CC1756001B35DC /* libavcodec.59.18.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC327CC16CB001B35DC /* libavcodec.59.18.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FE827CC1756001B35DC /* libavdevice.59.4.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB427CC16CA001B35DC /* libavdevice.59.4.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FE927CC1756001B35DC /* libavfilter.8.24.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB627CC16CA001B35DC /* libavfilter.8.24.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FEA27CC1756001B35DC /* libavformat.59.16.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB727CC16CA001B35DC /* libavformat.59.16.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FEB27CC1756001B35DC /* libavutil.57.17.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC127CC16CB001B35DC /* libavutil.57.17.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FEC27CC1756001B35DC /* libbrotlicommon.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC827CC16CB001B35DC /* libbrotlicommon.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FED27CC1756001B35DC /* libbrotlidec.1.0.9.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBB27CC16CA001B35DC /* libbrotlidec.1.0.9.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FEE27CC1756001B35DC /* libcrypto.3.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBD27CC16CA001B35DC /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FEF27CC1756001B35DC /* libfontconfig.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBA27CC16CA001B35DC /* libfontconfig.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF027CC1756001B35DC /* libfreetype.6.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB927CC16CA001B35DC /* libfreetype.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF127CC1756001B35DC /* libfribidi.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB227CC16CA001B35DC /* libfribidi.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF227CC1756001B35DC /* libharfbuzz-subset.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBC27CC16CA001B35DC /* libharfbuzz-subset.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF327CC1756001B35DC /* libharfbuzz.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB527CC16CA001B35DC /* libharfbuzz.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF427CC1756001B35DC /* liblcms2.2.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC227CC16CB001B35DC /* liblcms2.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF527CC1756001B35DC /* libmpv.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBF27CC16CB001B35DC /* libmpv.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF627CC1756001B35DC /* libssl.3.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FAE27CC16CA001B35DC /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF727CC1756001B35DC /* libswresample.4.3.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB327CC16CA001B35DC /* libswresample.4.3.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF827CC1756001B35DC /* libswscale.6.4.100.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC027CC16CB001B35DC /* libswscale.6.4.100.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FF927CC1756001B35DC /* libuchardet.0.0.7.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC627CC16CB001B35DC /* libuchardet.0.0.7.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFA27CC1756001B35DC /* libX11.6.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC527CC16CB001B35DC /* libX11.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFB27CC1756001B35DC /* libXau.6.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FAF27CC16CA001B35DC /* libXau.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFC27CC1756001B35DC /* libxcb-shape.0.0.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC427CC16CB001B35DC /* libxcb-shape.0.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFD27CC1756001B35DC /* libxcb-shm.0.0.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FBE27CC16CA001B35DC /* libxcb-shm.0.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFE27CC1756001B35DC /* libxcb-xfixes.0.0.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB127CC16CA001B35DC /* libxcb-xfixes.0.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F4FFF27CC1756001B35DC /* libxcb.1.1.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		370F500027CC1756001B35DC /* libXdmcp.6.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 370F4FC727CC16CB001B35DC /* libXdmcp.6.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		370F500C27CC1821001B35DC /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C2211C27ADA33300305B41 /* MPVViewController.swift */; };
 		3710A55529488C7D006F8025 /* PlaceholderListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3710A55429488C7D006F8025 /* PlaceholderListItem.swift */; };
 		3710A55629488C7D006F8025 /* PlaceholderListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3710A55429488C7D006F8025 /* PlaceholderListItem.swift */; };
@@ -256,36 +202,6 @@
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
 		3735C4E729A2D3D70051D251 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3735C4E629A2D3D70051D251 /* Logging */; };
-		3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
-		3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */; };
-		3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
-		3736A201286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */; };
-		3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */; };
-		3736A203286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */; };
-		3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F2286BB72300C9E5EE /* libavformat.xcframework */; };
-		3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F2286BB72300C9E5EE /* libavformat.xcframework */; };
-		3736A206286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */; };
-		3736A207286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */; };
-		3736A208286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */; };
-		3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */; };
-		3736A20A286BB72300C9E5EE /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F5286BB72300C9E5EE /* libssl.xcframework */; };
-		3736A20B286BB72300C9E5EE /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F5286BB72300C9E5EE /* libssl.xcframework */; };
-		3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F6286BB72300C9E5EE /* libavutil.xcframework */; };
-		3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F6286BB72300C9E5EE /* libavutil.xcframework */; };
-		3736A20E286BB72300C9E5EE /* libass.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F7286BB72300C9E5EE /* libass.xcframework */; };
-		3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F7286BB72300C9E5EE /* libass.xcframework */; };
-		3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */; };
-		3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */; };
-		3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F9286BB72300C9E5EE /* libswresample.xcframework */; };
-		3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1F9286BB72300C9E5EE /* libswresample.xcframework */; };
-		3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FA286BB72300C9E5EE /* libswscale.xcframework */; };
-		3736A215286BB72300C9E5EE /* libswscale.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FA286BB72300C9E5EE /* libswscale.xcframework */; };
-		3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */; };
-		3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */; };
-		3736A218286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
-		3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */; };
-		3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
-		3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3736A1FD286BB72300C9E5EE /* libmpv.xcframework */; };
 		3738535429451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535529451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
@@ -1036,6 +952,7 @@
 		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		FA97174C2A494700001FF53D /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA97174B2A494700001FF53D /* MPVKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1076,33 +993,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				370F4FFA27CC1756001B35DC /* libX11.6.dylib in Embed Frameworks */,
-				370F4FE827CC1756001B35DC /* libavdevice.59.4.100.dylib in Embed Frameworks */,
-				370F500027CC1756001B35DC /* libXdmcp.6.dylib in Embed Frameworks */,
-				370F4FF427CC1756001B35DC /* liblcms2.2.dylib in Embed Frameworks */,
-				370F4FE627CC1756001B35DC /* libass.9.dylib in Embed Frameworks */,
-				370F4FEF27CC1756001B35DC /* libfontconfig.1.dylib in Embed Frameworks */,
-				370F4FFC27CC1756001B35DC /* libxcb-shape.0.0.0.dylib in Embed Frameworks */,
-				370F4FEA27CC1756001B35DC /* libavformat.59.16.100.dylib in Embed Frameworks */,
-				370F4FF627CC1756001B35DC /* libssl.3.dylib in Embed Frameworks */,
-				370F4FF527CC1756001B35DC /* libmpv.dylib in Embed Frameworks */,
-				370F4FE927CC1756001B35DC /* libavfilter.8.24.100.dylib in Embed Frameworks */,
-				370F4FF827CC1756001B35DC /* libswscale.6.4.100.dylib in Embed Frameworks */,
-				370F4FFF27CC1756001B35DC /* libxcb.1.1.0.dylib in Embed Frameworks */,
-				370F4FF327CC1756001B35DC /* libharfbuzz.0.dylib in Embed Frameworks */,
-				370F4FE727CC1756001B35DC /* libavcodec.59.18.100.dylib in Embed Frameworks */,
-				370F4FEE27CC1756001B35DC /* libcrypto.3.dylib in Embed Frameworks */,
-				370F4FF027CC1756001B35DC /* libfreetype.6.dylib in Embed Frameworks */,
-				370F4FF727CC1756001B35DC /* libswresample.4.3.100.dylib in Embed Frameworks */,
-				370F4FF227CC1756001B35DC /* libharfbuzz-subset.0.dylib in Embed Frameworks */,
-				370F4FFB27CC1756001B35DC /* libXau.6.dylib in Embed Frameworks */,
-				370F4FEB27CC1756001B35DC /* libavutil.57.17.100.dylib in Embed Frameworks */,
-				370F4FEC27CC1756001B35DC /* libbrotlicommon.1.dylib in Embed Frameworks */,
-				370F4FF127CC1756001B35DC /* libfribidi.0.dylib in Embed Frameworks */,
-				370F4FED27CC1756001B35DC /* libbrotlidec.1.0.9.dylib in Embed Frameworks */,
-				370F4FF927CC1756001B35DC /* libuchardet.0.0.7.dylib in Embed Frameworks */,
-				370F4FFE27CC1756001B35DC /* libxcb-xfixes.0.0.0.dylib in Embed Frameworks */,
-				370F4FFD27CC1756001B35DC /* libxcb-shm.0.0.0.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1150,33 +1040,6 @@
 		370B79CB286279BA0045DB77 /* UIViewController+HideHomeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+HideHomeIndicator.swift"; sourceTree = "<group>"; };
 		370D5E4F292423F400D053A6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		370E99092A1EA8C500D144E9 /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
-		370F4FAE27CC16CA001B35DC /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libssl.3.dylib; sourceTree = "<group>"; };
-		370F4FAF27CC16CA001B35DC /* libXau.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libXau.6.dylib; sourceTree = "<group>"; };
-		370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libxcb.1.1.0.dylib; sourceTree = "<group>"; };
-		370F4FB127CC16CA001B35DC /* libxcb-xfixes.0.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libxcb-xfixes.0.0.0.dylib"; sourceTree = "<group>"; };
-		370F4FB227CC16CA001B35DC /* libfribidi.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libfribidi.0.dylib; sourceTree = "<group>"; };
-		370F4FB327CC16CA001B35DC /* libswresample.4.3.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libswresample.4.3.100.dylib; sourceTree = "<group>"; };
-		370F4FB427CC16CA001B35DC /* libavdevice.59.4.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libavdevice.59.4.100.dylib; sourceTree = "<group>"; };
-		370F4FB527CC16CA001B35DC /* libharfbuzz.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libharfbuzz.0.dylib; sourceTree = "<group>"; };
-		370F4FB627CC16CA001B35DC /* libavfilter.8.24.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libavfilter.8.24.100.dylib; sourceTree = "<group>"; };
-		370F4FB727CC16CA001B35DC /* libavformat.59.16.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libavformat.59.16.100.dylib; sourceTree = "<group>"; };
-		370F4FB827CC16CA001B35DC /* libass.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libass.9.dylib; sourceTree = "<group>"; };
-		370F4FB927CC16CA001B35DC /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libfreetype.6.dylib; sourceTree = "<group>"; };
-		370F4FBA27CC16CA001B35DC /* libfontconfig.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libfontconfig.1.dylib; sourceTree = "<group>"; };
-		370F4FBB27CC16CA001B35DC /* libbrotlidec.1.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libbrotlidec.1.0.9.dylib; sourceTree = "<group>"; };
-		370F4FBC27CC16CA001B35DC /* libharfbuzz-subset.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libharfbuzz-subset.0.dylib"; sourceTree = "<group>"; };
-		370F4FBD27CC16CA001B35DC /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcrypto.3.dylib; sourceTree = "<group>"; };
-		370F4FBE27CC16CA001B35DC /* libxcb-shm.0.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libxcb-shm.0.0.0.dylib"; sourceTree = "<group>"; };
-		370F4FBF27CC16CB001B35DC /* libmpv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmpv.dylib; sourceTree = "<group>"; };
-		370F4FC027CC16CB001B35DC /* libswscale.6.4.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libswscale.6.4.100.dylib; sourceTree = "<group>"; };
-		370F4FC127CC16CB001B35DC /* libavutil.57.17.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libavutil.57.17.100.dylib; sourceTree = "<group>"; };
-		370F4FC227CC16CB001B35DC /* liblcms2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = liblcms2.2.dylib; sourceTree = "<group>"; };
-		370F4FC327CC16CB001B35DC /* libavcodec.59.18.100.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libavcodec.59.18.100.dylib; sourceTree = "<group>"; };
-		370F4FC427CC16CB001B35DC /* libxcb-shape.0.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libxcb-shape.0.0.0.dylib"; sourceTree = "<group>"; };
-		370F4FC527CC16CB001B35DC /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libX11.6.dylib; sourceTree = "<group>"; };
-		370F4FC627CC16CB001B35DC /* libuchardet.0.0.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libuchardet.0.0.7.dylib; sourceTree = "<group>"; };
-		370F4FC727CC16CB001B35DC /* libXdmcp.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libXdmcp.6.dylib; sourceTree = "<group>"; };
-		370F4FC827CC16CB001B35DC /* libbrotlicommon.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libbrotlicommon.1.dylib; sourceTree = "<group>"; };
 		370F500A27CC176F001B35DC /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		3710A55429488C7D006F8025 /* PlaceholderListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderListItem.swift; sourceTree = "<group>"; };
 		3711403E26B206A6005B3555 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
@@ -1215,21 +1078,6 @@
 		3730D89F2712E2B70020ED53 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
 		37319F0427103F94004ECCD0 /* PlayerQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueue.swift; sourceTree = "<group>"; };
-		3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavdevice.xcframework; sourceTree = "<group>"; };
-		3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libuchardet.xcframework; sourceTree = "<group>"; };
-		3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libfribidi.xcframework; sourceTree = "<group>"; };
-		3736A1F2286BB72300C9E5EE /* libavformat.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavformat.xcframework; sourceTree = "<group>"; };
-		3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libfreetype.xcframework; sourceTree = "<group>"; };
-		3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libcrypto.xcframework; sourceTree = "<group>"; };
-		3736A1F5286BB72300C9E5EE /* libssl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libssl.xcframework; sourceTree = "<group>"; };
-		3736A1F6286BB72300C9E5EE /* libavutil.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavutil.xcframework; sourceTree = "<group>"; };
-		3736A1F7286BB72300C9E5EE /* libass.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libass.xcframework; sourceTree = "<group>"; };
-		3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavcodec.xcframework; sourceTree = "<group>"; };
-		3736A1F9286BB72300C9E5EE /* libswresample.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libswresample.xcframework; sourceTree = "<group>"; };
-		3736A1FA286BB72300C9E5EE /* libswscale.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libswscale.xcframework; sourceTree = "<group>"; };
-		3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libavfilter.xcframework; sourceTree = "<group>"; };
-		3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libharfbuzz.xcframework; sourceTree = "<group>"; };
-		3736A1FD286BB72300C9E5EE /* libmpv.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libmpv.xcframework; sourceTree = "<group>"; };
 		3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCacheModel.swift; sourceTree = "<group>"; };
 		373C8FE3275B955100CB5936 /* CommentsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsPage.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
@@ -1258,9 +1106,6 @@
 		374924EF29216C630017D862 /* VideoActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoActions.swift; sourceTree = "<group>"; };
 		37494EA429200B14000DF176 /* DocumentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsView.swift; sourceTree = "<group>"; };
 		37494EA629200E0B000DF176 /* DocumentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentsModel.swift; sourceTree = "<group>"; };
-		3749BF6F27ADA135000480FF /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
-		3749BF7027ADA135000480FF /* stream_cb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_cb.h; sourceTree = "<group>"; };
-		3749BF7127ADA135000480FF /* qthelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = qthelper.hpp; sourceTree = "<group>"; };
 		3749BF9227ADA142000480FF /* BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		374AB3D628BCAF0000DF56FB /* SeekModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SeekModel.swift; path = Model/SeekModel.swift; sourceTree = SOURCE_ROOT; };
 		374AB3DA28BCAF7E00DF56FB /* SeekType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekType.swift; sourceTree = "<group>"; };
@@ -1425,8 +1270,6 @@
 		37C0697D2725C8D400F7F6CB /* CMTime+DefaultTimescale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMTime+DefaultTimescale.swift"; sourceTree = "<group>"; };
 		37C0698127260B2100F7F6CB /* ThumbnailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailsModel.swift; sourceTree = "<group>"; };
 		37C194C626F6A9C8005D3B96 /* RecentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentsModel.swift; sourceTree = "<group>"; };
-		37C2211A27ADA2A900305B41 /* render_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_gl.h; sourceTree = "<group>"; };
-		37C2211B27ADA2A900305B41 /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render.h; sourceTree = "<group>"; };
 		37C2211C27ADA33300305B41 /* MPVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPVViewController.swift; sourceTree = "<group>"; };
 		37C2211E27ADA3A200305B41 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.2.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		37C2212027ADA3A600305B41 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.2.sdk/usr/lib/libbz2.tbd; sourceTree = DEVELOPER_DIR; };
@@ -1556,14 +1399,8 @@
 			files = (
 				37C2212B27ADA43700305B41 /* VideoToolbox.framework in Frameworks */,
 				371AC0AC294D1A490085989E /* CachedAsyncImage in Frameworks */,
-				3736A214286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
-				3736A216286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
 				3799AC0928B03CED001376F9 /* ActiveLabel in Frameworks */,
-				3736A218286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
-				3736A206286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */,
 				37C2212927ADA41400305B41 /* CoreMedia.framework in Frameworks */,
-				3736A200286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */,
-				3736A20A286BB72300C9E5EE /* libssl.xcframework in Frameworks */,
 				37C2212727ADA41000305B41 /* CoreFoundation.framework in Frameworks */,
 				37C2212527ADA40A00305B41 /* AudioToolbox.framework in Frameworks */,
 				372AA410286D067B0000B1DC /* Repeat in Frameworks */,
@@ -1572,27 +1409,19 @@
 				37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */,
 				37EE6DC528A305AD00BFD632 /* Reachability in Frameworks */,
 				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
-				3736A210286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
 				375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */,
-				3736A21A286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
 				377F9F74294403770043F856 /* Cache in Frameworks */,
-				3736A20C286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
 				37FB285627220D9000A57617 /* SDWebImagePINPlugin in Frameworks */,
-				3736A212286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */,
-				3736A204286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
-				3736A1FE286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
 				3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */,
+				FA97174C2A494700001FF53D /* MPVKit in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
-				3736A202286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
-				3736A208286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
-				3736A20E286BB72300C9E5EE /* libass.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1602,47 +1431,20 @@
 			files = (
 				379325D729A265AE00181CF1 /* Logging in Frameworks */,
 				372AA414286D06A10000B1DC /* Repeat in Frameworks */,
-				370F4FD227CC16CB001B35DC /* libavformat.59.16.100.dylib in Frameworks */,
-				370F4FD327CC16CB001B35DC /* libass.9.dylib in Frameworks */,
 				37F7AB5228A94EB900FB46B5 /* IOKit.framework in Frameworks */,
-				370F4FDF27CC16CB001B35DC /* libxcb-shape.0.0.0.dylib in Frameworks */,
-				370F4FE127CC16CB001B35DC /* libuchardet.0.0.7.dylib in Frameworks */,
 				379E7C362A2105B900AF8118 /* Introspect in Frameworks */,
-				370F4FDB27CC16CB001B35DC /* libswscale.6.4.100.dylib in Frameworks */,
-				370F4FDC27CC16CB001B35DC /* libavutil.57.17.100.dylib in Frameworks */,
-				370F4FE327CC16CB001B35DC /* libbrotlicommon.1.dylib in Frameworks */,
 				3703205827D2BAE4007A0CB8 /* Siesta in Frameworks */,
-				370F4FD127CC16CB001B35DC /* libavfilter.8.24.100.dylib in Frameworks */,
-				370F4FCF27CC16CB001B35DC /* libavdevice.59.4.100.dylib in Frameworks */,
-				370F4FC927CC16CB001B35DC /* libssl.3.dylib in Frameworks */,
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
 				374D11E72943C56300CB4350 /* Cache in Frameworks */,
-				370F4FD427CC16CB001B35DC /* libfreetype.6.dylib in Frameworks */,
 				3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */,
-				370F4FE227CC16CB001B35DC /* libXdmcp.6.dylib in Frameworks */,
-				370F4FDD27CC16CB001B35DC /* liblcms2.2.dylib in Frameworks */,
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
-				370F4FCB27CC16CB001B35DC /* libxcb.1.1.0.dylib in Frameworks */,
 				371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */,
-				370F4FD027CC16CB001B35DC /* libharfbuzz.0.dylib in Frameworks */,
-				370F4FCC27CC16CB001B35DC /* libxcb-xfixes.0.0.0.dylib in Frameworks */,
 				3703206627D2BB35007A0CB8 /* PINCache in Frameworks */,
-				370F4FD927CC16CB001B35DC /* libxcb-shm.0.0.0.dylib in Frameworks */,
-				370F4FCA27CC16CB001B35DC /* libXau.6.dylib in Frameworks */,
-				370F4FD527CC16CB001B35DC /* libfontconfig.1.dylib in Frameworks */,
 				375B8AB728B583BD00397B31 /* KeychainAccess in Frameworks */,
-				370F4FCE27CC16CB001B35DC /* libswresample.4.3.100.dylib in Frameworks */,
-				370F4FDA27CC16CB001B35DC /* libmpv.dylib in Frameworks */,
-				370F4FD827CC16CB001B35DC /* libcrypto.3.dylib in Frameworks */,
-				370F4FDE27CC16CB001B35DC /* libavcodec.59.18.100.dylib in Frameworks */,
 				3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */,
 				37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */,
 				3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */,
-				370F4FD627CC16CB001B35DC /* libbrotlidec.1.0.9.dylib in Frameworks */,
-				370F4FCD27CC16CB001B35DC /* libfribidi.0.dylib in Frameworks */,
-				370F4FE027CC16CB001B35DC /* libX11.6.dylib in Frameworks */,
-				370F4FD727CC16CB001B35DC /* libharfbuzz-subset.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1670,32 +1472,18 @@
 			files = (
 				3797104D28D3D19100D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				3772003C27E8EED000CB2475 /* libz.tbd in Frameworks */,
-				3736A211286BB72300C9E5EE /* libavcodec.xcframework in Frameworks */,
-				3736A205286BB72300C9E5EE /* libavformat.xcframework in Frameworks */,
-				3736A20B286BB72300C9E5EE /* libssl.xcframework in Frameworks */,
-				3736A215286BB72300C9E5EE /* libswscale.xcframework in Frameworks */,
 				37FB2849272207F000A57617 /* SDWebImageWebPCoder in Frameworks */,
-				3736A20D286BB72300C9E5EE /* libavutil.xcframework in Frameworks */,
-				3736A213286BB72300C9E5EE /* libswresample.xcframework in Frameworks */,
 				377F9F76294403880043F856 /* Cache in Frameworks */,
 				37FB285427220D8400A57617 /* SDWebImagePINPlugin in Frameworks */,
 				371AC0B4294D1C290085989E /* CachedAsyncImage in Frameworks */,
 				3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */,
 				379325D929A265B500181CF1 /* Logging in Frameworks */,
 				3772003927E8EEB700CB2475 /* AVFoundation.framework in Frameworks */,
-				3736A20F286BB72300C9E5EE /* libass.xcframework in Frameworks */,
-				3736A1FF286BB72300C9E5EE /* libavdevice.xcframework in Frameworks */,
-				3736A203286BB72300C9E5EE /* libfribidi.xcframework in Frameworks */,
-				3736A207286BB72300C9E5EE /* libfreetype.xcframework in Frameworks */,
 				3772003D27E8EEDB00CB2475 /* libiconv.tbd in Frameworks */,
 				372AA412286D06950000B1DC /* Repeat in Frameworks */,
 				3772003827E8EEB100CB2475 /* AudioToolbox.framework in Frameworks */,
-				3736A209286BB72300C9E5EE /* libcrypto.xcframework in Frameworks */,
-				3736A217286BB72300C9E5EE /* libavfilter.xcframework in Frameworks */,
-				3736A21B286BB72300C9E5EE /* libmpv.xcframework in Frameworks */,
 				3765917E27237D2A009F956E /* PINCache in Frameworks */,
 				3772003E27E8EEEB00CB2475 /* VideoToolbox.framework in Frameworks */,
-				3736A201286BB72300C9E5EE /* libuchardet.xcframework in Frameworks */,
 				37CF8B8828535E6300B71E37 /* SDWebImage in Frameworks */,
 				3772003A27E8EEBE00CB2475 /* CoreMedia.framework in Frameworks */,
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
@@ -1703,7 +1491,6 @@
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
-				3736A219286BB72300C9E5EE /* libharfbuzz.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1725,48 +1512,6 @@
 				37095E86291DC85400301883 /* Info.plist */,
 			);
 			path = "Open in Yattee";
-			sourceTree = "<group>";
-		};
-		370F4FAC27CC169D001B35DC /* macOS */ = {
-			isa = PBXGroup;
-			children = (
-				370F4FAD27CC16AD001B35DC /* lib */,
-			);
-			path = macOS;
-			sourceTree = "<group>";
-		};
-		370F4FAD27CC16AD001B35DC /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				370F4FB827CC16CA001B35DC /* libass.9.dylib */,
-				370F4FC327CC16CB001B35DC /* libavcodec.59.18.100.dylib */,
-				370F4FB427CC16CA001B35DC /* libavdevice.59.4.100.dylib */,
-				370F4FB627CC16CA001B35DC /* libavfilter.8.24.100.dylib */,
-				370F4FB727CC16CA001B35DC /* libavformat.59.16.100.dylib */,
-				370F4FC127CC16CB001B35DC /* libavutil.57.17.100.dylib */,
-				370F4FC827CC16CB001B35DC /* libbrotlicommon.1.dylib */,
-				370F4FBB27CC16CA001B35DC /* libbrotlidec.1.0.9.dylib */,
-				370F4FBD27CC16CA001B35DC /* libcrypto.3.dylib */,
-				370F4FBA27CC16CA001B35DC /* libfontconfig.1.dylib */,
-				370F4FB927CC16CA001B35DC /* libfreetype.6.dylib */,
-				370F4FB227CC16CA001B35DC /* libfribidi.0.dylib */,
-				370F4FBC27CC16CA001B35DC /* libharfbuzz-subset.0.dylib */,
-				370F4FB527CC16CA001B35DC /* libharfbuzz.0.dylib */,
-				370F4FC227CC16CB001B35DC /* liblcms2.2.dylib */,
-				370F4FBF27CC16CB001B35DC /* libmpv.dylib */,
-				370F4FAE27CC16CA001B35DC /* libssl.3.dylib */,
-				370F4FB327CC16CA001B35DC /* libswresample.4.3.100.dylib */,
-				370F4FC027CC16CB001B35DC /* libswscale.6.4.100.dylib */,
-				370F4FC627CC16CB001B35DC /* libuchardet.0.0.7.dylib */,
-				370F4FC527CC16CB001B35DC /* libX11.6.dylib */,
-				370F4FAF27CC16CA001B35DC /* libXau.6.dylib */,
-				370F4FC427CC16CB001B35DC /* libxcb-shape.0.0.0.dylib */,
-				370F4FBE27CC16CA001B35DC /* libxcb-shm.0.0.0.dylib */,
-				370F4FB127CC16CA001B35DC /* libxcb-xfixes.0.0.0.dylib */,
-				370F4FB027CC16CA001B35DC /* libxcb.1.1.0.dylib */,
-				370F4FC727CC16CB001B35DC /* libXdmcp.6.dylib */,
-			);
-			path = lib;
 			sourceTree = "<group>";
 		};
 		371114F227B9552400C2EF7B /* Controls */ = {
@@ -1919,28 +1664,6 @@
 			path = Backports;
 			sourceTree = "<group>";
 		};
-		3736A1EE286BB72300C9E5EE /* framework */ = {
-			isa = PBXGroup;
-			children = (
-				3736A1F7286BB72300C9E5EE /* libass.xcframework */,
-				3736A1F8286BB72300C9E5EE /* libavcodec.xcframework */,
-				3736A1EF286BB72300C9E5EE /* libavdevice.xcframework */,
-				3736A1FB286BB72300C9E5EE /* libavfilter.xcframework */,
-				3736A1F2286BB72300C9E5EE /* libavformat.xcframework */,
-				3736A1F6286BB72300C9E5EE /* libavutil.xcframework */,
-				3736A1F4286BB72300C9E5EE /* libcrypto.xcframework */,
-				3736A1F3286BB72300C9E5EE /* libfreetype.xcframework */,
-				3736A1F1286BB72300C9E5EE /* libfribidi.xcframework */,
-				3736A1FC286BB72300C9E5EE /* libharfbuzz.xcframework */,
-				3736A1FD286BB72300C9E5EE /* libmpv.xcframework */,
-				3736A1F5286BB72300C9E5EE /* libssl.xcframework */,
-				3736A1F9286BB72300C9E5EE /* libswresample.xcframework */,
-				3736A1FA286BB72300C9E5EE /* libswscale.xcframework */,
-				3736A1F0286BB72300C9E5EE /* libuchardet.xcframework */,
-			);
-			path = framework;
-			sourceTree = "<group>";
-		};
 		3743B864272169E200261544 /* Applications */ = {
 			isa = PBXGroup;
 			children = (
@@ -2053,28 +1776,6 @@
 				3709528729283A21001ECA40 /* RecentDocumentsView.swift */,
 			);
 			path = Documents;
-			sourceTree = "<group>";
-		};
-		3749BF6C27ADA135000480FF /* mpv */ = {
-			isa = PBXGroup;
-			children = (
-				3736A1EE286BB72300C9E5EE /* framework */,
-				3749BF6E27ADA135000480FF /* include */,
-				370F4FAC27CC169D001B35DC /* macOS */,
-			);
-			path = mpv;
-			sourceTree = "<group>";
-		};
-		3749BF6E27ADA135000480FF /* include */ = {
-			isa = PBXGroup;
-			children = (
-				3749BF6F27ADA135000480FF /* client.h */,
-				3749BF7127ADA135000480FF /* qthelper.hpp */,
-				37C2211A27ADA2A900305B41 /* render_gl.h */,
-				37C2211B27ADA2A900305B41 /* render.h */,
-				3749BF7027ADA135000480FF /* stream_cb.h */,
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		374C0539272436DA009BDDBE /* SponsorBlock */ = {
@@ -2441,7 +2142,7 @@
 		37DD9DCC2785EE6F00539416 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
-				3749BF6C27ADA135000480FF /* mpv */,
+				37DD9DAE2785D58D00539416 /* RefreshControl */,
 			);
 			path = Vendor;
 			sourceTree = "<group>";
@@ -2599,6 +2300,7 @@
 				377F9F73294403770043F856 /* Cache */,
 				371AC0AB294D1A490085989E /* CachedAsyncImage */,
 				379325D429A265A300181CF1 /* Logging */,
+				FA97174B2A494700001FF53D /* MPVKit */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2828,6 +2530,7 @@
 				374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */,
 				371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 				379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */,
+				FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4912,6 +4615,14 @@
 				minimumVersion = 0.3.0;
 			};
 		};
+		FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cxfksword/MPVKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.35.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -5179,6 +4890,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */;
 			productName = SDWebImagePINPlugin;
+		};
+		FA97174B2A494700001FF53D /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

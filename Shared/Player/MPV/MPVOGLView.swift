@@ -1,6 +1,7 @@
 import GLKit
 import Logging
 import OpenGLES
+import MPVKit
 
 final class MPVOGLView: GLKView {
     private var logger = Logger(label: "stream.yattee.mpv.oglview")
