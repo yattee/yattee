@@ -105,12 +105,6 @@ struct FavoriteItemView: View {
                 reloadVisibleWatches()
             }
         }
-        .onAppear {
-            Defaults.observe(.widgetsSettings) { _ in
-                watchModel.watchesChanged()
-            }
-            .tieToLifetime(of: accounts)
-        }
     }
 
     var emptyItemsText: String {

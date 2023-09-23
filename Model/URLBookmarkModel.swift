@@ -45,7 +45,7 @@ struct URLBookmarkModel {
     func saveBookmark(_ url: NSURL) {
         guard url.isFileURL else {
             logger.error("trying to save bookmark for something that is not a file")
-            logger.error("not a file: \(url.absoluteString)")
+            logger.error("not a file: \(url.absoluteString ?? "unknown")")
             return
         }
 

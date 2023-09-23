@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct ListView: View {

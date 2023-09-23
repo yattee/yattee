@@ -620,6 +620,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             .dictionaryValue["audioStreams"]?
             .arrayValue
             .filter { $0.dictionaryValue["format"]?.string == "M4A" }
+            .filter { stream in
+                let type = stream.dictionaryValue["audioTrackType"]?.string
+                return type == nil || type == "ORIGINAL"
+            }
             .sorted {
                 $0.dictionaryValue["bitrate"]?.int ?? 0 >
                     $1.dictionaryValue["bitrate"]?.int ?? 0

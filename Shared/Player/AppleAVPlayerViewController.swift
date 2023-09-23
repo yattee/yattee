@@ -47,7 +47,7 @@ final class AppleAVPlayerViewController: UIViewController {
         infoViewControllers.append(infoViewController([.chapters], title: "Chapters"))
         infoViewControllers.append(infoViewController([.comments], title: "Comments"))
 
-        var queueSections = [NowPlayingView.ViewSection.playingNext]
+        let queueSections = [NowPlayingView.ViewSection.playingNext]
 
         infoViewControllers.append(contentsOf: [
             infoViewController([.related], title: "Related"),

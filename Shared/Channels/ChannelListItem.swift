@@ -61,7 +61,8 @@ struct ChannelListItem: View {
     private var label: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack {
-                ChannelAvatarView(channel: channel)
+                ChannelAvatarView(channel: channel, subscribedBadge: false)
+                    .id("channel-avatar-\(channel.id)")
                 #if os(tvOS)
                     .frame(width: 90, height: 90)
                 #else

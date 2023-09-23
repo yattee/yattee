@@ -60,7 +60,7 @@ struct Playlist: Identifiable, Equatable, Hashable {
         )
     }
 
-    static func == (lhs: Playlist, rhs: Playlist) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id && lhs.updated == rhs.updated
     }
 

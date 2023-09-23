@@ -274,7 +274,11 @@ struct VideoPlayerView: View {
                             )
                             .onHover { hovering in
                                 hoveringPlayer = hovering
-                                hovering ? player.controls.show() : player.controls.hide()
+                                if hovering {
+                                    player.controls.show()
+                                } else {
+                                    player.controls.hide()
+                                }
                             }
                             .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
                         #if os(macOS)
@@ -290,9 +294,6 @@ struct VideoPlayerView: View {
                                 }
                             })
                         #endif
-
-                            .background(Color.black)
-
                         if !detailsHiddenInFullScreen {
                             VideoDetails(
                                 video: player.videoForDisplay,

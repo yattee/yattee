@@ -47,16 +47,16 @@ struct AccountValidationStatus: View {
     var validationStatusSystemImage: String {
         if isValidating {
             return "bolt.horizontal.fill"
-        } else {
-            return isValid ? "checkmark.circle.fill" : "xmark.circle.fill"
         }
+
+        return isValid ? "checkmark.circle.fill" : "xmark.circle.fill"
     }
 
     var validationStatusColor: Color {
         if isValidating {
             return .accentColor
-        } else {
-            return isValid ? .green : .red
         }
+
+        return isValid ? .green : .red
     }
 }

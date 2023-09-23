@@ -48,23 +48,19 @@ struct ThumbnailView: View {
     }
 
     @ViewBuilder var asyncImageIfAvailable: some View {
-        if #available(iOS 15, macOS 12, *) {
-            CachedAsyncImage(url: url, urlCache: BaseCacheModel.imageCache) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                case .failure:
-                    placeholder.onAppear {
-                        guard let url else { return }
-                        thumbnails.insertUnloadable(url)
-                    }
-                default:
-                    placeholder
+        CachedAsyncImage(url: url, urlCache: BaseCacheModel.imageCache, transaction: Transaction(animation: .default)) { phase in
+            switch phase {
+            case let .success(image):
+                image
+                    .resizable()
+            case .failure:
+                placeholder.onAppear {
+                    guard let url else { return }
+                    thumbnails.insertUnloadable(url)
                 }
+            default:
+                placeholder
             }
-        } else {
-            webImage
         }
     }
 

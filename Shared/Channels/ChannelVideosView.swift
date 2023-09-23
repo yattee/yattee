@@ -40,7 +40,7 @@ struct ChannelVideosView: View {
     }
 
     var body: some View {
-        let content = VStack {
+        VStack {
             #if os(tvOS)
                 VStack {
                     HStack(spacing: 24) {
@@ -181,19 +181,12 @@ struct ChannelVideosView: View {
         .navigationTitle(navigationTitle)
         #endif
 
-        return Group {
-            if #available(macOS 12.0, *) {
-                content
-                #if os(tvOS)
-                .background(Color.background(scheme: colorScheme))
-                #endif
-                #if !os(iOS)
-                .focusScope(focusNamespace)
-                #endif
-            } else {
-                content
-            }
-        }
+        #if os(tvOS)
+        .background(Color.background(scheme: colorScheme))
+        #endif
+        #if !os(iOS)
+        .focusScope(focusNamespace)
+        #endif
     }
 
     var verticalCellsEdgesIgnoringSafeArea: Edge.Set {
@@ -212,6 +205,7 @@ struct ChannelVideosView: View {
 
     var thumbnail: some View {
         ChannelAvatarView(channel: store.item?.channel)
+            .id("channel-avatar-\(store.item?.channel?.id ?? "")")
         #if os(tvOS)
             .frame(width: 80, height: 80, alignment: .trailing)
         #else
@@ -338,7 +332,8 @@ struct ChannelVideosView: View {
     private var resource: Resource? {
         guard let channel = presentedChannel else { return nil }
 
-        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        let tabData = channel.tabs.first { $0.contentType == contentType }?.data
+        let data = contentType != .videos ? tabData : nil
         let resource = accounts.api.channel(channel.id, contentType: contentType, data: data)
 
         if contentType == .videos {
@@ -451,7 +446,8 @@ struct ChannelVideosView: View {
             next = next ?? ""
         }
 
-        let data = contentType != .videos ? channel.tabs.first(where: { $0.contentType == contentType })?.data : nil
+        let tabData = channel.tabs.first { $0.contentType == contentType }?.data
+        let data = contentType != .videos ? tabData : nil
         accounts.api.channel(channel.id, contentType: contentType, data: data, page: next).load().onSuccess { response in
             if let page: ChannelPage = response.typedContent() {
                 self.page = page

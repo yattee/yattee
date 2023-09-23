@@ -79,7 +79,6 @@ struct Sidebar: View {
                         Label("Subscriptions", systemImage: "star.circle")
                             .accessibility(label: Text("Subscriptions"))
                     }
-                    .backport
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedText : nil)
                     .contextMenu {
                         playUnwatchedButton
@@ -152,7 +151,8 @@ struct Sidebar: View {
         if case .recentlyOpened = selection {
             scrollView.scrollTo("recentlyOpened")
             return
-        } else if case let .playlist(id) = selection {
+        }
+        if case let .playlist(id) = selection {
             scrollView.scrollTo(id)
             return
         }

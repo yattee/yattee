@@ -24,6 +24,7 @@ struct VideoDetails: View {
 
     struct ChannelView: View {
         @ObservedObject private var model = PlayerModel.shared
+        @Binding var detailsVisibility: Bool
 
         var video: Video? { model.videoForDisplay }
 
@@ -33,14 +34,19 @@ struct VideoDetails: View {
                     guard let channel = video?.channel else { return }
                     NavigationModel.shared.openChannel(channel, navigationStyle: .sidebar)
                 } label: {
-                    ChannelAvatarView(
-                        channel: video?.channel,
-                        video: video
-                    )
-                    .frame(maxWidth: 40, maxHeight: 40)
-                    .padding(.trailing, 5)
+                    if detailsVisibility {
+                        ChannelAvatarView(
+                            channel: video?.channel,
+                            video: video
+                        )
+                    } else {
+                        Circle()
+                            .foregroundColor(Color(white: 0.6).opacity(0.5))
+                    }
                 }
+                .frame(width: 40, height: 40)
                 .buttonStyle(.plain)
+                .padding(.trailing, 5)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
@@ -56,18 +62,14 @@ struct VideoDetails: View {
                         }
 
                         if let video, !video.isLocal {
-                            Group {
-                                Text("•")
+                            HStack(spacing: 2) {
+                                Image(systemName: "person.2.fill")
 
-                                HStack(spacing: 2) {
-                                    Image(systemName: "person.2.fill")
-
-                                    if let channel = model.videoForDisplay?.channel {
-                                        if let subscriptions = channel.subscriptionsString {
-                                            Text(subscriptions)
-                                        } else {
-                                            Text("1234").redacted(reason: .placeholder)
-                                        }
+                                if let channel = model.videoForDisplay?.channel {
+                                    if let subscriptions = channel.subscriptionsString {
+                                        Text(subscriptions)
+                                    } else {
+                                        Text("1234").redacted(reason: .placeholder)
                                     }
                                 }
                             }
@@ -93,8 +95,6 @@ struct VideoDetails: View {
         var body: some View {
             HStack(spacing: 4) {
                 publishedDateSection
-
-                Text("•")
 
                 HStack(spacing: 4) {
                     if model.videoBeingOpened != nil || video?.viewsCount != nil {
@@ -194,7 +194,7 @@ struct VideoDetails: View {
             VStack(alignment: .leading, spacing: 0) {
                 TitleView()
                 if video != nil, !video!.isLocal {
-                    ChannelView()
+                    ChannelView(detailsVisibility: $detailsVisibility)
                         .layoutPriority(1)
                         .padding(.bottom, 6)
                 }

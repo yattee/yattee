@@ -12,6 +12,7 @@ struct ChannelsView: View {
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
     @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
+    @Default(.showChannelAvatarInChannelsLists) private var showChannelAvatarInChannelsLists
 
     @State private var channelLinkActive = false
     @State private var channelForLink: Channel?
@@ -21,10 +22,9 @@ struct ChannelsView: View {
             Section(header: header) {
                 ForEach(channels) { channel in
                     let label = HStack {
-                        if let url = channel.thumbnailURLOrCached {
-                            ThumbnailView(url: url)
+                        if showChannelAvatarInChannelsLists {
+                            ChannelAvatarView(channel: channel, subscribedBadge: false)
                                 .frame(width: 35, height: 35)
-                                .clipShape(RoundedRectangle(cornerRadius: 35))
                         } else {
                             Image(systemName: RecentsModel.symbolSystemImage(channel.name))
                                 .imageScale(.large)
@@ -34,8 +34,9 @@ struct ChannelsView: View {
                         Text(channel.name)
                             .lineLimit(1)
                     }
-                    .backport
+                    #if !os(tvOS)
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
+                    #endif
 
                     Group {
                         #if os(tvOS)
@@ -73,8 +74,9 @@ struct ChannelsView: View {
 
                 Color.clear.padding(.bottom, 50)
                     .listRowBackground(Color.clear)
-                    .backport
-                    .listRowSeparator(false)
+                #if os(iOS)
+                    .listRowSeparator(.hidden)
+                #endif
             }
         }
         #if !os(tvOS)
@@ -89,12 +91,6 @@ struct ChannelsView: View {
             subscriptions.load(force: true)
         }
         #if os(iOS)
-        .refreshControl { refreshControl in
-            subscriptions.load(force: true) {
-                refreshControl.endRefreshing()
-            }
-        }
-        .backport
         .refreshable {
             await subscriptions.load(force: true)
         }

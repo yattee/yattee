@@ -63,15 +63,8 @@ struct Constants {
 
     static func seekIcon(_ type: String, _ interval: TimeInterval) -> String {
         let interval = Int(interval)
-        let allVersions = [10, 15, 30, 45, 60, 75, 90]
-        let iOS15 = [5]
+        let allVersions = [5, 10, 15, 30, 45, 60, 75, 90]
         let iconName = "go\(type).\(interval)"
-
-        if #available(iOS 15, macOS 12, *) {
-            if iOS15.contains(interval) {
-                return iconName
-            }
-        }
 
         if allVersions.contains(interval) {
             return iconName

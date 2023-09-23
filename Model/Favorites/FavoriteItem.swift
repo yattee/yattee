@@ -47,7 +47,7 @@ struct FavoriteItem: Codable, Equatable, Identifiable, Defaults.Serializable {
         }
     }
 
-    static func == (lhs: FavoriteItem, rhs: FavoriteItem) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.section == rhs.section
     }
 

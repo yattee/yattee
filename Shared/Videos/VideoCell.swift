@@ -24,6 +24,7 @@ struct VideoCell: View {
     @Default(.watchedVideoStyle) private var watchedVideoStyle
     @Default(.watchedVideoBadgeColor) private var watchedVideoBadgeColor
     @Default(.watchedVideoPlayNowBehavior) private var watchedVideoPlayNowBehavior
+    @Default(.showChannelAvatarInVideosListing) private var showChannelAvatarInVideosListing
 
     private var navigation: NavigationModel { .shared }
     private var player: PlayerModel { .shared }
@@ -161,17 +162,22 @@ struct VideoCell: View {
 
                     HStack(spacing: Constants.channelDetailsStackSpacing) {
                         if !inChannelView,
-                           let url = video.channel.thumbnailURLOrCached,
+                           showChannelAvatarInVideosListing,
                            video != .fixture
                         {
                             ChannelLinkView(channel: video.channel) {
-                                ThumbnailView(url: url)
-                                    .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
-                                    .clipShape(Circle())
+                                if showChannelAvatarInVideosListing {
+                                    ChannelAvatarView(channel: video.channel)
+                                        .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
+                                } else {
+                                    channelLabel(badge: false)
+                                }
                             }
                         }
 
-                        if !channelOnThumbnail, !inChannelView {
+                        if !channelOnThumbnail,
+                           !inChannelView
+                        {
                             ChannelLinkView(channel: video.channel) {
                                 channelLabel(badge: false)
                             }
@@ -264,12 +270,9 @@ struct VideoCell: View {
                         if !channelOnThumbnail, !inChannelView {
                             ChannelLinkView(channel: video.channel) {
                                 HStack(spacing: Constants.channelDetailsStackSpacing) {
-                                    if let url = video.channel.thumbnailURLOrCached,
-                                       video != .fixture
-                                    {
-                                        ThumbnailView(url: url)
+                                    if video != .fixture, showChannelAvatarInVideosListing {
+                                        ChannelAvatarView(channel: video.channel)
                                             .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
-                                            .clipShape(Circle())
                                     }
 
                                     channelLabel(badge: false)
@@ -295,9 +298,8 @@ struct VideoCell: View {
                        video != .fixture
                     {
                         ChannelLinkView(channel: video.channel) {
-                            ThumbnailView(url: url)
+                            ChannelAvatarView(channel: video.channel)
                                 .frame(width: Constants.channelThumbnailSize, height: Constants.channelThumbnailSize)
-                                .clipShape(Circle())
                         }
                     }
 

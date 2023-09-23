@@ -3,7 +3,7 @@ import SwiftUI
 struct AccentButton: View {
     var text: String?
     var imageSystemName: String?
-    var maxWidth: CGFloat? = .infinity
+    var maxWidth: CGFloat? = .infinity // swiftlint:disable:this no_cgfloat
     var bold = true
     var verticalPadding = 10.0
     var horizontalPadding = 10.0

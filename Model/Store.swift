@@ -4,7 +4,7 @@ import Siesta
 final class Store<Data>: ResourceObserver, ObservableObject {
     @Published private var all: Data?
 
-    var collection: Data { all ?? ([] as! Data) }
+    var collection: Data { all ?? ([item].compactMap { $0 } as! Data) }
     var item: Data? { all }
 
     init(_ data: Data? = nil) {

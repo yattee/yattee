@@ -70,17 +70,15 @@ struct PlayerBackendView: View {
 
             if UIDevice.current.userInterfaceIdiom != .pad {
                 return verticalSizeClass == .compact ? safeAreaModel.safeArea.top : 0
-            } else {
-                return safeAreaModel.safeArea.top.isZero ? safeAreaModel.safeArea.bottom : safeAreaModel.safeArea.top
             }
+            return safeAreaModel.safeArea.top.isZero ? safeAreaModel.safeArea.bottom : safeAreaModel.safeArea.top
         }
 
         var controlsBottomPadding: Double {
             if UIDevice.current.userInterfaceIdiom != .pad {
                 return player.playingFullScreen || verticalSizeClass == .compact ? safeAreaModel.safeArea.bottom : 0
-            } else {
-                return player.playingFullScreen ? safeAreaModel.safeArea.bottom : 0
             }
+            return player.playingFullScreen ? safeAreaModel.safeArea.bottom : 0
         }
     #endif
 

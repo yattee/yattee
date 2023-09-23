@@ -54,11 +54,11 @@ class Stream: Equatable, Hashable, Identifiable {
             return Int(refreshRatePart.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) ?? -1
         }
 
-        static func from(resolution: String, fps: Int? = nil) -> Resolution {
+        static func from(resolution: String, fps: Int? = nil) -> Self {
             allCases.first { $0.rawValue.contains(resolution) && $0.refreshRate == (fps ?? 30) } ?? .unknown
         }
 
-        static func < (lhs: Resolution, rhs: Resolution) -> Bool {
+        static func < (lhs: Self, rhs: Self) -> Bool {
             lhs.height == rhs.height ? (lhs.refreshRate < rhs.refreshRate) : (lhs.height < rhs.height)
         }
     }
@@ -77,7 +77,7 @@ class Stream: Equatable, Hashable, Identifiable {
             }
         }
 
-        static func < (lhs: Kind, rhs: Kind) -> Bool {
+        static func < (lhs: Self, rhs: Self) -> Bool {
             lhs.sortOrder < rhs.sortOrder
         }
     }
@@ -123,15 +123,17 @@ class Stream: Equatable, Hashable, Identifiable {
 
             if lowercased.contains("webm") {
                 return .webm
-            } else if lowercased.contains("avc1") {
-                return .avc1
-            } else if lowercased.contains("av01") {
-                return .av1
-            } else if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
-                return .mp4
-            } else {
-                return .unknown
             }
+            if lowercased.contains("avc1") {
+                return .avc1
+            }
+            if lowercased.contains("av01") {
+                return .av1
+            }
+            if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
+                return .mp4
+            }
+            return .unknown
         }
     }
 
@@ -190,9 +192,8 @@ class Stream: Equatable, Hashable, Identifiable {
 
         if kind == .hls {
             return "HLS"
-        } else {
-            return resolution?.name ?? "?"
         }
+        return resolution?.name ?? "?"
     }
 
     var description: String {
@@ -221,7 +222,8 @@ class Stream: Equatable, Hashable, Identifiable {
 
         if kind == .hls {
             return hlsURL
-        } else if videoAssetContainsAudio {
+        }
+        if videoAssetContainsAudio {
             return videoAsset.url
         }
 

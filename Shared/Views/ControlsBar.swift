@@ -167,6 +167,7 @@ struct ControlsBar: View {
                             channel: model.videoForDisplay?.channel,
                             video: model.videoForDisplay
                         )
+                        .id("channel-avatar-\(model.videoForDisplay?.id ?? "")")
                         .frame(width: barHeight - 10, height: barHeight - 10)
                     }
                     .contextMenu { contextMenu }
@@ -176,12 +177,13 @@ struct ControlsBar: View {
                         channel: model.videoForDisplay?.channel,
                         video: model.videoForDisplay
                     )
+                    .id("channel-avatar-\(model.videoForDisplay?.id ?? "")")
                     #if !os(tvOS)
-                    .highPriorityGesture(playerButtonDoubleTapGesture != .nothing ? doubleTapGesture : nil)
-                    .gesture(playerButtonSingleTapGesture != .nothing ? singleTapGesture : nil)
+                        .highPriorityGesture(playerButtonDoubleTapGesture != .nothing ? doubleTapGesture : nil)
+                        .gesture(playerButtonSingleTapGesture != .nothing ? singleTapGesture : nil)
                     #endif
-                    .frame(width: barHeight - 10, height: barHeight - 10)
-                    .contextMenu { contextMenu }
+                        .frame(width: barHeight - 10, height: barHeight - 10)
+                        .contextMenu { contextMenu }
                 }
 
                 if expansionState == .full {

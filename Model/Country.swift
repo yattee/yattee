@@ -215,7 +215,7 @@ extension Country {
         case .lk: return "Sri Lanka"
         case .se: return "Sweden"
         case .ch: return "Switzerland"
-        case .tw: return "Taiwan, Province of China[a]"
+        case .tw: return "Taiwan"
         case .tz: return "Tanzania, United Republic of"
         case .th: return "Thailand"
         case .tn: return "Tunisia"

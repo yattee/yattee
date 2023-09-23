@@ -8,17 +8,23 @@ struct AppSidebarSubscriptions: View {
     @ObservedObject private var subscriptions = SubscribedChannelsModel.shared
 
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
+    @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
+    @Default(.showChannelAvatarInChannelsLists) private var showChannelAvatarInChannelsLists
+
+    @State private var channelLinkActive = false
+    @State private var channelForLink: Channel?
 
     var body: some View {
         Section(header: Text("Subscriptions")) {
-            ForEach(subscriptions.all) { channel in
+            ForEach(channels) { channel in
                 NavigationLink(tag: TabSelection.channel(channel.id), selection: $navigation.tabSelection) {
                     LazyView(ChannelVideosView(channel: channel))
                 } label: {
                     HStack {
-                        if channel.thumbnailURLOrCached != nil {
+                        if showChannelAvatarInChannelsLists {
                             ChannelAvatarView(channel: channel, subscribedBadge: false)
                                 .frame(width: Constants.sidebarChannelThumbnailSize, height: Constants.sidebarChannelThumbnailSize)
+
                             Text(channel.name)
                         } else {
                             Label(channel.name, systemImage: RecentsModel.symbolSystemImage(channel.name))
@@ -26,14 +32,10 @@ struct AppSidebarSubscriptions: View {
 
                         Spacer()
                     }
-                    .backport
+                    .lineLimit(1)
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
                 }
                 .contextMenu {
-                    if subscriptions.isSubscribing(channel.id) {
-                        toggleWatchedButton(channel)
-                    }
-
                     Button("Unsubscribe") {
                         navigation.presentUnsubscribeAlert(channel, subscriptions: subscriptions)
                     }
@@ -43,29 +45,8 @@ struct AppSidebarSubscriptions: View {
         }
     }
 
-    @ViewBuilder func toggleWatchedButton(_ channel: Channel) -> some View {
-        if feed.canMarkChannelAsWatched(channel.id) {
-            markChannelAsWatchedButton(channel)
-        } else {
-            markChannelAsUnwatchedButton(channel)
-        }
-    }
-
-    func markChannelAsWatchedButton(_ channel: Channel) -> some View {
-        Button {
-            feed.markChannelAsWatched(channel.id)
-        } label: {
-            Label("Mark channel feed as watched", systemImage: "checkmark.circle.fill")
-        }
-        .disabled(!feed.canMarkAllFeedAsWatched)
-    }
-
-    func markChannelAsUnwatchedButton(_ channel: Channel) -> some View {
-        Button {
-            feed.markChannelAsUnwatched(channel.id)
-        } label: {
-            Label("Mark channel feed as unwatched", systemImage: "checkmark.circle")
-        }
+    var channels: [Channel] {
+        keepChannelsWithUnwatchedFeedOnTop ? subscriptions.allByUnwatchedCount : subscriptions.all
     }
 }
 

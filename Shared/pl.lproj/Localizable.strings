@@ -596,3 +596,5 @@
 "Play Now in MPV" = "Odtwórz teraz w MPV";
 "Keep channels with unwatched videos on top of subscriptions list" = "Kanały z nieobejrzanymi filmami na górze listy subskrypcji";
 "Show video context menu options to force selected backend" = "Pokaż opcje menu kontekstowego wideo, aby wymusić wybrany silnik";
+"Show channel avatars in videos lists" = "Pokaż awatary kanałów na listach wideo";
+"Show channel avatars in channels lists" = "Pokaż awatary kanałów na listach kanałów";

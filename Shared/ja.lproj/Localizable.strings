@@ -177,7 +177,7 @@
 "When partially watched video is played" = "一部視聴済みの動画の再生時";
 
 /* Selected video was played on given date */
-"Watched %@" = "視聴日 %@";
+"Watched %@" = "前回の視聴 %@";
 "Welcome" = "ようこそ";
 "Yattee" = "Yattee";
 "Yattee %@ (build %@)" = "Yattee %@ (ビルド %@)";
@@ -531,7 +531,7 @@
 "Switch to public locations" = "公開された場所に切り替え";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。";
 "Proxy videos" = "動画閲覧にプロキシ使用";
-"Sections" = "表示する部分";
+"Sections" = "表示するボタン";
 "System controls show buttons for %@" = "システム制御「%@」用のボタンを表示";
 "You need to create an instance and accounts\nto access %@ section" = "%@ セクションの利用には\nインスタンスとアカウントの作成が必要";
 "You need to select an account\nto access %@ section" = "%@ セクションの利用には\nアカウントの選択が必要";

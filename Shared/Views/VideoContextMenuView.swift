@@ -281,11 +281,7 @@ struct VideoContextMenuView: View {
             let label = Label("Remove…", systemImage: "trash.fill")
                 .foregroundColor(Color("AppRedColor"))
 
-            if #available(iOS 15, macOS 12, *) {
-                Button(role: .destructive, action: action) { label }
-            } else {
-                Button(action: action) { label }
-            }
+            Button(role: .destructive, action: action) { label }
         }
     #endif
 

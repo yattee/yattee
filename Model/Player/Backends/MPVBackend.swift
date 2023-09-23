@@ -357,7 +357,11 @@ final class MPVBackend: PlayerBackend {
     }
 
     func togglePlay() {
-        isPlaying ? pause() : play()
+        if isPlaying {
+            pause()
+        } else {
+            play()
+        }
     }
 
     func cancelLoads() {

@@ -86,7 +86,7 @@ final class MPVClient: ObservableObject {
             ]
 
             if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
-                puts("failed to initialize mpv GL context")
+                print("failed to initialize mpv GL context")
                 exit(1)
             }
 
@@ -471,9 +471,8 @@ final class MPVClient: ObservableObject {
             let data = Data(bufPtr)
             if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
                 return String(data: data[0 ... lastIndex], encoding: .isoLatin1)!
-            } else {
-                return String(data: data, encoding: .isoLatin1)!
             }
+            return String(data: data, encoding: .isoLatin1)!
         }
     }
 }
