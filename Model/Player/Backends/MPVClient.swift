@@ -109,6 +109,7 @@ final class MPVClient: ObservableObject {
 
         mpv_set_wakeup_callback(mpv, wakeUp, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
         mpv_observe_property(mpv, 0, "pause", MPV_FORMAT_FLAG)
+        mpv_observe_property(mpv, 0, "core-idle", MPV_FORMAT_FLAG)
     }
 
     func readEvents() {

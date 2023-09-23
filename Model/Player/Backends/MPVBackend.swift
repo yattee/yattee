@@ -605,6 +605,14 @@ final class MPVBackend: PlayerBackend {
                 isPlaying = !paused
                 networkStateTimer.start()
             }
+        case "core-idle":
+            if let idle = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee {
+                if !idle {
+                    isLoadingVideo = false
+                    isSeeking = false
+                    networkStateTimer.start()
+                }
+            }
         default:
             logger.info("MPV backend received unhandled property: \(name)")
         }
