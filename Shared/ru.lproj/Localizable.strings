@@ -1,0 +1,599 @@
+
+
+"Clear Search History..." = "Очистить историю поиска...";
+"Clear the queue" = "Очистить очередь";
+"%@ subscribers" = "%@ подписчиков";
+"%lld videos" = "%lld видео";
+"Accounts" = "Аккаунты";
+"Add Account" = "Добавить аккаунт";
+"Add Account..." = "Добавить аккаунт...";
+"Add Location" = "Добавить локацию";
+"Add profile..." = "Добавить профиль...";
+"Add to %@" = "Добавить к %@";
+"Add to Favorites" = "Добавить к избранному";
+"Add to Playlist" = "Добавить к плейлисту";
+"Anonymous" = "Анонимный";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Любой";
+"Apply to all" = "Применить ко всем";
+"Are you sure you want to delete playlist?" = "Вы точно хотите удалить плейлист?";
+"Are you sure you want to unsubscribe from %@?" = "Вы точно хотите описаться от %@?";
+"Autoplaying Next" = "Автоматически проигрывать след. видео";
+"Backend" = "Бэкэнд";
+"Blue" = "Синий";
+"Button" = "Кнопка";
+"Cancel" = "Отмена";
+"Captions" = "Субтитры";
+"Categories to Skip" = "Категории для пропуска";
+"Cellular" = "Через мобильный интернет";
+"Charging" = "Зарядка";
+"Clear All Recents" = "Очистить все последние записи";
+"Close" = "Закрыть";
+"Close PiP when player is opened" = "Закрыть К-в-К, когда плеер открыт";
+
+/* Video sort order in search */
+"Date" = "Дата";
+"Decrease rate" = "Снижение уровня";
+"Decreased opacity" = "Уменьшение непрозрачности";
+"Delete" = "Удалить";
+"Donations" = "Донаты";
+"Done" = "Применить";
+"Edit" = "Редактировать";
+"Edit Playlist" = "Редактировать плейлист";
+"Edit Quality Profile" = "Редактировать профиль качества";
+"Edit..." = "Редактировать...";
+"Enable Return YouTube Dislike" = "Включить дизлайки";
+"Error" = "Ошибка";
+"Error when accessing playlist" = "Ошибка при доступе к плейлисту";
+"Favorites" = "Избранное";
+"For videos which feature music as the primary content." = "Для видео, в которых музыка используется в качестве основного контента.";
+"Highest quality" = "Высшее качество";
+"History" = "История";
+"Honor orientation lock" = "Фиксация ориентации Honor";
+"Locations" = "Локации";
+"More info can be found in:" = "Более подробную информацию можно найти в:";
+"Movies" = "Фильмы";
+"MPV Documentation" = "Документация по MPV";
+"Music" = "Музыка";
+"Name" = "Имя";
+"New Playlist" = "Новый плейлист";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Не по теме в музыкальных клипах";
+"Password" = "Пароль";
+"Pause" = "Пауза";
+"Pause when entering background" = "Пауза при входе в фоновый режим";
+"Play Last" = "Играть последнее";
+"Play Music" = "Играть музыку";
+"Play Next" = "Играть следующее";
+"Preferred Formats" = "Предпочитаемые форматы";
+"Profiles" = "Профили";
+"Proxy videos" = "Проксировать видео";
+"Related" = "Связанный";
+"Share..." = "Поделиться...";
+
+/* Video duration filter in search */
+"Short" = "Короткое";
+"Show account username" = "Показать никнэйм аккаунта";
+"Show anonymous accounts" = "Показать анонимные аккаунты";
+"Show channel name" = "Показать имя канала";
+"Show keywords" = "Показать ключевые слова";
+"Show playback statistics" = "Показать статистику просмотра";
+"Show sidebar when space permits" = "Показать боковую панель, когда позволяет пространство";
+"Show video length" = "Показать длину видео";
+"Shuffle" = "Переместить";
+"Sign In Required" = "Требуется войти";
+
+/* Player controls layout size */
+"Small" = "Маленький";
+"Videos" = "Видео";
+
+/* Selected video was played on given date */
+"Watched %@" = "Просмотренные %@";
+"Wi-Fi" = "Wi-Fi";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "У вас нет списков воспроизведения\n\nНажмите на \"Новый плейлист\", чтобы создать его";
+"Could not refresh Subscriptions" = "Не удалось обновить подписки";
+"This video could not be opened" = "Это видео не удалось открыть";
+"Translations" = "Переводы";
+"Show Open Videos quick actions" = "Показать быстродействие открытия видео";
+"Recent History" = "Недавняя история";
+"Files" = "Файлы";
+"Show Documents" = "Показать документы";
+"Video Details" = "Детали видео";
+"Locations Manifest" = "Манифест локаций";
+"Remove Location" = "Удалить локацию";
+"Default Profile" = "Профиль по умолчанию";
+"Play all unwatched" = "Играть все непросмотренные";
+"Actions Buttons" = "Кнопки действий";
+"Play next item" = "Воспроизвести следующий элемент";
+"Lock orientation" = "Заблокировать ориентацию";
+"Music Mode" = "Музыкальный режим";
+"Total size: %@" = "Итоговый размер: %@";
+"Cache" = "Кэш";
+"Open channel" = "Открыть канал";
+"Inspector" = "Инспектор";
+"Open video description expanded" = "Открыть расширенное описание видео";
+" subscribers" = " подписчики";
+"%@ Channel" = "%@ Канал";
+"%@ Playlist" = "%@ Плейлист";
+"10 seconds forwards/backwards" = "10 секунд вперёд/назад";
+"Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются для приложения на этом инстансе";
+"Add Location..." = "Добавить локацию...";
+"Add Quality Profile" = "Добавить профиль качества";
+"Add to Playlist..." = "Добавить к плейлисту...";
+"Advanced" = "Расширенные";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Все";
+"Always use AVPlayer for live videos" = "Всегда использовать AVPlayer для прямых трансляций";
+"Are you sure you want to clear search history?" = "Вы точно хотите очистить историю поиска?";
+"Are you sure you want to clear history of watched videos?" = "Вы точно хотите очистить историю просмотренных видео?";
+"Are you sure you want to restore default quality profiles?" = "Вы точно хотите восстановить настройки по умолчанию для профиля качества?";
+"Automatic" = "Автоматически";
+"Badge" = "Оценка";
+"Badge & Decreased opacity" = "Оценка и уменьшенная непрозрачность";
+"Badge color" = "Цвет оценки";
+"Based on system color scheme" = "Как в системе";
+"Battery" = "Батарея";
+"Browsing" = "В браузере";
+"Buffering stream..." = "Буферизация прямой трансляции...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Баги и новые идеи можно отправить на трекер проблем на GitHub. ";
+"Category" = "Категория";
+"Chapters" = "Главы";
+"Clear" = "Очистить";
+"Clear All" = "Очистить всё";
+"Clear History" = "Очистить историю";
+"Close PiP and open player when application enters foreground" = "Закрыть К-в-К и открыть плеер, когда приложение не в спящем режиме";
+"Clear Search History" = "Очистить историю поиска";
+"Show Open Videos toolbar button" = "Кнопка \"Показать открытые видео\" на панели инструментов";
+"Buttons labels" = "Ярлыки кнопок";
+"Rotate to portrait when exiting fullscreen" = "Поворачивать в портретное положение при выходе из полноэкранного режима";
+"Round corners" = "Закругленные углы";
+"Save" = "Сохранить";
+"Save history of played videos" = "Сохранить историю проигранных видео";
+"Save history of searches, channels and playlists" = "Сохранение истории поиска, каналов и плейлистов";
+"Search" = "Поиск";
+"Search history is empty" = "История поиска пуста";
+"Search..." = "Поиск...";
+"Sections" = "Разделы";
+"Seek gesture sensitivity" = "Поиск чувствительности к жестам";
+"Seek gesture speed" = "Поиск скорости жеста";
+"Seek with horizontal swipe on video" = "Поиск с помощью горизонтального свайпа по видео";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Сегменты, обычно находящиеся в начале видео и включающие анимацию, стоп-кадр или клип, которые также можно увидеть в других видео того же создателя.";
+"Select location closest to you:" = "Выберите ближайшее к вам местоположение:";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Самореклама";
+"Settings" = "Настройки";
+"Share %@ link with time" = "Поделиться %@ ссылкой со временем";
+"Share %@ link" = "Поделиться %@ ссылкой";
+"Show history" = "Показать историю";
+"Show progress of watching on thumbnails" = "Показать прогресс просмотра на миниатюрах";
+"Shuffle All" = "Переместить всё";
+"Sidebar" = "Боковая панель";
+"Sort" = "Сортировать";
+
+/* Player controls layout size */
+"Smaller" = "Мельчайший";
+"Sort: %@" = "Сортировать: %@";
+
+/* SponsorBlock category name */
+"Sponsor" = "Спонсорская реклама";
+"Source" = "Исходный код";
+"SponsorBlock API Instance" = "Истанс SponsorBlock API";
+"Subscribe" = "Подписаться";
+
+/* Subscriptions title */
+"Subscriptions" = "Подписчики";
+"Switch to other public location" = "Переключиться на другую публичную локацию";
+"This cannot be reverted" = "Это не может быть отменено";
+"Switch to public locations" = "Переключить публичные локации";
+"System controls buttons" = "Кнопки управления системой";
+"System controls show buttons for %@" = "Кнопки управления системой для %@";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приятно это слышать. Доставлять приложения, которыми хотят пользоваться другие люди, - это весело. Вы можете рассмотреть возможность пожертвования проекту или помочь, внеся свой вклад в разработку новых функций.";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Это не может быть отменено. Возможно, вам потребуется переключаться между представлениями или перезапускать приложение, чтобы увидеть изменения.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Эта информация будет обрабатываться только на вашем устройстве и использоваться для подключения вас к серверу в указанной стране.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Это удалит все ваши пользовательские профили и вернет их значения по умолчанию. Это не может быть отменено.";
+"Thumbnails" = "Миниатюры";
+
+/* Video date filter in search */
+"Today" = "Сегодня";
+"Trending" = "Тренды";
+
+/* Player controls layout size for TV */
+"TV" = "ТВ";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Обычно ближе к концу видео, когда появляются титры и / или показываются концевые карточки.";
+"unknown" = "неизвестно";
+"Upload date" = "Дата загрузки";
+"Unsubscribe" = "Отписаться";
+"URL" = "URL-адрес";
+"Used to create links from videos, channels and playlists" = "Используется для создания ссылок на видео, каналы и плейлисты";
+"Username" = "Имя пользователя";
+
+/* Player controls layout size */
+"Very Large" = "Очень большой";
+
+/* Video sort order in search */
+"Views" = "Просмотры";
+"Watched" = "Просмотренные";
+
+/* Selected video is being played */
+"Watching now" = "Смотреть сейчас";
+"Yattee %@ (build %@)" = "Yattee %@ (сборка %@)";
+
+/* Video date filter in search */
+"Week" = "Неделя";
+"Welcome" = "Добро пожаловать";
+"Wiki" = "Вики";
+"When partially watched video is played" = "При воспроизведении частично просмотренного видео";
+"Yattee" = "Yattee";
+
+/* Video date filter in search */
+"Year" = "Год";
+"You can find information about using Yattee in the Wiki pages." = "Вы можете найти информацию об использовании Yattee на страницах вики.";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Вы можете использовать автоматический выбор профиля на основе текущего состояния устройства или переключить его в элементах управления настройками воспроизведения видео.";
+"You need to create an instance and accounts\nto access %@ section" = "Вам нужно создать экземпляр и учетные\nзаписи для доступа к разделу %@";
+"You have no Playlists" = "У вас нет плейлистов";
+"You need to select an account\nto access %@ section" = "Вам нужно выбрать учетную\nзапись для доступа к разделу %@";
+
+
+"Public" = "Публично";
+"Now Playing" = "Сейчас играет";
+"Unlisted" = "По ссылке";
+"Current Location" = "Текущая локация";
+"Private" = "Лично";
+"SponsorBlock" = "СпонсорБлок";
+"Playback queue is empty" = "Очередь воспроизведения пуста";
+"Playing Next" = "Играет дальше";
+"You can switch between profiles in playback settings controls." = "Вы можете переключаться между профилями в элементах управления настройками воспроизведения.";
+"Add Channels, Playlists and Searches to Favorites using" = "Добавить каналы, плейлисты и результаты поиска в избранное с помощью";
+"Stream & Player" = "Прямая трансляция и плеер";
+"Make default" = "Сделать по умолчанию";
+"Statistics" = "Статистика";
+"Visibility" = "Видимость";
+"Current Playlist" = "Текущий плейлист";
+"Hardware decoder" = "Аппаратный декодер";
+"Stream FPS" = "К/с прямой трансляции";
+"Cached time" = "Кэшированное время";
+"Rate & Captions" = "Оценка и субтитры";
+"Dropped frames" = "Пропущенные кадры";
+"Keep last played video in the queue after restart" = "Сохранить последнее воспроизведенное видео в очереди после перезапуска";
+"Any format" = "Любой формат";
+"%@ formats" = "%@ форматы";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Список воспроизведения пуст\n\nНажмите и удерживайте видео, а затем\n\"Добавить в список воспроизведения\"";
+"It can be changed later in settings. You can use your own locations too." = "Это можно изменить позже в настройках. Вы также можете использовать свои собственные локации.";
+"Comments are disabled" = "Комментарии отключены";
+"Press and hold remote button to open captions and quality menus" = "Нажмите и удерживайте кнопку дистанционного управления, чтобы открыть титры и меню качества";
+"No comments" = "Комментариев нет";
+"No chapters information available" = "Информация о главах недоступна";
+"Share Logs..." = "Поделиться логами…";
+"Could not load streams" = "Не удалось загрузить прямые трансляции";
+"Channel could not be found" = "Не удалось найти канал";
+"Could not open video" = "Не удалось открыть видео";
+"Could not extract channel information" = "Не удалось извлечь информацию о канале";
+"Could not extract SID from received cookies: %@" = "Не удалось извлечь SID из полученных файлов cookie: %@";
+"Could not update your token." = "Не удалось обновить ваш токен.";
+"Could not refresh Trending" = "Не удалось обновить тренды";
+"This URL could not be opened" = "Этот URL-адрес не удалось открыть";
+"For custom locations you can configure Frontend URL in Locations settings" = "Для пользовательских местоположений вы можете настроить URL-адрес интерфейса в настройках местоположений";
+"Could not open channel" = "Не удалось открыть канал";
+"Could not refresh Popular" = "Не удалось обновить вкладку \"Популярность\"";
+"Could not create share link" = "Не удалось создать ссылку для общего доступа";
+"Could not extract playlist ID" = "Не удалось извлечь идентификатор плейлиста";
+"Could not open playlist" = "Не удалось открыть плейлист";
+"Could not extract video ID" = "Не удалось извлечь идентификатор видео";
+"Could not load video" = "Не удалось загрузить видео";
+"No locations available at the moment" = "На данный момент нет локаций";
+"Could not refresh Playlists" = "Не удалось обновить плейлисты";
+"If you want this app to be available in your language, join translation project." = "Если вы хотите, чтобы это приложение было доступно на вашем языке, присоединяйтесь к проекту перевода.";
+"No documents" = "Нет документов";
+"Recent Documents" = "Последние документы";
+"Home" = "Дом";
+"Show Home" = "Показать дом";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Делитесь файлами из Finder на Mac\nили iTunes на Windows";
+"Show Favorites" = "Показать избранное";
+"Inspector visibility" = "Видимость инспектора";
+"Edit Favorites…" = "Редактирование избранного…";
+"Close PiP when starting playing other video" = "Закрыть К-в-К, когда воспроизводится другое видео";
+"Close player when closing video" = "Закрыть плеер, когда закрывается видео";
+"Close player when starting PiP" = "Закрыть плеер, когда запущен К-в-К";
+"Close video after playing last in the queue" = "Закрыть видео после проигрывания последнего в очереди";
+"Comments" = "Комментарии";
+"Connected successfully (%@)" = "Подключение завершено (%@)";
+"Contact" = "Контакт";
+"Connection failed" = "Подключение провалено";
+"Continue" = "Продолжить";
+"Continue from %@" = "Продолжить с %@";
+"Contributing" = "Контрибуция";
+"Controls" = "Управления";
+"Copy %@ link" = "Копировать %@ ссылку";
+"Copy %@ link with time" = "Копировать %@ ссылку со временем";
+"Could not load locations manifest" = "Не удалось загрузить манифест локаций";
+"Country" = "Страна";
+"Country Name or Code" = "Название страны или код";
+"Create Playlist" = "Создать плейлист";
+"Current: %@\n%@" = "Текущий: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Пользовательские";
+"Custom Locations" = "Пользовательские локации";
+"Disabled" = "Отключить";
+"Discord Server" = "Сервер на Discord";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Обсуждения проходят в Discord и Matrix. Это хорошие места для общих вопросов.";
+"Don't use public locations" = "Не использовать публичные локации";
+"Duration" = "Продолжительность";
+"Enable logging" = "Включить логирование";
+"Enter fullscreen in landscape" = "Войти в полноэкранный режим в альбомной ориентации";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Явные напоминания о необходимости поставить лайк, подписаться или взаимодействовать с ними на любой платной или бесплатной платформе (платформах) (например, нажать на видео).";
+"Filter" = "Фильтр";
+"Filter: active" = "Фильтр: активен";
+"Finding something to play..." = "Ищу другие видео...";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Форматы будут выбраны в том порядке, как указано в списке.\nHLS - это адаптивный формат (настройка разрешения не применяется).";
+"Find Other" = "Найти другое";
+"Frontend URL" = "URL инстанса";
+"Fullscreen size" = "Размер видео в полноэкранном";
+"Gaming" = "Игры";
+"Help" = "Помощь";
+"Hide sidebar" = "Скрыть боковую панель";
+"Highest" = "Высшее";
+
+/* Video date filter in search */
+"Hour" = "Час";
+"I am lost" = "Я заблудился";
+"I found a bug /" = "Я нашёл баг /";
+"High" = "Высокое";
+"I have a feature request" = "Я придумал новую функцию";
+"I like this app!" = "Мне нравится это приложение!";
+"I want to ask a question" = "У меня есть вопрос";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все соответствующие сведения (особенно: версию приложения, используемое устройство и версию системы, как пришли к ошибке).";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Если вам интересно, что будет в будущих обновлениях, вы можете отслеживать этапы проекта.";
+"Increase rate" = "Увеличение скорости";
+"Instance of current account" = "Инстанс текущего аккаунта";
+"Interface" = "Интерфейс";
+"Info" = "Информация";
+
+/* SponsorBlock category name */
+"Interaction" = "Взаимодействие";
+
+/* Player controls layout size */
+"Large" = "Большой";
+
+/* SponsorBlock category name */
+"Intro" = "Интро";
+"Issues Tracker" = "Трекер ошибок";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Большой лайаут подходит не для всех устройств, и ее использование может привести к тому, что элементы управления не поместятся на экране.";
+
+/* Selected video has just finished playing */
+"Just watched" = "Просто наблюдал";
+"LIVE" = "ПРЯМАЯ ТРАНСЛЯЦИЯ";
+
+/* Loading stream OSD */
+"Loading streams..." = "Загрузка прямой трансляции...";
+"Loading..." = "Загрузка...";
+"Lock portrait mode" = "Блокировка портретного режима";
+"Low" = "Низкое";
+"Low quality" = "Низкое качество";
+
+/* Video duration filter in search */
+"Long" = "Длинное";
+"Lowest" = "Низшее";
+"Mark as watched" = "Оцените видео";
+"Mark video as watched after playing" = "Оцените видео после просмотра";
+"Mark watched videos with" = "Оцените видео с";
+"Matrix Channel" = "Канал на Matrix";
+"Matrix Chat" = "Чат на Matrix";
+
+/* Player controls layout size */
+"Medium" = "Среднее";
+"Medium quality" = "Среднее качество";
+
+/* Video date filter in search */
+"Month" = "Месяц";
+"Milestones" = "Этапы проекта";
+"Next" = "Далее";
+"No Playlists" = "Без плейлистов";
+"No description" = "Без описания";
+"No results" = "Без результатов";
+"Nothing" = "Ничего";
+"Normal" = "Обычное";
+"Not available" = "Нет доступа";
+"Not Playing" = "Нет просмотров";
+"Only when signed in" = "Только после входа в";
+"Open \"Playlists\" tab to create new one" = "Открыть вкладку \"Плейлисты\", чтобы создать новый";
+"Open Settings" = "Отрыть настройки";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Открытие %@ прямой трансляции...";
+"Opening audio stream..." = "Открытие прямой трансляции аудио...";
+"Orientation" = "Ориентация";
+
+/* SponsorBlock category name */
+"Outro" = "Оутро";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Часть видеоролика, рекламирующего продукт или услугу, не имеющие прямого отношения к создателю. Создатель получит оплату или компенсацию в виде денег или бесплатных продуктов.";
+"Pause when player is closed" = "Пауза при закрытии плеера";
+"Picture in Picture" = "Картинка-в-Картинке";
+"Play" = "Играть";
+"Play All" = "Играть все";
+"Play in PiP" = "Играть в К-в-К";
+"Play Now" = "Играть сейчас";
+"Playback" = "Режим воспроизведения";
+"Player" = "Плеер";
+"Playlist" = "Плейлист";
+"Playlists" = "Плейлисты";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Список воспроизведения \"%@\" будет удален.\nЭтого не изменить.";
+"Popular" = "Популярность";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Продвижение продукта или услуги, которые непосредственно связаны с самим создателем. Обычно это включает в себя товары или продвижение монетизированных платформ.";
+"Public Manifest" = "Публичный манифест";
+"Quality" = "Качество";
+"Public Locations" = "Публичные локации";
+"Queue" = "Очередь";
+"Quality Profile" = "Профиль качества";
+"Queue is empty" = "Очередь пуста";
+"Rate" = "Оценить";
+
+/* Video sort order in search */
+"Rating" = "Рейтинг";
+"Recents" = "Недавние";
+"Regular size" = "Обычный размер";
+"Red" = "Красный";
+"Refresh" = "Обновить";
+"Regular Size" = "Обычный Размер";
+"Remove" = "Стереть";
+"Remove from Favorites" = "Стереть из избранного";
+"Remove from history" = "Стереть из истории";
+"Remove from Playlist" = "Стереть из плейлиста";
+
+/* Video sort order in search */
+"Relevance" = "Актуальность";
+"Remove from the queue" = "Стереть из очереди";
+"Replies" = "Ответы";
+"Reset search filters" = "Поисковые фильтры по умолчанию";
+"Reset" = "По умолчанию";
+"Reset watched status when playing again" = "Статус просмотра при повторном воспроизведении по умолчанию";
+"Restart" = "Перезапустить";
+"Resolution" = "Разрешение";
+"Restart the app to apply the settings above." = "Перезапустите приложение, чтобы применить выбранные настройки.";
+"Restart/Play next" = "Перезапустить/Играть следующее";
+"Restore default profiles..." = "Восстановить профили по умолчанию...";
+"Open logs in Finder" = "Открыть логи в Finder";
+"Pages toolbar position" = "Положение на панели инструментов вкладки \"Страницы\"";
+"Playback history is empty" = "История воспроизведения пуста";
+"Copy%@link" = "Копировать%@-сссыку";
+"Share%@link" = "Поделиться%@-ссылкой";
+"Are you sure you want to remove this document?" = "Вы уверены, что хотите удалить этот документ?";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" будет необратимо удален с этого устройства.";
+"Could not delete document" = "Не удалось удалить документ";
+"Open Video" = "Открыть Видео";
+"Are you sure you want to remove %@ location?" = "Вы уверены, что хотите удалить локацию %@ ?";
+"Live Streams" = "Прямые Трансляции";
+"Shorts" = "Короткие видео";
+"Verified" = "Проверенный";
+"Channel" = "Канал";
+"Mark channel feed as unwatched" = "Пометить канал как не просматриваемый";
+"Mark channel feed as watched" = "Пометить канал как просмотренный";
+"Open expanded" = "Открыть расширенный";
+"Short videos: visible" = "Короткие видео: показать";
+"Player Bar" = "Панель плеера";
+"Short videos: hidden" = "Короткие видео: скрыть";
+"Double tap gesture" = "Жест двойного касания";
+"Tap and hold channel thumbnail to open context menu with more actions" = "Нажмите и удерживайте миниатюру канала, чтобы открыть контекстное меню с дополнительными действиями";
+"Always show controls buttons" = "Всегда показывать кнопки управления";
+"Single tap gesture" = "Жест \"однократное нажатие\"";
+"Maximum width expanded" = "Максимальная ширина в полноэкранном режиме";
+"Clear all" = "Очистить весь кэш";
+"Right click channel thumbnail to open context menu with more actions" = "Щелчок правой кнопкой мыши на миниатюре канала открывает контекстное меню с дополнительными действиями";
+"Show unwatched feed badges" = "Показать значки непросмотренных каналов";
+"Seeking" = "Искать";
+"Gesture: fowards" = "Жест: вперед";
+"Controls Buttons" = "Кнопки управления";
+"System controls" = "Системные средства управления";
+"Controls button: backwards" = "Кнопка управления: назад";
+"Controls button: forwards" = "Кнопка управления: вперед";
+"Gesture: backwards" = "Жест: назад";
+"Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска жеста двойного касания левой/правой стороны плеера. Изменение настроек управления системой требует перезагрузки.";
+"Hide player" = "Скрыть плеер";
+"Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска двойного щелчка левой/правой стороной проигрывателя. Изменение настроек управления системой требует перезагрузки.";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска кнопок-стрелок пульта ДУ (для пульта Siri Remote 2-го поколения или новее). Изменение настроек управления системой требует перезагрузки.";
+"Close Video" = "Закрыть Видео";
+"Open channels with description expanded" = "Открытые каналы с расширенным описанием";
+"Show Next in Queue" = "Показать следующее в очереди";
+"Subscribe/Unsubscribe" = "Подписаться/Отписаться";
+"Maximum feed items" = "Максимальное количество объектов в ленте";
+"Are you sure you want to clear cache?" = "Вы уверены, что хотите очистить кэш?";
+"Show cache status" = "Показать статус кэша";
+"Show toggle watch status button" = "Показать кнопку переключения состояния часов";
+"Next in Queue" = "Следующий в очереди";
+"List" = "Список";
+"Cells" = "Клетки";
+"Toggle size" = "Тогл размера";
+"Toggle player" = "Тогл плеера";
+"Do nothing" = "Ничего не делать";
+"Feed" = "Лента";
+"Mark all as watched" = "Пометить все как просмотренное";
+"Mark all as unwatched" = "Пометить все как непросмотренное";
+"Queue - shuffled" = "Очередь - перемещена";
+"Rotate when entering fullscreen on landscape video" = "Поворот при переходе в полноэкранный режим на видео с ландшафтом";
+"Landscape left" = "Ландшафт слева";
+"Landscape right" = "Ландшафт справа";
+"No rotation" = "Нет вращения";
+"Available" = "Доступно";
+"Startup section" = "Раздел ввода в эксплуатацию";
+"Watched: hidden" = "Просмотренное: скрыто";
+"Home Settings" = "Настройки дома";
+"(watched and shorts hidden)" = "(просмотрено и короткие видео скрыты)";
+"Watched: visible" = "Просморенные: показаны";
+"No videos to show" = "Нет видео для показа";
+"(shorts hidden)" = "(короткие видео скрыты)";
+"Limit" = "Лимит";
+"(watched hidden)" = "(просмотренные скрыты)";
+"Disable filters" = "Отключить фильтры";
+"Are you sure you want to remove %@ from Favorites?" = "Вы уверены, что хотите удалить %@ из избранного?";
+"Keep channels with unwatched videos on top of subscriptions list" = "Сохранять каналы с непросмотренными видеороликами в верхней части списка подписок";
+"Show video context menu options to force selected backend" = "Показывать опции контекстного меню видео для принудительного выбора бэкенда";
+"Play Now in MPV" = "Играть сейчас в MPV";
+"Play Now in AVPlayer" = "Играть сейчас в AVPlayer";
+"Show channel avatars in videos lists" = "Показывать аватары каналов в списках видео";
+"Show channel avatars in channels lists" = "Показывать аватары каналов в списках каналов";
+"Fullscreen" = "Полный экран";
+"Playback Settings" = "Настройки воспроизведения";
+"Lock" = "Заблокировать";
+"Replay" = "Воспроизвести";
+"Description" = "Описание";
+"Loop one" = "Повторить одно";
+"Close video" = "Закрыть видео";
+"Autoplay next" = "Автоплей следующего";
+"Stream" = "Прямая трансляция";
+"Show scroll to top button in comments" = "Показать кнопку прокрутки к верху в комментариях";
+"Enter account credentials to connect..." = "Введите данные аккаунта для подключения...";
+"Opened File" = "Открытие файла";
+"Seek" = "Искать следующее/предыдущее";
+"Enter location address to connect..." = "Введите адрес местоположения для подключения...";
+"Show Inspector" = "Показать инспектора";
+"Clear Queue before opening" = "Очистить очередь до открытия";
+"URL to Open" = "URL-адрес для открытия";
+"Reload manifest" = "Перезагрузить манифест";
+"Open" = "Открыть";
+"Video actions buttons" = "Кнопки действий с видео";
+"Pages buttons" = "Кнопки страницы";
+"Enter link to open" = "Введите ссылку, чтобы открыть";
+"Could not open Files" = "Не удалось открыть файлы";
+"Enter links to open, one per line" = "Введите ссылки для открытия, по одной на строку";
+"Playback Mode" = "Режим Воспроизведения";
+"Add" = "Добавить";
+"Paste" = "Вставить";
+"Open Videos" = "Открыть видео";
+"Hide" = "Скрыть";
+"Always" = "Всегда";
+"Channels" = "Каналы";
+"Share" = "Поделиться";
+"Only for local files and URLs" = "Только для локальных файлов и URL-адресов";
+"Open Files" = "Открыть файлы";
+"Show icons and text when space permits" = "Показать значки и текст, когда позволяет свободное место";
+"Format" = "Формат";
+"Size" = "Размер";
+"Left" = "Лево";
+"Right" = "Право";
+"Driver" = "Драйвер";
+"Show only icons" = "Показать только иконки";
+"Center" = "Центр";
+"Documents" = "Документы";
+"Video" = "Видео-файл";
+"Sample Rate" = "Частота дискретизации";
+"Could not find any links to open in your clipboard" = "Не удалось найти никаких ссылок для открытия в вашем буфере обмена";
+"Audio" = "Аудио-файл";
+"FPS" = "К/с";
+"Address" = "Адрес";
+"File" = "Файл";
+"Codec" = "Кодек";
+"Remove…" = "Удалить…";
+"Actions buttons" = "Кнопки действия";
+"Show sidebar" = "Показать боковую панель";
+"Browse without account" = "Искать без аккаунта";
+"Opening file..." = "Отрытие файла...";
+"Public account" = "Публичный аккаунт";
+"Your Accounts" = "Ваши аккаунты";
+"Close video and player on end" = "Закрыть видео и плеер в конце";
+"Use system controls with AVPlayer" = "Использование системных элементов управления с помощью AVPlayer";
+"File Extension" = "Расширение файла";

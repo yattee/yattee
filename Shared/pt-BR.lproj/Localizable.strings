@@ -595,3 +595,5 @@
 "Keep channels with unwatched videos on top of subscriptions list" = "Manter canais com vídeos não vistos no topo da lista de inscrições";
 "Play Now in AVPlayer" = "Tocar Agora no AVPlayer";
 "Play Now in MPV" = "Tocar Agora em MPV";
+"Show channel avatars in videos lists" = "Mostrar avatares de canais em listas de vídeos";
+"Show channel avatars in channels lists" = "Mostrar avatares de canais em listas de canais";

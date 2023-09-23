@@ -222,7 +222,7 @@
 "I like this app!" = "Ich mag diese App!";
 "Hide sidebar" = "Seitenleiste ausblenden";
 "I am lost" = "Ich bin verloren";
-"I found a bug /" = "Ich fand einen Fehler /";
+"I found a bug /" = "Ich habe einen Fehler gefunden /";
 "I have a feature request" = "Ich habe eine Feature-Anfrage";
 "I want to ask a question" = "Ich möchte eine Frage stellen";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Wenn Sie sich für künftige Updates interessieren, können Sie die Meilensteine des Projekts verfolgen.";
@@ -595,3 +595,5 @@
 "Keep channels with unwatched videos on top of subscriptions list" = "Kanäle mit ungesehenen Videos oben in der Abonnementliste halten";
 "Show video context menu options to force selected backend" = "Video-Kontextmenüoptionen anzeigen, um die Auswahl des Backends zu erzwingen";
 "Play Now in AVPlayer" = "Jetzt in AVPlayer abspielen";
+"Show channel avatars in videos lists" = "Kanal-Avatare in Videolisten anzeigen";
+"Show channel avatars in channels lists" = "Kanal-Avatare in Kanallisten anzeigen";

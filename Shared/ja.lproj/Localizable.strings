@@ -595,3 +595,5 @@
 "Limit" = "上限";
 "Landscape left" = "左を下に横長";
 "Landscape right" = "右を下に横長";
+"Show channel avatars in channels lists" = "チャンネル一覧にチャンネルのアイコンを表示";
+"Show channel avatars in videos lists" = "動画一覧にチャンネルのアイコンを表示";
