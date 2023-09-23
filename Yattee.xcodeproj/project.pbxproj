@@ -1894,13 +1894,13 @@
 			children = (
 				37B4E802277D0A72004BF56A /* AppDelegate.swift */,
 				37B4E804277D0AB4004BF56A /* Orientation.swift */,
+				37DCD3102A18E8150059A470 /* OrientationModel.swift */,
 				379B0252287A1CDF001015B5 /* OrientationTracker.swift */,
+				37DCD3142A18F7630059A470 /* SafeAreaModel.swift */,
 				3784B23A272894DA00B09468 /* ShareSheet.swift */,
 				3749BF9227ADA142000480FF /* BridgingHeader.h */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
 				3782430A291E5AFA005DEC1C /* Yattee (iOS).entitlements */,
-				37DCD3102A18E8150059A470 /* OrientationModel.swift */,
-				37DCD3142A18F7630059A470 /* SafeAreaModel.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -1939,8 +1939,8 @@
 				37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */,
 				3751BA7F27E64244007B1A60 /* VideoLayer.swift */,
 				37737785276F9858000521C1 /* Windows.swift */,
-				374C0544272496FD009BDDBE /* Info.plist */,
 				370F500A27CC176F001B35DC /* BridgingHeader.h */,
+				374C0544272496FD009BDDBE /* Info.plist */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -1983,7 +1983,6 @@
 				37D4B0C12671614700C925CA /* Shared */,
 				3722AEBA274DA312005EA4D6 /* Backports */,
 				37C7A9022679058300E721B4 /* Extensions */,
-				37DD9DCC2785EE6F00539416 /* Vendor */,
 				3748186426A762300084E870 /* Fixtures */,
 				3712643C2865FF4500D77974 /* Shared Tests */,
 				37095E80291DC85400301883 /* Open in Yattee */,
@@ -2071,8 +2070,8 @@
 				3730D89F2712E2B70020ED53 /* NowPlayingView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
 				37D4B15E267164AF00C925CA /* Assets.xcassets */,
-				37D4B1AE26729DEB00C925CA /* Info.plist */,
 				3772002527E8ED2600CB2475 /* BridgingHeader.h */,
+				37D4B1AE26729DEB00C925CA /* Info.plist */,
 			);
 			path = tvOS;
 			sourceTree = "<group>";
@@ -2140,14 +2139,6 @@
 				37130A59277657090033018A /* Yattee.xcdatamodeld */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		37DD9DCC2785EE6F00539416 /* Vendor */ = {
-			isa = PBXGroup;
-			children = (
-				37DD9DAE2785D58D00539416 /* RefreshControl */,
-			);
-			path = Vendor;
 			sourceTree = "<group>";
 		};
 		37E6D79A2944ADCB00550C3D /* Subscriptions */ = {
