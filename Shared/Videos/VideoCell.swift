@@ -294,7 +294,7 @@ struct VideoCell: View {
                 HStack(spacing: 8) {
                     if channelOnThumbnail,
                        !inChannelView,
-                       let url = video.channel.thumbnailURLOrCached,
+                       video.channel.thumbnailURLOrCached != nil,
                        video != .fixture
                     {
                         ChannelLinkView(channel: video.channel) {

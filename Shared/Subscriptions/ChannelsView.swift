@@ -92,7 +92,7 @@ struct ChannelsView: View {
         }
         #if os(iOS)
         .refreshable {
-            await subscriptions.load(force: true)
+            subscriptions.load(force: true)
         }
         #endif
         #if !os(tvOS)

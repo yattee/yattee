@@ -53,7 +53,7 @@ struct Video: Identifiable, Equatable, Hashable {
 
     var channel: Channel
 
-    var related = [Video]()
+    var related = [Self]()
     var chapters = [Chapter]()
 
     var captions = [Captions]()

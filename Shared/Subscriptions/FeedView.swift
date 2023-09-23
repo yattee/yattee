@@ -23,7 +23,7 @@ struct FeedView: View {
             }
         #if os(iOS)
             .refreshable {
-                await feed.loadResources(force: true)
+                feed.loadResources(force: true)
             }
         #endif
         #if !os(tvOS)

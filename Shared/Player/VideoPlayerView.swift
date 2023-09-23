@@ -47,12 +47,12 @@ struct VideoPlayerView: View {
     #if !os(tvOS)
         @GestureState var dragGestureState = false
         @GestureState var dragGestureOffset = CGSize.zero
-        @State var isHorizontalDrag = false
-        @State var isVerticalDrag = false
-        @State var viewDragOffset = Self.hiddenOffset
+        @State var isHorizontalDrag = false // swiftlint:disable:this swiftui_state_private
+        @State var isVerticalDrag = false // swiftlint:disable:this swiftui_state_private
+        @State var viewDragOffset = Self.hiddenOffset // swiftlint:disable:this swiftui_state_private
     #endif
 
-    @ObservedObject var player = PlayerModel.shared
+    @ObservedObject var player = PlayerModel.shared // swiftlint:disable:this swiftui_state_private
 
     #if os(macOS)
         @ObservedObject private var navigation = NavigationModel.shared
@@ -66,7 +66,7 @@ struct VideoPlayerView: View {
     @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
     @Default(.avPlayerUsesSystemControls) var avPlayerUsesSystemControls
 
-    @ObservedObject var controlsOverlayModel = ControlOverlaysModel.shared
+    @ObservedObject var controlsOverlayModel = ControlOverlaysModel.shared // swiftlint:disable:this swiftui_state_private
 
     var body: some View {
         ZStack(alignment: overlayAlignment) {

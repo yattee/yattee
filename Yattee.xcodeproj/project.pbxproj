@@ -174,8 +174,6 @@
 		37270F1C28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
 		37270F1D28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
 		37270F1E28E06E3E00856150 /* String+Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37270F1B28E06E3E00856150 /* String+Localizable.swift */; };
-		3727B74A27872A920021C15E /* VisualEffectBlur-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */; };
-		3727B74B27872B880021C15E /* VisualEffectBlur-macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */; };
 		372820402945E4A8009A0E2D /* SubscriptionsPageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3728203F2945E4A8009A0E2D /* SubscriptionsPageButton.swift */; };
 		3729037E2739E47400EA99F6 /* MenuCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3729037D2739E47400EA99F6 /* MenuCommands.swift */; };
 		3729037F2739E47400EA99F6 /* MenuCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3729037D2739E47400EA99F6 /* MenuCommands.swift */; };
@@ -1070,8 +1068,6 @@
 		371F2F19269B43D300E4A7AB /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
 		3722AEBD274DA401005EA4D6 /* Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backport.swift; sourceTree = "<group>"; };
 		37270F1B28E06E3E00856150 /* String+Localizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Localizable.swift"; sourceTree = "<group>"; };
-		3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisualEffectBlur-macOS.swift"; sourceTree = "<group>"; };
-		3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisualEffectBlur-iOS.swift"; sourceTree = "<group>"; };
 		3728203F2945E4A8009A0E2D /* SubscriptionsPageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsPageButton.swift; sourceTree = "<group>"; };
 		3729037D2739E47400EA99F6 /* MenuCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCommands.swift; sourceTree = "<group>"; };
 		372915E52687E3B900F5A35B /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
@@ -1662,8 +1658,6 @@
 				376E331128AD3B320070E30C /* ScrollDismissesKeyboard+Backport.swift */,
 				37B7CFE82A19603B001B0564 /* ToolbarBackground+Backport.swift */,
 				37B7CFEA2A1960EC001B0564 /* ToolbarColorScheme+Backport.swift */,
-				3727B74927872A920021C15E /* VisualEffectBlur-iOS.swift */,
-				3727B74727872A500021C15E /* VisualEffectBlur-macOS.swift */,
 			);
 			path = Backports;
 			sourceTree = "<group>";
@@ -2807,7 +2801,6 @@
 				37E80F40287B472300561799 /* ScrollContentBackground+Backport.swift in Sources */,
 				375EC959289EEB8200751258 /* QualityProfileForm.swift in Sources */,
 				37D2E0D028B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
-				3727B74A27872A920021C15E /* VisualEffectBlur-iOS.swift in Sources */,
 				3709528829283A21001ECA40 /* RecentDocumentsView.swift in Sources */,
 				377F9F7F2944175F0043F856 /* FeedCacheModel.swift in Sources */,
 				37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */,
@@ -3042,7 +3035,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				37D836BD294927E700005E5E /* ChannelsCacheModel.swift in Sources */,
-				3727B74B27872B880021C15E /* VisualEffectBlur-macOS.swift in Sources */,
 				374710062755291C00CE0F87 /* SearchTextField.swift in Sources */,
 				37B7CFEC2A197844001B0564 /* AppleAVPlayerView.swift in Sources */,
 				37F0F4EB286F397E00C06C2E /* SettingsModel.swift in Sources */,

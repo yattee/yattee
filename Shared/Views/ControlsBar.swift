@@ -13,7 +13,7 @@ struct ControlsBar: View {
     @State private var shareURL: URL?
     @Binding var expansionState: ExpansionState
 
-    @State var gestureThrottle = Throttle(interval: 0.25)
+    @State var gestureThrottle = Throttle(interval: 0.25) // swiftlint:disable:this swiftui_state_private
 
     var presentingControls = true
     var backgroundEnabled = true
