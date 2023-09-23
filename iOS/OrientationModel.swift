@@ -9,7 +9,7 @@ final class OrientationModel {
     var orientation = UIInterfaceOrientation.portrait
     var lastOrientation: UIInterfaceOrientation?
     var orientationDebouncer = Debouncer(.milliseconds(300))
-    internal var orientationObserver: Any?
+    var orientationObserver: Any?
 
     private var player = PlayerModel.shared
 

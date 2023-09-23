@@ -90,7 +90,7 @@ final class MPVBackend: PlayerBackend {
 
     private var onFileLoaded: (() -> Void)?
 
-    internal var controlsUpdates = false
+    var controlsUpdates = false
     private var timeObserverThrottle = Throttle(interval: 2)
 
     var suggestedPlaybackRates: [Double] {

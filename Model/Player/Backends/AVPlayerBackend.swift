@@ -103,7 +103,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var timeObserverThrottle = Throttle(interval: 2)
 
-    internal var controlsUpdates = false
+    var controlsUpdates = false
 
     init() {
         addFrequentTimeObserver()

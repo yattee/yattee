@@ -495,7 +495,7 @@ struct WidgetSettings: Defaults.Serializable {
     }
 
     static func maxLimit(_ style: WidgetListingStyle) -> Int {
-        Self.maxLimit[style] ?? Self.defaultLimit
+        maxLimit[style] ?? defaultLimit
     }
 }
 

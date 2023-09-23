@@ -45,14 +45,14 @@ struct VideoPlayerView: View {
     #endif
 
     #if !os(tvOS)
-        @GestureState internal var dragGestureState = false
-        @GestureState internal var dragGestureOffset = CGSize.zero
-        @State internal var isHorizontalDrag = false
-        @State internal var isVerticalDrag = false
-        @State internal var viewDragOffset = Self.hiddenOffset
+        @GestureState var dragGestureState = false
+        @GestureState var dragGestureOffset = CGSize.zero
+        @State var isHorizontalDrag = false
+        @State var isVerticalDrag = false
+        @State var viewDragOffset = Self.hiddenOffset
     #endif
 
-    @ObservedObject internal var player = PlayerModel.shared
+    @ObservedObject var player = PlayerModel.shared
 
     #if os(macOS)
         @ObservedObject private var navigation = NavigationModel.shared
@@ -64,9 +64,9 @@ struct VideoPlayerView: View {
     @Default(.playerSidebar) var playerSidebar
     @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
     @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
-    @Default(.avPlayerUsesSystemControls) internal var avPlayerUsesSystemControls
+    @Default(.avPlayerUsesSystemControls) var avPlayerUsesSystemControls
 
-    @ObservedObject internal var controlsOverlayModel = ControlOverlaysModel.shared
+    @ObservedObject var controlsOverlayModel = ControlOverlaysModel.shared
 
     var body: some View {
         ZStack(alignment: overlayAlignment) {
