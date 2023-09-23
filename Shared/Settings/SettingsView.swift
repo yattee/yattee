@@ -211,7 +211,7 @@ struct SettingsView: View {
                                     .resizable()
                                     .renderingMode(.template)
                                     .frame(maxWidth: 30, maxHeight: 30)
-
+                                    .padding(.trailing, 6)
                                 Text("Discord Server")
                             }
                         }
@@ -222,6 +222,7 @@ struct SettingsView: View {
                                     .resizable()
                                     .renderingMode(.template)
                                     .frame(maxWidth: 30, maxHeight: 30)
+                                    .padding(.trailing, 6)
                                 Text("Matrix Chat")
                             }
                         }
