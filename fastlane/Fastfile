@@ -116,8 +116,8 @@ platform :ios do
     upload_to_testflight(
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
-      distribute_external: true,
-      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      # distribute_external: true,
+      # groups: TESTFLIGHT_EXTERNAL_GROUPS,
       changelog: changelog
     )
   end
@@ -168,8 +168,8 @@ platform :tvos do
     upload_to_testflight(
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
-      distribute_external: true,
-      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      # distribute_external: true,
+      # groups: TESTFLIGHT_EXTERNAL_GROUPS,
       changelog: changelog
     )
   end
@@ -221,8 +221,8 @@ platform :mac do
     upload_to_testflight(
       api_key: api_key,
       pkg: lane_context[SharedValues::PKG_OUTPUT_PATH],
-      distribute_external: true,
-      groups: TESTFLIGHT_EXTERNAL_GROUPS,
+      # distribute_external: true,
+      # groups: TESTFLIGHT_EXTERNAL_GROUPS,
       changelog: changelog
     )
   end
