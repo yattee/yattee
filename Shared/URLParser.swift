@@ -41,7 +41,7 @@ struct URLParser {
 
         if hasAnyOfPrefixes(path, Self.prefixes[.playlist]!) ||
             queryItemValue("v") == "playlist" ||
-            !(queryItemValue("list")?.isEmpty ?? false)
+            (queryItemValue("list") ?? "").count > 3
         {
             return .playlist
         }
