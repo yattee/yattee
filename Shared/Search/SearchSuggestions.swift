@@ -11,7 +11,7 @@ struct SearchSuggestions: View {
                 } label: {
                     HStack {
                         Image(systemName: "magnifyingglass")
-                        Text(state.queryText)
+                        Text(state.queryText.trimmingCharacters(in: .whitespacesAndNewlines))
                             .lineLimit(1)
                     }
                 }
