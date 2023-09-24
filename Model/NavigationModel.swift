@@ -66,7 +66,7 @@ final class NavigationModel: ObservableObject {
     @Published var tabSelection: TabSelection! { didSet {
         if oldValue == tabSelection { multipleTapHandler() }
         if tabSelection == nil, let item = recents.presentedItem {
-            DispatchQueue.main.async { [weak self] in
+            Delay.by(0.2) { [weak self] in
                 self?.tabSelection = .recentlyOpened(item.tag)
             }
         }
