@@ -10,6 +10,7 @@ struct QualityProfileForm: View {
 
     @State private var valid = false
 
+    @State private var initialized = false
     @State private var name = ""
     @State private var backend = PlayerBackendType.mpv
     @State private var resolution = ResolutionSetting.hd1080p60
@@ -226,7 +227,7 @@ struct QualityProfileForm: View {
     }
 
     func isFormatSelected(_ format: QualityProfile.Format) -> Bool {
-        (editing && formats.isEmpty ? qualityProfile.formats : formats).contains(format)
+        (initialized ? formats : qualityProfile.formats).contains(format)
     }
 
     func toggleFormat(_ format: QualityProfile.Format, value: Bool) {
@@ -282,6 +283,7 @@ struct QualityProfileForm: View {
             self.backend = qualityProfile.backend
             self.resolution = qualityProfile.resolution
             self.formats = .init(qualityProfile.formats)
+            self.initialized = true
         }
 
         validate()
