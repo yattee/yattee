@@ -11,7 +11,7 @@ struct AddPublicInstanceButton: View {
                 _ = InstancesModel.shared.add(app: app, name: "", url: account.urlString)
                 regenerateID()
             } label: {
-                Label("Add \(account.urlString)", systemImage: "plus")
+                Label(String(format: "Add %@", account.urlString), systemImage: "plus")
             }
             .id(id)
         }
