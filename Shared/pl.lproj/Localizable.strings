@@ -598,3 +598,6 @@
 "Show video context menu options to force selected backend" = "Pokaż opcje menu kontekstowego wideo, aby wymusić wybrany silnik";
 "Show channel avatars in videos lists" = "Pokaż awatary kanałów na listach wideo";
 "Show channel avatars in channels lists" = "Pokaż awatary kanałów na listach kanałów";
+"Podcasts" = "Podkasty";
+"Releases" = "Wydania";
+"Add %@" = "Dodaj %@";
