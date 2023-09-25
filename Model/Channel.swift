@@ -10,6 +10,8 @@ struct Channel: Identifiable, Hashable {
         case livestreams
         case shorts
         case channels
+        case releases
+        case podcasts
 
         static func from(_ name: String) -> Self? {
             let rawValueMatch = allCases.first { $0.rawValue == name }
@@ -45,6 +47,10 @@ struct Channel: Identifiable, Hashable {
                 return "1.square"
             case .channels:
                 return "person.3"
+            case .releases:
+                return "square.stack"
+            case .podcasts:
+                return "radio"
             }
         }
 

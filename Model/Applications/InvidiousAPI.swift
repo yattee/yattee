@@ -123,7 +123,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.dictionaryValue["videos"]?.arrayValue.map(self.extractVideo) ?? []
         }
 
-        ["latest", "playlists", "streams", "shorts", "channels", "videos"].forEach { type in
+        ["latest", "playlists", "streams", "shorts", "channels", "videos", "releases", "podcasts"].forEach { type in
             configureTransformer(pathPattern("channels/*/\(type)"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPage in
                 self.extractChannelPage(from: content.json)
             }
