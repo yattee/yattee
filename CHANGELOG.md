@@ -1,7 +1,5 @@
-## Build 161
-* Fixed regression with opening videos links
-* Fixed issue with deselecting formats in Quality profiles
-* Other minor fixes and improvements
+## Build 162
+* Added support for "Podcasts" and "Releases" channel tabs (Invidious)
 
 ## Previous builds
 * Added button in Location settings to add current used public location to "Custom Locations"
@@ -12,6 +10,8 @@
 * Fixed issue with handling opening URLs on macOS
 * Fixed issue with "Keep channels with unwatched videos on top of subscriptions list" setting not honored in sidebar
 * Fixed performance issues with accounts with large amount of subscribed channels
+* Fixed regression with opening videos links
+* Fixed issue with deselecting formats in Quality profiles
 * Fixed compatibility with iOS 17, macOS 14 and tvOS 17
 * Dropped support for iOS 14 and macOS 11
 * Fixed reported crashes
