@@ -601,7 +601,6 @@
 		379DC3D328BA4EB400B09677 /* Seek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DC3D028BA4EB400B09677 /* Seek.swift */; };
 		379E7C332A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
 		379E7C342A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E7C322A20FE3900AF8118 /* FocusableSearchTextField.swift */; };
-		379E7C362A2105B900AF8118 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 379E7C352A2105B900AF8118 /* Introspect */; };
 		379EF9E029AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
 		379EF9E129AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
 		379EF9E229AA585F009FE6C6 /* HideShortsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379EF9DF29AA585F009FE6C6 /* HideShortsButtons.swift */; };
@@ -698,7 +697,6 @@
 		37BD07BC2698AB60003EBB87 /* AppSidebarNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD07BA2698AB60003EBB87 /* AppSidebarNavigation.swift */; };
 		37BD07C12698AD3B003EBB87 /* TrendingCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B17F267B4DFB00704544 /* TrendingCountry.swift */; };
 		37BD07C32698AD4F003EBB87 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD07B42698AA4D003EBB87 /* ContentView.swift */; };
-		37BD07C72698B27B003EBB87 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 37BD07C62698B27B003EBB87 /* Introspect */; };
 		37BD07C82698B71C003EBB87 /* AppTabNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D4B0C32671614700C925CA /* AppTabNavigation.swift */; };
 		37BD07C92698FBDB003EBB87 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BD07B42698AA4D003EBB87 /* ContentView.swift */; };
 		37BD672426F13D65004BE0C1 /* AppSidebarPlaylists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA794A26DC30EC002A0235 /* AppSidebarPlaylists.swift */; };
@@ -1423,7 +1421,6 @@
 				3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */,
 				FA97174C2A494700001FF53D /* MPVKit in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
-				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
 				37C7367A2AC33010007630E1 /* SwiftUIIntrospect in Frameworks */,
@@ -1437,7 +1434,6 @@
 				379325D729A265AE00181CF1 /* Logging in Frameworks */,
 				372AA414286D06A10000B1DC /* Repeat in Frameworks */,
 				37F7AB5228A94EB900FB46B5 /* IOKit.framework in Frameworks */,
-				379E7C362A2105B900AF8118 /* Introspect in Frameworks */,
 				3703205827D2BAE4007A0CB8 /* Siesta in Frameworks */,
 				3703206827D2BB45007A0CB8 /* Defaults in Frameworks */,
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
@@ -2284,7 +2280,6 @@
 				377FC7D4267A080300A6BBAF /* SwiftyJSON */,
 				37BD07B62698AB2E003EBB87 /* Defaults */,
 				37BD07B82698AB2E003EBB87 /* Siesta */,
-				37BD07C62698B27B003EBB87 /* Introspect */,
 				37BADCA42699FB72009BE4FB /* Alamofire */,
 				37FB284C2722099E00A57617 /* SDWebImageWebPCoder */,
 				37FB285527220D9000A57617 /* SDWebImagePINPlugin */,
@@ -2337,7 +2332,6 @@
 				374D11E62943C56300CB4350 /* Cache */,
 				371AC0B1294D1C230085989E /* CachedAsyncImage */,
 				379325D629A265AE00181CF1 /* Logging */,
-				379E7C352A2105B900AF8118 /* Introspect */,
 				3704BDFE2ABF260C00370FF7 /* MPVKit */,
 				37C736772AC32B28007630E1 /* SwiftUIIntrospect */,
 			);
@@ -4827,11 +4821,6 @@
 			package = 3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */;
 			productName = ActiveLabel;
 		};
-		379E7C352A2105B900AF8118 /* Introspect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = Introspect;
-		};
 		37BADCA42699FB72009BE4FB /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */;
@@ -4851,11 +4840,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
 			productName = Siesta;
-		};
-		37BD07C62698B27B003EBB87 /* Introspect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = Introspect;
 		};
 		37C736772AC32B28007630E1 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;
