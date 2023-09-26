@@ -751,6 +751,8 @@
 		37C3A251272366440087A57A /* ChannelPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C3A250272366440087A57A /* ChannelPlaylistView.swift */; };
 		37C3A252272366440087A57A /* ChannelPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C3A250272366440087A57A /* ChannelPlaylistView.swift */; };
 		37C3A253272366440087A57A /* ChannelPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C3A250272366440087A57A /* ChannelPlaylistView.swift */; };
+		37C736782AC32B28007630E1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 37C736772AC32B28007630E1 /* SwiftUIIntrospect */; };
+		37C7367A2AC33010007630E1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 37C736792AC33010007630E1 /* SwiftUIIntrospect */; };
 		37C7A1D5267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
 		37C7A1D6267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
 		37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7A1D4267BFD9D0010EAD6 /* SponsorBlockSegment.swift */; };
@@ -1424,6 +1426,7 @@
 				37BD07C72698B27B003EBB87 /* Introspect in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
+				37C7367A2AC33010007630E1 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1440,6 +1443,7 @@
 				3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */,
 				374D11E72943C56300CB4350 /* Cache in Frameworks */,
 				3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */,
+				37C736782AC32B28007630E1 /* SwiftUIIntrospect in Frameworks */,
 				3703206227D2BB1B007A0CB8 /* SDWebImagePINPlugin in Frameworks */,
 				371AC0B2294D1C230085989E /* CachedAsyncImage in Frameworks */,
 				3703206627D2BB35007A0CB8 /* PINCache in Frameworks */,
@@ -2295,6 +2299,7 @@
 				371AC0AB294D1A490085989E /* CachedAsyncImage */,
 				379325D429A265A300181CF1 /* Logging */,
 				FA97174B2A494700001FF53D /* MPVKit */,
+				37C736792AC33010007630E1 /* SwiftUIIntrospect */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2334,6 +2339,7 @@
 				379325D629A265AE00181CF1 /* Logging */,
 				379E7C352A2105B900AF8118 /* Introspect */,
 				3704BDFE2ABF260C00370FF7 /* MPVKit */,
+				37C736772AC32B28007630E1 /* SwiftUIIntrospect */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -4038,9 +4044,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.5;
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
@@ -4080,9 +4084,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.5;
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
@@ -4854,6 +4856,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = Introspect;
+		};
+		37C736772AC32B28007630E1 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+		37C736792AC33010007630E1 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 		37CF8B8328535E4F00B71E37 /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -18,6 +18,12 @@ final class SearchModel: ObservableObject {
 
     @Published var focused = false
 
+    #if os(iOS)
+        var textField: UITextField!
+    #elseif os(macOS)
+        var textField: NSTextField!
+    #endif
+
     var accounts: AccountsModel { .shared }
     private var resource: Resource!
 
