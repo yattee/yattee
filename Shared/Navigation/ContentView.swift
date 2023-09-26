@@ -167,6 +167,9 @@ struct ContentView: View {
         #if os(iOS)
             .statusBarHidden(player.playingFullScreen)
         #endif
+        #if os(macOS)
+            .frame(minWidth: 1200)
+        #endif
     }
 
     @ViewBuilder var videoPlayer: some View {
