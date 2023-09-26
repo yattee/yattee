@@ -1,7 +1,10 @@
-## Build 162
-* Added support for "Podcasts" and "Releases" channel tabs (Invidious)
+## Build 163
+* Search text field focuses automatically (macOS)
+* Fixed crash when trying to create Quality Profile
+* Other minor fixes and improvements
 
 ## Previous builds
+* Added support for "Podcasts" and "Releases" channel tabs (Invidious)
 * Added button in Location settings to add current used public location to "Custom Locations"
 * Updated mpv and dependencies (using mpvkit library, mpv 0.36.0, ffmpeg 6.0)
 * Increased controls timeline/scrubber gesture area for easier handling
