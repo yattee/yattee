@@ -227,7 +227,7 @@ struct QualityProfileForm: View {
     }
 
     func isFormatSelected(_ format: QualityProfile.Format) -> Bool {
-        (initialized ? formats : (qualityProfile?.formats ?? [])).contains(format)
+        (initialized || qualityProfile.isNil ? formats : qualityProfile.formats).contains(format)
     }
 
     func toggleFormat(_ format: QualityProfile.Format, value: Bool) {
