@@ -727,9 +727,6 @@
 		37C194C726F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C194C826F6A9C8005D3B96 /* RecentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C194C626F6A9C8005D3B96 /* RecentsModel.swift */; };
 		37C2211D27ADA33300305B41 /* MPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C2211C27ADA33300305B41 /* MPVViewController.swift */; };
-		37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2211E27ADA3A200305B41 /* libz.tbd */; };
-		37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2212027ADA3A600305B41 /* libbz2.tbd */; };
-		37C2212327ADA3F200305B41 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2212227ADA3F200305B41 /* libiconv.tbd */; };
 		37C2212527ADA40A00305B41 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2212427ADA40A00305B41 /* AudioToolbox.framework */; };
 		37C2212727ADA41000305B41 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2212627ADA41000305B41 /* CoreFoundation.framework */; };
 		37C2212927ADA41400305B41 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C2212827ADA41400305B41 /* CoreMedia.framework */; };
@@ -1406,11 +1403,8 @@
 				37C2212727ADA41000305B41 /* CoreFoundation.framework in Frameworks */,
 				37C2212527ADA40A00305B41 /* AudioToolbox.framework in Frameworks */,
 				372AA410286D067B0000B1DC /* Repeat in Frameworks */,
-				37C2212327ADA3F200305B41 /* libiconv.tbd in Frameworks */,
 				379325D529A265A300181CF1 /* Logging in Frameworks */,
-				37C2212127ADA3A600305B41 /* libbz2.tbd in Frameworks */,
 				37EE6DC528A305AD00BFD632 /* Reachability in Frameworks */,
-				37C2211F27ADA3A200305B41 /* libz.tbd in Frameworks */,
 				375B8AB128B57F4200397B31 /* KeychainAccess in Frameworks */,
 				3765917C27237D21009F956E /* PINCache in Frameworks */,
 				37BD07B72698AB2E003EBB87 /* Defaults in Frameworks */,
