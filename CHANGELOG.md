@@ -1,4 +1,4 @@
-## Build 163
+## Build 164
 * Search text field focuses automatically (macOS)
 * Fixed crash when trying to create Quality Profile
 * Other minor fixes and improvements
