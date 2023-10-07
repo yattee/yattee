@@ -271,7 +271,7 @@
 "Popular" = "Populært";
 "Connection failed" = "Kunne ikke koble til";
 "Add Location" = "Legg til sted";
-"Always use AVPlayer for live videos" = "AVPlayer for direkte-videoer";
+"Always use AVPlayer for live videos" = "Alltid bruk AVPlayer for direktesendinger";
 "Apply to all" = "Bruk for alle";
 "Automatic" = "Automatisk";
 "Autoplaying Next" = "Spiller neste også";
