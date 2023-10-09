@@ -597,3 +597,6 @@
 "Landscape right" = "右を下に横長";
 "Show channel avatars in channels lists" = "チャンネル一覧にチャンネルのアイコンを表示";
 "Show channel avatars in videos lists" = "動画一覧にチャンネルのアイコンを表示";
+"Podcasts" = "ポッドキャスト";
+"Releases" = "リリース";
+"Add %@" = "追加 %@";
