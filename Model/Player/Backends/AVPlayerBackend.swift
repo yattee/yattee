@@ -666,6 +666,10 @@ final class AVPlayerBackend: PlayerBackend {
                 } else {
                     ScreenSaverManager.shared.enable()
                 }
+            #else
+                DispatchQueue.main.async {
+                    UIApplication.shared.isIdleTimerDisabled = self.model.presentingPlayer && self.isPlaying
+                }
             #endif
 
             self.timeObserverThrottle.execute {
