@@ -30,6 +30,8 @@ struct PlayerSettings: View {
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
 
     @Default(.showInspector) private var showInspector
+    @Default(.showChapters) private var showChapters
+    @Default(.showRelated) private var showRelated
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -73,8 +75,19 @@ struct PlayerSettings: View {
             }
 
             #if !os(tvOS)
-                Section(header: SettingsHeader(text: "Inspector".localized())) {
-                    inspectorVisibilityPicker
+                Section(header: SettingsHeader(text: "Info".localized())) {
+                    expandVideoDescriptionToggle
+                    showChaptersToggle
+                    showRelatedToggle
+                    #if os(macOS)
+                        HStack {
+                            Text("Inspector")
+                            inspectorVisibilityPicker
+                        }
+                        .padding(.leading, 20)
+                    #else
+                        inspectorVisibilityPicker
+                    #endif
                 }
             #endif
 
@@ -96,9 +109,6 @@ struct PlayerSettings: View {
                         showScrollToTopInCommentsToggle
                     #endif
 
-                    #if !os(tvOS)
-                        expandVideoDescriptionToggle
-                    #endif
                     returnYouTubeDislikeToggle
                 }
             }
@@ -240,15 +250,25 @@ struct PlayerSettings: View {
         }
     #endif
 
-    private var inspectorVisibilityPicker: some View {
-        Picker("Visibility", selection: $showInspector) {
-            Text("Always").tag(ShowInspectorSetting.always)
-            Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
+    #if !os(tvOS)
+        private var inspectorVisibilityPicker: some View {
+            Picker("Inspector", selection: $showInspector) {
+                Text("Always").tag(ShowInspectorSetting.always)
+                Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
         }
-        #if os(macOS)
-        .labelsHidden()
-        #endif
-    }
+
+        private var showChaptersToggle: some View {
+            Toggle("Chapters", isOn: $showChapters)
+        }
+
+        private var showRelatedToggle: some View {
+            Toggle("Related", isOn: $showRelated)
+        }
+    #endif
 }
 
 struct PlayerSettings_Previews: PreviewProvider {

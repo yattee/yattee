@@ -263,6 +263,8 @@ extension Defaults.Keys {
     static let hideShorts = Key<Bool>("hideShorts", default: false)
     static let hideWatched = Key<Bool>("hideWatched", default: false)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
+    static let showChapters = Key<Bool>("showChapters", default: true)
+    static let showRelated = Key<Bool>("showRelated", default: true)
     static let widgetsSettings = Key<[WidgetSettings]>("widgetsSettings", default: [])
 }
 

@@ -184,6 +184,8 @@ struct VideoDetails: View {
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showInspector) private var showInspector
+    @Default(.showChapters) private var showChapters
+    @Default(.showRelated) private var showRelated
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
     #endif
@@ -309,29 +311,29 @@ struct VideoDetails: View {
                                         .padding(.horizontal)
                                 }
 
-                                if player.videoBeingOpened.isNil,
-                                   !video.isLocal,
-                                   !video.chapters.isEmpty
-                                {
-                                    Section(header: chaptersHeader) {
-                                        ChaptersView()
+                                if player.videoBeingOpened.isNil {
+                                    if showChapters,
+                                       !video.isLocal,
+                                       !video.chapters.isEmpty
+                                    {
+                                        Section(header: chaptersHeader) {
+                                            ChaptersView()
+                                        }
                                     }
-                                }
 
-                                if player.videoBeingOpened.isNil,
-                                   video.isLocal || showInspector == .always
-                                {
-                                    InspectorView(video: player.videoForDisplay)
-                                        .padding(.horizontal)
-                                }
+                                    if showInspector == .always || video.isLocal {
+                                        InspectorView(video: player.videoForDisplay)
+                                            .padding(.horizontal)
+                                    }
 
-                                if player.videoBeingOpened.isNil,
-                                   !sidebarQueue,
-                                   !(player.videoForDisplay?.related.isEmpty ?? true)
-                                {
-                                    RelatedView()
-                                        .padding(.horizontal)
-                                        .padding(.top, 20)
+                                    if showRelated,
+                                       !sidebarQueue,
+                                       !(player.videoForDisplay?.related.isEmpty ?? true)
+                                    {
+                                        RelatedView()
+                                            .padding(.horizontal)
+                                            .padding(.top, 20)
+                                    }
                                 }
                             }
                         }
