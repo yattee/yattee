@@ -254,7 +254,7 @@
 "Play Now" = "Redă acum";
 "Play All" = "Reda toate";
 "Play Next" = "Redă Următorul";
-"Playlists" = "Playlist";
+"Playlists" = "Playlist-uri";
 "Profiles" = "Profiluri";
 "Preferred Formats" = "Formate preferate";
 "Quality" = "Calitate";
@@ -597,3 +597,6 @@
 "Show video context menu options to force selected backend" = "Afișați opțiunile din meniul contextual video pentru a forța backend-ul selectat";
 "Show channel avatars in videos lists" = "Afișați avatarele canalului în listele de videoclipuri";
 "Show channel avatars in channels lists" = "Afișați avatarele canalelor în listele de canale";
+"Podcasts" = "Podcast-uri";
+"Releases" = "Lansări";
+"Add %@" = "Adaugă %@";
