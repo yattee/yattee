@@ -32,8 +32,13 @@ struct CommentsView: View {
 
 struct CommentsView_Previews: PreviewProvider {
     static var previews: some View {
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+            CommentsView()
+                .previewInterfaceOrientation(.landscapeRight)
+                .injectFixtureEnvironmentObjects()
+        }
+
         CommentsView()
-            .previewInterfaceOrientation(.landscapeRight)
             .injectFixtureEnvironmentObjects()
     }
 }

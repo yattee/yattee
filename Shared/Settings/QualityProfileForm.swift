@@ -201,7 +201,7 @@ struct QualityProfileForm: View {
 
     @ViewBuilder var formatsPicker: some View {
         #if os(macOS)
-            ForEach(QualityProfile.Format.allCases, id: \.self) { format in
+            let list = ForEach(QualityProfile.Format.allCases, id: \.self) { format in
                 MultiselectRow(
                     title: format.description,
                     selected: isFormatSelected(format),
@@ -210,8 +210,16 @@ struct QualityProfileForm: View {
                     toggleFormat(format, value: value)
                 }
             }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
 
+            Group {
+                if #available(macOS 12.0, *) {
+                    list
+                        .listStyle(.inset(alternatesRowBackgrounds: true))
+                } else {
+                    list
+                        .listStyle(.inset)
+                }
+            }
             Spacer()
         #else
             ForEach(QualityProfile.Format.allCases, id: \.self) { format in

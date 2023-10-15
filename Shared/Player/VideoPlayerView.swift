@@ -294,6 +294,9 @@ struct VideoPlayerView: View {
                                 }
                             })
                         #endif
+
+                            .background(Color.black)
+
                         if !detailsHiddenInFullScreen {
                             VideoDetails(
                                 video: player.videoForDisplay,

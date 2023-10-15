@@ -4,6 +4,7 @@ final class MPVOGLView: NSView {
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
         autoresizingMask = [.width, .height]
+        wantsBestResolutionOpenGLSurface = true
     }
 
     @available(*, unavailable)

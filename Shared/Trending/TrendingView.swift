@@ -95,7 +95,12 @@ struct TrendingView: View {
                 .navigationTitle("Trending")
         #endif
         #if os(iOS)
-
+        .refreshControl { refreshControl in
+            resource.load().onCompletion { _ in
+                refreshControl.endRefreshing()
+            }
+        }
+        .backport
         .refreshable {
             DispatchQueue.main.async {
                 resource.load()

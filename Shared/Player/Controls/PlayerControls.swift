@@ -255,6 +255,8 @@ struct PlayerControls: View {
             {
                 ThumbnailView(url: url)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transition(.opacity)
+                    .animation(.default)
             } else if player.videoForDisplay == nil {
                 Color.black
             }

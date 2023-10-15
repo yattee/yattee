@@ -16,7 +16,11 @@ struct TrendingCountry: View {
         VStack {
             #if !os(tvOS)
                 HStack {
-                    TextField("Country", text: $query, prompt: Text(Self.prompt))
+                    if #available(iOS 15.0, macOS 12.0, *) {
+                        TextField("Country", text: $query, prompt: Text(Self.prompt))
+                    } else {
+                        TextField(Self.prompt, text: $query)
+                    }
 
                     Button("Done") { selectCountryAndDismiss() }
                         .keyboardShortcut(.defaultAction)
@@ -53,8 +57,12 @@ struct TrendingCountry: View {
 
         return Group {
             #if os(macOS)
-                list
-                    .listStyle(.inset(alternatesRowBackgrounds: true))
+                if #available(macOS 12.0, *) {
+                    list
+                        .listStyle(.inset(alternatesRowBackgrounds: true))
+                } else {
+                    list
+                }
             #else
                 list
             #endif

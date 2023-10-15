@@ -219,17 +219,25 @@ struct CommentView: View {
     }
 
     private var commentText: some View {
-        Text(comment.text)
-        #if !os(tvOS)
-            .textSelection(.enabled)
-        #endif
-        #if os(macOS)
-        .font(.system(size: 14))
-        #elseif os(iOS)
-        .font(.system(size: 15))
-        #endif
-        .lineSpacing(3)
-        .fixedSize(horizontal: false, vertical: true)
+        Group {
+            let text = Text(comment.text)
+            #if os(macOS)
+                .font(.system(size: 14))
+            #elseif os(iOS)
+                .font(.system(size: 15))
+            #endif
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if #available(iOS 15.0, macOS 12.0, *) {
+                text
+                #if !os(tvOS)
+                .textSelection(.enabled)
+                #endif
+            } else {
+                text
+            }
+        }
     }
 
     private func openChannelAction() {

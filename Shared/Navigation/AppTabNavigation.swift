@@ -95,6 +95,7 @@ struct AppTabNavigation: View {
                 .accessibility(label: Text("Subscriptions"))
         }
         .tag(TabSelection.subscriptions)
+        .backport
         .badge(showUnwatchedFeedBadges ? feedCount.unwatchedText : nil)
     }
 

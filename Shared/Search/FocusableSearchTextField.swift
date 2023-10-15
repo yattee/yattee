@@ -2,6 +2,7 @@ import Repeat
 import SwiftUI
 import SwiftUIIntrospect
 
+@available(iOS 15.0, macOS 12, *)
 struct FocusableSearchTextField: View {
     @ObservedObject private var state = SearchModel.shared
 

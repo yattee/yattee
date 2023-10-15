@@ -22,6 +22,12 @@ struct FeedView: View {
                 feed.loadResources()
             }
         #if os(iOS)
+            .refreshControl { refreshControl in
+                feed.loadResources(force: true) {
+                    refreshControl.endRefreshing()
+                }
+            }
+            .backport
             .refreshable {
                 feed.loadResources(force: true)
             }

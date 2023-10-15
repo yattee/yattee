@@ -30,9 +30,8 @@ struct PlayerQueueView: View {
             #endif
             Color.clear.padding(.bottom, 50)
                 .listRowBackground(Color.clear)
-            #if os(iOS)
-                .listRowSeparator(.hidden)
-            #endif
+                .backport
+                .listRowSeparator(false)
         }
         .environment(\.inNavigationView, false)
     }

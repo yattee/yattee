@@ -50,8 +50,15 @@ struct SponsorBlockSettings: View {
                         }
                     }
 
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
+                    Group {
+                        if #available(macOS 12.0, *) {
+                            list
+                                .listStyle(.inset(alternatesRowBackgrounds: true))
+                        } else {
+                            list
+                                .listStyle(.inset)
+                        }
+                    }
                     Spacer()
                 #else
                     ForEach(SponsorBlockAPI.categories, id: \.self) { category in

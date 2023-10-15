@@ -175,14 +175,24 @@ struct QualitySettings: View {
                 }
         }
 
-        #if os(macOS)
-            List {
+        if #available(macOS 12.0, *) {
+            #if os(macOS)
+                List {
+                    list
+                }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
+            #else
                 list
-            }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
-        #else
-            list
-        #endif
+            #endif
+        } else {
+            #if os(macOS)
+                List {
+                    list
+                }
+            #else
+                list
+            #endif
+        }
     }
 }
 
