@@ -29,7 +29,7 @@ struct FeedView: View {
             }
             .backport
             .refreshable {
-                feed.loadResources(force: true)
+                await feed.loadResources(force: true)
             }
         #endif
         #if !os(tvOS)

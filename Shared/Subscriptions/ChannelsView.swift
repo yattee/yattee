@@ -96,7 +96,7 @@ struct ChannelsView: View {
         }
         .backport
         .refreshable {
-            subscriptions.load(force: true)
+            await subscriptions.load(force: true)
         }
         #endif
         #if !os(tvOS)

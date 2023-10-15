@@ -12,7 +12,7 @@ struct RefreshControlModifier: ViewModifier {
     @State private var geometryReaderFrame: CGRect = .zero
     let refreshControl: RefreshControl
 
-    internal init(onValueChanged: @escaping (UIRefreshControl) -> Void) {
+    init(onValueChanged: @escaping (UIRefreshControl) -> Void) {
         refreshControl = RefreshControl(onValueChanged: onValueChanged)
     }
 

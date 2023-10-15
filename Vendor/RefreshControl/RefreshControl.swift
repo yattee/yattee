@@ -21,7 +21,7 @@ final class RefreshControl: ObservableObject {
 
     let onValueChanged: (_ refreshControl: UIRefreshControl) -> Void
 
-    internal init(onValueChanged: @escaping ((UIRefreshControl) -> Void)) {
+    init(onValueChanged: @escaping ((UIRefreshControl) -> Void)) {
         self.onValueChanged = onValueChanged
     }
 
