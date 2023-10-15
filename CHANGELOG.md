@@ -1,10 +1,7 @@
-## Build 165
-* Added Info section in Player settings
-  Added option to hide chapters
-  Added option to hide related videos
-  Moved other previous Info section settings
-* Fixed issue where screensaver would turn on while playing video with AVPlayer on tvOS
-* Fixed reported crashes
+## Build 166
+* Fixed issue with formatting video dates (Piped)
+* Brought back iOS 14 and macOS 11 support
+
 
 ## Previous builds
 * Added support for "Podcasts" and "Releases" channel tabs (Invidious)
@@ -20,6 +17,5 @@
 * Fixed regression with opening videos links
 * Fixed issue with deselecting formats in Quality profiles
 * Fixed compatibility with iOS 17, macOS 14 and tvOS 17
-* Dropped support for iOS 14 and macOS 11
 * Fixed reported crashes
 * Other minor fixes and improvements
