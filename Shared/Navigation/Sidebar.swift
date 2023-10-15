@@ -36,7 +36,7 @@ struct Sidebar: View {
             }
             .onChange(of: navigation.sidebarSectionChanged) { _ in
                 if let tabSelection = navigation.tabSelection {
-                    scrollScrollViewToItem(scrollView: scrollView, for: navigation.tabSelection)
+                    scrollScrollViewToItem(scrollView: scrollView, for: tabSelection)
                 }
             }
             .listStyle(.sidebar)
