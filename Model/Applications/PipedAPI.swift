@@ -496,7 +496,17 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let uploaded = details["uploaded"]?.double
         var published = (uploaded.isNil || uploaded == -1) ? nil : (uploaded! / 1000).formattedAsRelativeTime()
-        if published.isNil {
+        var publishedAt: Date?
+
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime]
+
+        if published.isNil,
+           let date = details["uploadDate"]?.string,
+           let formattedDate = dateFormatter.date(from: date)
+        {
+            publishedAt = formattedDate
+        } else {
             published = (details["uploadedDate"] ?? details["uploadDate"])?.string ?? ""
         }
 
@@ -526,6 +536,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             thumbnails: thumbnails,
             live: live,
             short: details["isShort"]?.bool ?? (length <= Video.shortLength),
+            publishedAt: publishedAt,
             likes: details["likes"]?.int,
             dislikes: details["dislikes"]?.int,
             streams: extractStreams(from: content),
