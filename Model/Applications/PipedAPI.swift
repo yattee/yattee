@@ -1,3 +1,4 @@
+import Alamofire
 import AVFoundation
 import Foundation
 import Siesta
@@ -148,28 +149,43 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             return
         }
 
-        login.request(
-            .post,
-            json: ["username": username, "password": password]
-        )
-        .onSuccess { response in
-            let token = response.json.dictionaryValue["token"]?.string ?? ""
-            if let error = response.json.dictionaryValue["error"]?.string {
-                NavigationModel.shared.presentAlert(
-                    title: "Account Error",
-                    message: error
-                )
-            } else if !token.isEmpty {
-                AccountsModel.setToken(self.account, token)
-                self.objectWillChange.send()
-            } else {
-                NavigationModel.shared.presentAlert(
-                    title: "Account Error",
-                    message: "Could not update your token."
-                )
+        AF.request(
+            login.url,
+            method: .post,
+            parameters: ["username": username, "password": password],
+            encoding: JSONEncoding.default
+        ).responseDecodable(of: JSON.self) { [weak self] response in
+            guard let self else {
+                return
             }
 
-            self.configure()
+            switch response.result {
+            case let .success(value):
+                let json = JSON(value)
+                let token = json.dictionaryValue["token"]?.string ?? ""
+                if let error = json.dictionaryValue["error"]?.string {
+                    NavigationModel.shared.presentAlert(
+                        title: "Account Error",
+                        message: error
+                    )
+                } else if !token.isEmpty {
+                    AccountsModel.setToken(self.account, token)
+                    self.objectWillChange.send()
+                } else {
+                    NavigationModel.shared.presentAlert(
+                        title: "Account Error",
+                        message: "Could not update your token."
+                    )
+                }
+
+                self.configure()
+
+            case let .failure(error):
+                NavigationModel.shared.presentAlert(
+                    title: "Account Error",
+                    message: error.localizedDescription
+                )
+            }
         }
     }
 
