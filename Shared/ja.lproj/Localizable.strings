@@ -567,7 +567,7 @@
 "Opened File" = "開いたファイル";
 "File Extension" = "ファイル拡張子";
 "Opening file..." = "ファイルを読み込み中...";
-"Your Accounts" = "使用するアカウント";
+"Your Accounts" = "アカウントを使用";
 "Public account" = "公開アカウント";
 "Browse without account" = "アカウントなしで閲覧";
 "Rotate when entering fullscreen on landscape video" = "横長動画を全画面にしたら回転するか";
