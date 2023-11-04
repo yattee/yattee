@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "revision" : "b2fa556e4e48cbf06cf8c63def138c98f4b811fa",
-        "version" : "5.8.0"
+        "revision" : "3dc6a42c7727c49bf26508e29b0a0b35f9c7e1ad",
+        "version" : "5.8.1"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cxfksword/MPVKit.git",
       "state" : {
-        "revision" : "96825b3dc2b38e5550268156148d47798ce6aa74",
-        "version" : "0.36.0"
+        "branch" : "main",
+        "revision" : "dca1e345a26d09a3d621d7656a94e6427f3f7b83"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "7550aa759c8d57800f7fdb3d17272a232b05e8cb"
+        "revision" : "fd1950de05a5ad77cb252fd88576c1e1809ee50d"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "b442fafefeee8d3f489e33e69e0bb9407deb4757",
-        "version" : "0.14.0"
+        "revision" : "7e70ec8165b455cc2b97ff5c5ac6a8064c737e6f",
+        "version" : "0.14.1"
       }
     },
     {
