@@ -1,3 +1,7 @@
-## Build 168
+## Build 169
+* Fixed issue with MPV subtitles not working
+* Updated dependencies
+
+## Previous builds
 * Fixed issue where Piped login token would not refresh
-* Update dependencies
+* Other minor changes and improvements
