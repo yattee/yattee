@@ -583,7 +583,7 @@
 "Startup section" = "Bereich Startup";
 "Home Settings" = "Startseite Einstellungen";
 "Watched: hidden" = "Beobachtet: versteckt";
-"(watched and shorts hidden)" = "(beobachtet und shorts versteckt)";
+"(watched and shorts hidden)" = "(gesehene und Shorts versteckt)";
 "Watched: visible" = "Beobachtet: sichtbar";
 "No videos to show" = "Keine Videos zu zeigen";
 "(watched hidden)" = "(versteckt beobachtet)";
@@ -597,3 +597,5 @@
 "Play Now in AVPlayer" = "Jetzt in AVPlayer abspielen";
 "Show channel avatars in videos lists" = "Kanal-Avatare in Videolisten anzeigen";
 "Show channel avatars in channels lists" = "Kanal-Avatare in Kanallisten anzeigen";
+"Podcasts" = "Podcasts";
+"Add %@" = "%@ hinzufügen";
