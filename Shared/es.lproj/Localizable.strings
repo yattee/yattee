@@ -517,12 +517,13 @@
 "Double tap gesture" = "Doble toque";
 "Player Bar" = "Barra del reproductor";
 "Controls Buttons" = "Botones de control";
-"Seeking" = "En busca de";
+"Seeking" = "Buscando";
 "Total size: %@" = "Tamaño total: %@";
-"Gesture: backwards" = "Gesto: hacia atrás";
-"Gesture: fowards" = "Gesto: hacia delante";
+"Gesture: backwards" = "Gesto: atrás";
+"Gesture: fowards" = "Gesto: adelante";
 "System controls" = "Controles del sistema";
 "Close video" = "Cerrar vídeo";
 "Controls button: backwards" = "Botón de control: hacia atrás";
 "Controls button: forwards" = "Botón de control: hacia delante";
 "Show unwatched feed badges" = "Mostrar insignias de feeds no vistos";
+"Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes de los gestos controlan el intervalo de salto para el gesto de doble toque en el lado izquierdo/derecho del reproductor. Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
