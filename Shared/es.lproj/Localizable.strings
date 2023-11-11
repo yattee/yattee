@@ -543,17 +543,17 @@
 "Toggle player" = "Alternar el reproductor";
 "Inspector" = "Inspector";
 "Playback Settings" = "Ajustes de la reproducción";
-"Show toggle watch status button" = "Botón de estado del reloj";
+"Show toggle watch status button" = "Mostrar botón alternar estado de seguimiento";
 "Queue - shuffled" = "Cola - aleatoria";
 "Cells" = "Celdas";
 "Do nothing" = "No hacer nada";
 "Next in Queue" = "Siguiente en la cola";
-"Open video description expanded" = "Abrir ampliada la descripción del vídeo";
+"Open video description expanded" = "Abrir la descripción del vídeo ampliada";
 "Mark all as unwatched" = "Marcar todo como no visto";
 "Mark all as watched" = "Marcar todo como visto";
 "List" = "Lista";
 "Toggle size" = "Alternar el tamaño";
-"Open channel" = "Canal abierto";
+"Open channel" = "Abrir canal";
 "Feed" = "Feed";
 "Available" = "Disponible";
 "Loop one" = "Bucle uno";
@@ -586,3 +586,4 @@
 "Landscape right" = "Apaisado a la derecha";
 "Your Accounts" = "Tus cuentas";
 "Description" = "Descripción";
+"Maximum feed items" = "Número máximo de elementos en el feed";
