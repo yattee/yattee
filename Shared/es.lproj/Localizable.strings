@@ -543,7 +543,7 @@
 "Toggle player" = "Alternar el reproductor";
 "Inspector" = "Inspector";
 "Playback Settings" = "Ajustes de la reproducción";
-"Show toggle watch status button" = "Mostrar botón alternar estado de seguimiento";
+"Show toggle watch status button" = "Mostrar el botón para alternar estado de la visualización";
 "Queue - shuffled" = "Cola - aleatoria";
 "Cells" = "Celdas";
 "Do nothing" = "No hacer nada";
@@ -587,7 +587,7 @@
 "Your Accounts" = "Tus cuentas";
 "Description" = "Descripción";
 "Maximum feed items" = "Número máximo de elementos en el feed";
-"Are you sure you want to remove %@ from Favorites?" = "Estás seguro de que quieres eliminar %@ de Favoritos?";
+"Are you sure you want to remove %@ from Favorites?" = "¿Estás seguro de que quieres eliminar %@ de favoritos?";
 "Limit" = "Límite";
 "Keep channels with unwatched videos on top of subscriptions list" = "Mantén los canales con los vídeos sin ver en la parte superior de la lista de suscripciones";
 "(shorts hidden)" = "(cortos ocultos)";
