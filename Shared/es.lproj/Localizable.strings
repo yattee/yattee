@@ -397,7 +397,7 @@
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Se eliminará la lista de reproducción \"%@\".\nNo se puede revertir.";
 "Playlists" = "Listas de reproducción";
 "Popular" = "Popular";
-"Proxy videos" = "Proxy videos";
+"Proxy videos" = "Vídeos proxy";
 "Regular size" = "Tamaño regular";
 "Related" = "Relacionado";
 
@@ -481,7 +481,7 @@
 "Playback" = "Reproducción";
 "Restart/Play next" = "Reiniciar/Reproducir siguiente";
 "This cannot be reverted" = "Esto no se puede revertir";
-"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Esto no se puede revertir. Es posible que deba cambiar entre vistas o reiniciar la aplicación para ver los cambios";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Esto no se puede revertir. Es posible que deba cambiar entre vistas o reiniciar la aplicación para ver los cambios.";
 "Could not open channel" = "No se pudo abrir el canal";
 "Recent History" = "Historial reciente";
 "Share files from Finder on a Mac\nor iTunes on Windows" = "Comparta archivos desde Finder en una Mac\no iTunes en Windows";
@@ -597,6 +597,6 @@
 "Show channel avatars in channels lists" = "Mostrar los avatares de los canales en las listas de los canales";
 "Play Now in MPV" = "Reproducir ahora en MPV";
 "Show channel avatars in videos lists" = "Mostrar los avatares de los canales en las listas de los vídeos";
-"Add %@" = "Añadir %@";
+"Add %@" = "Agregue %@";
 "Show video context menu options to force selected backend" = "Mostrar las opciones del menú contextual del vídeo para forzar el backend seleccionado";
 "Play Now in AVPlayer" = "Reproducir ahora en AVPlayer";
