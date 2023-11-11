@@ -527,3 +527,15 @@
 "Controls button: forwards" = "Botón de control: hacia delante";
 "Show unwatched feed badges" = "Mostrar insignias de feeds no vistos";
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes de los gestos controlan el intervalo de salto para el gesto de doble toque en el lado izquierdo/derecho del reproductor. Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
+"Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto para el doble clic en el lado izquierdo/derecho del reproductor. Para cambiar la configuración de los controles del sistema es necesario reiniciar.";
+"Open channels with description expanded" = "Abrir canales con descripción ampliada";
+"Subscribe/Unsubscribe" = "Suscribirse/Desuscribirse";
+"Are you sure you want to clear cache?" = "Estás seguro de que quieres borrar la caché?";
+"Lock orientation" = "Bloquear orientación";
+"Cache" = "Cache";
+"Actions Buttons" = "Botones de Acción";
+"Music Mode" = "Modo Música";
+"Play next item" = "Reproducir siguiente elemento";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto de los botones de flecha del mando a distancia (para Siri Remote de 2ª generación o posterior). Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
+"Show cache status" = "Mostrar estado de cache";
+"Show Next in Queue" = "Mostrar el siguiente en la cola";
