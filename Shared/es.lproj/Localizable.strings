@@ -592,3 +592,11 @@
 "Keep channels with unwatched videos on top of subscriptions list" = "Mantén los canales con los vídeos sin ver en la parte superior de la lista de suscripciones";
 "(shorts hidden)" = "(cortos ocultos)";
 "Disable filters" = "Desactivar los filtros";
+"Podcasts" = "Podcasts";
+"Releases" = "Lanzamientos";
+"Show channel avatars in channels lists" = "Mostrar los avatares de los canales en las listas de los canales";
+"Play Now in MPV" = "Reproducir ahora en MPV";
+"Show channel avatars in videos lists" = "Mostrar los avatares de los canales en las listas de los vídeos";
+"Add %@" = "Añadir %@";
+"Show video context menu options to force selected backend" = "Mostrar las opciones del menú contextual del vídeo para forzar el backend seleccionado";
+"Play Now in AVPlayer" = "Reproducir ahora en AVPlayer";
