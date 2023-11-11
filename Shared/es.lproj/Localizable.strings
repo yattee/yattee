@@ -530,7 +530,7 @@
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto para el doble clic en el lado izquierdo/derecho del reproductor. Para cambiar la configuración de los controles del sistema es necesario reiniciar.";
 "Open channels with description expanded" = "Abrir canales con descripción ampliada";
 "Subscribe/Unsubscribe" = "Suscribirse/Desuscribirse";
-"Are you sure you want to clear cache?" = "Estás seguro de que quieres borrar la caché?";
+"Are you sure you want to clear cache?" = "¿Seguro que quieres borrar la caché?";
 "Lock orientation" = "Bloquear orientación";
 "Cache" = "Cache";
 "Actions Buttons" = "Botones de Acción";
@@ -540,3 +540,18 @@
 "Show cache status" = "Mostrar estado de cache";
 "Show Next in Queue" = "Mostrar el siguiente en la cola";
 "Hide player" = "Ocultar al jugador";
+"Toggle player" = "Alternar el reproductor";
+"Inspector" = "Inspector";
+"Playback Settings" = "Ajustes de la reproducción";
+"Show toggle watch status button" = "Botón de estado del reloj";
+"Queue - shuffled" = "Cola - aleatoria";
+"Cells" = "Celdas";
+"Do nothing" = "No hacer nada";
+"Next in Queue" = "Siguiente en la cola";
+"Open video description expanded" = "Abrir ampliada la descripción del vídeo";
+"Mark all as unwatched" = "Marcar todo como no visto";
+"Mark all as watched" = "Marcar todo como visto";
+"List" = "Lista";
+"Toggle size" = "Alternar el tamaño";
+"Open channel" = "Canal abierto";
+"Feed" = "Feed";
