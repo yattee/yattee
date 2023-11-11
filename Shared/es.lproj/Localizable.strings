@@ -539,3 +539,4 @@
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto de los botones de flecha del mando a distancia (para Siri Remote de 2ª generación o posterior). Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
 "Show cache status" = "Mostrar estado de cache";
 "Show Next in Queue" = "Mostrar el siguiente en la cola";
+"Hide player" = "Ocultar al jugador";
