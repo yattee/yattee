@@ -169,7 +169,7 @@
 "Stream & Player" = "Transmisión y reproductor";
 "Picture in Picture" = "Imagen en imagen";
 "Visibility" = "Visibilidad";
-"Edit Favorites…" = "Editar Favoritos…";
+"Edit Favorites…" = "Editar los favoritos…";
 "Center" = "Centrar";
 "Wiki" = "Wiki";
 "Live Streams" = "Transmisiones en vivo";
@@ -250,7 +250,7 @@
 "Actions buttons" = "Botones de acciones";
 "Files" = "Archivos";
 "Sign In Required" = "Inicio de sesión requerido";
-"Buttons labels" = "Etiquetas de botones";
+"Buttons labels" = "Etiquetas de los botones";
 "Next" = "Siguiente";
 "Default Profile" = "Perfil por defecto";
 "Paste" = "Pegar";
@@ -266,7 +266,7 @@
 
 /* Loading stream OSD */
 "Loading streams..." = "Cargando secuencias...";
-"Public Locations" = "Ubicaciones Públicas";
+"Public Locations" = "Ubicaciones públicas";
 "Yattee" = "Yattee";
 "No results" = "No hay resultados";
 "Driver" = "Driver";
@@ -397,7 +397,7 @@
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Se eliminará la lista de reproducción \"%@\".\nNo se puede revertir.";
 "Playlists" = "Listas de reproducción";
 "Popular" = "Popular";
-"Proxy videos" = "Vídeos proxy";
+"Proxy videos" = "Utilizar un proxy para ver los vídeos";
 "Regular size" = "Tamaño regular";
 "Related" = "Relacionado";
 
@@ -488,7 +488,7 @@
 "Pages toolbar position" = "Posición de la barra de herramientas de páginas";
 "Video actions buttons" = "Botones de acciones de video";
 "Video" = "Video";
-"Show Open Videos toolbar button" = "Mostrar el botón de la barra de herramientas Abrir videos";
+"Show Open Videos toolbar button" = "Mostrar el botón de los vídeos abiertos en la barra de herramientas";
 "Show Documents" = "Mostrar documentos";
 "Clear Queue before opening" = "Borrar cola antes de abrir";
 "Open" = "Abrir";
@@ -502,7 +502,7 @@
 "Playback history is empty" = "El historial de reproducción está vacío";
 "Copy%@link" = "Copiar%@enlace";
 "Share%@link" = "Compartir%@enlace";
-"Open expanded" = "Abrir expandido";
+"Open expanded" = "Abrir maximizado";
 "Single tap gesture" = "Gesto de un solo toque";
 "Right click channel thumbnail to open context menu with more actions" = "Haz clic con el botón derecho en la miniatura del canal para abrir el menú contextual con más acciones";
 "Short videos: visible" = "Videos cortos: visible";
@@ -511,11 +511,11 @@
 "Short videos: hidden" = "Videos cortos: oculto";
 "Clear all" = "Borrar todo";
 "Always show controls buttons" = "Mostrar siempre los botones de control";
-"Mark channel feed as unwatched" = "Marcar canal como no visto";
+"Mark channel feed as unwatched" = "Marcar el feed del canal como no visto";
 "Play all unwatched" = "Reproducir todo lo no visto";
-"Mark channel feed as watched" = "Marcar canal como visto";
+"Mark channel feed as watched" = "Marcar el feed del canal como visto";
 "Double tap gesture" = "Gesto de doble toque";
-"Player Bar" = "Barra de reproducción";
+"Player Bar" = "Barra del reproductor";
 "Controls Buttons" = "Botones de control";
 "Seeking" = "Buscando";
 "Total size: %@" = "Tamaño total: %@";
@@ -528,7 +528,7 @@
 "Show unwatched feed badges" = "Mostrar insignias de feeds no vistos";
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes de los gestos controlan el intervalo de salto para el gesto de doble toque en el lado izquierdo/derecho del reproductor. Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto para el doble clic en el lado izquierdo/derecho del reproductor. Para cambiar la configuración de los controles del sistema es necesario reiniciar.";
-"Open channels with description expanded" = "Abrir canales con descripción ampliada";
+"Open channels with description expanded" = "Canales abiertos con la descripción ampliada";
 "Subscribe/Unsubscribe" = "Suscribirse/Desuscribirse";
 "Are you sure you want to clear cache?" = "¿Seguro que quieres borrar la caché?";
 "Lock orientation" = "Bloquear orientación";
@@ -536,7 +536,7 @@
 "Actions Buttons" = "Botones de Acción";
 "Music Mode" = "Modo Música";
 "Play next item" = "Reproducir siguiente elemento";
-"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo de salto de los botones de flecha del mando a distancia (para Siri Remote de 2ª generación o posterior). Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Los ajustes gestuales controlan el intervalo del salto de los botones de la flecha del mando a distancia (para Siri Remote de 2ª generación o posterior). Para cambiar los ajustes de los controles del sistema es necesario reiniciar.";
 "Show cache status" = "Mostrar estado de cache";
 "Show Next in Queue" = "Mostrar el siguiente en la cola";
 "Hide player" = "Ocultar al jugador";
@@ -553,12 +553,12 @@
 "Mark all as watched" = "Marcar todo como visto";
 "List" = "Lista";
 "Toggle size" = "Alternar el tamaño";
-"Open channel" = "Abrir canal";
+"Open channel" = "Abrir el canal";
 "Feed" = "Feed";
 "Available" = "Disponible";
 "Loop one" = "Bucle uno";
 "Use system controls with AVPlayer" = "Utilizar los controles del sistema con AVPlayer";
-"Opening file..." = "Abriendo archivo...";
+"Opening file..." = "Abriendo el archivo...";
 "No videos to show" = "No hay vídeos que mostrar";
 "Autoplay next" = "Reproducir automáticamente la siguiente";
 "Home Settings" = "Ajustes iniciales";
@@ -597,6 +597,6 @@
 "Show channel avatars in channels lists" = "Mostrar los avatares de los canales en las listas de los canales";
 "Play Now in MPV" = "Reproducir ahora en MPV";
 "Show channel avatars in videos lists" = "Mostrar los avatares de los canales en las listas de los vídeos";
-"Add %@" = "Agregue %@";
+"Add %@" = "Añada %@";
 "Show video context menu options to force selected backend" = "Mostrar las opciones del menú contextual del vídeo para forzar el backend seleccionado";
 "Play Now in AVPlayer" = "Reproducir ahora en AVPlayer";
