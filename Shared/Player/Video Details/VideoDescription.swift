@@ -21,19 +21,7 @@ struct VideoDescription: View {
     }
 
     var body: some View {
-        Group {
-            if !expandVideoDescription && !expand {
-                Button {
-                    expand = true
-                } label: {
-                    descriptionView
-                }
-                .buttonStyle(.plain)
-            } else {
-                descriptionView
-            }
-        }
-        .id(video.videoID)
+        descriptionView.id(video.videoID)
     }
 
     var descriptionView: some View {
@@ -54,7 +42,7 @@ struct VideoDescription: View {
     }
 
     var shouldExpand: Bool {
-        expandVideoDescription || expand
+        expand
     }
 
     @ViewBuilder var textDescription: some View {
