@@ -43,10 +43,10 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     var usedAspectRatioContentMode: ContentMode {
-        #if os(iOS)
-            fullScreen ? .fill : .fit
+        #if os(tvOS)
+            .fit
         #else
-                .fit
+            fullScreen ? .fill : .fit
         #endif
     }
 
