@@ -156,7 +156,7 @@ struct VideoPlayerView: View {
         .persistentSystemOverlays(!fullScreenPlayer)
         #endif
         #if os(macOS)
-        .frame(minWidth: 1100, minHeight: 700)
+        .frame(minWidth: playerSidebar != .never ? 1100 : 650, minHeight: 700)
         #endif
     }
 
