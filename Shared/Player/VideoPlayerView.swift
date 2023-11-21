@@ -22,7 +22,7 @@ struct VideoPlayerView: View {
     static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
-            300
+            335
         #else
             200
         #endif
@@ -315,7 +315,7 @@ struct VideoPlayerView: View {
                             .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
                         } else {
-                            VStack {}
+                            VStack { }
                         }
                     }
                 #endif
@@ -393,7 +393,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             } else {
-                VStack {}
+                VStack { }
             }
         }
         .onChange(of: fullScreenPlayer) { newValue in
@@ -508,6 +508,6 @@ struct VideoPlayerView_Previews: PreviewProvider {
             return view
         }
 
-        func updateUIView(_: UIView, context _: Context) {}
+        func updateUIView(_: UIView, context _: Context) { }
     }
 #endif
