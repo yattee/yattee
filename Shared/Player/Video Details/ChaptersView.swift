@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ChaptersView: View {
     @ObservedObject private var player = PlayerModel.shared
+    @Binding var expand: Bool
 
     var chapters: [Chapter] {
         player.videoForDisplay?.chapters ?? []
@@ -14,7 +15,7 @@ struct ChaptersView: View {
     }
 
     var body: some View {
-        if !chapters.isEmpty {
+        if expand && !chapters.isEmpty {
             #if os(tvOS)
                 List {
                     Section {
@@ -45,15 +46,22 @@ struct ChaptersView: View {
                     .padding(.horizontal)
                 }
             #endif
-        } else {
-            NoCommentsView(text: "No chapters information available".localized(), systemImage: "xmark.circle.fill")
+        } else if !chapters.isEmpty {
+            Section {
+                ChapterView(chapter: chapters[0])
+                if chapters.count > 1 {
+                    ChapterView(chapter: chapters[1])
+                        .opacity(0.3)
+                }
+            }
+            .padding(.horizontal)
         }
     }
 }
 
 struct ChaptersView_Previews: PreviewProvider {
     static var previews: some View {
-        ChaptersView()
+        ChaptersView(expand: .constant(false))
             .injectFixtureEnvironmentObjects()
     }
 }
