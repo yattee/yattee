@@ -105,6 +105,7 @@ extension PlayerModel {
 
     func playerAPI(_ video: Video) -> VideosAPI? {
         guard let url = video.instanceURL else { return accounts.api }
+        if accounts.current?.url == url { return accounts.api }
         switch video.app {
         case .local:
             return nil
@@ -263,8 +264,7 @@ extension PlayerModel {
             if let video = currentItem.video,
                video.isLocal,
                video.localStreamIsFile,
-               let localURL = video.localStream?.localURL
-            {
+               let localURL = video.localStream?.localURL {
                 logger.info("stopping security scoped resource access for \(localURL)")
                 localURL.stopAccessingSecurityScopedResource()
             }
@@ -293,8 +293,7 @@ extension PlayerModel {
         var restoredQueue = [PlayerQueueItem?]()
 
         if let lastPlayed,
-           !Defaults[.queue].contains(where: { $0.videoID == lastPlayed.videoID })
-        {
+           !Defaults[.queue].contains(where: { $0.videoID == lastPlayed.videoID }) {
             restoredQueue.append(lastPlayed)
             self.lastPlayed = nil
         }
@@ -341,8 +340,7 @@ extension PlayerModel {
         var message = error.userMessage
         if let errorDictionary = error.json.dictionaryObject,
            let errorMessage = errorDictionary["message"] ?? errorDictionary["error"],
-           let errorString = errorMessage as? String
-        {
+           let errorString = errorMessage as? String {
             message += "\n"
             message += errorString
         }
