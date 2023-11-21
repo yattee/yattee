@@ -169,6 +169,7 @@ struct VideoDetails: View {
     @State private var subscriptionToggleButtonDisabled = false
     @State private var page = DetailsPage.info
     @State private var descriptionExpanded = false
+    @State private var chaptersExpanded = false
 
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
@@ -317,10 +318,9 @@ struct VideoDetails: View {
                                 if player.videoBeingOpened.isNil {
                                     if showChapters,
                                        !video.isLocal,
-                                       !video.chapters.isEmpty
-                                    {
+                                       !video.chapters.isEmpty {
                                         Section(header: chaptersHeader) {
-                                            ChaptersView()
+                                            ChaptersView(expand: $chaptersExpanded)
                                         }
                                     }
 
@@ -331,8 +331,7 @@ struct VideoDetails: View {
 
                                     if showRelated,
                                        !sidebarQueue,
-                                       !(player.videoForDisplay?.related.isEmpty ?? true)
-                                    {
+                                       !(player.videoForDisplay?.related.isEmpty ?? true) {
                                         RelatedView()
                                             .padding(.horizontal)
                                             .padding(.top, 20)
@@ -390,8 +389,7 @@ struct VideoDetails: View {
             if showScrollToTopInComments,
                page == .comments,
                comments.loaded,
-               comments.all.count > 3
-            {
+               comments.all.count > 3 {
                 Button {
                     withAnimation {
                         proxy.scrollTo(Self.pageMenuID)
@@ -441,10 +439,17 @@ struct VideoDetails: View {
     }
 
     var chaptersHeader: some View {
-        Text("Chapters".localized())
-            .padding(.horizontal)
-            .font(.caption)
-            .foregroundColor(.secondary)
+        HStack {
+            Text("Chapters".localized())
+            Spacer()
+            Button(action: { chaptersExpanded.toggle() }) {
+                Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                    .imageScale(.small)
+            }
+        }
+        .padding(.horizontal)
+        .font(.caption)
+        .foregroundColor(.secondary)
     }
 }
 

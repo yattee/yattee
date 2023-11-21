@@ -282,7 +282,7 @@ struct PlayerSettings: View {
         }
 
         private var showChaptersToggle: some View {
-            Toggle("Chapters", isOn: $showChapters)
+            Toggle("Chapters (if available)", isOn: $showChapters)
         }
 
         private var showRelatedToggle: some View {
