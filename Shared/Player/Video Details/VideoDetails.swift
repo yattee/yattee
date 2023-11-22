@@ -318,7 +318,8 @@ struct VideoDetails: View {
                                 if player.videoBeingOpened.isNil {
                                     if showChapters,
                                        !video.isLocal,
-                                       !video.chapters.isEmpty {
+                                       !video.chapters.isEmpty
+                                    {
                                         Section(header: chaptersHeader) {
                                             ChaptersView(expand: $chaptersExpanded)
                                         }
@@ -331,7 +332,8 @@ struct VideoDetails: View {
 
                                     if showRelated,
                                        !sidebarQueue,
-                                       !(player.videoForDisplay?.related.isEmpty ?? true) {
+                                       !(player.videoForDisplay?.related.isEmpty ?? true)
+                                    {
                                         RelatedView()
                                             .padding(.horizontal)
                                             .padding(.top, 20)
@@ -389,7 +391,8 @@ struct VideoDetails: View {
             if showScrollToTopInComments,
                page == .comments,
                comments.loaded,
-               comments.all.count > 3 {
+               comments.all.count > 3
+            {
                 Button {
                     withAnimation {
                         proxy.scrollTo(Self.pageMenuID)
