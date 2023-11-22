@@ -416,7 +416,7 @@ struct VideoDetails: View {
             Button { descriptionExpanded.toggle()
             } label: {
                 Image(systemName: descriptionExpanded ? "chevron.up" : "chevron.down")
-                .imageScale(.small)
+                    .imageScale(.small)
             }
         }
         .padding(.horizontal)
