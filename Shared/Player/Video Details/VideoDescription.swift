@@ -6,11 +6,10 @@ import Foundation
 import SwiftUI
 
 struct VideoDescription: View {
-    static let collapsedLines = 5
-
     private var search: SearchModel { .shared }
     @Default(.showKeywords) private var showKeywords
     @Default(.expandVideoDescription) private var expandVideoDescription
+    @Default(.collapsedLinesDescription) private var collapsedLinesDescription
 
     var video: Video
     var detailsSize: CGSize?
@@ -51,14 +50,14 @@ struct VideoDescription: View {
                 if #available(macOS 12, *) {
                     DescriptionWithLinks(description: description, detailsSize: detailsSize)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
+                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
                     #if !os(tvOS)
                         .textSelection(.enabled)
                     #endif
                 } else {
                     Text(description)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
+                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
                 }
             }
             .multilineTextAlignment(.leading)
@@ -142,6 +141,8 @@ struct VideoDescription: View {
 
         @Environment(\.openURL) private var openURL
 
+        @Default(.collapsedLinesDescription) private var collapsedLinesDescription
+
         var player = PlayerModel.shared
 
         func makeUIView(context _: Context) -> some UIView {
@@ -175,7 +176,7 @@ struct VideoDescription: View {
         }
 
         func updateNumberOfLines() {
-            label.numberOfLines = expand ? 0 : VideoDescription.collapsedLines
+            label.numberOfLines = expand ? 0 : collapsedLinesDescription
         }
 
         func urlTapHandler(_ url: URL) {

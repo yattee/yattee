@@ -12,6 +12,7 @@ struct PlayerSettings: View {
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
+    @Default(.collapsedLinesDescription) private var collapsedLinesDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeVideoOnEOF) private var closeVideoOnEOF
     #if os(iOS)
@@ -77,6 +78,7 @@ struct PlayerSettings: View {
             #if !os(tvOS)
                 Section(header: SettingsHeader(text: "Info".localized())) {
                     expandVideoDescriptionToggle
+                    collapsedLineDescriptionStepper
                     showChaptersToggle
                     showRelatedToggle
                     #if os(macOS)
@@ -192,6 +194,19 @@ struct PlayerSettings: View {
 
     private var expandVideoDescriptionToggle: some View {
         Toggle("Open video description expanded", isOn: $expandVideoDescription)
+    }
+
+    private var collapsedLineDescriptionStepper: some View {
+        Stepper(value: $collapsedLinesDescription, in: 0 ... 10) {
+            Text("Description preview")
+            if collapsedLinesDescription == 0 {
+                Text("No preview")
+            } else if collapsedLinesDescription == 1 {
+                Text("\(collapsedLinesDescription) line")
+            } else {
+                Text("\(collapsedLinesDescription) lines")
+            }
+        }
     }
 
     private var returnYouTubeDislikeToggle: some View {
