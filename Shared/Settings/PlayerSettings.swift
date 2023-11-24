@@ -197,14 +197,17 @@ struct PlayerSettings: View {
     }
 
     private var collapsedLineDescriptionStepper: some View {
-        Stepper(value: $collapsedLinesDescription, in: 0 ... 10) {
-            Text("Description preview")
-            if collapsedLinesDescription == 0 {
-                Text("No preview")
-            } else if collapsedLinesDescription == 1 {
-                Text("\(collapsedLinesDescription) line")
-            } else {
-                Text("\(collapsedLinesDescription) lines")
+        LazyVStack {
+            Stepper(value: $collapsedLinesDescription, in: 0 ... 10) {
+                Text("Description preview")
+                #if os(macOS)
+                    Spacer()
+                #endif
+                if collapsedLinesDescription == 0 {
+                    Text("No preview")
+                } else {
+                    Text("\(collapsedLinesDescription) lines")
+                }
             }
         }
     }
