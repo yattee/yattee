@@ -105,6 +105,7 @@ extension PlayerModel {
 
     func playerAPI(_ video: Video) -> VideosAPI? {
         guard let url = video.instanceURL else { return accounts.api }
+        if accounts.current?.url == url { return accounts.api }
         switch video.app {
         case .local:
             return nil
