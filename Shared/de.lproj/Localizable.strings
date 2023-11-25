@@ -93,10 +93,10 @@
 "Player" = "Player";
 "Charging" = "Aufladen";
 "Clear" = "Löschen";
-"Clear Search History..." = "Suchverlauf löschen...";
+"Clear Search History..." = "Suchverlauf löschen …";
 "Filter: active" = "Filter: aktiv";
 "Find Other" = "Andere finden";
-"Edit..." = "Bearbeiten...";
+"Edit..." = "Bearbeiten …";
 
 /* Selected video has just finished playing */
 "Just watched" = "Kürzlich angesehen";
@@ -133,7 +133,7 @@
 "Are you sure you want to restore default quality profiles?" = "Möchten Sie die Standardqualitätsprofile wirklich wiederherstellen?";
 "Autoplaying Next" = "Nächstes Element automatisch abspielen";
 "Based on system color scheme" = "Basierend auf System Farbschema";
-"Buffering stream..." = "Lädt…";
+"Buffering stream..." = "Lädt …";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Fehler und tolle Ideen für Funktionen können an den Github Issue Tracker gesendet werden. ";
 "Categories to Skip" = "Zu überspringende Kategorien";
 "Close PiP and open player when application enters foreground" = "Schließe Bild-in-Bild und öffne den Player wenn die App in den Vordergrund geholt wird";
@@ -167,7 +167,7 @@
 "Issues Tracker" = "Issues Tracker";
 "Enter fullscreen in landscape" = "Vollbild im Querformat aufrufen";
 "Error when accessing playlist" = "Fehler beim Zugriff auf Wiedergabeliste";
-"Finding something to play..." = "Etwas zu spielen finden...";
+"Finding something to play..." = "Etwas zu spielen finden …";
 "Fullscreen size" = "Vollbildgröße";
 
 /* Video date filter in search */
@@ -182,7 +182,7 @@
 "Large" = "Groß";
 
 /* Loading stream OSD */
-"Loading streams..." = "Lädt Streams...";
+"Loading streams..." = "Lädt Streams …";
 
 /* Video duration filter in search */
 "Long" = "Lang";
@@ -199,7 +199,7 @@
 "More info can be found in:" = "Weitere Informationen finden Sie in:";
 "Movies" = "Filme";
 "Music" = "Musik";
-"Loading..." = "Lädt...";
+"Loading..." = "Lädt …";
 "Lock portrait mode" = "Hochformatmodus sperren";
 "Mark as watched" = "Als gesehen markieren";
 "Mark video as watched after playing" = "Video nach dem Abspielen als angesehen markieren";
@@ -210,7 +210,7 @@
 "Only when signed in" = "Nur wenn Sie eingeloggt sind";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Öffne %@-stream...";
+"Opening %@ stream..." = "Öffne %@-stream …";
 "Connection failed" = "Verbindung fehlgeschlagen";
 "Continue from %@" = "Ab %@ fortsetzen";
 "Contributing" = "Beitragen";
@@ -227,7 +227,7 @@
 "I want to ask a question" = "Ich möchte eine Frage stellen";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Wenn Sie sich für künftige Updates interessieren, können Sie die Meilensteine des Projekts verfolgen.";
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
-"Opening audio stream..." = "Audiostream wird geöffnet...";
+"Opening audio stream..." = "Audiostream wird geöffnet …";
 "Orientation" = "Ausrichtung";
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Wiedergabeliste \"%@\" wird gelöscht.\nDies kann nicht rückgängig gemacht werden.";
 "Preferred Formats" = "Bevorzugte Formate";
@@ -248,7 +248,7 @@
 /* Video sort order in search */
 "Rating" = "Bewertung";
 "Settings" = "Einstellungen";
-"Share..." = "Teilen...";
+"Share..." = "Teilen …";
 "Remove from Playlist" = "Aus Wiedergabeliste entfernen";
 "Remove from the queue" = "Aus der Warteschlange entfernen";
 "Replies" = "Antworten anzeigen";
@@ -257,7 +257,7 @@
 "Resolution" = "Auflösung";
 "Restart the app to apply the settings above." = "Starten Sie die App neu, um die Einstellungen zu übernehmen.";
 "Restart/Play next" = "Von Anfang an/Als Nächstes spielen";
-"Restore default profiles..." = "Standardprofile wiederherstellen...";
+"Restore default profiles..." = "Standardprofile wiederherstellen …";
 "Rotate to portrait when exiting fullscreen" = "Auf Hochformat drehen, wenn der Vollbildmodus beendet wird";
 "Round corners" = "Runde Ecken";
 "Switch to public locations" = "Zu öffentlichen Adressen wechseln";
@@ -271,10 +271,10 @@
 
 /* Video sort order in search */
 "Views" = "Aufrufe";
-"Watched" = "Beobachtet";
+"Watched" = "Gesehen";
 
 /* Selected video was played on given date */
-"Watched %@" = "Beobachtet %@";
+"Watched %@" = "%@ gesehen";
 
 /* Selected video is being played */
 "Watching now" = "Jetzt anschauen";
@@ -309,7 +309,7 @@
 /* Player controls layout size for TV */
 "TV" = "Fernsehen";
 "unknown" = "unbekannt";
-"Unsubscribe" = "Deabonnieren";
+"Unsubscribe" = "Abbestellen";
 "Upload date" = "Uploaddatum";
 "URL" = "URL";
 "Wi-Fi" = "Wi-Fi";
@@ -357,7 +357,7 @@
 "Hardware decoder" = "Hardware-Decoder";
 "Save history of searches, channels and playlists" = "Verlauf von Suchen, Kanälen und Wiedergabelisten speichern";
 "Search history is empty" = "Suchverlauf ist leer";
-"Search..." = "Suche...";
+"Search..." = "Suche …";
 "Sections" = "Abschnitte";
 "Seek gesture sensitivity" = "Suchgesten-Sensibilität";
 "Seek gesture speed" = "Geschwindigkeit der Suchgesten";
@@ -427,7 +427,7 @@
 "Could not refresh Trending" = "Trends kann nicht aktualisiert werden";
 "Could not open channel" = "Kanal kann nicht geöffnet werden";
 "This URL could not be opened" = "Diese URL kann nicht geöffnet werden";
-"Share Logs..." = "Logs teilen…";
+"Share Logs..." = "Logs teilen …";
 "Channel could not be found" = "Der Kanal konnte nicht gefunden werden";
 "Could not refresh Subscriptions" = "Abonnements konnten nicht aktualisiert werden";
 "If you want this app to be available in your language, join translation project." = "Wenn Sie wünschen, dass diese App auch in Ihrer Sprache verfügbar ist, nehmen Sie am Übersetzungsprojekt teil.";
@@ -439,11 +439,11 @@
 "Show Home" = "Startseite anzeigen";
 "Video Details" = "Videodetails";
 "Share files from Finder on a Mac\nor iTunes on Windows" = "Teilen von Dateien über den Finder auf einem Mac\noder iTunes unter Windows";
-"Recent History" = "Neueste Verlauf";
+"Recent History" = "Neuester Verlauf";
 "Show Open Videos toolbar button" = "Schaltfläche \"Videos öffnen\" in der Symbolleiste anzeigen";
-"Edit Favorites…" = "Favoriten bearbeiten…";
+"Edit Favorites…" = "Favoriten bearbeiten …";
 "Show Documents" = "Dokumente anzeigen";
-"Buttons labels" = "Tasten-Etiketten";
+"Buttons labels" = "Schaltflächen-Etiketten";
 "Inspector visibility" = "Sichtbarkeit der Inspector";
 "Pages toolbar position" = "Position der Seitensymbolleiste";
 "Clear Queue before opening" = "Warteschlange vor dem Öffnen löschen";
@@ -482,7 +482,7 @@
 "Sample Rate" = "Samplerate";
 "Files" = "Dateien";
 "Could not find any links to open in your clipboard" = "Kann keine Links zum Öffnen in Ihrer Zwischenablage finden";
-"Remove…" = "Entfernen…";
+"Remove…" = "Entfernen …";
 "Show Inspector" = "Inspector einblenden";
 "Actions buttons" = "Aktionsschaltflächen";
 "Show sidebar" = "Seitenleiste anzeigen";
@@ -503,7 +503,7 @@
 "Verified" = "Verifiziert";
 "Channel" = "Kanal";
 "Short videos: visible" = "Kurze Videos: sichtbar";
-"Player Bar" = "Spielerleiste";
+"Player Bar" = "Video-Player-Leiste";
 "Short videos: hidden" = "Kurze Videos: versteckt";
 "Play all unwatched" = "Alle ungesehen abspielen";
 "Double tap gesture" = "Doppeltippgeste";
@@ -539,7 +539,7 @@
 "Subscribe/Unsubscribe" = "Abonnieren/abbestellen";
 "Are you sure you want to clear cache?" = "Möchten Sie den Cache wirklich löschen?";
 "Single tap gesture" = "Einmalige Antippen-Geste";
-"Seeking" = "Suchend";
+"Seeking" = "Suchen";
 "List" = "Liste";
 "Cells" = "Zellen";
 "Show Next in Queue" = "Nächste in Warteschlange anzeigen";
@@ -564,12 +564,12 @@
 "Lock" = "Sperre";
 "Description" = "Beschreibung";
 "Seek" = "Suchen";
-"Enter account credentials to connect..." = "Geben Sie die Kontozugangsdaten ein, um eine Verbindung herzustellen...";
+"Enter account credentials to connect..." = "Geben Sie die Kontozugangsdaten ein, um eine Verbindung herzustellen …";
 "Show scroll to top button in comments" = "Schaltfläche Nach oben scrollen in Kommentaren anzeigen";
-"Enter location address to connect..." = "Geben Sie die Internetadresse ein, um eine Verbindung herzustellen...";
+"Enter location address to connect..." = "Geben Sie die Internetadresse ein, um eine Verbindung herzustellen …";
 "Opened File" = "Geöffnete Datei";
 "File Extension" = "Dateierweiterung";
-"Opening file..." = "Datei öffnen...";
+"Opening file..." = "Datei öffnen …";
 "Close video and player on end" = "Video und Player am Ende beenden";
 "Use system controls with AVPlayer" = "Systemsteuerung mit AVPlayer verwenden";
 "Public account" = "Öffentliches Konto";
@@ -582,12 +582,12 @@
 "Available" = "Verfügbar";
 "Startup section" = "Bereich Startup";
 "Home Settings" = "Startseite Einstellungen";
-"Watched: hidden" = "Beobachtet: versteckt";
-"(watched and shorts hidden)" = "(beobachtet und shorts versteckt)";
-"Watched: visible" = "Beobachtet: sichtbar";
+"Watched: hidden" = "Gesehene: versteckt";
+"(watched and shorts hidden)" = "(gesehene und Shorts versteckt)";
+"Watched: visible" = "Gesehene: sichtbar";
 "No videos to show" = "Keine Videos zu zeigen";
-"(watched hidden)" = "(versteckt beobachtet)";
-"(shorts hidden)" = "(shorts versteckt)";
+"(watched hidden)" = "(gesehene versteckt)";
+"(shorts hidden)" = "(Shorts versteckt)";
 "Disable filters" = "Filter deaktivieren";
 "Limit" = "Grenze";
 "Are you sure you want to remove %@ from Favorites?" = "Möchten Sie %@ wirklich aus den Favoriten entfernen?";
@@ -597,3 +597,6 @@
 "Play Now in AVPlayer" = "Jetzt in AVPlayer abspielen";
 "Show channel avatars in videos lists" = "Kanal-Avatare in Videolisten anzeigen";
 "Show channel avatars in channels lists" = "Kanal-Avatare in Kanallisten anzeigen";
+"Podcasts" = "Podcasts";
+"Add %@" = "%@ hinzufügen";
+"Releases" = "Veröffentlichungen";
