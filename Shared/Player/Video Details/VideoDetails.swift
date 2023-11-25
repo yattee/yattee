@@ -442,17 +442,33 @@ struct VideoDetails: View {
     }
 
     var chaptersHeader: some View {
-        HStack {
-            Text("Chapters".localized())
-            Spacer()
-            Button(action: { chaptersExpanded.toggle() }) {
-                Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
-                    .imageScale(.small)
+        #if canImport(UIKit)
+            Button(action: {
+                chaptersExpanded.toggle()
+            }) {
+                HStack {
+                    Text("Chapters".localized())
+                    Spacer()
+                    Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                        .imageScale(.small)
+                }
+                .padding(.horizontal)
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
-        }
-        .padding(.horizontal)
-        .font(.caption)
-        .foregroundColor(.secondary)
+        #elseif canImport(AppKit)
+            HStack {
+                Text("Chapters".localized())
+                Spacer()
+                Button(action: { chaptersExpanded.toggle() }) {
+                    Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                        .imageScale(.small)
+                }
+            }
+            .padding(.horizontal)
+            .font(.caption)
+            .foregroundColor(.secondary)
+        #endif
     }
 }
 
