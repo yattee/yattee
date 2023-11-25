@@ -23,21 +23,24 @@ struct VideoDescription: View {
         descriptionView.id(video.videoID)
     }
 
-    var descriptionView: some View {
-        VStack {
-            #if os(iOS)
-                ActiveLabelDescriptionRepresentable(
-                    description: description,
-                    detailsSize: detailsSize,
-                    expand: shouldExpand
-                )
-            #else
-                textDescription
-            #endif
+    @ViewBuilder var descriptionView: some View {
+        if !expand && collapsedLinesDescription == 0 {
+            EmptyView()
+        } else {
+            VStack {
+                #if os(iOS)
+                    ActiveLabelDescriptionRepresentable(
+                        description: description,
+                        detailsSize: detailsSize,
+                        expand: expand
+                    )
+                #else
+                    textDescription
+                #endif
 
-            keywords
+                keywords
+            }.contentShape(Rectangle())
         }
-        .contentShape(Rectangle())
     }
 
     var shouldExpand: Bool {
@@ -176,7 +179,12 @@ struct VideoDescription: View {
         }
 
         func updateNumberOfLines() {
-            label.numberOfLines = expand ? 0 : collapsedLinesDescription
+            if expand || collapsedLinesDescription > 0 {
+                label.numberOfLines = expand ? 0 : collapsedLinesDescription
+                label.isHidden = false
+            } else {
+                label.isHidden = true
+            }
         }
 
         func urlTapHandler(_ url: URL) {
