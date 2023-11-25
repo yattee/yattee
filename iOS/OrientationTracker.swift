@@ -86,9 +86,11 @@ public class OrientationTracker {
         if accelerometerData.acceleration.y <= -threshold {
             return .portrait
         }
-        if accelerometerData.acceleration.y >= threshold {
+
+        if UIDevice.current.userInterfaceIdiom == .pad && accelerometerData.acceleration.y >= threshold {
             return .portraitUpsideDown
         }
+
         return currentDeviceOrientation
     }
 }
