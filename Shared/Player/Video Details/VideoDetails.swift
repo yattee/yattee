@@ -410,18 +410,34 @@ struct VideoDetails: View {
     }
 
     var descriptionHeader: some View {
-        HStack {
-            Text("Description".localized())
-            Spacer()
-            Button { descriptionExpanded.toggle()
-            } label: {
-                Image(systemName: descriptionExpanded ? "chevron.up" : "chevron.down")
-                    .imageScale(.small)
+        #if canImport(UIKit)
+            Button(action: {
+                descriptionExpanded.toggle()
+            }) {
+                HStack {
+                    Text("Description".localized())
+                    Spacer()
+                    Image(systemName: descriptionExpanded ? "chevron.up" : "chevron.down")
+                        .imageScale(.small)
+                }
+                .padding(.horizontal)
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
-        }
-        .padding(.horizontal)
-        .font(.caption)
-        .foregroundColor(.secondary)
+        #elseif canImport(AppKit)
+            HStack {
+                Text("Description".localized())
+                Spacer()
+                Button { descriptionExpanded.toggle()
+                } label: {
+                    Image(systemName: descriptionExpanded ? "chevron.up" : "chevron.down")
+                        .imageScale(.small)
+                }
+            }
+            .padding(.horizontal)
+            .font(.caption)
+            .foregroundColor(.secondary)
+        #endif
     }
 
     var chaptersHeader: some View {
