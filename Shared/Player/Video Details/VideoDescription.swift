@@ -61,7 +61,7 @@ struct VideoDescription: View {
         #if !os(iOS)
             Group {
                 if #available(macOS 12, *) {
-                    Text(description)
+                    DescriptionWithLinks(description: description, detailsSize: detailsSize)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
                     #if !os(tvOS)
@@ -78,6 +78,33 @@ struct VideoDescription: View {
             .lineSpacing(3)
         #endif
     }
+
+    // If possibe convert URLs to clickable links
+    #if os(macOS)
+        @available(macOS 12, *)
+        struct DescriptionWithLinks: View {
+            let description: String
+            let detailsSize: CGSize?
+            let separators = CharacterSet(charactersIn: " \n")
+
+            var formattedString: AttributedString {
+                var attrString = AttributedString(description)
+                let words = description.unicodeScalars.split(whereSeparator: separators.contains).map(String.init)
+                words.forEach { word in
+                    if word.hasPrefix("https://") || word.hasPrefix("http://"), let url = URL(string: String(word)) {
+                        if let range = attrString.range(of: word) {
+                            attrString[range].link = url
+                        }
+                    }
+                }
+                return attrString
+            }
+
+            var body: some View {
+                Text(formattedString)
+            }
+        }
+    #endif
 
     @ViewBuilder var keywords: some View {
         if showKeywords {
