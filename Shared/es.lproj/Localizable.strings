@@ -600,3 +600,5 @@
 "Add %@" = "Añada %@";
 "Show video context menu options to force selected backend" = "Mostrar las opciones del menú contextual del vídeo para forzar el backend seleccionado";
 "Play Now in AVPlayer" = "Reproducir ahora en AVPlayer";
+"Description preview" = "Vista previa de la descripción";
+"No preview" = "Sin vista previa";
