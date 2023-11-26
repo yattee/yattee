@@ -47,15 +47,27 @@ struct ChaptersView: View {
                 }
             #endif
         } else if !chapters.isEmpty {
-            Section {
-                ChapterView(chapter: chapters[0])
-                if chapters.count > 1 {
-                    ChapterView(chapter: chapters[1])
-                        .opacity(0.3)
+            #if os(iOS)
+                Button(action: {
+                    self.expand.toggle() // Use your expanding logic here
+                }) {
+                    contents
                 }
-            }
-            .padding(.horizontal)
+            #else
+                contents
+            #endif
         }
+    }
+
+    var contents: some View {
+        Section {
+            ForEach(chapters.prefix(3).indices, id: \.self) { index in
+                ChapterView(chapter: chapters[index])
+                    .allowsHitTesting(expand)
+                    .opacity(index == 0 ? 1.0 : 0.3)
+            }
+        }
+        .padding(.horizontal)
     }
 }
 
