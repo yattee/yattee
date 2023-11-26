@@ -27,10 +27,7 @@ struct VideoPlayerSizeModifier: ViewModifier {
         content
             .frame(width: geometry.size.width)
             .frame(maxHeight: maxHeight)
-
-        #if !os(macOS)
             .aspectRatio(ratio, contentMode: usedAspectRatioContentMode)
-        #endif
     }
 
     var ratio: CGFloat? { // swiftlint:disable:this no_cgfloat
@@ -46,10 +43,10 @@ struct VideoPlayerSizeModifier: ViewModifier {
     }
 
     var usedAspectRatioContentMode: ContentMode {
-        #if os(iOS)
-            fullScreen ? .fill : .fit
-        #else
+        #if os(tvOS)
             .fit
+        #else
+            fullScreen ? .fill : .fit
         #endif
     }
 

@@ -22,7 +22,7 @@ struct VideoPlayerView: View {
     static let defaultAspectRatio = 16 / 9.0
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
-            300
+            335
         #else
             200
         #endif
@@ -156,7 +156,7 @@ struct VideoPlayerView: View {
         .persistentSystemOverlays(!fullScreenPlayer)
         #endif
         #if os(macOS)
-        .frame(minWidth: 1100, minHeight: 700)
+        .frame(minWidth: playerSidebar != .never ? 1100 : 650, minHeight: 700)
         #endif
     }
 
