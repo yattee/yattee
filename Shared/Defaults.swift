@@ -147,6 +147,7 @@ extension Defaults.Keys {
         static let expandVideoDescriptionDefault = true
     #endif
     static let expandVideoDescription = Key<Bool>("expandVideoDescription", default: expandVideoDescriptionDefault)
+    static let collapsedLinesDescription = Key<Int>("collapsedLinesDescription", default: 5)
 
     static let showChannelAvatarInChannelsLists = Key<Bool>("showChannelAvatarInChannelsLists", default: true)
     static let showChannelAvatarInVideosListing = Key<Bool>("showChannelAvatarInVideosListing", default: true)

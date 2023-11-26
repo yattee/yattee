@@ -6,11 +6,10 @@ import Foundation
 import SwiftUI
 
 struct VideoDescription: View {
-    static let collapsedLines = 5
-
     private var search: SearchModel { .shared }
     @Default(.showKeywords) private var showKeywords
     @Default(.expandVideoDescription) private var expandVideoDescription
+    @Default(.collapsedLinesDescription) private var collapsedLinesDescription
 
     var video: Video
     var detailsSize: CGSize?
@@ -21,56 +20,58 @@ struct VideoDescription: View {
     }
 
     var body: some View {
-        Group {
-            if !expandVideoDescription && !expand {
-                Button {
-                    expand = true
-                } label: {
-                    descriptionView
-                }
-                .buttonStyle(.plain)
-            } else {
-                descriptionView
-            }
-        }
-        .id(video.videoID)
+        descriptionView.id(video.videoID)
     }
 
-    var descriptionView: some View {
-        VStack {
-            #if os(iOS)
-                ActiveLabelDescriptionRepresentable(
-                    description: description,
-                    detailsSize: detailsSize,
-                    expand: shouldExpand
-                )
-            #else
-                textDescription
-            #endif
+    @ViewBuilder var descriptionView: some View {
+        if !expand && collapsedLinesDescription == 0 {
+            EmptyView()
+        } else {
+            VStack {
+                #if os(iOS)
+                    ActiveLabelDescriptionRepresentable(
+                        description: description,
+                        detailsSize: detailsSize,
+                        expand: expand
+                    )
+                #else
+                    textDescription
+                #endif
 
-            keywords
+                keywords
+            }
+            .contentShape(Rectangle())
+            .overlay(
+                Group {
+                    #if canImport(UIKit)
+                        if !expand {
+                            Button(action: { expand.toggle() }) {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                            }
+                        }
+                    #endif
+                }
+            )
         }
-        .contentShape(Rectangle())
     }
 
     var shouldExpand: Bool {
-        expandVideoDescription || expand
+        expand
     }
 
     @ViewBuilder var textDescription: some View {
-        #if !os(iOS)
+        #if canImport(AppKit)
             Group {
                 if #available(macOS 12, *) {
                     DescriptionWithLinks(description: description, detailsSize: detailsSize)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
-                    #if !os(tvOS)
+                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
                         .textSelection(.enabled)
-                    #endif
                 } else {
                     Text(description)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : Self.collapsedLines)
+                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
                 }
             }
             .multilineTextAlignment(.leading)
@@ -80,7 +81,7 @@ struct VideoDescription: View {
     }
 
     // If possibe convert URLs to clickable links
-    #if os(macOS)
+    #if canImport(AppKit)
         @available(macOS 12, *)
         struct DescriptionWithLinks: View {
             let description: String
@@ -136,7 +137,7 @@ struct VideoDescription: View {
     }
 
     var showScrollIndicators: Bool {
-        #if os(macOS)
+        #if canImport(AppKit)
             false
         #else
             true
@@ -153,6 +154,8 @@ struct VideoDescription: View {
         @State private var label = ActiveLabel()
 
         @Environment(\.openURL) private var openURL
+
+        @Default(.collapsedLinesDescription) private var collapsedLinesDescription
 
         var player = PlayerModel.shared
 
@@ -187,7 +190,12 @@ struct VideoDescription: View {
         }
 
         func updateNumberOfLines() {
-            label.numberOfLines = expand ? 0 : VideoDescription.collapsedLines
+            if expand || collapsedLinesDescription > 0 {
+                label.numberOfLines = expand ? 0 : collapsedLinesDescription
+                label.isHidden = false
+            } else {
+                label.isHidden = true
+            }
         }
 
         func urlTapHandler(_ url: URL) {
