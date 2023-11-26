@@ -42,7 +42,7 @@
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess.git",
       "state" : {
         "branch" : "master",
-        "revision" : "ecb18d8ce4d88277cc4fb103973352d91e18c535"
+        "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "fd1950de05a5ad77cb252fd88576c1e1809ee50d"
+        "revision" : "191b94cd545274603fcffce275dd4c1247587b6e"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "7e70ec8165b455cc2b97ff5c5ac6a8064c737e6f",
-        "version" : "0.14.1"
+        "revision" : "db4603921b31a6ce0f8c26d36d6a3fffc2dba481",
+        "version" : "0.14.2"
       }
     },
     {
