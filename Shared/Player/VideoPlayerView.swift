@@ -315,7 +315,7 @@ struct VideoPlayerView: View {
                             .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
                         } else {
-                            VStack { }
+                            VStack {}
                         }
                     }
                 #endif
@@ -393,7 +393,7 @@ struct VideoPlayerView: View {
                     }
                 #endif
             } else {
-                VStack { }
+                VStack {}
             }
         }
         .onChange(of: fullScreenPlayer) { newValue in
@@ -508,6 +508,6 @@ struct VideoPlayerView_Previews: PreviewProvider {
             return view
         }
 
-        func updateUIView(_: UIView, context _: Context) { }
+        func updateUIView(_: UIView, context _: Context) {}
     }
 #endif
