@@ -10,9 +10,9 @@ struct PlayerSettings: View {
     @Default(.showKeywords) private var showKeywords
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
+        @Default(.collapsedLinesDescription) private var collapsedLinesDescription
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
-    @Default(.collapsedLinesDescription) private var collapsedLinesDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeVideoOnEOF) private var closeVideoOnEOF
     #if os(iOS)
@@ -196,21 +196,23 @@ struct PlayerSettings: View {
         Toggle("Open video description expanded", isOn: $expandVideoDescription)
     }
 
-    private var collapsedLineDescriptionStepper: some View {
-        LazyVStack {
-            Stepper(value: $collapsedLinesDescription, in: 0 ... 10) {
-                Text("Description preview")
-                #if os(macOS)
-                    Spacer()
-                #endif
-                if collapsedLinesDescription == 0 {
-                    Text("No preview")
-                } else {
-                    Text("\(collapsedLinesDescription) lines")
+    #if !os(tvOS)
+        private var collapsedLineDescriptionStepper: some View {
+            LazyVStack {
+                Stepper(value: $collapsedLinesDescription, in: 0 ... 10) {
+                    Text("Description preview")
+                    #if os(macOS)
+                        Spacer()
+                    #endif
+                    if collapsedLinesDescription == 0 {
+                        Text("No preview")
+                    } else {
+                        Text("\(collapsedLinesDescription) lines")
+                    }
                 }
             }
         }
-    }
+    #endif
 
     private var returnYouTubeDislikeToggle: some View {
         Toggle("Enable Return YouTube Dislike", isOn: $enableReturnYouTubeDislike)

@@ -39,7 +39,20 @@ struct VideoDescription: View {
                 #endif
 
                 keywords
-            }.contentShape(Rectangle())
+            }
+            .contentShape(Rectangle())
+            .overlay(
+                Group {
+                    #if canImport(UIKit)
+                        if !expand {
+                            Button(action: { expand.toggle() }) {
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                            }
+                        }
+                    #endif
+                }
+            )
         }
     }
 
@@ -48,15 +61,13 @@ struct VideoDescription: View {
     }
 
     @ViewBuilder var textDescription: some View {
-        #if !os(iOS)
+        #if canImport(AppKit)
             Group {
                 if #available(macOS 12, *) {
                     DescriptionWithLinks(description: description, detailsSize: detailsSize)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
-                    #if !os(tvOS)
                         .textSelection(.enabled)
-                    #endif
                 } else {
                     Text(description)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,7 +81,7 @@ struct VideoDescription: View {
     }
 
     // If possibe convert URLs to clickable links
-    #if os(macOS)
+    #if canImport(AppKit)
         @available(macOS 12, *)
         struct DescriptionWithLinks: View {
             let description: String
@@ -126,7 +137,7 @@ struct VideoDescription: View {
     }
 
     var showScrollIndicators: Bool {
-        #if os(macOS)
+        #if canImport(AppKit)
             false
         #else
             true
