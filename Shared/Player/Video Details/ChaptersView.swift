@@ -15,47 +15,44 @@ struct ChaptersView: View {
     }
 
     var body: some View {
-        if expand && !chapters.isEmpty {
-            #if os(tvOS)
-                List {
-                    Section {
-                        ForEach(chapters) { chapter in
-                            ChapterView(chapter: chapter)
-                        }
-                    }
-                    .listRowBackground(Color.clear)
-                }
-                .listStyle(.plain)
-            #else
-                if chaptersHaveImages {
-                    ScrollView(.horizontal) {
-                        LazyHStack(spacing: 20) {
+        if !chapters.isEmpty {
+            if expand || chaptersHaveImages {
+                #if os(tvOS)
+                    List {
+                        Section {
                             ForEach(chapters) { chapter in
                                 ChapterView(chapter: chapter)
                             }
                         }
-                        .padding(.horizontal, 15)
+                        .listRowBackground(Color.clear)
                     }
-                    .frame(minHeight: ChapterView.thumbnailHeight + 100)
-                } else {
-                    Section {
-                        ForEach(chapters) { chapter in
-                            ChapterView(chapter: chapter)
+                    .listStyle(.plain)
+                #else
+                    if chaptersHaveImages {
+                        ScrollView(.horizontal) {
+                            LazyHStack(spacing: 20) {
+                                ForEach(chapters) { chapter in
+                                    ChapterView(chapter: chapter)
+                                }
+                            }
+                            .padding(.horizontal, 15)
                         }
+                        .frame(minHeight: ChapterView.thumbnailHeight + 100)
+                    } else {
+                        contents
                     }
-                    .padding(.horizontal)
-                }
-            #endif
-        } else if !chapters.isEmpty {
-            #if os(iOS)
-                Button(action: {
-                    self.expand.toggle() // Use your expanding logic here
-                }) {
+                #endif
+            } else {
+                #if os(iOS)
+                    Button(action: {
+                        self.expand.toggle()
+                    }) {
+                        contents
+                    }
+                #else
                     contents
-                }
-            #else
-                contents
-            #endif
+                #endif
+            }
         }
     }
 
