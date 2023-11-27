@@ -441,34 +441,48 @@ struct VideoDetails: View {
         #endif
     }
 
+    var chaptersHaveImages: Bool {
+        player.videoForDisplay?.chapters.allSatisfy { $0.image != nil } ?? false
+    }
+
     var chaptersHeader: some View {
-        #if canImport(UIKit)
-            Button(action: {
-                chaptersExpanded.toggle()
-            }) {
-                HStack {
-                    Text("Chapters".localized())
-                    Spacer()
-                    Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
-                        .imageScale(.small)
-                }
-                .padding(.horizontal)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            }
-        #elseif canImport(AppKit)
-            HStack {
+        Group {
+            if !chaptersHaveImages {
+                #if canImport(UIKit)
+                    Button(action: {
+                        chaptersExpanded.toggle()
+                    }) {
+                        HStack {
+                            Text("Chapters".localized())
+                            Spacer()
+                            Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                                .imageScale(.small)
+                        }
+                        .padding(.horizontal)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+                #elseif canImport(AppKit)
+                    HStack {
+                        Text("Chapters".localized())
+                        Spacer()
+                        Button(action: { chaptersExpanded.toggle() }) {
+                            Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                                .imageScale(.small)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                #endif
+            } else {
+                // No button, just the title when there are images
                 Text("Chapters".localized())
-                Spacer()
-                Button(action: { chaptersExpanded.toggle() }) {
-                    Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
-                        .imageScale(.small)
-                }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
             }
-            .padding(.horizontal)
-            .font(.caption)
-            .foregroundColor(.secondary)
-        #endif
+        }
     }
 }
 

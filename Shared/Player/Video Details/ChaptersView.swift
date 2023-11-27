@@ -37,7 +37,6 @@ struct ChaptersView: View {
                             }
                             .padding(.horizontal, 15)
                         }
-                        .frame(minHeight: ChapterView.thumbnailHeight + 100)
                     } else {
                         contents
                     }
