@@ -49,14 +49,14 @@ struct ChapterView: View {
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(chapter.title)
-                        .lineLimit(2)
+                        .lineLimit(3)
                         .multilineTextAlignment(.leading)
                         .font(.headline)
                     Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
                         .font(.system(.subheadline).monospacedDigit())
                         .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: Self.thumbnailWidth, alignment: .leading)
+                .frame(maxWidth: !chapter.image.isNil ? Self.thumbnailWidth : nil, alignment: .leading)
             }
         }
     #endif

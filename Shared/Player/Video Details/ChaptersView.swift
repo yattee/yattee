@@ -16,7 +16,7 @@ struct ChaptersView: View {
 
     var body: some View {
         if !chapters.isEmpty {
-            if expand || chaptersHaveImages {
+            if chaptersHaveImages {
                 #if os(tvOS)
                     List {
                         Section {
@@ -28,19 +28,22 @@ struct ChaptersView: View {
                     }
                     .listStyle(.plain)
                 #else
-                    if chaptersHaveImages {
-                        ScrollView(.horizontal) {
-                            LazyHStack(spacing: 20) {
-                                ForEach(chapters) { chapter in
-                                    ChapterView(chapter: chapter)
-                                }
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing: 20) {
+                            ForEach(chapters) { chapter in
+                                ChapterView(chapter: chapter)
                             }
-                            .padding(.horizontal, 15)
                         }
-                    } else {
-                        contents
+                        .padding(.horizontal, 15)
                     }
                 #endif
+            } else if expand {
+                Section {
+                    ForEach(chapters) { chapter in
+                        ChapterView(chapter: chapter)
+                    }
+                }
+                .padding(.horizontal)
             } else {
                 #if os(iOS)
                     Button(action: {
