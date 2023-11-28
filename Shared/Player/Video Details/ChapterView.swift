@@ -22,6 +22,10 @@ import SwiftUI
         var body: some View {
             Button(action: {
                 player.backend.seek(to: chapter.start, seekType: .userInteracted)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Introducing a delay to give the player a chance to skip to the chapter
+                    PlayerTimeModel.shared.currentTime = CMTime(seconds: chapter.start, preferredTimescale: 1)
+                    handleTimeUpdate(PlayerTimeModel.shared.currentTime)
+                }
             }) {
                 Group {
                     verticalChapter
@@ -30,13 +34,7 @@ import SwiftUI
             }
             .buttonStyle(.plain)
             .onReceive(PlayerTimeModel.shared.$currentTime) { cmTime in
-                let time = CMTimeGetSeconds(cmTime)
-                if time >= self.chapter.start, self.nextChapterStart == nil || time < self.nextChapterStart! {
-                    player.currentChapterIndex = self.chapterIndex
-                    if !player.playedChapters.contains(self.chapterIndex) {
-                        player.playedChapters.append(self.chapterIndex)
-                    }
-                }
+                self.handleTimeUpdate(cmTime)
             }
         }
 
@@ -50,7 +48,7 @@ import SwiftUI
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                         .font(.headline)
-                        .foregroundColor(isCurrentChapter ? .appRed : .primary)
+                        .foregroundColor(isCurrentChapter ? Color("AppRedColor") : .primary)
                     Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
                         .font(.system(.subheadline).monospacedDigit())
                         .foregroundColor(.secondary)
@@ -77,6 +75,16 @@ import SwiftUI
 
         static var thumbnailHeight: Double {
             thumbnailWidth / 1.7777
+        }
+
+        private func handleTimeUpdate(_ cmTime: CMTime) {
+            let time = CMTimeGetSeconds(cmTime)
+            if time >= chapter.start, nextChapterStart == nil || time < nextChapterStart! {
+                player.currentChapterIndex = chapterIndex
+                if !player.playedChapters.contains(chapterIndex) {
+                    player.playedChapters.append(chapterIndex)
+                }
+            }
         }
     }
 
