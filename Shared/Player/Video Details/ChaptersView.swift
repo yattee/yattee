@@ -30,8 +30,10 @@ struct ChaptersView: View {
                 #else
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 20) {
-                            ForEach(chapters) { chapter in
-                                ChapterView(chapter: chapter)
+                            ForEach(Array(chapters.indices), id: \.self) { index in
+                                let chapter = chapters[index]
+                                let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
+                                ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
                             }
                         }
                         .padding(.horizontal, 15)
@@ -39,8 +41,10 @@ struct ChaptersView: View {
                 #endif
             } else if expand {
                 Section {
-                    ForEach(chapters) { chapter in
-                        ChapterView(chapter: chapter)
+                    ForEach(Array(chapters.indices), id: \.self) { index in
+                        let chapter = chapters[index]
+                        let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
+                        ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
                     }
                 }
                 .padding(.horizontal)
@@ -60,8 +64,10 @@ struct ChaptersView: View {
 
     var contents: some View {
         Section {
-            ForEach(chapters.prefix(3).indices, id: \.self) { index in
-                ChapterView(chapter: chapters[index])
+            ForEach(Array(chapters.prefix(3).indices), id: \.self) { index in
+                let chapter = chapters[index]
+                let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
+                ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
                     .allowsHitTesting(expand)
                     .opacity(index == 0 ? 1.0 : 0.3)
             }

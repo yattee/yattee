@@ -1,16 +1,27 @@
+import CoreMedia
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
 
 struct ChapterView: View {
     var chapter: Chapter
+    var nextChapterStart: Double?
 
-    var player = PlayerModel.shared
+    var chapterIndex: Int
+    @ObservedObject private var player = PlayerModel.shared
+
+    var isCurrentChapter: Bool {
+        player.currentChapterIndex == chapterIndex
+    }
+
+    var hasBeenPlayed: Bool {
+        player.playedChapters.contains(chapterIndex)
+    }
 
     var body: some View {
-        Button {
+        Button(action: {
             player.backend.seek(to: chapter.start, seekType: .userInteracted)
-        } label: {
+        }) {
             Group {
                 #if os(tvOS)
                     horizontalChapter
@@ -21,6 +32,15 @@ struct ChapterView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .onReceive(PlayerTimeModel.shared.$currentTime) { cmTime in
+            let time = CMTimeGetSeconds(cmTime)
+            if time >= self.chapter.start, self.nextChapterStart == nil || time < self.nextChapterStart! {
+                player.currentChapterIndex = self.chapterIndex
+                if !player.playedChapters.contains(self.chapterIndex) {
+                    player.playedChapters.append(self.chapterIndex)
+                }
+            }
+        }
     }
 
     #if os(tvOS)
@@ -52,6 +72,7 @@ struct ChapterView: View {
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                         .font(.headline)
+                        .foregroundColor(isCurrentChapter ? .detailBadgeOutstandingStyleBackground : .primary)
                     Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
                         .font(.system(.subheadline).monospacedDigit())
                         .foregroundColor(.secondary)
@@ -87,7 +108,7 @@ struct ChapterView: View {
 
 struct ChapterView_Preview: PreviewProvider {
     static var previews: some View {
-        ChapterView(chapter: .init(title: "Chapter", start: 30))
+        ChapterView(chapter: .init(title: "Chapter", start: 30), chapterIndex: 0)
             .injectFixtureEnvironmentObjects()
     }
 }
