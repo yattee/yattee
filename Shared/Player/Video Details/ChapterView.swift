@@ -29,7 +29,6 @@ import SwiftUI
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-
             .onReceive(PlayerTimeModel.shared.$currentTime) { cmTime in
                 let time = CMTimeGetSeconds(cmTime)
                 if time >= self.chapter.start, self.nextChapterStart == nil || time < self.nextChapterStart! {
@@ -51,7 +50,7 @@ import SwiftUI
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                         .font(.headline)
-                        .foregroundColor(isCurrentChapter ? .detailBadgeOutstandingStyleBackground : .primary)
+                        .foregroundColor(isCurrentChapter ? .appRed : .primary)
                     Text(chapter.start.formattedAsPlaybackTime(allowZero: true) ?? "")
                         .font(.system(.subheadline).monospacedDigit())
                         .foregroundColor(.secondary)
