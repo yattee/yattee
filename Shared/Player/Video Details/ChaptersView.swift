@@ -21,7 +21,7 @@ struct ChaptersView: View {
                     List {
                         Section {
                             ForEach(chapters) { chapter in
-                                ChapterView(chapter: chapter)
+                                ChapterViewTVOS(chapter: chapter)
                             }
                         }
                         .listRowBackground(Color.clear)
@@ -29,51 +29,53 @@ struct ChaptersView: View {
                     .listStyle(.plain)
                 #else
                     ScrollView(.horizontal) {
-                        LazyHStack(spacing: 20) {
-                            ForEach(Array(chapters.indices), id: \.self) { index in
-                                let chapter = chapters[index]
-                                let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
-                                ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
-                            }
-                        }
-                        .padding(.horizontal, 15)
+                        LazyHStack(spacing: 20) { chapterViews(for: chapters.prefix(3), opacity: 1.0) }.padding(.horizontal, 15)
                     }
                 #endif
             } else if expand {
-                Section {
-                    ForEach(Array(chapters.indices), id: \.self) { index in
-                        let chapter = chapters[index]
-                        let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
-                        ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
+                #if os(tvOS)
+                    Section {
+                        ForEach(chapters) { chapter in
+                            ChapterViewTVOS(chapter: chapter)
+                        }
                     }
-                }
-                .padding(.horizontal)
+                #else
+                    Section { chapterViews(for: chapters[...], opacity: 1.0) }.padding(.horizontal)
+                #endif
             } else {
                 #if os(iOS)
                     Button(action: {
                         self.expand.toggle()
                     }) {
-                        contents
+                        Section {
+                            chapterViews(for: chapters.prefix(3), opacity: 0.3)
+                        }.padding(.horizontal)
                     }
+                #elseif os(macOS)
+                    Section {
+                        chapterViews(for: chapters.prefix(3), opacity: 0.3)
+                    }.padding(.horizontal)
                 #else
-                    contents
+                    Section {
+                        ForEach(chapters) { chapter in
+                            ChapterViewTVOS(chapter: chapter)
+                        }
+                    }
                 #endif
             }
         }
     }
 
-    var contents: some View {
-        Section {
-            ForEach(Array(chapters.prefix(3).indices), id: \.self) { index in
-                let chapter = chapters[index]
-                let nextChapterStart: Double? = index < chapters.count - 1 ? chapters[index + 1].start : nil
+    #if !os(tvOS)
+        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0) -> some View {
+            ForEach(Array(chaptersToShow.indices), id: \.self) { index in
+                let chapter = chaptersToShow[index]
+                let nextChapterStart: Double? = index < chaptersToShow.count - 1 ? chaptersToShow[index + 1].start : nil
                 ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
-                    .allowsHitTesting(expand)
-                    .opacity(index == 0 ? 1.0 : 0.3)
+                    .opacity(index == 0 ? 1.0 : opacity)
             }
         }
-        .padding(.horizontal)
-    }
+    #endif
 }
 
 struct ChaptersView_Previews: PreviewProvider {
