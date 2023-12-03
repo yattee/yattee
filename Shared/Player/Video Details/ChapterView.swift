@@ -12,11 +12,7 @@ import SwiftUI
         @ObservedObject private var player = PlayerModel.shared
 
         var isCurrentChapter: Bool {
-            player.currentChapterIndex == chapterIndex
-        }
-
-        var hasBeenPlayed: Bool {
-            player.playedChapters.contains(chapterIndex)
+            player.currentChapter == chapterIndex
         }
 
         var body: some View {
@@ -35,6 +31,7 @@ import SwiftUI
             .buttonStyle(.plain)
             .onReceive(PlayerTimeModel.shared.$currentTime) { cmTime in
                 self.handleTimeUpdate(cmTime)
+                print("currentChapterIndex:", player.currentChapter ?? 0)
             }
         }
 
@@ -80,10 +77,7 @@ import SwiftUI
         private func handleTimeUpdate(_ cmTime: CMTime) {
             let time = CMTimeGetSeconds(cmTime)
             if time >= chapter.start, nextChapterStart == nil || time < nextChapterStart! {
-                player.currentChapterIndex = chapterIndex
-                if !player.playedChapters.contains(chapterIndex) {
-                    player.playedChapters.append(chapterIndex)
-                }
+                player.currentChapter = chapterIndex
             }
         }
     }

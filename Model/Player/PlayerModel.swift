@@ -131,8 +131,7 @@ final class PlayerModel: ObservableObject {
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
-    @Published var playedChapters: [Int] = []
-    @Published var currentChapterIndex: Int?
+    @Published var currentChapter: Int?
 
     var accounts: AccountsModel { .shared }
     var comments: CommentsModel { .shared }
