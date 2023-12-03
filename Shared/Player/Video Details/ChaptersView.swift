@@ -29,7 +29,7 @@ struct ChaptersView: View {
                     .listStyle(.plain)
                 #else
                     ScrollView(.horizontal) {
-                        LazyHStack(spacing: 20) { chapterViews(for: chapters.prefix(3), opacity: 1.0) }.padding(.horizontal, 15)
+                        LazyHStack(spacing: 20) { chapterViews(for: chapters[...]) }.padding(.horizontal, 15)
                     }
                 #endif
             } else if expand {
@@ -40,7 +40,7 @@ struct ChaptersView: View {
                         }
                     }
                 #else
-                    Section { chapterViews(for: chapters[...], opacity: 1.0) }.padding(.horizontal)
+                    Section { chapterViews(for: chapters[...]) }.padding(.horizontal)
                 #endif
             } else {
                 #if os(iOS)
@@ -48,12 +48,12 @@ struct ChaptersView: View {
                         self.expand.toggle()
                     }) {
                         Section {
-                            chapterViews(for: chapters.prefix(3), opacity: 0.3)
+                            chapterViews(for: chapters.prefix(3), opacity: 0.3, clickable: false)
                         }.padding(.horizontal)
                     }
                 #elseif os(macOS)
                     Section {
-                        chapterViews(for: chapters.prefix(3), opacity: 0.3)
+                        chapterViews(for: chapters.prefix(3), opacity: 0.3, clickable: false)
                     }.padding(.horizontal)
                 #else
                     Section {
@@ -67,12 +67,13 @@ struct ChaptersView: View {
     }
 
     #if !os(tvOS)
-        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0) -> some View {
+        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true) -> some View {
             ForEach(Array(chaptersToShow.indices), id: \.self) { index in
                 let chapter = chaptersToShow[index]
                 let nextChapterStart: Double? = index < chaptersToShow.count - 1 ? chaptersToShow[index + 1].start : nil
                 ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
                     .opacity(index == 0 ? 1.0 : opacity)
+                    .allowsHitTesting(clickable)
             }
         }
     #endif
