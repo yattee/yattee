@@ -191,6 +191,10 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .getTimeUpdatesNotification, object: self.currentTime)
+    }
+
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
@@ -432,6 +436,8 @@ final class MPVBackend: PlayerBackend {
         timeObserverThrottle.execute {
             self.model.updateWatch(time: self.currentTime)
         }
+
+        NotificationCenter.default.post(name: .getTimeUpdatesNotification, object: self.currentTime)
     }
 
     private func stopClientUpdates() {
@@ -617,4 +623,8 @@ final class MPVBackend: PlayerBackend {
             logger.info("MPV backend received unhandled property: \(name)")
         }
     }
+}
+
+extension Notification.Name {
+    static let getTimeUpdatesNotification = Notification.Name("getTimeUpdatesNotification")
 }

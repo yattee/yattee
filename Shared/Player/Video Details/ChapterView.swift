@@ -18,10 +18,6 @@ import SwiftUI
         var body: some View {
             Button(action: {
                 player.backend.seek(to: chapter.start, seekType: .userInteracted)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Introducing a delay to give the player a chance to skip to the chapter
-                    PlayerTimeModel.shared.currentTime = CMTime(seconds: chapter.start, preferredTimescale: 1)
-                    handleTimeUpdate(PlayerTimeModel.shared.currentTime)
-                }
             }) {
                 Group {
                     verticalChapter
@@ -29,9 +25,14 @@ import SwiftUI
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .onReceive(PlayerTimeModel.shared.$currentTime) { cmTime in
-                self.handleTimeUpdate(cmTime)
-                print("currentChapterIndex:", player.currentChapter ?? 0)
+            .onReceive(
+                NotificationCenter.default
+                    .publisher(for: .getTimeUpdatesNotification)
+                    .receive(on: DispatchQueue.main)
+            ) { notification in
+                if let cmTime = notification.object as? CMTime {
+                    self.handleTimeUpdate(cmTime)
+                }
             }
         }
 
