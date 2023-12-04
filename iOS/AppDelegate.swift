@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import UIKit
 
@@ -12,11 +13,23 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool { // swiftlint:disable:this discouraged_optional_collection
         Self.instance = self
-        #if os(iOS)
-            UIViewController.swizzleHomeIndicatorProperty()
 
+        #if !os(macOS)
+            UIViewController.swizzleHomeIndicatorProperty()
             OrientationTracker.shared.startDeviceOrientationTracking()
+
+            // Configure the audio session for playback
+            do {
+                try AVAudioSession.sharedInstance().setCategory(
+                    .playback,
+                    mode: .moviePlayback,
+                    options: [.allowAirPlay, .allowBluetooth, .defaultToSpeaker])
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Failed to set audio session category: \(error)")
+            }
         #endif
+
         return true
     }
 
