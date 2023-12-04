@@ -32,6 +32,7 @@ struct PlayerSettings: View {
 
     @Default(.showInspector) private var showInspector
     @Default(.showChapters) private var showChapters
+    @Default(.expandChapters) private var expandChapters
     @Default(.showRelated) private var showRelated
 
     @ObservedObject private var accounts = AccountsModel.shared
@@ -80,6 +81,7 @@ struct PlayerSettings: View {
                     expandVideoDescriptionToggle
                     collapsedLineDescriptionStepper
                     showChaptersToggle
+                    expandChaptersToggle
                     showRelatedToggle
                     #if os(macOS)
                         HStack {
@@ -283,6 +285,12 @@ struct PlayerSettings: View {
 
         private var showChaptersToggle: some View {
             Toggle("Chapters (if available)", isOn: $showChapters)
+        }
+
+        private var expandChaptersToggle: some View {
+            Toggle("Open vertical chapters expanded", isOn: $expandChapters)
+                .disabled(!showChapters)
+                .foregroundColor(showChapters ? .primary : .secondary)
         }
 
         private var showRelatedToggle: some View {

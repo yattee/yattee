@@ -191,6 +191,7 @@ struct VideoDetails: View {
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
+    @Default(.expandChapters) private var expandChapters
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -246,6 +247,7 @@ struct VideoDetails: View {
         .background(colorScheme == .dark ? Color.black : .white)
         .onAppear {
             descriptionExpanded = expandVideoDescription
+            chaptersExpanded = expandChapters
         }
     }
 
