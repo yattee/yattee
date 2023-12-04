@@ -1,4 +1,3 @@
-import CoreMedia
 import Foundation
 import SDWebImageSwiftUI
 import SwiftUI
@@ -24,15 +23,6 @@ import SwiftUI
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .onReceive(
-                NotificationCenter.default
-                    .publisher(for: .getTimeUpdatesNotification)
-                    .receive(on: DispatchQueue.main)
-            ) { notification in
-                if let cmTime = notification.object as? CMTime {
-                    player.updateTime(cmTime)
-                }
-            }
         }
 
         var verticalChapter: some View {
