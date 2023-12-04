@@ -183,11 +183,17 @@ final class MPVBackend: PlayerBackend {
 
     init() {
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
-            self?.getTimeUpdates()
+            guard let self = self, self.model.activeBackend == .mpv else {
+                return
+            }
+            self.getTimeUpdates()
         }
 
         networkStateTimer = .init(interval: .seconds(Self.networkStateUpdateInterval), mode: .infinite) { [weak self] _ in
-            self?.updateNetworkState()
+            guard let self = self, self.model.activeBackend == .mpv else {
+                return
+            }
+            self.updateNetworkState()
         }
     }
 
@@ -623,8 +629,4 @@ final class MPVBackend: PlayerBackend {
             logger.info("MPV backend received unhandled property: \(name)")
         }
     }
-}
-
-extension Notification.Name {
-    static let getTimeUpdatesNotification = Notification.Name("getTimeUpdatesNotification")
 }

@@ -116,6 +116,10 @@ final class AVPlayerBackend: PlayerBackend {
         #endif
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .getTimeUpdatesNotification, object: self.currentTime)
+    }
+
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
         let sortedByResolution = streams
             .filter { ($0.kind == .adaptive || $0.kind == .stream) && $0.resolution <= maxResolution.value }
@@ -596,6 +600,8 @@ final class AVPlayerBackend: PlayerBackend {
             if self.controlsUpdates {
                 self.updateControls()
             }
+
+            NotificationCenter.default.post(name: .getTimeUpdatesNotification, object: self.currentTime)
         }
     }
 
