@@ -1,4 +1,3 @@
-import CoreMedia
 import Defaults
 import Foundation
 import SDWebImageSwiftUI
@@ -484,15 +483,6 @@ struct VideoDetails: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
-            }
-        }
-        .onReceive(
-            NotificationCenter.default
-                .publisher(for: .getTimeUpdatesNotification)
-                .receive(on: DispatchQueue.main)
-        ) { notification in
-            if let cmTime = notification.object as? CMTime {
-                player.updateTime(cmTime)
             }
         }
     }

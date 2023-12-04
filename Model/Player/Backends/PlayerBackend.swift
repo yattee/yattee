@@ -154,7 +154,3 @@ extension PlayerBackend {
         }
     }
 }
-
-extension Notification.Name {
-    static let getTimeUpdatesNotification = Notification.Name("getTimeUpdatesNotification")
-}
