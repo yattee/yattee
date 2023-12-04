@@ -70,8 +70,7 @@ struct ChaptersView: View {
         private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true) -> some View {
             ForEach(Array(chaptersToShow.indices), id: \.self) { index in
                 let chapter = chaptersToShow[index]
-                let nextChapterStart: Double? = index < chaptersToShow.count - 1 ? chaptersToShow[index + 1].start : nil
-                ChapterView(chapter: chapter, nextChapterStart: nextChapterStart, chapterIndex: index)
+                ChapterView(chapter: chapter, chapterIndex: index)
                     .opacity(index == 0 ? 1.0 : opacity)
                     .allowsHitTesting(clickable)
             }

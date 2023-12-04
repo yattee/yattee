@@ -6,13 +6,12 @@ import SwiftUI
 #if !os(tvOS)
     struct ChapterView: View {
         var chapter: Chapter
-        var nextChapterStart: Double?
 
         var chapterIndex: Int
         @ObservedObject private var player = PlayerModel.shared
 
         var isCurrentChapter: Bool {
-            player.currentChapter == chapterIndex
+            player.currentChapterIndex == chapterIndex
         }
 
         var body: some View {
@@ -31,7 +30,7 @@ import SwiftUI
                     .receive(on: DispatchQueue.main)
             ) { notification in
                 if let cmTime = notification.object as? CMTime {
-                    self.handleTimeUpdate(cmTime)
+                    player.updateTime(cmTime)
                 }
             }
         }
@@ -73,13 +72,6 @@ import SwiftUI
 
         static var thumbnailHeight: Double {
             thumbnailWidth / 1.7777
-        }
-
-        private func handleTimeUpdate(_ cmTime: CMTime) {
-            let time = CMTimeGetSeconds(cmTime)
-            if time >= chapter.start, nextChapterStart == nil || time < nextChapterStart! {
-                player.currentChapter = chapterIndex
-            }
         }
     }
 
@@ -144,7 +136,7 @@ struct ChapterView_Preview: PreviewProvider {
             ChapterViewTVOS(chapter: .init(title: "Chapter", start: 30))
                 .injectFixtureEnvironmentObjects()
         #else
-            ChapterView(chapter: .init(title: "Chapter", start: 30), nextChapterStart: nil, chapterIndex: 0)
+            ChapterView(chapter: .init(title: "Chapter", start: 30), chapterIndex: 0)
                 .injectFixtureEnvironmentObjects()
         #endif
     }
