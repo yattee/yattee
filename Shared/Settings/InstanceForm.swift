@@ -7,6 +7,10 @@ struct InstanceForm: View {
     @State private var url = ""
     @State private var isHTTPS = true
 
+    @State private var temporaryIgnoreCertificateError = false
+    @State private var ignoreCertificateError = false
+    @State private var showAlert = false
+
     @State private var app: VideosApp?
     @State private var isValid = false
     @State private var isValidated = false
@@ -36,6 +40,7 @@ struct InstanceForm: View {
             .frame(maxWidth: 1000)
         }
         .onChange(of: url) { _ in validate() }
+        .onChange(of: ignoreCertificateError) { _ in validate() }
         #if os(iOS)
             .padding(.vertical)
         #elseif os(tvOS)
@@ -126,6 +131,28 @@ struct InstanceForm: View {
             }
             .pickerStyle(SegmentedPickerStyle())
 
+            Toggle("Ignore certificate errors", isOn: $temporaryIgnoreCertificateError)
+                .onChange(of: temporaryIgnoreCertificateError) { newValue in
+                    if newValue {
+                        showAlert = true
+                    } else {
+                        // If the toggle is set to false, change the value directly
+                        ignoreCertificateError = false
+                    }
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("Security Risk".uppercased()),
+                        message: Text("Proceeding will ignore the SSL Certificate verification in your connection. This can pose a significant security threat, potentially exposing data to middlemen attacks.\n\nIgnoring Certificate errors should ONLY be used when dealing with known, self-signed certificates, such as those found in some test environments. In all other scenarios, it's recommended to resolve certificate errors rather than ignoring them.\n\nAre you absolutely sure you want to continue?"),
+                        primaryButton: .default(Text("Yes")) {
+                            ignoreCertificateError = temporaryIgnoreCertificateError
+                        },
+                        secondaryButton: .destructive(Text("No")) {
+                            temporaryIgnoreCertificateError = ignoreCertificateError
+                        }
+                    )
+                }
+
             #if os(tvOS)
                 VStack {
                     validationStatus
@@ -179,7 +206,8 @@ struct InstanceForm: View {
             isValid: $isValid,
             isValidated: $isValidated,
             isValidating: $isValidating,
-            error: $validationError
+            error: $validationError,
+            ignoreCertificateError: $ignoreCertificateError
         )
     }
 
