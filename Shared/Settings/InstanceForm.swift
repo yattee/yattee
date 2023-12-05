@@ -5,6 +5,7 @@ struct InstanceForm: View {
 
     @State private var name = ""
     @State private var url = ""
+    @State private var isHTTPS = true
 
     @State private var app: VideosApp?
     @State private var isValid = false
@@ -80,12 +81,50 @@ struct InstanceForm: View {
         Group {
             TextField("Name", text: $name)
 
-            TextField("Address", text: $url)
+            TextField("Address", text: Binding<String>(
+                get: { url },
+                set: {
+                    let regexPattern = "(http://|https://)[\\s]*(http://|https://)"
+                    let regex = try? NSRegularExpression(pattern: regexPattern, options: [])
+
+                    var cleanedURL: String = $0
+                    var previousURL: String
+                    repeat {
+                        previousURL = cleanedURL
+                        let range = NSRange(location: 0, length: cleanedURL.utf16.count)
+                        cleanedURL = regex?.stringByReplacingMatches(in: cleanedURL, options: [], range: range, withTemplate: "$2") ?? cleanedURL
+                    } while cleanedURL != previousURL
+
+                    if cleanedURL.hasPrefix("http://") {
+                        isHTTPS = false
+                        url = cleanedURL
+                    } else if cleanedURL.hasPrefix("https://") {
+                        isHTTPS = true
+                        url = cleanedURL
+                    } else {
+                        url = "\(isHTTPS ? "https://" : "http://")\(cleanedURL)"
+                    }
+                }
+            ))
 
             #if !os(macOS)
-                .autocapitalization(.none)
-                .keyboardType(.URL)
+            .autocapitalization(.none)
+            .autocorrectionDisabled(/*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+            .keyboardType(.URL)
             #endif
+
+            Picker("Scheme", selection: $isHTTPS) {
+                Text("http://").tag(false)
+                Text("https://").tag(true)
+            }
+            .onChange(of: isHTTPS) { selectedIsHTTPS in
+                if url.hasPrefix("http://"), selectedIsHTTPS {
+                    url = url.replacingOccurrences(of: "http://", with: "https://")
+                } else if url.hasPrefix("https://"), !selectedIsHTTPS {
+                    url = url.replacingOccurrences(of: "https://", with: "http://")
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
 
             #if os(tvOS)
                 VStack {
@@ -100,7 +139,7 @@ struct InstanceForm: View {
 
     @ViewBuilder var validationStatus: some View {
         Section {
-            if url.isEmpty {
+            if url.isEmpty || url == "http://" || url == "https://" {
                 Text("Enter location address to connect...")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.secondary)
