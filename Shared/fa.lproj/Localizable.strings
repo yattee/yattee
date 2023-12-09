@@ -1,0 +1,485 @@
+
+
+"Podcasts" = "پادکست‌ها";
+"Reset watched status when playing again" = "بازنشانی وضعیت تماشای ویدیو هنگام تماشای مجدد";
+"Finding something to play..." = "یافتن چیزی برای پخش…";
+"Available" = "در دسترس";
+
+/* Player controls layout size */
+"Very Large" = "خیلی بزرگ";
+"Audio" = "صدا";
+"Custom Locations" = "سرویس دهندگان سفارشی";
+"Always use AVPlayer for live videos" = "همیشه از AVPlayer برای ویدیوهای پخش زنده استفاده کن";
+"Clear Search History..." = "پاک کردن سابقهٔ جست و جو…";
+"Related" = "مرتبط";
+"Close Video" = "بستن پخش کننده";
+"Add to %@" = "افزودن به %@";
+"Could not open playlist" = "فهرست پخش باز نشد";
+"Disabled" = "غیرفعال";
+"Share..." = "اشتراک گذاری…";
+"For videos which feature music as the primary content." = "برای ویدیوهایی که محتوای اصلیشان موسیقی است.";
+"Save history of searches, channels and playlists" = "ذخیرهٔ سابقهٔ جست و جو، کانال‌ها و فهرست‌های پخش";
+"Clear Queue before opening" = "صف را پیش از باز کردن خالی کن";
+"Show playback statistics" = "نمایش آمار پخش";
+"Could not extract channel information" = "اطلاعات کانال دریافت نشد";
+"Video" = "ویدیو";
+"Matrix Chat" = "چت Matrix";
+"Loop one" = "پخش دوبارهٔ تکی";
+"Settings" = "تنظیمات";
+"10 seconds forwards/backwards" = "۱۰ ثانیه جلو/عقب";
+"Show progress of watching on thumbnails" = "پیشرفت پخش را روی تصویر بندانگشتی نشان بده";
+"Recents" = "تازه‌ترین‌ها";
+"Could not open channel" = "کانال باز نمی‌شود";
+"Select location closest to you:" = "نزدیکترین سرویس دهنده را انتخاب کنید:";
+"Fullscreen size" = "ابعاد تمام صفحه";
+"No Playlists" = "بدون فهرست پخش";
+"Highest quality" = "بالاترین کیفیت";
+"Edit..." = "ویرایش…";
+"Based on system color scheme" = "براساس طرح رنگ سیستم";
+"Quality" = "کیفیت";
+"Pause" = "مکث";
+"Controls Buttons" = "دکمه‌های کنترل";
+
+/* Subscriptions title */
+"Subscriptions" = "اشتراک‌ها";
+" subscribers" = " مشترکان";
+"Channels" = "کانال‌ها";
+"Resolution" = "وضوح تصویر";
+"Button" = "دکمه";
+"Badge & Decreased opacity" = "نشان و کاهش شفافیت";
+"Milestones" = "نقطهٔ عطف";
+"Are you sure you want to restore default quality profiles?" = "آیا از بازنشانی نمایه‌های کیفیت پیش‌فرض مطمئنید؟";
+"Show sidebar" = "نمایش نوار کناری";
+"Error" = "خطا";
+
+/* Video date filter in search */
+"Week" = "هفته";
+"Make default" = "پیش فرض شو";
+"Verified" = "تاییدشده";
+"Subscribe/Unsubscribe" = "اشتراک/لغو اشتراک";
+"Close player when closing video" = "هنگامی که ویدیو بسته می‌شود پخش کننده را ببند";
+"It can be changed later in settings. You can use your own locations too." = "می‌توانید بعدا در تنظیمات تغییر دهید. همچنان می‌توانید از سرویس دهندهٔ خودتان استفاده کنید.";
+"Comments are disabled" = "نظرها غیرفعال است";
+"Queue is empty" = "صف خالیست";
+"Playback Mode" = "وضعیت پخش";
+"Country" = "کشور";
+"Share" = "اشتراک‌گذاری";
+"Play in PiP" = "در تصویر-در-تصویر پخش کن";
+"System controls buttons" = "دکمه‌های کنترل سیستم";
+"Picture in Picture" = "تصویر-در-تصویر";
+"Comments" = "نظرها";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" از دستگاه حذف شده و غیرقابل بازگردانی خواهد بود.";
+"Now Playing" = "در حال پخش";
+"Charging" = "در حال شارژ";
+"Refresh" = "تازه‌سازی";
+
+/* Player controls layout size */
+"Large" = "بزرگ";
+"Are you sure you want to unsubscribe from %@?" = "آیا از لفو اشتراک %@ مطمئنید؟";
+
+/* Video duration filter in search */
+"Short" = "Short";
+"Switch to public locations" = "به سرویس دهندهٔ عمومی منتقل شو";
+"Profiles" = "نمایه‌ها";
+"New Playlist" = "فهرست پخش جدید";
+"Automatic" = "خودکار";
+"Opening file..." = "در حال باز کردن فایل…";
+"Add Quality Profile" = "افزودن نمایهٔ کیفیت";
+"Close video after playing last in the queue" = "ویدیو را پس از پخش آخرین مورد فهرست ببند";
+
+/* Player controls layout size */
+"Small" = "کوچک";
+"Clear" = "پاک کردن";
+"Anonymous" = "ناشناس";
+"Channel could not be found" = "کانال پیدا نشد";
+"Add to Favorites" = "افزودن به موردعلاقه‌ها";
+"Total size: %@" = "مجموع اندازه: %@";
+"Wi-Fi" = "اینترنت Wi-Fi";
+
+/* Selected video is being played */
+"Watching now" = "در حال تماشا";
+"Size" = "اندازه";
+"Connection failed" = "اتصال موفق نبود";
+"Could not open video" = "ویدیو باز نشد";
+"Badge color" = "رنگ نشان";
+
+/* Player controls layout size */
+"Medium" = "متوسط";
+"Reset search filters" = "بازنشانی صافی‌های جست و جو";
+"Play" = "پخش";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "همه";
+"No videos to show" = "ویدیویی برای نمایش نیست";
+"Username" = "نام کاربری";
+"Don't use public locations" = "از سرویس دهندگان عمومی استفاده نکنید";
+"I have a feature request" = "درخواست ویژگی و قابلیت دارم";
+"Clear All Recents" = "همهٔ موارد اخیر را پاک کن";
+"Regular size" = "ابعاد معمولی";
+"Autoplay next" = "پخش خودکار بعدی";
+"Shuffle" = "شافل";
+"This cannot be reverted" = "این گزینه غیرقابل بازگشت است";
+"unknown" = "ناشناخته";
+"Could not create share link" = "پیوند اشتراک‌گذاری ساخته نشد";
+"Home Settings" = "تنظیمات صفحهٔ اصلی";
+"You have no Playlists" = "فهرست پخشی ندارید";
+"Watched: visible" = "تماشاشده‌ها: قابل رویت";
+"Are you sure you want to remove this document?" = "از حذف این سند مطمئنید؟";
+
+/* Video sort order in search */
+"Rating" = "امتیازدهی";
+
+
+"Public" = "عمومی";
+"Add to Playlist..." = "افزودن به فهرست پخش…";
+"Category" = "دسته‌بندی";
+"Fullscreen" = "تمام صفحه";
+"No description" = "بدون شرح";
+"Gaming" = "بازی";
+"Apply to all" = "اعمال روی همه";
+"Close" = "بستن";
+
+/* Video date filter in search */
+"Year" = "سال";
+"Continue" = "ادامه";
+"Show channel name" = "نمایش نام کانال";
+"Remove Location" = "حذف سرویس دهنده";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "چیدمان بزرگ مناسب همهٔ دستگاه‌ها نیست و استفاده از آن ممکن است باعث بیرون ماندن کنترل‌ها از صفحهٔ نمایش شود.";
+"Shorts" = "Shortها";
+"Show Favorites" = "نمایش موردعلاقه‌ها";
+"Interface" = "رابط کاربری";
+"Unsubscribe" = "لغو اشتراک";
+"URL" = "نشانی";
+"Short videos: visible" = "ویدیوهای Short: قابل رویت";
+"Hardware decoder" = "دکودر سخت‌افزاری";
+"Search history is empty" = "سابقهٔ جست و جو خالیست";
+"Playback Settings" = "تنظیمات پخش";
+"Are you sure you want to clear search history?" = "آیا از حذف سابقهٔ جست و جو مطمئنید؟";
+"Could not load video" = "ویدیو دریافت نشد";
+"Show video length" = "طول ویدیو را نشان بده";
+"Hide" = "مخفی کردن";
+"Clear Search History" = "پاک کردن سابقهٔ جست و جو";
+"Play Now in MPV" = "الان در MPV پخش کن";
+"Switch to other public location" = "به یک سرویس دهندهٔ عمومی دیگر منتقل شو";
+"Restart the app to apply the settings above." = "برای اعمال تنظیمات بالا اپ را دوباره راه‌اندازی کنید.";
+"Are you sure you want to clear cache?" = "آیا از حذف حافظهٔ مخفی مطمئنید؟";
+"Filter" = "صافی";
+"Open Settings" = "باز کردن تنظیمات";
+"Buffering stream..." = "بافر کردن استریم…";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "فهرست پخش خالیست\n\nروی ویدیو ضربه بزنید و نگه دارید، سپس\n\"افزودن به فهرست پخش\" را انتخاب کنید";
+"Playback history is empty" = "سابقهٔ پخش خالیست";
+"Chapters" = "فصل‌های ویدیو";
+"(watched and shorts hidden)" = "(تماشاشده‌ها و Shortها مخفی)";
+
+/* Video sort order in search */
+"Views" = "بازدیدها";
+"I want to ask a question" = "می‌خواهم سوالی بپرسم";
+"Show keywords" = "نمایش کلیدواژه‌ها";
+"Edit" = "ویرایش";
+"Could not refresh Playlists" = "فهرست پخش بازسازی نشد";
+"Categories to Skip" = "دسته‌بندی‌هایی که رد می‌شوند";
+"Private" = "خصوصی";
+"This video could not be opened" = "این ویدیو باز نمی‌شود";
+"Center" = "وسط";
+"High" = "بالا";
+
+/* Video date filter in search */
+"Today" = "امروز";
+"Remove from Playlist" = "حذف از فهرست پخش";
+"URL to Open" = "نشانی برای باز کردن";
+"Replies" = "پاسخ‌ها";
+"Movies" = "فیلم‌ها";
+"Unlisted" = "فهرست نشده";
+"Wiki" = "ویکی";
+"Sort" = "ترتیب";
+"Frontend URL" = "نشانی Frontend";
+"Restore default profiles..." = "بازنشانی نمایه‌های پیش‌فرض…";
+"Any format" = "هر فرمتی";
+"Open" = "باز کردن";
+"Filter: active" = "صافی: فعال";
+"Play Music" = "موسیقی را پخش کن";
+"Clear All" = "همه را پاک کن";
+"Add Account" = "افزودن حساب کاربری";
+"Cancel" = "لغو";
+"Accounts are not supported for the application of this instance" = "حساب کاربری در این سرویس دهنده پشتیبانی نمی‌شود";
+"System controls" = "کنترل‌های سیستم";
+"Hide player" = "پخش‌کننده را مخفی کن";
+"Lock orientation" = "قفل چرخش صفحه";
+"Cache" = "حافظهٔ مخفی";
+
+/* Video date filter in search */
+"Hour" = "ساعت";
+"Open Videos" = "باز کردن ویدیو";
+"Add" = "افزودن";
+"Show icons and text when space permits" = "اگر جا بود متن و آیکن‌ها را نشان بده";
+"Documents" = "مستندات";
+"Play Next" = "بعدی را پخش کن";
+"Battery" = "باتری";
+"Rotate to portrait when exiting fullscreen" = "پس از خروج از تمام صفحه به حالت عمودی بچرخ";
+"Could not delete document" = "سند حذف نشد";
+"Show account username" = "نمایش نام کاربری";
+"Queue - shuffled" = "صف - شافل";
+"Source" = "منبع";
+"Always" = "همیشه";
+
+/* Video duration filter in search */
+"Long" = "دراز";
+"Mark video as watched after playing" = "ویدیو را پس از پخش به عنوان تماشا شده نشانه بگذار";
+"%@ Playlist" = "%@ فهرست‌ پخش";
+"Playback queue is empty" = "صف پخش خالیست";
+"Add profile..." = "افزودن نمایه…";
+"Short videos: hidden" = "ویدیوهای Short: مخفی";
+"No documents" = "بدون مستندات";
+"Lowest" = "پایینترین";
+"Not available" = "در دسترس نیست";
+"Add Location" = "افزودن سرویس دهنده";
+"Public Locations" = "سرویس دهندگان عمومی";
+"Remove from history" = "حذف از سابقه";
+"Could not update your token." = "Token شما به روز نشد.";
+"Channel" = "کانال";
+"Limit" = "محدود";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "سفارشی";
+"Close video" = "ویدیو را ببند";
+"Remove from Favorites" = "حذف از موردعلاقه‌ها";
+"Watched: hidden" = "تماشاشده: مخفی";
+"Close PiP and open player when application enters foreground" = "هنگامی که اپ باز می‌شود تصویر-در-تصویر را ببند و پخش‌کننده را باز کن";
+"Show Documents" = "نمایش مستندات";
+
+/* SponsorBlock category name */
+"Outro" = "انتها";
+"Music Mode" = "وضعیت موسیقی";
+"Edit Playlist" = "ویرایش فهرست پخش";
+"Mark as watched" = "نشانه گذاری به عنوان تماشا شده";
+"Stream" = "استریم";
+"Remove…" = "حذف…";
+"Add Location..." = "افزودن سرویس دهنده…";
+"%@ subscribers" = "%@ مشترکان";
+
+/* SponsorBlock category name */
+"Sponsor" = "حامی مالی";
+"Remove from the queue" = "حذف از صف";
+"Quality Profile" = "نمایهٔ کیفیت";
+"LIVE" = "زنده";
+"Accounts" = "حساب‌ها";
+"Done" = "انجام شد";
+"Enter links to open, one per line" = "پیوندها را وارد کنید تا باز شوند، هر خط یک پیوند";
+"Files" = "فایل‌ها";
+"No results" = "بدون نتیجه";
+"Current: %@\n%@" = "فعلی: %@\n%@";
+"Donations" = "حمایت مالی";
+"%@ Channel" = "%@ کانال";
+"Do nothing" = "کاری نکن";
+"File" = "فایل";
+"Yattee %@ (build %@)" = "Yattee %@ (بیلد %@)";
+"Proxy videos" = "پروکسی کردن ویدیوها";
+"Player" = "پخش‌کننده";
+"Play next item" = "مورد بعدی را پخش کن";
+"Controls" = "کنترل‌ها";
+"This URL could not be opened" = "این نشانی باز نمی‌شود";
+"Trending" = "پرطرفدار";
+"Opening audio stream..." = "باز کردن استریم صوتی…";
+"Statistics" = "آمار";
+"Pause when player is closed" = "پس از بسته شدن پخش‌کننده مکث کن";
+"Play All" = "همه را پخش کن";
+"Sort: %@" = "ترتیب: %@";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "باز کردن استریم %@…";
+"Next in Queue" = "مورد بعد در صف";
+"Honor orientation lock" = "قفل چرخش صفحه را در نظر بگیر";
+"Rate" = "امتیاز";
+"Playing Next" = "پخش بعدی";
+"%lld videos" = "%lld ویدیو";
+"Enable Return YouTube Dislike" = "فعال کردن بازگرداندن YouTube Dislike";
+"Country Name or Code" = "نام یا کد کشور";
+"Clear the queue" = "پاک کردن صف";
+"Could not extract playlist ID" = "شناسهٔ فهرست پخش دریافت نشد";
+"Could not load streams" = "استریم قابل دریافت نیست";
+"Are you sure you want to clear history of watched videos?" = "آیا از حذف سابقهٔ تماشا مطمئنید؟";
+"Mark all as unwatched" = "همه را به عنوان تماشانشده نشانه بگذار";
+"Thumbnails" = "بندانگشتی‌ها";
+"Left" = "چپ";
+"Open \"Playlists\" tab to create new one" = "زبانهٔ «فهرست پخش» را باز کنید تا یک فهرست جدید بسازید";
+"Replay" = "پخش دوباره";
+"Remove" = "حذف کردن";
+"Close player when starting PiP" = "هنگامی که تصویر-در-تصویر آغاز می‌شود پخش کننده را ببند";
+"Controls button: backwards" = "دکمه‌های کنترل: عقب";
+"I am lost" = "گم شده‌ام";
+"Show only icons" = "فقط آیکن‌ها را نشان بده";
+"Clear all" = "همه را پاک کن";
+"Shuffle All" = "شافل کردن همه";
+"Discord Server" = "سرور Discord";
+"Subscribe" = "اشتراک";
+"Loading..." = "درحال دریافت…";
+"Edit Favorites…" = "ویرایش موردعلاقه‌ها…";
+"Sections" = "بخش‌ها";
+"Play Last" = "آخرین را پخش کن";
+"Pages buttons" = "دکمه‌های صفحه‌ها";
+"No comments" = "بدون نظر";
+"Connected successfully (%@)" = "با موفقیت وصل شد (%@)";
+"(watched hidden)" = "(تماشاشده‌ها مخفی)";
+"Enable logging" = "فعال کردن ثبت log";
+"Are you sure you want to delete playlist?" = "آیا از حذف فهرست پخش مطمئنید؟";
+"Description preview" = "پیش‌نمایش شرح";
+"Open Files" = "باز کردن فایل‌ها";
+"Hide sidebar" = "نوار کناری را مخفی کن";
+"Show anonymous accounts" = "نمایش حساب‌های ناشناس";
+"Always show controls buttons" = "همیشه دکمه‌های کنترل را نشان بده";
+"Mark all as watched" = "همه را به عنوان تماشاشده نشانه بگذار";
+
+/* Player controls layout size */
+"Smaller" = "کوچکتر";
+"Search" = "جست و جو";
+"Favorites" = "مورد علاقه‌ها";
+"Address" = "نشانی";
+"MPV Documentation" = "مستندات MPV";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "اگر ایرادی را گزارش می‌کنید، همهٔ جزییات مربوط (به ویژه نسخهٔ اپ، دستگاه مورد استفاده و نسخهٔ سیستم عامل و گام‌هایی که برای بازسازی ایراد لازم است) را ذکر کنید.";
+"Only when signed in" = "تنها پس از ورود";
+"Sign In Required" = "لازم است که وارد شوید";
+
+/* SponsorBlock category name */
+"Self-promotion" = "تبلیغ شخصی";
+"Only for local files and URLs" = "فقط برای فایل‌های محلی و پیوندها";
+
+/* SponsorBlock category name */
+"Interaction" = "تعامل";
+"Preferred Formats" = "فرمت‌های ترجیحی";
+"Reset" = "بازنشانی";
+"Badge" = "نشان";
+"Error when accessing playlist" = "خطا هنگام دسترسی به فهرست پخش";
+"Right" = "راست";
+"Blue" = "آبی";
+"Low quality" = "کیفیت پایین";
+"Popular" = "محبوب";
+"List" = "فهرست";
+"Create Playlist" = "ساخت فهرست پخش";
+"Show sidebar when space permits" = "اگر جا بود نوارکناری را نشان بده";
+"Locations" = "سرویس دهندگان";
+"Playlists" = "فهرست‌های پخش";
+"Current Location" = "سرویس دهندهٔ فعلی";
+"Could not open Files" = "فایل باز نشد";
+"Regular Size" = "ابعاد معمولی";
+"Could not refresh Popular" = "محبوبترین‌ها به روز نمی‌شود";
+"Recent History" = "سابقهٔ اخیر";
+"Clear History" = "پاک کردن سابقه";
+"Play all unwatched" = "همهٔ دیده‌نشده‌ها را پخش کن";
+"Show Home" = "نمایش صفحهٔ اصلی";
+"More info can be found in:" = "اطلاعات بیشتر در:";
+"Name" = "نام";
+"History" = "سابقه";
+
+/* Video date filter in search */
+"Month" = "ماه";
+"Matrix Channel" = "کانال Matrix";
+"Round corners" = "گوشه‌های گرد";
+"Pause when entering background" = "پس از ورود به پس‌زمینه مکث کن";
+"Music" = "موسیقی";
+"I like this app!" = "از این اپ خوشم می‌آید!";
+"Upload date" = "تاریخ انتشار";
+"Save history of played videos" = "ذخیرهٔ سابقهٔ ویدیوهای پخش شده";
+"Add Account..." = "افزودن حساب کاربری…";
+"Public account" = "حساب کاربری عمومی";
+"Add %@" = "افزودن %@";
+"Autoplaying Next" = "پخش خودکار بعدی";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "فهرست پخش ندارید\n\nروی «فهرست جدید» ضربه بزنید و یکی بسازید";
+"No chapters information available" = "اطلاعاتی در مورد فصل‌های ویدیو در دسترس نیست";
+"Lock" = "قفل";
+"Nothing" = "هیچ";
+"Cellular" = "اینترنت همراه";
+"Password" = "رمز عبور";
+"Add to Playlist" = "افزودن به فهرست پخش";
+"(shorts hidden)" = "(Shortها مخفی)";
+"Are you sure you want to remove %@ location?" = "از حذف سرویس دهندهٔ \"%@\" مطمئنید؟";
+"Current Playlist" = "فهرست پخش فعلی";
+
+/* Selected video was played on given date */
+"Watched %@" = "تماشا شده %@";
+"Videos" = "ویدیوها";
+"No locations available at the moment" = "در حال حاضر سرویس دهنده‌ای در دسترس نیست";
+"Show history" = "نمایش سابقه";
+"Default Profile" = "نمایهٔ پیش‌فرض";
+"Red" = "قرمز";
+"No preview" = "بدون پیش‌نمایش";
+"Info" = "اطلاعات";
+
+/* Loading stream OSD */
+"Loading streams..." = "درحال دریافت استریم…";
+"No rotation" = "بدون چرخش";
+"Codec" = "کدک (Codec)";
+"Startup section" = "بخش آغازین";
+"Edit Quality Profile" = "ویرایش نمایهٔ کیفیت";
+"Browse without account" = "استفاده بدون حساب کاربری";
+
+/* Video sort order in search */
+"Relevance" = "ارتباط";
+"Help" = "کمک";
+"Find Other" = "یافتن دیگری";
+"Play Now" = "الان پخش کن";
+"Close PiP when starting playing other video" = "هنگامی که ویدیوی دیگری آغاز به پخش می‌کند تصویر-در-تصویر را ببند";
+"Show cache status" = "نمایش وضعیت حافظهٔ مخفی";
+"Play Now in AVPlayer" = "الان در AVPlayer پخش کن";
+"Medium quality" = "کیفیت متوسط";
+"Stream & Player" = "استریم و پخش‌کننده";
+"Contributing" = "مشارکت";
+"Save" = "ذخیره";
+"Buttons labels" = "برچسب دکمه‌ها";
+"Close video and player on end" = "در پایان ویدیو و پخش‌کننده را ببند";
+"Delete" = "حذف";
+
+/* Player controls layout size for TV */
+"TV" = "تلویزیون";
+"Continue from %@" = "از %@ ادامه بده";
+"I found a bug /" = "ایرادی پیدا کرده‌ام /";
+"Recent Documents" = "مستندات تازه";
+"Orientation" = "چرخش صفحه";
+"Low" = "پایین";
+"Restart" = "راه‌اندازی دوباره";
+"Search..." = "جست و جو…";
+"Open Video" = "ویدیو را باز کن";
+"Sidebar" = "نوار کناری";
+"Translations" = "ترجمه‌ها";
+"Duration" = "مدت زمان";
+
+/* Video sort order in search */
+"Date" = "تاریخ";
+"Disable filters" = "غیرفعال کردن صافی‌ها";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "فهرست پخش \"%@\" حذف خواهد شد.\nقابل بازگردانی نیست.";
+"Enter link to open" = "پیوند را وارد کنید تا باز شود";
+"Restart/Play next" = "پخش دوباره/بعدی";
+"Your Accounts" = "حساب کاربری شما";
+"Open channel" = "کانال را باز کن";
+"Queue" = "صف";
+"Controls button: forwards" = "دکمه‌های کنترل: جلو";
+"Normal" = "عادی";
+"Next" = "بعدی";
+"Home" = "صفحهٔ اصلی";
+"Contact" = "تماس";
+"Show Next in Queue" = "مورد بعدی صف را نشان بده";
+"Browsing" = "مرور";
+"Watched" = "تماشا شده";
+"Highest" = "بالاترین";
+"You can find information about using Yattee in the Wiki pages." = "اطلاعات در مورد چگونگی استفاده از Yattee را می‌توانید در صفحات ویکی پیدا کنید.";
+"Captions" = "زیرنویس";
+"Playlist" = "فهرست پخش";
+
+/* SponsorBlock category name */
+"Intro" = "مقدمه";
+"Description" = "شرح";
+"Instance of current account" = "سرویس دهندهٔ حساب کاربری فعلی";
+"Advanced" = "پیشرفته";
+"Welcome" = "خوش آمدید";
+
+/* Selected video has just finished playing */
+"Just watched" = "همین الان تماشا کردم";
+"Close PiP when player is opened" = "هنگامی که پخش‌کننده باز می‌شود تصویر-در-تصویر را ببند";
+"Lock portrait mode" = "قفل حالت عمودی";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "هر";
+"Mark watched videos with" = "نشانه گذاری ویدیوها به عنوان تماشا شده با";
+"Not Playing" = "پخش نمی‌شود";
+"Video Details" = "جزییات ویدیو";
+"Live Streams" = "پخش زنده";

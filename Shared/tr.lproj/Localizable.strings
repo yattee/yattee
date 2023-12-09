@@ -294,15 +294,15 @@
 "Hide" = "";
 "Playing Next" = "";
 "Are you sure you want to remove this document?" = "";
-"Show channel name" = "";
+"Show channel name" = "Kanal adını göster";
 "Unlisted" = "";
 "Paste" = "";
 "Rate & Captions" = "";
 "Format" = "";
-"Right" = "";
+"Right" = "Sağ";
 "Stream FPS" = "";
 "Cached time" = "";
-"Sign In Required" = "";
+"Sign In Required" = "Giriş yapmanız gerekiyor";
 "Could not create share link" = "";
 "Locations Manifest" = "";
 "When partially watched video is played" = "";
@@ -323,19 +323,19 @@
 "Show Documents" = "";
 "Press and hold remote button to open captions and quality menus" = "";
 "No locations available at the moment" = "";
-"Show account username" = "";
+"Show account username" = "Hesabın kullanıcı adını göster";
 "Used to create links from videos, channels and playlists" = "";
 "Size" = "";
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "";
-"Sort: %@" = "";
-"Select location closest to you:" = "";
+"Sort: %@" = "Sırala: %@";
+"Select location closest to you:" = "Size en yakın konumu seçin:";
 "Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "";
 
 /* Video duration filter in search */
-"Short" = "";
+"Short" = "Kısa";
 "Home" = "";
 "Remove Location" = "";
-"Edit Favorites…" = "";
+"Edit Favorites…" = "Favorileri düzenle…";
 "Show Open Videos toolbar button" = "";
 "Sample Rate" = "";
 "Private" = "";
@@ -365,14 +365,14 @@
 "Subscriptions" = "";
 "Upload date" = "";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "";
-"Shuffle" = "";
+"Shuffle" = "Karıştır";
 "Buttons labels" = "";
-"Share %@ link" = "";
+"Share %@ link" = "%@ bağlantısını paylaş";
 "Could not load streams" = "";
 "Playback history is empty" = "";
 "Show icons and text when space permits" = "";
 "unknown" = "";
-"Share..." = "";
+"Share..." = "Paylaş...";
 
 /* Video sort order in search */
 "Views" = "";
@@ -382,7 +382,7 @@
 "Could not refresh Playlists" = "";
 "Actions buttons" = "";
 "Any format" = "";
-"Show playback statistics" = "";
+"Show playback statistics" = "Oynatma istatistiklerini göster";
 "Pages buttons" = "";
 "Videos" = "";
 "Codec" = "";
@@ -396,7 +396,7 @@
 "Open" = "";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "";
+"Opening %@ stream..." = "%@ akışı açılıyor...";
 "Clear Queue before opening" = "";
 "Copy %@ link with time" = "Bağlantıyı %@ zaman ile kopyala";
 "Show Inspector" = "";
@@ -412,15 +412,15 @@
 
 /* Video date filter in search */
 "Week" = "";
-"Sidebar" = "";
+"Sidebar" = "Kenar çubuğu";
 "Show only icons" = "";
 "Current: %@\n%@" = "Şuan: %@\n%@";
-"Show anonymous accounts" = "";
+"Show anonymous accounts" = "Anonim hesapları göster";
 "Could not open playlist" = "";
 "Round corners" = "";
 "URL" = "";
 "Recents" = "";
-"Show sidebar when space permits" = "";
+"Show sidebar when space permits" = "Alan olduğu sürece kenar çubuğunu göster";
 "System controls buttons" = "";
 "Could not extract channel information" = "";
 "Public Locations" = "";
@@ -431,22 +431,22 @@
 "Continue from %@" = "% devam et";
 "Copy %@ link" = "Bağlantıyı %@ kopyala";
 "Seek gesture sensitivity" = "";
-"Show keywords" = "";
+"Show keywords" = "Anahtar kelimeleri göster";
 "Wiki" = "";
 "Username" = "";
 "Could not extract video ID" = "";
 
 /* Player controls layout size */
-"Smaller" = "";
-"Sort" = "";
+"Smaller" = "Küçült";
+"Sort" = "Sırala";
 "This cannot be reverted" = "";
 "Public Manifest" = "";
 "You have no Playlists" = "";
 "Watched" = "";
 "Could not open video" = "";
 "Channel could not be found" = "";
-"Show video length" = "";
-"Source" = "";
+"Show video length" = "Video uzunluğunu göster";
+"Source" = "Kaynak";
 "Welcome" = "";
 "Wi-Fi" = "";
 "Could not open channel" = "";
@@ -454,13 +454,13 @@
 "Could not extract playlist ID" = "";
 "Could not load video" = "";
 "Decreased opacity" = "Düşük şeffaflık";
-"Shuffle All" = "";
-"Share %@ link with time" = "";
+"Shuffle All" = "Tümünü karıştır";
+"Share %@ link with time" = "%@ bağlantısını zaman bilgisiyle birlikte paylaş";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "";
 "Unsubscribe" = "";
 "Current Location" = "";
 "Stream & Player" = "";
-"Hardware decoder" = "";
+"Hardware decoder" = "Donanımsal çözücü";
 "Honor orientation lock" = "";
 "Seek with horizontal swipe on video" = "";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "";
@@ -473,12 +473,12 @@
 "Self-promotion" = "";
 
 /* Player controls layout size */
-"Small" = "";
+"Small" = "Küçük";
 
 /* SponsorBlock category name */
-"Sponsor" = "";
+"Sponsor" = "Sponsor";
 "System controls show buttons for %@" = "";
-"Show history" = "";
+"Show history" = "Kullanım geçmişini göster";
 "Could not extract SID from received cookies: %@" = "";
 "This will remove all your custom profiles and return their default values. This cannot be reverted." = "";
 "Switch to other public location" = "";
@@ -502,3 +502,6 @@
 "Share" = "";
 "File" = "";
 "Share%@link" = "";
+"Cache" = "Önbellek";
+"Enter account credentials to connect..." = "Bağlanmak için hesap bilgilerini girin...";
+"Show scroll to top button in comments" = "Yorumlarda yukarıya götür düğmesini göster";
