@@ -56,27 +56,24 @@ struct VideoDescription: View {
         }
     }
 
-    var shouldExpand: Bool {
-        expand
-    }
-
     @ViewBuilder var textDescription: some View {
         #if canImport(AppKit)
             Group {
                 if #available(macOS 12, *) {
                     DescriptionWithLinks(description: description, detailsSize: detailsSize)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
+                        .lineLimit(expand ? 500 : collapsedLinesDescription)
                         .textSelection(.enabled)
                 } else {
                     Text(description)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(shouldExpand ? 500 : collapsedLinesDescription)
+                        .lineLimit(expand ? 500 : collapsedLinesDescription)
                 }
             }
             .multilineTextAlignment(.leading)
             .font(.system(size: 14))
             .lineSpacing(3)
+            .allowsHitTesting(expand)
         #endif
     }
 
