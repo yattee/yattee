@@ -364,6 +364,7 @@ struct ChannelVideosView: View {
                             }
                         } label: {
                             Label("Unsubscribe", systemImage: "xmark.circle")
+                                .help("Unsubscribe")
                             #if os(iOS)
                                 .labelStyle(.automatic)
                             #else
@@ -380,6 +381,7 @@ struct ChannelVideosView: View {
                             }
                         } label: {
                             Label("Subscribe", systemImage: "circle")
+                                .help("Subscribe")
                             #if os(iOS)
                                 .labelStyle(.automatic)
                             #else
@@ -413,6 +415,7 @@ struct ChannelVideosView: View {
             feed.markChannelAsWatched(channel.id)
         } label: {
             Label("Mark channel feed as watched", systemImage: "checkmark.circle.fill")
+                .help("Mark channel feed as watched")
         }
         .disabled(!feed.canMarkAllFeedAsWatched)
     }
@@ -423,6 +426,7 @@ struct ChannelVideosView: View {
             feed.markChannelAsUnwatched(channel.id)
         } label: {
             Label("Mark channel feed as unwatched", systemImage: "checkmark.circle")
+                .help("Mark channel feed as unwatched")
         }
     }
 
