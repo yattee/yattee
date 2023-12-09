@@ -601,3 +601,5 @@
 "Podcasts" = "Podkasty";
 "Releases" = "Wydania";
 "Add %@" = "Dodaj %@";
+"Description preview" = "Podgląd opisu";
+"No preview" = "Brak podglądu";
