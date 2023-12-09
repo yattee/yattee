@@ -30,7 +30,6 @@ struct AccountViewButton: View {
 
                     if accountPickerDisplaysUsername {
                         label
-                            .labelStyle(.titleOnly)
                     }
                 }
             }
@@ -47,6 +46,6 @@ struct AccountViewButton: View {
     }
 
     private var label: some View {
-        Label(model.current?.description ?? "Select Account", systemImage: "globe")
+        Text(model.current?.description ?? "Select Account")
     }
 }
