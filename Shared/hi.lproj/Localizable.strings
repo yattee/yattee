@@ -3,17 +3,17 @@
 "%@ Channel" = "%@ चैनल";
 "%@ Playlist" = "%@ प्लेलिस्ट";
 "%@ subscribers" = "%@ सदस्य";
-"%lld videos" = "%lld वीडियों";
+"%lld videos" = "%lld वीडियो";
 " subscribers" = " सदस्य";
-"10 seconds forwards/backwards" = "10 पल आगे/पीछे";
-"Accounts" = "खातें";
-"Accounts are not supported for the application of this instance" = "इस इन्सटेंस के लिए खातों उपलब्ध नहीं हैं";
+"10 seconds forwards/backwards" = "10 सेकंड आगे/पीछे";
+"Accounts" = "खाते";
+"Accounts are not supported for the application of this instance" = "इस इन्सटेंस के लिए खाते उपलब्ध नहीं हैं";
 "Add to Playlist..." = "गीतमाला में जोड़ें…";
 "Advanced" = "उन्नत";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "सभी";
-"Always use AVPlayer for live videos" = "लाइव वीडियो के लिए सदा ए.वी. प्लेयर का उपयोग करें";
+"Always use AVPlayer for live videos" = "लाइव वीडियो के लिए सदा AVPlayer का उपयोग करें";
 "Anonymous" = "गुप्त";
 
 /* Video date filter in search
