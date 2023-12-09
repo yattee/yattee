@@ -131,6 +131,8 @@ final class PlayerModel: ObservableObject {
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
+    @Published var currentChapterIndex: Int?
+
     var accounts: AccountsModel { .shared }
     var comments: CommentsModel { .shared }
     var controls: PlayerControlsModel { .shared }
@@ -1111,5 +1113,37 @@ final class PlayerModel: ObservableObject {
 
         onPlayStream.forEach { $0(stream) }
         onPlayStream.removeAll()
+    }
+
+    func updateTime(_ cmTime: CMTime) {
+        let time = CMTimeGetSeconds(cmTime)
+        let newChapterIndex = chapterForTime(time)
+        if currentChapterIndex != newChapterIndex {
+            DispatchQueue.main.async {
+                self.currentChapterIndex = newChapterIndex
+            }
+        }
+    }
+
+    private func chapterForTime(_ time: Double) -> Int? {
+        guard let chapters = self.videoForDisplay?.chapters else {
+            return nil
+        }
+
+        for (index, chapter) in chapters.enumerated() {
+            let nextChapterStartTime = index < (chapters.count - 1) ? chapters[index + 1].start : nil
+
+            if let nextChapterStart = nextChapterStartTime {
+                if time >= chapter.start, time < nextChapterStart {
+                    return index
+                }
+            } else {
+                if time >= chapter.start {
+                    return index
+                }
+            }
+        }
+
+        return nil
     }
 }

@@ -169,6 +169,7 @@ struct VideoDetails: View {
     @State private var subscriptionToggleButtonDisabled = false
     @State private var page = DetailsPage.info
     @State private var descriptionExpanded = false
+    @State private var chaptersExpanded = false
 
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
@@ -190,6 +191,7 @@ struct VideoDetails: View {
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
+    @Default(.expandChapters) private var expandChapters
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -245,6 +247,7 @@ struct VideoDetails: View {
         .background(colorScheme == .dark ? Color.black : .white)
         .onAppear {
             descriptionExpanded = expandVideoDescription
+            chaptersExpanded = expandChapters
         }
     }
 
@@ -320,7 +323,7 @@ struct VideoDetails: View {
                                        !video.chapters.isEmpty
                                     {
                                         Section(header: chaptersHeader) {
-                                            ChaptersView()
+                                            ChaptersView(expand: $chaptersExpanded)
                                         }
                                     }
 
@@ -440,11 +443,48 @@ struct VideoDetails: View {
         #endif
     }
 
+    var chaptersHaveImages: Bool {
+        player.videoForDisplay?.chapters.allSatisfy { $0.image != nil } ?? false
+    }
+
     var chaptersHeader: some View {
-        Text("Chapters".localized())
-            .padding(.horizontal)
-            .font(.caption)
-            .foregroundColor(.secondary)
+        Group {
+            if !chaptersHaveImages {
+                #if canImport(UIKit)
+                    Button(action: {
+                        chaptersExpanded.toggle()
+                    }) {
+                        HStack {
+                            Text("Chapters".localized())
+                            Spacer()
+                            Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                                .imageScale(.small)
+                        }
+                        .padding(.horizontal)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+                #elseif canImport(AppKit)
+                    HStack {
+                        Text("Chapters".localized())
+                        Spacer()
+                        Button(action: { chaptersExpanded.toggle() }) {
+                            Image(systemName: chaptersExpanded ? "chevron.up" : "chevron.down")
+                                .imageScale(.small)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                #endif
+            } else {
+                // No button, just the title when there are images
+                Text("Chapters".localized())
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+            }
+        }
     }
 }
 

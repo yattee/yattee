@@ -182,13 +182,21 @@ final class MPVBackend: PlayerBackend {
     }
 
     init() {
+        // swiftlint:disable shorthand_optional_binding
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
-            self?.getTimeUpdates()
+            guard let self = self, self.model.activeBackend == .mpv else {
+                return
+            }
+            self.getTimeUpdates()
         }
 
         networkStateTimer = .init(interval: .seconds(Self.networkStateUpdateInterval), mode: .infinite) { [weak self] _ in
-            self?.updateNetworkState()
+            guard let self = self, self.model.activeBackend == .mpv else {
+                return
+            }
+            self.updateNetworkState()
         }
+        // swiftlint:enable shorthand_optional_binding
     }
 
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
@@ -432,6 +440,8 @@ final class MPVBackend: PlayerBackend {
         timeObserverThrottle.execute {
             self.model.updateWatch(time: self.currentTime)
         }
+
+        self.model.updateTime(self.currentTime!)
     }
 
     private func stopClientUpdates() {

@@ -596,6 +596,8 @@ final class AVPlayerBackend: PlayerBackend {
             if self.controlsUpdates {
                 self.updateControls()
             }
+
+            self.model.updateTime(self.currentTime!)
         }
     }
 

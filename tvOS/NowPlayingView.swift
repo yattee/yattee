@@ -130,7 +130,7 @@ struct NowPlayingView: View {
                         } else {
                             Section(header: Text("Chapters")) {
                                 ForEach(video.chapters) { chapter in
-                                    ChapterView(chapter: chapter)
+                                    ChapterViewTVOS(chapter: chapter)
                                         .padding(.horizontal, 40)
                                 }
                             }
