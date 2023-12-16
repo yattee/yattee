@@ -602,3 +602,5 @@
 "Add %@" = "追加 %@";
 "Description preview" = "説明のプレビュー";
 "No preview" = "プレビューなし";
+"Open vertical chapters expanded" = "チャプターを縦方向に開く";
+"Chapters (if available)" = "チャプター (あれば)";
