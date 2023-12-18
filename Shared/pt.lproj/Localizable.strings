@@ -595,3 +595,12 @@
 "Replay" = "Replay";
 "Autoplay next" = "Tocar automaticamente próximo";
 "Stream" = "Stream";
+"Podcasts" = "Podcasts";
+"Releases" = "Lançamentos";
+"Show channel avatars in channels lists" = "Mostrar avatares de canais em listas de canais";
+"Open vertical chapters expanded" = "Abrir capítulos verticais expandidos";
+"Description preview" = "Descrição da prévia";
+"Show channel avatars in videos lists" = "Mostrar avatares de canais em listas de vídeos";
+"Add %@" = "Adicionar %@";
+"No preview" = "Sem prévia";
+"Chapters (if available)" = "Capítulos (se disponível)";
