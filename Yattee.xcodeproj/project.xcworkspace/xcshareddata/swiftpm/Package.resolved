@@ -60,7 +60,7 @@
       "location" : "https://github.com/cxfksword/MPVKit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "dca1e345a26d09a3d621d7656a94e6427f3f7b83"
+        "revision" : "109909d0ffa82d8b72b536469d09fd6dd684061e"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "fbe79221b146aa6647dceb5a5c75873a48b69519"
+        "revision" : "e278c13e46e8d20c895c221e922c6ac6b72aaca9"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
       "state" : {
-        "revision" : "aee64ef39b570c44ccf0f884c440fc6494a23c76",
-        "version" : "2.2.5"
+        "revision" : "261b6cec35686d2dc192b809ab50742b4502a73b",
+        "version" : "2.2.6"
       }
     },
     {
