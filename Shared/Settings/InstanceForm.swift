@@ -32,7 +32,7 @@ struct InstanceForm: View {
                     VStack {
                         validationStatus
                     }
-                    .frame(minHeight: 60, alignment: .topLeading)
+                    .frame(alignment: .topLeading)
                     .padding(.horizontal, 15)
                 #endif
                 footer
@@ -47,7 +47,7 @@ struct InstanceForm: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .background(Color.background(scheme: colorScheme))
         #else
-            .frame(width: 400, height: 180)
+            .frame(width: 400)
             .padding(.vertical)
         #endif
     }
@@ -56,14 +56,13 @@ struct InstanceForm: View {
         HStack {
             Text("Add Location")
                 .font(.title2.bold())
+            #if !os(macOS)
+                Spacer()
 
-            Spacer()
-
-            Button("Cancel") {
-                presentationMode.wrappedValue.dismiss()
-            }
-            #if !os(tvOS)
-            .keyboardShortcut(.cancelAction)
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
             #endif
         }
         .padding(.horizontal)
@@ -185,6 +184,13 @@ struct InstanceForm: View {
     private var footer: some View {
         HStack {
             Spacer()
+
+            #if os(macOS)
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
+            #endif
 
             Button("Save", action: submitForm)
                 .disabled(!isValid)
