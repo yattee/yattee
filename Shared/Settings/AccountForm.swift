@@ -27,7 +27,7 @@ struct AccountForm: View {
                     VStack {
                         validationStatus
                     }
-                    .frame(minHeight: 60, alignment: .topLeading)
+                    .frame(alignment: .topLeading)
                     .padding(.horizontal, 15)
                 #endif
                 footer
@@ -40,7 +40,7 @@ struct AccountForm: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .background(Color.background(scheme: colorScheme))
         #else
-        .frame(width: 400, height: 180)
+        .frame(width: 400)
         .padding(.vertical)
         #endif
     }
@@ -50,13 +50,13 @@ struct AccountForm: View {
             Text("Add Account")
                 .font(.title2.bold())
 
-            Spacer()
+            #if !os(macOS)
+                Spacer()
 
-            Button("Cancel") {
-                presentationMode.wrappedValue.dismiss()
-            }
-            #if !os(tvOS)
-            .keyboardShortcut(.cancelAction)
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
             #endif
         }
         .padding(.horizontal)
@@ -118,6 +118,13 @@ struct AccountForm: View {
     var footer: some View {
         HStack {
             Spacer()
+
+            #if os(macOS)
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+            #endif
 
             Button("Save", action: submitForm)
                 .disabled(!isValid)
