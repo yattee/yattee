@@ -1,18 +1,18 @@
 
 
-"Add Account" = "أضف حساب";
-"Add Account..." = "أضف حساب…";
-"Add Location" = "أضف موقع";
-"Add Location..." = "إضافة موقع ...";
-"%@ Playlist" = "قائمة التشغيل";
-"%@ Channel" = "قناة %@";
-"%@ subscribers" = "%@ مشترك";
-"Add to %@" = "أضف إلى %@";
-"%lld videos" = "%lld مقاطع فيديو";
-"Add profile..." = "إضافة ملف تعريف ...";
+"Add Account" = "إضافة حساب";
+"Add Account..." = "إضافة حساب…";
+"Add Location" = "إضافة موقع";
+"Add Location..." = "إضافة موقع...";
+"%@ Playlist" = "%@ قائمة تشغيل";
+"%@ Channel" = "%@ قناة";
+"%@ subscribers" = "%@ المتابعين";
+"Add to %@" = "إضافة إلى %@";
+"%lld videos" = "%Lld مقاطع الفيديو";
+"Add profile..." = "إضافة ملف تعريف...";
 "Add Quality Profile" = "إضافة ملف تعريف الجودة";
-"Add to Playlist" = "أضف إلى قائمة التشغيل";
-"Add to Playlist..." = "أضف إلى قائمة التشغيل...";
+"Add to Playlist" = "إضافة إلى قائمة تشغيل";
+"Add to Playlist..." = "إضافة إلى قائمة تشغيل...";
 "Advanced" = "متقدم";
 
 /* Trending category, section containing all kinds of videos */
@@ -22,13 +22,13 @@
 "Are you sure you want to restore default quality profiles?" = "هل أنت متأكد من أنك تريد استعادة ملفات تعريف الجودة الافتراضية؟";
 "Automatic" = "تلقائي";
 "Autoplaying Next" = "التشغيل التلقائي للتالي";
-"Are you sure you want to unsubscribe from %@?" = "هل أنت متأكد من رغبتك في إلغاء الاشتراك من ٪@؟";
+"Are you sure you want to unsubscribe from %@?" = "هل أنت متأكد من رغبتك في إلغاء الإشتراك من ٪@؟";
 "Badge & Decreased opacity" = "شارة ونقص التعتيم";
 "Browsing" = "التصفح";
 "Based on system color scheme" = "بناء على نظام ألوان الجهاز";
 "Battery" = "البطارية";
 "Blue" = "أزرق";
-"Buffering stream..." = "جار تخزين تيار الفيديو…";
+"Buffering stream..." = "جار تخزين بث الفيديو…";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "يمكن إرسال الأخطاء وأفكار الميزات الرائعة إلى أداة تعقب مشكلات فى GitHub. ";
 "Button" = "زر";
 "Cancel" = "إلغاء";
@@ -37,13 +37,13 @@
 "Chapters" = "الفصول";
 "Captions" = "التسميات التوضيحية";
 "Cellular" = "خلوي";
-"Clear History" = "مسح التاريخ";
+"Clear History" = "مسح سجل التاريخ";
 "Clear Search History" = "مسح سجل البحث";
 "Clear Search History..." = "مسح سجل البحث…";
 "Clear All" = "مسح الكل";
 "Clear All Recents" = "مسح جميع الجديد";
 "Close player when closing video" = "أغلق المشغل عند غلق الفيديو";
-"Clear" = "مسح الكل";
+"Clear" = "مسح";
 "Close PiP and open player when application enters foreground" = "أغلق الفيديو المصغر وافتح المشغل عندما يدخل التطبيق في المقدمة";
 "Close PiP when player is opened" = "أغلق الفيديو المصغر عند فتح المشغل";
 "Close Video" = "اغلق الفيديو";
@@ -74,21 +74,21 @@
 "Decrease rate" = "انخفاض معدل";
 "Decreased opacity" = "انخفاض التعتيم";
 "Enable logging" = "تمكين التسجيل";
-"Discord Server" = "سيرفر Discord";
+"Discord Server" = "خادم Discord";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "تجري المناقشات في Discord و Matrix. إنه مكان جيد للأسئلة العامة.";
 "Don't use public locations" = "لا تستخدم المواقع العامة";
 "Donations" = "التبرعات";
 "Done" = "تم";
 "Duration" = "مدة";
 "Edit" = "تعديل";
-"Edit Playlist" = "عدل قائمة التشغيل";
+"Edit Playlist" = "عدل قائمة تشغيل";
 "Edit Quality Profile" = "تعديل ملف تعريف الجودة";
 "Edit..." = "تعديل...";
 "Enable Return YouTube Dislike" = "تمكين إرجاع زر لا يعجبني";
 "Enter fullscreen in landscape" = "املاء الشاشة عند الدخول فى الوضع الافقي";
 "Error" = "خطأ";
-"Error when accessing playlist" = "خطأ عند الوصول إلى قائمة التشغيل";
-"Favorites" = "المفضلات";
+"Error when accessing playlist" = "خطأ عند الوصول إلى قائمة تشغيل";
+"Favorites" = "المفضلة";
 "Filter: active" = "المنقى: فعال";
 "Find Other" = "العثور على غيرها";
 "Finding something to play..." = "العثور على شيء للتشغيل ...";
@@ -98,7 +98,7 @@
 "Hide sidebar" = "إخفاء الشريط الجانبي";
 "Highest" = "أعلى";
 "Highest quality" = "أعلى جودة";
-"History" = "تاريخ";
+"History" = "سجل التاريخ";
 
 /* Video date filter in search */
 "Hour" = "ساعة";
@@ -121,7 +121,7 @@
 "Issues Tracker" = "تعقب المشاكل";
 
 /* Selected video has just finished playing */
-"Just watched" = "تمت مشاهدته للتو";
+"Just watched" = "تمت المشاهدة للتو";
 
 /* Player controls layout size */
 "Large" = "كبير";
@@ -129,7 +129,7 @@
 "LIVE" = "مباشر";
 
 /* Loading stream OSD */
-"Loading streams..." = "جارٍ تحميل البثوث ...";
+"Loading streams..." = "جارٍ تحميل بثوث ...";
 "Loading..." = "تحميل...";
 
 /* Video duration filter in search */
@@ -137,9 +137,9 @@
 "Low" = "منخفض";
 "Low quality" = "جودة منخفضة";
 "Lowest" = "أدنى";
-"Mark as watched" = "وضع علامة كمراقب";
-"Mark video as watched after playing" = "ضع علامة على الفيديو كمشاهدة بعد التشغيل";
-"Mark watched videos with" = "وضع علامة على مقاطع الفيديو التي تمت مشاهدتها باستخدام";
+"Mark as watched" = "وضع علامة تمت المشاهدة";
+"Mark video as watched after playing" = "ضع علامة على الفيديو تمت المشاهدة بعد التشغيل";
+"Mark watched videos with" = "وضع علامة على مقاطع الفيديو التي تمت المشاهدة باستخدام";
 "Matrix Channel" = "قناة Matrix";
 "Matrix Chat" = "دردشة Matrix";
 "More info can be found in:" = "يمكن العثور على مزيد من المعلومات في:";
@@ -154,7 +154,7 @@
 "No results" = "لا توجد نتائج";
 "Normal" = "عادي";
 "Not available" = "غير متوفر";
-"Not Playing" = "لا يلعب";
+"Not Playing" = "لا يعمل";
 "Nothing" = "لا شئ";
 
 /* SponsorBlock category name */
@@ -163,19 +163,19 @@
 "Open Settings" = "افتح الإعدادات";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "فتح %@ تيار ...";
-"Opening audio stream..." = "يتم الآن فتح الصوت ...";
+"Opening %@ stream..." = "فتح %@ بث ...";
+"Opening audio stream..." = "يتم فتح بث صوتي ...";
 "Orientation" = "اتجاه";
-"Play in PiP" = "تشغيل الفيديو المصغر";
+"Play in PiP" = "تشغيل في الفيديو المصغر";
 "Play Last" = "تشغيل الاخير";
-"Play Music" = "شغل الموسيقى";
+"Play Music" = "تشغل الموسيقى";
 "Play Next" = "تشغيل التالى";
-"Play Now" = "شغل الآن";
-"Playback" = "التشغيل";
+"Play Now" = "تشغل الآن";
+"Playback" = "إعادة التشغيل";
 "Player" = "المشغل";
-"Playlist" = "قائمة التشغيل";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "سيتم حذف قائمة التشغيل \"%@\".\nلا يمكن التراجع عنه.";
-"Playlists" = "قوائم التشغيل";
+"Playlist" = "قائمة تشغيل";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "سيتم حذف قائمة تشغيل \"%@\".\nلا يمكن التراجع عنه.";
+"Playlists" = "قوائم تشغيل";
 "Popular" = "شعبي";
 "Preferred Formats" = "التنسيقات المفضلة";
 "Profiles" = "ملفات تعريف";
@@ -195,26 +195,26 @@
 "Refresh" = "تحديث";
 "Regular size" = "الحجم العادي";
 "Regular Size" = "الحجم العادي";
-"Related" = "ذات الصله";
+"Related" = "ذات الصلة";
 
 /* Video sort order in search */
 "Relevance" = "الصلة";
-"Remove" = "أزيل";
+"Remove" = "‏إزالة";
 "Remove from Favorites" = "إزالة من المفضلة";
 "Remove from history" = "إزالة من سجل التاريخ";
-"Remove from Playlist" = "إزالة من قائمة التشغيل";
+"Remove from Playlist" = "إزالة من قائمة تشغيل";
 "Remove from the queue" = "إزالة من قائمة الانتظار";
 "Replies" = "الردود";
 "Reset" = "إعادة ضبط";
 "Reset search filters" = "إعادة تعيين عوامل تصفية البحث";
-"Reset watched status when playing again" = "إعادة تعيين حالة المشاهدة عند اللعب مرة أخرى";
+"Reset watched status when playing again" = "إعادة تعيين حالة المشاهدة عند التشغيل مرة أخرى";
 "Resolution" = "دقة";
-"Restart" = "اعاده تشغيل";
+"Restart" = "إعادة تشغيل";
 "Restart the app to apply the settings above." = "أعد تشغيل التطبيق لتطبيق الإعدادات أعلاه.";
 "Restore default profiles..." = "استعادة ملفات التعريف الافتراضية ...";
 "Round corners" = "زوايا مستديرة";
-"Save" = "يحفظ";
-"Save history of searches, channels and playlists" = "حفظ سجل عمليات البحث والقنوات وقوائم التشغيل";
+"Save" = "حفظ";
+"Save history of searches, channels and playlists" = "حفظ سجل عمليات البحث والقنوات وقوائم تشغيل";
 "Search history is empty" = "سجل البحث فارغ";
 "Search..." = "بحث...";
 "Sections" = "الأقسام";
@@ -222,8 +222,8 @@
 
 /* SponsorBlock category name */
 "Self-promotion" = "الترويج الذاتي";
-"Settings" = "اعدادات";
-"Share %@ link" = "مشاركة الرابط %@";
+"Settings" = "الإعدادات";
+"Share %@ link" = "مشاركة رابط %@";
 "Share %@ link with time" = "مشاركة الرابط %@ مع الوقت";
 "Share..." = "شارك...";
 
@@ -232,9 +232,9 @@
 "Show account username" = "إظهار اسم مستخدم الحساب";
 "Show anonymous accounts" = "إظهار الحسابات المجهولة";
 "Show channel name" = "إظهار اسم القناة";
-"Show history" = "عرض التاريخ";
+"Show history" = "‏إظهار سجل التاريخ";
 "Show keywords" = "إظهار الكلمات الرئيسية";
-"Show playback statistics" = "عرض إحصائيات التشغيل";
+"Show playback statistics" = "إظهار إحصائيات التشغيل";
 "Show sidebar when space permits" = "إظهار الشريط الجانبي عندما تسمح المساحة";
 "Shuffle" = "خلط";
 "Shuffle All" = "خلط الجميع";
@@ -262,7 +262,7 @@
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "ستتم معالجة هذه المعلومات فقط على جهازك واستخدامها لتوصيلك بالخادم في البلد المحدد.";
 "Upload date" = "تاريخ الرفع";
 "URL" = "الرابط";
-"Used to create links from videos, channels and playlists" = "يستخدم لإنشاء روابط من مقاطع الفيديو والقنوات وقوائم التشغيل";
+"Used to create links from videos, channels and playlists" = "يستخدم لإنشاء روابط من مقاطع الفيديو والقنوات وقوائم تشغيل";
 "Username" = "اسم المستخدم";
 
 /* Player controls layout size */
@@ -271,18 +271,18 @@
 
 /* Video sort order in search */
 "Views" = "المشاهدات";
-"Watched" = "تمت مشاهدته";
+"Watched" = "تمت المشاهدة";
 
 /* Selected video was played on given date */
-"Watched %@" = "شاهدت %@";
+"Watched %@" = "تمت ‏ المشاهدة %@";
 
 /* Selected video is being played */
-"Watching now" = "يشاهد الآن";
+"Watching now" = "المشاهدة الآن";
 
 /* Video date filter in search */
 "Week" = "أسبوع";
 "Welcome" = "مرحبا";
-"When partially watched video is played" = "عند تشغيل الفيديو الذي تمت مشاهدته جزئيا";
+"When partially watched video is played" = "عند تشغيل الفيديو الذي تمت المشاهدة جزئيا";
 "Wi-Fi" = "واي فاي";
 "Yattee" = "Yattee";
 "Yattee %@ (build %@)" = "Yattee%@ (بناء%@)";
@@ -298,26 +298,26 @@
 "Unlisted" = "غير علنى";
 "Now Playing" = "يعرض الآن";
 "Playback queue is empty" = "قائمة انتظار التشغيل فارغة";
-"Playing Next" = "تشغيل الآتي";
-"Add Channels, Playlists and Searches to Favorites using" = "إضافة القنوات وقوائم التشغيل وعمليات البحث إلى المفضلات باستخدام";
+"Playing Next" = "تشغيل التالي";
+"Add Channels, Playlists and Searches to Favorites using" = "إضافة القنوات، قوائم تشغيل، عمليات البحث إلى المفضلة باستخدام";
 "Make default" = "جعله افتراضي";
 "Visibility" = "امكانية الرؤية";
-"Stream & Player" = "تيار ومشغل";
+"Stream & Player" = "بث و تشغيل";
 "Statistics" = "إحصائيات";
 "Hardware decoder" = "وحدة فك ترميز الأجهزة";
 "Rate & Captions" = "التقييم والتسميات التوضيحية";
 "Dropped frames" = "الإطارات المتساقطة";
-"Stream FPS" = "عدد الإطارات فى الثانية فى التيار";
+"Stream FPS" = "عدد الإطارات فى الثانية فى البث";
 "Any format" = "أي شكل";
 "%@ formats" = "%@ تنسيقات";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "قائمة التشغيل فارغة\n\nاضغط مع الاستمرار على مقطع فيديو ثم\n\"إضافة إلى قائمة التشغيل\"";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "قائمة تشغيل فارغة\n\nاضغط مع الاستمرار على مقطع فيديو ثم\n\"إضافة إلى قائمة تشغيل\"";
 "Press and hold remote button to open captions and quality menus" = "اضغط مع الاستمرار على زر التحكم عن بعد لفتح التسميات التوضيحية وقوائم الجودة";
 "Comments are disabled" = "التعليقات معطلة";
 "No comments" = "لا توجد تعليقات";
 "No chapters information available" = "لا توجد معلومات متاحة عن الفصول";
 "Open logs in Finder" = "فتح السجلات في Finder";
 "Could not refresh Subscriptions" = "تعذر تحديث الاشتراكات";
-"Could not load streams" = "تعذر تحميل التدفقات";
+"Could not load streams" = "تعذر تحميل البثوث";
 "Could not extract channel information" = "تعذر استخراج معلومات القناة";
 "Could not extract SID from received cookies: %@" = "تعذر استخراج SID من ملفات تعريف الارتباط المستلمة: %@";
 "Could not update your token." = "تعذر تحديث الرمز المميز الخاص بك.";
@@ -325,13 +325,13 @@
 "For custom locations you can configure Frontend URL in Locations settings" = "بالنسبة للمواقع المخصصة، يمكنك تكوين عنوان URL للواجهة الأمامية في إعدادات المواقع";
 "This URL could not be opened" = "تعذر فتح عنوان URL هذا";
 "Could not open channel" = "تعذر فتح القناة";
-"Could not open playlist" = "تعذر فتح قائمة التشغيل";
+"Could not open playlist" = "تعذر فتح قائمة تشغيل";
 "Could not extract video ID" = "تعذر استخراج معرف الفيديو";
 "This video could not be opened" = "تعذر فتح هذا الفيديو";
-"Could not extract playlist ID" = "تعذر استخراج معرف قائمة التشغيل";
+"Could not extract playlist ID" = "تعذر استخراج معرف قائمة تشغيل";
 "Could not load video" = "تعذر تحميل الفيديو";
 "No locations available at the moment" = "لا توجد مواقع متاحة في الوقت الحالي";
-"Could not refresh Playlists" = "تعذر تحديث قوائم التشغيل";
+"Could not refresh Playlists" = "تعذر تحديث قوائم تشغيل";
 "If you want this app to be available in your language, join translation project." = "إذا كنت تريد أن يكون هذا التطبيق متاحا بلغتك ، فانضم إلى مشروع الترجمة.";
 "Translations" = "الترجمات";
 "No documents" = "لا توجد مستندات";
@@ -339,14 +339,14 @@
 "Share files from Finder on a Mac\nor iTunes on Windows" = "مشاركة الملفات من Finder على جهاز Mac\nأو iTunes على Windows";
 "Home" = "الصفحة الرئيسية";
 "Show Open Videos quick actions" = "إظهار الإجراءات السريعة لمقاطع الفيديو المفتوحة";
-"Recent History" = "التاريخ الحديث";
-"Show Favorites" = "إظهار المفضلات";
+"Recent History" = "سجل تاريخ حديث";
+"Show Favorites" = "إظهار المفضلة";
 "Inspector visibility" = "امكانية رؤية المفتش";
-"Edit Favorites…" = "تعديل المفضلات…";
+"Edit Favorites…" = "تعديل المفضلة…";
 "Buttons labels" = "تسميات الأزرار";
-"Show Documents" = "عرض الوثائق";
+"Show Documents" = "إظهار الوثائق";
 "Pages toolbar position" = "موضع شريط أدوات الصفحات";
-"Show Inspector" = "عرض المفتش";
+"Show Inspector" = "إظهار المفتش";
 "Reload manifest" = "إعادة تحميل البيان";
 "Open" = "فتح";
 "Video actions buttons" = "أزرار إجراءات الفيديو";
@@ -355,39 +355,39 @@
 "Channel" = "قناة";
 "Shorts" = "فيديوهات قصيرة";
 "Verified" = "مصدق عليها";
-"Live Streams" = "البثوث المباشرة";
+"Live Streams" = "بثوث مباشرة";
 "Are you sure you want to remove %@ location?" = "هل أنت متأكد أنك تريد إزالة موقع @%؟";
 "Could not delete document" = "تعذر حذف المستند";
 "\"%@\" will be irreversibly removed from this device." = "ستتم إزالة \"%@\" بشكل لا رجعة فيه من هذا الجهاز.";
 "Are you sure you want to remove this document?" = "هل أنت متأكد من أنك تريد إزالة هذا المستند؟";
-"Open Video" = "افتح الفيديو";
+"Open Video" = "فتح الفيديو";
 "Address" = "عنوان";
 "Remove…" = "أزيل…";
-"Show sidebar" = "عرض الشريط الجانبي";
+"Show sidebar" = "إظهار الشريط الجانبي";
 "Remove Location" = "إزالة الموقع";
 " subscribers" = " المتابعين";
 "Accounts" = "الحسابات";
-"10 seconds forwards/backwards" = "عشرة ثوان إلى الأمام/الخلف";
+"10 seconds forwards/backwards" = "10 ثوان إلى الأمام/الخلف";
 
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "أي";
 "Are you sure you want to clear search history?" = "هل أنت متأكد من أنك تريد مسح سجل البحث؟";
-"Add to Favorites" = "أضف إلى المفضلات";
+"Add to Favorites" = "إضافة إلى المفضلة";
 "Anonymous" = "مجهول";
-"Are you sure you want to delete playlist?" = "هل أنت متأكد من أنك تريد حذف قائمة التشغيل؟";
-"Are you sure you want to clear history of watched videos?" = "هل أنت متأكد من أنك تريد مسح سجل مقاطع الفيديو التي تمت مشاهدتها؟";
+"Are you sure you want to delete playlist?" = "هل أنت متأكد من أنك تريد حذف قائمة تشغيل؟";
+"Are you sure you want to clear history of watched videos?" = "هل أنت متأكد من أنك تريد مسح سجل مقاطع الفيديو التي تمت المشاهدة؟";
 "Clear the queue" = "امسح قائمة الانتظار";
 "Charging" = "جاري الشحن";
 "Close" = "أغلق";
 "Close player when starting PiP" = "أغلق المشغل عند فتح الفيديو المصغر";
-"High" = "عالية";
+"High" = "عالي";
 "Badge color" = "لون الشارة";
 "Accounts are not supported for the application of this instance" = "الحسابات غير مدعومة للتطبيق الخاص بهذه الحالة";
 "Backend" = "الواجهة الخلفية";
 "Badge" = "شارة";
 "Close PiP when starting playing other video" = "أغلق الفيديو المصغر عند بدء تشغيل فيديو آخر";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الاشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع فيديو).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الإشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع فيديو).";
 "Filter" = "تنقية";
 "Frontend URL" = "عنوان URL للواجهة الأمامية";
 "Fullscreen size" = "حجم ملء الشاشة";
@@ -401,10 +401,10 @@
 
 /* Video date filter in search */
 "Month" = "شهر";
-"Open \"Playlists\" tab to create new one" = "افتح علامة التبويب \"قوائم التشغيل\" لإنشاء واحدة جديدة";
-"Pause when player is closed" = "إيقاف مؤقت عند إغلاق اللاعب";
+"Open \"Playlists\" tab to create new one" = "افتح علامة التبويب \"قوائم تشغيل\" لإنشاء واحدة جديدة";
+"Pause when player is closed" = "إيقاف مؤقت عند إغلاق المشغل";
 "Play" = "تشغيل";
-"Pause when entering background" = "توقف مؤقتا عند إدخال الخلفية";
+"Pause when entering background" = "توقف مؤقتا عند دخول الخلفية";
 "Pause" = "وقف مؤقت";
 
 /* SponsorBlock category name */
@@ -414,9 +414,9 @@
 "Picture in Picture" = "الفيديو المصغر";
 "Play All" = "تشغيل الكل";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "سيتم تحديد التنسيقات بالترتيب كما هو مدرج.\nHLS هو تنسيق قابل للتكيف (لا ينطبق إعداد الدقة).";
-"Restart/Play next" = "أعد تشغيل / شغل بعد ذلك";
+"Restart/Play next" = "أعد تشغيل / تشغيل التالي";
 "Rotate to portrait when exiting fullscreen" = "التدوير إلى عمودي عند الخروج من وضع ملء الشاشة";
-"Save history of played videos" = "حفظ تاريخ مقاطع الفيديو المشغلة";
+"Save history of played videos" = "حفظ سجل تاريخ مقاطع الفيديو المشغلة";
 "Search" = "بحث";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "المقاطع التي يتم العثور عليها عادة في بداية الفيديو والتي تتضمن رسما متحركا أو إطارا ثابتا أو مقطعا يظهر أيضا في مقاطع فيديو أخرى من قبل منشئ المحتوى نفسه.";
 "Show progress of watching on thumbnails" = "إظهار تقدم المشاهدة على الصور المصغرة";
@@ -424,7 +424,7 @@
 /* Player controls layout size */
 "Smaller" = "الأصغر";
 "Switch to public locations" = "التبديل إلى المواقع العامة";
-"Show video length" = "عرض طول الفيديو";
+"Show video length" = "إظهار طول الفيديو";
 "Private" = "خاص";
 "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "من الجيد سماع ذلك. من الممتع تقديم التطبيقات التي يريد الآخرون استخدامها. يمكنك التفكير في التبرع للمشروع أو المساعدة من خلال المساهمة في تطوير ميزات جديدة.";
 
@@ -437,14 +437,14 @@
 "Today" = "اليوم";
 "Trending" = "الشائع";
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "عادةً ما تكون بالقرب من الفيديو أو في نهايته عند ظهور قائمة الأسماء و / أو ظهور بطاقات النهاية.";
-"Unsubscribe" = "إلغاء الاشتراك";
+"Unsubscribe" = "إلغاء الإشتراك";
 
 
 "Public" = "علني";
 "Share Logs..." = "مشاركة السجلات …";
 "Current Location" = "الموقع الحالي";
 "You can switch between profiles in playback settings controls." = "يمكنك التبديل بين ملفات التعريف في عناصر التحكم في إعدادات التشغيل.";
-"Current Playlist" = "قائمة التشغيل الحالية";
+"Current Playlist" = "قائمة تشغيل الحالية";
 "Keep last played video in the queue after restart" = "احتفظ بآخر فيديو تم تشغيله في قائمة الانتظار بعد إعادة التشغيل";
 "Cached time" = "الوقت المخزن مؤقتا";
 "It can be changed later in settings. You can use your own locations too." = "يمكن تغييره لاحقا في الإعدادات. يمكنك استخدام المواقع الخاصة بك أيضا.";
@@ -453,16 +453,16 @@
 "Could not refresh Popular" = "تعذر تحديث المحتويات الشعبية";
 "Files" = "الملفات";
 "Could not create share link" = "تعذر إنشاء رابط مشاركة";
-"Show Home" = "عرض الصفحة الرئيسية";
+"Show Home" = "إظهار الصفحة الرئيسية";
 "Video Details" = "تفاصيل الفيديو";
 "Clear Queue before opening" = "مسح قائمة الانتظار قبل الفتح";
 "Current: %@\n%@" = "الحالي: %@\n%@";
 "Thumbnails" = "المعاينات";
-"Show Open Videos toolbar button" = "إظهار زر الفيديوهات المفتوحة في شريط الأدوات";
+"Show Open Videos toolbar button" = "أظهار زر شريط الأدوات لمقاطع الفيديو المفتوحة";
 "URL to Open" = "الرابط المراد فتحه";
 "Enter link to open" = "أدخل الرابط للفتح";
 "Pages buttons" = "أزرار الصفحات";
-"Could not open Files" = "لا يمكن فتح الملفات";
+"Could not open Files" = "تعذر فتح الملفات";
 "Paste" = "لصق";
 "Open Videos" = "فتح الفيديوهات";
 "Enter links to open, one per line" = "أدخل الروابط للفتح, كل رابط في سطر";
@@ -484,7 +484,7 @@
 "Codec" = "الترميز";
 "Size" = "حجم";
 "FPS" = "شريحة كل ثانية";
-"Could not find any links to open in your clipboard" = "لا يمكن العثور على روابط للفتح في الحافظة";
+"Could not find any links to open in your clipboard" = "تعذر العثور على روابط للفتح في الحافظة";
 "Actions buttons" = "أزرار الإجراءات";
 "Locations Manifest" = "بيان المواقع";
 "Default Profile" = "الملف الشخصي الإفتراضي";
@@ -492,14 +492,115 @@
 "Copy%@link" = "نسخ الرابط %@";
 "Share%@link" = "مشاركة الرابط %@";
 "Instance of current account" = "مثيل الحساب الحالي";
-"Seek gesture sensitivity" = "إطار حساسية الإيماءات";
-"Video" = "";
-"Audio" = "";
-"Honor orientation lock" = "";
-"Proxy videos" = "توكيل الفيديوهات";
-"Seek gesture speed" = "سرعة بحث الإيماءة";
-"Seek with horizontal swipe on video" = "للبحث بالتمرير الأفقي على الفيديو";
+"Seek gesture sensitivity" = "حساسية إيماءة التقديم";
+"Video" = "‏الفيديو";
+"Audio" = "الصوت";
+"Honor orientation lock" = "قفل توجيه الشرف";
+"Proxy videos" = "وكيل الفيديوهات";
+"Seek gesture speed" = "سرعة إيماءة التقديم";
+"Seek with horizontal swipe on video" = "التقديم باستخدام التمرير الأفقي على الفيديو";
 "System controls show buttons for %@" = "تعرض ضوابط النظام أزرارًا لـ %@";
 "Wiki" = "ويكي";
-"Sample Rate" = "";
+"Sample Rate" = "معدل العينة";
 "Short videos: visible" = "مقاطع الفيديو القصيرة: مرئية";
+"Show channel avatars in channels lists" = "‏إظهار الصور الرمزية للقناة في قوائم القنوات";
+"Show channel avatars in videos lists" = "أظهر الصور الرمزية للقناة في قوائم مقاطع الفيديو";
+"Keep channels with unwatched videos on top of subscriptions list" = "احتفظ بالقنوات التي تحتوي على مقاطع فيديو غير المشاهدة على رأس قائمة الاشتراكات";
+"Show video context menu options to force selected backend" = "أظهر خيارات قائمة سياق الفيديو لفرض الواجهة الخلفية المحددة";
+"Play Now in AVPlayer" = "تشغيل الآن في AVPlayer";
+"Play Now in MPV" = "تشغيل الآن في MPV";
+"Enter account credentials to connect..." = "أدخل بيانات اعتماد الحساب للاتصال...";
+"Seek" = "التقديم";
+"Show scroll to top button in comments" = "أظهر التمرير إلى الزر العلوي في التعليقات";
+"Enter location address to connect..." = "أدخل عنوان الموقع للإتصال...";
+"File Extension" = "ملحق الملف";
+"Public account" = "حساب عام";
+"Your Accounts" = "حساباتك";
+"Browse without account" = "تصفح بدون حساب";
+"Mark channel feed as unwatched" = "ضع علامة على تغذية القناة لم تتم المشاهدة";
+"Play all unwatched" = "‏تشغيل كل شيء لم يتم المشاهدة";
+"Player Bar" = "‏شريط المشغل";
+"Double tap gesture" = "إيماءة النقرة المزدوجة";
+"Open expanded" = "فتح موسعاً";
+"Always show controls buttons" = "‏دائما إظهار أزرار التحكم";
+"Clear all" = "‏مسح الكل";
+"Maximum width expanded" = "الحد الأقصى للعرض الموسع";
+"Single tap gesture" = "إيماءة بنقرة واحدة";
+"Tap and hold channel thumbnail to open context menu with more actions" = "‫ اضغط مع الاستمرار على الصورة المصغرة للقناة لفتح قائمة السياق مع المزيد من الإجراءات";
+"Right click channel thumbnail to open context menu with more actions" = "انقر بزر الماوس الأيمن فوق الصورة المصغرة للقناة لفتح قائمة السياق مع المزيد من الإجراءات";
+"Seeking" = "التقديم";
+"Gesture: fowards" = "إيماءة: إلى الأمام";
+"Show unwatched feed badges" = "أظهر شارات التغذية التي لم تتم المشاهدة";
+"Controls button: forwards" = "زر التحكم: إلى الأمام";
+"Gesture: backwards" = "إيماءة: للخلف";
+"Hide player" = "إخفاء المشغل";
+"Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "التحكم في إعدادات إيماءة الفاصل الزمني للتخطي لإيماءة النقر المزدوج على الجانب الأيسر / الأيمن من المشغل. يتطلب تغيير إعدادات عناصر التحكم في النظام إعادة التشغيل.";
+"Controls Buttons" = "أزرار التحكم";
+"Play next item" = "الشغل العنصر التالي";
+"Lock orientation" = "‏إقفال التدوير";
+"Music Mode" = "وضع الموسيقى";
+"Close video" = "أغلق الفيديو";
+"Total size: %@" = "الحجم الإجمالي: %@";
+"Actions Buttons" = "أزرار الإجراءات";
+"Subscribe/Unsubscribe" = "الإشتراك/إلغاء الإشتراك";
+"Show cache status" = "أظهر حالة ذاكرة التخزين المؤقت";
+"Cache" = "ذاكرة التخزين المؤقت";
+"Maximum feed items" = "الحد الأقصى لعناصر التغذية";
+"Open channels with description expanded" = "فتح القنوات مع الوصف موسعاً";
+"Close video and player on end" = "أغلق الفيديو والمشغل على النهاية";
+"Use system controls with AVPlayer" = "استخدم عناصر التحكم في النظام مع AVPlayer";
+"Rotate when entering fullscreen on landscape video" = "قم بالتدوير عند إدخال ملء الشاشة على فيديو الأفقي";
+"Landscape left" = "‏يسار الأفقي";
+"Landscape right" = "‏يمين الأفقي";
+"No rotation" = "‏لا تدوير";
+"System controls" = "نظام التحكم";
+"Controls button: backwards" = "زر التحكم: للخلف";
+"Are you sure you want to clear cache?" = "هل أنت متأكد من أنك تريد مسح ذاكرة التخزين المؤقت؟";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "التحكم في إعدادات إيماءة الفاصل الزمني للتخطي لأزرار الأسهم عن بعد (للجيل الثاني من Siri Remote أو أحدث). يتطلب تغيير إعدادات عناصر التحكم في النظام إعادة التشغيل.";
+"Opened File" = "ملف مفتوح";
+"Opening file..." = "فتح الملف...";
+"Short videos: hidden" = "مقاطع الفيديو القصيرة: مخفية";
+"Mark channel feed as watched" = "ضع علامة على تغذية القناة تمت المشاهدة";
+"Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "التحكم في إعدادات إيماءة فترة التخطي للنقر المزدوج على الجانب الأيسر/الأيمن من المشغل. يتطلب تغيير إعدادات عناصر التحكم في النظام إعادة التشغيل.";
+"Available" = "متوفر";
+"Startup section" = "‏قسم بدء التشغيل";
+"Home Settings" = "‏إعدادات الرئيسية";
+"Watched: hidden" = "تمت المشاهدة: مخفي";
+"Watched: visible" = "تمت المشاهدة: مرئي";
+"No videos to show" = "لا توجد مقاطع فيديو لعرضها";
+"(watched and shorts hidden)" = "(تمت المشاهدة ومقاطع قصيرة مخفية)";
+"(shorts hidden)" = "(مقاطع قصيرة مخفية)";
+"Disable filters" = "تعطيل الفلاتر";
+"(watched hidden)" = "(تم المشاهدة مخفية)";
+"Limit" = "حد";
+"Are you sure you want to remove %@ from Favorites?" = "هل أنت متأكد من أنك تريد إزالة %@ من المفضلة؟";
+"List" = "قائمة";
+"Cells" = "خلايا";
+"Toggle size" = "‏حجم التبديل";
+"Toggle player" = "تبديل المشغل";
+"Show Next in Queue" = "أظهر التالي في قائمة الانتظار";
+"Show toggle watch status button" = "إظهار تبديل زر حالة الساعة";
+"Next in Queue" = "التالي في قائمة الإنتظار";
+"Do nothing" = "لا تفعل شيئا";
+"Open channel" = "فتح القناة";
+"Inspector" = "مفتش";
+"Open video description expanded" = "فتح وصف الفيديو موسعاً";
+"Feed" = "تغذية";
+"Mark all as unwatched" = "ضع علامة على الجميع على أنه لم تتم المشاهدة";
+"Mark all as watched" = "ضع علامة على الجميع على أنه تمت المشاهدة";
+"Queue - shuffled" = "قائمة الإنتظار - تم خلطها";
+"Replay" = "إعادة المشغل";
+"Lock" = "قفل";
+"Fullscreen" = "ملء الشاشة";
+"Loop one" = "‏حلقة واحدة";
+"Playback Settings" = "إعدادات التشغيل";
+"Description" = "وصف";
+"Autoplay next" = "التشغيل التلقائي التالي";
+"Stream" = "بث";
+"Chapters (if available)" = "الفصول (إن وجدت)";
+"Open vertical chapters expanded" = "فتح الفصول الرأسية موسعاً";
+"No preview" = "لا توجد معاينة";
+"Description preview" = "معاينة الوصف";
+"Podcasts" = "‏بودكاست";
+"Releases" = "الإصدارات";
+"Add %@" = "إضافة %@";
