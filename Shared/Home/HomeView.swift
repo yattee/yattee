@@ -116,14 +116,14 @@ struct HomeView: View {
             #endif
         }
         .onAppear {
-            Defaults.observe(.favorites) { _ in
-                favoritesChanged.toggle()
+            Task {
+                for await _ in Defaults.updates(.favorites) {
+                    favoritesChanged.toggle()
+                }
+                for await _ in Defaults.updates(.widgetsSettings) {
+                    favoritesChanged.toggle()
+                }
             }
-            .tieToLifetime(of: accounts)
-            Defaults.observe(.widgetsSettings) { _ in
-                favoritesChanged.toggle()
-            }
-            .tieToLifetime(of: accounts)
         }
 
         .redrawOn(change: favoritesChanged)
