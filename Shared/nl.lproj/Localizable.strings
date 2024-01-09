@@ -1,0 +1,62 @@
+
+
+"Always use AVPlayer for live videos" = "Gebruik altijd AVPlayer voor live video's";
+"Clear Search History..." = "Wis zoek geschiedenis...";
+"Add to %@" = "Toevoegen aan %@";
+"10 seconds forwards/backwards" = "10 seconden vooruit/achteruit";
+"Based on system color scheme" = "Gebaseerd op systeem kleuren pallet";
+" subscribers" = " Abonnees";
+"Button" = "Knop";
+"Are you sure you want to restore default quality profiles?" = "Weet u zeker dat u de standaardkwaliteitsprofielen wilt herstellen?";
+"Charging" = "Opladen";
+"Are you sure you want to unsubscribe from %@?" = "Weet u zeker dat u zich wilt afmelden voor %@?";
+"Automatic" = "Automatisch";
+"Add Quality Profile" = "Kwaliteitsprofiel toevoegen";
+"Clear" = "Leeg";
+"Anonymous" = "Anoniem";
+"Add to Favorites" = "Toevoegen aan favorieten";
+"Badge color" = "Embleem kleur";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "Alles";
+"Clear All Recents" = "Leeg alle recenten";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Bugs en functie-ideeën kunnen naar de GitHub-problementracker worden gestuurd. ";
+"Add to Playlist..." = "Toevoegen aan afspeellijst...";
+"Category" = "Categorie";
+"Apply to all" = "Toepassen op alles";
+"Close" = "Dicht";
+"Are you sure you want to clear search history?" = "Weet u zeker dat u de zoekgeschiedenis wilt wissen?";
+"Clear Search History" = "Wis zoek geschiedenis";
+"Buffering stream..." = "Stream bufferen...";
+"Chapters" = "Hoofdstukken";
+"Categories to Skip" = "Categorieën om over te slaan";
+"Clear All" = "Leeg alles";
+"Add Account" = "Account toevoegen";
+"Cancel" = "Annuleren";
+"Accounts are not supported for the application of this instance" = "Accounts zijn niet ondersteund voor de toepassing van dit exemplaar";
+"Battery" = "Batterij";
+"%@ Playlist" = "Afspeellijst";
+"Add profile..." = "Profiel toevoegen...";
+"Add Location" = "Locatie toevoegen";
+"Add Location..." = "Locatie toevoegen...";
+"%@ subscribers" = "abonnees";
+"Accounts" = "Accounts";
+"%@ Channel" = "Kanaal";
+"%lld videos" = "%lld video's";
+"Clear the queue" = "Wis de wachtrij";
+"Are you sure you want to clear history of watched videos?" = "Weet je zeker dat je de geschiedenis van bekeken video's wilt wissen?";
+"Are you sure you want to delete playlist?" = "Weet je zeker dat je de afspeellijst wilt verwijderen?";
+"Badge" = "Embleem";
+"Blue" = "Blauw";
+"Clear History" = "Wis geschiedenis";
+"Add Account..." = "Account toevoegen...";
+"Autoplaying Next" = "Volgende automatisch afspelen";
+"Cellular" = "Mobiele data";
+"Add to Playlist" = "Toevoegen aan afspeellijst";
+"Browsing" = "Zoeken";
+"Captions" = "Ondertiteling";
+"Advanced" = "Geavanceerd";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "Elk";
