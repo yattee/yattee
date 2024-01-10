@@ -597,3 +597,8 @@
 "Close video and player on end" = "Закрыть видео и плеер в конце";
 "Use system controls with AVPlayer" = "Использование системных элементов управления с помощью AVPlayer";
 "File Extension" = "Расширение файла";
+"No preview" = "Без предварительного просмотра";
+"Description preview" = "Предварительный просмотр описания";
+"Podcasts" = "Подкасты";
+"Releases" = "Релизы";
+"Add %@" = "Добавить %@";
