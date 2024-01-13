@@ -1,11 +1,8 @@
-## Build 172
+## Build 173
 * Updated dependencies
 * Updated localizations
 * Fixed reported crashes
 * Other minor changes and improvements
-
-**Big thanks to [@stonerl](https://github.com/stonerl) for the last contributions!**
-**And to past, current and future project contributors!**
 
 ## Previous builds
 * Description is collapsible with a button
@@ -21,3 +18,5 @@
 * Added Persian, Spanish, Turkish and Russian localizations
 * Fixed issue with displaying account username
 * Other minor changes and improvements
+
+**Big thanks to the past, current and future project contributors!**
