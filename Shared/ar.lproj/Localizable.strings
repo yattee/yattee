@@ -4,11 +4,11 @@
 "Add Account..." = "إضافة حساب…";
 "Add Location" = "إضافة موقع";
 "Add Location..." = "إضافة موقع...";
-"%@ Playlist" = "%@ قائمة تشغيل";
-"%@ Channel" = "%@ قناة";
-"%@ subscribers" = "%@ المتابعين";
+"%@ Playlist" = "قائمة تشغيل %@";
+"%@ Channel" = "قناة %@";
+"%@ subscribers" = "%@ مشتركين";
 "Add to %@" = "إضافة إلى %@";
-"%lld videos" = "%Lld مقاطع الفيديو";
+"%lld videos" = "مقاطع فيديو %Lld";
 "Add profile..." = "إضافة ملف تعريف...";
 "Add Quality Profile" = "إضافة ملف تعريف الجودة";
 "Add to Playlist" = "إضافة إلى قائمة تشغيل";
@@ -54,7 +54,7 @@
 "Connected successfully (%@)" = "تم الاتصال بنجاح (%@)";
 "Country" = "البلد";
 "Country Name or Code" = "اسم الدولة أو الرمز";
-"Copy %@ link" = "نسخ الرابط: %@";
+"Copy %@ link" = "نسخ رابط %@";
 "Contributing" = "المساهمة";
 "Contact" = "التواصل";
 "Continue from %@" = "الإستمرار من %@";
@@ -163,7 +163,7 @@
 "Open Settings" = "فتح الإعدادات";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "فتح %@ بث...";
+"Opening %@ stream..." = "فتح بث %@ ...";
 "Opening audio stream..." = "فتح بث صوتي...";
 "Orientation" = "اتجاه";
 "Play in PiP" = "تشغيل في الفيديو المصغر";
@@ -224,7 +224,7 @@
 "Self-promotion" = "الترويج الذاتي";
 "Settings" = "الإعدادات";
 "Share %@ link" = "مشاركة رابط %@";
-"Share %@ link with time" = "مشاركة الرابط %@ مع الوقت";
+"Share %@ link with time" = "مشاركة رابط %@ مع الوقت";
 "Share..." = "‏مشاركة...";
 
 /* Video duration filter in search */
@@ -285,7 +285,7 @@
 "When partially watched video is played" = "عند تشغيل الفيديو الذي تمت المشاهدة جزئيا";
 "Wi-Fi" = "واي فاي";
 "Yattee" = "Yattee";
-"Yattee %@ (build %@)" = "Yattee%@ (بناء%@)";
+"Yattee %@ (build %@)" = "Yattee %@ (بناء %@)";
 
 /* Video date filter in search */
 "Year" = "سنة";
@@ -309,7 +309,7 @@
 "Dropped frames" = "الإطارات المتساقطة";
 "Stream FPS" = "عدد الإطارات فى الثانية فى البث";
 "Any format" = "أي شكل";
-"%@ formats" = "%@ تنسيقات";
+"%@ formats" = "تنسيقات %@";
 "Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "قائمة تشغيل فارغة\n\nالضغط مع الإستمرار على مقطع الفيديو ثم\n\"إضافة إلى قائمة تشغيل\"";
 "Press and hold remote button to open captions and quality menus" = "الضغط مع الإستمرار على زر التحكم عن بعد لفتح الترجمة وقوائم الجودة";
 "Comments are disabled" = "التعليقات معطلة";
@@ -365,7 +365,7 @@
 "Remove…" = "‏إزالة…";
 "Show sidebar" = "إظهار الشريط الجانبي";
 "Remove Location" = "إزالة الموقع";
-" subscribers" = " المتابعين";
+" subscribers" = " المشتركين";
 "Accounts" = "الحسابات";
 "10 seconds forwards/backwards" = "10 ثوان إلى الأمام/للخلف";
 
@@ -489,8 +489,8 @@
 "Locations Manifest" = "بيان المواقع";
 "Default Profile" = "الملف الشخصي الإفتراضي";
 "Playback history is empty" = "سجل تاريخ التشغيل فارغ";
-"Copy%@link" = "نسخ الرابط %@";
-"Share%@link" = "مشاركة الرابط %@";
+"Copy%@link" = "نسخ رابط %@";
+"Share%@link" = "مشاركة رابط %@";
 "Instance of current account" = "مثيل الحساب الحالي";
 "Seek gesture sensitivity" = "حساسية إيماءة التقديم";
 "Video" = "الفيديو";
@@ -585,7 +585,7 @@
 "Open channel" = "فتح القناة";
 "Inspector" = "مفتش";
 "Open video description expanded" = "فتح وصف الفيديو موسعاً";
-"Feed" = "تغذية";
+"Feed" = "محتوى الإشتراكات";
 "Mark all as unwatched" = "ضع علامة على الجميع لم تتم المشاهدة";
 "Mark all as watched" = "ضع علامة على الجميع تمت المشاهدة";
 "Queue - shuffled" = "قائمة الإنتظار - تم خلطها";
