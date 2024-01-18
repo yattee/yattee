@@ -496,7 +496,7 @@
 "Video" = "الفيديو";
 "Audio" = "الصوت";
 "Honor orientation lock" = "قفل توجيه الشرف";
-"Proxy videos" = "وكيل مقاطع الفيديو";
+"Proxy videos" = "توسيط المقاطع";
 "Seek gesture speed" = "سرعة إيماءة التقديم";
 "Seek with horizontal swipe on video" = "التقديم باستخدام التمرير الأفقي على الفيديو";
 "System controls show buttons for %@" = "‏نظام عناصر التحكم إظهار الأزرار لـ %@";
