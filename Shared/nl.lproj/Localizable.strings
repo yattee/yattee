@@ -53,10 +53,209 @@
 "Autoplaying Next" = "Volgende automatisch afspelen";
 "Cellular" = "Mobiele data";
 "Add to Playlist" = "Toevoegen aan afspeellijst";
-"Browsing" = "Zoeken";
+"Browsing" = "Bladeren";
 "Captions" = "Ondertiteling";
 "Advanced" = "Geavanceerd";
 
 /* Video date filter in search
    Video duration filter in search */
 "Any" = "Elk";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Als je een fout meldt, voeg dan alle relevantie details toe (in het bijzonder: versienummer van de app, gebruikte apparaat en systeemversie, stappen om te reproduceren).";
+"Opening audio stream..." = "Audio stream aan het openen...";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Deel van een video dat een product of dienst promoot dat niet direct van de maker van de video is. De maker ontvangt compensatie in de vorm van betaling of gratis producten.";
+"Pause when player is closed" = "Pauzeer bij sluiten van de speler";
+"Remove" = "Verwijder";
+"Restart" = "Herstart";
+"Round corners" = "Ronde hoeken";
+"Restart the app to apply the settings above." = "Herstart de app om deze instellingen toe te passen.";
+"Save" = "Opslaan";
+"Close Video" = "Sluit Video";
+"Close video after playing last in the queue" = "Sluit video na het laatste item in de wachtrij";
+"Contact" = "Contact";
+"Copy %@ link" = "Kopieer %@ link";
+"Copy %@ link with time" = "Kopieer %@ link inclusief tijd";
+"Custom Locations" = "Aangepaste locaties";
+"Continue" = "Verder";
+
+/* Video sort order in search */
+"Date" = "Datum";
+"Contributing" = "Bijdragen";
+"Controls" = "Bediening";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discussies vinden plaats op Discord en Matrix. Je kan er terecht voor algemene vragen.";
+"Enter fullscreen in landscape" = "Open volledig scherm in landschapmodus";
+"Error when accessing playlist" = "Fout bij openen afspeellijst";
+"Donations" = "Donaties";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Formaten worden geselecteerd in de genoemde volgorde.\nHLS is een adaptief formaat (instellingen voor resolutie worden niet toegepast).";
+"Backend" = "Backend";
+"Badge & Decreased opacity" = "Embleem & Verminderde helderheid";
+"Close PiP and open player when application enters foreground" = "Sluit Beeld in Beeld en open speler wanneer de app op de voorgrond treedt";
+"Close PiP when player is opened" = "Sluit Beeld in Beeld wanneer de speler wordt geopend";
+"Close PiP when starting playing other video" = "Sluit Beeld in Beeld wanneer een andere video begint te spelen";
+"Close player when closing video" = "Sluit speler bij het sluiten van een video";
+"Close player when starting PiP" = "Sluit speler bij het starten van Beeld in Beeld";
+"Comments" = "Commentaar";
+"Connected successfully (%@)" = "Succesvol verbonden (%@)";
+"Connection failed" = "Verbinding mislukt";
+"Continue from %@" = "Verder vanaf %@";
+"Could not load locations manifest" = "Kon locatie manifest niet laden";
+"Country" = "Land";
+"Country Name or Code" = "Landnaam of -code";
+"Create Playlist" = "Creëer afspeellijst";
+"Current: %@\n%@" = "Huidig: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "Aangepast";
+"Decreased opacity" = "Verlaagde helderheid";
+"Delete" = "Verwijder";
+"Disabled" = "Uitgeschakeld";
+"Don't use public locations" = "Gebruik geen publieke locaties";
+"Decrease rate" = "Verlaag tempo";
+"Done" = "Klaar";
+"Duration" = "Duur";
+"Edit" = "Bewerken";
+"Edit Playlist" = "Bewerk Afspeellijst";
+"Edit Quality Profile" = "Bewerk Kwaliteitsprofiel";
+"Edit..." = "Bewerk...";
+"Enable Return YouTube Dislike" = "Schakel Return YouTube Dislike in";
+"Error" = "Fout";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Expliciete herinneringen om te liken, abonneren of communiceren met hen op enig ander gratis of betaald platform (bijv. op een video klikken).";
+"Favorites" = "Favorieten";
+"Filter" = "Filter";
+"Filter: active" = "Filter: actief";
+"Find Other" = "Vind Andere";
+"Finding something to play..." = "Vind iets om af te spelen...";
+"For videos which feature music as the primary content." = "Voor videos waarin muziek centraal staat als inhoud.";
+"Frontend URL" = "Frontend URL";
+"Fullscreen size" = "Volledig schermformaat";
+"Gaming" = "Gamen";
+"Help" = "Hulp";
+"Hide sidebar" = "Verberg zijbalk";
+"High" = "Hoog";
+"Highest" = "Hoogste";
+"Highest quality" = "Hoogste kwaliteit";
+"History" = "Geschiedenis";
+"Honor orientation lock" = "Staanderichtingsslot opvolgen";
+
+/* Video date filter in search */
+"Hour" = "Uur";
+"I am lost" = "Ik ben verdwaald";
+"I found a bug /" = "Ik heb een fout gevonden /";
+"I have a feature request" = "Ik heb een functieverzoek";
+"I like this app!" = "Ik vind deze app leuk!";
+"I want to ask a question" = "Ik wil een vraag stellen";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Als je geïnteresseerd bent in toekomstige updates, kan je Milestones van het project volgen.";
+"Increase rate" = "Verhoog tempo";
+"Info" = "";
+"Instance of current account" = "Instantie van huidig account";
+
+/* SponsorBlock category name */
+"Interaction" = "Interactie";
+"Issues Tracker" = "Problementracker";
+
+/* Selected video has just finished playing */
+"Just watched" = "Net bekeken";
+
+/* Player controls layout size */
+"Large" = "Groot";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Grote layout is niet geschikt voor alle apparaten en kan er voor zorgen dat niet alles op het scherm past.";
+
+/* Loading stream OSD */
+"Loading streams..." = "Streams aan het laden...";
+"Loading..." = "Laden...";
+"Locations" = "Locaties";
+"Lock portrait mode" = "Vergrendel protretmodus";
+
+/* Video duration filter in search */
+"Long" = "Lang";
+"Low" = "Laag";
+"Low quality" = "Lage kwaliteit";
+"Lowest" = "Laagste";
+"Mark as watched" = "Markeer als bekeken";
+"Mark video as watched after playing" = "Markeer videos als bekeken na afspelen";
+"Mark watched videos with" = "Markeer videos als bekeken met";
+"Matrix Channel" = "Matrix Kanaal";
+
+/* Player controls layout size */
+"Medium" = "Gemiddeld";
+"Medium quality" = "Gemiddelde kwaliteit";
+"Milestones" = "Mijlpalen";
+
+/* Video date filter in search */
+"Month" = "Maand";
+"More info can be found in:" = "Meer informatie beschikbaar in:";
+"Movies" = "Films";
+"MPV Documentation" = "MPV Documentatie";
+"Music" = "Muziek";
+"Name" = "Naam";
+"New Playlist" = "Nieuwe Afspeellijst";
+"Next" = "Volgende";
+"No description" = "Geen omschrijving";
+"No Playlists" = "Geen Afspeellijsten";
+"No results" = "Geen resultaten";
+"Normal" = "Normaal";
+"Not available" = "Niet beschikbaar";
+"Not Playing" = "Niet aan het spelen";
+"Nothing" = "Niets";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "Ongerelateerd in muziekvideos";
+"Only when signed in" = "Alleen wanneer ingelogd";
+"Open \"Playlists\" tab to create new one" = "Open tabblad \"Afspeellijsten\" om een nieuwe te creëeren";
+"Open Settings" = "Open Instellingen";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "Steam %@ aan het openen...";
+"Orientation" = "Oriëntatie";
+"Password" = "Wachtwoord";
+"Pause" = "Pauzeren";
+"Pause when entering background" = "Pauzeer wanneer op de achtergrond";
+"Picture in Picture" = "Beeld in Beeld";
+"Play" = "Speel Af";
+"Play in PiP" = "Speel af in BiB";
+"Play All" = "Speel Alle";
+"Play Last" = "Speel Laatste";
+"Play Music" = "Speel Muziek";
+"Play Next" = "Speel Volgende";
+"Play Now" = "Speel Nu";
+"Playback" = "Afspelen";
+"Player" = "Speler";
+"Playlist" = "Afspeellijst";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Afspeellijst \"%@\" wordt verwijderd.\nDit kan niet ongedaan gemaakt worden.";
+"Playlists" = "Afspeellijsten";
+"Popular" = "Populair";
+"Preferred Formats" = "Voorkeursformaten";
+"Profiles" = "Profielen";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promotie van een product of dienst van de maker van de video zelf. Dit is inclusief promotie van merchandise of betaalde platformen.";
+"Public Locations" = "Publieke Locaties";
+"Public Manifest" = "Openbaar Manifest";
+"Quality" = "Kwaliteit";
+"Quality Profile" = "Kwaliteitsprofiel";
+"Queue" = "Wachtrij";
+"Queue is empty" = "Lege wachtrij";
+"Rate" = "Tempo";
+
+/* Video sort order in search */
+"Rating" = "Beoordeling";
+"Recents" = "Recent";
+"Red" = "Rood";
+"Refresh" = "Ververs";
+"Regular size" = "Normaal formaat";
+"Regular Size" = "Normaal Formaat";
+"Related" = "Gerelateerd";
+
+/* Video sort order in search */
+"Relevance" = "Relevantie";
+"Remove from Favorites" = "Verwijder uit Favorieten";
+"Remove from history" = "Verwijder uit geschiedenis";
+"Remove from Playlist" = "Verwijder uit Afspeellijst";
+"Remove from the queue" = "Verwijder uit de wachtrij";
+"Replies" = "Reacties";
+"Reset search filters" = "Reset zoekfilters";
+"Reset watched status when playing again" = "Reset bekeken-status bij opnieuw afspelen";
+"Resolution" = "Resolutie";
+"Restart/Play next" = "Herstart/Speel hierna";
+"Restore default profiles..." = "Herstel standaard profielen...";
+"Rotate to portrait when exiting fullscreen" = "Roteer naar portretmodus bij het verlaten van volledig scherm";
+"Save history of played videos" = "Sla geschiedenis van afgespeelde videos op";
+"Save history of searches, channels and playlists" = "Sla geschiedenis van zoekopdrachten, kanalen en afspeellijsten op";
+"Search" = "Zoeken";
