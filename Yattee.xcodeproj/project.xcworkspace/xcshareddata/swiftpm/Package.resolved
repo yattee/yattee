@@ -59,7 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cxfksword/MPVKit.git",
       "state" : {
-        "revision" : "dca1e345a26d09a3d621d7656a94e6427f3f7b83"
+        "revision" : "96825b3dc2b38e5550268156148d47798ce6aa74",
+        "version" : "0.36.0"
       }
     },
     {
@@ -104,7 +105,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "59730af512c06fb569c119d737df4c1c499e001d"
+        "revision" : "a41be90abd89b125cd7588f20b9788108254091a"
       }
     },
     {
