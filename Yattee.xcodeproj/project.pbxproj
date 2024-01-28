@@ -203,7 +203,6 @@
 		37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
-		3735C4E729A2D3D70051D251 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 3735C4E629A2D3D70051D251 /* Logging */; };
 		3738535429451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535529451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
@@ -576,6 +575,7 @@
 		378AE943274EF00A006A4EE1 /* Color+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378AE942274EF00A006A4EE1 /* Color+Background.swift */; };
 		378AE944274EF00A006A4EE1 /* Color+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378AE942274EF00A006A4EE1 /* Color+Background.swift */; };
 		378AE945274EF00A006A4EE1 /* Color+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378AE942274EF00A006A4EE1 /* Color+Background.swift */; };
+		378CC2E32B669489006309F4 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 378CC2E22B669489006309F4 /* Logging */; };
 		378E50FB26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
 		378E50FC26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
 		378E50FD26FE8B9F00F49626 /* Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378E50FA26FE8B9F00F49626 /* Instance.swift */; };
@@ -1027,14 +1027,14 @@
 		};
 		372B3689286E022A00BB84D7 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
 				37095E89291DC85400301883 /* Open in Yattee.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		372B368D286E03CD00BB84D7 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -1430,7 +1430,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3735C4E729A2D3D70051D251 /* Logging in Frameworks */,
+				378CC2E32B669489006309F4 /* Logging in Frameworks */,
 				377F9F85294417FA0043F856 /* SwiftyJSON in Frameworks */,
 				377F9F83294417B40043F856 /* Cache in Frameworks */,
 			);
@@ -2340,7 +2340,7 @@
 			packageProductDependencies = (
 				377F9F82294417B40043F856 /* Cache */,
 				377F9F84294417FA0043F856 /* SwiftyJSON */,
-				3735C4E629A2D3D70051D251 /* Logging */,
+				378CC2E22B669489006309F4 /* Logging */,
 			);
 			productName = "Open in Yattee";
 			productReference = 37095E7F291DC85400301883 /* Open in Yattee.appex */;
@@ -3813,7 +3813,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
@@ -3824,7 +3824,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3844,7 +3844,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
@@ -3856,7 +3856,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3875,11 +3875,11 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Shared-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -3895,11 +3895,11 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.arekf.Shared-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -4059,7 +4059,7 @@
 				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -4083,7 +4083,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-Wl,-no_compact_unwind",
@@ -4112,7 +4112,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "GLES_SILENCE_DEPRECATION=1";
@@ -4133,7 +4133,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-Wl,-no_compact_unwind",
@@ -4164,7 +4164,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -4180,7 +4180,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
@@ -4203,7 +4203,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEAD_CODE_STRIPPING = YES;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
@@ -4220,7 +4220,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
@@ -4238,7 +4238,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4246,7 +4246,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4262,7 +4262,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4270,7 +4270,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4288,7 +4288,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4297,7 +4297,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4313,7 +4313,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4322,7 +4322,7 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4339,7 +4339,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4355,7 +4355,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind",
 					"-lstdc++",
@@ -4379,7 +4379,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				DEVELOPMENT_ASSET_PATHS = "";
 				"DEVELOPMENT_TEAM[sdk=appletvos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
@@ -4396,7 +4396,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind",
 					"-lstdc++",
@@ -4420,14 +4420,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -4444,14 +4444,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 174;
+				CURRENT_PROJECT_VERSION = 176;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.YatteeUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -4754,8 +4754,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cxfksword/MPVKit.git";
 			requirement = {
-				kind = revision;
-				revision = dca1e345a26d09a3d621d7656a94e6427f3f7b83;
+				kind = exactVersion;
+				version = 0.36.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -4846,11 +4846,6 @@
 			package = 375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
-		3735C4E629A2D3D70051D251 /* Logging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
-			productName = Logging;
-		};
 		374D11E62943C56300CB4350 /* Cache */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */;
@@ -4920,6 +4915,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
+		};
+		378CC2E22B669489006309F4 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 		379325D429A265A300181CF1 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
