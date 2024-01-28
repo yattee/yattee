@@ -1,4 +1,4 @@
-## Build 176
+## Build 177
 * Updated dependencies
 * Updated localizations
 * Fixed reported crashes
