@@ -1,7 +1,13 @@
 ## Build 177
+* Added Settings Import/Export (iOS, macOS)
+  * Export all settings, instances and accounts
+  * Import selected elements from the file
+  * Include unencrypted passwords in the export or provide them during the import
+* Added Controls setting "Action button labels" icon or icon and text
+* Added Advanced setting for MPV: "deinterlace"
 * Updated dependencies
 * Updated localizations
-* Fixed reported crashes
+* Fixed reported crash
 * Other minor changes and improvements
 
 **Big thanks to the past, current and future project contributors!**
