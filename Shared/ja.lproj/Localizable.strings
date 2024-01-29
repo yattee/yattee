@@ -12,7 +12,7 @@
 " subscribers" = " 人の登録者";
 "%@ subscribers" = "%@ 人の登録者";
 "Accounts are not supported for the application of this instance" = "このインスタンスはアカウントに対応していません";
-"%lld videos" = "本の動画";
+"%lld videos" = "%lld本の動画";
 "%@ Channel" = "%@ チャンネル";
 "%@ Playlist" = "%@ 再生リスト";
 "Add Location" = "場所を追加";
