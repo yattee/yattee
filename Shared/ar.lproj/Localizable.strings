@@ -307,7 +307,7 @@
 "Hardware decoder" = "وحدة فك ترميز الأجهزة";
 "Rate & Captions" = "معدل سرعة التشغيل و الترجمة";
 "Dropped frames" = "الإطارات المتساقطة";
-"Stream FPS" = "عدد الإطارات فى الثانية فى البث";
+"Stream FPS" = "عدد الإطارات في الثانية في البث";
 "Any format" = "أي شكل";
 "%@ formats" = "تنسيقات %@";
 "Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "قائمة تشغيل فارغة\n\nالضغط مع الإستمرار على مقطع الفيديو ثم\n\"إضافة إلى قائمة تشغيل\"";
