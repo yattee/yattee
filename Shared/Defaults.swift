@@ -163,6 +163,9 @@ extension Defaults.Keys {
         static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
     #endif
     static let closeVideoOnEOF = Key<Bool>("closeVideoOnEOF", default: false)
+    #if !os(tvOS)
+        static let exitFullscreenOnEOF = Key<Bool>("exitFullscreenOnEOF", default: true)
+    #endif
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
     static let closePiPOnOpeningPlayer = Key<Bool>("closePiPOnOpeningPlayer", default: false)
     #if !os(macOS)
