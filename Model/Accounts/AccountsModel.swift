@@ -64,6 +64,10 @@ final class AccountsModel: ObservableObject {
         )
     }
 
+    func find(_ id: Account.ID) -> Account? {
+        all.first { $0.id == id }
+    }
+
     func configureAccount() {
         if let account = lastUsed ??
             InstancesModel.shared.lastUsed?.anonymousAccount ??
@@ -108,8 +112,8 @@ final class AccountsModel: ObservableObject {
         Defaults[.accounts].first { $0.id == id }
     }
 
-    static func add(instance: Instance, name: String, username: String, password: String) -> Account {
-        let account = Account(instanceID: instance.id, name: name, urlString: instance.apiURLString)
+    static func add(instance: Instance, id: String? = UUID().uuidString, name: String, username: String, password: String) -> Account {
+        let account = Account(id: id, instanceID: instance.id, name: name, urlString: instance.apiURLString)
         Defaults[.accounts].append(account)
 
         setCredentials(account, username: username, password: password)

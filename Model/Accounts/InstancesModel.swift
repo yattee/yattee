@@ -42,13 +42,21 @@ final class InstancesModel: ObservableObject {
         Defaults[.accounts].filter { $0.instanceID == id }
     }
 
-    func add(app: VideosApp, name: String, url: String) -> Instance {
+    func add(id: String? = UUID().uuidString, app: VideosApp, name: String, url: String) -> Instance {
         let instance = Instance(
-            app: app, id: UUID().uuidString, name: name, apiURLString: standardizedURL(url)
+            app: app, id: id, name: name, apiURLString: standardizedURL(url)
         )
         Defaults[.instances].append(instance)
 
         return instance
+    }
+
+    func insert(id: String? = UUID().uuidString, app: VideosApp, name: String, url: String) -> Instance {
+        if let instance = Defaults[.instances].first(where: { $0.apiURL.absoluteString == standardizedURL(url) }) {
+            return instance
+        }
+
+        return add(id: id, app: app, name: name, url: url)
     }
 
     func setFrontendURL(_ instance: Instance, _ url: String) {

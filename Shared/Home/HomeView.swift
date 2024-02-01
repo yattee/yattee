@@ -22,7 +22,6 @@ struct HomeView: View {
         @Default(.favorites) private var favorites
         @Default(.widgetsSettings) private var widgetsSettings
     #endif
-    @Default(.homeHistoryItems) private var homeHistoryItems
     @Default(.showFavoritesInHome) private var showFavoritesInHome
     @Default(.showOpenActionsInHome) private var showOpenActionsInHome
     @Default(.showQueueInHome) private var showQueueInHome

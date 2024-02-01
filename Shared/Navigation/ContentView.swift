@@ -68,6 +68,7 @@ struct ContentView: View {
                 SettingsView()
             }
         )
+        .modifier(ImportSettingsSheetViewModifier(isPresented: $navigation.presentingSettingsImportSheet, settingsFile: $navigation.settingsImportURL))
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAccounts) {
                 AccountsView()

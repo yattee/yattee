@@ -68,4 +68,8 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(apiURL)
     }
+
+    var accounts: [Account] {
+        AccountsModel.shared.all.filter { $0.instanceID == id }
+    }
 }

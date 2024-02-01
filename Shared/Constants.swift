@@ -61,6 +61,26 @@ enum Constants {
         #endif
     }
 
+    static var deviceName: String {
+        #if os(macOS)
+            Host().localizedName ?? "Mac"
+        #else
+            UIDevice.current.name
+        #endif
+    }
+
+    static var platform: String {
+        #if os(macOS)
+            "macOS"
+        #elseif os(iOS)
+            "iOS"
+        #elseif os(tvOS)
+            "tvOS"
+        #else
+            "unknown"
+        #endif
+    }
+
     static func seekIcon(_ type: String, _ interval: TimeInterval) -> String {
         let interval = Int(interval)
         let allVersions = [10, 15, 30, 45, 60, 75, 90]

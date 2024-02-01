@@ -153,7 +153,7 @@ struct AccountForm: View {
             return
         }
 
-        let account = AccountsModel.add(instance: instance, name: name, username: username, password: password)
+        let account = AccountsModel.add(instance: instance, id: nil, name: name, username: username, password: password)
         selectedAccount?.wrappedValue = account
 
         presentationMode.wrappedValue.dismiss()

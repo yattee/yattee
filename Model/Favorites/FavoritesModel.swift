@@ -25,6 +25,7 @@ struct FavoritesModel {
     }
 
     func add(_ item: FavoriteItem) {
+        if contains(item) { return }
         all.append(item)
     }
 
@@ -121,5 +122,13 @@ struct FavoritesModel {
 
     func widgetSettings(_ item: FavoriteItem) -> WidgetSettings {
         widgetsSettings.first { $0.id == item.widgetSettingsKey } ?? WidgetSettings(id: item.widgetSettingsKey)
+    }
+
+    func updateWidgetSettings(_ settings: WidgetSettings) {
+        if let index = widgetsSettings.firstIndex(where: { $0.id == settings.id }) {
+            widgetsSettings[index] = settings
+        } else {
+            widgetsSettings.append(settings)
+        }
     }
 }

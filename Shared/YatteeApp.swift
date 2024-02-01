@@ -21,6 +21,14 @@ struct YatteeApp: App {
     }
 
     static var logsDirectory: URL {
+        temporaryDirectory
+    }
+
+    static var settingsExportDirectory: URL {
+        temporaryDirectory
+    }
+
+    private static var temporaryDirectory: URL {
         URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
     }
 

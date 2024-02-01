@@ -107,6 +107,10 @@ final class NavigationModel: ObservableObject {
 
     @Published var presentingFileImporter = false
 
+    @Published var presentingSettingsImportSheet = false
+    @Published var presentingSettingsFileImporter = false
+    @Published var settingsImportURL: URL?
+
     func openChannel(_ channel: Channel, navigationStyle: NavigationStyle) {
         guard channel.id != Video.fixtureChannelID else {
             return
@@ -269,6 +273,8 @@ final class NavigationModel: ObservableObject {
         presentingChannel = false
         presentingPlaylist = false
         presentingOpenVideos = false
+        presentingFileImporter = false
+        presentingSettingsImportSheet = false
     }
 
     func hideKeyboard() {
@@ -279,8 +285,9 @@ final class NavigationModel: ObservableObject {
 
     func presentAlert(title: String, message: String? = nil) {
         let message = message.isNil ? nil : Text(message!)
-        alert = Alert(title: Text(title), message: message)
-        presentingAlert = true
+        let alert = Alert(title: Text(title), message: message)
+
+        presentAlert(alert)
     }
 
     func presentRequestErrorAlert(_ error: RequestError) {
@@ -289,6 +296,11 @@ final class NavigationModel: ObservableObject {
     }
 
     func presentAlert(_ alert: Alert) {
+        guard !presentingSettings else {
+            SettingsModel.shared.presentAlert(alert)
+            return
+        }
+
         self.alert = alert
         presentingAlert = true
     }
@@ -310,6 +322,16 @@ final class NavigationModel: ObservableObject {
         default:
             print("not implemented")
         }
+    }
+
+    func presentSettingsImportSheet(_ url: URL, forceSettings: Bool = false) {
+        guard !presentingSettings, !forceSettings else {
+            ImportExportSettingsModel.shared.reset()
+            SettingsModel.shared.presentSettingsImportSheet(url)
+            return
+        }
+        settingsImportURL = url
+        presentingSettingsImportSheet = true
     }
 }
 
