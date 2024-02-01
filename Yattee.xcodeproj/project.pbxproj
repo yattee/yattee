@@ -1366,12 +1366,6 @@
 		37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AVPlayerViewController+FullScreen.swift"; sourceTree = "<group>"; };
 		37DD87C6271C9CFE0027CBF9 /* PlayerStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStreams.swift; sourceTree = "<group>"; };
 		37DD9DA22785BBC900539416 /* NoCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCommentsView.swift; sourceTree = "<group>"; };
-		37DD9DAF2785D58D00539416 /* RefreshControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RefreshControl.swift; sourceTree = "<group>"; };
-		37DD9DB02785D58D00539416 /* RefreshControlModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RefreshControlModifier.swift; sourceTree = "<group>"; };
-		37DD9DB82785D60200539416 /* FramePreferenceKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FramePreferenceKey.swift; sourceTree = "<group>"; };
-		37DD9DB92785D60200539416 /* ScrollViewMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollViewMatcher.swift; sourceTree = "<group>"; };
-		37DD9DC12785D63A00539416 /* UIView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
-		37DD9DC22785D63A00539416 /* UIResponder+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIResponder+Extensions.swift"; sourceTree = "<group>"; };
 		37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalScrollingFix.swift; sourceTree = "<group>"; };
 		37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsNavigationLink.swift; sourceTree = "<group>"; };
 		37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedChannelsModel.swift; sourceTree = "<group>"; };
@@ -1879,19 +1873,6 @@
 			path = Modifiers;
 			sourceTree = "<group>";
 		};
-		3773B7D12ADC05FF00B5FEF3 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				37DD9DC12785D63A00539416 /* UIView+Extensions.swift */,
-				37DD9DAF2785D58D00539416 /* RefreshControl.swift */,
-				37DD9DB02785D58D00539416 /* RefreshControlModifier.swift */,
-				37DD9DB82785D60200539416 /* FramePreferenceKey.swift */,
-				37DD9DB92785D60200539416 /* ScrollViewMatcher.swift */,
-				37DD9DC22785D63A00539416 /* UIResponder+Extensions.swift */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		3773B7F32ADC076800B5FEF3 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
@@ -2096,7 +2077,6 @@
 				37D4B0E12671614900C925CA /* Tests macOS */,
 				3DA101AC287C30F50027D920 /* Xcode-config */,
 				37D9169A27388A81002B1BAA /* README.md */,
-				3773B7D12ADC05FF00B5FEF3 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
