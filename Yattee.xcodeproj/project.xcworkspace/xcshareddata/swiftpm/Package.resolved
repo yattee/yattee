@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cxfksword/MPVKit.git",
       "state" : {
-        "revision" : "27c5749412a366639a4361eb612f7301872639ad",
-        "version" : "0.37.0"
+        "revision" : "96825b3dc2b38e5550268156148d47798ce6aa74",
+        "version" : "0.36.0"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ashleymills/Reachability.swift",
       "state" : {
-        "revision" : "c01bbdf2d633cf049ae1ed1a68a2020a8bda32e2",
-        "version" : "5.1.0"
+        "revision" : "c01127cb51f591045696128effe43c16840d08bf",
+        "version" : "5.2.0"
       }
     },
     {
@@ -132,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "db4603921b31a6ce0f8c26d36d6a3fffc2dba481",
-        "version" : "0.14.2"
+        "revision" : "acfb824ca5cd9dbde2c43dc6b5a008c6757dee85",
+        "version" : "0.14.3"
       }
     },
     {
