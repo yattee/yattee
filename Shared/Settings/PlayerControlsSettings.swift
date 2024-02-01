@@ -15,6 +15,7 @@ struct PlayerControlsSettings: View {
     @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
     @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
     @Default(.systemControlsSeekDuration) private var systemControlsSeekDuration
+    @Default(.playerActionsButtonLabelStyle) private var playerActionsButtonLabelStyle
     @Default(.actionButtonShareEnabled) private var actionButtonShareEnabled
     @Default(.actionButtonSubscribeEnabled) private var actionButtonSubscribeEnabled
     @Default(.actionButtonCloseEnabled) private var actionButtonCloseEnabled
@@ -116,6 +117,15 @@ struct PlayerControlsSettings: View {
     @ViewBuilder var actionsButtonsSection: some View {
         Section(header: SettingsHeader(text: "Actions Buttons".localized())) {
             actionButtonToggles
+        }
+
+        Section {
+            Picker("Action button labels", selection: $playerActionsButtonLabelStyle) {
+                ForEach(ButtonLabelStyle.allCases, id: \.rawValue) { style in
+                    Text(style.description).tag(style)
+                }
+            }
+            .modifier(SettingsPickerModifier())
         }
     }
 

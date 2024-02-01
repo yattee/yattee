@@ -148,14 +148,7 @@ extension Defaults.Keys {
     static let playerControlsPlaybackModeEnabled = Key<Bool>("playerControlsPlaybackModeEnabled", default: false)
     static let playerControlsMusicModeEnabled = Key<Bool>("playerControlsMusicModeEnabled", default: false)
 
-    // TODO: IMPLEMENT THIS
-    // ** rgdfo;fgks iojsiojf
-    #if os(macOS)
-        static let playerDetailsPageButtonLabelStyleDefault = ButtonLabelStyle.iconAndText
-    #else
-        static let playerDetailsPageButtonLabelStyleDefault = UIDevice.current.userInterfaceIdiom == .phone ? ButtonLabelStyle.iconOnly : .iconAndText
-    #endif
-    static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: playerDetailsPageButtonLabelStyleDefault)
+    static let playerActionsButtonLabelStyle = Key<ButtonLabelStyle>("playerActionsButtonLabelStyle", default: .iconAndText)
 
     static let actionButtonShareEnabled = Key<Bool>("actionButtonShareEnabled", default: true)
     static let actionButtonAddToPlaylistEnabled = Key<Bool>("actionButtonAddToPlaylistEnabled", default: true)
@@ -437,6 +430,15 @@ enum ButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
 
     var text: Bool {
         self == .iconAndText
+    }
+
+    var description: String {
+        switch self {
+        case .iconOnly:
+            "Icon only"
+        case .iconAndText:
+            "Icon and text"
+        }
     }
 }
 
