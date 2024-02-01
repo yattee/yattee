@@ -3,7 +3,7 @@ import Defaults
 import Logging
 import UIKit
 
-struct Orientation {
+enum Orientation {
     static var logger = Logger(label: "stream.yattee.orientation")
 
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {

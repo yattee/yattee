@@ -2,7 +2,7 @@ import Defaults
 import Foundation
 import SwiftUI
 
-struct Constants {
+enum Constants {
     static let yatteeProtocol = "yattee://"
     static let overlayAnimation = Animation.linear(duration: 0.2)
     static var isIPhone: Bool {

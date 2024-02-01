@@ -1,6 +1,6 @@
 import Foundation
 
-struct Power {
+enum Power {
     static var hasInternalBattery: Bool {
         let psInfo = IOPSCopyPowerSourcesInfo().takeRetainedValue()
         let psList = IOPSCopyPowerSourcesList(psInfo).takeRetainedValue() as [CFTypeRef]
