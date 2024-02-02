@@ -436,9 +436,9 @@ enum ButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
     var description: String {
         switch self {
         case .iconOnly:
-            "Icon only"
+            return "Icon only"
         case .iconAndText:
-            "Icon and text"
+            return "Icon and text"
         }
     }
 }
