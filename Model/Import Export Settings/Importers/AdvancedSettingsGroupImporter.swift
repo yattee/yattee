@@ -25,6 +25,10 @@ struct AdvancedSettingsGroupImporter {
             Defaults[.mpvCachePauseWait] = mpvCachePauseWait
         }
 
+        if let mpvDeinterlace = json["mpvDeinterlace"].bool {
+            Defaults[.mpvDeinterlace] = mpvDeinterlace
+        }
+
         if let showCacheStatus = json["showCacheStatus"].bool {
             Defaults[.showCacheStatus] = showCacheStatus
         }

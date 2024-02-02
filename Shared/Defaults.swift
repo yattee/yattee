@@ -257,6 +257,7 @@ extension Defaults.Keys {
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)
     static let mpvCacheSecs = Key<String>("mpvCacheSecs", default: "120")
     static let mpvCachePauseWait = Key<String>("mpvCachePauseWait", default: "3")
+    static let mpvDeinterlace = Key<Bool>("mpvDeinterlace", default: false)
 
     static let showCacheStatus = Key<Bool>("showCacheStatus", default: false)
     static let feedCacheSize = Key<String>("feedCacheSize", default: "50")

@@ -5,6 +5,7 @@ struct AdvancedSettings: View {
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
     @Default(.mpvCacheSecs) private var mpvCacheSecs
     @Default(.mpvCachePauseWait) private var mpvCachePauseWait
+    @Default(.mpvDeinterlace) private var mpvDeinterlace
     @Default(.mpvEnableLogging) private var mpvEnableLogging
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
@@ -86,6 +87,8 @@ struct AdvancedSettings: View {
                 #endif
             }
             .multilineTextAlignment(.trailing)
+
+            Toggle("deinterlace", isOn: $mpvDeinterlace)
 
             if mpvEnableLogging {
                 logButton

@@ -9,6 +9,7 @@ final class AdvancedSettingsGroupExporter: SettingsGroupExporter {
             "mpvEnableLogging": Defaults[.mpvEnableLogging],
             "mpvCacheSecs": Defaults[.mpvCacheSecs],
             "mpvCachePauseWait": Defaults[.mpvCachePauseWait],
+            "mpvDeinterlace": Defaults[.mpvDeinterlace],
             "showCacheStatus": Defaults[.showCacheStatus],
             "feedCacheSize": Defaults[.feedCacheSize]
         ]
