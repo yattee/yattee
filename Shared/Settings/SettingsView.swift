@@ -286,7 +286,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
             }
-            .foregroundColor(.accent)
+            .foregroundColor(.accentColor)
             .buttonStyle(.plain)
 
             NavigationLink(destination: LazyView(ExportSettings())) {

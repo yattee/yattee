@@ -73,7 +73,7 @@ struct ExportSettings: View {
                     Text(group.label)
                     Spacer()
                     Image(systemName: "checkmark")
-                        .foregroundColor(.accent)
+                        .foregroundColor(.accentColor)
                         .opacity(isGroupInSelectedGroups ? 1 : 0)
                 }
                 .animation(nil, value: isGroupInSelectedGroups)
@@ -122,7 +122,7 @@ struct ExportSettings: View {
             Label(model.isExportInProgress ? "Export in progress..." : "Export...", systemImage: model.isExportInProgress ? "fireworks" : "square.and.arrow.up")
                 .animation(nil, value: model.isExportInProgress)
             #if !os(macOS)
-                .foregroundColor(.accent)
+                .foregroundColor(.accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             #endif

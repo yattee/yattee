@@ -51,31 +51,31 @@ final class ImportExportSettingsModel: ObservableObject {
         var label: String {
             switch self {
             case .browsingSettings:
-                "Browsing"
+                return "Browsing"
             case .playerSettings:
-                "Player"
+                return "Player"
             case .controlsSettings:
-                "Controls"
+                return "Controls"
             case .qualitySettings:
-                "Quality"
+                return "Quality"
             case .historySettings:
-                "History"
+                return "History"
             case .sponsorBlockSettings:
-                "SponsorBlock"
+                return "SponsorBlock"
             case .locationsSettings:
-                "Public Locations"
+                return "Public Locations"
             case .instances:
-                "Custom Locations"
+                return "Custom Locations"
             case .accounts:
-                "Accounts"
+                return "Accounts"
             case .accountsUnencryptedPasswords:
-                "Accounts passwords (unencrypted)"
+                return "Accounts passwords (unencrypted)"
             case .advancedSettings:
-                "Advanced"
+                return "Advanced"
             case .recentlyOpened:
-                "Recents"
+                return "Recents"
             case .otherData:
-                "Other data"
+                return "Other data"
             }
         }
     }

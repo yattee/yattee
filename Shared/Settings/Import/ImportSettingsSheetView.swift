@@ -108,7 +108,7 @@ struct ImportSettingsSheetView: View {
                     Text(group.label)
                     Spacer()
                     Image(systemName: "checkmark")
-                        .foregroundColor(.accent)
+                        .foregroundColor(.accentColor)
                         .opacity(isChecked ? 1 : 0)
                 }
                 .contentShape(Rectangle())
