@@ -16,7 +16,7 @@ final class PlayerViewController: NSViewController {
         return [ratio, 1.0].max()!
     }
 
-    override func viewDidDisappear() {
+    func viewDidDisappear() {
         super.viewDidDisappear()
     }
 

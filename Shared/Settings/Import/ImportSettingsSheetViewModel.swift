@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-class ImportSettingsSheetViewModel: ObservableObject {
+final class ImportSettingsSheetViewModel: ObservableObject {
     static let shared = ImportSettingsSheetViewModel()
 
     @Published var selectedInstances = Set<Instance.ID>()

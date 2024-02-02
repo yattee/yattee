@@ -154,7 +154,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             method: .post,
             parameters: ["username": username, "password": password],
             encoding: JSONEncoding.default
-        ).responseDecodable(of: JSON.self) { [weak self] response in
+        )
+        .responseDecodable(of: JSON.self) { [weak self] response in
             guard let self else {
                 return
             }
