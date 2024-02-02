@@ -158,8 +158,10 @@ struct ExportSettings: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        ExportSettings()
+struct ExportSettings_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            ExportSettings()
+        }
     }
 }

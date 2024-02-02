@@ -255,6 +255,8 @@ struct ImportSettingsSheetView: View {
     }
 }
 
-#Preview {
-    ImportSettingsSheetView(settingsFile: .constant(URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!))
+struct ImportSettingsSheetView_Previews: PreviewProvider {
+    static var previews: some View {
+        ImportSettingsSheetView(settingsFile: .constant(URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!))
+    }
 }

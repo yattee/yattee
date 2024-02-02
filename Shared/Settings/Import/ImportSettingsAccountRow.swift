@@ -171,17 +171,19 @@ struct ImportSettingsAccountRow: View {
     }
 }
 
-#Preview {
-    let fileModel = ImportSettingsFileModel(url: URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!)
+struct ImportSettingsAccountRow_Previews: PreviewProvider {
+    static var previews: some View {
+        let fileModel = ImportSettingsFileModel(url: URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!)
 
-    return List {
-        ImportSettingsAccountRow(
-            account: .init(name: "arekf", urlString: "https://instance.com", username: "arekf"),
-            fileModel: fileModel
-        )
-        ImportSettingsAccountRow(
-            account: .init(name: "arekf", urlString: "https://instance.com", username: "arekf", password: "a"),
-            fileModel: fileModel
-        )
+        return List {
+            ImportSettingsAccountRow(
+                account: .init(name: "arekf", urlString: "https://instance.com", username: "arekf"),
+                fileModel: fileModel
+            )
+            ImportSettingsAccountRow(
+                account: .init(name: "arekf", urlString: "https://instance.com", username: "arekf", password: "a"),
+                fileModel: fileModel
+            )
+        }
     }
 }
