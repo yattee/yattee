@@ -622,3 +622,9 @@
 "Action button labels" = "Etykiety przycisków akcji";
 "Icon only" = "Tylko ikony";
 "Icon and text" = "Ikony i tekst";
+"Custom Location already exists" = "Własna Lokalizacja już istnieje";
+"Custom Location selected for import" = "Lokalizacja wybrana do zaimportowania";
+"Custom Location not selected for import" = "Lokalizacji nie wybrano do zaimportowania";
+"Password required to import" = "Hasło wymagane do zaimportowania";
+"Password saved in import file" = "Hasło zapisane w importowanym pliku";
+"Account already exists" = "Konto już istnieje";
