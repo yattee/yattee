@@ -619,3 +619,9 @@
 "Platform" = "Platform";
 "Action button labels" = "Action button labels";
 "Icon and text" = "Icon and text";
+"Password required to import" = "Password required to import";
+"Custom Location already exists" = "Custom Location already exists";
+"Custom Location selected for import" = "Custom Location selected for import";
+"Custom Location not selected for import" = "Custom Location not selected for import";
+"Account already exists" = "Account already exists";
+"Password saved in import file" = "Password saved in import file";
