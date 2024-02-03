@@ -27,7 +27,7 @@ jobs:
         # lane: ['mac beta', 'ios beta', 'tvos beta']
         lane: ['ios beta', 'tvos beta']
     name: Releasing ${{ matrix.lane }} version to TestFlight
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -51,7 +51,7 @@ jobs:
           if-no-files-found: ignore
   mac_notarized:
     name: Build and notarize macOS app
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
