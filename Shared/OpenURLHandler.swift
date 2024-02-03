@@ -14,15 +14,15 @@ struct OpenURLHandler {
     var navigationStyle: NavigationStyle
 
     func handle(_ url: URL) {
-        if url.isFileURL, url.standardizedFileURL.absoluteString.hasSuffix(".\(ImportExportSettingsModel.settingsExtension)") {
-            navigation.presentSettingsImportSheet(url)
-            return
-        }
-
         if Self.firstHandle {
             Self.firstHandle = false
 
             Delay.by(1) { handle(url) }
+            return
+        }
+
+        if url.isFileURL, url.standardizedFileURL.absoluteString.hasSuffix(".\(ImportExportSettingsModel.settingsExtension)") {
+            navigation.presentSettingsImportSheet(url)
             return
         }
 

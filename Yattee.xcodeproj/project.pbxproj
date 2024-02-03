@@ -662,6 +662,7 @@
 		37A5DBC8285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
 		37A5DBC9285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
 		37A5DBCA285E371400CA4DD1 /* ControlBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */; };
+		37A6D4ED2B6E372700B26299 /* ImportSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6D4EC2B6E372700B26299 /* ImportSettings.swift */; };
 		37A7D6E32B67E303009CB1ED /* ImportSettingsFileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372C74692B67098A00BE179B /* ImportSettingsFileModel.swift */; };
 		37A7D6E52B67E315009CB1ED /* SettingsGroupExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7D6E42B67E315009CB1ED /* SettingsGroupExporter.swift */; };
 		37A7D6E62B67E315009CB1ED /* SettingsGroupExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7D6E42B67E315009CB1ED /* SettingsGroupExporter.swift */; };
@@ -1360,6 +1361,7 @@
 		37A362BD29537AAA00BDF328 /* PlaybackSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackSettings.swift; sourceTree = "<group>"; };
 		37A362C129537FED00BDF328 /* PlaybackSettingsPresentationDetents+Backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaybackSettingsPresentationDetents+Backport.swift"; sourceTree = "<group>"; };
 		37A5DBC7285E371400CA4DD1 /* ControlBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlBackgroundModifier.swift; sourceTree = "<group>"; };
+		37A6D4EC2B6E372700B26299 /* ImportSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSettings.swift; sourceTree = "<group>"; };
 		37A7D6E42B67E315009CB1ED /* SettingsGroupExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGroupExporter.swift; sourceTree = "<group>"; };
 		37A7D6E82B67E334009CB1ED /* BrowsingSettingsGroupExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingSettingsGroupExporter.swift; sourceTree = "<group>"; };
 		37A7D6EC2B67E3BF009CB1ED /* BrowsingSettingsGroupImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowsingSettingsGroupImporter.swift; sourceTree = "<group>"; };
@@ -2162,6 +2164,7 @@
 		37BBB33D2B6B9C80001C4845 /* Import */ = {
 			isa = PBXGroup;
 			children = (
+				37A6D4EC2B6E372700B26299 /* ImportSettings.swift */,
 				37BBB3422B6BB88F001C4845 /* ImportSettingsAccountRow.swift */,
 				372C74622B66FFFC00BE179B /* ImportSettingsFileImporterViewModifier.swift */,
 				37BBB33E2B6B9D52001C4845 /* ImportSettingsSheetView.swift */,
@@ -3840,6 +3843,7 @@
 				37E80F45287B7AC000561799 /* ControlsBar.swift in Sources */,
 				3743CA50270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				376BE50827347B57009AD608 /* SettingsHeader.swift in Sources */,
+				37A6D4ED2B6E372700B26299 /* ImportSettings.swift in Sources */,
 				37A9966026D6F9B9006E3224 /* HomeView.swift in Sources */,
 				372820402945E4A8009A0E2D /* SubscriptionsPageButton.swift in Sources */,
 				37001565271B1F250049C794 /* AccountsModel.swift in Sources */,

@@ -31,9 +31,9 @@ struct SettingsView: View {
 
     var body: some View {
         settings
+            .modifier(ImportSettingsSheetViewModifier(isPresented: $settingsModel.presentingSettingsImportSheet, settingsFile: $settingsModel.settingsImportURL))
         #if !os(tvOS)
-        .modifier(ImportSettingsFileImporterViewModifier(isPresented: $navigation.presentingSettingsFileImporter))
-        .modifier(ImportSettingsSheetViewModifier(isPresented: $settingsModel.presentingSettingsImportSheet, settingsFile: $settingsModel.settingsImportURL))
+            .modifier(ImportSettingsFileImporterViewModifier(isPresented: $navigation.presentingSettingsFileImporter))
         #endif
         #if os(iOS)
         .backport
@@ -281,19 +281,27 @@ struct SettingsView: View {
 
     var importView: some View {
         Section {
-            Button(action: importSettings) {
-                Label("Import Settings...", systemImage: "square.and.arrow.down")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-            }
-            .foregroundColor(.accentColor)
-            .buttonStyle(.plain)
+            #if os(tvOS)
+                NavigationLink(destination: LazyView(ImportSettings())) {
+                    Label("Import Settings", systemImage: "square.and.arrow.down")
+                        .labelStyle(SettingsLabel())
+                }
+                .padding(.horizontal, 20)
+            #else
+                Button(action: importSettings) {
+                    Label("Import Settings...", systemImage: "square.and.arrow.down")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .foregroundColor(.accentColor)
+                .buttonStyle(.plain)
 
-            NavigationLink(destination: LazyView(ExportSettings())) {
-                Label("Export Settings", systemImage: "square.and.arrow.up")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-            }
+                NavigationLink(destination: LazyView(ExportSettings())) {
+                    Label("Export Settings", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+            #endif
         }
     }
 

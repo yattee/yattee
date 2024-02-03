@@ -4,6 +4,7 @@ struct ImportSettingsSheetView: View {
     @Binding var settingsFile: URL?
     @StateObject private var model = ImportSettingsSheetViewModel.shared
     @StateObject private var importExportModel = ImportExportSettingsModel.shared
+    @StateObject private var fileModel = ImportSettingsFileModel.shared
 
     @Environment(\.presentationMode) private var presentationMode
 
@@ -23,12 +24,12 @@ struct ImportSettingsSheetView: View {
             #endif
         }
         .onAppear {
-            guard let fileModel else { return }
-            model.reset(fileModel.locationsSettingsGroupImporter)
-            importExportModel.reset(fileModel)
+            guard let settingsFile else { return }
+            fileModel.loadData(settingsFile)
         }
         .onChange(of: settingsFile) { _ in
-            importExportModel.reset(fileModel)
+            guard let settingsFile else { return }
+            fileModel.loadData(settingsFile)
         }
     }
 
@@ -56,7 +57,7 @@ struct ImportSettingsSheetView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button(action: {
-                    fileModel?.performImport()
+                    fileModel.performImport()
                     presentingCompletedAlert = true
                     ImportExportSettingsModel.shared.reset()
                 }) {
@@ -85,16 +86,8 @@ struct ImportSettingsSheetView: View {
         return !model.selectedAccounts.isEmpty || !model.selectedInstances.isEmpty || !importExportModel.selectedExportGroups.isEmpty
     }
 
-    var fileModel: ImportSettingsFileModel? {
-        guard let settingsFile else { return nil }
-
-        return ImportSettingsFileModel(url: settingsFile)
-    }
-
     var locationsSettingsGroupImporter: LocationsSettingsGroupImporter? {
-        guard let fileModel else { return nil }
-
-        return fileModel.locationsSettingsGroupImporter
+        fileModel.locationsSettingsGroupImporter
     }
 
     struct ExportGroupRow: View {
@@ -128,34 +121,43 @@ struct ImportSettingsSheetView: View {
             Section(header: Text("Settings")) {
                 ForEach(ImportExportSettingsModel.ExportGroup.settingsGroups) { group in
                     ExportGroupRow(group: group)
-                        .disabled(!fileModel!.isGroupIncludedInFile(group))
+                        .disabled(!fileModel.isGroupIncludedInFile(group))
                 }
             }
 
             Section(header: Text("Other")) {
                 ForEach(ImportExportSettingsModel.ExportGroup.otherGroups) { group in
                     ExportGroupRow(group: group)
-                        .disabled(!fileModel!.isGroupIncludedInFile(group))
+                        .disabled(!fileModel.isGroupIncludedInFile(group))
                 }
             }
         }
     }
 
     @ViewBuilder var metadata: some View {
-        if let fileModel {
+        if let settingsFile {
             Section(header: Text("File information")) {
-                MetadataRow(name: Text("Name"), value: Text(fileModel.filename))
+                MetadataRow(name: Text("Name"), value: Text(fileModel.filename(settingsFile)))
 
                 if let date = fileModel.metadataDate {
                     MetadataRow(name: Text("Date"), value: Text(date))
+                    #if os(tvOS)
+                        .focusable()
+                    #endif
                 }
 
                 if let build = fileModel.metadataBuild {
                     MetadataRow(name: Text("Build"), value: Text(build))
+                    #if os(tvOS)
+                        .focusable()
+                    #endif
                 }
 
                 if let platform = fileModel.metadataPlatform {
                     MetadataRow(name: Text("Platform"), value: Text(platform))
+                    #if os(tvOS)
+                        .focusable()
+                    #endif
                 }
             }
         }
@@ -231,24 +233,22 @@ struct ImportSettingsSheetView: View {
     }
 
     @ViewBuilder var importOptions: some View {
-        if let fileModel {
-            if fileModel.isPublicInstancesSettingsGroupInFile || !instances.isEmpty {
-                Section(header: Text("Locations")) {
-                    if fileModel.isPublicInstancesSettingsGroupInFile {
-                        ExportGroupRow(group: .locationsSettings)
-                    }
+        if fileModel.isPublicInstancesSettingsGroupInFile || !instances.isEmpty {
+            Section(header: Text("Locations")) {
+                if fileModel.isPublicInstancesSettingsGroupInFile {
+                    ExportGroupRow(group: .locationsSettings)
+                }
 
-                    ForEach(instances) { instance in
-                        ImportInstanceRow(instance: instance, accounts: accounts)
-                    }
+                ForEach(instances) { instance in
+                    ImportInstanceRow(instance: instance, accounts: accounts)
                 }
             }
+        }
 
-            if !accounts.isEmpty {
-                Section(header: Text("Accounts")) {
-                    ForEach(accounts) { account in
-                        ImportSettingsAccountRow(account: account, fileModel: fileModel)
-                    }
+        if !accounts.isEmpty {
+            Section(header: Text("Accounts")) {
+                ForEach(accounts) { account in
+                    ImportSettingsAccountRow(account: account, fileModel: fileModel)
                 }
             }
         }

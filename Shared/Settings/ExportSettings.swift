@@ -30,6 +30,13 @@ struct ExportSettings: View {
                 #endif
             #endif
         }
+        #if os(iOS)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                exportButton
+            }
+        }
+        #endif
         .navigationTitle("Export Settings")
     }
 
@@ -106,12 +113,6 @@ struct ExportSettings: View {
                     ExportGroupRow(group: group)
                 }
             }
-
-            #if !os(macOS)
-                Section {
-                    exportButton
-                }
-            #endif
         }
         .buttonStyle(.plain)
         .disabled(model.isExportInProgress)
@@ -119,7 +120,7 @@ struct ExportSettings: View {
 
     var exportButton: some View {
         Button(action: exportSettings) {
-            Label(model.isExportInProgress ? "Export in progress..." : "Export...", systemImage: model.isExportInProgress ? "fireworks" : "square.and.arrow.up")
+            Text(model.isExportInProgress ? "In progress..." : "Export")
                 .animation(nil, value: model.isExportInProgress)
             #if !os(macOS)
                 .foregroundColor(.accentColor)

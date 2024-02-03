@@ -2,15 +2,11 @@ import Defaults
 import Foundation
 import SwiftyJSON
 
-struct ImportSettingsFileModel {
-    let url: URL
-
-    var filename: String {
-        String(url.lastPathComponent.dropLast(ImportExportSettingsModel.settingsExtension.count + 1))
-    }
+final class ImportSettingsFileModel: ObservableObject {
+    static let shared = ImportSettingsFileModel()
 
     var locationsSettingsGroupImporter: LocationsSettingsGroupImporter? {
-        if let locationsSettings = json?.dictionaryValue["locationsSettings"] {
+        if let locationsSettings = json.dictionaryValue["locationsSettings"] {
             return LocationsSettingsGroupImporter(
                 json: locationsSettings,
                 includePublicLocations: importExportModel.isGroupEnabled(.locationsSettings),
@@ -24,6 +20,8 @@ struct ImportSettingsFileModel {
 
     var importExportModel = ImportExportSettingsModel.shared
     var sheetViewModel = ImportSettingsSheetViewModel.shared
+
+    var loadTask: URLSessionTask?
 
     func isGroupIncludedInFile(_ group: ImportExportSettingsModel.ExportGroup) -> Bool {
         switch group {
@@ -48,7 +46,7 @@ struct ImportSettingsFileModel {
     }
 
     func groupJSON(_ group: ImportExportSettingsModel.ExportGroup) -> JSON {
-        json?.dictionaryValue[group.rawValue] ?? .init()
+        json.dictionaryValue[group.rawValue] ?? .init()
     }
 
     func performImport() {
@@ -91,17 +89,34 @@ struct ImportSettingsFileModel {
         }
     }
 
-    var json: JSON? {
-        if let fileContents = try? Data(contentsOf: url),
-           let json = try? JSON(data: fileContents)
-        {
-            return json
+    @Published var json = JSON()
+
+    func loadData(_ url: URL) {
+        json = JSON()
+        loadTask?.cancel()
+
+        loadTask = URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let data else { return }
+
+            if let json = try? JSON(data: data) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.json = json
+
+                    self.sheetViewModel.reset(locationsSettingsGroupImporter)
+                    self.importExportModel.reset(self)
+                }
+            }
         }
-        return nil
+        loadTask?.resume()
+    }
+
+    func filename(_ url: URL) -> String {
+        String(url.lastPathComponent.dropLast(ImportExportSettingsModel.settingsExtension.count + 1))
     }
 
     var metadataBuild: String? {
-        if let build = json?.dictionaryValue["metadata"]?.dictionaryValue["build"]?.string {
+        if let build = json.dictionaryValue["metadata"]?.dictionaryValue["build"]?.string {
             return build
         }
 
@@ -109,7 +124,7 @@ struct ImportSettingsFileModel {
     }
 
     var metadataPlatform: String? {
-        if let platform = json?.dictionaryValue["metadata"]?.dictionaryValue["platform"]?.string {
+        if let platform = json.dictionaryValue["metadata"]?.dictionaryValue["platform"]?.string {
             return platform
         }
 
@@ -117,7 +132,7 @@ struct ImportSettingsFileModel {
     }
 
     var metadataDate: String? {
-        if let timestamp = json?.dictionaryValue["metadata"]?.dictionaryValue["timestamp"]?.doubleValue {
+        if let timestamp = json.dictionaryValue["metadata"]?.dictionaryValue["timestamp"]?.doubleValue {
             let date = Date(timeIntervalSince1970: timestamp)
             return dateFormatter.string(from: date)
         }

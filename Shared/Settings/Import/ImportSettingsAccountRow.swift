@@ -27,102 +27,110 @@ struct ImportSettingsAccountRow: View {
     }
 
     var body: some View {
-        Button(action: { model.toggleAccount(account, accounts: accounts) }) {
-            let accountExists = AccountsModel.shared.find(account.id) != nil
+        #if os(tvOS)
+            row
+        #else
+            Button(action: { model.toggleAccount(account, accounts: accounts) }) {
+                row
+            }
+            .buttonStyle(.plain)
+        #endif
+    }
 
-            VStack(alignment: .leading) {
-                HStack {
-                    Text(account.username)
-                    Spacer()
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.accentColor)
-                        .opacity(isChecked ? 1 : 0)
-                }
-                Text(account.instance?.description ?? "")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+    var row: some View {
+        let accountExists = AccountsModel.shared.find(account.id) != nil
 
-                Group {
-                    if let instanceID = account.instanceID {
-                        if accountExists {
-                            HStack {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(Color("AppRedColor"))
-                                Text("Account already exists")
-                            }
-                        } else {
-                            Group {
-                                if InstancesModel.shared.find(instanceID) != nil {
-                                    HStack {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                        Text("Custom Location already exists")
-                                    }
-                                } else if model.selectedInstances.contains(instanceID) {
-                                    HStack {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                        Text("Custom Location selected for import")
-                                    }
-                                } else {
-                                    HStack {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.red)
-                                        Text("Custom Location not selected for import")
-                                    }
-                                    .foregroundColor(Color("AppRedColor"))
-                                }
-                            }
-                            .frame(minHeight: 20)
+        return VStack(alignment: .leading) {
+            HStack {
+                Text(account.username)
+                Spacer()
+                Image(systemName: "checkmark")
+                    .foregroundColor(.accentColor)
+                    .opacity(isChecked ? 1 : 0)
+            }
+            Text(account.instance?.description ?? "")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
-                            if account.password.isNil || account.password!.isEmpty {
-                                Group {
-                                    if password.isEmpty {
-                                        HStack {
-                                            Image(systemName: "key")
-                                            Text("Password required to import")
-                                        }
-                                        .foregroundColor(Color("AppRedColor"))
-                                    } else {
-                                        AccountValidationStatus(
-                                            app: .constant(instance.app),
-                                            isValid: $isValid,
-                                            isValidated: $isValidated,
-                                            isValidating: $isValidating,
-                                            error: $validationError
-                                        )
-                                    }
-                                }
-                                .frame(minHeight: 20)
-                            } else {
+            Group {
+                if let instanceID = account.instanceID {
+                    if accountExists {
+                        HStack {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(Color("AppRedColor"))
+                            Text("Account already exists")
+                        }
+                    } else {
+                        Group {
+                            if InstancesModel.shared.find(instanceID) != nil {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)
-
-                                    Text("Password saved in import file")
+                                    Text("Custom Location already exists")
                                 }
+                            } else if model.selectedInstances.contains(instanceID) {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                    Text("Custom Location selected for import")
+                                }
+                            } else {
+                                HStack {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
+                                    Text("Custom Location not selected for import")
+                                }
+                                .foregroundColor(Color("AppRedColor"))
+                            }
+                        }
+                        .frame(minHeight: 20)
+
+                        if account.password.isNil || account.password!.isEmpty {
+                            Group {
+                                if password.isEmpty {
+                                    HStack {
+                                        Image(systemName: "key")
+                                        Text("Password required to import")
+                                    }
+                                    .foregroundColor(Color("AppRedColor"))
+                                } else {
+                                    AccountValidationStatus(
+                                        app: .constant(instance.app),
+                                        isValid: $isValid,
+                                        isValidated: $isValidated,
+                                        isValidating: $isValidating,
+                                        error: $validationError
+                                    )
+                                }
+                            }
+                            .frame(minHeight: 20)
+                        } else {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+
+                                Text("Password saved in import file")
                             }
                         }
                     }
                 }
-                .foregroundColor(.primary)
-                .font(.caption)
-                .padding(.vertical, 2)
-
-                if !accountExists && (account.password.isNil || account.password!.isEmpty) {
-                    SecureField("Password", text: $password)
-                        .onChange(of: password) { _ in validate() }
-                    #if !os(tvOS)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    #endif
-                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .onChange(of: isValid) { _ in afterValidation() }
-            .animation(nil, value: isChecked)
+            .foregroundColor(.primary)
+            .font(.caption)
+            .padding(.vertical, 2)
+
+            if !accountExists && (account.password.isNil || account.password!.isEmpty) {
+                SecureField("Password", text: $password)
+                    .onChange(of: password) { _ in validate() }
+                #if !os(tvOS)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                #endif
+            }
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .onChange(of: isValid) { _ in afterValidation() }
+        .animation(nil, value: isChecked)
     }
 
     var isChecked: Bool {
@@ -173,7 +181,8 @@ struct ImportSettingsAccountRow: View {
 
 struct ImportSettingsAccountRow_Previews: PreviewProvider {
     static var previews: some View {
-        let fileModel = ImportSettingsFileModel(url: URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!)
+        let fileModel = ImportSettingsFileModel()
+        fileModel.loadData(URL(string: "https://gist.githubusercontent.com/arekf/578668969c9fdef1b3828bea864c3956/raw/f794a95a20261bcb1145e656c8dda00bea339e2a/yattee-recents.yatteesettings")!)
 
         return List {
             ImportSettingsAccountRow(
