@@ -98,7 +98,7 @@ struct ImportSettingsSheetView: View {
         var body: some View {
             Button(action: { model.toggleExportGroupSelection(group) }) {
                 HStack {
-                    Text(group.label)
+                    Text(group.label.localized())
                     Spacer()
                     Image(systemName: "checkmark")
                         .foregroundColor(.accentColor)
