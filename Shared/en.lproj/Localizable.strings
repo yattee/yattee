@@ -625,3 +625,4 @@
 "Custom Location not selected for import" = "Custom Location not selected for import";
 "Account already exists" = "Account already exists";
 "Password saved in import file" = "Password saved in import file";
+"Export in progress..." = "Export in progress...";
