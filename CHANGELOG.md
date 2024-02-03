@@ -1,4 +1,10 @@
-## Build 177
+## Build 178
+* Added Settings import via URL for tvOS
+* Localization fixes
+* Updated dependencies (mpvkit 0.37.0)
+* Other minor changes and improvements
+
+## Previous builds
 * Added Settings Import/Export (iOS, macOS)
   * Export all settings, instances and accounts
   * Import selected elements from the file
