@@ -195,9 +195,14 @@ struct PlaylistsView: View {
             response in
             if let nextPagePlaylist: Playlist = response.typedContent() {
                 if !nextPagePlaylist.videos.isEmpty {
-                    var currentPlaylist = self.userPlaylist.item
-                    currentPlaylist!.videos.append(contentsOf: nextPagePlaylist.videos)
-                    self.userPlaylist.replace(currentPlaylist!)
+                    var updatedPlaylist = self.userPlaylist.item
+                    let currentVideoIDs = Set(updatedPlaylist?.videos.map { $0.videoID } ?? [])
+                    // XXX: Invidious API returns duplicit videos, remove once fixed on Invidious side
+                    let newVideos = nextPagePlaylist.videos.filter { !currentVideoIDs.contains($0.videoID) }
+                    updatedPlaylist?.videos.append(contentsOf: newVideos)
+                    if !newVideos.isEmpty {
+                        self.userPlaylist.replace(updatedPlaylist!)
+                    }
                 } else {
                     self.canFetchMoreData = false
                 }
