@@ -176,6 +176,11 @@ final class PlayerModel: ObservableObject {
     @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
     @Default(.playerRate) var playerRate
     @Default(.systemControlsSeekDuration) var systemControlsSeekDuration
+    
+    #if os(macOS)
+        @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
+        @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
+    #endif
 
     #if !os(macOS)
         @Default(.closePiPAndOpenPlayerOnEnteringForeground) var closePiPAndOpenPlayerOnEnteringForeground
@@ -187,6 +192,10 @@ final class PlayerModel: ObservableObject {
     var onPlayStream = [(Stream) -> Void]()
     var rateToRestore: Float?
     private var remoteCommandCenterConfigured = false
+    
+    #if os(macOS)
+        var keyPressMonitor: Any?
+    #endif
 
     init() {
         #if !os(macOS)
@@ -212,6 +221,7 @@ final class PlayerModel: ObservableObject {
         #if os(macOS)
             if presentingPlayer {
                 Windows.player.focus()
+                assignKeyPressMonitor()
                 return
             }
         #endif
@@ -227,6 +237,7 @@ final class PlayerModel: ObservableObject {
         #if os(macOS)
             Windows.player.open()
             Windows.player.focus()
+            assignKeyPressMonitor()
         #endif
     }
 
@@ -246,6 +257,7 @@ final class PlayerModel: ObservableObject {
         }
 
         #if os(macOS)
+            destroyKeyPressMonitor()
             Windows.player.hide()
         #endif
     }
@@ -1146,4 +1158,46 @@ final class PlayerModel: ObservableObject {
 
         return nil
     }
+    
+    #if os(macOS)
+        private func assignKeyPressMonitor() {
+            keyPressMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { keyEvent -> NSEvent? in
+                switch keyEvent.keyCode {
+                case 124:
+                    if !self.liveStreamInAVPlayer {
+                        let interval = TimeInterval(self.buttonForwardSeekDuration) ?? 10
+                        self.backend.seek(
+                            relative: .secondsInDefaultTimescale(interval),
+                            seekType: .userInteracted
+                        )
+                    }
+                case 123:
+                    if !self.liveStreamInAVPlayer {
+                        let interval = TimeInterval(self.buttonBackwardSeekDuration) ?? 10
+                        self.backend.seek(
+                            relative: .secondsInDefaultTimescale(-interval),
+                            seekType: .userInteracted
+                        )
+                    }
+                case 3:
+                    self.toggleFullscreen(
+                        self.playingFullScreen,
+                        showControls: false
+                    )
+                case 49:
+                    if !self.controls.isLoadingVideo {
+                        self.backend.togglePlay()
+                    }
+                default: return keyEvent
+                }
+                return nil
+            }
+        }
+        
+        private func destroyKeyPressMonitor() {
+            if let keyPressMonitor = keyPressMonitor {
+                NSEvent.removeMonitor(keyPressMonitor)
+            }
+        }
+    #endif
 }
