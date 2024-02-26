@@ -37,6 +37,7 @@ struct FavoriteButton: View {
                     .contentShape(Rectangle())
                     #endif
                 }
+                .help(isFavorite ? "Remove from Favorites" : "Add to Favorites")
                 .disabled(item.isNil)
                 .onAppear {
                     isFavorite = item.isNil ? false : favorites.contains(item)
