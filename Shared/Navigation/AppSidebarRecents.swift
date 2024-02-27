@@ -5,12 +5,14 @@ struct AppSidebarRecents: View {
     var recents = RecentsModel.shared
 
     @Default(.recentlyOpened) private var recentItems
+    @Default(.limitRecents) private var limitRecents
+    @Default(.limitRecentsAmount) private var limitRecentsAmount
 
     var body: some View {
         Group {
             if !recentItems.isEmpty {
                 Section(header: Text("Recents")) {
-                    ForEach(recentItems.reversed()) { recent in
+                    ForEach(recentItems.reversed().prefix(limitRecents ? limitRecentsAmount : recentItems.count)) { recent in
                         Group {
                             switch recent.type {
                             case .channel:
