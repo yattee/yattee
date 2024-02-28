@@ -1,1 +1,631 @@
 
+
+"Format" = "格式";
+"Driver" = "驅動";
+"Audio" = "音效";
+"Show only icons" = "只顯示圖標";
+"Center" = "正中";
+"File" = "文件";
+"Documents" = "文件";
+"Video" = "視頻";
+"Codec" = "編碼";
+"Size" = "大小";
+"Sample Rate" = "取樣率";
+"Mark channel feed as watched" = "標記頻道為已觀看";
+"Clear all" = "清除所有";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" 將會於此裝置上被永久移除。";
+"Music Mode" = "音樂模式";
+"Close video" = "關閉視頻";
+"Play next item" = "播放下一項目";
+"Maximum width expanded" = "最大寬度已展開";
+"Show unwatched feed badges" = "顯示未觀看的 Feed 標誌";
+"Gesture: fowards" = "手勢: 向前";
+"Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "手勢設置控制遠程箭頭按鈕的跳過間隔(用於第二代 Siri Remote 或更新版本)。更改系統控制設置需要重新啓動。";
+"Opened File" = "已打開文件";
+"Landscape left" = "橫屏左邊";
+"Landscape right" = "橫屏右邊";
+"Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "手勢設置控制玩家左右兩側雙擊手勢的跳過間隔。更改系統控制設置需要重新啓動。";
+"Show scroll to top button in comments" = "在評論中顯示滾動到頂部按鈕";
+"(watched and shorts hidden)" = "(隱藏已觀看及短片)";
+"(watched hidden)" = "(隱藏已觀看)";
+"Show video context menu options to force selected backend" = "顯示視頻內容目錄選項來強制已選取的後端";
+"Other data" = "其他資料";
+"Other data include last used playback preferences and listing options" = "其他資料包括上次的播放喜好和清單選項";
+"File information" = "檔案資訊";
+"Build" = "版本";
+"Action button labels" = "動作按鈕標籤";
+"Icon and text" = "圖示及文字";
+"Password required to import" = "需要匯入的密碼";
+"Edit" = "編輯";
+"Enable Return YouTube Dislike" = "啟用YouTube 不喜歡回報";
+"Enter fullscreen in landscape" = "橫屏下進入全屏";
+"Error when accessing playlist" = "播放列表出錯";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "明確提醒在任何付費或免費平台上按讚、訂閱或與他們互動（例如點擊影片）。";
+"For videos which feature music as the primary content." = "以音樂為主要內容的視頻。";
+"I like this app!" = "我喜歡這app!";
+"If you are interested what's coming in future updates, you can track project Milestones." = "如果您對將來的功能更新感興趣，您可以追蹤我們的專案里程碑。";
+"Increase rate" = "增长率";
+
+/* SponsorBlock category name */
+"Intro" = "簡介";
+"Issues Tracker" = "問題追蹤器";
+
+/* Selected video has just finished playing */
+"Just watched" = "已觀看";
+
+/* Player controls layout size */
+"Large" = "大";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "大佈局並不適合所有設備，使用它可能導致控制按鈕在屏幕上並不貼合。";
+"LIVE" = "直播";
+"Low quality" = "低畫質";
+"Low" = "低";
+"Mark video as watched after playing" = "播放後標記為已觀看";
+"MPV Documentation" = "MPV 文檔";
+"Orientation" = "方向";
+"Music" = "音樂";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "視頻宣傳產品或服務的一部分，與創作者沒有直接關係。創作者將以金錢或免費產品的形式獲得報酬或補償。";
+"Remove from Playlist" = "從播放清單中移除";
+"Replies" = "回覆";
+"Reset" = "重設";
+"Restart the app to apply the settings above." = "重啟app 以應用以上設置。";
+"Sections" = "章節";
+"Share..." = "分享...";
+"Show account username" = "顯示帳戶名稱";
+"Show channel name" = "顯示頻道名稱";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "這不能復原。你可能需要轉換顯示或重啟app 才能顯示變更。";
+
+/* Player controls layout size for TV */
+"TV" = "電視";
+"unknown" = "不明";
+"Unsubscribe" = "取消訂閱";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "通常在視頻結束時或接近視頻結尾時，出現 Credits Pop Up 和結束卡片。";
+"Upload date" = "上載日期";
+"URL" = "網址";
+"Used to create links from videos, channels and playlists" = "用於從視頻、頻道和播放列表創建鏈接";
+
+/* Player controls layout size */
+"Very Large" = "非常大";
+"Videos" = "視頻";
+
+/* Video sort order in search */
+"Views" = "觀看次數";
+"Watched" = "已觀看";
+"No chapters information available" = "沒有章節資訊";
+"Share Logs..." = "分享日誌…";
+"Any format" = "任何格式";
+"%@ formats" = "%@ 格式";
+"Keep last played video in the queue after restart" = "重啟後保留最後播放視頻至隊列";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "播放清單空白\n\n點擊並按住視頻然後\n\"加至播放清單\"";
+"Could not refresh Subscriptions" = "無法更新訂閱列表";
+"Could not load streams" = "無法加載視頻";
+"Could not open video" = "無法開啟視頻";
+"Channel could not be found" = "無法找到頻道";
+"For custom locations you can configure Frontend URL in Locations settings" = "對於自定義站台，您可以在設置中配置前端 URL";
+"This URL could not be opened" = "無法打開此URL";
+"Could not open channel" = "無法打開頻道";
+
+/* Selected video is being played */
+"Watching now" = "觀看中";
+
+/* Video date filter in search */
+"Week" = "星期";
+"Yattee" = "Yattee";
+"Could not update your token." = "無法更新你的權仗(Token)。";
+"Could not refresh Trending" = "無法更新趨勢";
+"Could not extract channel information" = "無法獲取頻道資訊";
+"Yattee %@ (build %@)" = "Yattee %@ (版本 %@)";
+
+/* Video date filter in search */
+"Year" = "年";
+"You can find information about using Yattee in the Wiki pages." = "您可以在 Wiki 相關頁面中找到有關使用 Yattee 的信息。";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "您可以使用基於當前設備狀態的自動配置文件選擇，或在視頻播放設置控件中進行切換。";
+"Could not extract playlist ID" = "無法提取播放清單ID";
+"Could not load video" = "無法載入視頻";
+"You need to create an instance and accounts\nto access %@ section" = "你需要建立站台及帳戶\n來存取 %@ 部分";
+"You need to select an account\nto access %@ section" = "你需要選擇帳戶\n來存取 %@ 部分";
+"If you want this app to be available in your language, join translation project." = "如果你想此app 以你的語言顯示，請加入翻譯專案。";
+"Private" = "私人";
+"Playback queue is empty" = "回放隊列空白";
+"Playing Next" = "播放下一個";
+"You can switch between profiles in playback settings controls." = "您可以在回放設置控件中切換配置文件。";
+"Current Playlist" = "當前播放清單";
+"Stream & Player" = "串流及播放器";
+"Statistics" = "數據";
+"Hardware decoder" = "硬體解碼";
+"Stream FPS" = "串流 FPS";
+"Cached time" = "緩存時間";
+"Rate & Captions" = "評分及字幕";
+"Dropped frames" = "損失幀數";
+"Could not create share link" = "無法建立分享連結";
+"%@ Channel" = "%@ 頻道";
+"%@ Playlist" = "%@ 播放清單";
+"%@ subscribers" = "%@ 訂閱者";
+"Accounts" = "帳戶";
+"Accounts are not supported for the application of this instance" = "本站並不支持帳戶";
+"Add Account" = "新增帳戶";
+"%lld videos" = "%lld 視頻";
+"Add Account..." = "新增帳戶...";
+"Add Location" = "新增站點";
+"Add Location..." = "新增站點...";
+"Add profile..." = "新增配置...";
+"Add Quality Profile" = "新增質量配置";
+"Add to %@" = "添加到 %@";
+"Add to Favorites" = "加至我的最愛";
+"Add to Playlist" = "加至播放清單";
+"Add to Playlist..." = "加至播放清單...";
+"Advanced" = "高級";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "所有";
+"Always use AVPlayer for live videos" = "總是使用AVPlayer(直播)";
+"Anonymous" = "匿名";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "任何";
+"Apply to all" = "套用至全部";
+"Are you sure you want to unsubscribe from %@?" = "確定要取消訂閱 %@？";
+"Automatic" = "自動";
+"Autoplaying Next" = "自動播放下一個";
+"Backend" = "後台";
+"Categories to Skip" = "要跳過的類別";
+"Cellular" = "流動網絡";
+"Chapters" = "章節";
+"Charging" = "充電中";
+"Clear" = "清除";
+"Clear All" = "清除所有";
+"Clear All Recents" = "清除所有最近";
+"Clear History" = "清除記錄";
+"Clear Search History" = "清除搜尋記錄";
+"Clear Search History..." = "清除搜尋記錄...";
+"Clear the queue" = "清除隊列";
+"Close" = "關閉";
+"Close PiP when player is opened" = "當播放器打開時，關閉 PiP";
+"Close player when closing video" = "當關閉視頻時，關閉播放器";
+"Close player when starting PiP" = "當啟動PiP時，關閉播放器";
+"Close Video" = "關閉視頻";
+"Close video after playing last in the queue" = "播放完最後隊列後關閉視頻";
+"Connected successfully (%@)" = "連接成功 (%@)";
+"Connection failed" = "連接失敗";
+"Contact" = "聯繫";
+"Continue" = "繼續";
+"Continue from %@" = "從 %@繼續";
+"Contributing" = "貢獻";
+"Controls" = "控制";
+"Copy %@ link" = "複製 %@ 連結";
+"Copy %@ link with time" = "複製 %@ 連結(含時間)";
+"Could not load locations manifest" = "無法加載站台列表";
+"Country Name or Code" = "國家名稱或代碼";
+"Create Playlist" = "新建播放清單";
+"Current: %@\n%@" = "現在: %@\n%@";
+
+/* Locations settings, custom instance is selected as current */
+"Custom" = "自定義";
+"Custom Locations" = "自定義站台";
+
+/* Video sort order in search */
+"Date" = "日期";
+"Decrease rate" = "下降率";
+"Decreased opacity" = "減少透明度";
+"Delete" = "刪除";
+"Disabled" = "禁用";
+"Discord Server" = "Discord 伺服器";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "討論在 Discord 及 Matrix 中進行，您可以在裡面詢問一些簡單的問題。";
+"Don't use public locations" = "不要使用公開站台";
+"Donations" = "捐贈";
+"Done" = "完成";
+"Duration" = "時長";
+"Edit Playlist" = "編輯播放清單";
+"Edit Quality Profile" = "編輯質量配置";
+"Edit..." = "編輯...";
+"Enable logging" = "啟用日誌";
+"Error" = "錯誤";
+"Favorites" = "喜歡";
+"Filter" = "篩選";
+"Filter: active" = "篩選: 啟用";
+"Find Other" = "搜尋其他";
+"Finding something to play..." = "正在尋找視頻...";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "格式將按列出的順序選擇。\nHLS是一種自適應格式（解析度設定不適用）。";
+"Frontend URL" = "前端網址";
+"Fullscreen size" = "全屏大小";
+"Gaming" = "遊戲";
+"Help" = "幫助";
+"Hide sidebar" = "隱藏側邊欄";
+"High" = "高";
+"Highest" = "最高";
+"Highest quality" = "最高畫質";
+"History" = "歷史";
+"Honor orientation lock" = "方向鎖";
+
+/* Video date filter in search */
+"Hour" = "小時";
+"I am lost" = "我迷失了";
+"I found a bug /" = "我發現bug";
+"I have a feature request" = "我有一個功能需要";
+"I want to ask a question" = "我想問問題";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "如果你要反饋一個 bug，請包括所有相關資料（特別是：App 版本，使用設備以及系統版本，重現步驟）。";
+"Info" = "資訊";
+"Instance of current account" = "此帳戶站台";
+
+/* SponsorBlock category name */
+"Interaction" = "交互";
+"Interface" = "介面";
+
+/* Loading stream OSD */
+"Loading streams..." = "加載中...";
+"Loading..." = "加載中...";
+"Locations" = "地址";
+"Lock portrait mode" = "鎖定直屏";
+
+/* Video duration filter in search */
+"Long" = "長";
+"Lowest" = "最低";
+"Mark as watched" = "標記為已觀看";
+"Mark watched videos with" = "標記已觀看視頻";
+"Matrix Channel" = "Matrix 頻道";
+"Matrix Chat" = "Matrix 聊天";
+
+/* Player controls layout size */
+"Medium" = "中";
+"Medium quality" = "中畫質";
+"Milestones" = "里程碑";
+
+/* Video date filter in search */
+"Month" = "月";
+"More info can be found in:" = "更多資訊可在:";
+"Movies" = "電影";
+"Name" = "名稱";
+"New Playlist" = "新播放清單";
+"Next" = "下一個";
+"No description" = "無簡介";
+"No Playlists" = "沒有播放清單";
+"No results" = "沒有結果";
+"Normal" = "正常";
+"Not available" = "不可用";
+"Not Playing" = "沒有播放";
+"Nothing" = "沒有東西";
+
+/* SponsorBlock category name */
+"Offtopic in Music Videos" = "在音樂視頻中的無關內容";
+"Only when signed in" = "僅當登錄後";
+"Open \"Playlists\" tab to create new one" = "打開「播放列表」 頁面創建新的播放列表";
+"Open Settings" = "打開設置";
+
+/* Loading stream OSD */
+"Opening %@ stream..." = "正在打開 %@ ...";
+"Opening audio stream..." = "正在打開音訊...";
+
+/* SponsorBlock category name */
+"Outro" = "結尾";
+"Password" = "密碼";
+"Pause" = "暫停";
+"Pause when entering background" = "進入後台時暫停";
+"Pause when player is closed" = "播放器關閉時暫停";
+"Picture in Picture" = "畫中畫";
+"Play" = "播放";
+"Play All" = "全部播放";
+"Play in PiP" = "在畫中畫播放";
+"Play Last" = "播放最後";
+"Play Music" = "播放音樂";
+"Play Next" = "播放下一部";
+"Play Now" = "即時播放";
+"Playback" = "回放";
+"Player" = "播放器";
+"Playlist" = "播放清單";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "播放清單 “%@” 將被删除。\n此操作不可恢復。";
+"Playlists" = "播放清單";
+"Popular" = "熱播";
+"Preferred Formats" = "喜好格式";
+"Profiles" = "配置";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "推廣與創作者本身直接相關的產品或服務。這通常包括商品或盈利平台的推廣。";
+"Proxy videos" = "代理視頻";
+"Public Locations" = "公共站台";
+"Public Manifest" = "公共清單";
+"Quality" = "畫質";
+"Quality Profile" = "畫質配置";
+"Queue" = "隊列";
+"Queue is empty" = "隊列為空";
+"Rate" = "比率";
+
+/* Video sort order in search */
+"Rating" = "評級";
+"Recents" = "最近";
+"Red" = "紅";
+"Refresh" = "更新";
+"Regular size" = "正常大小";
+"Regular Size" = "正常大小";
+"Related" = "相關";
+
+/* Video sort order in search */
+"Relevance" = "相關度";
+"Remove" = "移除";
+"Remove from Favorites" = "從最愛中移除";
+"Remove from history" = "從歷史中移除";
+"Remove from the queue" = "從隊列中移除";
+"Reset search filters" = "重設搜尋篩選";
+"Reset watched status when playing again" = "重新播放後重設播放狀態";
+"Resolution" = "分辨率";
+"Restart" = "重新啟動";
+"Restart/Play next" = "重新播放/播放下一個";
+"Restore default profiles..." = "重置默認配置文件...";
+"Rotate to portrait when exiting fullscreen" = "退出全屏後旋轉為直屏";
+"Round corners" = "圓角";
+"Save" = "儲存";
+"Save history of played videos" = "儲存已播放視頻記錄";
+"Save history of searches, channels and playlists" = "儲存搜尋, 頻道及播放清單記錄";
+"Search" = "搜尋";
+"Search history is empty" = "搜尋歷史為空";
+"Search..." = "搜尋...";
+"Seek gesture sensitivity" = "手勢靈敏度";
+"Seek gesture speed" = "手勢速度";
+"Seek with horizontal swipe on video" = "視頻水平滑動搜索";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "通常在視頻開頭找到的片段，包括動畫、靜止幀或剪輯，這些片段也可以由同一創作者在其他視頻中看到。";
+"Select location closest to you:" = "選取離你最近的站台:";
+
+/* SponsorBlock category name */
+"Self-promotion" = "自我推銷";
+"Settings" = "設置";
+"Share %@ link" = "分享 %@ 連結";
+"Share %@ link with time" = "分享 %@ 連結(含時間)";
+
+/* Video duration filter in search */
+"Short" = "短";
+"Show anonymous accounts" = "顯示匿名帳戶";
+"Show history" = "顯示歷史";
+"Show keywords" = "顯示關鍵字";
+"Show playback statistics" = "顯示回放統計";
+"Show progress of watching on thumbnails" = "縮圖顯示播放進度";
+"Show sidebar when space permits" = "空間充裕時顯示側邊欄";
+"Show video length" = "顯示視頻長度";
+"Shuffle" = "隨機播放";
+"Shuffle All" = "隨機播放全部";
+"Sidebar" = "側邊欄";
+"Sign In Required" = "需要登錄";
+
+/* Player controls layout size */
+"Small" = "小";
+
+/* Player controls layout size */
+"Smaller" = "更小";
+"Sort" = "排序";
+"Sort: %@" = "排序: %@";
+"Source" = "源";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"SponsorBlock" = "SponsorBlock";
+"SponsorBlock API Instance" = "SponsorBlock API 實例";
+"Subscribe" = "訂閱";
+
+/* Subscriptions title */
+"Subscriptions" = "訂閱";
+"Switch to other public location" = "轉換其他公共站台";
+"Switch to public locations" = "轉換至公共站台";
+"System controls buttons" = "系統控制鍵";
+"System controls show buttons for %@" = "系統控制%@鍵";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "很高興聽到您這麼說。提供人們想要的應用程序是一件很有趣的事情。您可以考慮為項目捐款，或為新功能開發做出貢獻。";
+"This cannot be reverted" = "這不能復原";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "此信息將僅在您的設備上處理，並用於將您連接到指定國家/地區的服務器。";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "這將刪除所有自定義配置文件並還原為其默認值。此操作無法復原。";
+"Thumbnails" = "縮圖";
+
+/* Video date filter in search */
+"Today" = "今日";
+"Trending" = "趨勢";
+"Username" = "用戶名稱";
+
+/* Selected video was played on given date */
+"Watched %@" = "已觀看 %@";
+"Welcome" = "歡迎";
+"Wi-Fi" = "無線網絡";
+"Wiki" = "維基";
+"You have no Playlists" = "你沒有播放清單";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "你沒有播放清單\n\n點擊\"新建播放清單\"建立";
+
+
+"Public" = "公開";
+"Unlisted" = "未列出";
+"Now Playing" = "現正播放";
+"Current Location" = "現在位置";
+"Add Channels, Playlists and Searches to Favorites using" = "添加頻道、播放清單和搜索到最愛";
+"Make default" = "設為預設";
+"Visibility" = "可見度";
+"It can be changed later in settings. You can use your own locations too." = "稍後可以在設置中更改。你也可以使用自己的地址。";
+"Press and hold remote button to open captions and quality menus" = "按住遙控按鈕打開字幕和畫質功能表";
+"Comments are disabled" = "留言被關閉";
+"No comments" = "沒有留言";
+"Open logs in Finder" = "在Finder 中開啟日誌";
+"Could not extract SID from received cookies: %@" = "無法從Cookies 提取SID: %@";
+"Could not refresh Popular" = "無法更新熱播";
+"Could not open playlist" = "無法打開播放清單";
+"Could not extract video ID" = "無法提取視頻ID";
+"This video could not be opened" = "這視頻無法打開";
+"No locations available at the moment" = "現時沒有可用地址";
+"Could not refresh Playlists" = "無法更新播放清單";
+"Translations" = "翻譯";
+"No documents" = "沒有文件";
+"Recent Documents" = "最近文件";
+"Home" = "主頁";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "在 Windows iTunes 或 Mac 上\n共享 Finder 中的文件";
+"Show Home" = "顯示主頁";
+"Show Open Videos quick actions" = "顯示打開視頻快速操作";
+"Recent History" = "最近歷史";
+"Show Favorites" = "顯示最愛";
+"Inspector visibility" = "檢查器可見度";
+"Edit Favorites…" = "編輯最愛…";
+"Show Open Videos toolbar button" = "顯示打開視頻工具按鈕";
+"Buttons labels" = "按鈕標簽";
+"Files" = "文件";
+"Show Documents" = "顯示文件";
+"Pages toolbar position" = "頁面工具列位置";
+"Video Details" = "視頻詳情";
+"Show Inspector" = "顯示檢查器";
+"Reload manifest" = "重新載入清單";
+"Clear Queue before opening" = "開啟前清除隊列";
+"Open" = "打開";
+"Video actions buttons" = "視頻操作按鈕";
+"Pages buttons" = "頁面按鈕";
+"URL to Open" = "要打開的URL";
+"Enter link to open" = "輸入要打開的連結";
+"Could not open Files" = "無法打開文件";
+"Paste" = "貼上";
+"Open Videos" = "打開視頻";
+"Enter links to open, one per line" = "輸入需要打開的連結，每行一個";
+"Playback Mode" = "回放模式";
+"Add" = "添加";
+"Hide" = "隱藏";
+"Always" = "總是";
+"Only for local files and URLs" = "僅針對本地文件以及連結";
+"Right" = "右";
+"Channels" = "頻道";
+"Open Files" = "打開文件";
+"Share" = "分享";
+"Show icons and text when space permits" = "在空間允許時顯示圖標和文字";
+"Left" = "左";
+"FPS" = "FPS";
+"Address" = "地址";
+"Remove…" = "移除…";
+"Show sidebar" = "顯示側邊欄";
+"Locations Manifest" = "地址清單";
+"Remove Location" = "移除地址";
+"Open Video" = "打開視頻";
+"Default Profile" = "預設配置";
+"Playback history is empty" = "回放記錄空白";
+"Copy%@link" = "複製%@連結";
+"Share%@link" = "分享%@連結";
+"Are you sure you want to remove this document?" = "你確定要移除文件?";
+"Could not delete document" = "無法刪除文件";
+"Live Streams" = "直播";
+"Shorts" = "短片";
+"Channel" = "頻道";
+"Mark channel feed as unwatched" = "標記頻道為未觀看";
+"Could not find any links to open in your clipboard" = "無法在你的剪輯版中找到任何可以打開的連結";
+"Actions buttons" = "動作按鈕";
+"Are you sure you want to remove %@ location?" = "你確定想要刪除 %@ 地址？";
+"Verified" = "已認證";
+"Open expanded" = "展開";
+"Short videos: visible" = "短片: 可見";
+"Player Bar" = "播放器控制條";
+"Short videos: hidden" = "短片: 隱藏";
+"Play all unwatched" = "播放所有未觀看";
+"Double tap gesture" = "雙擊手勢";
+"Tap and hold channel thumbnail to open context menu with more actions" = "點擊並按住頻道縮圖以打開包含更多操作的選單";
+"Always show controls buttons" = "總是顯示控制按鈕";
+"Single tap gesture" = "單擊手勢";
+"Seeking" = "搜索中";
+"Right click channel thumbnail to open context menu with more actions" = "右鍵單擊頻道縮圖以打開具有更多操作的選單";
+"Controls Buttons" = "控制按鈕";
+"System controls" = "系統控制";
+"Controls button: backwards" = "控制按鈕: 向後";
+"Controls button: forwards" = "控制按鈕: 向前";
+"Gesture: backwards" = "手勢: 向後";
+"Hide player" = "隱藏播放器";
+"Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "手勢設置控制雙擊播放器左/右的跳躍間隔。更改系統控制設置需要重新啓動。";
+"Lock orientation" = "鎖定方向";
+"Cache" = "緩存";
+"Actions Buttons" = "動作按鈕";
+"Total size: %@" = "總大小: %@";
+"Open channels with description expanded" = "打開頻道(含描述展開)";
+"Subscribe/Unsubscribe" = "訂閱/取消訂閱";
+"Show cache status" = "顯示緩存狀態";
+"Maximum feed items" = "最大Feed 項目";
+"Open channel" = "打開頻道";
+"Inspector" = "檢查器";
+"Open video description expanded" = "打開視頻描述";
+"Mark all as unwatched" = "標記所有為未觀看";
+"Mark all as watched" = "標記所有為已觀看";
+"Playback Settings" = "回放設定";
+"Replay" = "重播";
+"Fullscreen" = "全屏幕";
+"Lock" = "鎖定";
+"Description" = "描述";
+"Autoplay next" = "自動播放下一個";
+"Stream" = "串流";
+"Are you sure you want to clear cache?" = "你確定要清除緩存嗎？";
+"Show Next in Queue" = "在隊列中顯示下一個";
+"Show toggle watch status button" = "顯示切換觀看狀態按鈕";
+"Next in Queue" = "隊列中下一個";
+"List" = "列表";
+"Cells" = "Cells";
+"Toggle size" = "替換大小";
+"Toggle player" = "替換播放器";
+"Do nothing" = "不做";
+"Feed" = "Feed";
+"Queue - shuffled" = "隊列 - 隨機";
+"Loop one" = "單個循環";
+"File Extension" = "副檔名";
+"Opening file..." = "正在打開文件...";
+"Public account" = "公共帳戶";
+"Enter account credentials to connect..." = "輸入帳號密碼來連接...";
+"Enter location address to connect..." = "輸入站台地址來連接...";
+"Seek" = "搜索";
+"Your Accounts" = "你的帳戶";
+"Browse without account" = "匿名瀏覽";
+"Close video and player on end" = "播放結束時關閉視頻及播放器";
+"Use system controls with AVPlayer" = "在AVPlayer 時使用系統控制按鈕";
+"Rotate when entering fullscreen on landscape video" = "觀看橫向全屏視頻時旋轉";
+"Available" = "可用";
+"Home Settings" = "首頁設置";
+"Watched: hidden" = "已觀看: 隱藏";
+"No rotation" = "不要旋轉";
+"Startup section" = "啟動部分";
+"Watched: visible" = "已觀看: 可見";
+"No videos to show" = "沒有視頻顯示";
+"(shorts hidden)" = "(隱藏短片)";
+"Disable filters" = "禁用過濾";
+"Limit" = "限制";
+"Are you sure you want to remove %@ from Favorites?" = "你確定要從最愛中刪除 %@ 嗎？";
+"Keep channels with unwatched videos on top of subscriptions list" = "保留頻道內未觀看視頻在訂閱列表頂端";
+"Play Now in MPV" = "在MPV 中播放";
+"Play Now in AVPlayer" = "在AVPlayer 中播放";
+"Show channel avatars in videos lists" = "在視頻列表中顯示頻道頭像";
+"Show channel avatars in channels lists" = "在頻道列表中顯示頻道頭像";
+"Podcasts" = "播客";
+"Releases" = "發布";
+"Add %@" = "添加 %@";
+"Description preview" = "描述預覽";
+"No preview" = "沒有預覽";
+"Open vertical chapters expanded" = "展開垂直章節";
+"Chapters (if available)" = "章節(如有)";
+"Import Settings..." = "匯入設定...";
+"Export Settings" = "匯出設定";
+"Accounts passwords (unencrypted)" = "帳戶密碼 (非加密)";
+"Other" = "其他";
+"Export..." = "匯出…";
+"Are you sure you want to export unencrypted passwords?" = "你確定要匯出未加密的密碼?";
+"Icon only" = "僅圖示";
+"Export" = "匯出";
+"Import" = "匯入";
+"Platform" = "平台";
+"Custom Location already exists" = "自定義站台已存在";
+"Custom Location selected for import" = "選擇導入的自定義站台";
+"Custom Location not selected for import" = "未選擇導入的自定義站台";
+"Account already exists" = "帳戶已存在";
+"Password saved in import file" = "密碼已儲存在匯入文件";
+"Export in progress..." = "匯出中...";
+"In progress..." = "進行中…";
+" subscribers" = " 訂閱者";
+"10 seconds forwards/backwards" = "前放/回放10秒";
+"Are you sure you want to clear history of watched videos?" = "確定要清除播放歷史？";
+"Are you sure you want to clear search history?" = "確定要清除搜尋歷史？";
+"Are you sure you want to delete playlist?" = "確定要刪除播放清單？";
+"Are you sure you want to restore default quality profiles?" = "確定要回復預設質量配置？";
+"Badge" = "標記";
+"Badge & Decreased opacity" = "標記及降低透明度";
+"Badge color" = "標記顏色";
+"Based on system color scheme" = "根據系統配置";
+"Battery" = "電池";
+"Blue" = "藍";
+"Browsing" = "瀏覽";
+"Buffering stream..." = "緩衝中...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "缺陷及主意也可以在 GitHub Issues 界面提出。 ";
+"Cancel" = "取消";
+"Button" = "按鈕";
+"Captions" = "字幕";
+"Category" = "類別";
+"Close PiP and open player when application enters foreground" = "當應用程式進入前台時，關閉 PiP 並打開播放器";
+"Close PiP when starting playing other video" = "當播放其他視頻時，關閉 PiP";
+"Comments" = "留言";
+"Country" = "國家";
+"When partially watched video is played" = "播放未完全觀看視頻時";
+"Do not share this file with anyone or you can lose access to your accounts. If you don't select to export passwords you will be asked to provide them during import" = "請勿與任何人共用此文件，否則您可能會失去對帳戶的存取權限。如果您不選擇匯出密碼，系統將要求您在匯入過程中提供密碼";
