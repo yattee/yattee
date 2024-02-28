@@ -25,7 +25,7 @@
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
         "branch" : "master",
-        "revision" : "a73f7d09534c35a509d2914849a75c15c12fbbbd"
+        "revision" : "ad6abdf2a3a866288a7dad2c4e13379406002a81"
       }
     },
     {
@@ -106,7 +106,7 @@
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
         "branch" : "master",
-        "revision" : "80c8b2023a5efb4415a2c615acfec075e5c243d2"
+        "revision" : "e7329c6fb61c04f4b6fda008b6650efdb08cf9b7"
       }
     },
     {

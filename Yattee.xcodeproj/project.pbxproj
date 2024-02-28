@@ -1196,6 +1196,7 @@
 		3730D89F2712E2B70020ED53 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
 		37319F0427103F94004ECCD0 /* PlayerQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueue.swift; sourceTree = "<group>"; };
+		37367E582B8F63C200436163 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCacheModel.swift; sourceTree = "<group>"; };
 		373C8FE3275B955100CB5936 /* CommentsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsPage.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
@@ -2773,6 +2774,7 @@
 				es,
 				tr,
 				ru,
+				"zh-Hant",
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -4045,6 +4047,7 @@
 				3767F3322B25053B00F257BC /* es */,
 				3767F3332B25058300F257BC /* tr */,
 				3767F3342B2505EF00F257BC /* ru */,
+				37367E582B8F63C200436163 /* zh-Hant */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
