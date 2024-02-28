@@ -113,6 +113,7 @@ struct SubscriptionsView: View {
         } label: {
             Label("Play all unwatched", systemImage: "play")
         }
+        .help("Play all unwatched")
         .disabled(!feed.canPlayUnwatchedFeed)
     }
 
@@ -130,6 +131,7 @@ struct SubscriptionsView: View {
         } label: {
             Label("Mark all as watched", systemImage: "checkmark.circle.fill")
         }
+        .help("Mark all as watched")
         .disabled(!feed.canMarkAllFeedAsWatched)
     }
 
@@ -139,6 +141,7 @@ struct SubscriptionsView: View {
         } label: {
             Label("Mark all as unwatched", systemImage: "checkmark.circle")
         }
+        .help("Mark all as unwatched")
     }
 }
 

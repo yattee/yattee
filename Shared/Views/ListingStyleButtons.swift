@@ -16,6 +16,7 @@ struct ListingStyleButtons: View {
                     .imageScale(.small)
                 #endif
             }
+            .help(listingStyle == .cells ? "List" : "Cells")
         #endif
     }
 

@@ -66,6 +66,7 @@ struct HomeSettings: View {
                                     .font(.system(size: 30))
                                 #endif
                             }
+                            .help("Add to Favorites")
                             #if !os(tvOS)
                             .buttonStyle(.borderless)
                             #endif

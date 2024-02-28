@@ -38,6 +38,7 @@ struct ShareButton<LabelView: View>: View {
                 label
             }
             .menuStyle(.borderlessButton)
+            .help("Share")
             #if os(macOS)
                 .frame(maxWidth: 60)
             #endif

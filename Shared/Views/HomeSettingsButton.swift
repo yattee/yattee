@@ -11,6 +11,7 @@ struct HomeSettingsButton: View {
         }
         .font(.caption)
         .imageScale(.small)
+        .help("Home Settings")
     }
 }
 
