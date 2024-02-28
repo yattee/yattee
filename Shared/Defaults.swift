@@ -225,6 +225,9 @@ extension Defaults.Keys {
 
     static let saveRecents = Key<Bool>("saveRecents", default: true)
     static let saveHistory = Key<Bool>("saveHistory", default: true)
+    static let showRecents = Key<Bool>("showRecents", default: true)
+    static let limitRecents = Key<Bool>("limitRecents", default: false)
+    static let limitRecentsAmount = Key<Int>("limitRecentsAmount", default: 10)
     static let showWatchingProgress = Key<Bool>("showWatchingProgress", default: true)
     static let saveLastPlayed = Key<Bool>("saveLastPlayed", default: false)
 

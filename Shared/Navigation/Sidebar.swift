@@ -13,6 +13,7 @@ struct Sidebar: View {
         @Default(.showDocuments) private var showDocuments
     #endif
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
+    @Default(.showRecents) private var showRecents
 
     var body: some View {
         ScrollViewReader { scrollView in
@@ -20,8 +21,10 @@ struct Sidebar: View {
                 mainNavigationLinks
 
                 if !accounts.isEmpty {
-                    AppSidebarRecents()
-                        .id("recentlyOpened")
+                    if showRecents {
+                        AppSidebarRecents()
+                            .id("recentlyOpened")
+                    }
 
                     if accounts.api.signedIn {
                         if visibleSections.contains(.subscriptions), accounts.app.supportsSubscriptions {

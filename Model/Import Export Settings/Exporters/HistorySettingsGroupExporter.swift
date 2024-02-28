@@ -15,7 +15,11 @@ final class HistorySettingsGroupExporter: SettingsGroupExporter {
 
             "watchedVideoStyle": Defaults[.watchedVideoStyle].rawValue,
             "watchedVideoBadgeColor": Defaults[.watchedVideoBadgeColor].rawValue,
-            "showToggleWatchedStatusButton": Defaults[.showToggleWatchedStatusButton]
+            "showToggleWatchedStatusButton": Defaults[.showToggleWatchedStatusButton],
+
+            "showRecents": Defaults[.showRecents],
+            "limitRecents": Defaults[.limitRecents],
+            "limitRecentsAmount": Defaults[.limitRecentsAmount]
         ]
     }
 }
