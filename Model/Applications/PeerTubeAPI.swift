@@ -316,6 +316,11 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
     }
 
     func playlist(_ id: String) -> Resource? {
+        return playlist(id, page: nil)
+    }
+    
+    func playlist(_ id: String, page: String? = nil) -> Resource? {
+        // TODO
         resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
     }
 
