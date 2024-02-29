@@ -112,12 +112,12 @@
 "Help" = "Ayuda";
 "Hide sidebar" = "Ocultar barra lateral";
 "Add Location" = "Añadir ubicación";
-"Add Location..." = "Añadir ubicación...";
+"Add Location..." = "Añadir ubicación..";
 "Decrease rate" = "Tasa de disminución";
 "Decreased opacity" = "Opacidad disminuida";
 "High" = "Alto";
 "%lld videos" = "%lld videos";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Recordatorios explícitos para marquen \"me gusta\", se suscriban o interactúen con ellos en cualquier plataforma de pago o gratuita (por ejemplo, haciendo clic en un vídeo).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Recordatorios explícitos para que indiquen les guste, se suscriban o interactúen con ellos en cualquier plataforma de pago o gratuita (por ejemplo, haciendo clic en un vídeo).\n";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Los formatos se seleccionarán en orden como se indica.\nHLS es un formato adaptable (no aplica la configuración de resolución).";
 "Fullscreen size" = "Tamaño de pantalla completa";
 "Badge & Decreased opacity" = "Insignia y opacidad dosminuída";
