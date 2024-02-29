@@ -323,10 +323,16 @@ final class AVPlayerBackend: PlayerBackend {
             self.asset = nil
         }
 
+        @Default(.avPlayerUsesSystemControls) var avPlayerUsesSystemControls
+
         let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
+            if !avPlayerUsesSystemControls {
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true)
+                } catch {
+                    print("Activating AVAudioSession failed: \(error)")
+                }
+            }
 
             self.setRate(self.model.currentRate)
 
