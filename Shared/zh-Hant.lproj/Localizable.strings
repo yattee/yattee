@@ -40,7 +40,7 @@
 "Enable Return YouTube Dislike" = "啟用YouTube 不喜歡回報";
 "Enter fullscreen in landscape" = "橫屏下進入全屏";
 "Error when accessing playlist" = "播放清單出錯";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "明確提醒在任何付費或免費平台上按讚、訂閱或與他們互動（例如點擊影片）。";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "明確提醒在任何付費或免費平台上按讚、訂閱或與他們互動（例如點擊影片）。\n";
 "For videos which feature music as the primary content." = "以音樂為主要內容的視頻。";
 "I like this app!" = "我喜歡這app!";
 "If you are interested what's coming in future updates, you can track project Milestones." = "如果您對將來的功能更新感興趣，您可以追蹤我們的專案里程碑。";
@@ -146,7 +146,7 @@
 "%lld videos" = "%lld 視頻";
 "Add Account..." = "新增帳戶...";
 "Add Location" = "新增站點";
-"Add Location..." = "新增站點...";
+"Add Location..." = "新增站點..";
 "Add profile..." = "新增配置...";
 "Add Quality Profile" = "新增畫質配置";
 "Add to %@" = "添加到 %@";
