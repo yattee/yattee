@@ -3,7 +3,7 @@
 "Add Account" = "إضافة حساب";
 "Add Account..." = "إضافة حساب…";
 "Add Location" = "إضافة موقع";
-"Add Location..." = "إضافة موقع...";
+"Add Location..." = "أضِف موقع..";
 "%@ Playlist" = "قائمة تشغيل %@";
 "%@ Channel" = "قناة %@";
 "%@ subscribers" = "مشتركين %@";
@@ -387,7 +387,7 @@
 "Backend" = "الواجهة الخلفية";
 "Badge" = "الشارة";
 "Close PiP when starting playing other video" = "غلق الفيديو المصغر عند بدء تشغيل فيديو آخر";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الإشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع الفيديو).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الإشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع الفيديو).\n";
 "Filter" = "‏ عامل التصفية";
 "Frontend URL" = "عنوان URL للواجهة الأمامية";
 "Fullscreen size" = "حجم ملء الشاشة";
