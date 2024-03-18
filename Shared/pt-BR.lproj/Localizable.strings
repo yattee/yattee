@@ -355,7 +355,7 @@
 "Could not extract channel information" = "Não pôde extrair informação do canal";
 "For custom locations you can configure Frontend URL in Locations settings" = "Para localizações personalizadas você pode configurar URL do frontend nas configurações de localização";
 "Add Location" = "Adicionar Localização";
-"Add Location..." = "Adicionar Localização…";
+"Add Location..." = "Adicionar Localização..";
 "For videos which feature music as the primary content." = "Para vídeos que têm música como conteúdo principal.";
 "Close video after playing last in the queue" = "Fechar vídeo depois de tocar o último na fila";
 "Clear Search History" = "Limpar Histórico de Busca";
@@ -406,7 +406,7 @@
 "Country" = "País";
 "Clear All" = "Limpar Tudo";
 "Clear All Recents" = "Limpar Todos os Recentes";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de dar like, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clique em um vídeo).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de dar like, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clicar em um vídeo).\n";
 "Duration" = "Duração";
 "Edit Quality Profile" = "Editar Perfil de Qualidade";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discussões acontecem no Discord e no Matrix. É um bom lugar para perguntas gerais.";

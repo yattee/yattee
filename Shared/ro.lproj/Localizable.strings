@@ -10,7 +10,7 @@
 "Accounts are not supported for the application of this instance" = "Conturile nu sunt acceptate pentru aplicaţia acestei instanțe";
 "%lld videos" = "%lld videoclipuri";
 "Add Location" = "Adaugă locație";
-"Add Location..." = "Adaugă locație...";
+"Add Location..." = "Adaugă locație..";
 "Add profile..." = "Adaugă profil...";
 "Add to %@" = "Adaugă la %@";
 "Add to Playlist" = "Adaugă la playlist";
@@ -62,7 +62,7 @@
 "Edit" = "Editați";
 "Edit Playlist" = "Editați Playlist";
 "Enter fullscreen in landscape" = "Introduceți ecranul complet în peisaj";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Mementouri explicite de a aprecia, de a vă abona sau de a interacționa cu ele pe orice platformă (platforme) plătite sau gratuite (de exemplu, faceți clic pe un videoclip).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Mementouri explicite de a aprecia, de a vă abona sau de a interacționa cu ele pe orice platformă (platforme) plătite sau gratuite (de exemplu, faceți clic pe un videoclip).\n";
 "Find Other" = "Găsiți alte";
 "Finding something to play..." = "Să găsești ceva de jucat...";
 "For videos which feature music as the primary content." = "Pentru videoclipurile care includ muzica ca conținut principal.";

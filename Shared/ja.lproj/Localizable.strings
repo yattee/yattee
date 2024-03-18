@@ -529,7 +529,7 @@
 "For custom locations you can configure Frontend URL in Locations settings" = "場所を指定するには、場所の設定からフロントエンドのURLを設定します";
 "Public Locations" = "公開された場所";
 "Switch to public locations" = "公開された場所に切り替え";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。\n";
 "Proxy videos" = "動画閲覧にプロキシ使用";
 "Sections" = "表示するボタン";
 "System controls show buttons for %@" = "システム制御「%@」用のボタンを表示";
