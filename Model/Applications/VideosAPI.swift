@@ -117,6 +117,10 @@ extension VideosAPI {
 
         urlComponents.host = frontendHost
 
+        if frontendHost.contains("youtube.com") {
+            urlComponents.port = nil
+        }
+
         var queryItems = [URLQueryItem]()
 
         switch item.contentType {
