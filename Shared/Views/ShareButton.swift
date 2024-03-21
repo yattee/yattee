@@ -77,7 +77,7 @@ struct ShareButton<LabelView: View>: View {
 
     private var youtubeActions: some View {
         Group {
-            if let url = accounts.api.shareURL(contentItem, frontendHost: "www.youtube.com") {
+            if let url = accounts.api.shareURL(contentItem, frontendURL: "https://www.youtube.com") {
                 Button(labelForShareURL("YouTube")) {
                     shareAction(url)
                 }
@@ -87,7 +87,7 @@ struct ShareButton<LabelView: View>: View {
                         shareAction(
                             accounts.api.shareURL(
                                 contentItem,
-                                frontendHost: "www.youtube.com",
+                                frontendURL: "https://www.youtube.com",
                                 time: player.backend.currentTime
                             )!
                         )
