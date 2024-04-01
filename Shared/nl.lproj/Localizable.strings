@@ -145,7 +145,7 @@
 "I want to ask a question" = "Ik wil een vraag stellen";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Als je geïnteresseerd bent in toekomstige updates, kan je Milestones van het project volgen.";
 "Increase rate" = "Verhoog tempo";
-"Info" = "";
+"Info" = "Info";
 "Instance of current account" = "Instantie van huidig account";
 
 /* SponsorBlock category name */
@@ -259,3 +259,38 @@
 "Save history of played videos" = "Sla geschiedenis van afgespeelde videos op";
 "Save history of searches, channels and playlists" = "Sla geschiedenis van zoekopdrachten, kanalen en afspeellijsten op";
 "Search" = "Zoeken";
+"Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Stukken normaal in het begin van een video met een animatie, stil plaatje, of stukje van een andere video van dezelfde maker.";
+"Discord Server" = "Discord Server";
+"Enable logging" = "Loggen inschakelen";
+"Interface" = "Interface";
+
+/* SponsorBlock category name */
+"Intro" = "Intro";
+"LIVE" = "LIVE";
+"Matrix Chat" = "Matrix Chat";
+
+/* SponsorBlock category name */
+"Outro" = "Outro";
+"Proxy videos" = "Video's door proxyserver leiden";
+"Reset" = "Herstellen";
+"Search history is empty" = "Zoekgeschiedenis is leeg";
+"Search..." = "Zoeken...";
+"Sections" = "Secties";
+"Seek gesture sensitivity" = "Zoek gebaar gevoeligheid";
+"Seek gesture speed" = "Zoek gebaar snelheid";
+"Seek with horizontal swipe on video" = "Scrollen met horizontale sleep op video";
+"Select location closest to you:" = "Selecteer de dichtstbijzijnde locatie:";
+
+/* SponsorBlock category name */
+"Self-promotion" = "Zelfpromotie";
+"Settings" = "Instellingen";
+"Share %@ link" = "%@ link delen";
+"Share %@ link with time" = "%@ link met tijd delen";
+"Share..." = "Delen...";
+
+/* Video duration filter in search */
+"Short" = "Kort";
+"Show account username" = "Gebruikersnaam van account laten zien";
+"Show anonymous accounts" = "Anonieme accounts laten zien";
+"Show channel name" = "Naam van kanaal laten zien";
+"Show history" = "Geschiedenis laten zien";
