@@ -47,21 +47,14 @@ final class CommentsModel: ObservableObject {
                     self.all += commentsPage.comments
                     self.nextPage = commentsPage.nextPage
                     self.disabled = commentsPage.disabled
-                } else {
-                    print("Failed to parse response: \(response)")
                 }
             }
-            .onFailure { [weak self] error in
-                self?.handleFailure(error: error)
+            .onFailure { [weak self] _ in
+                self?.disabled = true
             }
             .onCompletion { [weak self] _ in
                 self?.loaded = true
             }
-    }
-
-    func handleFailure(error: Error) {
-        disabled = true
-        print("Encountered an error: \(error)")
     }
 
     func loadNextPageIfNeeded(current comment: Comment) {
