@@ -35,30 +35,33 @@ final class CommentsModel: ObservableObject {
 
     func load(page: String? = nil) {
         guard let video = player.currentVideo else { return }
-
-        if !firstPage && !nextPageAvailable {
-            return
-        }
-
-        firstPage = page.isNil || page!.isEmpty
+        guard firstPage || nextPageAvailable else { return }
 
         player
             .playerAPI(video)?
             .comments(video.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
-                if let page: CommentsPage = response.typedContent() {
-                    self?.all += page.comments
-                    self?.nextPage = page.nextPage
-                    self?.disabled = page.disabled
+                guard let self = self else { return }
+                if let commentsPage: CommentsPage = response.typedContent() {
+                    self.all += commentsPage.comments
+                    self.nextPage = commentsPage.nextPage
+                    self.disabled = commentsPage.disabled
+                } else {
+                    print("Failed to parse response: \(response)")
                 }
             }
-            .onFailure { [weak self] requestError in
-                self?.disabled = !requestError.json.dictionaryValue["error"].isNil
+            .onFailure { [weak self] error in
+                self?.handleFailure(error: error)
             }
             .onCompletion { [weak self] _ in
                 self?.loaded = true
             }
+    }
+
+    func handleFailure(error: Error) {
+        disabled = true
+        print("Encountered an error: \(error)")
     }
 
     func loadNextPageIfNeeded(current comment: Comment) {

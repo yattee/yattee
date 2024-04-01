@@ -113,8 +113,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.compactMap { self.extractVideo(from: $0) }
         }
 
-        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>) -> CommentsPage in
-            let details = content.json.dictionaryValue
+        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>?) -> CommentsPage in
+            guard let details = content?.json.dictionaryValue else {
+                return CommentsPage(comments: [], nextPage: nil, disabled: true)
+            }
+
             let comments = details["comments"]?.arrayValue.compactMap { self.extractComment(from: $0) } ?? []
             let nextPage = details["nextpage"]?.string
             let disabled = details["disabled"]?.bool ?? false
@@ -663,16 +666,16 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let videoStreams = content.dictionaryValue["videoStreams"]?.arrayValue ?? []
 
-        videoStreams.forEach { videoStream in
+        for videoStream in videoStreams {
             let videoCodec = videoStream.dictionaryValue["codec"]?.string ?? ""
             if Self.disallowedVideoCodecs.contains(where: videoCodec.contains) {
-                return
+                continue
             }
 
             guard let audioAssetUrl = audioStream.dictionaryValue["url"]?.url,
                   let videoAssetUrl = videoStream.dictionaryValue["url"]?.url
             else {
-                return
+                continue
             }
 
             let audioAsset = AVURLAsset(url: audioAssetUrl)
