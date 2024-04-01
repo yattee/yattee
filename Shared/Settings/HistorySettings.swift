@@ -10,6 +10,9 @@ struct HistorySettings: View {
     @Default(.saveRecents) private var saveRecents
     @Default(.saveLastPlayed) private var saveLastPlayed
     @Default(.saveHistory) private var saveHistory
+    @Default(.showRecents) private var showRecents
+    @Default(.limitRecents) private var limitRecents
+    @Default(.limitRecentsAmount) private var limitRecentsAmount
     @Default(.showWatchingProgress) private var showWatchingProgress
     @Default(.watchedThreshold) private var watchedThreshold
     @Default(.watchedVideoStyle) private var watchedVideoStyle
@@ -56,6 +59,26 @@ struct HistorySettings: View {
                 Section(header: SettingsHeader(text: "History".localized())) {
                     Toggle("Save history of searches, channels and playlists", isOn: $saveRecents)
                     Toggle("Save history of played videos", isOn: $saveHistory)
+                    Toggle("Show recents in sidebar", isOn: $showRecents)
+                    #if os(macOS)
+                    HStack {
+                        Toggle("Limit recents shown", isOn: $limitRecents)
+                            .frame(minWidth: 140, alignment: .leading)
+                            .disabled(!showRecents)
+                        Spacer()
+                        counterButtons(for: $limitRecentsAmount)
+                            .disabled(!limitRecents)
+                    }
+                    #else
+                    Toggle("Limit recents shown", isOn: $limitRecents)
+                        .disabled(!showRecents)
+                    HStack {
+                        Text("Recents shown")
+                        Spacer()
+                        counterButtons(for: $limitRecentsAmount)
+                            .disabled(!limitRecents)
+                    }
+                    #endif
                     Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
                         .disabled(!saveHistory)
                     Toggle("Keep last played video in the queue after restart", isOn: $saveLastPlayed)
@@ -167,6 +190,71 @@ struct HistorySettings: View {
         } label: {
             Text("Clear History")
                 .foregroundColor(.red)
+        }
+    }
+
+    private func counterButtons(for _value: Binding<Int>) -> some View {
+        var value: Binding<Int> {
+            Binding(
+                get: { return _value.wrappedValue },
+                set: {
+                    if $0 < 1 {
+                        _value.wrappedValue = 1
+                    } else {
+                        _value.wrappedValue = $0
+                    }
+                }
+            )
+        }
+
+        return HStack {
+            #if !os(tvOS)
+                Label("Minus", systemImage: "minus")
+                    .imageScale(.large)
+                    .labelStyle(.iconOnly)
+                    .padding(7)
+                    .foregroundColor(limitRecents ? .accentColor : .gray)
+                    .accessibilityAddTraits(.isButton)
+                #if os(iOS)
+                    .frame(minHeight: 35)
+                    .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
+                #endif
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        value.wrappedValue -= 1
+                    }
+            #endif
+
+            #if os(tvOS)
+                let textFieldWidth = 100.00
+            #else
+                let textFieldWidth = 30.00
+            #endif
+
+            TextField("Duration", value: value, formatter: NumberFormatter())
+                .frame(width: textFieldWidth, alignment: .trailing)
+                .multilineTextAlignment(.center)
+                .labelsHidden()
+                .foregroundColor(limitRecents ? .accentColor : .gray)
+            #if !os(macOS)
+                .keyboardType(.numberPad)
+            #endif
+
+            #if !os(tvOS)
+                Label("Plus", systemImage: "plus")
+                    .imageScale(.large)
+                    .labelStyle(.iconOnly)
+                    .padding(7)
+                    .foregroundColor(limitRecents ? .accentColor : .gray)
+                    .accessibilityAddTraits(.isButton)
+                #if os(iOS)
+                    .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
+                #endif
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        value.wrappedValue += 1
+                    }
+            #endif
         }
     }
 }
