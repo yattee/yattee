@@ -123,7 +123,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             content.json.dictionaryValue["videos"]?.arrayValue.map(self.extractVideo) ?? []
         }
 
-        ["latest", "playlists", "streams", "shorts", "channels", "videos", "releases", "podcasts"].forEach { type in
+        for type in ["latest", "playlists", "streams", "shorts", "channels", "videos", "releases", "podcasts"] {
             configureTransformer(pathPattern("channels/*/\(type)"), requestMethods: [.get]) { (content: Entity<JSON>) -> ChannelPage in
                 self.extractChannelPage(from: content.json)
             }
@@ -691,6 +691,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         let author = details["author"]?.string ?? ""
         let channelId = details["authorId"]?.string ?? UUID().uuidString
         let authorAvatarURL = details["authorThumbnails"]?.arrayValue.last?.dictionaryValue["url"]?.string ?? ""
+        let htmlContent = details["contentHtml"]?.string ?? ""
+        let decodedContent = decodeHtml(htmlContent)
         return Comment(
             id: UUID().uuidString,
             author: author,
@@ -699,10 +701,23 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             pinned: false,
             hearted: false,
             likeCount: details["likeCount"]?.int ?? 0,
-            text: details["content"]?.string ?? "",
+            text: decodedContent,
             repliesPage: details["replies"]?.dictionaryValue["continuation"]?.string,
             channel: Channel(app: .invidious, id: channelId, name: author)
         )
+    }
+
+    private func decodeHtml(_ htmlEncodedString: String) -> String {
+        if let data = htmlEncodedString.data(using: .utf8) {
+            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ]
+            if let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil) {
+                return attributedString.string
+            }
+        }
+        return htmlEncodedString
     }
 
     private func extractCaptions(from content: JSON) -> [Captions] {
