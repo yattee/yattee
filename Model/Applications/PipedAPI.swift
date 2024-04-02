@@ -113,8 +113,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             content.json.arrayValue.compactMap { self.extractVideo(from: $0) }
         }
 
-        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>) -> CommentsPage in
-            let details = content.json.dictionaryValue
+        configureTransformer(pathPattern("comments/*")) { (content: Entity<JSON>?) -> CommentsPage in
+            guard let details = content?.json.dictionaryValue else {
+                return CommentsPage(comments: [], nextPage: nil, disabled: true)
+            }
+
             let comments = details["comments"]?.arrayValue.compactMap { self.extractComment(from: $0) } ?? []
             let nextPage = details["nextpage"]?.string
             let disabled = details["disabled"]?.bool ?? false
@@ -663,16 +666,16 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let videoStreams = content.dictionaryValue["videoStreams"]?.arrayValue ?? []
 
-        videoStreams.forEach { videoStream in
+        for videoStream in videoStreams {
             let videoCodec = videoStream.dictionaryValue["codec"]?.string ?? ""
             if Self.disallowedVideoCodecs.contains(where: videoCodec.contains) {
-                return
+                continue
             }
 
             guard let audioAssetUrl = audioStream.dictionaryValue["url"]?.url,
                   let videoAssetUrl = videoStream.dictionaryValue["url"]?.url
             else {
-                return
+                continue
             }
 
             let audioAsset = AVURLAsset(url: audioAssetUrl)
@@ -724,15 +727,23 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let commentorUrl = details["commentorUrl"]?.string
         let channelId = commentorUrl?.components(separatedBy: "/")[2] ?? ""
 
+        let commentText = extractCommentText(from: details["commentText"]?.stringValue)
+        let commentId = details["commentId"]?.string ?? UUID().uuidString
+
+        // Sanity checks: return nil if required data is missing
+        if commentText.isEmpty || commentId.isEmpty || author.isEmpty {
+            return nil
+        }
+
         return Comment(
-            id: details["commentId"]?.string ?? UUID().uuidString,
+            id: commentId,
             author: author,
             authorAvatarURL: details["thumbnail"]?.string ?? "",
             time: details["commentedTime"]?.string ?? "",
             pinned: details["pinned"]?.bool ?? false,
             hearted: details["hearted"]?.bool ?? false,
             likeCount: details["likeCount"]?.int ?? 0,
-            text: extractCommentText(from: details["commentText"]?.stringValue),
+            text: commentText,
             repliesPage: details["repliesPage"]?.string,
             channel: Channel(app: .piped, id: channelId, name: author)
         )
