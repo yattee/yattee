@@ -1,6 +1,8 @@
-## Build 180
-* Add help text to all header buttons (by @rickykresslein)
-* Add Chinese (Traditional) localization (by @rexcsk)
+## Build 181
+* History Setting: hide the recent activity in the sidebar or limit the number of items shown (by @rickykresslein)
+* Fix issues with empty comments (by @stonerl)
+* Improved Invidious comments (by @stonerl)
+* Downgrade MPVKit to 0.36.0-1 due to issues with WebVTT subtitles
 * Updated localizations
 * Updated dependencies
 
@@ -13,7 +15,8 @@
   * Import via URL for tvOS
 * Added Controls setting "Action button labels" icon or icon and text
 * Added Advanced setting for MPV: "deinterlace"
-* Updated dependencies (mpvkit 0.37.0)
+* Add help text to all header buttons (by @rickykresslein)
+* Add Chinese (Traditional) localization (by @rexcsk)
 * Localization fixes
 * Updated localizations
 * Fixed reported crash
