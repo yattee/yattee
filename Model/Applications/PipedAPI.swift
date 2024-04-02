@@ -727,15 +727,23 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         let commentorUrl = details["commentorUrl"]?.string
         let channelId = commentorUrl?.components(separatedBy: "/")[2] ?? ""
 
+        let commentText = extractCommentText(from: details["commentText"]?.stringValue)
+        let commentId = details["commentId"]?.string ?? UUID().uuidString
+
+        // Sanity checks: return nil if required data is missing
+        if commentText.isEmpty || commentId.isEmpty || author.isEmpty {
+            return nil
+        }
+
         return Comment(
-            id: details["commentId"]?.string ?? UUID().uuidString,
+            id: commentId,
             author: author,
             authorAvatarURL: details["thumbnail"]?.string ?? "",
             time: details["commentedTime"]?.string ?? "",
             pinned: details["pinned"]?.bool ?? false,
             hearted: details["hearted"]?.bool ?? false,
             likeCount: details["likeCount"]?.int ?? 0,
-            text: extractCommentText(from: details["commentText"]?.stringValue),
+            text: commentText,
             repliesPage: details["repliesPage"]?.string,
             channel: Channel(app: .piped, id: channelId, name: author)
         )
