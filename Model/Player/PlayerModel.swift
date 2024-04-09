@@ -850,12 +850,11 @@ final class PlayerModel: ObservableObject {
             remoteCommandCenterConfigured = true
 
             #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setCategory(
-                    .playback,
-                    mode: .moviePlayback
-                )
-
-                UIApplication.shared.beginReceivingRemoteControlEvents()
+                do {
+                    try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                } catch {
+                    print("Setting category to AVAudioSessionCategoryPlayback failed: \(error)")
+                }
             #endif
 
             let interval = TimeInterval(systemControlsSeekDuration) ?? 10
