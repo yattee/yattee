@@ -433,12 +433,12 @@ struct PlaybackSettings: View {
         let captions = player.currentVideo?.captions ?? []
         Picker("Captions".localized(), selection: $player.captions) {
             if captions.isEmpty {
-                Text("Not available")
+                Text("Not available").tag(Captions?.none)
             } else {
                 Text("Disabled").tag(Captions?.none)
-            }
-            ForEach(captions) { caption in
-                Text(caption.description).tag(Optional(caption))
+                ForEach(captions) { caption in
+                    Text(caption.description).tag(Optional(caption))
+                }
             }
         }
         .disabled(captions.isEmpty)
