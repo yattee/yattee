@@ -1,15 +1,18 @@
 import Defaults
 import SwiftUI
+import UIKit
 
 struct SponsorBlockSettings: View {
+    @ObservedObject private var settings = SettingsModel.shared
+
     @Default(.sponsorBlockInstance) private var sponsorBlockInstance
     @Default(.sponsorBlockCategories) private var sponsorBlockCategories
+    @Default(.sponsorBlockColors) private var sponsorBlockColors
 
     var body: some View {
         Group {
             #if os(macOS)
                 sections
-
                 Spacer()
             #else
                 List {
@@ -35,41 +38,63 @@ struct SponsorBlockSettings: View {
                 .labelsHidden()
                 #if !os(macOS)
                     .autocapitalization(.none)
+                    .disableAutocorrection(true)
                     .keyboardType(.URL)
                 #endif
             }
+            Section(header: SettingsHeader(text: "Categories to Skip".localized())) {
+                categoryRows
+            }
+            colorSection
 
-            Section(header: SettingsHeader(text: "Categories to Skip".localized()), footer: categoriesDetails) {
-                #if os(macOS)
-                    let list = ForEach(SponsorBlockAPI.categories, id: \.self) { category in
-                        MultiselectRow(
-                            title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
-                            selected: sponsorBlockCategories.contains(category)
-                        ) { value in
-                            toggleCategory(category, value: value)
-                        }
-                    }
+            Button {
+                settings.presentAlert(
+                    Alert(
+                        title: Text("Restore Default Colors?"),
+                        message: Text("This action will reset all custom colors back to their original defaults. " +
+                            "Any custom color changes you've made will be lost."),
+                        primaryButton: .destructive(Text("Restore")) {
+                            resetColors()
+                        },
+                        secondaryButton: .cancel()
+                    )
+                )
+            } label: {
+                Text("Restore Default Colors …")
+                    .foregroundColor(.red)
+            }
 
-                    Group {
-                        if #available(macOS 12.0, *) {
-                            list
-                                .listStyle(.inset(alternatesRowBackgrounds: true))
-                        } else {
-                            list
-                                .listStyle(.inset)
-                        }
-                    }
-                    Spacer()
-                #else
-                    ForEach(SponsorBlockAPI.categories, id: \.self) { category in
-                        MultiselectRow(
-                            title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
-                            selected: sponsorBlockCategories.contains(category)
-                        ) { value in
-                            toggleCategory(category, value: value)
-                        }
-                    }
-                #endif
+            Section(footer: categoriesDetails) {
+                EmptyView()
+            }
+        }
+    }
+
+    private var colorSection: some View {
+        Section(header: SettingsHeader(text: "Colors for Categories")) {
+            ForEach(SponsorBlockAPI.categories, id: \.self) { category in
+                LazyVStack(alignment: .leading) {
+                    ColorPicker(
+                        SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
+                        selection: Binding(
+                            get: { getColor(for: category) },
+                            set: { setColor($0, for: category) }
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private var categoryRows: some View {
+        ForEach(SponsorBlockAPI.categories, id: \.self) { category in
+            LazyVStack(alignment: .leading) {
+                MultiselectRow(
+                    title: SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
+                    selected: sponsorBlockCategories.contains(category)
+                ) { value in
+                    toggleCategory(category, value: value)
+                }
             }
         }
     }
@@ -90,7 +115,6 @@ struct SponsorBlockSettings: View {
             }
         }
         .foregroundColor(.secondary)
-        .padding(.top, 10)
     }
 
     func toggleCategory(_ category: String, value: Bool) {
@@ -99,6 +123,40 @@ struct SponsorBlockSettings: View {
         } else if value {
             sponsorBlockCategories.insert(category)
         }
+    }
+
+    private func getColor(for category: String) -> Color {
+        if let hexString = sponsorBlockColors[category], let rgbValue = Int(hexString.dropFirst(), radix: 16) {
+            let r = Double((rgbValue >> 16) & 0xFF) / 255.0
+            let g = Double((rgbValue >> 8) & 0xFF) / 255.0
+            let b = Double(rgbValue & 0xFF) / 255.0
+            return Color(red: r, green: g, blue: b)
+        }
+        return Color("AppRedColor") // Fallback color if no match found
+    }
+
+    private func setColor(_ color: Color, for category: String) {
+        let uiColor = UIColor(color)
+
+        // swiftlint:disable no_cgfloat
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        // swiftlint:enable no_cgfloat
+
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        let r = Int(red * 255.0)
+        let g = Int(green * 255.0)
+        let b = Int(blue * 255.0)
+
+        let rgbValue = (r << 16) | (g << 8) | b
+        sponsorBlockColors[category] = String(format: "#%06x", rgbValue)
+    }
+
+    private func resetColors() {
+        sponsorBlockColors = SponsorBlockColors.dictionary
     }
 }
 
