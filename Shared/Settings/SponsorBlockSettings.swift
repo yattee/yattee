@@ -79,17 +79,18 @@ struct SponsorBlockSettings: View {
             ForEach(SponsorBlockAPI.categories, id: \.self) { category in
                 Text(SponsorBlockAPI.categoryDescription(category) ?? "Category")
                     .fontWeight(.bold)
+                    .padding(.bottom, 0.5)
                 #if os(tvOS)
                     .focusable()
                 #endif
 
                 Text(SponsorBlockAPI.categoryDetails(category) ?? "Details")
-                    .padding(.bottom, 3)
+                    .padding(.bottom, 10)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .foregroundColor(.secondary)
-        .padding(.top, 3)
+        .padding(.top, 10)
     }
 
     func toggleCategory(_ category: String, value: Bool) {
