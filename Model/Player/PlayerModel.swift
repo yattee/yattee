@@ -1190,7 +1190,8 @@ final class PlayerModel: ObservableObject {
                     if !self.controls.isLoadingVideo {
                         self.backend.togglePlay()
                     }
-                default: return keyEvent
+                default:
+                    return keyEvent
                 }
                 return nil
             }
