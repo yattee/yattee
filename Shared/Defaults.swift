@@ -244,6 +244,9 @@ extension Defaults.Keys {
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
     static let sponsorBlockColors = Key<[String: String]>("sponsorBlockColors", default: SponsorBlockColors.dictionary)
+    static let sponsorBlockShowTimeWithSkipsRemoved = Key<Bool>("sponsorBlockShowTimeWithSkipsRemoved", default: false)
+    static let sponsorBlockShowCategoriesInTimeline = Key<Bool>("sponsorBlockShowCategoriesInTimeline", default: true)
+    static let sponsorBlockShowNoticeAfterSkip = Key<Bool>("sponsorBlockShowNoticeAfterSkip", default: true)
 
     // MARK: GROUP - Locations
 

@@ -8,6 +8,9 @@ struct SponsorBlockSettings: View {
     @Default(.sponsorBlockInstance) private var sponsorBlockInstance
     @Default(.sponsorBlockCategories) private var sponsorBlockCategories
     @Default(.sponsorBlockColors) private var sponsorBlockColors
+    @Default(.sponsorBlockShowTimeWithSkipsRemoved) private var showTimeWithSkipsRemoved
+    @Default(.sponsorBlockShowCategoriesInTimeline) private var showCategoriesInTimeline
+    @Default(.sponsorBlockShowNoticeAfterSkip) private var showNoticeAfterSkip
 
     var body: some View {
         Group {
@@ -42,6 +45,13 @@ struct SponsorBlockSettings: View {
                     .keyboardType(.URL)
                 #endif
             }
+
+            Section(header: Text("Playback")) {
+                Toggle("Categories in timeline", isOn: $showCategoriesInTimeline)
+                Toggle("Post-skip notice", isOn: $showNoticeAfterSkip)
+                Toggle("Adjusted total time", isOn: $showTimeWithSkipsRemoved)
+            }
+
             Section(header: SettingsHeader(text: "Categories to Skip".localized())) {
                 categoryRows
             }

@@ -52,6 +52,8 @@ struct TimelineView: View {
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.sponsorBlockColors) private var sponsorBlockColors
+    @Default(.sponsorBlockShowTimeWithSkipsRemoved) private var showTimeWithSkipsRemoved
+    @Default(.sponsorBlockShowCategoriesInTimeline) private var showCategoriesInTimeline
 
     var playerControlsLayout: PlayerControlsLayout {
         player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
@@ -84,13 +86,15 @@ struct TimelineView: View {
             Group {
                 VStack(spacing: 3) {
                     if dragging {
-                        if let segment = projectedSegment,
-                           let description = SponsorBlockAPI.categoryDescription(segment.category)
-                        {
-                            Text(description)
-                                .font(.system(size: playerControlsLayout.segmentFontSize))
-                                .fixedSize()
-                                .foregroundColor(getColor(for: segment.category))
+                        if showCategoriesInTimeline {
+                            if let segment = projectedSegment,
+                               let description = SponsorBlockAPI.categoryDescription(segment.category)
+                            {
+                                Text(description)
+                                    .font(.system(size: playerControlsLayout.segmentFontSize))
+                                    .fixedSize()
+                                    .foregroundColor(getColor(for: segment.category))
+                            }
                         }
                         if let chapter = projectedChapter {
                             Text(chapter.title)
@@ -156,8 +160,10 @@ struct TimelineView: View {
                                 .frame(width: (dragging ? projectedValue : current) * oneUnitWidth)
                                 .zIndex(1)
 
-                            segmentsLayers
-                                .zIndex(2)
+                            if showCategoriesInTimeline {
+                                segmentsLayers
+                                    .zIndex(2)
+                            }
                         }
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 
@@ -247,7 +253,7 @@ struct TimelineView: View {
                 }
             }
         } else {
-            Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
+            Text(dragging || !showTimeWithSkipsRemoved ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
                 .frame(minWidth: 35)
         }
