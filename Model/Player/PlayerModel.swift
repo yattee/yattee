@@ -76,6 +76,8 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    var previousActiveBackend: PlayerBackendType?
+
     lazy var playerBackendView = PlayerBackendView()
 
     @Published var playerSize: CGSize = .zero { didSet {
@@ -176,7 +178,7 @@ final class PlayerModel: ObservableObject {
     @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
     @Default(.playerRate) var playerRate
     @Default(.systemControlsSeekDuration) var systemControlsSeekDuration
-    
+
     #if os(macOS)
         @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
         @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
@@ -192,7 +194,7 @@ final class PlayerModel: ObservableObject {
     var onPlayStream = [(Stream) -> Void]()
     var rateToRestore: Float?
     private var remoteCommandCenterConfigured = false
-    
+
     #if os(macOS)
         var keyPressMonitor: Any?
     #endif
@@ -532,7 +534,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType, changingStream: Bool = true) {
+    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType, changingStream: Bool = true, isInClosePip: Bool = false) {
         guard activeBackend != to else {
             return
         }
@@ -541,7 +543,7 @@ final class PlayerModel: ObservableObject {
 
         let wasPlaying = isPlaying
 
-        if to == .mpv {
+        if to == .mpv && !isInClosePip {
             closePiP()
         }
 
@@ -664,6 +666,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func startPiP() {
+        previousActiveBackend = activeBackend
         avPlayerBackend.startPictureInPictureOnPlay = false
         avPlayerBackend.startPictureInPictureOnSwitch = false
 
@@ -716,6 +719,12 @@ final class PlayerModel: ObservableObject {
         #endif
 
         backend.closePiP()
+        if previousActiveBackend == .mpv {
+            saveTime {
+                self.changeActiveBackend(from: self.activeBackend, to: .mpv, isInClosePip: true)
+                self.controls.resetTimer()
+            }
+        }
     }
 
     var pipImage: String {
@@ -1158,7 +1167,7 @@ final class PlayerModel: ObservableObject {
 
         return nil
     }
-    
+
     #if os(macOS)
         private func assignKeyPressMonitor() {
             keyPressMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { keyEvent -> NSEvent? in
@@ -1193,7 +1202,7 @@ final class PlayerModel: ObservableObject {
                 return nil
             }
         }
-        
+
         private func destroyKeyPressMonitor() {
             if let keyPressMonitor = keyPressMonitor {
                 NSEvent.removeMonitor(keyPressMonitor)
