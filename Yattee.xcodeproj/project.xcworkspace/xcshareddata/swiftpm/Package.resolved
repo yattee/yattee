@@ -60,7 +60,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cxfksword/MPVKit.git",
       "state" : {
-        "revision" : "dca1e345a26d09a3d621d7656a94e6427f3f7b83"
+        "revision" : "11f3fecac220c6ef41bd084541bf4d0e69fe3b31"
       }
     },
     {
@@ -181,5 +181,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
