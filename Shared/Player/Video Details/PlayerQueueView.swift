@@ -90,7 +90,7 @@ struct PlayerQueueView: View {
     }
 
     var queueHeader: some View {
-        Text("Queue".localized())
+        Text(sidebarQueue ? "Queue".localized() : "")
         #if !os(macOS)
             .foregroundColor(.secondary)
             .font(.caption)
