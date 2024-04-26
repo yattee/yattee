@@ -673,7 +673,7 @@ final class PlayerModel: ObservableObject {
         }
 
         guard let video = currentVideo else { return }
-        guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30) else { return }
+        guard let stream = backend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: qualityProfile!.formats) else { return }
 
         exitFullScreen()
 

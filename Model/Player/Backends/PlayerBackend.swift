@@ -29,7 +29,6 @@ protocol PlayerBackend {
     var videoWidth: Double? { get }
     var videoHeight: Double? { get }
 
-    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream?
     func canPlay(_ stream: Stream) -> Bool
     func canPlayAtRate(_ rate: Double) -> Bool
 
@@ -128,6 +127,38 @@ extension PlayerBackend {
             guard let item = model.autoplayItem else { return }
             model.resetAutoplay()
             model.advanceToItem(item)
+        }
+    }
+
+    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting, formatOrder: [QualityProfile.Format]) -> Stream? {
+        return streams.map { stream in
+            if stream.kind == .hls {
+                stream.resolution = maxResolution.value
+                stream.format = .hls
+            } else if stream.kind == .stream {
+                stream.format = .stream
+            }
+            return stream
+        }
+        .filter { stream in
+            stream.resolution <= maxResolution.value
+        }
+        .max { lhs, rhs in
+            if lhs.resolution == rhs.resolution {
+                guard let lhsFormat = QualityProfile.Format(rawValue: lhs.format.rawValue),
+                      let rhsFormat = QualityProfile.Format(rawValue: rhs.format.rawValue)
+                else {
+                    print("Failed to extract lhsFormat or rhsFormat")
+                    return false
+                }
+
+                let lhsFormatIndex = formatOrder.firstIndex(of: lhsFormat) ?? Int.max
+                let rhsFormatIndex = formatOrder.firstIndex(of: rhsFormat) ?? Int.max
+
+                return lhsFormatIndex > rhsFormatIndex
+            }
+
+            return lhs.resolution < rhs.resolution
         }
     }
 

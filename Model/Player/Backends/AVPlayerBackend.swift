@@ -116,16 +116,6 @@ final class AVPlayerBackend: PlayerBackend {
         #endif
     }
 
-    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
-        let sortedByResolution = streams
-            .filter { ($0.kind == .adaptive || $0.kind == .stream) && $0.resolution <= maxResolution.value }
-            .sorted { $0.resolution > $1.resolution }
-
-        return streams.first { $0.kind == .hls } ??
-            sortedByResolution.first { $0.kind == .stream } ??
-            sortedByResolution.first
-    }
-
     func canPlay(_ stream: Stream) -> Bool {
         stream.kind == .hls || stream.kind == .stream || (stream.kind == .adaptive && stream.format == .mp4)
     }

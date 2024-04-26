@@ -201,29 +201,6 @@ final class MPVBackend: PlayerBackend {
 
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
 
-    func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting) -> Stream? {
-        streams
-            .filter { $0.kind != .hls && $0.resolution <= maxResolution.value }
-            .max { lhs, rhs in
-                let predicates: [AreInIncreasingOrder] = [
-                    { $0.resolution < $1.resolution },
-                    { $0.format > $1.format }
-                ]
-
-                for predicate in predicates {
-                    if !predicate(lhs, rhs), !predicate(rhs, lhs) {
-                        continue
-                    }
-
-                    return predicate(lhs, rhs)
-                }
-
-                return false
-            } ??
-            streams.first { $0.kind == .hls } ??
-            streams.first
-    }
-
     func canPlay(_ stream: Stream) -> Bool {
         stream.resolution != .unknown && stream.format != .av1
     }

@@ -165,11 +165,11 @@ extension Defaults.Keys {
 
     // MARK: GROUP - Quality
 
-    static let hd2160pMPVProfile = QualityProfile(id: "hd2160pMPVProfile", backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases)
-    static let hd1080pMPVProfile = QualityProfile(id: "hd1080pMPVProfile", backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases)
-    static let hd720pMPVProfile = QualityProfile(id: "hd720pMPVProfile", backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases)
-    static let hd720pAVPlayerProfile = QualityProfile(id: "hd720pAVPlayerProfile", backend: .appleAVPlayer, resolution: .hd720p60, formats: [.hls, .stream])
-    static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream])
+    static let hd2160pMPVProfile = QualityProfile(id: "hd2160pMPVProfile", backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd1080pMPVProfile = QualityProfile(id: "hd1080pMPVProfile", backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd720pMPVProfile = QualityProfile(id: "hd720pMPVProfile", backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd720pAVPlayerProfile = QualityProfile(id: "hd720pAVPlayerProfile", backend: .appleAVPlayer, resolution: .hd720p60, formats: [.hls, .stream], order: Array(QualityProfile.Format.allCases.indices))
+    static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream], order: Array(QualityProfile.Format.allCases.indices))
 
     #if os(iOS)
         static let qualityProfilesDefault = UIDevice.current.userInterfaceIdiom == .pad ? [
