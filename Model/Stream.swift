@@ -83,21 +83,21 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     enum Format: String, Comparable {
-        case webm
         case avc1
         case av1
+        case webm
         case mp4
         case unknown
 
         private var sortOrder: Int {
             switch self {
-            case .mp4:
-                return 0
             case .avc1:
-                return 1
+                return 0
             case .av1:
-                return 2
+                return 1
             case .webm:
+                return 2
+            case .mp4:
                 return 3
             case .unknown:
                 return 4
@@ -121,14 +121,14 @@ class Stream: Equatable, Hashable, Identifiable {
         static func from(_ string: String) -> Self {
             let lowercased = string.lowercased()
 
-            if lowercased.contains("webm") {
-                return .webm
-            }
             if lowercased.contains("avc1") {
                 return .avc1
             }
             if lowercased.contains("av01") {
                 return .av1
+            }
+            if lowercased.contains("webm") {
+                return .webm
             }
             if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
                 return .mp4

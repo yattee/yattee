@@ -8,10 +8,10 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     enum Format: String, CaseIterable, Identifiable, Defaults.Serializable {
         case hls
         case stream
-        case mp4
         case avc1
         case av1
         case webm
+        case mp4
 
         var id: String {
             rawValue
@@ -35,14 +35,14 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
                 return nil
             case .stream:
                 return nil
-            case .mp4:
-                return .mp4
-            case .webm:
-                return .webm
             case .avc1:
                 return .avc1
             case .av1:
                 return .av1
+            case .webm:
+                return .webm
+            case .mp4:
+                return .mp4
             }
         }
     }

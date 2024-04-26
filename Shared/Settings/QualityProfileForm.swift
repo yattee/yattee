@@ -199,17 +199,21 @@ struct QualityProfileForm: View {
         #endif
     }
 
+    var filteredFormatList: some View {
+        ForEach(QualityProfile.Format.allCases.filter { !isFormatDisabled($0) }, id: \.self) { format in
+            MultiselectRow(
+                title: format.description,
+                selected: isFormatSelected(format),
+                disabled: isFormatDisabled(format)
+            ) { value in
+                toggleFormat(format, value: value)
+            }
+        }
+    }
+
     @ViewBuilder var formatsPicker: some View {
         #if os(macOS)
-            let list = ForEach(QualityProfile.Format.allCases, id: \.self) { format in
-                MultiselectRow(
-                    title: format.description,
-                    selected: isFormatSelected(format),
-                    disabled: isFormatDisabled(format)
-                ) { value in
-                    toggleFormat(format, value: value)
-                }
-            }
+            let list = filteredFormatList
 
             Group {
                 if #available(macOS 12.0, *) {
@@ -222,15 +226,7 @@ struct QualityProfileForm: View {
             }
             Spacer()
         #else
-            ForEach(QualityProfile.Format.allCases, id: \.self) { format in
-                MultiselectRow(
-                    title: format.description,
-                    selected: isFormatSelected(format),
-                    disabled: isFormatDisabled(format)
-                ) { value in
-                    toggleFormat(format, value: value)
-                }
-            }
+            filteredFormatList
         #endif
     }
 
