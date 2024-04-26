@@ -936,7 +936,7 @@ final class PlayerModel: ObservableObject {
         func handleEnterForeground() {
             setNeedsDrawing(presentingPlayer)
 
-            if !musicMode {
+            if !musicMode, activeBackend == .appleAVPlayer {
                 avPlayerBackend.bindPlayerToLayer()
             }
 
