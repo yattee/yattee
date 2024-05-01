@@ -47,9 +47,13 @@ struct VideoPlayerView: View {
     #if !os(tvOS)
         @GestureState var dragGestureState = false
         @GestureState var dragGestureOffset = CGSize.zero
-        @State var isHorizontalDrag = false // swiftlint:disable:this swiftui_state_private
-        @State var isVerticalDrag = false // swiftlint:disable:this swiftui_state_private
-        @State var viewDragOffset = Self.hiddenOffset // swiftlint:disable:this swiftui_state_private
+        @GestureState var isLongPressing = false
+        // swiftlint:disable swiftui_state_private
+        @State var isHorizontalDrag = false
+        @State var isVerticalDrag = false
+        @State var viewDragOffset = Self.hiddenOffset
+        @State var startTouchTime: Date? = nil
+        // swiftlint:enable swiftui_state_private
     #endif
 
     @ObservedObject var player = PlayerModel.shared // swiftlint:disable:this swiftui_state_private
