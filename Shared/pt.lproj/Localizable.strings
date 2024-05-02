@@ -59,7 +59,7 @@
 "Add Account" = "Adicionar Conta";
 "Add Account..." = "Adicionar Conta…";
 "Add Location" = "Adicionar Localização";
-"Add Location..." = "Adicionar Localização…";
+"Add Location..." = "Adicionar Localização...";
 "Add profile..." = "Adicionar perfil…";
 "Add Quality Profile" = "Adicionar Perfil de Qualidade";
 "Add to %@" = "Adicionar a %@";
@@ -148,7 +148,7 @@
 "Enter fullscreen in landscape" = "Entrar no ecrã inteiro em modo paisagem";
 "Error" = "Erro";
 "Error when accessing playlist" = "Erro ao acessar playlist";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de dar like, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clique num vídeo).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos para dar gosto, subscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clicar num vídeo).\n";
 "Favorites" = "Favoritos";
 "Filter" = "Filtro";
 "Filter: active" = "Filtro: ativo";
@@ -604,3 +604,9 @@
 "Add %@" = "Adicionar %@";
 "No preview" = "Sem prévia";
 "Chapters (if available)" = "Capítulos (se disponível)";
+"Import Settings..." = "Definições de Importação...";
+"Export Settings" = "Definições de Exportação";
+"Accounts passwords (unencrypted)" = "Palavras-passe das contas (não encriptadas)";
+"Other" = "Outro";
+"Other data" = "Outros dados";
+"Export..." = "Exportar…";
