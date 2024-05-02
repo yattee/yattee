@@ -69,7 +69,7 @@
       "location" : "https://github.com/pinterest/PINCache",
       "state" : {
         "branch" : "master",
-        "revision" : "97a5dbd3f1e69605bcd4103fdb32ca855887c47a"
+        "revision" : "f856226e8bee58d75cb6be1707ae0cb2f5801150"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ashleymills/Reachability.swift",
       "state" : {
-        "revision" : "7b7018a69c84ea94ac2a38dff626e16ea81d1db9",
-        "version" : "5.2.1"
+        "revision" : "57da4b1270cab7c2228919eabc0e4e1bf93e48ea",
+        "version" : "5.2.2"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "branch" : "master",
-        "revision" : "f6afa0132961d593f07970d84e2d8b588c29ea04"
+        "revision" : "f6afa0132961d593f07970d84e2d8b588c29ea04",
+        "version" : "5.19.1"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
       "state" : {
-        "revision" : "8a33fb3ca75a01267f775f891f7d61f675e95072",
-        "version" : "0.14.5"
+        "revision" : "f534cfe830a7807ecc3d0332127a502426cfa067",
+        "version" : "0.14.6"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lorenzofiamingo/swiftui-cached-async-image",
       "state" : {
-        "branch" : "main",
-        "revision" : "2abb11839f80ebb07a58ac5e146a1da664260c16"
+        "revision" : "467a3d17479887943ab917a379e62bbaff60ac8a",
+        "version" : "2.1.1"
       }
     },
     {
@@ -181,5 +181,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
