@@ -783,15 +783,9 @@ final class PlayerModel: ObservableObject {
 
         func lockOrientationAction() {
             if lockedOrientation.isNil {
-                let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
-                lockedOrientation = orientationMask
-                let orientation = OrientationTracker.shared.currentInterfaceOrientation
-                Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
-                // iOS 16 workaround
-                Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
+                lockedOrientation = OrientationTracker.shared.currentInterfaceOrientationMask
             } else {
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
         }
     #endif
@@ -1094,7 +1088,7 @@ final class PlayerModel: ObservableObject {
                     return
                 }
 
-                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock ||
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock && lockedOrientation.isNil ||
                     !honorSystemOrientationLock else { return }
 
                 if currentVideoIsLandscape {

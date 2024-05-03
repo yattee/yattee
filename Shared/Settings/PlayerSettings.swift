@@ -302,7 +302,7 @@ struct PlayerSettings: View {
 
     #if os(iOS)
         private var honorSystemOrientationLockToggle: some View {
-            Toggle("Honor orientation lock", isOn: $honorSystemOrientationLock)
+            Toggle("Follow device orientation lock", isOn: $honorSystemOrientationLock)
                 .disabled(!enterFullscreenInLandscape)
         }
 
@@ -311,7 +311,7 @@ struct PlayerSettings: View {
         }
 
         private var rotateToLandscapeOnEnterFullScreenPicker: some View {
-            Picker("Rotate when entering fullscreen on landscape video", selection: $rotateToLandscapeOnEnterFullScreen) {
+            Picker("Fullscreen rotation", selection: $rotateToLandscapeOnEnterFullScreen) {
                 Text("Landscape left").tag(FullScreenRotationSetting.landscapeLeft)
                 Text("Landscape right").tag(FullScreenRotationSetting.landscapeRight)
                 Text("No rotation").tag(FullScreenRotationSetting.disabled)
