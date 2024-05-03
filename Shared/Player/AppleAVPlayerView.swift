@@ -18,7 +18,7 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock ||
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock && player.lockedOrientation.isNil ||
                     !honorSystemOrientationLock else { return }
 
                 if PlayerModel.shared.currentVideoIsLandscape {
