@@ -333,7 +333,7 @@ struct TimelineView: View {
     var chaptersLayers: some View {
         ForEach(chapters) { chapter in
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color.orange)
+                .fill(Color("AppRedColor"))
                 .frame(maxWidth: 2, maxHeight: height)
                 .offset(x: (chapter.start * oneUnitWidth) - 1)
         }

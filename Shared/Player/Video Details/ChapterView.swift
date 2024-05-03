@@ -15,7 +15,7 @@ import SwiftUI
 
         var body: some View {
             Button(action: {
-                player.backend.seek(to: chapter.start, seekType: .userInteracted)
+                player.backend.seek(to: chapter.start, seekType: .chapterSkip(chapter.title))
             }) {
                 Group {
                     verticalChapter
@@ -72,7 +72,7 @@ import SwiftUI
 
         var body: some View {
             Button {
-                player.backend.seek(to: chapter.start, seekType: .userInteracted)
+                player.backend.seek(to: chapter.start, seekType: .chapterSkip(chapter.title))
             } label: {
                 Group {
                     horizontalChapter
