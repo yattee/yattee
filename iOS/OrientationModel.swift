@@ -67,10 +67,8 @@ final class OrientationModel {
                         if orientation.isLandscape {
                             self.player.controls.presentingControls = false
                             self.player.enterFullScreen(showControls: false)
-                            Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                         } else {
                             self.player.exitFullScreen(showControls: false)
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                         }
                     }
                 }

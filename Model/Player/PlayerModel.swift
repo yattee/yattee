@@ -1095,10 +1095,9 @@ final class PlayerModel: ObservableObject {
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
                     Delay.by(delay) {
                         let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
