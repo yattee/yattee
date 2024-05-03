@@ -506,7 +506,7 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if presentingPlayer, activeBackend == .appleAVPlayer, avPlayerUsesSystemControls, Constants.isIPhone {
-                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                Orientation.lockOrientation(.all, andRotateTo: .portrait)
             }
         #endif
 
@@ -532,7 +532,7 @@ final class PlayerModel: ObservableObject {
         if !presentingPlayer {
             #if os(iOS)
                 if Defaults[.lockPortraitWhenBrowsing] {
-                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    Orientation.lockOrientation(.all, andRotateTo: .portrait)
                 } else {
                     Orientation.lockOrientation(.allButUpsideDown)
                 }
