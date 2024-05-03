@@ -164,7 +164,7 @@ struct BrowsingSettings: View {
                 Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                     .onChange(of: lockPortraitWhenBrowsing) { lock in
                         if lock {
-                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                            Orientation.lockOrientation(.all, andRotateTo: .portrait)
                         } else {
                             Orientation.lockOrientation(.allButUpsideDown)
                         }
