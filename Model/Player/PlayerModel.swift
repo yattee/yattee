@@ -131,6 +131,7 @@ final class PlayerModel: ObservableObject {
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
+        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
     #endif
 
     @Published var currentChapterIndex: Int?
@@ -1092,7 +1093,10 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock ||
+                    !honorSystemOrientationLock else { return }
+
                 if currentVideoIsLandscape {
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     Delay.by(delay) {
