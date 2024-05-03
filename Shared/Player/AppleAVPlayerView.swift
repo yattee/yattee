@@ -21,7 +21,7 @@ import SwiftUI
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
+                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
