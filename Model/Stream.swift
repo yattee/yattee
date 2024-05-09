@@ -176,6 +176,11 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var quality: String {
         guard localURL.isNil else { return "Opened File" }
+
+        if kind == .hls {
+            return "adaptive (HLS)"
+        }
+
         return resolution.name
     }
 
@@ -183,7 +188,7 @@ class Stream: Equatable, Hashable, Identifiable {
         guard localURL.isNil else { return "File" }
 
         if kind == .hls {
-            return format.description
+            return "adaptive (HLS)"
         }
 
         if kind == .stream {
@@ -195,7 +200,7 @@ class Stream: Equatable, Hashable, Identifiable {
     var description: String {
         guard localURL.isNil else { return resolutionAndFormat }
         let instanceString = instance.isNil ? "" : " - (\(instance!.description))"
-        return format != .hls ? "\(resolutionAndFormat)\(instanceString)" : "\(format.description)\(instanceString)"
+        return format != .hls ? "\(resolutionAndFormat)\(instanceString)" : "adaptive (HLS)\(instanceString)"
     }
 
     var resolutionAndFormat: String {
