@@ -277,11 +277,11 @@
 "Large" = "Böyük";
 
 /* Loading stream OSD */
-"Loading streams..." = "Yayımlar yüklənilir...";
+"Loading streams…" = "Yayımlar yüklənilir…";
 "Only when signed in" = "Yalnız daxil olduqda";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "%@ yayımı açılır...";
+"Opening %@ stream…" = "%@ yayımı açılır…";
 "Matrix Chat" = "Matrix Söhbət";
 
 /* Player controls layout size */
@@ -296,7 +296,7 @@
 "Open Settings" = "Tənzimləmələri Aç";
 "Movies" = "Filmlər";
 "No description" = "Açıqlama yoxdur";
-"Opening audio stream..." = "Səs yayımı açılır...";
+"Opening audio stream…" = "Səs yayımı açılır…";
 "Password" = "Şifrə";
 "Preferred Formats" = "Üstünlük Verilən Formatlar";
 "Quality Profile" = "Profil Keyfiyyəti";

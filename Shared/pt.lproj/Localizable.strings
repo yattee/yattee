@@ -196,7 +196,7 @@
 "LIVE" = "AO VIVO";
 
 /* Loading stream OSD */
-"Loading streams..." = "Carregando streams…";
+"Loading streams…" = "Carregando streams…";
 "Loading..." = "Carregando…";
 "Locations" = "Localizações";
 "Lock portrait mode" = "Travar modo retrato";
@@ -237,8 +237,8 @@
 "Open Settings" = "Abrir Ajustes";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Abrindo stream %@…";
-"Opening audio stream..." = "Abrindo stream de áudio…";
+"Opening %@ stream…" = "Abrindo stream %@…";
+"Opening audio stream…" = "Abrindo stream de áudio…";
 "Orientation" = "Orientação";
 
 /* SponsorBlock category name */
@@ -557,7 +557,7 @@
 "Keep channels with unwatched videos on top of subscriptions list" = "Manter canais com vídeos não vistos no topo da lista de inscrições";
 "Opened File" = "Ficheiro Aberto";
 "File Extension" = "Extensão do Ficheiro";
-"Opening file..." = "A abrir ficheiro…";
+"Opening file…" = "A abrir ficheiro…";
 "Close video and player on end" = "Fechar vídeo e player ao final";
 "Use system controls with AVPlayer" = "Usar controles do sistema com o AVPlayer";
 "Public account" = "Conta pública";

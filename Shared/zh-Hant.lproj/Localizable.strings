@@ -252,7 +252,7 @@
 "Interface" = "介面";
 
 /* Loading stream OSD */
-"Loading streams..." = "加載中...";
+"Loading streams…" = "加載中…";
 "Loading..." = "加載中...";
 "Locations" = "地址";
 "Lock portrait mode" = "鎖定直屏";
@@ -292,8 +292,8 @@
 "Open Settings" = "打開設置";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "正在打開 %@ ...";
-"Opening audio stream..." = "正在打開音訊...";
+"Opening %@ stream…" = "正在打開 %@ …";
+"Opening audio stream…" = "正在打開音訊…";
 
 /* SponsorBlock category name */
 "Outro" = "結尾";
@@ -554,7 +554,7 @@
 "Queue - shuffled" = "隊列 - 隨機";
 "Loop one" = "單個循環";
 "File Extension" = "副檔名";
-"Opening file..." = "正在打開文件...";
+"Opening file…" = "正在打開文件…";
 "Public account" = "公共帳戶";
 "Enter account credentials to connect..." = "輸入帳號密碼來連接...";
 "Enter location address to connect..." = "輸入站台地址來連接...";

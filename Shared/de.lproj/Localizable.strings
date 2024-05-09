@@ -182,7 +182,7 @@
 "Large" = "Groß";
 
 /* Loading stream OSD */
-"Loading streams..." = "Lädt Streams …";
+"Loading streams…" = "Lädt Streams …";
 
 /* Video duration filter in search */
 "Long" = "Lang";
@@ -210,7 +210,7 @@
 "Only when signed in" = "Nur wenn Sie eingeloggt sind";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Öffne %@-stream …";
+"Opening %@ stream…" = "Öffne %@-Stream …";
 "Connection failed" = "Verbindung fehlgeschlagen";
 "Continue from %@" = "Ab %@ fortsetzen";
 "Contributing" = "Beitragen";
@@ -227,7 +227,7 @@
 "I want to ask a question" = "Ich möchte eine Frage stellen";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Wenn Sie sich für künftige Updates interessieren, können Sie die Meilensteine des Projekts verfolgen.";
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Das große Layout ist nicht für alle Geräte geeignet und kann dazu führen, dass die Bedienelemente nicht auf den Bildschirm passen.";
-"Opening audio stream..." = "Audiostream wird geöffnet …";
+"Opening audio stream…" = "Audiostream wird geöffnet …";
 "Orientation" = "Ausrichtung";
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Die Wiedergabeliste \"%@\" wird gelöscht.\nDies kann nicht rückgängig gemacht werden.";
 "Preferred Formats" = "Bevorzugte Formate";
@@ -569,7 +569,7 @@
 "Enter location address to connect..." = "Geben Sie die Internetadresse ein, um eine Verbindung herzustellen …";
 "Opened File" = "Geöffnete Datei";
 "File Extension" = "Dateierweiterung";
-"Opening file..." = "Datei öffnen …";
+"Opening file…" = "Datei öffnen …";
 "Close video and player on end" = "Video und Player am Ende beenden";
 "Use system controls with AVPlayer" = "Systemsteuerung mit AVPlayer verwenden";
 "Public account" = "Öffentliches Konto";

@@ -166,7 +166,7 @@
 "Only when signed in" = "Pouze když přihlášený";
 "Open \"Playlists\" tab to create new one" = "Otevřete kartu \"Playlisty\", aby jste vytvořili nový";
 "Open Settings" = "Otevřete Nastavení";
-"Opening audio stream..." = "Otevírám audio stream...";
+"Opening audio stream…" = "Otevírám audio stream…";
 "Orientation" = "Orientace";
 "Password" = "Heslo";
 "Pause" = "Pauza";
@@ -401,11 +401,11 @@
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Propagace produktu nebo služby, která přímo souvisí s tvůrcem samotným. Obvykle se jedná o zboží nebo zpeněžené platformy.";
 
 /* Loading stream OSD */
-"Loading streams..." = "Načítaní streamu...";
+"Loading streams…" = "Načítaní streamu…";
 "Matrix Chat" = "Matrix Chat";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Otevírám %@ stream...";
+"Opening %@ stream…" = "Otevírám %@ stream…";
 
 /* SponsorBlock category name */
 "Outro" = "Zakončení";
@@ -543,7 +543,7 @@
 "Available" = "Dostupné";
 "Are you sure you want to remove %@ from Favorites?" = "Opravdu chcete odstranit %@ z oblíbených položek?";
 "Use system controls with AVPlayer" = "Použití systémových ovládacích prvků s AVPlayerem";
-"Opening file..." = "Otvírání souboru...";
+"Opening file…" = "Otvírání souboru…";
 "No videos to show" = "Žádná videa k zobrazení";
 "Autoplay next" = "Automaticky přehrát další";
 "Inspector" = "Inspektor";

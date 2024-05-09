@@ -110,7 +110,7 @@
 "I want to ask a question" = "Bir soru sormak istiyorum";
 
 /* Loading stream OSD */
-"Loading streams..." = "Akışlar yükleniyor...";
+"Loading streams…" = "Akışlar yükleniyor…";
 "Edit Quality Profile" = "Kalite Profilini Düzenle";
 "Frontend URL" = "Ön uç URL'si";
 "Close player when starting PiP" = "Resim içinde Resim modu başlatılırken oynatıcıyı kapat";
@@ -227,7 +227,7 @@
 "No description" = "Açıklama yok";
 "Normal" = "Normal";
 "Open \"Playlists\" tab to create new one" = "Yeni bir tane oluşturmak için \"Oynatma Listeleri\" sekmesini açın";
-"Opening audio stream..." = "Ses akışı açılıyor...";
+"Opening audio stream…" = "Ses akışı açılıyor…";
 "Rate" = "Derecelendir";
 "Orientation" = "Yönlendirme";
 "No results" = "Sonuç yok";
@@ -396,7 +396,7 @@
 "Open" = "Aç";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "%@ akışı açılıyor...";
+"Opening %@ stream…" = "%@ akışı açılıyor…";
 "Clear Queue before opening" = "Açmadan önce Bekleme Listesini temizle";
 "Copy %@ link with time" = "Bağlantıyı %@ zaman ile kopyala";
 "Show Inspector" = "Denetleyiciyi Göster";

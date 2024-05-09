@@ -74,7 +74,7 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
 
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+            guard let self = self else { return }
             guard let video = item.video else {
                 return
             }
@@ -94,7 +94,9 @@ extension PlayerModel {
                 }
             } else {
                 self.videoBeingOpened = nil
-                self.availableStreams = self.streamsWithInstance(instance: playerInstance, streams: video.streams)
+                self.streamsWithInstance(instance: playerInstance, streams: video.streams) { processedStreams in
+                    self.availableStreams = processedStreams
+                }
             }
         }
     }

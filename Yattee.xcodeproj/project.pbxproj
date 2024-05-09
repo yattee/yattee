@@ -1070,6 +1070,9 @@
 		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
+		E258F38B2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
+		E258F38C2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
 		FA97174C2A494700001FF53D /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA97174B2A494700001FF53D /* MPVKit */; };
 /* End PBXBuildFile section */
 
@@ -1539,6 +1542,7 @@
 		3DA101AD287C30F50027D920 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
 		3DA101AE287C30F50027D920 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
 		3DA101AF287C30F50027D920 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		E258F3892BF61BD2005B8C28 /* URLTester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTester.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2293,6 +2297,7 @@
 				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
 				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				378FFBC328660172009E3FBE /* URLParser.swift */,
+				E258F3892BF61BD2005B8C28 /* URLTester.swift */,
 				37D4B0C22671614700C925CA /* YatteeApp.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37BD07C42698ADEE003EBB87 /* Yattee.entitlements */,
@@ -3138,6 +3143,7 @@
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
 				3752069D285E910600CA655F /* ChapterView.swift in Sources */,
 				375EC96A289F232600751258 /* QualityProfilesModel.swift in Sources */,
+				E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37FFC440272734C3009FFD26 /* Throttle.swift in Sources */,
@@ -3621,6 +3627,7 @@
 				378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
+				E258F38B2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				370E990B2A1EA8C500D144E9 /* WatchModel.swift in Sources */,
 				3717407E2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				37FB28422721B22200A57617 /* ContentItem.swift in Sources */,
@@ -3908,6 +3915,7 @@
 				37B2631C2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
 				37484C2B26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
+				E258F38C2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				374AB3DD28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,

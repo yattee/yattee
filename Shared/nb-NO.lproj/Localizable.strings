@@ -82,7 +82,7 @@
 "LIVE" = "Direkte";
 
 /* Loading stream OSD */
-"Loading streams..." = "Laster inn strømmer …";
+"Loading streams…" = "Laster inn strømmer …";
 
 /* Video duration filter in search */
 "Long" = "Lang";
@@ -223,7 +223,7 @@
 "Rate" = "Takt";
 "Not Playing" = "Spiller ikke";
 "Open \"Playlists\" tab to create new one" = "Åpne «Spillelister»-fanen for å opprette ny";
-"Opening audio stream..." = "Åpner lydstrøm …";
+"Opening audio stream…" = "Åpner lydstrøm …";
 "Password" = "Passord";
 "Nothing" = "Ingenting";
 "Picture in Picture" = "Bilde-i-bilde";
@@ -303,7 +303,7 @@
 "Offtopic in Music Videos" = "Urelaterte ting i musikkvideoer";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Åpner %@-strøm …";
+"Opening %@ stream…" = "Åpner %@-strøm …";
 "Play in PiP" = "Bilde-i-bilde";
 "Pause when entering background" = "Pause ved forsendelse til bakgrunnen";
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Promoterer noe som har å gjøre med skaperen direkte. Vanligvis effekter eller betalte plattformer.";

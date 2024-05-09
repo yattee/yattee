@@ -157,7 +157,7 @@
 "LIVE" = "LIVE";
 
 /* Loading stream OSD */
-"Loading streams..." = "Loading streams...";
+"Loading streams…" = "Loading streams…";
 "Loading..." = "Loading...";
 "Locations" = "Locations";
 "Lock portrait mode" = "Lock portrait mode";
@@ -202,8 +202,8 @@
 "Open Settings" = "Open Settings";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Opening %@ stream...";
-"Opening audio stream..." = "Opening audio stream...";
+"Opening %@ stream…" = "Opening %@ stream…";
+"Opening audio stream…" = "Opening audio stream…";
 "Orientation" = "Orientation";
 
 /* SponsorBlock category name */
@@ -567,7 +567,7 @@
 "Seek" = "Seek";
 "Opened File" = "Opened File";
 "File Extension" = "File Extension";
-"Opening file..." = "Opening file...";
+"Opening file…" = "Opening file…";
 "Public account" = "Public account";
 "Your Accounts" = "Your Accounts";
 "Browse without account" = "Browse without account";

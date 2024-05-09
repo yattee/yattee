@@ -152,7 +152,7 @@
 "Loading..." = "加载中...";
 
 /* Loading stream OSD */
-"Loading streams..." = "加载流中...";
+"Loading streams…" = "加载流中…";
 "Locations" = "地址";
 "Lock portrait mode" = "锁定竖屏模式";
 
@@ -191,8 +191,8 @@
 "Open Settings" = "打开设置";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "正在打开 %@ 的流...";
-"Opening audio stream..." = "正在打开音频流...";
+"Opening %@ stream…" = "正在打开 %@ 的流…";
+"Opening audio stream…" = "正在打开音频流…";
 "Orientation" = "方向";
 
 /* SponsorBlock category name */
@@ -530,7 +530,7 @@
 "Show scroll to top button in comments" = "在评论中显示“滚动到顶部”按钮";
 "Opened File" = "打开的文件";
 "File Extension" = "文件扩展";
-"Opening file..." = "打开文件中...";
+"Opening file…" = "打开文件中…";
 "Single tap gesture" = "单击手势";
 "Right click channel thumbnail to open context menu with more actions" = "右键单击频道缩略图以打开具有更多操作的上下文菜单";
 "Show unwatched feed badges" = "显示未观看的 Feed 标志";

@@ -298,6 +298,14 @@ final class PlayerModel: ObservableObject {
         backend.isPlaying
     }
 
+    var isPaused: Bool {
+        backend.isPaused
+    }
+
+    var hasStarted: Bool {
+        backend.hasStarted
+    }
+
     var playerItemDuration: CMTime? {
         guard !currentItem.isNil else {
             return nil

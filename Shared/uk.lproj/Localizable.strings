@@ -259,7 +259,7 @@
 "LIVE" = "В ЕФІРІ";
 
 /* Loading stream OSD */
-"Loading streams..." = "Завантаження трансляції...";
+"Loading streams…" = "Завантаження трансляції…";
 "Loading..." = "Завантаження...";
 "Locations" = "Локації";
 "Lock portrait mode" = "Заблокувати портретний режим";
@@ -298,8 +298,8 @@
 "Open Settings" = "Відрити налаштування";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Запуск трансляції %@...";
-"Opening audio stream..." = "Запуск аудіо трансляції...";
+"Opening %@ stream…" = "Запуск трансляції %@…";
+"Opening audio stream…" = "Запуск аудіо трансляції…";
 "Orientation" = "Орієнтація";
 
 /* SponsorBlock category name */

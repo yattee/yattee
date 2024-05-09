@@ -370,7 +370,7 @@
 "LIVE" = "ПРЯМАЯ ТРАНСЛЯЦИЯ";
 
 /* Loading stream OSD */
-"Loading streams..." = "Загрузка прямой трансляции...";
+"Loading streams…" = "Загрузка прямой трансляции…";
 "Loading..." = "Загрузка...";
 "Lock portrait mode" = "Блокировка портретного режима";
 "Low" = "Низкое";
@@ -405,8 +405,8 @@
 "Open Settings" = "Отрыть настройки";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Открытие %@ прямой трансляции...";
-"Opening audio stream..." = "Открытие прямой трансляции аудио...";
+"Opening %@ stream…" = "Открытие %@ прямой трансляции…";
+"Opening audio stream…" = "Открытие прямой трансляции аудио…";
 "Orientation" = "Ориентация";
 
 /* SponsorBlock category name */
@@ -591,7 +591,7 @@
 "Actions buttons" = "Кнопки действия";
 "Show sidebar" = "Показать боковую панель";
 "Browse without account" = "Искать без аккаунта";
-"Opening file..." = "Отрытие файла...";
+"Opening file…" = "Отрытие файла…";
 "Public account" = "Публичный аккаунт";
 "Your Accounts" = "Ваши аккаунты";
 "Close video and player on end" = "Закрыть видео и плеер в конце";
