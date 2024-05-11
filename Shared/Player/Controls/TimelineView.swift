@@ -331,7 +331,7 @@ struct TimelineView: View {
     }
 
     var chaptersLayers: some View {
-        ForEach(chapters) { chapter in
+        ForEach(chapters.filter { $0.start != 0 }) { chapter in
             RoundedRectangle(cornerRadius: 4)
                 .fill(Color("AppRedColor"))
                 .frame(maxWidth: 2, maxHeight: height)
