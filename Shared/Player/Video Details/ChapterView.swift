@@ -12,7 +12,10 @@ import SwiftUI
         var showThumbnail: Bool
 
         var isCurrentChapter: Bool {
-            player.currentChapterIndex == chapterIndex
+            if let currentChapterIndex = player.currentChapterIndex {
+                return currentChapterIndex == chapterIndex
+            }
+            return false
         }
 
         var body: some View {
