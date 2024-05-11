@@ -131,9 +131,17 @@ extension PlayerBackend {
     }
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting, formatOrder: [QualityProfile.Format]) -> Stream? {
+        // filter out non HLS streams
+        let nonHLSStreams = streams.filter { $0.kind != .hls }
+
+        // find max resolution from non HLS streams
+        let bestResolution = nonHLSStreams
+            .filter { $0.resolution <= maxResolution.value }
+            .max { $0.resolution < $1.resolution }?.resolution
+
         return streams.map { stream in
             if stream.kind == .hls {
-                stream.resolution = maxResolution.value
+                stream.resolution = bestResolution ?? maxResolution.value
                 stream.format = .hls
             } else if stream.kind == .stream {
                 stream.format = .stream
