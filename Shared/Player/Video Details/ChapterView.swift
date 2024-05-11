@@ -9,6 +9,8 @@ import SwiftUI
         var chapterIndex: Int
         @ObservedObject private var player = PlayerModel.shared
 
+        var showThumbnail: Bool
+
         var isCurrentChapter: Bool {
             player.currentChapterIndex == chapterIndex
         }
@@ -27,7 +29,7 @@ import SwiftUI
 
         var verticalChapter: some View {
             VStack(spacing: 12) {
-                if !chapter.image.isNil {
+                if !chapter.image.isNil, showThumbnail {
                     smallImage(chapter)
                 }
                 VStack(alignment: .leading, spacing: 4) {
@@ -40,7 +42,7 @@ import SwiftUI
                         .font(.system(.subheadline).monospacedDigit())
                         .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: !chapter.image.isNil ? Self.thumbnailWidth : nil, alignment: .leading)
+                .frame(maxWidth: !chapter.image.isNil && showThumbnail ? Self.thumbnailWidth : nil, alignment: .leading)
             }
         }
 
@@ -126,7 +128,7 @@ struct ChapterView_Preview: PreviewProvider {
             ChapterViewTVOS(chapter: .init(title: "Chapter", start: 30))
                 .injectFixtureEnvironmentObjects()
         #else
-            ChapterView(chapter: .init(title: "Chapter", start: 30), chapterIndex: 0)
+            ChapterView(chapter: .init(title: "Chapter", start: 30), chapterIndex: 0, showThumbnail: true)
                 .injectFixtureEnvironmentObjects()
         #endif
     }

@@ -5,18 +5,16 @@ import SwiftUI
 struct ChaptersView: View {
     @ObservedObject private var player = PlayerModel.shared
     @Binding var expand: Bool
+    let chaptersHaveImages: Bool
+    let showThumbnails: Bool
 
     var chapters: [Chapter] {
         player.videoForDisplay?.chapters ?? []
     }
 
-    var chaptersHaveImages: Bool {
-        chapters.allSatisfy { $0.image != nil }
-    }
-
     var body: some View {
         if !chapters.isEmpty {
-            if chaptersHaveImages {
+            if chaptersHaveImages, showThumbnails {
                 #if os(tvOS)
                     List {
                         Section {
@@ -70,7 +68,7 @@ struct ChaptersView: View {
         private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true) -> some View {
             ForEach(Array(chaptersToShow.indices), id: \.self) { index in
                 let chapter = chaptersToShow[index]
-                ChapterView(chapter: chapter, chapterIndex: index)
+                ChapterView(chapter: chapter, chapterIndex: index, showThumbnail: showThumbnails)
                     .opacity(index == 0 ? 1.0 : opacity)
                     .allowsHitTesting(clickable)
             }
@@ -80,7 +78,7 @@ struct ChaptersView: View {
 
 struct ChaptersView_Previews: PreviewProvider {
     static var previews: some View {
-        ChaptersView(expand: .constant(false))
+        ChaptersView(expand: .constant(false), chaptersHaveImages: false, showThumbnails: true)
             .injectFixtureEnvironmentObjects()
     }
 }

@@ -186,6 +186,8 @@ struct VideoDetails: View {
     @Default(.playerSidebar) private var playerSidebar
     @Default(.showInspector) private var showInspector
     @Default(.showChapters) private var showChapters
+    @Default(.showChapterThumbnails) private var showChapterThumbnails
+    @Default(.showChapterThumbnailsOnlyWhenDifferent) private var showChapterThumbnailsOnlyWhenDifferent
     @Default(.showRelated) private var showRelated
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
@@ -287,6 +289,63 @@ struct VideoDetails: View {
         }
     }
 
+    func infoView(video: Video) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
+                .frame(maxWidth: .infinity)
+            } else if let description = video.description, !description.isEmpty {
+                Section(header: descriptionHeader) {
+                    VideoDescription(video: video, detailsSize: detailsSize, expand: $descriptionExpanded)
+                        .padding(.horizontal)
+                }
+            } else if !video.isLocal {
+                Text("No description")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+            }
+
+            if player.videoBeingOpened.isNil {
+                if showChapters,
+                   !video.isLocal,
+                   !video.chapters.isEmpty
+                {
+                    Section(header: chaptersHeader) {
+                        ChaptersView(expand: $chaptersExpanded, chaptersHaveImages: chaptersHaveImages, showThumbnails: showThumbnails)
+                    }
+                }
+
+                if showInspector == .always || video.isLocal {
+                    InspectorView(video: player.videoForDisplay)
+                        .padding(.horizontal)
+                }
+
+                if showRelated,
+                   !sidebarQueue,
+                   !(player.videoForDisplay?.related.isEmpty ?? true)
+                {
+                    RelatedView()
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                }
+            }
+        }
+        .onAppear {
+            if !pageAvailable(page) {
+                page = .info
+            }
+        }
+        .transition(.opacity)
+        .animation(nil, value: player.currentItem)
+        #if os(iOS)
+            .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
+        #endif
+    }
+
     var pageView: some View {
         ScrollView(.vertical) {
             LazyVStack {
@@ -296,69 +355,12 @@ struct VideoDetails: View {
 
                 switch page {
                 case .info:
-                    Group {
-                        if let video {
-                            VStack(alignment: .leading, spacing: 10) {
-                                if !player.videoBeingOpened.isNil && (video.description.isNil || video.description!.isEmpty) {
-                                    VStack {
-                                        ProgressView()
-                                            .progressViewStyle(.circular)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                } else if let description = video.description, !description.isEmpty {
-                                    Section(header: descriptionHeader) {
-                                        VideoDescription(video: video, detailsSize: detailsSize, expand: $descriptionExpanded)
-                                            .padding(.horizontal)
-                                    }
-                                } else if !video.isLocal {
-                                    Text("No description")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .padding(.horizontal)
-                                }
-
-                                if player.videoBeingOpened.isNil {
-                                    if showChapters,
-                                       !video.isLocal,
-                                       !video.chapters.isEmpty
-                                    {
-                                        Section(header: chaptersHeader) {
-                                            ChaptersView(expand: $chaptersExpanded)
-                                        }
-                                    }
-
-                                    if showInspector == .always || video.isLocal {
-                                        InspectorView(video: player.videoForDisplay)
-                                            .padding(.horizontal)
-                                    }
-
-                                    if showRelated,
-                                       !sidebarQueue,
-                                       !(player.videoForDisplay?.related.isEmpty ?? true)
-                                    {
-                                        RelatedView()
-                                            .padding(.horizontal)
-                                            .padding(.top, 20)
-                                    }
-                                }
-                            }
-                        }
+                    if let video = self.video {
+                        infoView(video: video)
                     }
-                    .onAppear {
-                        if video != nil, !pageAvailable(page) {
-                            page = .info
-                        }
-                    }
-                    .transition(.opacity)
-                    .animation(nil, value: player.currentItem)
-                    #if os(iOS)
-                        .frame(maxWidth: YatteeApp.isForPreviews ? .infinity : maxWidth)
-                    #endif
-
                 case .queue:
                     PlayerQueueView(sidebarQueue: false)
                         .padding(.horizontal)
-
                 case .comments:
                     CommentsView()
                         .onAppear {
@@ -447,9 +449,27 @@ struct VideoDetails: View {
         player.videoForDisplay?.chapters.allSatisfy { $0.image != nil } ?? false
     }
 
+    var chapterImagesTheSame: Bool {
+        guard let firstChapterURL = player.videoForDisplay?.chapters.first?.image else {
+            return false
+        }
+
+        return player.videoForDisplay?.chapters.allSatisfy { $0.image == firstChapterURL } ?? false
+    }
+
+    var showThumbnails: Bool {
+        if !chaptersHaveImages || !showChapterThumbnails {
+            return false
+        }
+        if showChapterThumbnailsOnlyWhenDifferent {
+            return !chapterImagesTheSame
+        }
+        return true
+    }
+
     var chaptersHeader: some View {
         Group {
-            if !chaptersHaveImages {
+            if !chaptersHaveImages || !showThumbnails {
                 #if canImport(UIKit)
                     Button(action: {
                         chaptersExpanded.toggle()
