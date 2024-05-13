@@ -128,6 +128,8 @@ final class MPVClient: ObservableObject {
     func loadFile(
         _ url: URL,
         audio: URL? = nil,
+        bitrate: Int? = nil,
+        kind: Stream.Kind,
         sub: URL? = nil,
         time: CMTime? = nil,
         forceSeekable: Bool = false,
@@ -158,6 +160,10 @@ final class MPVClient: ObservableObject {
 
         if !options.isEmpty {
             args.append(options.joined(separator: ","))
+        }
+
+        if kind == .hls, bitrate != 0 {
+            checkError(mpv_set_option_string(mpv, "hls-bitrate", String(describing: bitrate)))
         }
 
         command("loadfile", args: args, returnValueCallback: completionHandler)

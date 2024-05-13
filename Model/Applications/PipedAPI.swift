@@ -687,6 +687,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             let fps = qualityComponents.count > 1 ? Int(qualityComponents[1]) : 30
             let resolution = Stream.Resolution.from(resolution: quality, fps: fps)
             let videoFormat = videoStream.dictionaryValue["format"]?.string
+            let bitrate = videoStream.dictionaryValue["bitrate"]?.int
 
             if videoOnly {
                 streams.append(
@@ -696,7 +697,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                         videoAsset: videoAsset,
                         resolution: resolution,
                         kind: .adaptive,
-                        videoFormat: videoFormat
+                        videoFormat: videoFormat,
+                        bitrate: bitrate
                     )
                 )
             } else {

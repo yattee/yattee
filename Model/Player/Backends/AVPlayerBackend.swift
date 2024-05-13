@@ -298,6 +298,11 @@ final class AVPlayerBackend: PlayerBackend {
         removeItemDidPlayToEndTimeObserver()
 
         model.playerItem = playerItem(stream)
+
+        if stream.isHLS {
+            model.playerItem?.preferredPeakBitRate = Double(model.qualityProfile?.resolution.value.bitrate ?? 0)
+        }
+
         guard model.playerItem != nil else {
             return
         }

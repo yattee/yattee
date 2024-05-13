@@ -140,7 +140,11 @@ struct QualityProfileForm: View {
             Text("Formats can be reordered and will be selected in this order.")
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("**Note:** HLS is an adaptive format, resolution setting doesn't apply.")
+            Text("**Note:** HLS is an adaptive format where specific resolution settings don't apply.")
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top)
+            Text("Yattee attempts to match the quality that is closest to the set resolution, but exact results cannot be guaranteed.")
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 0.1)
@@ -301,7 +305,7 @@ struct QualityProfileForm: View {
     func isResolutionDisabled(_ resolution: ResolutionSetting) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        return resolution.value > .hd720p30
+        return resolution.value > .hd1080p60
     }
 
     func initializeForm() {

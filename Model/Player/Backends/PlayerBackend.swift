@@ -137,11 +137,17 @@ extension PlayerBackend {
         // find max resolution from non HLS streams
         let bestResolution = nonHLSStreams
             .filter { $0.resolution <= maxResolution.value }
-            .max { $0.resolution < $1.resolution }?.resolution
+            .max { $0.resolution < $1.resolution }
+
+        // finde max bitrate from non HLS streams
+        let bestBitrate = nonHLSStreams
+            .filter { $0.resolution <= maxResolution.value }
+            .max { $0.bitrate ?? 0 < $1.bitrate ?? 0 }
 
         return streams.map { stream in
             if stream.kind == .hls {
-                stream.resolution = bestResolution ?? maxResolution.value
+                stream.resolution = bestResolution?.resolution ?? maxResolution.value
+                stream.bitrate = bestBitrate?.bitrate ?? (bestResolution?.resolution.bitrate ?? maxResolution.value.bitrate)
                 stream.format = .hls
             } else if stream.kind == .stream {
                 stream.format = .stream

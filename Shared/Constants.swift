@@ -5,6 +5,23 @@ import SwiftUI
 enum Constants {
     static let yatteeProtocol = "yattee://"
     static let overlayAnimation = Animation.linear(duration: 0.2)
+
+    static var isAppleTV: Bool {
+        #if os(iOS)
+            UIDevice.current.userInterfaceIdiom == .tv
+        #else
+            false
+        #endif
+    }
+
+    static var isMac: Bool {
+        #if os(iOS)
+            UIDevice.current.userInterfaceIdiom == .mac
+        #else
+            false
+        #endif
+    }
+
     static var isIPhone: Bool {
         #if os(iOS)
             UIDevice.current.userInterfaceIdiom == .phone

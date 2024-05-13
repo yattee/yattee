@@ -54,6 +54,32 @@ class Stream: Equatable, Hashable, Identifiable {
             return Int(refreshRatePart.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) ?? -1
         }
 
+        // These values are an approximation.
+        // https://support.google.com/youtube/answer/1722171?hl=en#zippy=%2Cbitrate
+
+        var bitrate: Int {
+            switch self {
+            case .hd2160p60, .hd2160p50, .hd2160p48, .hd2160p30:
+                return 56000000 // 56 Mbit/s
+            case .hd1440p60, .hd1440p50, .hd1440p48, .hd1440p30:
+                return 24000000 // 24 Mbit/s
+            case .hd1080p60, .hd1080p50, .hd1080p48, .hd1080p30:
+                return 12000000 // 12 Mbit/s
+            case .hd720p60, .hd720p50, .hd720p48, .hd720p30:
+                return 9500000 // 9.5 Mbit/s
+            case .sd480p30:
+                return 4000000 // 4 Mbit/s
+            case .sd360p30:
+                return 1500000 // 1.5 Mbit/s
+            case .sd240p30:
+                return 1000000 // 1 Mbit/s
+            case .sd144p30:
+                return 600000 // 0.6 Mbit/s
+            case .unknown:
+                return 0
+            }
+        }
+
         static func from(resolution: String, fps: Int? = nil) -> Self {
             allCases.first { $0.rawValue.contains(resolution) && $0.refreshRate == (fps ?? 30) } ?? .unknown
         }
@@ -143,6 +169,7 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var encoding: String?
     var videoFormat: String?
+    var bitrate: Int?
 
     init(
         instance: Instance? = nil,
@@ -153,7 +180,8 @@ class Stream: Equatable, Hashable, Identifiable {
         resolution: Resolution? = nil,
         kind: Kind = .hls,
         encoding: String? = nil,
-        videoFormat: String? = nil
+        videoFormat: String? = nil,
+        bitrate: Int? = nil
     ) {
         self.instance = instance
         self.audioAsset = audioAsset
@@ -164,6 +192,7 @@ class Stream: Equatable, Hashable, Identifiable {
         self.kind = kind
         self.encoding = encoding
         format = .from(videoFormat ?? "")
+        self.bitrate = bitrate
     }
 
     var isLocal: Bool {
