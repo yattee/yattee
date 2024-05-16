@@ -51,9 +51,22 @@ struct TimelineView: View {
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+    @Default(.sponsorBlockColors) private var sponsorBlockColors
+    @Default(.sponsorBlockShowTimeWithSkipsRemoved) private var showTimeWithSkipsRemoved
+    @Default(.sponsorBlockShowCategoriesInTimeline) private var showCategoriesInTimeline
 
     var playerControlsLayout: PlayerControlsLayout {
         player.playingFullScreen ? fullScreenPlayerControlsLayout : regularPlayerControlsLayout
+    }
+
+    private func getColor(for category: String) -> Color {
+        if let hexString = sponsorBlockColors[category], let rgbValue = Int(hexString.dropFirst(), radix: 16) {
+            let r = Double((rgbValue >> 16) & 0xFF) / 255.0
+            let g = Double((rgbValue >> 8) & 0xFF) / 255.0
+            let b = Double(rgbValue & 0xFF) / 255.0
+            return Color(red: r, green: g, blue: b)
+        }
+        return Color("AppRedColor") // Fallback color if no match found
     }
 
     var chapters: [Chapter] {
@@ -73,13 +86,15 @@ struct TimelineView: View {
             Group {
                 VStack(spacing: 3) {
                     if dragging {
-                        if let segment = projectedSegment,
-                           let description = SponsorBlockAPI.categoryDescription(segment.category)
-                        {
-                            Text(description)
-                                .font(.system(size: playerControlsLayout.segmentFontSize))
-                                .fixedSize()
-                                .foregroundColor(Color("AppRedColor"))
+                        if showCategoriesInTimeline {
+                            if let segment = projectedSegment,
+                               let description = SponsorBlockAPI.categoryDescription(segment.category)
+                            {
+                                Text(description)
+                                    .font(.system(size: playerControlsLayout.segmentFontSize))
+                                    .fixedSize()
+                                    .foregroundColor(getColor(for: segment.category))
+                            }
                         }
                         if let chapter = projectedChapter {
                             Text(chapter.title)
@@ -145,8 +160,10 @@ struct TimelineView: View {
                                 .frame(width: (dragging ? projectedValue : current) * oneUnitWidth)
                                 .zIndex(1)
 
-                            segmentsLayers
-                                .zIndex(2)
+                            if showCategoriesInTimeline {
+                                segmentsLayers
+                                    .zIndex(2)
+                            }
                         }
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 
@@ -236,7 +253,7 @@ struct TimelineView: View {
                 }
             }
         } else {
-            Text(dragging ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
+            Text(dragging || !showTimeWithSkipsRemoved ? playerTime.durationPlaybackTime : playerTime.withoutSegmentsPlaybackTime)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
                 .frame(minWidth: 35)
         }
@@ -299,7 +316,7 @@ struct TimelineView: View {
         ForEach(segments, id: \.uuid) { segment in
             Rectangle()
                 .offset(x: segmentLayerHorizontalOffset(segment))
-                .foregroundColor(Color("AppRedColor"))
+                .foregroundColor(getColor(for: segment.category))
                 .frame(maxHeight: height)
                 .frame(width: segmentLayerWidth(segment))
         }

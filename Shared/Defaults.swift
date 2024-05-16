@@ -243,6 +243,10 @@ extension Defaults.Keys {
 
     static let sponsorBlockInstance = Key<String>("sponsorBlockInstance", default: "https://sponsor.ajay.app")
     static let sponsorBlockCategories = Key<Set<String>>("sponsorBlockCategories", default: Set(SponsorBlockAPI.categories))
+    static let sponsorBlockColors = Key<[String: String]>("sponsorBlockColors", default: SponsorBlockColors.dictionary)
+    static let sponsorBlockShowTimeWithSkipsRemoved = Key<Bool>("sponsorBlockShowTimeWithSkipsRemoved", default: false)
+    static let sponsorBlockShowCategoriesInTimeline = Key<Bool>("sponsorBlockShowCategoriesInTimeline", default: true)
+    static let sponsorBlockShowNoticeAfterSkip = Key<Bool>("sponsorBlockShowNoticeAfterSkip", default: true)
 
     // MARK: GROUP - Locations
 
@@ -579,4 +583,27 @@ struct WidgetSettingsBridge: Defaults.Bridge {
 enum WidgetListingStyle: String, CaseIterable, Defaults.Serializable {
     case horizontalCells
     case list
+}
+
+enum SponsorBlockColors: String {
+    case sponsor = "#00D400" // Green
+    case selfpromo = "#FFFF00" // Yellow
+    case interaction = "#CC00FF" // Purple
+    case intro = "#00FFFF" // Cyan
+    case outro = "#0202ED" // Dark Blue
+    case preview = "#008FD6" // Light Blue
+    case filler = "#7300FF" // Violet
+    case music_offtopic = "#FF9900" // Orange
+
+    // Define all cases, can be used to iterate over the colors
+    static let allCases: [SponsorBlockColors] = [.sponsor, .selfpromo, .interaction, .intro, .outro, .preview, .filler, .music_offtopic]
+
+    // Create a dictionary with the category names as keys and colors as values
+    static let dictionary: [String: String] = {
+        var dict = [String: String]()
+        for item in allCases {
+            dict[String(describing: item)] = item.rawValue
+        }
+        return dict
+    }()
 }

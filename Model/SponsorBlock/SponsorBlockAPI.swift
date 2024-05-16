@@ -5,7 +5,7 @@ import Logging
 import SwiftyJSON
 
 final class SponsorBlockAPI: ObservableObject {
-    static let categories = ["sponsor", "selfpromo", "intro", "outro", "interaction", "music_offtopic"]
+    static let categories = ["sponsor", "selfpromo", "interaction", "intro", "outro", "preview", "filler", "music_offtopic"]
 
     let logger = Logger(label: "stream.yattee.app.sb")
 
@@ -21,15 +21,19 @@ final class SponsorBlockAPI: ObservableObject {
         case "sponsor":
             return "Sponsor".localized()
         case "selfpromo":
-            return "Self-promotion".localized()
-        case "intro":
-            return "Intro".localized()
-        case "outro":
-            return "Outro".localized()
+            return "Unpaid/Self Promotion".localized()
         case "interaction":
-            return "Interaction".localized()
+            return "Interaction Reminder (Subscribe)".localized()
+        case "intro":
+            return "Intermission/Intro Animation".localized()
+        case "outro":
+            return "Endcards/Credits".localized()
+        case "preview":
+            return "Preview/Recap/Hook".localized()
+        case "filler":
+            return "Filler Tangent/Jokes".localized()
         case "music_offtopic":
-            return "Offtopic in Music Videos".localized()
+            return "Music: Non-Music Section".localized()
         default:
             return name.capitalized
         }
@@ -46,8 +50,13 @@ final class SponsorBlockAPI: ObservableObject {
                 "The creator will receive payment or compensation in the form of money or free products.").localized()
 
         case "selfpromo":
-            return ("Promoting a product or service that is directly related to the creator themselves. " +
+            return ("The creator will not receive any payment in exchange for this promotion. " +
+                "This includes charity drives or free shout outs for products or other people they like.\n\n" +
+                "Promoting a product or service that is directly related to the creator themselves. " +
                 "This usually includes merchandise or promotion of monetized platforms.").localized()
+
+        case "interaction":
+            return "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).".localized()
 
         case "intro":
             return ("Segments typically found at the start of a video that include an animation, " +
@@ -56,8 +65,11 @@ final class SponsorBlockAPI: ObservableObject {
         case "outro":
             return "Typically near or at the end of the video when the credits pop up and/or endcards are shown.".localized()
 
-        case "interaction":
-            return "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video).".localized()
+        case "preview":
+            return "Collection of clips that show what is coming up in in this video or other videos in a series where all information is repeated later in the video".localized()
+
+        case "filler":
+            return "Filler Tangent/ Jokes is only for tangential scenes added only for filler or humor that are not required to understand the main content of the video.".localized()
 
         case "music_offtopic":
             return "For videos which feature music as the primary content.".localized()
@@ -100,8 +112,8 @@ final class SponsorBlockAPI: ObservableObject {
                 self.segments = JSON(value).arrayValue.map(SponsorBlockSegment.init).sorted { $0.end < $1.end }
 
                 self.logger.info("loaded \(self.segments.count) SponsorBlock segments")
-                self.segments.forEach {
-                    self.logger.info("\($0.start) -> \($0.end)")
+                for segment in self.segments {
+                    self.logger.info("\(segment.start) -> \(segment.end)")
                 }
             case let .failure(error):
                 self.segments = []

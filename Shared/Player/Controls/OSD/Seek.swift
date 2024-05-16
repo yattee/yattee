@@ -13,6 +13,18 @@ struct Seek: View {
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+    @Default(.sponsorBlockColors) private var sponsorBlockColors
+    @Default(.sponsorBlockShowNoticeAfterSkip) private var showNoticeAfterSkip
+
+    private func getColor(for category: String) -> Color {
+        if let hexString = sponsorBlockColors[category], let rgbValue = Int(hexString.dropFirst(), radix: 16) {
+            let r = Double((rgbValue >> 16) & 0xFF) / 255.0
+            let g = Double((rgbValue >> 8) & 0xFF) / 255.0
+            let b = Double(rgbValue & 0xFF) / 255.0
+            return Color(red: r, green: g, blue: b)
+        }
+        return Color("AppRedColor") // Fallback color if no match found
+    }
 
     var body: some View {
         Group {
@@ -25,6 +37,7 @@ struct Seek: View {
             #endif
         }
         .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
+        .animation(.easeIn)
     }
 
     var content: some View {
@@ -51,7 +64,8 @@ struct Seek: View {
                 if let segment = projectedSegment {
                     Text(SponsorBlockAPI.categoryDescription(segment.category) ?? "Sponsor")
                         .font(.system(size: playerControlsLayout.segmentFontSize))
-                        .foregroundColor(Color("AppRedColor"))
+                        .foregroundColor(getColor(for: segment.category))
+                        .padding(.bottom, 3)
                 }
             } else {
                 #if !os(tvOS)
@@ -69,7 +83,8 @@ struct Seek: View {
                         Divider()
                         Text(SponsorBlockAPI.categoryDescription(category) ?? "Sponsor")
                             .font(.system(size: playerControlsLayout.segmentFontSize))
-                            .foregroundColor(Color("AppRedColor"))
+                            .foregroundColor(getColor(for: category))
+                            .padding(.bottom, 3)
                     default:
                         EmptyView()
                     }
@@ -117,6 +132,7 @@ struct Seek: View {
     var visible: Bool {
         guard !(model.lastSeekTime.isNil && !model.isSeeking) else { return false }
         if let type = model.lastSeekType, !type.presentable { return false }
+        if !showNoticeAfterSkip { if case .segmentSkip? = model.lastSeekType { return false }}
 
         return !controls.presentingControls && !controls.presentingOverlays && model.presentingOSD
     }

@@ -71,13 +71,13 @@ final class SeekModel: ObservableObject {
     func showOSD() {
         guard !presentingOSD else { return }
 
-        withAnimation(.easeIn(duration: 0.1)) { self.presentingOSD = true }
+        presentingOSD = true
     }
 
     func hideOSD() {
         guard presentingOSD else { return }
 
-        withAnimation(.easeIn(duration: 0.1)) { self.presentingOSD = false }
+        presentingOSD = false
     }
 
     func hideOSDWithDelay() {
