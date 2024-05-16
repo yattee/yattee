@@ -77,6 +77,8 @@ extension Defaults.Keys {
     static let collapsedLinesDescription = Key<Int>("collapsedLinesDescription", default: 5)
 
     static let showChapters = Key<Bool>("showChapters", default: true)
+    static let showChapterThumbnails = Key<Bool>("showChapterThumbnails", default: true)
+    static let showChapterThumbnailsOnlyWhenDifferent = Key<Bool>("showChapterThumbnailsOnlyWhenDifferent", default: true)
     static let expandChapters = Key<Bool>("expandChapters", default: true)
     static let showRelated = Key<Bool>("showRelated", default: true)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)

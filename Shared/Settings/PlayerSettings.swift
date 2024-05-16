@@ -32,6 +32,8 @@ struct PlayerSettings: View {
 
     @Default(.showInspector) private var showInspector
     @Default(.showChapters) private var showChapters
+    @Default(.showChapterThumbnails) private var showThumbnails
+    @Default(.showChapterThumbnailsOnlyWhenDifferent) private var showThumbnailsOnlyWhenDifferent
     @Default(.expandChapters) private var expandChapters
     @Default(.showRelated) private var showRelated
 
@@ -80,8 +82,6 @@ struct PlayerSettings: View {
                 Section(header: SettingsHeader(text: "Info".localized())) {
                     expandVideoDescriptionToggle
                     collapsedLineDescriptionStepper
-                    showChaptersToggle
-                    expandChaptersToggle
                     showRelatedToggle
                     #if os(macOS)
                         HStack {
@@ -92,6 +92,13 @@ struct PlayerSettings: View {
                     #else
                         inspectorVisibilityPicker
                     #endif
+                }
+
+                Section(header: SettingsHeader(text: "Chapters".localized())) {
+                    showChaptersToggle
+                    showThumbnailsToggle
+                    showThumbnailsWhenDifferentToggle
+                    expandChaptersToggle
                 }
             #endif
 
@@ -284,7 +291,19 @@ struct PlayerSettings: View {
         }
 
         private var showChaptersToggle: some View {
-            Toggle("Chapters (if available)", isOn: $showChapters)
+            Toggle("Show chapters", isOn: $showChapters)
+        }
+
+        private var showThumbnailsToggle: some View {
+            Toggle("Show thumbnails", isOn: $showThumbnails)
+                .disabled(!showChapters)
+                .foregroundColor(showChapters ? .primary : .secondary)
+        }
+
+        private var showThumbnailsWhenDifferentToggle: some View {
+            Toggle("Show thumbnails only when unique", isOn: $showThumbnailsOnlyWhenDifferent)
+                .disabled(!showChapters || !showThumbnails)
+                .foregroundColor(showChapters && showThumbnails ? .primary : .secondary)
         }
 
         private var expandChaptersToggle: some View {
