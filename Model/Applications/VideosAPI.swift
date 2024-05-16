@@ -117,7 +117,7 @@ extension VideosAPI {
             urlComponents = instanceComponents
         }
         
-        guard var urlComponents: URLComponents = urlComponents else {
+        guard var urlComponents else {
             return nil
         }
 
