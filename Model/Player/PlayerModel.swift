@@ -946,7 +946,10 @@ final class PlayerModel: ObservableObject {
     #else
         func handleEnterForeground() {
             setNeedsDrawing(presentingPlayer)
-            avPlayerBackend.bindPlayerToLayer()
+
+            if !musicMode, activeBackend == .appleAVPlayer {
+                avPlayerBackend.bindPlayerToLayer()
+            }
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
