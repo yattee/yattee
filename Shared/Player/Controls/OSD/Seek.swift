@@ -85,6 +85,14 @@ struct Seek: View {
                             .font(.system(size: playerControlsLayout.segmentFontSize))
                             .foregroundColor(getColor(for: category))
                             .padding(.bottom, 3)
+                    case let .chapterSkip(chapter):
+                        Divider()
+                        Text(chapter)
+                            .font(.system(size: playerControlsLayout.segmentFontSize))
+                            .truncationMode(.tail)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color("AppRedColor"))
+                            .padding(.bottom, 3)
                     default:
                         EmptyView()
                     }
