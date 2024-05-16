@@ -483,3 +483,7 @@
 "Not Playing" = "پخش نمی‌شود";
 "Video Details" = "جزییات ویدیو";
 "Live Streams" = "پخش زنده";
+"Backend" = "Backend";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "ایرادها و پیشنهادی خوب برای امکانات را می‌توانید به GitHub issues tracker بفرستید. ";
+"Copy %@ link" = "پیوند %@ را کپی کنید";
+"Copy %@ link with time" = "پیوند %@ با مهرزمان کپی کنید";
