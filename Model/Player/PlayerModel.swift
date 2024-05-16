@@ -76,6 +76,8 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    var previousActiveBackend: PlayerBackendType?
+
     lazy var playerBackendView = PlayerBackendView()
 
     @Published var playerSize: CGSize = .zero { didSet {
@@ -532,7 +534,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType, changingStream: Bool = true) {
+    func changeActiveBackend(from: PlayerBackendType, to: PlayerBackendType, changingStream: Bool = true, isInClosePip: Bool = false) {
         guard activeBackend != to else {
             return
         }
@@ -541,7 +543,7 @@ final class PlayerModel: ObservableObject {
 
         let wasPlaying = isPlaying
 
-        if to == .mpv {
+        if to == .mpv && !isInClosePip {
             closePiP()
         }
 
@@ -664,6 +666,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func startPiP() {
+        previousActiveBackend = activeBackend
         avPlayerBackend.startPictureInPictureOnPlay = false
         avPlayerBackend.startPictureInPictureOnSwitch = false
 
@@ -716,6 +719,12 @@ final class PlayerModel: ObservableObject {
         #endif
 
         backend.closePiP()
+        if previousActiveBackend == .mpv {
+            saveTime {
+                self.changeActiveBackend(from: self.activeBackend, to: .mpv, isInClosePip: true)
+                self.controls.resetTimer()
+            }
+        }
     }
 
     var pipImage: String {
