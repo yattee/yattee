@@ -66,7 +66,7 @@ protocol VideosAPI {
         failureHandler: ((RequestError) -> Void)?,
         completionHandler: @escaping (PlayerQueueItem) -> Void
     )
-    func shareURL(_ item: ContentItem, frontendURL: String?, time: CMTime?) -> URL?
+    func shareURL(_ item: ContentItem, frontendURLString: String?, time: CMTime?) -> URL?
 
     func comments(_ id: Video.ID, page: String?) -> Resource?
 }
@@ -113,7 +113,7 @@ extension VideosAPI {
         if let frontendURLString,
            let frontendURL = URL(string: frontendURLString)
         {
-            urlComponents = URLComponents(URL: frontendURL, resolvingAgainstBaseURL: false)
+            urlComponents = URLComponents(url: frontendURL, resolvingAgainstBaseURL: false)
         } else if let instanceComponents = account?.instance?.urlComponents {
             urlComponents = instanceComponents
         }

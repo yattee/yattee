@@ -3,7 +3,6 @@ import Foundation
 import SwiftUI
 
 enum Constants {
-    static let yatteeProtocol = "yattee://"
     static let overlayAnimation = Animation.linear(duration: 0.2)
 
     static var isAppleTV: Bool {
@@ -95,6 +94,20 @@ enum Constants {
             "tvOS"
         #else
             "unknown"
+        #endif
+    }
+
+    static var defaultNavigationStyle: NavigationStyle {
+        #if os(macOS)
+            return .sidebar
+        #elseif os(iOS)
+            if isIPad {
+                return .sidebar
+            } else {
+                return .tab
+            }
+        #else
+            return .tab
         #endif
     }
 

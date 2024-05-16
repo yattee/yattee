@@ -4,8 +4,6 @@ import Siesta
 
 struct OpenURLHandler {
     static var firstHandle = true
-    static let yatteeProtocol = "yattee://"
-
     var accounts: AccountsModel { .shared }
     var navigation: NavigationModel { .shared }
     var recents: RecentsModel { .shared }

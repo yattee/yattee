@@ -625,30 +625,32 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    @objc func handleAudioSessionInterruption(_ notification: Notification) {
-        logger.info("Audio session interruption received.")
+    #if !os(macOS)
+        @objc func handleAudioSessionInterruption(_ notification: Notification) {
+            logger.info("Audio session interruption received.")
 
-        guard let info = notification.userInfo,
-              let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt
-        else {
-            logger.info("AVAudioSessionInterruptionTypeKey is missing or not a UInt in userInfo.")
-            return
+            guard let info = notification.userInfo,
+                  let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt
+            else {
+                logger.info("AVAudioSessionInterruptionTypeKey is missing or not a UInt in userInfo.")
+                return
+            }
+
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+
+            logger.info("Interruption type received: \(String(describing: type))")
+
+            switch type {
+            case .began:
+                pause()
+                logger.info("Audio session interrupted.")
+            default:
+                break
+            }
         }
 
-        let type = AVAudioSession.InterruptionType(rawValue: typeValue)
-
-        logger.info("Interruption type received: \(String(describing: type))")
-
-        switch type {
-        case .began:
-            pause()
-            logger.info("Audio session interrupted.")
-        default:
-            break
+        deinit {
+            NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
         }
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
-    }
+    #endif
 }

@@ -1,6 +1,8 @@
 import Defaults
 import SwiftUI
-import UIKit
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 struct SponsorBlockSettings: View {
     @ObservedObject private var settings = SettingsModel.shared
@@ -55,24 +57,27 @@ struct SponsorBlockSettings: View {
             Section(header: SettingsHeader(text: "Categories to Skip".localized())) {
                 categoryRows
             }
-            colorSection
 
-            Button {
-                settings.presentAlert(
-                    Alert(
-                        title: Text("Restore Default Colors?"),
-                        message: Text("This action will reset all custom colors back to their original defaults. " +
-                            "Any custom color changes you've made will be lost."),
-                        primaryButton: .destructive(Text("Restore")) {
-                            resetColors()
-                        },
-                        secondaryButton: .cancel()
+            #if os(iOS)
+                colorSection
+
+                Button {
+                    settings.presentAlert(
+                        Alert(
+                            title: Text("Restore Default Colors?"),
+                            message: Text("This action will reset all custom colors back to their original defaults. " +
+                                "Any custom color changes you've made will be lost."),
+                            primaryButton: .destructive(Text("Restore")) {
+                                resetColors()
+                            },
+                            secondaryButton: .cancel()
+                        )
                     )
-                )
-            } label: {
-                Text("Restore Default Colors …")
-                    .foregroundColor(.red)
-            }
+                } label: {
+                    Text("Restore Default Colors …")
+                        .foregroundColor(.red)
+                }
+            #endif
 
             Section(footer: categoriesDetails) {
                 EmptyView()
@@ -80,21 +85,23 @@ struct SponsorBlockSettings: View {
         }
     }
 
-    private var colorSection: some View {
-        Section(header: SettingsHeader(text: "Colors for Categories")) {
-            ForEach(SponsorBlockAPI.categories, id: \.self) { category in
-                LazyVStack(alignment: .leading) {
-                    ColorPicker(
-                        SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
-                        selection: Binding(
-                            get: { getColor(for: category) },
-                            set: { setColor($0, for: category) }
+    #if os(iOS)
+        private var colorSection: some View {
+            Section(header: SettingsHeader(text: "Colors for Categories")) {
+                ForEach(SponsorBlockAPI.categories, id: \.self) { category in
+                    LazyVStack(alignment: .leading) {
+                        ColorPicker(
+                            SponsorBlockAPI.categoryDescription(category) ?? "Unknown",
+                            selection: Binding(
+                                get: { getColor(for: category) },
+                                set: { setColor($0, for: category) }
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
-    }
+    #endif
 
     private var categoryRows: some View {
         ForEach(SponsorBlockAPI.categories, id: \.self) { category in
@@ -145,25 +152,27 @@ struct SponsorBlockSettings: View {
         return Color("AppRedColor") // Fallback color if no match found
     }
 
-    private func setColor(_ color: Color, for category: String) {
-        let uiColor = UIColor(color)
+    #if canImport(UIKit)
+        private func setColor(_ color: Color, for category: String) {
+            let uiColor = UIColor(color)
 
-        // swiftlint:disable no_cgfloat
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        // swiftlint:enable no_cgfloat
+            // swiftlint:disable no_cgfloat
+            var red: CGFloat = 0
+            var green: CGFloat = 0
+            var blue: CGFloat = 0
+            var alpha: CGFloat = 0
+            // swiftlint:enable no_cgfloat
 
-        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+            uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 
-        let r = Int(red * 255.0)
-        let g = Int(green * 255.0)
-        let b = Int(blue * 255.0)
+            let r = Int(red * 255.0)
+            let g = Int(green * 255.0)
+            let b = Int(blue * 255.0)
 
-        let rgbValue = (r << 16) | (g << 8) | b
-        sponsorBlockColors[category] = String(format: "#%06x", rgbValue)
-    }
+            let rgbValue = (r << 16) | (g << 8) | b
+            sponsorBlockColors[category] = String(format: "#%06x", rgbValue)
+        }
+    #endif
 
     private func resetColors() {
         sponsorBlockColors = SponsorBlockColors.dictionary

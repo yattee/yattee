@@ -22,7 +22,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         if url.scheme == "yattee" {
-            OpenURLHandler.handle(url)
+            OpenURLHandler(navigationStyle: Constants.defaultNavigationStyle).handle(url)
             return true
         }
         return false
