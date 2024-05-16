@@ -66,7 +66,7 @@ protocol VideosAPI {
         failureHandler: ((RequestError) -> Void)?,
         completionHandler: @escaping (PlayerQueueItem) -> Void
     )
-    func shareURL(_ item: ContentItem, frontendHost: String?, time: CMTime?) -> URL?
+    func shareURL(_ item: ContentItem, frontendURL: String?, time: CMTime?) -> URL?
 
     func comments(_ id: Video.ID, page: String?) -> Resource?
 }
@@ -108,14 +108,18 @@ extension VideosAPI {
             .onFailure { failureHandler?($0) }
     }
 
-    func shareURL(_ item: ContentItem, frontendHost: String? = nil, time: CMTime? = nil) -> URL? {
-        guard let frontendHost = frontendHost ?? account?.instance?.frontendHost,
-              var urlComponents = account?.instance?.urlComponents
-        else {
+    func shareURL(_ item: ContentItem, frontendURLString: String? = nil, time: CMTime? = nil) -> URL? {
+        var urlComponents: URLComponents?
+        if let frontendURLString,
+            let frontendURL = URL(string: frontendURLString) {
+            urlComponents = URLComponents(URL: frontendURL, resolvingAgainstBaseURL: false)
+        } else if let instanceComponents = account?.instance?.urlComponents {
+            urlComponents = instanceComponents
+        }
+        
+        guard var urlComponents else {
             return nil
         }
-
-        urlComponents.host = frontendHost
 
         var queryItems = [URLQueryItem]()
 
