@@ -4867,8 +4867,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
 			};
 		};
 		372915E22687E33E00F5A35B /* XCRemoteSwiftPackageReference "Defaults" */ = {
@@ -4963,8 +4963,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.19.1;
 			};
 		};
 		37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
