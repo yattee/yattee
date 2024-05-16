@@ -108,10 +108,10 @@ extension VideosAPI {
             .onFailure { failureHandler?($0) }
     }
 
-    func shareURL(_ item: ContentItem, frontendURL: String? = nil, time: CMTime? = nil) -> URL? {
+    func shareURL(_ item: ContentItem, frontendURLString: String? = nil, time: CMTime? = nil) -> URL? {
         var urlComponents: URLComponents?
-        if let frontendURLString: String = frontendURL,
-            let frontendURL: URL = URL(string: frontendURLString) {
+        if let frontendURLString,
+            let frontendURL = URL(string: frontendURLString) {
             urlComponents = URLComponents(URL: frontendURL, resolvingAgainstBaseURL: false)
         } else if let instanceComponents = account?.instance?.urlComponents {
             urlComponents = instanceComponents
