@@ -134,7 +134,7 @@ final class AVPlayerBackend: PlayerBackend {
         _ stream: Stream,
         of video: Video,
         preservingTime: Bool,
-        upgrading _: Bool
+        upgrading: Bool
     ) {
         isLoadingVideo = true
 
@@ -145,7 +145,7 @@ final class AVPlayerBackend: PlayerBackend {
                 _ = url.startAccessingSecurityScopedResource()
             }
 
-            loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime)
+            loadSingleAsset(url, stream: stream, of: video, preservingTime: preservingTime, upgrading: upgrading)
         } else {
             model.logger.info("playing stream with many assets:")
             model.logger.info("composition audio asset: \(stream.audioAsset.url)")
@@ -226,7 +226,8 @@ final class AVPlayerBackend: PlayerBackend {
         _ url: URL,
         stream: Stream,
         of video: Video,
-        preservingTime: Bool = false
+        preservingTime: Bool = false,
+        upgrading: Bool = false
     ) {
         asset?.cancelLoading()
         asset = AVURLAsset(url: url)
@@ -235,7 +236,7 @@ final class AVPlayerBackend: PlayerBackend {
             switch self?.asset?.statusOfValue(forKey: "duration", error: &error) {
             case .loaded:
                 DispatchQueue.main.async { [weak self] in
-                    self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime)
+                    self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime, upgrading: upgrading)
                 }
             case .failed:
                 DispatchQueue.main.async { [weak self] in
@@ -310,7 +311,8 @@ final class AVPlayerBackend: PlayerBackend {
     private func insertPlayerItem(
         _ stream: Stream,
         for video: Video,
-        preservingTime: Bool = false
+        preservingTime: Bool = false,
+        upgrading: Bool = false
     ) {
         removeItemDidPlayToEndTimeObserver()
 
@@ -394,7 +396,7 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         if preservingTime {
-            if model.preservedTime.isNil {
+            if model.preservedTime.isNil || upgrading {
                 model.saveTime {
                     replaceItemAndSeek()
                     startPlaying()

@@ -345,7 +345,7 @@ final class MPVBackend: PlayerBackend {
         }
 
         if preservingTime {
-            if model.preservedTime.isNil {
+            if model.preservedTime.isNil || upgrading {
                 model.saveTime {
                     replaceItem(self.model.preservedTime)
                 }
