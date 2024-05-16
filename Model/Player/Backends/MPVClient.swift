@@ -140,6 +140,10 @@ final class MPVClient: ObservableObject {
 
         args.append("replace")
 
+        // needed since mpvkit 0.38.0
+        // https://github.com/mpv-player/mpv/issues/13806#issuecomment-2029818905
+        args.append("-1")
+
         if let time, time.seconds > 0 {
             options.append("start=\(Int(time.seconds))")
         }
