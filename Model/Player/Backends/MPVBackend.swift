@@ -301,7 +301,7 @@ final class MPVBackend: PlayerBackend {
                         }
                     }
 
-                    client.loadFile(url, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
+                    client.loadFile(url, bitrate: stream.bitrate, kind: stream.kind, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
                         self?.isLoadingVideo = true
                     }
                 } else {
@@ -313,7 +313,7 @@ final class MPVBackend: PlayerBackend {
                     let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                     let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 
-                    client.loadFile(fileToLoad, audio: audioTrack, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
+                    client.loadFile(fileToLoad, audio: audioTrack, bitrate: stream.bitrate, kind: stream.kind, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
                         self?.isLoadingVideo = true
                         self?.pause()
                     }
