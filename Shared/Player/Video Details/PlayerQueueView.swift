@@ -11,6 +11,7 @@ struct PlayerQueueView: View {
     @ObservedObject private var player = PlayerModel.shared
 
     @Default(.saveHistory) private var saveHistory
+    @Default(.showRelated) private var showRelated
 
     var body: some View {
         Group {
@@ -19,7 +20,7 @@ struct PlayerQueueView: View {
                     autoplaying
                 }
                 playingNext
-                if sidebarQueue {
+                if sidebarQueue, showRelated {
                     related
                 }
             }
