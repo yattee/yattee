@@ -5003,7 +5003,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cxfksword/MPVKit.git";
 			requirement = {
-				kind = upToNextMinorVersion;
+				kind = upToNextMajorVersion;
 				minimumVersion = 0.38.0;
 			};
 		};

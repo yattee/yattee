@@ -70,7 +70,7 @@
       "location" : "https://github.com/pinterest/PINCache",
       "state" : {
         "branch" : "master",
-        "revision" : "f856226e8bee58d75cb6be1707ae0cb2f5801150"
+        "revision" : "2fb85948463292c2e824148cf17dc62a4c217a94"
       }
     },
     {
@@ -78,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pinterest/PINOperation.git",
       "state" : {
-        "revision" : "40504c156a68b20f98f7ddc73a115cbb7893be25",
-        "version" : "1.2.2"
+        "revision" : "a74f978733bdaf982758bfa23d70a189f4b4c1b6",
+        "version" : "1.2.3"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "f6afa0132961d593f07970d84e2d8b588c29ea04",
-        "version" : "5.19.1"
+        "revision" : "5642d1ffe3dbe628592443bd14154e31929727b4",
+        "version" : "5.19.2"
       }
     },
     {
@@ -182,5 +182,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
