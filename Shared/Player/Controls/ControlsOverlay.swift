@@ -312,7 +312,6 @@ struct ControlsOverlay: View {
                     .foregroundColor(.primary)
             }
             .transaction { t in t.animation = .none }
-
             .buttonStyle(.plain)
             .foregroundColor(.primary)
             .frame(width: 240, height: 40)
@@ -374,12 +373,12 @@ struct ControlsOverlay: View {
         let captions = player.currentVideo?.captions ?? []
         Picker("Captions", selection: captionsBinding) {
             if captions.isEmpty {
-                Text("Not available")
+                Text("Not available").tag(Captions?.none)
             } else {
                 Text("Disabled").tag(Captions?.none)
-            }
-            ForEach(captions) { caption in
-                Text(caption.description).tag(Optional(caption))
+                ForEach(captions) { caption in
+                    Text(caption.description).tag(Optional(caption))
+                }
             }
         }
         .disabled(captions.isEmpty)

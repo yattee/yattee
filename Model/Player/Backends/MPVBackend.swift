@@ -275,6 +275,10 @@ final class MPVBackend: PlayerBackend {
 
                 self.startClientUpdates()
 
+                // Captions should only be displayed when selected by the user,
+                // not when the video starts. So, we remove them.
+                self.client?.removeSubs()
+
                 if !preservingTime,
                    !upgrading,
                    let segment = self.model.sponsorBlock.segments.first,
