@@ -19,4 +19,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         #endif
         return true
     }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if url.scheme == "yattee" {
+            OpenURLHandler.handle(url)
+            return true
+        }
+        return false
+    }
 }
