@@ -142,7 +142,6 @@ struct PlaybackSettings: View {
         }
         .animation(nil, value: player.activeBackend)
         .frame(alignment: .topLeading)
-
         .ignoresSafeArea(.all, edges: .bottom)
         .backport
         .playbackSettingsPresentationDetents()
@@ -235,7 +234,6 @@ struct PlaybackSettings: View {
             #if os(iOS)
                 .padding(12)
                 .frame(width: 40, height: 40)
-
                 .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
                 .contentShape(Rectangle())
             #endif
@@ -261,7 +259,6 @@ struct PlaybackSettings: View {
             #if os(iOS)
                 .padding(12)
                 .frame(width: 40, height: 40)
-
                 .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
                 .contentShape(Rectangle())
             #endif

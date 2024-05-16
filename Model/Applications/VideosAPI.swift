@@ -111,12 +111,13 @@ extension VideosAPI {
     func shareURL(_ item: ContentItem, frontendURLString: String? = nil, time: CMTime? = nil) -> URL? {
         var urlComponents: URLComponents?
         if let frontendURLString,
-            let frontendURL = URL(string: frontendURLString) {
+           let frontendURL = URL(string: frontendURLString)
+        {
             urlComponents = URLComponents(URL: frontendURL, resolvingAgainstBaseURL: false)
         } else if let instanceComponents = account?.instance?.urlComponents {
             urlComponents = instanceComponents
         }
-        
+
         guard var urlComponents else {
             return nil
         }

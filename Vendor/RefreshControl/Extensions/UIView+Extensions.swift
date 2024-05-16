@@ -26,7 +26,7 @@ extension UIView {
     }
 
     private func viewsInHierarchy<ViewType: UIView>(views: inout [ViewType]) {
-        subviews.forEach { eachSubView in
+        for eachSubView in subviews {
             if let matchingView = eachSubView as? ViewType {
                 views.append(matchingView)
             }

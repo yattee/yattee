@@ -1,6 +1,7 @@
 import Defaults
 import Foundation
 import SwiftUI
+
 struct SettingsView: View {
     static let matrixURL = URL(string: "https://tinyurl.com/matrix-yattee")!
     static let discordURL = URL(string: "https://yattee.stream/discord")!

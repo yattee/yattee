@@ -261,7 +261,6 @@ struct PlayerControlsSettings: View {
                 TextField("Duration", text: value)
                     .frame(width: textFieldWidth, alignment: .trailing)
                     .multilineTextAlignment(.center)
-
                     .labelsHidden()
                 #if !os(macOS)
                     .keyboardType(.numberPad)

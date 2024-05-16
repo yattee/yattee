@@ -88,7 +88,7 @@ struct VideoDescription: View {
             var formattedString: AttributedString {
                 var attrString = AttributedString(description)
                 let words = description.unicodeScalars.split(whereSeparator: separators.contains).map(String.init)
-                words.forEach { word in
+                for word in words {
                     if word.hasPrefix("https://") || word.hasPrefix("http://"), let url = URL(string: String(word)) {
                         if let range = attrString.range(of: word) {
                             attrString[range].link = url

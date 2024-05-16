@@ -31,7 +31,7 @@ struct VerticalScrollingFixWrapper<Content>: View where Content: View {
     }
 
     var body: some View {
-        VerticalScrollingFixViewRepresentable(content: self.content())
+        VerticalScrollingFixViewRepresentable(content: content())
     }
 }
 

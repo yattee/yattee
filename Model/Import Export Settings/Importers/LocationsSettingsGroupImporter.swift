@@ -56,7 +56,7 @@ struct LocationsSettingsGroupImporter {
         }
 
         if let accounts = json["accounts"].array {
-            accounts.forEach { accountJSON in
+            for accountJSON in accounts {
                 let dict = accountJSON.dictionaryValue.mapValues { json in json.stringValue }
                 if let account = AccountsBridge().deserialize(dict),
                    includedAccountsIDs.contains(account.id)

@@ -114,7 +114,7 @@ struct URLBookmarkModel {
     func refreshAll() {
         logger.info("refreshing all bookmarks")
 
-        allURLs.forEach { url in
+        for url in allURLs {
             if loadBookmark(url) != nil {
                 logger.info("bookmark for \(url) exists")
             } else {

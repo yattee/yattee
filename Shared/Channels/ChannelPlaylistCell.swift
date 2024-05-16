@@ -53,7 +53,6 @@ struct ChannelPlaylistCell: View {
 
                 Text("\(playlist.videosCount ?? playlist.videos.count) videos")
                     .foregroundColor(.secondary)
-
                     .frame(height: 20)
             }
         }

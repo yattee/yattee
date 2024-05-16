@@ -80,7 +80,7 @@ struct ChaptersView: View {
     }
 
     #if !os(tvOS)
-        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true, scrollViewProxy: ScrollViewProxy? = nil) -> some View {
+        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true, scrollViewProxy _: ScrollViewProxy? = nil) -> some View {
             ForEach(Array(chaptersToShow.indices), id: \.self) { index in
                 let chapter = chaptersToShow[index]
                 ChapterView(chapter: chapter, chapterIndex: index, showThumbnail: showThumbnails)

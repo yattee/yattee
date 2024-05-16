@@ -147,7 +147,7 @@ struct OpenVideosModel {
         if prepending {
             videos.reverse()
         }
-        videos.forEach { video in
+        for video in videos {
             player.enqueueVideo(video, play: false, prepending: prepending, loadDetails: false)
         }
     }

@@ -198,7 +198,7 @@ struct PlaylistFormView: View {
                 }
             }
         #else
-            Button(self.visibility.name) {
+            Button(visibility.name) {
                 self.visibility = self.visibility.next()
             }
             .contextMenu {

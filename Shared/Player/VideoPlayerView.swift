@@ -263,7 +263,6 @@ struct VideoPlayerView: View {
                 #else
                     GeometryReader { geometry in
                         player.playerBackendView
-
                             .modifier(
                                 VideoPlayerSizeModifier(
                                     geometry: geometry,

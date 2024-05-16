@@ -60,21 +60,21 @@ class Stream: Equatable, Hashable, Identifiable {
         var bitrate: Int {
             switch self {
             case .hd2160p60, .hd2160p50, .hd2160p48, .hd2160p30:
-                return 56000000 // 56 Mbit/s
+                return 56_000_000 // 56 Mbit/s
             case .hd1440p60, .hd1440p50, .hd1440p48, .hd1440p30:
-                return 24000000 // 24 Mbit/s
+                return 24_000_000 // 24 Mbit/s
             case .hd1080p60, .hd1080p50, .hd1080p48, .hd1080p30:
-                return 12000000 // 12 Mbit/s
+                return 12_000_000 // 12 Mbit/s
             case .hd720p60, .hd720p50, .hd720p48, .hd720p30:
-                return 9500000 // 9.5 Mbit/s
+                return 9_500_000 // 9.5 Mbit/s
             case .sd480p30:
-                return 4000000 // 4 Mbit/s
+                return 4_000_000 // 4 Mbit/s
             case .sd360p30:
-                return 1500000 // 1.5 Mbit/s
+                return 1_500_000 // 1.5 Mbit/s
             case .sd240p30:
-                return 1000000 // 1 Mbit/s
+                return 1_000_000 // 1 Mbit/s
             case .sd144p30:
-                return 600000 // 0.6 Mbit/s
+                return 600_000 // 0.6 Mbit/s
             case .unknown:
                 return 0
             }

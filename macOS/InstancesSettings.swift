@@ -153,7 +153,6 @@ struct InstancesSettings: View {
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-
         .onAppear {
             selectedInstanceID = instances.first?.id
             frontendURL = selectedInstanceFrontendURL

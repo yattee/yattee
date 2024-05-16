@@ -176,7 +176,7 @@ struct URLParser {
     private func removePrefixes(_ value: String, _ prefixes: [String]) -> String {
         var value = value
 
-        prefixes.forEach { prefix in
+        for prefix in prefixes {
             if value.hasPrefix(prefix) {
                 value.removeFirst(prefix.count)
             }

@@ -81,7 +81,6 @@ struct FavoriteItemView: View {
                     }
                 }
                 .contentShape(Rectangle())
-
                 .onAppear {
                     if item.section == .history {
                         reloadVisibleWatches()
@@ -165,7 +164,7 @@ struct FavoriteItemView: View {
                 .prefix(favoritesModel.limit(item))
         )
         let last = watches.last
-        watches.forEach { watch in
+        for watch in watches {
             player.loadHistoryVideoDetails(watch) {
                 guard let video = player.historyVideo(watch.videoID), itemVisible(.init(video: video)) else { return }
                 visibleWatches.append(watch)

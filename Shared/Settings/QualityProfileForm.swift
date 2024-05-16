@@ -48,7 +48,6 @@ struct QualityProfileForm: View {
 
         .onAppear(perform: initializeForm)
         .onChange(of: backend, perform: { _ in backendChanged(self.backend); updateActiveFormats(); validate() })
-
         .onChange(of: name, perform: { _ in validate() })
         .onChange(of: resolution, perform: { _ in validate() })
         .onChange(of: orderedFormats, perform: { _ in validate() })

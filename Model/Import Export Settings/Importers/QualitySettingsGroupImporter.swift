@@ -26,7 +26,7 @@ struct QualitySettingsGroupImporter {
         }
 
         if let qualityProfiles = json["qualityProfiles"].array {
-            qualityProfiles.forEach { qualityProfileJSON in
+            for qualityProfileJSON in qualityProfiles {
                 let dict = qualityProfileJSON.dictionaryValue.mapValues { json in json.stringValue }
                 if let item = QualityProfileBridge().deserialize(dict) {
                     QualityProfilesModel.shared.update(item, item)

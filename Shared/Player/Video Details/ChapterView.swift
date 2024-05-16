@@ -57,7 +57,6 @@ import SwiftUI
                 }
                 .indicator(.activity)
                 .frame(width: Self.thumbnailWidth, height: Self.thumbnailHeight)
-
                 .mask(RoundedRectangle(cornerRadius: 6))
         }
 

@@ -61,23 +61,23 @@ struct HistorySettings: View {
                     Toggle("Save history of played videos", isOn: $saveHistory)
                     Toggle("Show recents in sidebar", isOn: $showRecents)
                     #if os(macOS)
-                    HStack {
-                        Toggle("Limit recents shown", isOn: $limitRecents)
-                            .frame(minWidth: 140, alignment: .leading)
-                            .disabled(!showRecents)
-                        Spacer()
-                        counterButtons(for: $limitRecentsAmount)
-                            .disabled(!limitRecents)
-                    }
+                        HStack {
+                            Toggle("Limit recents shown", isOn: $limitRecents)
+                                .frame(minWidth: 140, alignment: .leading)
+                                .disabled(!showRecents)
+                            Spacer()
+                            counterButtons(for: $limitRecentsAmount)
+                                .disabled(!limitRecents)
+                        }
                     #else
-                    Toggle("Limit recents shown", isOn: $limitRecents)
-                        .disabled(!showRecents)
-                    HStack {
-                        Text("Recents shown")
-                        Spacer()
-                        counterButtons(for: $limitRecentsAmount)
-                            .disabled(!limitRecents)
-                    }
+                        Toggle("Limit recents shown", isOn: $limitRecents)
+                            .disabled(!showRecents)
+                        HStack {
+                            Text("Recents shown")
+                            Spacer()
+                            counterButtons(for: $limitRecentsAmount)
+                                .disabled(!limitRecents)
+                        }
                     #endif
                     Toggle("Show progress of watching on thumbnails", isOn: $showWatchingProgress)
                         .disabled(!saveHistory)
@@ -196,7 +196,7 @@ struct HistorySettings: View {
     private func counterButtons(for _value: Binding<Int>) -> some View {
         var value: Binding<Int> {
             Binding(
-                get: { return _value.wrappedValue },
+                get: { _value.wrappedValue },
                 set: {
                     if $0 < 1 {
                         _value.wrappedValue = 1

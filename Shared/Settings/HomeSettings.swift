@@ -68,7 +68,7 @@ struct HomeSettings: View {
                             }
                             .help("Add to Favorites")
                             #if !os(tvOS)
-                            .buttonStyle(.borderless)
+                                .buttonStyle(.borderless)
                             #endif
                         }
                     }

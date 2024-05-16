@@ -22,7 +22,7 @@ struct BrowsingSettingsGroupImporter {
         }
 
         if let favorites = json["favorites"].array {
-            favorites.forEach { favoriteJSON in
+            for favoriteJSON in favorites {
                 if let jsonString = favoriteJSON.rawString(options: []),
                    let item = FavoriteItem.bridge.deserialize(jsonString)
                 {
@@ -32,7 +32,7 @@ struct BrowsingSettingsGroupImporter {
         }
 
         if let widgetsFavorites = json["widgetsSettings"].array {
-            widgetsFavorites.forEach { widgetJSON in
+            for widgetJSON in widgetsFavorites {
                 let dict = widgetJSON.dictionaryValue.mapValues { json in json.stringValue }
                 if let item = WidgetSettingsBridge().deserialize(dict) {
                     FavoritesModel.shared.updateWidgetSettings(item)

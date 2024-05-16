@@ -17,13 +17,13 @@ extension String {
 
         var outputText = self
 
-        results.reversed().forEach { match in
-            (1 ..< match.numberOfRanges).reversed().forEach { rangeIndex in
+        for match in results.reversed() {
+            for rangeIndex in (1 ..< match.numberOfRanges).reversed() {
                 let matchingGroup: String = (self as NSString).substring(with: match.range(at: rangeIndex))
                 let rangeBounds = match.range(at: rangeIndex)
 
                 guard let range = Range(rangeBounds, in: self) else {
-                    return
+                    continue
                 }
                 let replacement = replacementStringClosure(matchingGroup) ?? matchingGroup
 
