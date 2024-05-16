@@ -9,9 +9,23 @@ struct MultiselectRow: View {
     @State private var toggleChecked = false
 
     var body: some View {
-        #if os(macOS)
+        #if os(tvOS)
+            Button(action: { action(!selected) }) {
+                HStack {
+                    Text(self.title)
+                    Spacer()
+                    if selected {
+                        Image(systemName: "checkmark")
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .disabled(disabled)
+        #else
             Toggle(title, isOn: $toggleChecked)
+            #if os(macOS)
                 .toggleStyle(.checkbox)
+            #endif
                 .onAppear {
                     guard !disabled else { return }
                     toggleChecked = selected
@@ -19,24 +33,6 @@ struct MultiselectRow: View {
                 .onChange(of: toggleChecked) { new in
                     action(new)
                 }
-        #else
-            Button(action: { action(!selected) }) {
-                HStack {
-                    Text(self.title)
-                    Spacer()
-                    if selected {
-                        Image(systemName: "checkmark")
-                        #if os(iOS)
-                            .foregroundColor(.accentColor)
-                        #endif
-                    }
-                }
-                .contentShape(Rectangle())
-            }
-            .disabled(disabled)
-            #if !os(tvOS)
-                .buttonStyle(.plain)
-            #endif
         #endif
     }
 }

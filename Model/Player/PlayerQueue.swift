@@ -127,12 +127,12 @@ extension PlayerModel {
 
         if let streamPreferredForProfile = backend.bestPlayable(
             availableStreams.filter { backend.canPlay($0) && profile.isPreferred($0) },
-            maxResolution: profile.resolution
+            maxResolution: profile.resolution, formatOrder: profile.formats
         ) {
             return streamPreferredForProfile
         }
 
-        return backend.bestPlayable(availableStreams.filter { backend.canPlay($0) }, maxResolution: profile.resolution)
+        return backend.bestPlayable(availableStreams.filter { backend.canPlay($0) }, maxResolution: profile.resolution, formatOrder: profile.formats)
     }
 
     func advanceToNextItem() {

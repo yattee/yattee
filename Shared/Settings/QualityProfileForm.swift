@@ -1,6 +1,11 @@
 import Defaults
 import SwiftUI
 
+struct FormatState: Equatable {
+    let format: QualityProfile.Format
+    var isActive: Bool
+}
+
 struct QualityProfileForm: View {
     @Binding var qualityProfileID: QualityProfile.ID?
 
@@ -15,6 +20,7 @@ struct QualityProfileForm: View {
     @State private var backend = PlayerBackendType.mpv
     @State private var resolution = ResolutionSetting.hd1080p60
     @State private var formats = [QualityProfile.Format]()
+    @State private var orderedFormats: [FormatState] = []
 
     @Default(.qualityProfiles) private var qualityProfiles
 
@@ -26,6 +32,7 @@ struct QualityProfileForm: View {
         return nil
     }
 
+    // swiftlint:disable trailing_closure
     var body: some View {
         VStack {
             Group {
@@ -40,8 +47,11 @@ struct QualityProfileForm: View {
         #endif
 
         .onAppear(perform: initializeForm)
-        .onChange(of: backend, perform: backendChanged)
-        .onChange(of: formats) { _ in validate() }
+        .onChange(of: backend, perform: { _ in backendChanged(self.backend); updateActiveFormats(); validate() })
+
+        .onChange(of: name, perform: { _ in validate() })
+        .onChange(of: resolution, perform: { _ in validate() })
+        .onChange(of: orderedFormats, perform: { _ in validate() })
         #if os(iOS)
             .padding(.vertical)
         #elseif os(tvOS)
@@ -52,6 +62,8 @@ struct QualityProfileForm: View {
             .padding(.vertical, 10)
         #endif
     }
+
+    // swiftlint:enable trailing_closure
 
     var header: some View {
         HStack {
@@ -124,9 +136,16 @@ struct QualityProfileForm: View {
     }
 
     var formatsFooter: some View {
-        Text("Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply).")
-            .foregroundColor(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading) {
+            Text("Formats can be reordered and will be selected in this order.")
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("**Note:** HLS is an adaptive format, resolution setting doesn't apply.")
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 0.1)
+        }
+        .padding(.top, 2)
     }
 
     @ViewBuilder var qualityPicker: some View {
@@ -199,17 +218,25 @@ struct QualityProfileForm: View {
         #endif
     }
 
+    var filteredFormatList: some View {
+        ForEach(Array(orderedFormats.enumerated()), id: \.element.format) { idx, element in
+            let format = element.format
+            MultiselectRow(
+                title: format.description,
+                selected: element.isActive
+            ) { value in
+                orderedFormats[idx].isActive = value
+            }
+        }
+        .onMove { source, destination in
+            orderedFormats.move(fromOffsets: source, toOffset: destination)
+            validate()
+        }
+    }
+
     @ViewBuilder var formatsPicker: some View {
         #if os(macOS)
-            let list = ForEach(QualityProfile.Format.allCases, id: \.self) { format in
-                MultiselectRow(
-                    title: format.description,
-                    selected: isFormatSelected(format),
-                    disabled: isFormatDisabled(format)
-                ) { value in
-                    toggleFormat(format, value: value)
-                }
-            }
+            let list = filteredFormatList
 
             Group {
                 if #available(macOS 12.0, *) {
@@ -222,28 +249,19 @@ struct QualityProfileForm: View {
             }
             Spacer()
         #else
-            ForEach(QualityProfile.Format.allCases, id: \.self) { format in
-                MultiselectRow(
-                    title: format.description,
-                    selected: isFormatSelected(format),
-                    disabled: isFormatDisabled(format)
-                ) { value in
-                    toggleFormat(format, value: value)
-                }
-            }
+            filteredFormatList
         #endif
     }
 
     func isFormatSelected(_ format: QualityProfile.Format) -> Bool {
-        (initialized || qualityProfile.isNil ? formats : qualityProfile.formats).contains(format)
+        return orderedFormats.first { $0.format == format }?.isActive ?? false
     }
 
     func toggleFormat(_ format: QualityProfile.Format, value: Bool) {
-        if let index = formats.firstIndex(where: { $0 == format }), !value {
-            formats.remove(at: index)
-        } else if value {
-            formats.append(format)
+        if let index = orderedFormats.firstIndex(where: { $0.format == format }) {
+            orderedFormats[index].isActive = value
         }
+        validate() // Check validity after a toggle operation
     }
 
     var footer: some View {
@@ -274,6 +292,12 @@ struct QualityProfileForm: View {
         return !avPlayerFormats.contains(format)
     }
 
+    func updateActiveFormats() {
+        for (index, format) in orderedFormats.enumerated() where isFormatDisabled(format.format) {
+            orderedFormats[index].isActive = false
+        }
+    }
+
     func isResolutionDisabled(_ resolution: ResolutionSetting) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
@@ -281,27 +305,39 @@ struct QualityProfileForm: View {
     }
 
     func initializeForm() {
-        guard editing else {
-            validate()
-            return
+        if editing {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.name = qualityProfile.name ?? ""
+                self.backend = qualityProfile.backend
+                self.resolution = qualityProfile.resolution
+                self.orderedFormats = qualityProfile.order.map { order in
+                    let format = QualityProfile.Format.allCases[order]
+                    let isActive = qualityProfile.formats.contains(format)
+                    return FormatState(format: format, isActive: isActive)
+                }
+                self.initialized = true
+            }
+        } else {
+            name = ""
+            backend = .mpv
+            resolution = .hd720p60
+            orderedFormats = QualityProfile.Format.allCases.map {
+                FormatState(format: $0, isActive: true)
+            }
+            initialized = true
         }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.name = qualityProfile.name ?? ""
-            self.backend = qualityProfile.backend
-            self.resolution = qualityProfile.resolution
-            self.formats = .init(qualityProfile.formats)
-            self.initialized = true
-        }
-
         validate()
     }
 
     func backendChanged(_: PlayerBackendType) {
-        formats.filter { isFormatDisabled($0) }.forEach { format in
-            if let index = formats.firstIndex(where: { $0 == format }) {
-                formats.remove(at: index)
-            }
+        let defaultFormats = QualityProfile.Format.allCases.map {
+            FormatState(format: $0, isActive: true)
+        }
+
+        if backend == .appleAVPlayer {
+            orderedFormats = orderedFormats.filter { !isFormatDisabled($0.format) }
+        } else {
+            orderedFormats = defaultFormats
         }
 
         if isResolutionDisabled(resolution),
@@ -312,20 +348,33 @@ struct QualityProfileForm: View {
     }
 
     func validate() {
-        valid = !formats.isEmpty
+        if !initialized {
+            valid = false
+        } else if editing {
+            let savedOrderFormats = qualityProfile.order.map { order in
+                let format = QualityProfile.Format.allCases[order]
+                let isActive = qualityProfile.formats.contains(format)
+                return FormatState(format: format, isActive: isActive)
+            }
+            valid = name != qualityProfile.name
+                || backend != qualityProfile.backend
+                || resolution != qualityProfile.resolution
+                || orderedFormats != savedOrderFormats
+        } else { valid = true }
     }
 
     func submitForm() {
         guard valid else { return }
 
-        formats = formats.unique()
+        let activeFormats = orderedFormats.filter { $0.isActive }.map { $0.format }
 
         let formProfile = QualityProfile(
             id: qualityProfile?.id ?? UUID().uuidString,
             name: name,
             backend: backend,
             resolution: resolution,
-            formats: Array(formats)
+            formats: activeFormats,
+            order: orderedFormats.map { QualityProfile.Format.allCases.firstIndex(of: $0.format)! }
         )
 
         if editing {

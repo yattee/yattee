@@ -204,6 +204,7 @@ struct YatteeApp: App {
         URLBookmarkModel.shared.refreshAll()
 
         migrateHomeHistoryItems()
+        migrateQualityProfiles()
     }
 
     func migrateHomeHistoryItems() {
@@ -219,6 +220,16 @@ struct YatteeApp: App {
         }
 
         Defaults[.homeHistoryItems] = -1
+    }
+
+    @Default(.qualityProfiles) private var qualityProfilesData
+
+    func migrateQualityProfiles() {
+        for profile in qualityProfilesData where profile.order.isEmpty {
+            var updatedProfile = profile
+            updatedProfile.order = Array(QualityProfile.Format.allCases.indices)
+            QualityProfilesModel.shared.update(profile, updatedProfile)
+        }
     }
 
     var navigationStyle: NavigationStyle {

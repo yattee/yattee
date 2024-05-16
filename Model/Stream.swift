@@ -64,7 +64,7 @@ class Stream: Equatable, Hashable, Identifiable {
     }
 
     enum Kind: String, Comparable {
-        case stream, adaptive, hls
+        case hls, adaptive, stream
 
         private var sortOrder: Int {
             switch self {
@@ -82,37 +82,23 @@ class Stream: Equatable, Hashable, Identifiable {
         }
     }
 
-    enum Format: String, Comparable {
-        case webm
+    enum Format: String {
         case avc1
-        case av1
         case mp4
+        case av1
+        case webm
+        case hls
+        case stream
         case unknown
-
-        private var sortOrder: Int {
-            switch self {
-            case .mp4:
-                return 0
-            case .avc1:
-                return 1
-            case .av1:
-                return 2
-            case .webm:
-                return 3
-            case .unknown:
-                return 4
-            }
-        }
-
-        static func < (lhs: Self, rhs: Self) -> Bool {
-            lhs.sortOrder < rhs.sortOrder
-        }
 
         var description: String {
             switch self {
             case .webm:
                 return "WebM"
-
+            case .hls:
+                return "adaptive (HLS)"
+            case .stream:
+                return "Stream"
             default:
                 return rawValue.uppercased()
             }
@@ -121,17 +107,23 @@ class Stream: Equatable, Hashable, Identifiable {
         static func from(_ string: String) -> Self {
             let lowercased = string.lowercased()
 
-            if lowercased.contains("webm") {
-                return .webm
-            }
             if lowercased.contains("avc1") {
                 return .avc1
+            }
+            if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
+                return .mp4
             }
             if lowercased.contains("av01") {
                 return .av1
             }
-            if lowercased.contains("mpeg_4") || lowercased.contains("mp4") {
-                return .mp4
+            if lowercased.contains("webm") {
+                return .webm
+            }
+            if lowercased.contains("stream") {
+                return .stream
+            }
+            if lowercased.contains("hls") {
+                return .hls
             }
             return .unknown
         }
@@ -184,22 +176,31 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var quality: String {
         guard localURL.isNil else { return "Opened File" }
-        return kind == .hls ? "adaptive (HLS)" : "\(resolution.name)\(kind == .stream ? " (\(kind.rawValue))" : "")"
+
+        if kind == .hls {
+            return "adaptive (HLS)"
+        }
+
+        return resolution.name
     }
 
     var shortQuality: String {
         guard localURL.isNil else { return "File" }
 
         if kind == .hls {
-            return "HLS"
+            return "adaptive (HLS)"
         }
-        return resolution?.name ?? "?"
+
+        if kind == .stream {
+            return resolution.name
+        }
+        return resolutionAndFormat
     }
 
     var description: String {
         guard localURL.isNil else { return resolutionAndFormat }
         let instanceString = instance.isNil ? "" : " - (\(instance!.description))"
-        return "\(resolutionAndFormat)\(instanceString)"
+        return format != .hls ? "\(resolutionAndFormat)\(instanceString)" : "adaptive (HLS)\(instanceString)"
     }
 
     var resolutionAndFormat: String {
