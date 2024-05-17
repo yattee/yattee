@@ -57,41 +57,54 @@ extension PlayerModel {
     }
 
     func streamsWithInstance(instance _: Instance, streams: [Stream], completion: @escaping ([Stream]) -> Void) {
-        let forbiddenAssetTestGroup = DispatchGroup()
-        var hasForbiddenAsset = false
+        // Queue for stream processing
+        let streamProcessingQueue = DispatchQueue(label: "stream.yattee.streamProcessing.Queue", qos: .userInitiated)
+        // Queue for accessing the processedStreams array
+        let processedStreamsQueue = DispatchQueue(label: "stream.yattee.processedStreams.Queue")
+        // DispatchGroup for managing multiple tasks
+        let streamProcessingGroup = DispatchGroup()
 
-        let (nonHLSAssets, hlsURLs) = getAssets(from: streams)
+        var processedStreams = [Stream]()
 
-        if let randomStream = nonHLSAssets.randomElement() {
-            let instance = randomStream.0
-            let asset = randomStream.1
-            let url = randomStream.2
-            let requestRange = randomStream.3
+        for stream in streams {
+            streamProcessingQueue.async(group: streamProcessingGroup) {
+                let forbiddenAssetTestGroup = DispatchGroup()
+                var hasForbiddenAsset = false
 
-            if let asset = asset, let instance = instance, !instance.proxiesVideos {
-                if instance.app == .invidious {
-                    testAsset(url: url, range: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
-                        hasForbiddenAsset = isForbidden
+                let (nonHLSAssets, hlsURLs) = self.getAssets(from: [stream])
+
+                if let randomStream = nonHLSAssets.randomElement() {
+                    let instance = randomStream.0
+                    let asset = randomStream.1
+                    let url = randomStream.2
+                    let requestRange = randomStream.3
+
+                    // swiftlint:disable:next shorthand_optional_binding
+                    if let asset = asset, let instance = instance, !instance.proxiesVideos {
+                        if instance.app == .invidious {
+                            self.testAsset(url: url, range: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
+                                hasForbiddenAsset = isForbidden
+                            }
+                        } else if instance.app == .piped {
+                            self.testPipedAssets(asset: asset, requestRange: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
+                                hasForbiddenAsset = isForbidden
+                            }
+                        }
                     }
-                } else if instance.app == .piped {
-                    testPipedAssets(asset: asset, requestRange: requestRange!, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup, completion: { isForbidden in
-                        hasForbiddenAsset = isForbidden
-                    })
+                } else if let randomHLS = hlsURLs.randomElement() {
+                    let instance = randomHLS.0
+                    let asset = AVURLAsset(url: randomHLS.1)
+
+                    if instance?.app == .piped {
+                        self.testPipedAssets(asset: asset, requestRange: nil, isHLS: true, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
+                            hasForbiddenAsset = isForbidden
+                        }
+                    }
                 }
-            }
-        } else if let randomHLS = hlsURLs.randomElement() {
-            let instance = randomHLS.0
-            let asset = AVURLAsset(url: randomHLS.1)
 
-            if instance?.app == .piped {
-                testPipedAssets(asset: asset, requestRange: nil, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup, completion: { isForbidden in
-                    hasForbiddenAsset = isForbidden
-                })
-            }
-        }
+                forbiddenAssetTestGroup.wait()
 
-        forbiddenAssetTestGroup.notify(queue: .main) {
-            let processedStreams = streams.map { stream -> Stream in
+                // Post-processing code
                 if let instance = stream.instance {
                     if instance.app == .invidious {
                         if hasForbiddenAsset || instance.proxiesVideos {
@@ -104,35 +117,36 @@ extension PlayerModel {
                         }
                     } else if instance.app == .piped, !instance.proxiesVideos, !hasForbiddenAsset {
                         if let hlsURL = stream.hlsURL {
-                            forbiddenAssetTestGroup.enter()
-                            PipedAPI.nonProxiedAsset(url: hlsURL) { nonProxiedURL in
-                                if let nonProxiedURL = nonProxiedURL {
+                            PipedAPI.nonProxiedAsset(url: hlsURL) { possibleNonProxiedURL in
+                                if let nonProxiedURL = possibleNonProxiedURL {
                                     stream.hlsURL = nonProxiedURL.url
                                 }
-                                forbiddenAssetTestGroup.leave()
                             }
                         } else {
                             if let audio = stream.audioAsset {
-                                forbiddenAssetTestGroup.enter()
                                 PipedAPI.nonProxiedAsset(asset: audio) { nonProxiedAudioAsset in
                                     stream.audioAsset = nonProxiedAudioAsset
-                                    forbiddenAssetTestGroup.leave()
                                 }
                             }
                             if let video = stream.videoAsset {
-                                forbiddenAssetTestGroup.enter()
                                 PipedAPI.nonProxiedAsset(asset: video) { nonProxiedVideoAsset in
                                     stream.videoAsset = nonProxiedVideoAsset
-                                    forbiddenAssetTestGroup.leave()
                                 }
                             }
                         }
                     }
                 }
-                return stream
-            }
 
-            forbiddenAssetTestGroup.notify(queue: .main) {
+                // Append to processedStreams within the processedStreamsQueue
+                processedStreamsQueue.sync {
+                    processedStreams.append(stream)
+                }
+            }
+        }
+
+        streamProcessingGroup.notify(queue: .main) {
+            // Access and pass processedStreams within the processedStreamsQueue block
+            processedStreamsQueue.sync {
                 completion(processedStreams)
             }
         }
@@ -161,21 +175,23 @@ extension PlayerModel {
     }
 
     private func testAsset(url: URL, range: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Bool) -> Void) {
+        // In case the range is nil, generate a random one.
         let randomEnd = Int.random(in: 200 ... 800)
         let requestRange = range ?? "0-\(randomEnd)"
-        let HTTPStatusForbidden = 403
 
         forbiddenAssetTestGroup.enter()
         URLTester.testURLResponse(url: url, range: requestRange, isHLS: isHLS) { statusCode in
-            completion(statusCode == HTTPStatusForbidden)
+            completion(statusCode == HTTPStatus.Forbidden)
             forbiddenAssetTestGroup.leave()
         }
     }
 
     private func testPipedAssets(asset: AVURLAsset, requestRange: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Bool) -> Void) {
-        PipedAPI.nonProxiedAsset(asset: asset) { nonProxiedAsset in
-            if let nonProxiedAsset = nonProxiedAsset {
+        PipedAPI.nonProxiedAsset(asset: asset) { possibleNonProxiedAsset in
+            if let nonProxiedAsset = possibleNonProxiedAsset {
                 self.testAsset(url: nonProxiedAsset.url, range: requestRange, isHLS: isHLS, forbiddenAssetTestGroup: forbiddenAssetTestGroup, completion: completion)
+            } else {
+                completion(false)
             }
         }
     }

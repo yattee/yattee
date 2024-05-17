@@ -5,7 +5,6 @@ enum URLTester {
     private static let hlsMediaPrefix = "#EXT-X-MEDIA:"
     private static let hlsInfPrefix = "#EXTINF:"
     private static let uriRegex = "(?<=URI=\")(.*?)(?=\")"
-    private static let HTTPStatusForbidden = 403
 
     static func testURLResponse(url: URL, range: String, isHLS: Bool, completion: @escaping (Int) -> Void) {
         if isHLS {
@@ -24,7 +23,7 @@ enum URLTester {
 
         var dataTask: URLSessionDataTask?
         dataTask = URLSession.shared.dataTask(with: request) { _, response, _ in
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? HTTPStatusForbidden
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? HTTPStatus.Forbidden
             Logger(label: "stream.yattee.httpRequest").info("URL: \(url) | Status Code: \(statusCode)")
             completion(statusCode, dataTask)
         }
@@ -37,6 +36,8 @@ enum URLTester {
                 httpRequest(url: url, range: range) { statusCode, _ in
                     completion(statusCode)
                 }
+            } else {
+                completion(HTTPStatus.NotFound)
             }
         }
     }
@@ -64,10 +65,15 @@ enum URLTester {
 
     private static func parseHLSManifest(manifestUrl: URL, completion: @escaping ([URL]) -> Void) {
         URLSession.shared.dataTask(with: manifestUrl) { data, _, _ in
-            guard let data = data,
-                  let manifest = String(data: data, encoding: .utf8),
-                  !manifest.isEmpty
-            else {
+            // swiftlint:disable:next shorthand_optional_binding
+            guard let data = data else {
+                Logger(label: "stream.yattee.httpRequest").error("Data is nil")
+                completion([])
+                return
+            }
+
+            // swiftlint:disable:next non_optional_string_data_conversion
+            guard let manifest = String(data: data, encoding: .utf8), !manifest.isEmpty else {
                 Logger(label: "stream.yattee.httpRequest").error("Cannot read or empty HLS manifest")
                 completion([])
                 return
