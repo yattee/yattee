@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ListView: View {
     var items: [ContentItem]
-    var limit: Int? = 10
+    var limit: Int?
 
     var body: some View {
         LazyVStack(alignment: .leading) {
@@ -16,16 +16,12 @@ struct ListView: View {
     }
 
     var limitedItems: [ContentItem] {
-        if let limit, limit >= 0 {
-            return Array(items.prefix(limit))
-        }
-
-        return items
+        Array(items.prefix(limit ?? items.count))
     }
 }
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        ListView(items: [.init(video: .fixture)])
+        ListView(items: [.init(video: .fixture)], limit: 10)
     }
 }

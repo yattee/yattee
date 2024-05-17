@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 
 struct FavoriteItemView: View {
     var item: FavoriteItem
+    @Binding var favoritesChanged: Bool
 
     @Environment(\.navigationStyle) private var navigationStyle
     @StateObject private var store = FavoriteResourceObserver()
@@ -25,8 +26,9 @@ struct FavoriteItemView: View {
     @Default(.widgetsSettings) private var widgetsSettings
     @Default(.visibleSections) private var visibleSections
 
-    init(item: FavoriteItem) {
+    init(item: FavoriteItem, favoritesChanged: Binding<Bool>) {
         self.item = item
+        _favoritesChanged = favoritesChanged
     }
 
     var body: some View {
@@ -92,6 +94,7 @@ struct FavoriteItemView: View {
                 .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
                 .onChange(of: hideShorts) { _ in reloadVisibleWatches() }
                 .onChange(of: hideWatched) { _ in reloadVisibleWatches() }
+                .onChange(of: favoritesChanged) { _ in reloadVisibleWatches() }
             }
         }
         .id(watchModel.historyToken)
@@ -486,14 +489,22 @@ struct FavoriteItemView: View {
 }
 
 struct FavoriteItemView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            VStack {
-                FavoriteItemView(item: .init(section: .channel("peerTube", "a", "Search: resistance body upper band workout")))
-                    .environment(\.navigationStyle, .tab)
-                FavoriteItemView(item: .init(section: .channel("peerTube", "a", "Marques")))
-                    .environment(\.navigationStyle, .sidebar)
+    struct PreviewWrapper: View {
+        @State private var favoritesChanged = false
+
+        var body: some View {
+            NavigationView {
+                VStack {
+                    FavoriteItemView(item: .init(section: .channel("peerTube", "a", "Search: resistance body upper band workout")), favoritesChanged: $favoritesChanged)
+                        .environment(\.navigationStyle, .tab)
+                    FavoriteItemView(item: .init(section: .channel("peerTube", "a", "Marques")), favoritesChanged: $favoritesChanged)
+                        .environment(\.navigationStyle, .sidebar)
+                }
             }
         }
+    }
+
+    static var previews: some View {
+        PreviewWrapper()
     }
 }

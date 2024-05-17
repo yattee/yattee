@@ -1,18 +1,13 @@
 import SwiftUI
 
 struct HistoryView: View {
-    var limit = 10
+    var limit: Int
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
 
     @ObservedObject private var player = PlayerModel.shared
-
     @State private var visibleWatches = [Watch]()
-
-    init(limit: Int = 10) {
-        self.limit = limit
-    }
 
     var body: some View {
         LazyVStack {
@@ -38,10 +33,14 @@ struct HistoryView: View {
     func reloadVisibleWatches() {
         visibleWatches = Array(watches.filter { $0.videoID != player.currentVideo?.videoID }.prefix(limit))
     }
+
+    init(limit: Int = 10) {
+        self.limit = limit
+    }
 }
 
 struct HistoryView_Previews: PreviewProvider {
     static var previews: some View {
-        HistoryView()
+        HistoryView(limit: 10)
     }
 }
