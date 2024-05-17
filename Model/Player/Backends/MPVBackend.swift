@@ -10,7 +10,7 @@ import SwiftUI
 
 final class MPVBackend: PlayerBackend {
     static var timeUpdateInterval = 0.5
-    static var networkStateUpdateInterval = 1.0
+    static var networkStateUpdateInterval = 0.1
 
     private var logger = Logger(label: "mpv-backend")
 

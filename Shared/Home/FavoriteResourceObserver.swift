@@ -5,18 +5,52 @@ final class FavoriteResourceObserver: ObservableObject, ResourceObserver {
     @Published var contentItems = [ContentItem]()
 
     func resourceChanged(_ resource: Resource, event _: ResourceEvent) {
+        // swiftlint:disable discouraged_optional_collection
+        var newVideos: [Video]?
+        var newItems: [ContentItem]?
+        // swiftlint:enable discouraged_optional_collection
+
+        var newChannel: Channel?
+        var newChannelPlaylist: ChannelPlaylist?
+        var newPlaylist: Playlist?
+        var newPage: SearchPage?
+
         if let videos: [Video] = resource.typedContent() {
-            contentItems = videos.map { ContentItem(video: $0) }
+            newVideos = videos
         } else if let channel: Channel = resource.typedContent() {
-            contentItems = channel.videos.map { ContentItem(video: $0) }
+            newChannel = channel
         } else if let playlist: ChannelPlaylist = resource.typedContent() {
-            contentItems = playlist.videos.map { ContentItem(video: $0) }
+            newChannelPlaylist = playlist
         } else if let playlist: Playlist = resource.typedContent() {
-            contentItems = playlist.videos.map { ContentItem(video: $0) }
+            newPlaylist = playlist
         } else if let page: SearchPage = resource.typedContent() {
-            contentItems = page.results
+            newPage = page
         } else if let items: [ContentItem] = resource.typedContent() {
-            contentItems = items
+            newItems = items
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            var newContentItems: [ContentItem] = []
+
+            if let videos = newVideos {
+                newContentItems = videos.map { ContentItem(video: $0) }
+            } else if let channel = newChannel {
+                newContentItems = channel.videos.map { ContentItem(video: $0) }
+            } else if let playlist = newChannelPlaylist {
+                newContentItems = playlist.videos.map { ContentItem(video: $0) }
+            } else if let playlist = newPlaylist {
+                newContentItems = playlist.videos.map { ContentItem(video: $0) }
+            } else if let page = newPage {
+                newContentItems = page.results
+            } else if let items = newItems {
+                newContentItems = items
+            }
+
+            DispatchQueue.main.async {
+                if !newContentItems.isEmpty {
+                    self.contentItems = newContentItems
+                }
+            }
         }
     }
 }
