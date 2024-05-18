@@ -97,11 +97,11 @@ struct HomeView: View {
                 VStack(alignment: .leading) {
                     #if os(tvOS)
                         ForEach(Defaults[.favorites]) { item in
-                            FavoriteItemView(item: item)
+                            FavoriteItemView(item: item, favoritesChanged: $favoritesChanged)
                         }
                     #else
                         ForEach(favorites) { item in
-                            FavoriteItemView(item: item)
+                            FavoriteItemView(item: item, favoritesChanged: $favoritesChanged)
                             #if os(macOS)
                                 .workaroundForVerticalScrollingBug()
                             #endif
