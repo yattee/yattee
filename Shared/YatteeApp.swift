@@ -150,61 +150,74 @@ struct YatteeApp: App {
         }
         configured = true
 
-        #if DEBUG
-            SiestaLog.Category.enabled = .common
-        #endif
-        SDImageCodersManager.shared.addCoder(SDImageAWebPCoder.shared)
-        SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
+        DispatchQueue.main.async {
+            #if DEBUG
+                SiestaLog.Category.enabled = .common
+            #endif
+            SDImageCodersManager.shared.addCoder(SDImageAWebPCoder.shared)
+            SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
-        if !Defaults[.lastAccountIsPublic] {
-            AccountsModel.shared.configureAccount()
-        }
-
-        if let countryOfPublicInstances = Defaults[.countryOfPublicInstances] {
-            InstancesManifest.shared.setPublicAccount(countryOfPublicInstances, asCurrent: AccountsModel.shared.current.isNil)
-        }
-
-        if !AccountsModel.shared.current.isNil {
-            player.restoreQueue()
-        }
-
-        if !Defaults[.saveRecents] {
-            recents.clear()
-        }
-
-        let startupSection = Defaults[.startupSection]
-        var section: TabSelection? = startupSection.tabSelection
-
-        #if os(macOS)
-            if section == .playlists {
-                section = .search
+            if !Defaults[.lastAccountIsPublic] {
+                AccountsModel.shared.configureAccount()
             }
-        #endif
 
-        NavigationModel.shared.tabSelection = section ?? .search
+            if let countryOfPublicInstances = Defaults[.countryOfPublicInstances] {
+                InstancesManifest.shared.setPublicAccount(countryOfPublicInstances, asCurrent: AccountsModel.shared.current.isNil)
+            }
 
-        playlists.load()
+            if !AccountsModel.shared.current.isNil {
+                player.restoreQueue()
+            }
 
-        #if !os(macOS)
-            player.updateRemoteCommandCenter()
-        #endif
-
-        if player.presentingPlayer {
-            player.presentingPlayer = false
-        }
-
-        #if os(iOS)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                if Defaults[.lockPortraitWhenBrowsing] {
-                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            DispatchQueue.global(qos: .userInitiated).async {
+                if !Defaults[.saveRecents] {
+                    recents.clear()
                 }
             }
-        #endif
 
-        URLBookmarkModel.shared.refreshAll()
+            let startupSection = Defaults[.startupSection]
+            var section: TabSelection? = startupSection.tabSelection
 
-        migrateHomeHistoryItems()
-        migrateQualityProfiles()
+            #if os(macOS)
+                if section == .playlists {
+                    section = .search
+                }
+            #endif
+
+            NavigationModel.shared.tabSelection = section ?? .search
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                playlists.load()
+            }
+
+            #if !os(macOS)
+                player.updateRemoteCommandCenter()
+            #endif
+
+            if player.presentingPlayer {
+                player.presentingPlayer = false
+            }
+
+            #if os(iOS)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    if Defaults[.lockPortraitWhenBrowsing] {
+                        Orientation.lockOrientation(.all, andRotateTo: .portrait)
+                    }
+                }
+            #endif
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                URLBookmarkModel.shared.refreshAll()
+            }
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.migrateHomeHistoryItems()
+            }
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.migrateQualityProfiles()
+            }
+        }
     }
 
     func migrateHomeHistoryItems() {

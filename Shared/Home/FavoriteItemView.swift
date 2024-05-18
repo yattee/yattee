@@ -89,6 +89,9 @@ struct FavoriteItemView: View {
                         loadCacheAndResource()
                     }
                 }
+                .onDisappear {
+                    resource?.removeObservers(ownedBy: store)
+                }
                 .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
                 .onChange(of: hideShorts) { _ in reloadVisibleWatches() }
                 .onChange(of: hideWatched) { _ in reloadVisibleWatches() }
@@ -96,13 +99,12 @@ struct FavoriteItemView: View {
         }
         .id(watchModel.historyToken)
         .onChange(of: accounts.current) { _ in
+            resource?.removeObservers(ownedBy: store)
             resource?.addObserver(store)
             loadCacheAndResource(force: true)
         }
         .onChange(of: watchModel.historyToken) { _ in
-            Delay.by(0.5) {
-                reloadVisibleWatches()
-            }
+            reloadVisibleWatches()
         }
     }
 
@@ -164,12 +166,15 @@ struct FavoriteItemView: View {
                 .prefix(favoritesModel.limit(item))
         )
         let last = watches.last
+
         for watch in watches {
             player.loadHistoryVideoDetails(watch) {
                 guard let video = player.historyVideo(watch.videoID), itemVisible(.init(video: video)) else { return }
                 visibleWatches.append(watch)
-                guard watch == last else { return }
-                visibleWatches.sort { $0.watchedAt ?? Date() > $1.watchedAt ?? Date() }
+
+                if watch == last {
+                    visibleWatches.sort { $0.watchedAt ?? Date() > $1.watchedAt ?? Date() }
+                }
             }
         }
     }
