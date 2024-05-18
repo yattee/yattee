@@ -129,7 +129,7 @@
 "LIVE" = "مباشر";
 
 /* Loading stream OSD */
-"Loading streams..." = "تحميل بثوث...";
+"Loading streams…" = "تحميل بثوث…";
 "Loading..." = "تحميل...";
 
 /* Video duration filter in search */
@@ -163,8 +163,8 @@
 "Open Settings" = "فتح الإعدادات";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "فتح بث %@ ...";
-"Opening audio stream..." = "فتح بث صوتي...";
+"Opening %@ stream…" = "فتح بث %@ …";
+"Opening audio stream…" = "فتح بث صوتي…";
 "Orientation" = "اتجاه";
 "Play in PiP" = "تشغيل في الفيديو المصغر";
 "Play Last" = "تشغيل الأخير";
@@ -558,7 +558,7 @@
 "Are you sure you want to clear cache?" = "هل أنت متأكد من أنك تريد مسح ذاكرة التخزين المؤقت؟";
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "التحكم في إعدادات إيماءة الفاصل الزمني للتخطي لأزرار الأسهم عن بعد (للجيل الثاني من Siri Remote أو أحدث). تغيير إعدادات نظام عناصر التحكم يتطلب إعادة بدء التشغيل.";
 "Opened File" = "ملف مفتوح";
-"Opening file..." = "فتح الملف...";
+"Opening file…" = "فتح الملف…";
 "Short videos: hidden" = "مقاطع الفيديو القصيرة: مخفية";
 "Mark channel feed as watched" = "وضع علامة تمت المشاهدة على محتوى القناة";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "التحكم في إعدادات إيماءة فترة التخطي للنقر المزدوج على الجانب الأيسر/الأيمن من المشغل. تغيير إعدادات نظام عناصر التحكم يتطلب إعادة بدء التشغيل.";

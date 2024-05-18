@@ -158,8 +158,8 @@
 "Open Settings" = "Apri Impostazioni";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Apertura stream %@...";
-"Opening audio stream..." = "Apertura stream audio...";
+"Opening %@ stream…" = "Apertura stream %@…";
+"Opening audio stream…" = "Apertura stream audio…";
 "Orientation" = "Orientamento";
 
 /* SponsorBlock category name */
@@ -170,7 +170,7 @@
 "LIVE" = "DIRETTA";
 
 /* Loading stream OSD */
-"Loading streams..." = "Caricamento stream...";
+"Loading streams…" = "Caricamento stream…";
 "Loading..." = "Caricamento...";
 "Locations" = "Posizioni";
 "Low quality" = "Qualità bassa";
@@ -569,7 +569,7 @@
 "Enter location address to connect..." = "Inserisci posizione per connetterti...";
 "Opened File" = "File aperto";
 "File Extension" = "Estensione file";
-"Opening file..." = "Apro file...";
+"Opening file…" = "Apro file…";
 "Close video and player on end" = "Chiudi video e riproduttore alla fine";
 "Use system controls with AVPlayer" = "Usa controlli di sistema con AVPlayer";
 "Public account" = "Account pubblico";

@@ -491,6 +491,35 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         )
     }
 
+    static func nonProxiedAsset(asset: AVURLAsset, completion: @escaping (AVURLAsset?) -> Void) {
+        guard var urlComponents = URLComponents(url: asset.url, resolvingAgainstBaseURL: false) else {
+            completion(asset)
+            return
+        }
+
+        guard let hostItem = urlComponents.queryItems?.first(where: { $0.name == "host" }),
+              let hostValue = hostItem.value
+        else {
+            completion(asset)
+            return
+        }
+
+        urlComponents.host = hostValue
+
+        guard let newUrl = urlComponents.url else {
+            completion(asset)
+            return
+        }
+
+        completion(AVURLAsset(url: newUrl))
+    }
+
+    // Overload used for hlsURLS
+    static func nonProxiedAsset(url: URL, completion: @escaping (AVURLAsset?) -> Void) {
+        let asset = AVURLAsset(url: url)
+        nonProxiedAsset(asset: asset, completion: completion)
+    }
+
     private func extractVideo(from content: JSON) -> Video? {
         let details = content.dictionaryValue
 
@@ -579,10 +608,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             return nil
         }
 
-        return URL(string: thumbnailURL
-            .absoluteString
-            .replacingOccurrences(of: "hqdefault", with: quality.filename)
-            .replacingOccurrences(of: "maxresdefault", with: quality.filename)
+        return URL(
+            string: thumbnailURL
+                .absoluteString
+                .replacingOccurrences(of: "hqdefault", with: quality.filename)
+                .replacingOccurrences(of: "maxresdefault", with: quality.filename)
         )
     }
 
@@ -688,6 +718,19 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             let resolution = Stream.Resolution.from(resolution: quality, fps: fps)
             let videoFormat = videoStream.dictionaryValue["format"]?.string
             let bitrate = videoStream.dictionaryValue["bitrate"]?.int
+            var requestRange: String?
+
+            if let initStart = videoStream.dictionaryValue["initStart"]?.int,
+               let initEnd = videoStream.dictionaryValue["initEnd"]?.int
+            {
+                requestRange = "\(initStart)-\(initEnd)"
+            } else if let indexStart = videoStream.dictionaryValue["indexStart"]?.int,
+                      let indexEnd = videoStream.dictionaryValue["indexEnd"]?.int
+            {
+                requestRange = "\(indexStart)-\(indexEnd)"
+            } else {
+                requestRange = nil
+            }
 
             if videoOnly {
                 streams.append(
@@ -698,7 +741,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                         resolution: resolution,
                         kind: .adaptive,
                         videoFormat: videoFormat,
-                        bitrate: bitrate
+                        bitrate: bitrate,
+                        requestRange: requestRange
                     )
                 )
             } else {

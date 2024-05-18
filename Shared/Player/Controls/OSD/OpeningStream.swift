@@ -10,26 +10,28 @@ struct OpeningStream: View {
     }
 
     var visible: Bool {
-        (!player.currentItem.isNil && !player.videoBeingOpened.isNil) || (player.isLoadingVideo && !model.pausedForCache && !player.isSeeking)
+        (!player.currentItem.isNil && !player.videoBeingOpened.isNil) ||
+            (player.isLoadingVideo && !model.pausedForCache && !player.isSeeking) ||
+            !player.hasStarted
     }
 
     var reason: String {
         guard player.videoBeingOpened == nil else {
-            return "Loading streams...".localized()
+            return "Loading streams…".localized()
         }
 
         if player.musicMode {
-            return "Opening audio stream...".localized()
+            return "Opening audio stream…".localized()
         }
 
         if let selection = player.streamSelection {
             if selection.isLocal {
-                return "Opening file...".localized()
+                return "Opening file…".localized()
             }
-            return String(format: "Opening %@ stream...".localized(), selection.shortQuality)
+            return String(format: "Opening %@ stream…".localized(), selection.shortQuality)
         }
 
-        return "Loading streams...".localized()
+        return "Loading streams…".localized()
     }
 
     var state: String? {

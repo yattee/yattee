@@ -95,7 +95,7 @@ enum VideosApp: String, CaseIterable {
     }
 
     var allowsDisablingVidoesProxying: Bool {
-        self == .invidious
+        self == .invidious || self == .piped
     }
 
     var supportsOpeningVideosByID: Bool {

@@ -84,8 +84,8 @@
 "Open Settings" = "सेटिंग खोलें";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "%@ स्ट्रीम खुल रहा…";
-"Opening audio stream..." = "ऑडियो स्ट्रीम खुल रहा…";
+"Opening %@ stream…" = "%@ स्ट्रीम खुल रहा…";
+"Opening audio stream…" = "ऑडियो स्ट्रीम खुल रहा…";
 "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "यदि आप किसी बग की रिपोर्ट कर रहे हैं, तो सभी प्रासंगिक विवरण शामिल करें (विशेषकर: ऐप संस्करण, प्रयुक्त डिवाइस और सिस्टम संस्करण, पुन: पेश करने के चरण)।";
 "Increase rate" = "दर बढ़ाएँ";
 "Info" = "जानकारी";
@@ -104,7 +104,7 @@
 "LIVE" = "लाइव";
 
 /* Loading stream OSD */
-"Loading streams..." = "स्ट्रीम लोड हो रहें…";
+"Loading streams…" = "स्ट्रीम लोड हो रहें…";
 "Loading..." = "लोड हो रहा…";
 "Locations" = "स्थान";
 "Lock portrait mode" = "पोर्ट्रेट मोड लॉक करें";

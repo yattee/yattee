@@ -89,7 +89,7 @@
 "LIVE" = "LIVE";
 
 /* Loading stream OSD */
-"Loading streams..." = "Se încarcă fluxurile...";
+"Loading streams…" = "Se încarcă fluxurile…";
 "Locations" = "Locații";
 "Mark watched videos with" = "Marcați videoclipurile vizionate cu";
 "Matrix Channel" = "Canal Matrix";
@@ -100,7 +100,7 @@
 "Nothing" = "Nimic";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Se deschide %@ flux...";
+"Opening %@ stream…" = "Se deschide %@ flux…";
 "Play Last" = "Reda ultimul";
 "Player" = "Player";
 "Playlist" = "Playlist";
@@ -243,7 +243,7 @@
 /* SponsorBlock category name */
 "Outro" = "Outro";
 "Orientation" = "Orientare";
-"Opening audio stream..." = "Se deschide fluxul audio...";
+"Opening audio stream…" = "Se deschide fluxul audio…";
 "Password" = "Parolă";
 "Pause" = "Pauză";
 "Pause when entering background" = "Pauză când intrați în fundal";
@@ -568,7 +568,7 @@
 "Enter account credentials to connect..." = "Introduceți acreditările contului pentru a vă conecta...";
 "Enter location address to connect..." = "Introdu adresa locației pentru a te conecta...";
 "Opened File" = "Fișier deschis";
-"Opening file..." = "Deschiderea fișierului...";
+"Opening file…" = "Deschiderea fișierului…";
 "File Extension" = "Extensie fișier";
 "Use system controls with AVPlayer" = "Utilizați controalele de sistem cu AVPlayer";
 "Rotate when entering fullscreen on landscape video" = "Rotiți când intrați pe ecran complet în videoclipul peisaj";

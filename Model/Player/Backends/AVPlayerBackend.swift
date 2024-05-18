@@ -40,6 +40,11 @@ final class AVPlayerBackend: PlayerBackend {
 
     var isLoadingVideo = false
 
+    var hasStarted = false
+    var isPaused: Bool {
+        avPlayer.timeControlStatus == .paused
+    }
+
     var isPlaying: Bool {
         avPlayer.timeControlStatus == .playing
     }
@@ -158,6 +163,12 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         avPlayer.play()
+
+        // Setting hasStarted to true the first time player started
+        if !hasStarted {
+            hasStarted = true
+        }
+
         model.objectWillChange.send()
     }
 
@@ -180,6 +191,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     func stop() {
         avPlayer.replaceCurrentItem(with: nil)
+        hasStarted = false
     }
 
     func cancelLoads() {

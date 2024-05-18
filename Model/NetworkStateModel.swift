@@ -26,7 +26,7 @@ final class NetworkStateModel: ObservableObject {
     }
 
     var bufferingStateText: String? {
-        guard detailsAvailable else { return nil }
+        guard detailsAvailable && player.hasStarted else { return nil }
         return String(format: "%.0f%%", bufferingState)
     }
 

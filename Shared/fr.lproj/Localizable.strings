@@ -282,11 +282,11 @@
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Le grand format n'est pas adapté à tous les appareils et son utilisation peut empêcher certains contrôles de s'afficher à l'écran.";
 
 /* Loading stream OSD */
-"Loading streams..." = "Chargement des flux...";
+"Loading streams…" = "Chargement des flux…";
 "Lock portrait mode" = "Verrouille l'orientation en mode portrait";
 "Matrix Channel" = "Salon Matrix";
 "Only when signed in" = "Uniquement lorsque vous êtes connecté";
-"Opening audio stream..." = "Ouverture du flux audio…";
+"Opening audio stream…" = "Ouverture du flux audio…";
 "Orientation" = "Orientation";
 
 /* SponsorBlock category name */
@@ -424,7 +424,7 @@
 "Milestones" = "Étapes";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Ouverture du flux %@…";
+"Opening %@ stream…" = "Ouverture du flux %@…";
 "Regular size" = "Taille normale";
 "Regular Size" = "Taille normale";
 "Related" = "En relation";
@@ -567,7 +567,7 @@
 "Seek" = "Recherche";
 "Show scroll to top button in comments" = "Afficher le bouton de retour en haut de la page dans les commentaires";
 "Opened File" = "Fichier ouvert";
-"Opening file..." = "Ouverture du fichier...";
+"Opening file…" = "Ouverture du fichier…";
 "Enter location address to connect..." = "Entrez l'adresse de l'instance pour se connecter...";
 "File Extension" = "Extension de fichier";
 "Public account" = "Compte publique";

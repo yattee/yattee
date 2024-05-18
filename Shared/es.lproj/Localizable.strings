@@ -138,7 +138,7 @@
 
 /* Video date filter in search */
 "Today" = "Hoy";
-"Opening audio stream..." = "Abriendo transmisión de audio...";
+"Opening audio stream…" = "Abriendo transmisión de audio…";
 "Open Video" = "Abrir Video";
 "I want to ask a question" = "Quiero hacer una pregunta";
 "Save history of played videos" = "Guardar historial de videos reproducidos";
@@ -208,7 +208,7 @@
 "No documents" = "Sin documentos";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Abriendo %@ emisión...";
+"Opening %@ stream…" = "Abriendo %@ emisión…";
 "Documents" = "Documentos";
 "Thumbnails" = "Miniaturas";
 "Password" = "Contraseña";
@@ -265,7 +265,7 @@
 "Shuffle" = "Mezclar";
 
 /* Loading stream OSD */
-"Loading streams..." = "Cargando secuencias...";
+"Loading streams…" = "Cargando secuencias…";
 "Public Locations" = "Ubicaciones públicas";
 "Yattee" = "Yattee";
 "No results" = "No hay resultados";
@@ -558,7 +558,7 @@
 "Available" = "Disponible";
 "Loop one" = "Bucle uno";
 "Use system controls with AVPlayer" = "Utilizar los controles del sistema con AVPlayer";
-"Opening file..." = "Abriendo el archivo...";
+"Opening file…" = "Abriendo el archivo…";
 "No videos to show" = "No hay vídeos que mostrar";
 "Autoplay next" = "Reproducir automáticamente la siguiente";
 "Home Settings" = "Ajustes iniciales";

@@ -44,6 +44,8 @@ final class MPVBackend: PlayerBackend {
         }
     }}
 
+    var hasStarted = false
+    var isPaused = false
     var isPlaying = true { didSet {
         networkStateTimer.start()
 
@@ -337,7 +339,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func play() {
-        isPlaying = true
         startClientUpdates()
 
         if controls.presentingControls {
@@ -354,13 +355,22 @@ final class MPVBackend: PlayerBackend {
         }
 
         client?.play()
+
+        isPlaying = true
+        isPaused = false
+
+        // Setting hasStarted to true the first time player started
+        if !hasStarted {
+            hasStarted = true
+        }
     }
 
     func pause() {
-        isPlaying = false
         stopClientUpdates()
 
         client?.pause()
+        isPaused = true
+        isPlaying = false
     }
 
     func togglePlay() {
@@ -377,6 +387,9 @@ final class MPVBackend: PlayerBackend {
 
     func stop() {
         client?.stop()
+        isPlaying = false
+        isPaused = false
+        hasStarted = false
     }
 
     func seek(to time: CMTime, seekType _: SeekType, completionHandler: ((Bool) -> Void)?) {
@@ -392,8 +405,8 @@ final class MPVBackend: PlayerBackend {
     }
 
     func closeItem() {
-        client?.pause()
-        client?.stop()
+        pause()
+        stop()
         self.video = nil
         self.stream = nil
     }

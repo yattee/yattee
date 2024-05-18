@@ -102,7 +102,7 @@
 "Just watched" = "Acabou de assistir";
 
 /* Loading stream OSD */
-"Loading streams..." = "Carregando streams…";
+"Loading streams…" = "Carregando streams…";
 "Medium quality" = "Qualidade média";
 "No description" = "Sem descrição";
 "No Playlists" = "Sem playlists";
@@ -114,8 +114,8 @@
 "Open Settings" = "Abrir Ajustes";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Abrindo stream %@…";
-"Opening audio stream..." = "Abrindo stream de áudio…";
+"Opening %@ stream…" = "Abrindo stream %@…";
+"Opening audio stream…" = "Abrindo stream de áudio…";
 "Orientation" = "Orientação";
 
 /* SponsorBlock category name */
@@ -569,7 +569,7 @@
 "Enter account credentials to connect..." = "Insira as credenciais da conta para conectar…";
 "Opened File" = "Arquivo Aberto";
 "File Extension" = "Extensão do Arquivo";
-"Opening file..." = "Abrindo arquivo…";
+"Opening file…" = "Abrindo arquivo…";
 "Browse without account" = "Navegar sem uma conta";
 "Rotate when entering fullscreen on landscape video" = "Girar quando entrar no modo tela cheia em vídeo em paisagem";
 "Landscape left" = "Paisagem à esquerda";

@@ -113,7 +113,7 @@
 "LIVE" = "EN VIU";
 
 /* Loading stream OSD */
-"Loading streams..." = "S'estan carregant els fluxos...";
+"Loading streams…" = "S'estan carregant els fluxos…";
 "Loading..." = "Carregant...";
 "Locations" = "Ubicacions";
 "Lock portrait mode" = "Bloqueja el mode vertical";
@@ -147,7 +147,7 @@
 "Offtopic in Music Videos" = "Offtopic als vídeos musicals";
 "Open \"Playlists\" tab to create new one" = "Obriu la pestanya \"Llistes de reproducció\" per crear-ne una de nova";
 "Open Settings" = "Obriu Configuració";
-"Opening audio stream..." = "Obrint la reproducció d'àudio...";
+"Opening audio stream…" = "Obrint la reproducció d'àudio…";
 "Orientation" = "Orientació";
 
 /* SponsorBlock category name */
@@ -454,7 +454,7 @@
 "Low" = "Baix";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "S'està obrint %@...";
+"Opening %@ stream…" = "S'està obrint %@…";
 "Only when signed in" = "Només quan s'ha iniciat la sessió";
 "Password" = "Contrasenya";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Part d'un vídeo que promociona un producte o servei no relacionat directament amb el creador. El creador rebrà un pagament o compensació en forma de diners o productes gratuïts.";

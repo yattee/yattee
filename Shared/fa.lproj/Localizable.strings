@@ -83,7 +83,7 @@
 "Profiles" = "نمایه‌ها";
 "New Playlist" = "فهرست پخش جدید";
 "Automatic" = "خودکار";
-"Opening file..." = "در حال باز کردن فایل…";
+"Opening file…" = "در حال باز کردن فایل…";
 "Add Quality Profile" = "افزودن نمایهٔ کیفیت";
 "Close video after playing last in the queue" = "ویدیو را پس از پخش آخرین مورد فهرست ببند";
 
@@ -279,14 +279,14 @@
 "Controls" = "کنترل‌ها";
 "This URL could not be opened" = "این نشانی باز نمی‌شود";
 "Trending" = "پرطرفدار";
-"Opening audio stream..." = "باز کردن استریم صوتی…";
+"Opening audio stream…" = "باز کردن استریم صوتی…";
 "Statistics" = "آمار";
 "Pause when player is closed" = "پس از بسته شدن پخش‌کننده مکث کن";
 "Play All" = "همه را پخش کن";
 "Sort: %@" = "ترتیب: %@";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "باز کردن استریم %@…";
+"Opening %@ stream…" = "باز کردن استریم %@…";
 "Next in Queue" = "مورد بعد در صف";
 "Honor orientation lock" = "قفل چرخش صفحه را در نظر بگیر";
 "Rate" = "امتیاز";
@@ -405,7 +405,7 @@
 "Info" = "اطلاعات";
 
 /* Loading stream OSD */
-"Loading streams..." = "درحال دریافت استریم…";
+"Loading streams…" = "درحال دریافت استریم…";
 "No rotation" = "بدون چرخش";
 "Codec" = "کدک (Codec)";
 "Startup section" = "بخش آغازین";

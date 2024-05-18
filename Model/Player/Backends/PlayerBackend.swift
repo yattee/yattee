@@ -19,6 +19,8 @@ protocol PlayerBackend {
     var loadedVideo: Bool { get }
     var isLoadingVideo: Bool { get }
 
+    var hasStarted: Bool { get }
+    var isPaused: Bool { get }
     var isPlaying: Bool { get }
     var isSeeking: Bool { get }
     var playerItemDuration: CMTime? { get }

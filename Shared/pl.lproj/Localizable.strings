@@ -157,7 +157,7 @@
 "LIVE" = "LIVE";
 
 /* Loading stream OSD */
-"Loading streams..." = "Ładowanie strumieni...";
+"Loading streams…" = "Ładowanie strumieni…";
 "Loading..." = "Ładowanie…";
 "Locations" = "Lokalizacje";
 "Lock portrait mode" = "Zablokuj tryb portretowy";
@@ -202,8 +202,8 @@
 "Open Settings" = "Otwórz Ustawienia";
 
 /* Loading stream OSD */
-"Opening %@ stream..." = "Otwieranie strumienia %@…";
-"Opening audio stream..." = "Otwieranie strumienia audio...";
+"Opening %@ stream…" = "Otwieranie strumienia %@…";
+"Opening audio stream…" = "Otwieranie strumienia audio…";
 "Orientation" = "Orientacja";
 
 /* SponsorBlock category name */
@@ -570,7 +570,7 @@
 "Enter location address to connect..." = "Wprowadź adres lokalizacji, aby połączyć...";
 "Opened File" = "Otwarty plik";
 "File Extension" = "Rozszerzenie pliku";
-"Opening file..." = "Otwieranie pliku...";
+"Opening file…" = "Otwieranie pliku…";
 "Public account" = "Konto publiczne";
 "Your Accounts" = "Twoje konta";
 "Browse without account" = "Przeglądanie bez konta";

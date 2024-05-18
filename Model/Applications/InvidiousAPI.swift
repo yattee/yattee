@@ -655,7 +655,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 kind: .adaptive,
                 encoding: videoStream["encoding"].string,
                 videoFormat: videoStream["type"].string,
-                bitrate: videoStream["bitrate"].int
+                bitrate: videoStream["bitrate"].int,
+                requestRange: videoStream["init"].string ?? videoStream["index"].string
             )
         }
     }

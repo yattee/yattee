@@ -170,6 +170,7 @@ class Stream: Equatable, Hashable, Identifiable {
     var encoding: String?
     var videoFormat: String?
     var bitrate: Int?
+    var requestRange: String?
 
     init(
         instance: Instance? = nil,
@@ -181,7 +182,8 @@ class Stream: Equatable, Hashable, Identifiable {
         kind: Kind = .hls,
         encoding: String? = nil,
         videoFormat: String? = nil,
-        bitrate: Int? = nil
+        bitrate: Int? = nil,
+        requestRange: String? = nil
     ) {
         self.instance = instance
         self.audioAsset = audioAsset
@@ -193,6 +195,7 @@ class Stream: Equatable, Hashable, Identifiable {
         self.encoding = encoding
         format = .from(videoFormat ?? "")
         self.bitrate = bitrate
+        self.requestRange = requestRange
     }
 
     var isLocal: Bool {

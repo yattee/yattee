@@ -1070,6 +1070,12 @@
 		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		E25028B02BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
+		E25028B12BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
+		E25028B22BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
+		E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
+		E258F38B2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
+		E258F38C2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
 		FA97174C2A494700001FF53D /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA97174B2A494700001FF53D /* MPVKit */; };
 /* End PBXBuildFile section */
 
@@ -1539,6 +1545,8 @@
 		3DA101AD287C30F50027D920 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
 		3DA101AE287C30F50027D920 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
 		3DA101AF287C30F50027D920 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatus.swift; sourceTree = "<group>"; };
+		E258F3892BF61BD2005B8C28 /* URLTester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTester.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2286,6 +2294,7 @@
 				372915E52687E3B900F5A35B /* Defaults.swift */,
 				37D2E0D328B67EFC00F64D52 /* Delay.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
+				E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */,
 				375B537828DF6CBB004C1D19 /* Localizable.strings */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
@@ -2293,6 +2302,7 @@
 				3700155E271B12DD0049C794 /* SiestaConfiguration.swift */,
 				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				378FFBC328660172009E3FBE /* URLParser.swift */,
+				E258F3892BF61BD2005B8C28 /* URLTester.swift */,
 				37D4B0C22671614700C925CA /* YatteeApp.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37BD07C42698ADEE003EBB87 /* Yattee.entitlements */,
@@ -3115,6 +3125,7 @@
 				37DD87C7271C9CFE0027CBF9 /* PlayerStreams.swift in Sources */,
 				37F7D82C289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				375EC95D289EEEE000751258 /* QualityProfile.swift in Sources */,
+				E25028B02BF790F5002CB9FC /* HTTPStatus.swift in Sources */,
 				3773B8102ADC076800B5FEF3 /* ScrollViewMatcher.swift in Sources */,
 				371B7E662759786B00D21217 /* Comment+Fixtures.swift in Sources */,
 				37BE0BD326A1D4780092E2DB /* AppleAVPlayerView.swift in Sources */,
@@ -3138,6 +3149,7 @@
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
 				3752069D285E910600CA655F /* ChapterView.swift in Sources */,
 				375EC96A289F232600751258 /* QualityProfilesModel.swift in Sources */,
+				E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
 				37FFC440272734C3009FFD26 /* Throttle.swift in Sources */,
@@ -3587,6 +3599,7 @@
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
 				371B7E5D27596B8400D21217 /* Comment.swift in Sources */,
 				37EF5C232739D37B00B03725 /* MenuModel.swift in Sources */,
+				E25028B12BF790F5002CB9FC /* HTTPStatus.swift in Sources */,
 				37A7D71C2B680E66009CB1ED /* LocationsSettingsGroupExporter.swift in Sources */,
 				37BC50A92778A84700510953 /* HistorySettings.swift in Sources */,
 				374DE88128BB896C0062BBF2 /* PlayerDragGesture.swift in Sources */,
@@ -3621,6 +3634,7 @@
 				378E9C39294552A700B2D696 /* ThumbnailView.swift in Sources */,
 				370F4FAB27CC164D001B35DC /* PlayerControlsModel.swift in Sources */,
 				37E8B0ED27B326C00024006F /* TimelineView.swift in Sources */,
+				E258F38B2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				370E990B2A1EA8C500D144E9 /* WatchModel.swift in Sources */,
 				3717407E2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				37FB28422721B22200A57617 /* ContentItem.swift in Sources */,
@@ -3866,6 +3880,7 @@
 				37130A61277657300033018A /* PersistenceController.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				3717407F2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
+				E25028B22BF790F5002CB9FC /* HTTPStatus.swift in Sources */,
 				370F4FAA27CC163B001B35DC /* PlayerBackend.swift in Sources */,
 				376A33E62720CB35000C1D6B /* Account.swift in Sources */,
 				3763C98B290C7A50004D3B5F /* OpenVideosView.swift in Sources */,
@@ -3908,6 +3923,7 @@
 				37B2631C2735EAAB00FE0D40 /* FavoriteResourceObserver.swift in Sources */,
 				37484C2B26FC83FF00287258 /* AccountForm.swift in Sources */,
 				37FB2860272225E800A57617 /* ContentItemView.swift in Sources */,
+				E258F38C2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				37F7D82E289EB05F00E2B3D0 /* SettingsPickerModifier.swift in Sources */,
 				374AB3DD28BCAF7E00DF56FB /* SeekType.swift in Sources */,
 				374C053727242D9F009BDDBE /* SponsorBlockSettings.swift in Sources */,
