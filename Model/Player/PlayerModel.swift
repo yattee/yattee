@@ -683,10 +683,11 @@ final class PlayerModel: ObservableObject {
             return
         }
 
-        guard let video = currentVideo else { return }
-        guard let stream = backend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: qualityProfile!.formats) else { return }
+        // First, we need to create an array with supported formats.
+        let formatOrderPiP: [QualityProfile.Format] = [.hls, .stream, .mp4]
 
-        exitFullScreen()
+        guard let video = currentVideo else { return }
+        guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: formatOrderPiP) else { return }
 
         if avPlayerBackend.video == video {
             if activeBackend != .appleAVPlayer {
@@ -698,7 +699,19 @@ final class PlayerModel: ObservableObject {
             playStream(stream, of: video, preservingTime: true, upgrading: true, withBackend: avPlayerBackend)
         }
 
-        controls.objectWillChange.send()
+        var retryCount = 0
+        _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+            if let pipController = self?.pipController, pipController.isPictureInPictureActive, self?.avPlayerBackend.isPlaying == true {
+                self?.exitFullScreen()
+                self?.controls.objectWillChange.send()
+                timer.invalidate()
+            } else if retryCount < 3, self?.activeBackend == .appleAVPlayer, self?.avPlayerBackend.startPictureInPictureOnSwitch == false {
+                // If PiP didn't start, try starting it again up to 3 times,
+                self?.avPlayerBackend.startPictureInPictureOnSwitch = true
+                self?.avPlayerBackend.tryStartingPictureInPicture()
+                retryCount += 1
+            }
+        }
     }
 
     var transitioningToPiP: Bool {
@@ -726,12 +739,19 @@ final class PlayerModel: ObservableObject {
             show()
         #endif
 
-        backend.closePiP()
         if previousActiveBackend == .mpv {
             saveTime {
                 self.changeActiveBackend(from: self.activeBackend, to: .mpv, isInClosePip: true)
-                self.controls.resetTimer()
+                _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+                    if self?.activeBackend == .mpv, self?.mpvBackend.isPlaying == true {
+                        self?.backend.closePiP()
+                        self?.controls.resetTimer()
+                        timer.invalidate()
+                    }
+                }
             }
+        } else {
+            backend.closePiP()
         }
     }
 

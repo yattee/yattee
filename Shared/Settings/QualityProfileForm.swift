@@ -304,7 +304,7 @@ struct QualityProfileForm: View {
     func isResolutionDisabled(_ resolution: ResolutionSetting) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        return resolution.value > .hd1080p60
+        return resolution.value > .hd720p30
     }
 
     func initializeForm() {
