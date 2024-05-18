@@ -1,4 +1,22 @@
-## Build 181
+## Build 183
+* Conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/662
+* HomeView: Changes to Favourites and History Widget by @stonerl in https://github.com/yattee/yattee/pull/672
+* Snappy UI - Offloading non UI task to background threads by @stonerl in https://github.com/yattee/yattee/pull/671
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/673
+
+## Previous builds
+* Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
+* Added Settings Import/Export
+  * Export all settings, instances and accounts
+  * Import selected elements from the file
+  * Include unencrypted passwords in the export or provide them during the import
+  * Import via URL for tvOS
+* Added Controls setting "Action button labels" icon or icon and text
+* Added Advanced setting for MPV: "deinterlace"
+* Add help text to all header buttons (by @rickykresslein)
+* History Setting: hide the recent activity in the sidebar or limit the number of items shown (by @rickykresslein)
+* Fix issues with empty comments (by @stonerl)
+* Improved Invidious comments (by @stonerl)
 * Don't show related in sidebar when disabled in settings by @stonerl in https://github.com/yattee/yattee/pull/635
 * Handle audio session interrupts by other media by @stonerl in https://github.com/yattee/yattee/pull/640
 * Only show Queue header in sidebar view by @stonerl in https://github.com/yattee/yattee/pull/642
@@ -18,26 +36,10 @@
 * HLS: set target bitrate / AVPlayer: higher resolution by @stonerl in https://github.com/yattee/yattee/pull/667
 * Fix #619: Remove ports from shared YouTube links by @0x000C in https://github.com/yattee/yattee/pull/627
 * XCode enable IDEPreferLogStreaming by @stonerl in https://github.com/yattee/yattee/pull/638
-* Updated localizations
-* Upgraded dependencies
-
-## Previous builds
-* Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
-* Added Settings Import/Export
-  * Export all settings, instances and accounts
-  * Import selected elements from the file
-  * Include unencrypted passwords in the export or provide them during the import
-  * Import via URL for tvOS
-* Added Controls setting "Action button labels" icon or icon and text
-* Added Advanced setting for MPV: "deinterlace"
-* Add help text to all header buttons (by @rickykresslein)
-* History Setting: hide the recent activity in the sidebar or limit the number of items shown (by @rickykresslein)
-* Fix issues with empty comments (by @stonerl)
-* Improved Invidious comments (by @stonerl)
-* Downgrade MPVKit to 0.36.0-1 due to issues with WebVTT subtitles
 * Add Chinese (Traditional) localization (by @rexcsk)
 * Localization fixes
 * Updated localizations
+* Upgraded dependencies
 * Fixed reported crash
 * Other minor changes and improvements
 
