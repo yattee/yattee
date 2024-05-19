@@ -110,9 +110,9 @@ struct AdvancedSettings: View {
                             Image(systemName: "link")
                         }
                         .font(.footnote)
-                    #endif
-                    #if os(macOS)
-                    .onHover(perform: onHover(_:))
+                        #if os(macOS)
+                            .onHover(perform: onHover(_:))
+                        #endif
                     #endif
                 }.frame(minWidth: 140, alignment: .leading)
 
