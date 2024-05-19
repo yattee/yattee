@@ -206,6 +206,9 @@ struct YatteeApp: App {
                 }
             #endif
 
+            // Initialize UserAgentManager
+            _ = UserAgentManager.shared
+
             DispatchQueue.global(qos: .userInitiated).async {
                 URLBookmarkModel.shared.refreshAll()
             }

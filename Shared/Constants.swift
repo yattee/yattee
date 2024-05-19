@@ -103,9 +103,8 @@ enum Constants {
         #elseif os(iOS)
             if isIPad {
                 return .sidebar
-            } else {
-                return .tab
             }
+            return .tab
         #else
             return .tab
         #endif

@@ -20,6 +20,7 @@ enum URLTester {
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
         request.setValue("bytes=\(range)", forHTTPHeaderField: "Range")
+        request.setValue(UserAgentManager.shared.userAgent, forHTTPHeaderField: "User-Agent")
 
         var dataTask: URLSessionDataTask?
         dataTask = URLSession.shared.dataTask(with: request) { _, response, _ in
