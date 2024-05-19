@@ -1,8 +1,7 @@
-## Build 183
-* Conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/662
-* HomeView: Changes to Favourites and History Widget by @stonerl in https://github.com/yattee/yattee/pull/672
-* Snappy UI - Offloading non UI task to background threads by @stonerl in https://github.com/yattee/yattee/pull/671
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/673
+## Build 184
+* Fix PiP Mode Not Working Using MPV by @stonerl in https://github.com/yattee/yattee/pull/676
+* Advanced Settings: cache-pause-initial by @stonerl in https://github.com/yattee/yattee/pull/679
+* Changed description for Format reordering by @stonerl in https://github.com/yattee/yattee/pull/677
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -36,6 +35,9 @@
 * HLS: set target bitrate / AVPlayer: higher resolution by @stonerl in https://github.com/yattee/yattee/pull/667
 * Fix #619: Remove ports from shared YouTube links by @0x000C in https://github.com/yattee/yattee/pull/627
 * XCode enable IDEPreferLogStreaming by @stonerl in https://github.com/yattee/yattee/pull/638
+* Conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/662
+* HomeView: Changes to Favourites and History Widget by @stonerl in https://github.com/yattee/yattee/pull/672
+* Snappy UI - Offloading non UI task to background threads by @stonerl in https://github.com/yattee/yattee/pull/671
 * Add Chinese (Traditional) localization (by @rexcsk)
 * Localization fixes
 * Updated localizations
