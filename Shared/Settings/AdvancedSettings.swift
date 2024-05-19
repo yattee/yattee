@@ -5,6 +5,7 @@ struct AdvancedSettings: View {
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
     @Default(.mpvCacheSecs) private var mpvCacheSecs
     @Default(.mpvCachePauseWait) private var mpvCachePauseWait
+    @Default(.mpvCachePauseInital) private var mpvCachePauseInital
     @Default(.mpvDeinterlace) private var mpvDeinterlace
     @Default(.mpvEnableLogging) private var mpvEnableLogging
     @Default(.showCacheStatus) private var showCacheStatus
@@ -68,9 +69,32 @@ struct AdvancedSettings: View {
                 mpvEnableLoggingToggle
             #endif
 
+            Toggle(isOn: $mpvCachePauseInital) {
+                HStack {
+                    Text("cache-pause-initial")
+                    #if !os(tvOS)
+                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!) {
+                            Image(systemName: "link")
+                                .font(.footnote)
+                        }
+                        #if os(macOS)
+                        .onHover(perform: onHover(_:))
+                        #endif
+                    #endif
+                }
+            }
+
             HStack {
                 Text("cache-secs")
-                    .frame(minWidth: 140, alignment: .leading)
+                #if !os(tvOS)
+                    Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!) {
+                        Image(systemName: "link")
+                            .font(.footnote)
+                        #if os(macOS)
+                            .onHover(perform: onHover(_:))
+                        #endif
+                    }
+                #endif
                 TextField("cache-secs", text: $mpvCacheSecs)
                 #if !os(macOS)
                     .keyboardType(.numberPad)
@@ -79,8 +103,19 @@ struct AdvancedSettings: View {
             .multilineTextAlignment(.trailing)
 
             HStack {
-                Text("cache-pause-wait")
-                    .frame(minWidth: 140, alignment: .leading)
+                Group {
+                    Text("cache-pause-wait")
+                    #if !os(tvOS)
+                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!) {
+                            Image(systemName: "link")
+                        }
+                        .font(.footnote)
+                    #endif
+                    #if os(macOS)
+                    .onHover(perform: onHover(_:))
+                    #endif
+                }.frame(minWidth: 140, alignment: .leading)
+
                 TextField("cache-pause-wait", text: $mpvCachePauseWait)
                 #if !os(macOS)
                     .keyboardType(.numberPad)
@@ -88,7 +123,20 @@ struct AdvancedSettings: View {
             }
             .multilineTextAlignment(.trailing)
 
-            Toggle("deinterlace", isOn: $mpvDeinterlace)
+            Toggle(isOn: $mpvDeinterlace) {
+                HStack {
+                    Text("deinterlace")
+                    #if !os(tvOS)
+                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!) {
+                            Image(systemName: "link")
+                                .font(.footnote)
+                        }
+                        #if os(macOS)
+                        .onHover(perform: onHover(_:))
+                        #endif
+                    #endif
+                }
+            }
 
             if mpvEnableLogging {
                 logButton
@@ -103,20 +151,19 @@ struct AdvancedSettings: View {
     }
 
     @ViewBuilder var mpvFooter: some View {
-        let url = "https://mpv.io/manual/master"
+        let url = "https://mpv.io/manual/stable/"
 
         VStack(alignment: .leading) {
             Text("Restart the app to apply the settings above.")
+                .padding(.bottom, 1)
             VStack(alignment: .leading, spacing: 2) {
                 #if os(tvOS)
-                    Text("More info can be found in MPV Documentation:")
+                    Text("More info can be found in MPV reference manual:")
                     Text(url)
                 #else
-                    Text("More info can be found in:")
-                    Link("MPV Documentation", destination: URL(string: url)!)
-                    #if os(macOS)
-                        .onHover(perform: onHover(_:))
-                    #endif
+                    Text("Further information can be found in the ")
+                        + Text("MPV reference manual").underline().bold()
+                        + Text(" by clicking on the link icon next to the option.")
                 #endif
             }
         }
