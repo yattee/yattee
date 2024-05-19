@@ -60,7 +60,7 @@ final class MPVClient: ObservableObject {
             checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))
         #endif
 
-        checkError(mpv_set_option_string(mpv, "cache-pause-initial", "yes"))
+        checkError(mpv_set_option_string(mpv, "cache-pause-initial", Defaults[.mpvCachePauseInital] ? "yes" : "no"))
         checkError(mpv_set_option_string(mpv, "cache-secs", Defaults[.mpvCacheSecs]))
         checkError(mpv_set_option_string(mpv, "cache-pause-wait", Defaults[.mpvCachePauseWait]))
         checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
