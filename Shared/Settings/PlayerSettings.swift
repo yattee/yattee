@@ -49,6 +49,10 @@ struct PlayerSettings: View {
         }
     #endif
 
+    #if os(tvOS)
+        @State private var isShowingLanguagePicker = false
+    #endif
+
     var body: some View {
         Group {
             #if os(macOS)
@@ -101,7 +105,23 @@ struct PlayerSettings: View {
 
             Section(header: SettingsHeader(text: "Captions".localized())) {
                 showCaptionsAutoShowToggle
-                captionDefaultLanguagePicker
+                #if !os(tvOS)
+                    captionDefaultLanguagePicker
+                #else
+                    Button(action: { isShowingLanguagePicker = true }) {
+                        HStack {
+                            Text("Default language")
+                            Spacer()
+                            Text("\(LanguageCodes(rawValue: captionsDefaultLanguageCode)!.description.capitalized) (\(captionsDefaultLanguageCode))").foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingLanguagePicker) {
+                        LanguagePickerTVOS(
+                            selectedLanguage: $captionsDefaultLanguageCode,
+                            isShowing: $isShowingLanguagePicker
+                        )
+                    }
+                #endif
             }
 
             #if !os(tvOS)
@@ -290,26 +310,47 @@ struct PlayerSettings: View {
         }
     #endif
 
+    private var showCaptionsAutoShowToggle: some View {
+        Toggle("Always show captions", isOn: $captionsAutoShow)
+    }
+
     #if !os(tvOS)
-        private var inspectorVisibilityPicker: some View {
-            Picker("Inspector", selection: $showInspector) {
-                Text("Always").tag(ShowInspectorSetting.always)
-                Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
-            }
-            #if os(macOS)
-            .labelsHidden()
-            #endif
-        }
-
-        private var showCaptionsAutoShowToggle: some View {
-            Toggle("Always show captions", isOn: $captionsAutoShow)
-        }
-
         private var captionDefaultLanguagePicker: some View {
             Picker("Default language", selection: $captionsDefaultLanguageCode) {
                 ForEach(LanguageCodes.allCases, id: \.self) { language in
                     Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
                 }
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
+        }
+    #else
+        struct LanguagePickerTVOS: View {
+            @Binding var selectedLanguage: String
+            @Binding var isShowing: Bool
+
+            var body: some View {
+                NavigationView {
+                    List(LanguageCodes.allCases, id: \.self) { language in
+                        Button(action: {
+                            selectedLanguage = language.rawValue
+                            isShowing = false
+                        }) {
+                            Text("\(language.description.capitalized) (\(language.rawValue))")
+                        }
+                    }
+                    .navigationTitle("Select Default Language")
+                }
+            }
+        }
+    #endif
+
+    #if !os(tvOS)
+        private var inspectorVisibilityPicker: some View {
+            Picker("Inspector", selection: $showInspector) {
+                Text("Always").tag(ShowInspectorSetting.always)
+                Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
             }
             #if os(macOS)
             .labelsHidden()
