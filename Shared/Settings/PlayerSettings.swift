@@ -40,6 +40,7 @@ struct PlayerSettings: View {
 
     @Default(.captionsAutoShow) private var captionsAutoShow
     @Default(.captionsDefaultLanguageCode) private var captionsDefaultLanguageCode
+    @Default(.captionsFallbackLanguageCode) private var captionsFallbackLanguageCode
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -50,7 +51,8 @@ struct PlayerSettings: View {
     #endif
 
     #if os(tvOS)
-        @State private var isShowingLanguagePicker = false
+        @State private var isShowingDefaultLanguagePicker = false
+        @State private var isShowingFallbackLanguagePicker = false
     #endif
 
     var body: some View {
@@ -107,18 +109,33 @@ struct PlayerSettings: View {
                 showCaptionsAutoShowToggle
                 #if !os(tvOS)
                     captionDefaultLanguagePicker
+                    captionFallbackLanguagePicker
                 #else
-                    Button(action: { isShowingLanguagePicker = true }) {
+                    Button(action: { isShowingDefaultLanguagePicker = true }) {
                         HStack {
                             Text("Default language")
                             Spacer()
                             Text("\(LanguageCodes(rawValue: captionsDefaultLanguageCode)!.description.capitalized) (\(captionsDefaultLanguageCode))").foregroundColor(.secondary)
                         }
                     }
-                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingLanguagePicker) {
-                        LanguagePickerTVOS(
+                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingDefaultLanguagePicker) {
+                        defaultLanguagePickerTVOS(
                             selectedLanguage: $captionsDefaultLanguageCode,
-                            isShowing: $isShowingLanguagePicker
+                            isShowing: $isShowingDefaultLanguagePicker
+                        )
+                    }
+
+                    Button(action: { isShowingFallbackLanguagePicker = true }) {
+                        HStack {
+                            Text("Fallback language")
+                            Spacer()
+                            Text("\(LanguageCodes(rawValue: captionsFallbackLanguageCode)!.description.capitalized) (\(captionsFallbackLanguageCode))").foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingDefaultLanguagePicker) {
+                        fallbackLanguagePickerTVOS(
+                            selectedLanguage: $captionsFallbackLanguageCode,
+                            isShowing: $isShowingFallbackLanguagePicker
                         )
                     }
                 #endif
@@ -325,8 +342,19 @@ struct PlayerSettings: View {
             .labelsHidden()
             #endif
         }
+
+        private var captionFallbackLanguagePicker: some View {
+            Picker("Fallback language", selection: $captionsFallbackLanguageCode) {
+                ForEach(LanguageCodes.allCases, id: \.self) { language in
+                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                }
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
+        }
     #else
-        struct LanguagePickerTVOS: View {
+        struct defaultLanguagePickerTVOS: View {
             @Binding var selectedLanguage: String
             @Binding var isShowing: Bool
 
@@ -341,6 +369,25 @@ struct PlayerSettings: View {
                         }
                     }
                     .navigationTitle("Select Default Language")
+                }
+            }
+        }
+
+        struct fallbackLanguagePickerTVOS: View {
+            @Binding var selectedLanguage: String
+            @Binding var isShowing: Bool
+
+            var body: some View {
+                NavigationView {
+                    List(LanguageCodes.allCases, id: \.self) { language in
+                        Button(action: {
+                            selectedLanguage = language.rawValue
+                            isShowing = false
+                        }) {
+                            Text("\(language.description.capitalized) (\(language.rawValue))")
+                        }
+                    }
+                    .navigationTitle("Select Fallback Language")
                 }
             }
         }

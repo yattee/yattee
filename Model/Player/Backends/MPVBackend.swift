@@ -219,10 +219,17 @@ final class MPVBackend: PlayerBackend {
         var captions: Captions?
 
         if Defaults[.captionsAutoShow] == true {
-            let captionsLanguageCode = Defaults[.captionsDefaultLanguageCode]
-            if !captionsLanguageCode.isEmpty {
-                captions = video.captions.first { $0.code == captionsLanguageCode } ??
-                    video.captions.first { $0.code.contains(captionsLanguageCode) }
+            let captionsDefaultLanguageCode = Defaults[.captionsDefaultLanguageCode],
+                captionsFallbackLanguageCode = Defaults[.captionsFallbackLanguageCode]
+
+            // Try to get captions with the default language code first
+            captions = video.captions.first { $0.code == captionsDefaultLanguageCode } ??
+                video.captions.first { $0.code.contains(captionsDefaultLanguageCode) }
+
+            // If there are still no captions, try to get captions with the fallback language code
+            if captions.isNil && !captionsFallbackLanguageCode.isEmpty {
+                captions = video.captions.first { $0.code == captionsFallbackLanguageCode } ??
+                    video.captions.first { $0.code.contains(captionsFallbackLanguageCode) }
             }
         } else {
             captions = nil

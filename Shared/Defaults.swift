@@ -304,6 +304,7 @@ extension Defaults.Keys {
     static let captionsAutoShow = Key<Bool>("captionsAutoShow", default: false)
     static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
     static let captionsDefaultLanguageCode = Key<String>("captionsDefaultLanguageCode", default: LanguageCodes.English.rawValue)
+    static let captionsFallbackLanguageCode = Key<String>("captionsDefaultFallbackCode", default: LanguageCodes.English.rawValue)
 
     static let lastUsedPlaylistID = Key<Playlist.ID?>("lastPlaylistID")
     static let lastAccountIsPublic = Key<Bool>("lastAccountIsPublic", default: false)
