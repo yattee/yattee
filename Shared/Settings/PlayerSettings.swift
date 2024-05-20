@@ -41,6 +41,7 @@ struct PlayerSettings: View {
     @Default(.captionsAutoShow) private var captionsAutoShow
     @Default(.captionsDefaultLanguageCode) private var captionsDefaultLanguageCode
     @Default(.captionsFallbackLanguageCode) private var captionsFallbackLanguageCode
+    @Default(.captionsFontScaleSize) private var captionsFontScaleSize
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -106,7 +107,12 @@ struct PlayerSettings: View {
             #endif
 
             Section(header: SettingsHeader(text: "Captions".localized())) {
+                #if os(tvOS)
+                    Text("Size").font(.subheadline)
+                #endif
+                captionsFontScaleSizePicker
                 showCaptionsAutoShowToggle
+
                 #if !os(tvOS)
                     captionDefaultLanguagePicker
                     captionFallbackLanguagePicker
@@ -329,6 +335,20 @@ struct PlayerSettings: View {
 
     private var showCaptionsAutoShowToggle: some View {
         Toggle("Always show captions", isOn: $captionsAutoShow)
+    }
+
+    private var captionsFontScaleSizePicker: some View {
+        Picker("Size", selection: $captionsFontScaleSize) {
+            Text("Small").tag(Float(0.5))
+            Text("Medium").tag(Float(1.0))
+            Text("Large").tag(Float(2.0))
+        }
+        .onChange(of: captionsFontScaleSize) { _ in
+            PlayerModel.shared.mpvBackend.client.setSubFontSize()
+        }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
     }
 
     #if !os(tvOS)
