@@ -42,6 +42,7 @@ struct PlayerSettings: View {
     @Default(.captionsDefaultLanguageCode) private var captionsDefaultLanguageCode
     @Default(.captionsFallbackLanguageCode) private var captionsFallbackLanguageCode
     @Default(.captionsFontScaleSize) private var captionsFontScaleSize
+    @Default(.captionsFontColor) private var captionsFontColor
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -111,6 +112,10 @@ struct PlayerSettings: View {
                     Text("Size").font(.subheadline)
                 #endif
                 captionsFontScaleSizePicker
+                #if os(tvOS)
+                    Text("Color").font(.subheadline)
+                #endif
+                captionsFontColorPicker
                 showCaptionsAutoShowToggle
 
                 #if !os(tvOS)
@@ -339,12 +344,29 @@ struct PlayerSettings: View {
 
     private var captionsFontScaleSizePicker: some View {
         Picker("Size", selection: $captionsFontScaleSize) {
-            Text("Small").tag(Float(0.5))
-            Text("Medium").tag(Float(1.0))
-            Text("Large").tag(Float(2.0))
+            Text("Small").tag(String("0.5"))
+            Text("Medium").tag(String("1.0"))
+            Text("Large").tag(String("2.0"))
         }
         .onChange(of: captionsFontScaleSize) { _ in
-            PlayerModel.shared.mpvBackend.client.setSubFontSize()
+            PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
+        }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
+    }
+
+    private var captionsFontColorPicker: some View {
+        Picker("Color", selection: $captionsFontColor) {
+            Text("White").tag(String("#FFFFFF"))
+            Text("Yellow").tag(String("#FFFF00"))
+            Text("Red").tag(String("#FF0000"))
+            Text("Orange").tag(String("#FFA500"))
+            Text("Green").tag(String("#008000"))
+            Text("Blue").tag(String("#0000FF"))
+        }
+        .onChange(of: captionsFontColor) { _ in
+            PlayerModel.shared.mpvBackend.client.setSubFontColor(color: captionsFontColor)
         }
         #if os(macOS)
         .labelsHidden()
