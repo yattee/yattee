@@ -30,12 +30,16 @@ struct PlayerSettings: View {
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
 
+    @Default(.showRelated) private var showRelated
     @Default(.showInspector) private var showInspector
+
     @Default(.showChapters) private var showChapters
     @Default(.showChapterThumbnails) private var showThumbnails
     @Default(.showChapterThumbnailsOnlyWhenDifferent) private var showThumbnailsOnlyWhenDifferent
     @Default(.expandChapters) private var expandChapters
-    @Default(.showRelated) private var showRelated
+
+    @Default(.captionsAutoShow) private var captionsAutoShow
+    @Default(.captionsDefaultLanguageCode) private var captionsDefaultLanguageCode
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -93,7 +97,14 @@ struct PlayerSettings: View {
                         inspectorVisibilityPicker
                     #endif
                 }
+            #endif
 
+            Section(header: SettingsHeader(text: "Captions".localized())) {
+                showCaptionsAutoShowToggle
+                captionDefaultLanguagePicker
+            }
+
+            #if !os(tvOS)
                 Section(header: SettingsHeader(text: "Chapters".localized())) {
                     showChaptersToggle
                     showThumbnailsToggle
@@ -284,6 +295,21 @@ struct PlayerSettings: View {
             Picker("Inspector", selection: $showInspector) {
                 Text("Always").tag(ShowInspectorSetting.always)
                 Text("Only for local files and URLs").tag(ShowInspectorSetting.onlyLocal)
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
+        }
+
+        private var showCaptionsAutoShowToggle: some View {
+            Toggle("Always show captions", isOn: $captionsAutoShow)
+        }
+
+        private var captionDefaultLanguagePicker: some View {
+            Picker("Default language", selection: $captionsDefaultLanguageCode) {
+                ForEach(LanguageCodes.allCases, id: \.self) { language in
+                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                }
             }
             #if os(macOS)
             .labelsHidden()

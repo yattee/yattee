@@ -1,3 +1,4 @@
+import Combine
 import Defaults
 import SwiftUI
 
@@ -393,8 +394,10 @@ struct PlaybackSettings: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "text.bubble")
-                    if let captions = player.captions {
-                        Text(captions.code)
+                    if let captions = player.captions,
+                       let language = LanguageCodes(rawValue: captions.code)
+                    {
+                        Text("\(language.description.capitalized) (\(language.rawValue))")
                             .foregroundColor(.accentColor)
                     }
                 }

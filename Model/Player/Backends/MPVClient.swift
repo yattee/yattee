@@ -405,6 +405,14 @@ final class MPVClient: ObservableObject {
         setString("video", "no")
     }
 
+    func setSubToAuto() {
+        setString("sub", "auto")
+    }
+
+    func setSubToNo() {
+        setString("sub", "no")
+    }
+
     var tracksCount: Int {
         Int(getString("track-list/count") ?? "-1") ?? -1
     }
