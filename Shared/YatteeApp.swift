@@ -154,7 +154,12 @@ struct YatteeApp: App {
             #if DEBUG
                 SiestaLog.Category.enabled = .common
             #endif
-            SDImageCodersManager.shared.addCoder(SDImageAWebPCoder.shared)
+            #if os(tvOS)
+                SDImageCodersManager.shared.addCoder(SDImageWebPCoder.shared)
+            #else
+                SDImageCodersManager.shared.addCoder(SDImageAWebPCoder.shared)
+            #endif
+            
             SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
             if !Defaults[.lastAccountIsPublic] {
