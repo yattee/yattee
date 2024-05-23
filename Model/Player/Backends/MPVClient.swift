@@ -70,6 +70,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "deinterlace", Defaults[.mpvDeinterlace] ? "yes" : "no"))
         checkError(mpv_set_option_string(mpv, "sub-scale", Defaults[.captionsFontScaleSize]))
         checkError(mpv_set_option_string(mpv, "sub-color", Defaults[.captionsFontColor]))
+        checkError(mpv_set_option_string(mpv, "user-agent", UserAgentManager.shared.userAgent))
 
         checkError(mpv_initialize(mpv))
 

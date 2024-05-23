@@ -1070,6 +1070,9 @@
 		37FFC440272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC441272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
 		37FFC442272734C3009FFD26 /* Throttle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FFC43F272734C3009FFD26 /* Throttle.swift */; };
+		E24DC6582BFA124100BF6187 /* UserAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24DC6572BFA124100BF6187 /* UserAgentManager.swift */; };
+		E24DC6592BFA124100BF6187 /* UserAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24DC6572BFA124100BF6187 /* UserAgentManager.swift */; };
+		E24DC65A2BFA124100BF6187 /* UserAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24DC6572BFA124100BF6187 /* UserAgentManager.swift */; };
 		E25028B02BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
 		E25028B12BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
 		E25028B22BF790F5002CB9FC /* HTTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */; };
@@ -1548,6 +1551,7 @@
 		3DA101AD287C30F50027D920 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
 		3DA101AE287C30F50027D920 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
 		3DA101AF287C30F50027D920 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		E24DC6572BFA124100BF6187 /* UserAgentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentManager.swift; sourceTree = "<group>"; };
 		E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatus.swift; sourceTree = "<group>"; };
 		E258F3892BF61BD2005B8C28 /* URLTester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTester.swift; sourceTree = "<group>"; };
 		E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageCodes.swift; sourceTree = "<group>"; };
@@ -2308,6 +2312,7 @@
 				37FFC43F272734C3009FFD26 /* Throttle.swift */,
 				378FFBC328660172009E3FBE /* URLParser.swift */,
 				E258F3892BF61BD2005B8C28 /* URLTester.swift */,
+				E24DC6572BFA124100BF6187 /* UserAgentManager.swift */,
 				37D4B0C22671614700C925CA /* YatteeApp.swift */,
 				37D4B0C42671614800C925CA /* Assets.xcassets */,
 				37BD07C42698ADEE003EBB87 /* Yattee.entitlements */,
@@ -3154,6 +3159,7 @@
 				377FC7DC267A081800A6BBAF /* PopularView.swift in Sources */,
 				3752069D285E910600CA655F /* ChapterView.swift in Sources */,
 				375EC96A289F232600751258 /* QualityProfilesModel.swift in Sources */,
+				E24DC6582BFA124100BF6187 /* UserAgentManager.swift in Sources */,
 				E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */,
 				3751B4B227836902000B7DF4 /* SearchPage.swift in Sources */,
 				37CC3F4C270CFE1700608308 /* PlayerQueueView.swift in Sources */,
@@ -3420,6 +3426,7 @@
 				3743CA4F270EFE3400E4D32B /* PlayerQueueRow.swift in Sources */,
 				374C053C2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				377FC7DD267A081A00A6BBAF /* PopularView.swift in Sources */,
+				E24DC6592BFA124100BF6187 /* UserAgentManager.swift in Sources */,
 				374924DB2921050B0017D862 /* LocationsSettings.swift in Sources */,
 				371AC0A0294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
 				379E7C342A20FE3900AF8118 /* FocusableSearchTextField.swift in Sources */,
@@ -3885,6 +3892,7 @@
 				37BA221329526A19000DAD1F /* ControlsGradientView.swift in Sources */,
 				374C0541272472C0009BDDBE /* PlayerSponsorBlock.swift in Sources */,
 				37130A61277657300033018A /* PersistenceController.swift in Sources */,
+				E24DC65A2BFA124100BF6187 /* UserAgentManager.swift in Sources */,
 				37E70929271CDDAE00D34DDE /* OpenSettingsButton.swift in Sources */,
 				3717407F2949D40800FDDBC7 /* ChannelLinkView.swift in Sources */,
 				E25028B22BF790F5002CB9FC /* HTTPStatus.swift in Sources */,

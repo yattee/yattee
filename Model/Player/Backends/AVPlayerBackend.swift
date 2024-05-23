@@ -232,7 +232,10 @@ final class AVPlayerBackend: PlayerBackend {
         upgrading: Bool = false
     ) {
         asset?.cancelLoading()
-        asset = AVURLAsset(url: url)
+        asset = AVURLAsset(
+            url: url,
+            options: ["AVURLAssetHTTPHeaderFieldsKey": ["User-Agent": "\(UserAgentManager.shared.userAgent)"]]
+        )
         asset?.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
             var error: NSError?
             switch self?.asset?.statusOfValue(forKey: "duration", error: &error) {
