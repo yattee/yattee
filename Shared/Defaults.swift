@@ -270,6 +270,7 @@ extension Defaults.Keys {
     static let mpvDeinterlace = Key<Bool>("mpvDeinterlace", default: false)
     static let mpvHWdec = Key<String>("hwdec", default: "auto-safe")
     static let mpvDemuxerLavfProbeInfo = Key<String>("mpvDemuxerLavfProbeInfo", default: "no")
+    static let mpvInitialAudioSync = Key<Bool>("mpvInitialAudioSync", default: true)
 
     static let showCacheStatus = Key<Bool>("showCacheStatus", default: false)
     static let feedCacheSize = Key<String>("feedCacheSize", default: "50")
