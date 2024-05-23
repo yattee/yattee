@@ -8,6 +8,8 @@ struct AdvancedSettings: View {
     @Default(.mpvCachePauseInital) private var mpvCachePauseInital
     @Default(.mpvDeinterlace) private var mpvDeinterlace
     @Default(.mpvEnableLogging) private var mpvEnableLogging
+    @Default(.mpvHWdec) private var mpvHWdec
+    @Default(.mpvDemuxerLavfProbeInfo) private var mpvDemuxerLavfProbeInfo
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
@@ -73,12 +75,14 @@ struct AdvancedSettings: View {
                 HStack {
                     Text("cache-pause-initial")
                     #if !os(tvOS)
-                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!) {
-                            Image(systemName: "link")
-                                .font(.footnote)
-                        }
+                        Image(systemName: "link")
+                            .accessibilityAddTraits([.isButton, .isLink])
+                            .font(.footnote)
+                            .onTapGesture {
+                                UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
+                            }
                         #if os(macOS)
-                        .onHover(perform: onHover(_:))
+                            .onHover(perform: onHover(_:))
                         #endif
                     #endif
                 }
@@ -87,13 +91,16 @@ struct AdvancedSettings: View {
             HStack {
                 Text("cache-secs")
                 #if !os(tvOS)
-                    Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!) {
-                        Image(systemName: "link")
-                            .font(.footnote)
-                        #if os(macOS)
-                            .onHover(perform: onHover(_:))
-                        #endif
-                    }
+                    Image(systemName: "link")
+                        .accessibilityAddTraits([.isButton, .isLink])
+                        .font(.footnote)
+                        .onTapGesture {
+                            UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
+                        }
+                    #if os(macOS)
+                        .onHover(perform: onHover(_:))
+                    #endif
+
                 #endif
                 TextField("cache-secs", text: $mpvCacheSecs)
                 #if !os(macOS)
@@ -106,10 +113,12 @@ struct AdvancedSettings: View {
                 Group {
                     Text("cache-pause-wait")
                     #if !os(tvOS)
-                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!) {
-                            Image(systemName: "link")
-                        }
-                        .font(.footnote)
+                        Image(systemName: "link")
+                            .accessibilityAddTraits([.isButton, .isLink])
+                            .font(.footnote)
+                            .onTapGesture {
+                                UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
+                            }
                         #if os(macOS)
                             .onHover(perform: onHover(_:))
                         #endif
@@ -127,15 +136,67 @@ struct AdvancedSettings: View {
                 HStack {
                     Text("deinterlace")
                     #if !os(tvOS)
-                        Link(destination: URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!) {
-                            Image(systemName: "link")
-                                .font(.footnote)
-                        }
+                        Image(systemName: "link")
+                            .accessibilityAddTraits([.isButton, .isLink])
+                            .font(.footnote)
+                            .onTapGesture {
+                                UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
+                            }
                         #if os(macOS)
-                        .onHover(perform: onHover(_:))
+                            .onHover(perform: onHover(_:))
                         #endif
                     #endif
                 }
+            }
+
+            HStack {
+                Text("hwdec")
+
+                #if !os(tvOS)
+                    Image(systemName: "link")
+                        .accessibilityAddTraits([.isButton, .isLink])
+                        .font(.footnote)
+                        .onTapGesture {
+                            UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
+                        }
+                    #if os(macOS)
+                        .onHover( /* perform: onHover(_:) */ )
+                    #endif
+                #endif
+
+                Picker("", selection: $mpvHWdec) {
+                    ForEach(["auto", "auto-safe", "auto-copy"], id: \.self) {
+                        Text($0)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+            }
+
+            if mpvEnableLogging {
+                logButton
+            }
+
+            HStack {
+                Text("demuxer-lavf-probe-info")
+
+                #if !os(tvOS)
+                    Image(systemName: "link")
+                        .accessibilityAddTraits([.isButton, .isLink])
+                        .font(.footnote)
+                        .onTapGesture {
+                            UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
+                        }
+                    #if os(macOS)
+                        .onHover( /* perform: onHover(_:) */ )
+                    #endif
+                #endif
+
+                Picker("", selection: $mpvDemuxerLavfProbeInfo) {
+                    ForEach(["yes", "no", "auto", "nostreams"], id: \.self) {
+                        Text($0)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
             }
 
             if mpvEnableLogging {

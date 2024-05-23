@@ -60,17 +60,43 @@ final class MPVClient: ObservableObject {
             checkError(mpv_set_option_string(mpv, "input-media-keys", "yes"))
         #endif
 
+        // CACHING //
+
         checkError(mpv_set_option_string(mpv, "cache-pause-initial", Defaults[.mpvCachePauseInital] ? "yes" : "no"))
         checkError(mpv_set_option_string(mpv, "cache-secs", Defaults[.mpvCacheSecs]))
         checkError(mpv_set_option_string(mpv, "cache-pause-wait", Defaults[.mpvCachePauseWait]))
+
+        // PLAYBACK //
         checkError(mpv_set_option_string(mpv, "keep-open", "yes"))
-        checkError(mpv_set_option_string(mpv, "hwdec", machine == "x86_64" ? "no" : "auto-safe"))
-        checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
-        checkError(mpv_set_option_string(mpv, "demuxer-lavf-analyzeduration", "1"))
         checkError(mpv_set_option_string(mpv, "deinterlace", Defaults[.mpvDeinterlace] ? "yes" : "no"))
         checkError(mpv_set_option_string(mpv, "sub-scale", Defaults[.captionsFontScaleSize]))
         checkError(mpv_set_option_string(mpv, "sub-color", Defaults[.captionsFontColor]))
         checkError(mpv_set_option_string(mpv, "user-agent", UserAgentManager.shared.userAgent))
+
+        // GPU //
+
+        checkError(mpv_set_option_string(mpv, "hwdec", Defaults[.mpvHWdec]))
+        checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
+
+        // We set set everything to OpenGL so MPV doesn't have to probe for other APIs.
+        checkError(mpv_set_option_string(mpv, "gpu-api", "opengl"))
+        checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "0"))
+
+        #if !os(macOS)
+            checkError(mpv_set_option_string(mpv, "opengl-es", "yes"))
+        #endif
+
+        // We set this to ordered since we use OpenGL and Apple's implementation is ancient.
+        checkError(mpv_set_option_string(mpv, "dither", "ordered"))
+
+        // DEMUXER //
+
+        // We request to test for lavf first and skip probing other demuxer.
+        checkError(mpv_set_option_string(mpv, "demuxer", "lavf"))
+        checkError(mpv_set_option_string(mpv, "audio-demuxer", "lavf"))
+        checkError(mpv_set_option_string(mpv, "sub-demuxer", "lavf"))
+        checkError(mpv_set_option_string(mpv, "demuxer-lavf-analyzeduration", "1"))
+        checkError(mpv_set_option_string(mpv, "demuxer-lavf-probe-info", Defaults[.mpvDemuxerLavfProbeInfo]))
 
         checkError(mpv_initialize(mpv))
 
