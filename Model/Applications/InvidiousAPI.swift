@@ -502,7 +502,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             keywords: json["keywords"].arrayValue.compactMap { $0.string },
             streams: extractStreams(from: json),
             related: extractRelated(from: json),
-            chapters: extractChapters(from: description),
+            chapters: createChapters(from: description, thumbnails: json),
             captions: extractCaptions(from: json)
         )
     }
@@ -573,6 +573,22 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
             return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
         }
+    }
+
+    private func createChapters(from description: String, thumbnails: JSON) -> [Chapter] {
+        var chapters = extractChapters(from: description)
+
+        if !chapters.isEmpty {
+            let thumbnailsData = extractThumbnails(from: thumbnails)
+            let thumbnailURL = thumbnailsData.first { $0.quality == .medium }?.url
+
+            for chapter in chapters.indices {
+                if let url = thumbnailURL {
+                    chapters[chapter].image = url
+                }
+            }
+        }
+        return chapters
     }
 
     private static var contentItemsKeys = ["items", "videos", "latestVideos", "playlists", "relatedChannels"]

@@ -30,12 +30,19 @@ struct PlayerSettings: View {
 
     @Default(.enableReturnYouTubeDislike) private var enableReturnYouTubeDislike
 
+    @Default(.showRelated) private var showRelated
     @Default(.showInspector) private var showInspector
+
     @Default(.showChapters) private var showChapters
     @Default(.showChapterThumbnails) private var showThumbnails
     @Default(.showChapterThumbnailsOnlyWhenDifferent) private var showThumbnailsOnlyWhenDifferent
     @Default(.expandChapters) private var expandChapters
-    @Default(.showRelated) private var showRelated
+
+    @Default(.captionsAutoShow) private var captionsAutoShow
+    @Default(.captionsDefaultLanguageCode) private var captionsDefaultLanguageCode
+    @Default(.captionsFallbackLanguageCode) private var captionsFallbackLanguageCode
+    @Default(.captionsFontScaleSize) private var captionsFontScaleSize
+    @Default(.captionsFontColor) private var captionsFontColor
 
     @ObservedObject private var accounts = AccountsModel.shared
 
@@ -43,6 +50,11 @@ struct PlayerSettings: View {
         private var idiom: UIUserInterfaceIdiom {
             UIDevice.current.userInterfaceIdiom
         }
+    #endif
+
+    #if os(tvOS)
+        @State private var isShowingDefaultLanguagePicker = false
+        @State private var isShowingFallbackLanguagePicker = false
     #endif
 
     var body: some View {
@@ -93,7 +105,54 @@ struct PlayerSettings: View {
                         inspectorVisibilityPicker
                     #endif
                 }
+            #endif
 
+            Section(header: SettingsHeader(text: "Captions".localized())) {
+                #if os(tvOS)
+                    Text("Size").font(.subheadline)
+                #endif
+                captionsFontScaleSizePicker
+                #if os(tvOS)
+                    Text("Color").font(.subheadline)
+                #endif
+                captionsFontColorPicker
+                showCaptionsAutoShowToggle
+
+                #if !os(tvOS)
+                    captionDefaultLanguagePicker
+                    captionFallbackLanguagePicker
+                #else
+                    Button(action: { isShowingDefaultLanguagePicker = true }) {
+                        HStack {
+                            Text("Default language")
+                            Spacer()
+                            Text("\(LanguageCodes(rawValue: captionsDefaultLanguageCode)!.description.capitalized) (\(captionsDefaultLanguageCode))").foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingDefaultLanguagePicker) {
+                        defaultLanguagePickerTVOS(
+                            selectedLanguage: $captionsDefaultLanguageCode,
+                            isShowing: $isShowingDefaultLanguagePicker
+                        )
+                    }
+
+                    Button(action: { isShowingFallbackLanguagePicker = true }) {
+                        HStack {
+                            Text("Fallback language")
+                            Spacer()
+                            Text("\(LanguageCodes(rawValue: captionsFallbackLanguageCode)!.description.capitalized) (\(captionsFallbackLanguageCode))").foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity).sheet(isPresented: $isShowingDefaultLanguagePicker) {
+                        fallbackLanguagePickerTVOS(
+                            selectedLanguage: $captionsFallbackLanguageCode,
+                            isShowing: $isShowingFallbackLanguagePicker
+                        )
+                    }
+                #endif
+            }
+
+            #if !os(tvOS)
                 Section(header: SettingsHeader(text: "Chapters".localized())) {
                     showChaptersToggle
                     showThumbnailsToggle
@@ -276,6 +335,103 @@ struct PlayerSettings: View {
     #if !os(macOS)
         private var closePiPAndOpenPlayerOnEnteringForegroundToggle: some View {
             Toggle("Close PiP and open player when application enters foreground", isOn: $closePiPAndOpenPlayerOnEnteringForeground)
+        }
+    #endif
+
+    private var showCaptionsAutoShowToggle: some View {
+        Toggle("Always show captions", isOn: $captionsAutoShow)
+    }
+
+    private var captionsFontScaleSizePicker: some View {
+        Picker("Size", selection: $captionsFontScaleSize) {
+            Text("Small").tag(String("0.5"))
+            Text("Medium").tag(String("1.0"))
+            Text("Large").tag(String("2.0"))
+        }
+        .onChange(of: captionsFontScaleSize) { _ in
+            PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
+        }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
+    }
+
+    private var captionsFontColorPicker: some View {
+        Picker("Color", selection: $captionsFontColor) {
+            Text("White").tag(String("#FFFFFF"))
+            Text("Yellow").tag(String("#FFFF00"))
+            Text("Red").tag(String("#FF0000"))
+            Text("Orange").tag(String("#FFA500"))
+            Text("Green").tag(String("#008000"))
+            Text("Blue").tag(String("#0000FF"))
+        }
+        .onChange(of: captionsFontColor) { _ in
+            PlayerModel.shared.mpvBackend.client.setSubFontColor(color: captionsFontColor)
+        }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
+    }
+
+    #if !os(tvOS)
+        private var captionDefaultLanguagePicker: some View {
+            Picker("Default language", selection: $captionsDefaultLanguageCode) {
+                ForEach(LanguageCodes.allCases, id: \.self) { language in
+                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                }
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
+        }
+
+        private var captionFallbackLanguagePicker: some View {
+            Picker("Fallback language", selection: $captionsFallbackLanguageCode) {
+                ForEach(LanguageCodes.allCases, id: \.self) { language in
+                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                }
+            }
+            #if os(macOS)
+            .labelsHidden()
+            #endif
+        }
+    #else
+        struct defaultLanguagePickerTVOS: View {
+            @Binding var selectedLanguage: String
+            @Binding var isShowing: Bool
+
+            var body: some View {
+                NavigationView {
+                    List(LanguageCodes.allCases, id: \.self) { language in
+                        Button(action: {
+                            selectedLanguage = language.rawValue
+                            isShowing = false
+                        }) {
+                            Text("\(language.description.capitalized) (\(language.rawValue))")
+                        }
+                    }
+                    .navigationTitle("Select Default Language")
+                }
+            }
+        }
+
+        struct fallbackLanguagePickerTVOS: View {
+            @Binding var selectedLanguage: String
+            @Binding var isShowing: Bool
+
+            var body: some View {
+                NavigationView {
+                    List(LanguageCodes.allCases, id: \.self) { language in
+                        Button(action: {
+                            selectedLanguage = language.rawValue
+                            isShowing = false
+                        }) {
+                            Text("\(language.description.capitalized) (\(language.rawValue))")
+                        }
+                    }
+                    .navigationTitle("Select Fallback Language")
+                }
+            }
         }
     #endif
 

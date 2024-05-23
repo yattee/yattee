@@ -1079,6 +1079,9 @@
 		E258F38A2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
 		E258F38B2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
 		E258F38C2BF61BD2005B8C28 /* URLTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = E258F3892BF61BD2005B8C28 /* URLTester.swift */; };
+		E27568B92BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
+		E27568BA2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
+		E27568BB2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
 		FA97174C2A494700001FF53D /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA97174B2A494700001FF53D /* MPVKit */; };
 /* End PBXBuildFile section */
 
@@ -1551,6 +1554,7 @@
 		E24DC6572BFA124100BF6187 /* UserAgentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentManager.swift; sourceTree = "<group>"; };
 		E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatus.swift; sourceTree = "<group>"; };
 		E258F3892BF61BD2005B8C28 /* URLTester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTester.swift; sourceTree = "<group>"; };
+		E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageCodes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2299,6 +2303,7 @@
 				37D2E0D328B67EFC00F64D52 /* Delay.swift */,
 				3761ABFC26F0F8DE00AA496F /* EnvironmentValues.swift */,
 				E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */,
+				E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */,
 				375B537828DF6CBB004C1D19 /* Localizable.strings */,
 				3729037D2739E47400EA99F6 /* MenuCommands.swift */,
 				37B7958F2771DAE0001CF27B /* OpenURLHandler.swift */,
@@ -3231,6 +3236,7 @@
 				37C3A24D272360470087A57A /* ChannelPlaylist+Fixtures.swift in Sources */,
 				37484C2D26FC844700287258 /* InstanceSettings.swift in Sources */,
 				37DD9DA32785BBC900539416 /* NoCommentsView.swift in Sources */,
+				E27568B92BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */,
 				377A20A92693C9A2002842B8 /* TypedContentAccessors.swift in Sources */,
 				37484C3126FCB8F900287258 /* AccountValidator.swift in Sources */,
 				377ABC48286E5887009C986F /* Sequence+Unique.swift in Sources */,
@@ -3411,6 +3417,7 @@
 				371F2F1B269B43D300E4A7AB /* NavigationModel.swift in Sources */,
 				3756C2AB2861151C00E4B059 /* NetworkStateModel.swift in Sources */,
 				375EC95A289EEB8200751258 /* QualityProfileForm.swift in Sources */,
+				E27568BA2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */,
 				37001564271B1F250049C794 /* AccountsModel.swift in Sources */,
 				378FFBC528660172009E3FBE /* URLParser.swift in Sources */,
 				3761ABFE26F0F8DE00AA496F /* EnvironmentValues.swift in Sources */,
@@ -4008,6 +4015,7 @@
 				37FB28432721B22200A57617 /* ContentItem.swift in Sources */,
 				37A7D6EF2B67E3BF009CB1ED /* BrowsingSettingsGroupImporter.swift in Sources */,
 				37D2E0D228B67DBC00F64D52 /* AnimationCompletionObserverModifier.swift in Sources */,
+				E27568BB2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */,
 				37A7D6EB2B67E334009CB1ED /* BrowsingSettingsGroupExporter.swift in Sources */,
 				37AAF2A226741C97007FC770 /* FeedView.swift in Sources */,
 				37484C1B26FC837400287258 /* PlayerSettings.swift in Sources */,

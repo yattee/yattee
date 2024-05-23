@@ -217,9 +217,22 @@ final class MPVBackend: PlayerBackend {
         #endif
 
         var captions: Captions?
-        if let captionsLanguageCode = Defaults[.captionsLanguageCode] {
-            captions = video.captions.first { $0.code == captionsLanguageCode } ??
-                video.captions.first { $0.code.contains(captionsLanguageCode) }
+
+        if Defaults[.captionsAutoShow] == true {
+            let captionsDefaultLanguageCode = Defaults[.captionsDefaultLanguageCode],
+                captionsFallbackLanguageCode = Defaults[.captionsFallbackLanguageCode]
+
+            // Try to get captions with the default language code first
+            captions = video.captions.first { $0.code == captionsDefaultLanguageCode } ??
+                video.captions.first { $0.code.contains(captionsDefaultLanguageCode) }
+
+            // If there are still no captions, try to get captions with the fallback language code
+            if captions.isNil && !captionsFallbackLanguageCode.isEmpty {
+                captions = video.captions.first { $0.code == captionsFallbackLanguageCode } ??
+                    video.captions.first { $0.code.contains(captionsFallbackLanguageCode) }
+            }
+        } else {
+            captions = nil
         }
 
         let updateCurrentStream = {
@@ -254,9 +267,8 @@ final class MPVBackend: PlayerBackend {
 
                 self.startClientUpdates()
 
-                // Captions should only be displayed when selected by the user,
-                // not when the video starts. So, we remove them.
-                self.client?.removeSubs()
+                if Defaults[.captionsAutoShow] { self.client?.setSubToAuto() } else { self.client?.setSubToNo() }
+                PlayerModel.shared.captions = self.captions
 
                 if !preservingTime,
                    !upgrading,

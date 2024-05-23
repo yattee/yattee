@@ -65,7 +65,7 @@ import SwiftUI
         }
 
         static var thumbnailHeight: Double {
-            thumbnailWidth / 1.7777
+            thumbnailWidth / (16 / 9)
         }
     }
 
