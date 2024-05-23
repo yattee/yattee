@@ -78,10 +78,11 @@ struct AdvancedSettings: View {
                         Image(systemName: "link")
                             .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
+                        #if os(iOS)
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
                             }
-                        #if os(macOS)
+                        #elseif os(macOS)
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -94,10 +95,11 @@ struct AdvancedSettings: View {
                     Image(systemName: "link")
                         .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
+                    #if os(iOS)
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
                         }
-                    #if os(macOS)
+                    #elseif os(macOS)
                         .onHover(perform: onHover(_:))
                     #endif
 
@@ -116,10 +118,11 @@ struct AdvancedSettings: View {
                         Image(systemName: "link")
                             .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
+                        #if os(iOS)
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
                             }
-                        #if os(macOS)
+                        #elseif os(macOS)
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -139,10 +142,11 @@ struct AdvancedSettings: View {
                         Image(systemName: "link")
                             .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
+                        #if os(iOS)
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
                             }
-                        #if os(macOS)
+                        #elseif os(macOS)
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -156,11 +160,12 @@ struct AdvancedSettings: View {
                     Image(systemName: "link")
                         .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
+                    #if os(iOS)
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
                         }
-                    #if os(macOS)
-                        .onHover( /* perform: onHover(_:) */ )
+                    #elseif os(macOS)
+                        .onHover(perform: onHover(_:))
                     #endif
                 #endif
 
@@ -169,7 +174,9 @@ struct AdvancedSettings: View {
                         Text($0)
                     }
                 }
+                #if !os(tvOS)
                 .pickerStyle(MenuPickerStyle())
+                #endif
             }
 
             if mpvEnableLogging {
@@ -183,11 +190,12 @@ struct AdvancedSettings: View {
                     Image(systemName: "link")
                         .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
+                    #if os(iOS)
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
                         }
-                    #if os(macOS)
-                        .onHover( /* perform: onHover(_:) */ )
+                    #elseif os(macOS)
+                        .onHover(perform: onHover(_:))
                     #endif
                 #endif
 
@@ -196,7 +204,9 @@ struct AdvancedSettings: View {
                         Text($0)
                     }
                 }
+                #if !os(tvOS)
                 .pickerStyle(MenuPickerStyle())
+                #endif
             }
 
             if mpvEnableLogging {
