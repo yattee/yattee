@@ -72,6 +72,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "sub-scale", Defaults[.captionsFontScaleSize]))
         checkError(mpv_set_option_string(mpv, "sub-color", Defaults[.captionsFontColor]))
         checkError(mpv_set_option_string(mpv, "user-agent", UserAgentManager.shared.userAgent))
+        checkError(mpv_set_option_string(mpv, "initial-audio-sync", Defaults[.mpvInitialAudioSync] ? "yes" : "no"))
 
         // GPU //
 

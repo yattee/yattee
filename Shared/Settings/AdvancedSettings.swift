@@ -10,6 +10,7 @@ struct AdvancedSettings: View {
     @Default(.mpvEnableLogging) private var mpvEnableLogging
     @Default(.mpvHWdec) private var mpvHWdec
     @Default(.mpvDemuxerLavfProbeInfo) private var mpvDemuxerLavfProbeInfo
+    @Default(.mpvInitialAudioSync) private var mpvInitialAudioSync
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
@@ -83,6 +84,9 @@ struct AdvancedSettings: View {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
                             }
                         #elseif os(macOS)
+                            .onTapGesture {
+                                NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
+                            }
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -100,6 +104,9 @@ struct AdvancedSettings: View {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
                         }
                     #elseif os(macOS)
+                        .onTapGesture {
+                            NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
+                        }
                         .onHover(perform: onHover(_:))
                     #endif
 
@@ -123,6 +130,9 @@ struct AdvancedSettings: View {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
                             }
                         #elseif os(macOS)
+                            .onTapGesture {
+                                NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
+                            }
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -147,6 +157,30 @@ struct AdvancedSettings: View {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
                             }
                         #elseif os(macOS)
+                            .onTapGesture {
+                                NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
+                            }
+                            .onHover(perform: onHover(_:))
+                        #endif
+                    #endif
+                }
+            }
+
+            Toggle(isOn: $mpvInitialAudioSync) {
+                HStack {
+                    Text("initial-audio-sync")
+                    #if !os(tvOS)
+                        Image(systemName: "link")
+                            .accessibilityAddTraits([.isButton, .isLink])
+                            .font(.footnote)
+                        #if os(iOS)
+                            .onTapGesture {
+                                UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-initial-audio-sync")!)
+                            }
+                        #elseif os(macOS)
+                            .onTapGesture {
+                                NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-initial-audio-sync")!)
+                            }
                             .onHover(perform: onHover(_:))
                         #endif
                     #endif
@@ -165,6 +199,9 @@ struct AdvancedSettings: View {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
                         }
                     #elseif os(macOS)
+                        .onTapGesture {
+                            NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
+                        }
                         .onHover(perform: onHover(_:))
                     #endif
                 #endif
@@ -179,10 +216,6 @@ struct AdvancedSettings: View {
                 #endif
             }
 
-            if mpvEnableLogging {
-                logButton
-            }
-
             HStack {
                 Text("demuxer-lavf-probe-info")
 
@@ -195,6 +228,9 @@ struct AdvancedSettings: View {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
                         }
                     #elseif os(macOS)
+                        .onTapGesture {
+                            NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
+                        }
                         .onHover(perform: onHover(_:))
                     #endif
                 #endif
