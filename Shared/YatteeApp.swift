@@ -159,7 +159,7 @@ struct YatteeApp: App {
             #else
                 SDImageCodersManager.shared.addCoder(SDImageAWebPCoder.shared)
             #endif
-            
+
             SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
             if !Defaults[.lastAccountIsPublic] {
