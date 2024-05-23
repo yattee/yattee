@@ -152,58 +152,94 @@ extension VideosAPI {
         /*
          The following chapter patterns are covered:
 
-         start - end - title / start - end: Title / start - end title
-         start - title / start: title / start title / [start] - title / [start]: title / [start] title
-         index. title - start / index. title start
-         title: (start)
+         1) "start - end - title" / "start - end: Title" / "start - end title"
+         2) "start - title" / "start: title" / "start title" / "[start] - title" / "[start]: title" / "[start] title"
+         3) "index. title - start" / "index. title start"
+         4) "title: (start)"
+         5) "(start) title"
 
-         The order is important!
+         These represent:
+
+         -  "start" and "end" are timestamps, defining the start and end of the individual chapter
+         -  "title" is the name of the chapter
+         -  "index" is the chapter's position in a list
+
+         The order of these patterns is important as it determines the priority. The patterns listed first have a higher priority.
+         In the case of multiple matches, the pattern with the highest priority will be chosen - lower number means higher priority.
          */
         let patterns = [
             "(?<=\\n|^)\\s*(?:►\\s*)?\\[?(?<start>(?:[0-9]+:){1,2}[0-9]+)\\]?(?:\\s*-\\s*)?(?<end>(?:[0-9]+:){1,2}[0-9]+)?(?:\\s*-\\s*|\\s*[:]\\s*)?(?<title>.*)(?=\\n|$)",
             "(?<=\\n|^)\\s*(?:►\\s*)?\\[?(?<start>(?:[0-9]+:){1,2}[0-9]+)\\]?\\s*[-:]?\\s*(?<title>.+)(?=\\n|$)",
             "(?<=\\n|^)(?<index>[0-9]+\\.\\s)(?<title>.+?)(?:\\s*-\\s*)?(?<start>(?:[0-9]+:){1,2}[0-9]+)(?=\\n|$)",
-            "(?<=\\n|^)(?<title>.+?):\\s*\\((?<start>(?:[0-9]+:){1,2}[0-9]+)\\)(?=\\n|$)"
+            "(?<=\\n|^)(?<title>.+?):\\s*\\((?<start>(?:[0-9]+:){1,2}[0-9]+)\\)(?=\\n|$)",
+            "(?<=^|\\n)\\((?<start>(?:[0-9]+:){1,2}[0-9]+)\\)\\s*(?<title>.+?)(?=\\n|$)"
         ]
 
-        for pattern in patterns {
-            guard let chaptersRegularExpression = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { continue }
-            let chapterLines = chaptersRegularExpression.matches(in: description, range: NSRange(description.startIndex..., in: description))
+        let extractChaptersGroup = DispatchGroup()
+        var capturedChapters: [Int: [Chapter]] = [:]
+        let lock = NSLock()
 
-            if !chapterLines.isEmpty {
-                return chapterLines.compactMap { line in
-                    let titleRange = line.range(withName: "title")
-                    let startRange = line.range(withName: "start")
-                    guard let titleSubstringRange = Range(titleRange, in: description),
-                          let startSubstringRange = Range(startRange, in: description)
-                    else {
-                        return nil
+        for (index, pattern) in patterns.enumerated() {
+            extractChaptersGroup.enter()
+            DispatchQueue.global().async {
+                if let chaptersRegularExpression = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                    let chapterLines = chaptersRegularExpression.matches(in: description, range: NSRange(description.startIndex..., in: description))
+                    let extractedChapters = chapterLines.compactMap { line -> Chapter? in
+                        let titleRange = line.range(withName: "title")
+                        let startRange = line.range(withName: "start")
+
+                        guard let titleSubstringRange = Range(titleRange, in: description),
+                              let startSubstringRange = Range(startRange, in: description)
+                        else {
+                            return nil
+                        }
+
+                        let titleCapture = String(description[titleSubstringRange]).trimmingCharacters(in: .whitespaces)
+                        let startCapture = String(description[startSubstringRange])
+                        let startComponents = startCapture.components(separatedBy: ":")
+                        guard startComponents.count <= 3 else { return nil }
+
+                        var hours: Double?
+                        var minutes: Double?
+                        var seconds: Double?
+
+                        if startComponents.count == 3 {
+                            hours = Double(startComponents[0])
+                            minutes = Double(startComponents[1])
+                            seconds = Double(startComponents[2])
+                        } else if startComponents.count == 2 {
+                            minutes = Double(startComponents[0])
+                            seconds = Double(startComponents[1])
+                        }
+
+                        guard var startSeconds = seconds else { return nil }
+
+                        startSeconds += (minutes ?? 0) * 60
+                        startSeconds += (hours ?? 0) * 60 * 60
+
+                        return Chapter(title: titleCapture, start: startSeconds)
                     }
-                    let titleCapture = String(description[titleSubstringRange]).trimmingCharacters(in: .whitespaces)
-                    let startCapture = String(description[startSubstringRange])
-                    let startComponents = startCapture.components(separatedBy: ":")
-                    guard startComponents.count <= 3 else { return nil }
 
-                    var hours: Double?
-                    var minutes: Double?
-                    var seconds: Double?
-
-                    if startComponents.count == 3 {
-                        hours = Double(startComponents[0])
-                        minutes = Double(startComponents[1])
-                        seconds = Double(startComponents[2])
-                    } else if startComponents.count == 2 {
-                        minutes = Double(startComponents[0])
-                        seconds = Double(startComponents[1])
+                    if !extractedChapters.isEmpty {
+                        lock.lock()
+                        capturedChapters[index] = extractedChapters
+                        lock.unlock()
                     }
-
-                    guard var startSeconds = seconds else { return nil }
-
-                    startSeconds += (minutes ?? 0) * 60
-                    startSeconds += (hours ?? 0) * 60 * 60
-
-                    return .init(title: titleCapture, start: startSeconds)
                 }
+                extractChaptersGroup.leave()
+            }
+        }
+
+        extractChaptersGroup.wait()
+
+        // Now we sort the keys of the capturedChapters dictionary.
+        // These keys correspond to the priority of each pattern.
+        let sortedKeys = Array(capturedChapters.keys).sorted(by: <)
+
+        // Return first non-empty result in the order of patterns
+        for key in sortedKeys {
+            if let chapters = capturedChapters[key], !chapters.isEmpty {
+                return chapters
             }
         }
         return []
