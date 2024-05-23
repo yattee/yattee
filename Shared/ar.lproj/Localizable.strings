@@ -387,7 +387,7 @@
 "Backend" = "الواجهة الخلفية";
 "Badge" = "الشارة";
 "Close PiP when starting playing other video" = "غلق الفيديو المصغر عند بدء تشغيل فيديو آخر";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الإشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع الفيديو).\n";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "تذكيرات صريحة لإبداء الإعجاب بها أو الإشتراك فيها أو التفاعل معها على أي منصة (منصات) مدفوعة أو مجانية (مثل النقر فوق مقطع الفيديو).";
 "Filter" = "‏ عامل التصفية";
 "Frontend URL" = "عنوان URL للواجهة الأمامية";
 "Fullscreen size" = "حجم ملء الشاشة";
@@ -628,4 +628,4 @@
 "Password required to import" = "كلمة المرور مطلوبة للإستيراد";
 "Password saved in import file" = "كلمة المرور محفوظة في ملف الإستيراد";
 "Export in progress..." = "جارِ التصدير...";
-"In progress..." = "في تَقَدم…";
+"In progress..." = "في طور الأجراء…";
