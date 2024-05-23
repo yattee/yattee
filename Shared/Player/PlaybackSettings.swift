@@ -1,3 +1,4 @@
+import Combine
 import Defaults
 import SwiftUI
 
@@ -383,23 +384,35 @@ struct PlaybackSettings: View {
     }
 
     @ViewBuilder private var captionsButton: some View {
+        let videoCaptions = player.currentVideo?.captions
         #if os(macOS)
             captionsPicker
                 .labelsHidden()
                 .frame(maxWidth: 300)
         #elseif os(iOS)
             Menu {
-                captionsPicker
+                if videoCaptions?.isEmpty == false {
+                    captionsPicker
+                }
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "text.bubble")
-                    if let captions = player.captions {
-                        Text(captions.code)
+                    if let captions = player.captions,
+                       let language = LanguageCodes(rawValue: captions.code)
+                    {
+                        Text("\(language.description.capitalized) (\(language.rawValue))")
                             .foregroundColor(.accentColor)
+                    } else {
+                        if videoCaptions?.isEmpty == true {
+                            Text("Not available")
+                        } else {
+                            Text("Disabled")
+                        }
                     }
                 }
                 .frame(alignment: .trailing)
                 .frame(height: 40)
+                .disabled(videoCaptions?.isEmpty == true)
             }
             .transaction { t in t.animation = .none }
             .buttonStyle(.plain)

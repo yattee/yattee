@@ -68,6 +68,8 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "vo", "libmpv"))
         checkError(mpv_set_option_string(mpv, "demuxer-lavf-analyzeduration", "1"))
         checkError(mpv_set_option_string(mpv, "deinterlace", Defaults[.mpvDeinterlace] ? "yes" : "no"))
+        checkError(mpv_set_option_string(mpv, "sub-scale", Defaults[.captionsFontScaleSize]))
+        checkError(mpv_set_option_string(mpv, "sub-color", Defaults[.captionsFontColor]))
 
         checkError(mpv_initialize(mpv))
 
@@ -403,6 +405,22 @@ final class MPVClient: ObservableObject {
 
     func setVideoToNo() {
         setString("video", "no")
+    }
+
+    func setSubToAuto() {
+        setString("sub", "auto")
+    }
+
+    func setSubToNo() {
+        setString("sub", "no")
+    }
+
+    func setSubFontSize(scaleSize: String) {
+        setString("sub-scale", scaleSize)
+    }
+
+    func setSubFontColor(color: String) {
+        setString("sub-color", color)
     }
 
     var tracksCount: Int {
