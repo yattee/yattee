@@ -1,1 +1,43 @@
 
+
+"%@ Playlist" = "%@ 플레이리스트";
+"%@ subscribers" = "%@ 구독자";
+"10 seconds forwards/backwards" = "10초 건너뛰기/뒤로 가기";
+"Accounts" = "계정";
+"Accounts are not supported for the application of this instance" = "해당 애플리케이션 인스턴스는 계정을 지원하지 않습니다";
+"Add Location" = "주소 추가";
+"Add Location..." = "주소 추가...";
+"Add profile..." = "프로필 추가...";
+"Add Quality Profile" = "품질 프로필 추가";
+"Add to %@" = "%@에 추가";
+"Add to Favorites" = "즐겨찾기에 추가";
+"Add to Playlist" = "플레이리스트에 추가";
+"Add to Playlist..." = "플레이리스트에 추가...";
+"Advanced" = "고급";
+
+/* Trending category, section containing all kinds of videos */
+"All" = "전체";
+"Always use AVPlayer for live videos" = "라이브 동영상에 항상 AVPlayer 사용";
+"Anonymous" = "익명";
+
+/* Video date filter in search
+   Video duration filter in search */
+"Any" = "모두";
+"Apply to all" = "모두 적용";
+"Are you sure you want to clear search history?" = "검색 기록을 삭제하시겠습니까?";
+"Are you sure you want to delete playlist?" = "플레이리스트를 삭제하시겠습니까?";
+"Are you sure you want to restore default quality profiles?" = "기본 품질 프로필로 복구하시겠습니까?";
+"Are you sure you want to unsubscribe from %@?" = "%@을/를 구독 해제하시겠습니까?";
+"Autoplaying Next" = "다음으로 자동재생";
+"Backend" = "백엔드";
+"Badge" = "배지";
+"Battery" = "배터리";
+"Cellular" = "셀룰러";
+" subscribers" = " 구독자";
+"%@ Channel" = "%@ 채널";
+"%lld videos" = "%lld 동영상";
+"Are you sure you want to clear history of watched videos?" = "동영상 시청 기록을 삭제하시겠습니까?";
+"Add Account" = "계정 추가";
+"Add Account..." = "계정 추가...";
+"Automatic" = "자동";
+"Close" = "닫기";
