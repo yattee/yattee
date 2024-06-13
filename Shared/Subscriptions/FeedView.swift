@@ -29,8 +29,10 @@ struct FeedView: View {
     }
 
     @State private var selectedChannel: Channel?
+    #if os(tvOS)
     @FocusState private var focusedChannel: String?
-    @State private var feedChannelsViewVisible: Bool = false
+    #endif
+    @State private var feedChannelsViewVisible = false
     private var navigation = NavigationModel.shared
     private let dismiss_channel_list_id = "dismiss_channel_list_id"
 
@@ -74,7 +76,8 @@ struct FeedView: View {
             selectedFeedView
         #endif
     }
-
+    
+    #if os(tvOS)
     var feedChannelsView: some View {
         ScrollViewReader { proxy in
             VStack {
@@ -153,12 +156,11 @@ struct FeedView: View {
                             self.feedChannelsViewVisible = false
                         }
                     }
-                } else {
-                    // Fallback on earlier versions
                 }
             }
         }
     }
+    #endif
 
     var selectedFeedView: some View {
         VerticalCells(items: videos) { if shouldDisplayHeader { header } }
