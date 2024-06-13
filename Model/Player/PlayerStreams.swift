@@ -56,82 +56,101 @@ extension PlayerModel {
             }
     }
 
-    func streamsWithInstance(instance _: Instance, streams: [Stream], completion: @escaping ([Stream]) -> Void) {
+    func streamsWithInstance(instance: Instance, streams: [Stream], completion: @escaping ([Stream]) -> Void) {
         // Queue for stream processing
-        let streamProcessingQueue = DispatchQueue(label: "stream.yattee.streamProcessing.Queue", qos: .userInitiated)
+        let streamProcessingQueue = DispatchQueue(label: "stream.yattee.streamProcessing.Queue")
         // Queue for accessing the processedStreams array
         let processedStreamsQueue = DispatchQueue(label: "stream.yattee.processedStreams.Queue")
         // DispatchGroup for managing multiple tasks
         let streamProcessingGroup = DispatchGroup()
 
         var processedStreams = [Stream]()
+        let instance = instance
+
+        var hasForbiddenAsset = false
+        var hasAllowedAsset = false
 
         for stream in streams {
             streamProcessingQueue.async(group: streamProcessingGroup) {
                 let forbiddenAssetTestGroup = DispatchGroup()
-                var hasForbiddenAsset = false
+                if !hasAllowedAsset, !hasForbiddenAsset, !instance.proxiesVideos, stream.format != Stream.Format.unknown {
+                    let (nonHLSAssets, hlsURLs) = self.getAssets(from: [stream])
+                    if let firstStream = nonHLSAssets.first {
+                        let asset = firstStream.0
+                        let url = firstStream.1
+                        let requestRange = firstStream.2
 
-                let (nonHLSAssets, hlsURLs) = self.getAssets(from: [stream])
-
-                if let randomStream = nonHLSAssets.randomElement() {
-                    let instance = randomStream.0
-                    let asset = randomStream.1
-                    let url = randomStream.2
-                    let requestRange = randomStream.3
-
-                    // swiftlint:disable:next shorthand_optional_binding
-                    if let asset = asset, let instance = instance, !instance.proxiesVideos {
                         if instance.app == .invidious {
-                            self.testAsset(url: url, range: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
-                                hasForbiddenAsset = isForbidden
+                            self.testAsset(url: url, range: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { status in
+                                switch status {
+                                case HTTPStatus.Forbidden:
+                                    hasForbiddenAsset = true
+                                case HTTPStatus.PartialContent:
+                                    hasAllowedAsset = true
+                                case HTTPStatus.OK:
+                                    hasAllowedAsset = true
+                                default:
+                                    break
+                                }
                             }
                         } else if instance.app == .piped {
-                            self.testPipedAssets(asset: asset, requestRange: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
-                                hasForbiddenAsset = isForbidden
+                            self.testPipedAssets(asset: asset!, requestRange: requestRange, isHLS: false, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { status in
+                                switch status {
+                                case HTTPStatus.Forbidden:
+                                    hasForbiddenAsset = true
+                                case HTTPStatus.PartialContent:
+                                    hasAllowedAsset = true
+                                case HTTPStatus.OK:
+                                    hasAllowedAsset = true
+                                default:
+                                    break
+                                }
                             }
                         }
-                    }
-                } else if let randomHLS = hlsURLs.randomElement() {
-                    let instance = randomHLS.0
-                    let asset = AVURLAsset(url: randomHLS.1)
-
-                    if instance?.app == .piped {
-                        self.testPipedAssets(asset: asset, requestRange: nil, isHLS: true, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { isForbidden in
-                            hasForbiddenAsset = isForbidden
+                    } else if let firstHLS = hlsURLs.first {
+                        let asset = AVURLAsset(url: firstHLS)
+                        if instance.app == .piped {
+                            self.testPipedAssets(asset: asset, requestRange: nil, isHLS: true, forbiddenAssetTestGroup: forbiddenAssetTestGroup) { status in
+                                switch status {
+                                case HTTPStatus.Forbidden:
+                                    hasForbiddenAsset = true
+                                case HTTPStatus.PartialContent:
+                                    hasAllowedAsset = true
+                                case HTTPStatus.OK:
+                                    hasAllowedAsset = true
+                                default:
+                                    break
+                                }
+                            }
                         }
                     }
                 }
-
                 forbiddenAssetTestGroup.wait()
 
                 // Post-processing code
-                if let instance = stream.instance {
-                    if instance.app == .invidious {
-                        if hasForbiddenAsset || instance.proxiesVideos {
-                            if let audio = stream.audioAsset {
-                                stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: audio)
-                            }
-                            if let video = stream.videoAsset {
-                                stream.videoAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: video)
+                if instance.app == .invidious, hasForbiddenAsset || instance.proxiesVideos {
+                    if let audio = stream.audioAsset {
+                        stream.audioAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: audio)
+                    }
+                    if let video = stream.videoAsset {
+                        stream.videoAsset = InvidiousAPI.proxiedAsset(instance: instance, asset: video)
+                    }
+                } else if instance.app == .piped, !instance.proxiesVideos, !hasForbiddenAsset {
+                    if let hlsURL = stream.hlsURL {
+                        PipedAPI.nonProxiedAsset(url: hlsURL) { possibleNonProxiedURL in
+                            if let nonProxiedURL = possibleNonProxiedURL {
+                                stream.hlsURL = nonProxiedURL.url
                             }
                         }
-                    } else if instance.app == .piped, !instance.proxiesVideos, !hasForbiddenAsset {
-                        if let hlsURL = stream.hlsURL {
-                            PipedAPI.nonProxiedAsset(url: hlsURL) { possibleNonProxiedURL in
-                                if let nonProxiedURL = possibleNonProxiedURL {
-                                    stream.hlsURL = nonProxiedURL.url
-                                }
+                    } else {
+                        if let audio = stream.audioAsset {
+                            PipedAPI.nonProxiedAsset(asset: audio) { nonProxiedAudioAsset in
+                                stream.audioAsset = nonProxiedAudioAsset
                             }
-                        } else {
-                            if let audio = stream.audioAsset {
-                                PipedAPI.nonProxiedAsset(asset: audio) { nonProxiedAudioAsset in
-                                    stream.audioAsset = nonProxiedAudioAsset
-                                }
-                            }
-                            if let video = stream.videoAsset {
-                                PipedAPI.nonProxiedAsset(asset: video) { nonProxiedVideoAsset in
-                                    stream.videoAsset = nonProxiedVideoAsset
-                                }
+                        }
+                        if let video = stream.videoAsset {
+                            PipedAPI.nonProxiedAsset(asset: video) { nonProxiedVideoAsset in
+                                stream.videoAsset = nonProxiedVideoAsset
                             }
                         }
                     }
@@ -152,21 +171,21 @@ extension PlayerModel {
         }
     }
 
-    private func getAssets(from streams: [Stream]) -> (nonHLSAssets: [(Instance?, AVURLAsset?, URL, String?)], hlsURLs: [(Instance?, URL)]) {
-        var nonHLSAssets = [(Instance?, AVURLAsset?, URL, String?)]()
-        var hlsURLs = [(Instance?, URL)]()
+    private func getAssets(from streams: [Stream]) -> (nonHLSAssets: [(AVURLAsset?, URL, String?)], hlsURLs: [URL]) {
+        var nonHLSAssets = [(AVURLAsset?, URL, String?)]()
+        var hlsURLs = [URL]()
 
         for stream in streams {
             if stream.isHLS {
                 if let url = stream.hlsURL?.url {
-                    hlsURLs.append((stream.instance, url))
+                    hlsURLs.append(url)
                 }
             } else {
                 if let asset = stream.audioAsset {
-                    nonHLSAssets.append((stream.instance, asset, asset.url, stream.requestRange))
+                    nonHLSAssets.append((asset, asset.url, stream.requestRange))
                 }
                 if let asset = stream.videoAsset {
-                    nonHLSAssets.append((stream.instance, asset, asset.url, stream.requestRange))
+                    nonHLSAssets.append((asset, asset.url, stream.requestRange))
                 }
             }
         }
@@ -174,24 +193,24 @@ extension PlayerModel {
         return (nonHLSAssets, hlsURLs)
     }
 
-    private func testAsset(url: URL, range: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Bool) -> Void) {
+    private func testAsset(url: URL, range: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Int) -> Void) {
         // In case the range is nil, generate a random one.
         let randomEnd = Int.random(in: 200 ... 800)
         let requestRange = range ?? "0-\(randomEnd)"
 
         forbiddenAssetTestGroup.enter()
         URLTester.testURLResponse(url: url, range: requestRange, isHLS: isHLS) { statusCode in
-            completion(statusCode == HTTPStatus.Forbidden)
+            completion(statusCode)
             forbiddenAssetTestGroup.leave()
         }
     }
 
-    private func testPipedAssets(asset: AVURLAsset, requestRange: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Bool) -> Void) {
+    private func testPipedAssets(asset: AVURLAsset, requestRange: String?, isHLS: Bool, forbiddenAssetTestGroup: DispatchGroup, completion: @escaping (Int) -> Void) {
         PipedAPI.nonProxiedAsset(asset: asset) { possibleNonProxiedAsset in
             if let nonProxiedAsset = possibleNonProxiedAsset {
                 self.testAsset(url: nonProxiedAsset.url, range: requestRange, isHLS: isHLS, forbiddenAssetTestGroup: forbiddenAssetTestGroup, completion: completion)
             } else {
-                completion(false)
+                completion(0)
             }
         }
     }
