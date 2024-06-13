@@ -21,13 +21,13 @@ struct FeedView: View {
             $0.channel.id == selectedChannel.id
         })
     }
-    
+
     var channels: [Channel] {
         feed.videos.map {
             $0.channel
         }.unique()
     }
-    
+
     @State private var selectedChannel: Channel?
     @FocusState private var focusedChannel: String?
     @State private var feedChannelsViewVisible: Bool = false
@@ -36,45 +36,45 @@ struct FeedView: View {
 
     var body: some View {
         #if os(tvOS)
-        GeometryReader { geometry in
-            ZStack {
-                // selected channel feed view
-                HStack(spacing: 0) {
-                    // sidebar - show channels
-                    if feedChannelsViewVisible {
-                        Spacer()
-                            .frame(width: geometry.size.width * 0.3)
-                    }
-                    selectedFeedView
-                }
-                .disabled(feedChannelsViewVisible)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                
-                if feedChannelsViewVisible {
+            GeometryReader { geometry in
+                ZStack {
+                    // selected channel feed view
                     HStack(spacing: 0) {
                         // sidebar - show channels
-                        feedChannelsView
-                            .padding(.all)
-                            .frame(width: geometry.size.width * 0.3)
-                            .background()
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .contentShape(RoundedRectangle(cornerRadius: 16))
-                        Rectangle()
-                            .fill(.clear)
-                            .id(dismiss_channel_list_id)
-                            .focusable()
-                            .focused(self.$focusedChannel, equals: dismiss_channel_list_id)
+                        if feedChannelsViewVisible {
+                            Spacer()
+                                .frame(width: geometry.size.width * 0.3)
+                        }
+                        selectedFeedView
                     }
+                    .disabled(feedChannelsViewVisible)
                     .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
+
+                    if feedChannelsViewVisible {
+                        HStack(spacing: 0) {
+                            // sidebar - show channels
+                            feedChannelsView
+                                .padding(.all)
+                                .frame(width: geometry.size.width * 0.3)
+                                .background()
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .contentShape(RoundedRectangle(cornerRadius: 16))
+                            Rectangle()
+                                .fill(.clear)
+                                .id(dismiss_channel_list_id)
+                                .focusable()
+                                .focused(self.$focusedChannel, equals: dismiss_channel_list_id)
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                    }
                 }
             }
-        }
         #else
             selectedFeedView
         #endif
     }
-    
+
     var feedChannelsView: some View {
         ScrollViewReader { proxy in
             VStack {
@@ -102,7 +102,7 @@ struct FeedView: View {
                         .font(.caption)
                         .buttonStyle(PlainButtonStyle())
                         .focused(self.$focusedChannel, equals: "all")
-                        
+
                         ForEach(channels, id: \.self) { channel in
                             Button(action: {
                                 self.selectedChannel = channel
@@ -127,7 +127,7 @@ struct FeedView: View {
                             .focused(self.$focusedChannel, equals: channel.id)
                         }
                     }
-                    .onChange(of: self.focusedChannel, {
+                    .onChange(of: self.focusedChannel) {
                         if self.focusedChannel == "all" {
                             withAnimation {
                                 self.selectedChannel = nil
@@ -141,9 +141,9 @@ struct FeedView: View {
                                 }
                             }
                         }
-                    })
+                    }
                     .onAppear {
-                        guard let selectedChannel = self.selectedChannel  else {
+                        guard let selectedChannel = self.selectedChannel else {
                             return
                         }
                         proxy.scrollTo(selectedChannel, anchor: .top)
@@ -159,7 +159,7 @@ struct FeedView: View {
             }
         }
     }
-    
+
     var selectedFeedView: some View {
         VerticalCells(items: videos) { if shouldDisplayHeader { header } }
             .environment(\.loadMoreContentHandler) { feed.loadNextPage() }
@@ -208,27 +208,26 @@ struct FeedView: View {
                         .font(.caption)
                 }
                 .opacity(feedChannelsViewVisible ? 0 : 1)
-                .frame(minWidth: (feedChannelsViewVisible ? 0 : nil), maxWidth:  (feedChannelsViewVisible ? 0 : nil))
-            channelHeaderView
-            if (selectedChannel == nil) {
-                Spacer()
-            }
-            if feedChannelsViewVisible == false {
-                ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
-                HideWatchedButtons()
-                HideShortsButtons()
-            }
+                .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
+                channelHeaderView
+                if selectedChannel == nil {
+                    Spacer()
+                }
+                if feedChannelsViewVisible == false {
+                    ListingStyleButtons(listingStyle: $subscriptionsListingStyle)
+                    HideWatchedButtons()
+                    HideShortsButtons()
+                }
             #endif
 
             if feedChannelsViewVisible == false {
                 if showCacheStatus {
-                    
                     CacheStatusHeader(
                         refreshTime: feed.formattedFeedTime,
                         isLoading: feed.isLoading
                     )
                 }
-                
+
                 #if os(tvOS)
                     Button {
                         feed.loadResources(force: true)
@@ -247,44 +246,44 @@ struct FeedView: View {
             .padding(.trailing, 30)
         #endif
     }
-    
+
     var channelHeaderView: some View {
-        guard let selectedChannel = self.selectedChannel else {
+        guard let selectedChannel = selectedChannel else {
             return AnyView(
                 Text("All Channels")
-                .font(.caption)
-                .frame(alignment: .leading)
-                .lineLimit(1)
-                .padding(0)
-                .padding(.leading, 16)
+                    .font(.caption)
+                    .frame(alignment: .leading)
+                    .lineLimit(1)
+                    .padding(0)
+                    .padding(.leading, 16)
             )
         }
-        
+
         return AnyView(
-                HStack(spacing: 16) {
-                    ChannelAvatarView(channel: selectedChannel, subscribedBadge: false)
-                        .id("channel-avatar-\(selectedChannel.id)")
-                        .frame(width: 80, height: 80)
-                    Text("\(selectedChannel.name)")
-                        .font(.caption)
-                        .frame(alignment: .leading)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
-                    Spacer()
-                    if feedChannelsViewVisible == false {
-                        Button(action: {
-                            navigation.openChannel(selectedChannel, navigationStyle: .tab)
-                        }) {
-                            Text("Visit Channel")
-                                .font(.caption)
-                                .frame(alignment: .leading)
-                                .lineLimit(1)
-                                .fixedSize(horizontal: true, vertical: false)
-                        }
+            HStack(spacing: 16) {
+                ChannelAvatarView(channel: selectedChannel, subscribedBadge: false)
+                    .id("channel-avatar-\(selectedChannel.id)")
+                    .frame(width: 80, height: 80)
+                Text("\(selectedChannel.name)")
+                    .font(.caption)
+                    .frame(alignment: .leading)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                Spacer()
+                if feedChannelsViewVisible == false {
+                    Button(action: {
+                        navigation.openChannel(selectedChannel, navigationStyle: .tab)
+                    }) {
+                        Text("Visit Channel")
+                            .font(.caption)
+                            .frame(alignment: .leading)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                 }
-                .padding(0)
-                .padding(.leading, 16)
+            }
+            .padding(0)
+            .padding(.leading, 16)
         )
     }
 
