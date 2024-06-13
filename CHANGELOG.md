@@ -1,12 +1,8 @@
-## Build 185
-* Fix thumbnails failing to load on tvOS by @patelhiren in https://github.com/yattee/yattee/pull/688
-* speed up sorting for Stream by @stonerl in https://github.com/yattee/yattee/pull/681
-* faster chapter extraction by @stonerl in https://github.com/yattee/yattee/pull/682
-* Invidious: add images to chapters by @stonerl in https://github.com/yattee/yattee/pull/685
-* Improved Captions handling by @stonerl in https://github.com/yattee/yattee/pull/684
-* Add User-Agent to request by @stonerl in https://github.com/yattee/yattee/pull/680
-* MPV: speed up playback start by @stonerl in https://github.com/yattee/yattee/pull/689
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/683
+## Build 186
+* tvOS: Refined Subscriptions View by @patelhiren in https://github.com/yattee/yattee/pull/697
+* More responsive UI when Favorites are used. by @stonerl in https://github.com/yattee/yattee/pull/695
+* Improved conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/696
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/694
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -44,6 +40,13 @@
 * HomeView: Changes to Favourites and History Widget by @stonerl in https://github.com/yattee/yattee/pull/672
 * Snappy UI - Offloading non UI task to background threads by @stonerl in https://github.com/yattee/yattee/pull/671
 * Fix PiP Mode Not Working Using MPV by @stonerl in https://github.com/yattee/yattee/pull/676
+* Fix thumbnails failing to load on tvOS by @patelhiren in https://github.com/yattee/yattee/pull/688
+* speed up sorting for Stream by @stonerl in https://github.com/yattee/yattee/pull/681
+* faster chapter extraction by @stonerl in https://github.com/yattee/yattee/pull/682
+* Invidious: add images to chapters by @stonerl in https://github.com/yattee/yattee/pull/685
+* Improved Captions handling by @stonerl in https://github.com/yattee/yattee/pull/684
+* Add User-Agent to request by @stonerl in https://github.com/yattee/yattee/pull/680
+* MPV: speed up playback start by @stonerl in https://github.com/yattee/yattee/pull/689
 * Advanced Settings: cache-pause-initial by @stonerl in https://github.com/yattee/yattee/pull/679
 * Changed description for Format reordering by @stonerl in https://github.com/yattee/yattee/pull/677
 * Add Chinese (Traditional) localization (by @rexcsk)
