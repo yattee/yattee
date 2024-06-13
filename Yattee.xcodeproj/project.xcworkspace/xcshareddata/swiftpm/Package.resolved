@@ -25,7 +25,7 @@
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f44a8f6b5ec27730198725ccc542fef0d1cc6b3d"
+        "revision" : "fd97438a85d44aa4f7186145cdba90e3c36f1c94"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ashleymills/Reachability.swift",
       "state" : {
-        "revision" : "57da4b1270cab7c2228919eabc0e4e1bf93e48ea",
-        "version" : "5.2.2"
+        "revision" : "7cbd73f46a7dfaeca079e18df7324c6de6d1834a",
+        "version" : "5.2.3"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "5642d1ffe3dbe628592443bd14154e31929727b4",
-        "version" : "5.19.2"
+        "revision" : "b8523c1642f3c142b06dd98443ea7c48343a4dfd",
+        "version" : "5.19.3"
       }
     },
     {
