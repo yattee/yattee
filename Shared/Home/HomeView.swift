@@ -5,9 +5,11 @@ import UniformTypeIdentifiers
 
 struct HomeView: View {
     @ObservedObject private var accounts = AccountsModel.shared
+    @ObservedObject private var player = PlayerModel.shared
 
     @State private var presentingHomeSettings = false
     @State private var favoritesChanged = false
+    @State private var updateTask: Task<Void, Never>?
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -15,8 +17,6 @@ struct HomeView: View {
     #if os(iOS)
         @State private var recentDocumentsID = UUID()
     #endif
-
-    var favoritesObserver: Any?
 
     #if !os(tvOS)
         @Default(.favorites) private var favorites
@@ -121,6 +121,24 @@ struct HomeView: View {
                 }
                 for await _ in Defaults.updates(.widgetsSettings) {
                     favoritesChanged.toggle()
+                }
+            }
+        }
+        .onDisappear {
+            updateTask?.cancel()
+        }
+
+        .onChange(of: player.presentingPlayer) { _ in
+            if player.presentingPlayer {
+                updateTask?.cancel()
+            } else {
+                Task {
+                    for await _ in Defaults.updates(.favorites) {
+                        favoritesChanged.toggle()
+                    }
+                    for await _ in Defaults.updates(.widgetsSettings) {
+                        favoritesChanged.toggle()
+                    }
                 }
             }
         }

@@ -88,26 +88,38 @@ struct FavoriteItemView: View {
                         reloadVisibleWatches()
                     } else {
                         resource?.addObserver(store)
-                        loadCacheAndResource()
+                        DispatchQueue.main.async {
+                            self.loadCacheAndResource()
+                        }
                     }
                 }
                 .onDisappear {
                     resource?.removeObservers(ownedBy: store)
                 }
-                .onChange(of: player.currentVideo) { _ in reloadVisibleWatches() }
-                .onChange(of: hideShorts) { _ in reloadVisibleWatches() }
-                .onChange(of: hideWatched) { _ in reloadVisibleWatches() }
-                .onChange(of: favoritesChanged) { _ in reloadVisibleWatches() }
+                .onChange(of: player.currentVideo) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
+                .onChange(of: hideShorts) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
+                .onChange(of: hideWatched) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
+                // Delay is necessary to update the list with the new items.
+                .onChange(of: favoritesChanged) { _ in if !player.presentingPlayer { Delay.by(1.0) { reloadVisibleWatches() } } }
+                .onChange(of: player.presentingPlayer) { _ in
+                    if player.presentingPlayer {
+                        resource?.removeObservers(ownedBy: store)
+                    } else {
+                        resource?.addObserver(store)
+                    }
+                }
             }
         }
         .id(watchModel.historyToken)
         .onChange(of: accounts.current) { _ in
-            resource?.removeObservers(ownedBy: store)
-            resource?.addObserver(store)
-            loadCacheAndResource(force: true)
+            DispatchQueue.main.async {
+                loadCacheAndResource(force: true)
+            }
         }
         .onChange(of: watchModel.historyToken) { _ in
-            reloadVisibleWatches()
+            if !player.presentingPlayer {
+                reloadVisibleWatches()
+            }
         }
     }
 
@@ -159,24 +171,26 @@ struct FavoriteItemView: View {
     }
 
     func reloadVisibleWatches() {
-        guard item.section == .history else { return }
+        DispatchQueue.main.async {
+            guard item.section == .history else { return }
 
-        visibleWatches = []
+            visibleWatches = []
 
-        let watches = Array(
-            watches
-                .filter { $0.videoID != player.currentVideo?.videoID && itemVisible(.init(video: $0.video)) }
-                .prefix(favoritesModel.limit(item))
-        )
-        let last = watches.last
+            let watches = Array(
+                watches
+                    .filter { $0.videoID != player.currentVideo?.videoID && itemVisible(.init(video: $0.video)) }
+                    .prefix(favoritesModel.limit(item))
+            )
+            let last = watches.last
 
-        for watch in watches {
-            player.loadHistoryVideoDetails(watch) {
-                guard let video = player.historyVideo(watch.videoID), itemVisible(.init(video: video)) else { return }
-                visibleWatches.append(watch)
+            for watch in watches {
+                player.loadHistoryVideoDetails(watch) {
+                    guard let video = player.historyVideo(watch.videoID), itemVisible(.init(video: video)) else { return }
+                    visibleWatches.append(watch)
 
-                if watch == last {
-                    visibleWatches.sort { $0.watchedAt ?? Date() > $1.watchedAt ?? Date() }
+                    if watch == last {
+                        visibleWatches.sort { $0.watchedAt ?? Date() > $1.watchedAt ?? Date() }
+                    }
                 }
             }
         }
@@ -227,6 +241,9 @@ struct FavoriteItemView: View {
             onSuccess = { response in
                 if let videos: [Video] = response.typedContent() {
                     FeedCacheModel.shared.storeFeed(account: accounts.current, videos: videos)
+                    DispatchQueue.main.async {
+                        store.contentItems = contentItems
+                    }
                 }
             }
         case let .channel(_, id, name):
@@ -239,19 +256,21 @@ struct FavoriteItemView: View {
             }
 
             onSuccess = { response in
-                if let channel: Channel = response.typedContent() {
-                    ChannelsCacheModel.shared.store(channel)
-                    store.contentItems = ContentItem.array(of: channel.videos)
-                } else if let videos: [Video] = response.typedContent() {
-                    channel.videos = videos
-                    ChannelsCacheModel.shared.store(channel)
-                    store.contentItems = ContentItem.array(of: videos)
-                } else if let channelPage: ChannelPage = response.typedContent() {
-                    if let channel = channelPage.channel {
+                DispatchQueue.main.async {
+                    if let channel: Channel = response.typedContent() {
                         ChannelsCacheModel.shared.store(channel)
-                    }
+                        store.contentItems = ContentItem.array(of: channel.videos)
+                    } else if let videos: [Video] = response.typedContent() {
+                        channel.videos = videos
+                        ChannelsCacheModel.shared.store(channel)
+                        store.contentItems = ContentItem.array(of: videos)
+                    } else if let channelPage: ChannelPage = response.typedContent() {
+                        if let channel = channelPage.channel {
+                            ChannelsCacheModel.shared.store(channel)
+                        }
 
-                    store.contentItems = channelPage.results
+                        store.contentItems = channelPage.results
+                    }
                 }
             }
         case let .channelPlaylist(_, id, title):
@@ -264,6 +283,9 @@ struct FavoriteItemView: View {
             onSuccess = { response in
                 if let playlist: ChannelPlaylist = response.typedContent() {
                     ChannelPlaylistsCacheModel.shared.storePlaylist(playlist: playlist)
+                    DispatchQueue.main.async {
+                        store.contentItems = contentItems
+                    }
                 }
             }
         case let .playlist(_, id):
@@ -272,12 +294,16 @@ struct FavoriteItemView: View {
             if let playlist = playlists.first(where: { $0.id == id }) {
                 contentItems = ContentItem.array(of: playlist.videos)
             }
+
+            DispatchQueue.main.async {
+                store.contentItems = contentItems
+            }
         default:
             contentItems = []
-        }
 
-        if !contentItems.isEmpty {
-            store.contentItems = contentItems
+            DispatchQueue.main.async {
+                store.contentItems = contentItems
+            }
         }
 
         if force {
