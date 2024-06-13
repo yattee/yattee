@@ -179,10 +179,6 @@ struct AdvancedSettings: View {
                 #endif
             }
 
-            if mpvEnableLogging {
-                logButton
-            }
-
             HStack {
                 Text("demuxer-lavf-probe-info")
 
