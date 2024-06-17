@@ -11,6 +11,7 @@ struct FeedView: View {
 
     #if os(tvOS)
         @Default(.subscriptionsListingStyle) private var subscriptionsListingStyle
+        @StateObject private var accountsModel = AccountsViewModel()
     #endif
 
     var videos: [ContentItem] {
@@ -78,6 +79,23 @@ struct FeedView: View {
     }
     
     #if os(tvOS)
+    
+    var accountsPicker: some View {
+        ForEach(accountsModel.sortedAccounts.filter{ $0.anonymous == false }) { account in
+            Button(action: {
+                AccountsModel.shared.setCurrent(account)
+            }) {
+                HStack {
+                    Text("\(account.description) (\(account.instance.app.rawValue))")
+                    if account == accountsModel.currentAccount {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
     var feedChannelsView: some View {
         ScrollViewReader { proxy in
             VStack {
@@ -198,19 +216,23 @@ struct FeedView: View {
     var header: some View {
         HStack(spacing: 16) {
             #if os(tvOS)
-                Button(action: {
-                    withAnimation {
-                        self.feedChannelsViewVisible = true
-                        self.focusedChannel = selectedChannel?.id ?? "all"
+                if #available(tvOS 17.0, *) {
+                    Menu {
+                        accountsPicker
+                    } label: {
+                        Label("Channels", systemImage: "filemenu.and.selection")
+                            .labelStyle(.iconOnly)
+                            .imageScale(.small)
+                            .font(.caption)
+                    } primaryAction: {
+                        withAnimation {
+                            self.feedChannelsViewVisible = true
+                            self.focusedChannel = selectedChannel?.id ?? "all"
+                        }
                     }
-                }) {
-                    Label("Channels", systemImage: "filemenu.and.selection")
-                        .labelStyle(.iconOnly)
-                        .imageScale(.small)
-                        .font(.caption)
+                    .opacity(feedChannelsViewVisible ? 0 : 1)
+                    .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 }
-                .opacity(feedChannelsViewVisible ? 0 : 1)
-                .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 channelHeaderView
                 if selectedChannel == nil {
                     Spacer()
