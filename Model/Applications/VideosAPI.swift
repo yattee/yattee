@@ -28,6 +28,7 @@ protocol VideosAPI {
     func unsubscribe(_ channelID: String, onCompletion: @escaping () -> Void)
 
     func playlist(_ id: String) -> Resource?
+    func playlist(_ id: String, page: String?) -> Resource?
     func playlistVideo(_ playlistID: String, _ videoID: String) -> Resource?
     func playlistVideos(_ id: String) -> Resource?
 

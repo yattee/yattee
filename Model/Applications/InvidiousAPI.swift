@@ -312,7 +312,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func playlist(_ id: String) -> Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
+        return playlist(id, page: nil)
+    }
+    
+    func playlist(_ id: String, page: String? = nil) -> Resource? {
+        let resource = resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
+        guard let page else { return resource }
+        
+        return resource.withParam("page", page)
     }
 
     func playlistVideos(_ id: String) -> Resource? {

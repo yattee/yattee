@@ -296,6 +296,11 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
     }
 
     func playlist(_ id: String) -> Resource? {
+        return playlist(id, page: nil)
+    }
+    
+    func playlist(_ id: String, page: String? = nil) -> Resource? {
+        // TODO
         channelPlaylist(id)
     }
 

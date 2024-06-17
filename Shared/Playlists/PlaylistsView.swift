@@ -10,6 +10,9 @@ struct PlaylistsView: View {
 
     @State private var showingEditPlaylist = false
     @State private var editedPlaylist: Playlist?
+    
+    @State private var currentPage = 1
+    @State private var canFetchMoreData = true
 
     @StateObject private var channelPlaylist = Store<ChannelPlaylist>()
     @StateObject private var userPlaylist = Store<Playlist>()
@@ -26,20 +29,16 @@ struct PlaylistsView: View {
     @Default(.showCacheStatus) private var showCacheStatus
 
     var items: [ContentItem] {
-        var videos = currentPlaylist?.videos ?? []
+        var videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
 
-        if videos.isEmpty {
-            videos = userPlaylist.item?.videos ?? channelPlaylist.item?.videos ?? []
+        if !accounts.app.userPlaylistsEndpointIncludesVideos {
+            var i = 0
 
-            if !accounts.app.userPlaylistsEndpointIncludesVideos {
-                var i = 0
-
-                for index in videos.indices {
-                    var video = videos[index]
-                    video.indexID = "\(i)"
-                    i += 1
-                    videos[index] = video
-                }
+            for index in videos.indices {
+                var video = videos[index]
+                video.indexID = "\(i)"
+                i += 1
+                videos[index] = video
             }
         }
 
@@ -64,6 +63,7 @@ struct PlaylistsView: View {
         SignInRequiredView(title: "Playlists".localized()) {
             VStack {
                 VerticalCells(items: items, allowEmpty: true) { if shouldDisplayHeader { header } }
+                    .environment(\.loadMoreContentHandler) { loadNextPage() }
                     .environment(\.currentPlaylistID, currentPlaylist?.id)
                     .environment(\.listingStyle, playlistListingStyle)
 
@@ -75,19 +75,27 @@ struct PlaylistsView: View {
             }
         }
         .onAppear {
+            self.currentPage = 1
+            self.canFetchMoreData = true
             model.load()
             loadResource()
         }
         .onChange(of: accounts.current) { _ in
+            self.currentPage = 1
+            self.canFetchMoreData = true
             model.load(force: true)
             loadResource()
         }
         .onChange(of: currentPlaylist) { _ in
+            self.currentPage = 1
+            self.canFetchMoreData = true
             channelPlaylist.clear()
             userPlaylist.clear()
             loadResource()
         }
         .onChange(of: model.reloadPlaylists) { _ in
+            self.currentPage = 1
+            self.canFetchMoreData = true
             loadResource()
         }
         #if os(iOS)
@@ -176,6 +184,32 @@ struct PlaylistsView: View {
             }
     }
 
+    func loadNextPage() {
+        guard canFetchMoreData else {
+            return	
+        }
+        guard let playlist = currentPlaylist else { return }
+        
+        self.currentPage += 1
+        accounts.api.playlist(playlist.id, page: String(currentPage))?.load().onSuccess {
+            response in
+            if let nextPagePlaylist: Playlist = response.typedContent() {
+                if !nextPagePlaylist.videos.isEmpty {
+                    var updatedPlaylist = self.userPlaylist.item
+                    let currentVideoIDs = Set(updatedPlaylist?.videos.map { $0.videoID } ?? [])
+                    // XXX: Invidious API returns duplicit videos, remove once fixed on Invidious side
+                    let newVideos = nextPagePlaylist.videos.filter { !currentVideoIDs.contains($0.videoID) }
+                    updatedPlaylist?.videos.append(contentsOf: newVideos)
+                    if !newVideos.isEmpty {
+                        self.userPlaylist.replace(updatedPlaylist!)
+                    }
+                } else {
+                    self.canFetchMoreData = false
+                }
+            }
+        }
+    }
+    
     func loadCachedResource() {
         if !selectedPlaylistID.isEmpty,
            let currentPlaylist,
