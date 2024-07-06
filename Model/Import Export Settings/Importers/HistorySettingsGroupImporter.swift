@@ -13,6 +13,18 @@ struct HistorySettingsGroupImporter {
             Defaults[.saveHistory] = saveHistory
         }
 
+        if let showRecents = json["showRecents"].bool {
+            Defaults[.showRecents] = showRecents
+        }
+
+        if let limitRecents = json["limitRecents"].bool {
+            Defaults[.limitRecents] = limitRecents
+        }
+
+        if let limitRecentsAmount = json["limitRecentsAmount"].int {
+            Defaults[.limitRecentsAmount] = limitRecentsAmount
+        }
+
         if let showWatchingProgress = json["showWatchingProgress"].bool {
             Defaults[.showWatchingProgress] = showWatchingProgress
         }
@@ -49,18 +61,6 @@ struct HistorySettingsGroupImporter {
 
         if let showToggleWatchedStatusButton = json["showToggleWatchedStatusButton"].bool {
             Defaults[.showToggleWatchedStatusButton] = showToggleWatchedStatusButton
-        }
-
-        if let showRecents = json["showRecents"].bool {
-            Defaults[.showRecents] = showRecents
-        }
-
-        if let limitRecents = json["limitRecents"].bool {
-            Defaults[.limitRecents] = limitRecents
-        }
-
-        if let limitRecentsAmount = json["limitRecentsAmount"].int {
-            Defaults[.limitRecentsAmount] = limitRecentsAmount
         }
     }
 }

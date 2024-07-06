@@ -10,6 +10,8 @@ final class PlayerSettingsGroupExporter: SettingsGroupExporter {
             "expandVideoDescription": Defaults[.expandVideoDescription],
             "collapsedLinesDescription": Defaults[.collapsedLinesDescription],
             "showChapters": Defaults[.showChapters],
+            "showChapterThumbnails": Defaults[.showChapterThumbnails],
+            "showChapterThumbnailsOnlyWhenDifferent": Defaults[.showChapterThumbnailsOnlyWhenDifferent],
             "expandChapters": Defaults[.expandChapters],
             "showRelated": Defaults[.showRelated],
             "showInspector": Defaults[.showInspector].rawValue,
@@ -18,7 +20,12 @@ final class PlayerSettingsGroupExporter: SettingsGroupExporter {
             "enableReturnYouTubeDislike": Defaults[.enableReturnYouTubeDislike],
             "closePiPOnNavigation": Defaults[.closePiPOnNavigation],
             "closePiPOnOpeningPlayer": Defaults[.closePiPOnOpeningPlayer],
-            "closePlayerOnOpeningPiP": Defaults[.closePlayerOnOpeningPiP]
+            "closePlayerOnOpeningPiP": Defaults[.closePlayerOnOpeningPiP],
+            "captionsAutoShow": Defaults[.captionsAutoShow],
+            "captionsDefaultLanguageCode": Defaults[.captionsDefaultLanguageCode],
+            "captionsFallbackLanguageCode": Defaults[.captionsFallbackLanguageCode],
+            "captionsFontScaleSize": Defaults[.captionsFontScaleSize],
+            "captionsFontColor": Defaults[.captionsFontColor]
         ]
     }
 

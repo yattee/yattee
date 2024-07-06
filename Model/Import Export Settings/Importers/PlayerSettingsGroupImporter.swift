@@ -29,6 +29,14 @@ struct PlayerSettingsGroupImporter {
             Defaults[.showChapters] = showChapters
         }
 
+        if let showChapterThumbnails = json["showChapterThumbnails"].bool {
+            Defaults[.showChapterThumbnails] = showChapterThumbnails
+        }
+
+        if let showChapterThumbnailsOnlyWhenDifferent = json["showChapterThumbnailsOnlyWhenDifferent"].bool {
+            Defaults[.showChapterThumbnailsOnlyWhenDifferent] = showChapterThumbnailsOnlyWhenDifferent
+        }
+
         if let expandChapters = json["expandChapters"].bool {
             Defaults[.expandChapters] = expandChapters
         }
@@ -96,5 +104,25 @@ struct PlayerSettingsGroupImporter {
                 Defaults[.rotateToLandscapeOnEnterFullScreen] = rotateToLandscapeOnEnterFullScreen
             }
         #endif
+
+        if let captionsAutoShow = json["captionsAutoShow"].bool {
+            Defaults[.captionsAutoShow] = captionsAutoShow
+        }
+
+        if let captionsDefaultLanguageCode = json["captionsDefaultLanguageCode"].string {
+            Defaults[.captionsDefaultLanguageCode] = captionsDefaultLanguageCode
+        }
+
+        if let captionsFallbackLanguageCode = json["captionsFallbackLanguageCode"].string {
+            Defaults[.captionsFallbackLanguageCode] = captionsFallbackLanguageCode
+        }
+
+        if let captionsFontScaleSize = json["captionsFontScaleSize"].string {
+            Defaults[.captionsFontScaleSize] = captionsFontScaleSize
+        }
+
+        if let captionsFontColor = json["captionsFontColor"].string {
+            Defaults[.captionsFontColor] = captionsFontColor
+        }
     }
 }

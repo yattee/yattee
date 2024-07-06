@@ -25,8 +25,24 @@ struct AdvancedSettingsGroupImporter {
             Defaults[.mpvCachePauseWait] = mpvCachePauseWait
         }
 
+        if let mpvCachePauseInital = json["mpvCachePauseInital"].bool {
+            Defaults[.mpvCachePauseInital] = mpvCachePauseInital
+        }
+
         if let mpvDeinterlace = json["mpvDeinterlace"].bool {
             Defaults[.mpvDeinterlace] = mpvDeinterlace
+        }
+
+        if let mpvHWdec = json["mpvHWdec"].string {
+            Defaults[.mpvHWdec] = mpvHWdec
+        }
+
+        if let mpvDemuxerLavfProbeInfo = json["mpvDemuxerLavfProbeInfo"].string {
+            Defaults[.mpvDemuxerLavfProbeInfo] = mpvDemuxerLavfProbeInfo
+        }
+
+        if let mpvInitialAudioSync = json["mpvInitialAudioSync"].bool {
+            Defaults[.mpvInitialAudioSync] = mpvInitialAudioSync
         }
 
         if let showCacheStatus = json["showCacheStatus"].bool {

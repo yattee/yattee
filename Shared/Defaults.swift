@@ -106,6 +106,12 @@ extension Defaults.Keys {
         static let closePiPAndOpenPlayerOnEnteringForeground = Key<Bool>("closePiPAndOpenPlayerOnEnteringForeground", default: false)
     #endif
 
+    static let captionsAutoShow = Key<Bool>("captionsAutoShow", default: false)
+    static let captionsDefaultLanguageCode = Key<String>("captionsDefaultLanguageCode", default: LanguageCodes.English.rawValue)
+    static let captionsFallbackLanguageCode = Key<String>("captionsDefaultFallbackCode", default: LanguageCodes.English.rawValue)
+    static let captionsFontScaleSize = Key<String>("captionsFontScale", default: "1.0")
+    static let captionsFontColor = Key<String>("captionsFontColor", default: "#FFFFFF")
+
     // MARK: GROUP - Controls
 
     static let avPlayerUsesSystemControls = Key<Bool>("avPlayerUsesSystemControls", default: true)
@@ -304,13 +310,7 @@ extension Defaults.Keys {
     static let lastPlayed = Key<PlayerQueueItem?>("lastPlayed")
 
     static let activeBackend = Key<PlayerBackendType>("activeBackend", default: .mpv)
-    static let captionsAutoShow = Key<Bool>("captionsAutoShow", default: false)
     static let captionsLanguageCode = Key<String?>("captionsLanguageCode")
-    static let captionsDefaultLanguageCode = Key<String>("captionsDefaultLanguageCode", default: LanguageCodes.English.rawValue)
-    static let captionsFallbackLanguageCode = Key<String>("captionsDefaultFallbackCode", default: LanguageCodes.English.rawValue)
-    static let captionsFontScaleSize = Key<String>("captionsFontScale", default: "1.0")
-    static let captionsFontColor = Key<String>("captionsFontColor", default: "#FFFFFF")
-
     static let lastUsedPlaylistID = Key<Playlist.ID?>("lastPlaylistID")
     static let lastAccountIsPublic = Key<Bool>("lastAccountIsPublic", default: false)
 
