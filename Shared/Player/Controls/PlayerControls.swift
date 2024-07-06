@@ -75,20 +75,16 @@ struct PlayerControls: View {
             }
 
             VStack {
-                Spacer()
                 ZStack {
-                    GeometryReader { geometry in
-                        VStack(spacing: 0) {
-                            ZStack {
-                                OpeningStream()
-                                NetworkState()
-                            }
+                    VStack(spacing: 0) {
+                        ZStack {
+                            OpeningStream()
+                            NetworkState()
                         }
-                        .position(
-                            x: geometry.size.width / 2,
-                            y: geometry.size.height / 2
-                        )
+
+                        Spacer()
                     }
+                    .offset(y: playerControlsLayout.osdVerticalOffset + 5)
 
                     if showControls {
                         Section {

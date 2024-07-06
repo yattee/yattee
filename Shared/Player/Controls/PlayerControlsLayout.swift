@@ -277,6 +277,10 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
         }
     }
 
+    var osdVerticalOffset: Double {
+        buttonSize
+    }
+
     var osdProgressBarHeight: Double {
         switch self {
         case .tvRegular:
