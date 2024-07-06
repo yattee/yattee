@@ -294,3 +294,240 @@
 "Show anonymous accounts" = "Anonieme accounts laten zien";
 "Show channel name" = "Naam van kanaal laten zien";
 "Show history" = "Geschiedenis laten zien";
+"Show keywords" = "Toon sleutelwoorden";
+"Show progress of watching on thumbnails" = "Toon vooruitgang bovenop voorvertoning";
+"Show playback statistics" = "Toon afspeelstatistieken";
+"Show sidebar when space permits" = "Toon zijbalk wanneer de ruimte dit toelaat";
+"Show video length" = "Toon videoduur";
+"Shuffle" = "Shuffle";
+"Shuffle All" = "Shuffle alles";
+"Sidebar" = "Zijbalk";
+"Sign In Required" = "Aanmelden vereist";
+
+/* Player controls layout size */
+"Small" = "Klein";
+
+/* Player controls layout size */
+"Smaller" = "Kleiner";
+"Subscribe" = "Abonneer";
+
+/* Subscriptions title */
+"Subscriptions" = "Abonnementen";
+"Switch to other public location" = "Schakel naar andere publieke locatie";
+"System controls show buttons for %@" = "Knoppen systeemcontrole voor %@";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Dat is fijn om te horen. Het is leuk om apps aan te bieden die mensen willen gebruiken. Je kan een donatie overwegen of een bijdrage leveren in de ontwikkeling van nieuwe functionaliteiten.";
+"This cannot be reverted" = "Dit kan niet ongedaan worden gemaakt";
+"Switch to public locations" = "Schakel naar publieke locatie";
+"System controls buttons" = "Knoppen voor systeemcontrole";
+"This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Dit kan niet ongedaan worden gemaakt. Je zou mogelijks tussen de weergave moeten schakelen of de app opnieuw te openen om de wijzigingen te zien.";
+"This information will be processed only on your device and used to connect you to the server in the specified country." = "Deze informatie zal enkel verwerkt worden binnen het toestel zelf en gebruikt worden om te verbinden met de server in het gekozen land.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Dit zal alle profielen verwijderen en terug naar de initiële waarden brengen. Dit kan niet ongedaan worden gemaakt.";
+"Thumbnails" = "Voorvertoningen";
+
+/* Video date filter in search */
+"Today" = "Vandaag";
+"Trending" = "Trending";
+
+/* Player controls layout size for TV */
+"TV" = "TV";
+"unknown" = "onbekend";
+"Unsubscribe" = "Afmelden";
+"Upload date" = "Datum van opladen";
+"URL" = "URL";
+"Videos" = "Videos";
+
+/* Video sort order in search */
+"Views" = "Views";
+
+/* Selected video is being played */
+"Watching now" = "Aan het bekijken";
+
+/* Video date filter in search */
+"Week" = "Week";
+"Welcome" = "Welkom";
+"When partially watched video is played" = "Wanneer een gedeeltelijk bekeken video wordt afgespeeld";
+"Wi-Fi" = "Wi-Fi";
+"Wiki" = "Wiki";
+"Yattee" = "Yattee";
+"Yattee %@ (build %@)" = "Yattee %@ (build %@)";
+"You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Je kan gebruik maken van een automatische profielselectie gebaseerd op de status van het toestel of maak een keuze in de aspeelinstellingen.";
+"You have no Playlists" = "Je hebt geen afspeellijsten";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "Je hebt geen afspeellijsten\n\nTik op \"Nieuwe afspeellijst\" om er een aan te maken";
+"You need to create an instance and accounts\nto access %@ section" = "Je moet een instance en een account aanmaken\nom toegang te krijgen tot het onderdeel %@";
+"You need to select an account\nto access %@ section" = "Je moet een account selecteren\nom toegang te krijgen tot het onderdeel %@";
+
+
+"Public" = "Publiek";
+"Unlisted" = "Onopgelijst";
+"Now Playing" = "Wordt nu afgespeeld";
+"Current Location" = "Huidige Locatie";
+"Private" = "Privé";
+"Playback queue is empty" = "Afspeellijst is leeg";
+"Playing Next" = "Speelt Hierna";
+"You can switch between profiles in playback settings controls." = "Je kan schakelen tussen profielen via de afspeelinstellingen.";
+"Add Channels, Playlists and Searches to Favorites using" = "Voeg Kanalen, Afspeellijsten en Zoekopdrachten toe aan Favorieten gebruik makend van";
+"Make default" = "Stel in als standaard";
+"Visibility" = "Zichtbaarheid";
+"Current Playlist" = "Huidige Afspeellijst";
+"Stream & Player" = "Stream & Speler";
+"Statistics" = "Statistieken";
+"Hardware decoder" = "Hardware decoder";
+"Stream FPS" = "Stream FPS";
+"Cached time" = "Cache duurtijd";
+"Rate & Captions" = "Beoordelen & Ondertiteling";
+"Dropped frames" = "Verloren frames";
+"Any format" = "Elk formaat";
+"%@ formats" = "%@ formaten";
+"Keep last played video in the queue after restart" = "Behoud de laatst gespeelde video in de afspeellijst na herstart";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Afspeellijst is leeg\n\nTik en houd de video vast en\nkies dan \"Voeg toe aan afspeellijst\"";
+"It can be changed later in settings. You can use your own locations too." = "Dit kan later aangepast worden in de instellingen. Je kan tevens je eigen locatie gebruiken.";
+"Press and hold remote button to open captions and quality menus" = "Tik en houd de knop van de afstandsbediening ingedrukt om het menu van de ondertitelingen en streamkwaliteit te openen";
+"Comments are disabled" = "Commentaar is uitgeschakeld";
+"No comments" = "Geen commentaren";
+"No chapters information available" = "Geen hoofdstukinformatie beschikbaar";
+"Share Logs..." = "Deel logboek…";
+"Open logs in Finder" = "Open logboek in Finder";
+"Channel could not be found" = "Kanaal kan niet gevonden worden";
+"Could not extract channel information" = "Kan geen informatie van het kanaal vinden";
+"Could not extract SID from received cookies: %@" = "Kon de SID niet bepalen van de ontvangen cookies: %@";
+"Could not update your token." = "Kan jouw token niet updaten.";
+"Could not refresh Trending" = "Kon Trending niet verversen";
+"Could not create share link" = "Kon geen link aanmaken om te delen";
+"Could not open playlist" = "Kon de afspeellijst niet openen";
+"Could not extract video ID" = "Kon de video ID niet bepalen";
+"This video could not be opened" = "Deze video kon niet worden geopend";
+"Could not extract playlist ID" = "Kon de playlist ID niet bepalen";
+"No locations available at the moment" = "Geen locaties beschikbaar op dit moment";
+"Could not refresh Playlists" = "Kon de Afspeellijsten niet verversen";
+"If you want this app to be available in your language, join translation project." = "Als je deze app in jouw taal wenst te gebruiken, neem deel aan het vertalingsproject.";
+"Translations" = "Vertalingen";
+"No documents" = "Geen documenten";
+"Recent Documents" = "Recente Documenten";
+"Home" = "Home";
+"Pages buttons" = "Paginas knoppen";
+"Only for local files and URLs" = "Enkel voor lokale bestanden en URLs";
+"Right" = "Rechts";
+"Playback Mode" = "Afspeelmodus";
+"Add" = "Voeg toe";
+"Hide" = "Verberg";
+"Always" = "Altijd";
+"Channels" = "Kanalen";
+"Open Files" = "Open Bestanden";
+"Share" = "Deel";
+"Show icons and text when space permits" = "Toon iconen en tekst wanneer de ruimte dit toelaat";
+"Left" = "Links";
+"Format" = "Formaat";
+"Driver" = "Driver";
+"Show only icons" = "Toon enkel iconen";
+"Audio" = "Audio";
+"File" = "Bestand";
+"Documents" = "Documenten";
+"Video" = "Video";
+"Codec" = "Codec";
+"Size" = "Grootte";
+"FPS" = "FPS";
+"Sample Rate" = "Sample Rate";
+"Could not find any links to open in your clipboard" = "Kon geen links vinden om te openen in het klembord";
+"Address" = "Adres";
+"Show sidebar" = "Toon zijbalk";
+"Locations Manifest" = "Locatie Manifest";
+"Remove Location" = "Verwijder Locatie";
+"Could not delete document" = "Kon het document niet verwijderen";
+"Verified" = "Geverifiëerd";
+"Channel" = "Kanaal";
+"Open expanded" = "Open uitgeklapt";
+"Mark channel feed as unwatched" = "Markeer het kanaal als onbekeken";
+"Mark channel feed as watched" = "Markeer het kanaal als bekeken";
+"Short videos: visible" = "Korte videos: zichtbaar";
+"Player Bar" = "Afspeelbalk";
+"Short videos: hidden" = "Korte videos: verborgen";
+"Play all unwatched" = "Speel alle onbekeken af";
+"Seeking" = "Scrollen";
+"System controls" = "Systeembediening";
+"Controls button: backwards" = "Bedieningsknop: terug";
+
+/* Loading stream OSD */
+"Loading streams…" = "Streams laden…";
+
+/* Loading stream OSD */
+"Opening %@ stream…" = "Stream %@ openen…";
+"Opening audio stream…" = "Audio stream openen…";
+"Sort" = "Sorteer";
+"Sort: %@" = "Sorteer: %@";
+
+/* SponsorBlock category name */
+"Sponsor" = "Sponsor";
+"SponsorBlock" = "SponsorBlock";
+"Source" = "Bron";
+"SponsorBlock API Instance" = "SponsorBlock API Instance";
+"Username" = "Gebruikersnaam";
+
+/* Player controls layout size */
+"Very Large" = "Heel Groot";
+"Watched" = "Bekeken";
+
+/* Selected video was played on given date */
+"Watched %@" = "%@ Bekeken";
+
+/* Video date filter in search */
+"Year" = "Jaar";
+"Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Typisch dicht bij of op het einde van een video wanneer de aftiteling getoond wordt.";
+"Used to create links from videos, channels and playlists" = "Gebruikt om links te maken van videos, kanalen en afspeellijsten";
+"You can find information about using Yattee in the Wiki pages." = "Je vindt informatie over het gebruik van Yattee in de Wiki.";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Deel bestanden van Finder op Mac\nof iTunes op Windows";
+"Show Favorites" = "Toon Favorieten";
+"Inspector visibility" = "Inspector zichtbaarheid";
+"Edit Favorites…" = "Pas Favorieten aan…";
+"Show Open Videos toolbar button" = "Toon Open Videos werkbalkknop";
+"Show Inspector" = "Toon Inspector";
+"Open" = "Open";
+"Open Videos" = "Open Videos";
+"Enter links to open, one per line" = "Voeg links toe om te openen, één per lijn";
+"Could not refresh Subscriptions" = "Kan Abonnementen niet verversen";
+"Show Home" = "Toon Home";
+"Recent History" = "Recente Geschiedenis";
+"Enter link to open" = "Voeg de link in om te openen";
+"Show Open Videos quick actions" = "Toon Open Videos snelle acties";
+"Files" = "Bestanden";
+"Could not open Files" = "Kon Bestanden niet openen";
+"Could not load streams" = "Kan de streams niet laden";
+"Could not open video" = "Kan de video niet openen";
+"Buttons labels" = "Knoppen labels";
+"Show Documents" = "Toon Documenten";
+"Video Details" = "Video Eigenschappen";
+"Clear Queue before opening" = "Maak de wachtrij leeg voor het openen";
+"For custom locations you can configure Frontend URL in Locations settings" = "Voor aangepaste locaties kan je de URL instellen in de locatie instellingen";
+"This URL could not be opened" = "Deze URL kon niet geopend worden";
+"Could not load video" = "Kon de video niet laden";
+"Pages toolbar position" = "Paginas werkbalk positie";
+"Reload manifest" = "Ververs het manifest";
+"Video actions buttons" = "Video actie knoppen";
+"URL to Open" = "URL om te Openen";
+"Paste" = "Plakken";
+"Share%@link" = "Deel %@link";
+"Could not open channel" = "Kan het Kanaal niet openen";
+"Could not refresh Popular" = "Kon Populair niet verversen";
+"Center" = "Midden";
+"Open Video" = "Open Video";
+"Default Profile" = "Standaard Profiel";
+"Playback history is empty" = "Afspeelgeschiedenis is leeg";
+"Shorts" = "Shorts";
+"Double tap gesture" = "Dubbele tik gebaar";
+"Tap and hold channel thumbnail to open context menu with more actions" = "Tik en houd voorvertoningsafbeelding vast om het contextmenu te openen met meer acties";
+"Always show controls buttons" = "Toon altijd bedieningsknoppen";
+"Single tap gesture" = "Enkel tikgebaar";
+"Maximum width expanded" = "Maximale breedte uitgeklapt";
+"Clear all" = "Verwijder alle";
+"Show unwatched feed badges" = "Toon onbekeken feed badges";
+"Controls button: forwards" = "Bedieningsknop: voorwaarts";
+"Remove…" = "Verwijder…";
+"Actions buttons" = "Actieknoppen";
+"\"%@\" will be irreversibly removed from this device." = "\"%@\" zal onherroepelijk verwijderd worden van dit toestel.";
+"Right click channel thumbnail to open context menu with more actions" = "Rechts klikken op voorvertoningsafbeelding om de contextmenu te openen met meer acties";
+"Gesture: backwards" = "Gebaar: achteruit";
+"Copy%@link" = "Kopieer %@link";
+"Live Streams" = "Livestreams";
+"Gesture: fowards" = "Gebaar: voorwaarts";
+"Controls Buttons" = "Bedieningsknoppen";
+"Are you sure you want to remove this document?" = "Ben je zeker om dit document te verwijderen?";
+"Are you sure you want to remove %@ location?" = "Ben je zeker om locatie %a te verwijderen?";
