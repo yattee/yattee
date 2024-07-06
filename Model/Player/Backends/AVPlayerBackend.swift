@@ -542,6 +542,7 @@ final class AVPlayerBackend: PlayerBackend {
                         }
                     }
                 }
+
             case .failed:
                 DispatchQueue.main.async {
                     self.model.playerError = item.error

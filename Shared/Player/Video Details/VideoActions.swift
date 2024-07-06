@@ -164,7 +164,6 @@ struct VideoActions: View {
                     }
                 case .musicMode:
                     actionButton("Music", systemImage: "music.note", active: player.musicMode, action: player.toggleMusicMode)
-
                 case .settings:
                     actionButton("Settings", systemImage: "gear") {
                         withAnimation(ControlOverlaysModel.animation) {
@@ -179,7 +178,6 @@ struct VideoActions: View {
                     actionButton("Hide", systemImage: "chevron.down") {
                         player.hide(animate: true)
                     }
-
                 case .close:
                     actionButton("Close", systemImage: "xmark") {
                         player.closeCurrentItem()

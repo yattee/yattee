@@ -469,6 +469,7 @@ struct FavoriteItemView: View {
         switch item.section {
         case .history:
             return nil
+
         case .subscriptions:
             if accounts.app.supportsSubscriptions {
                 return accounts.api.feed(1)

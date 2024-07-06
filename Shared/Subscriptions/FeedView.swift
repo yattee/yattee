@@ -31,7 +31,7 @@ struct FeedView: View {
 
     @State private var selectedChannel: Channel?
     #if os(tvOS)
-    @FocusState private var focusedChannel: String?
+        @FocusState private var focusedChannel: String?
     #endif
     @State private var feedChannelsViewVisible = false
     private var navigation = NavigationModel.shared
@@ -77,107 +77,107 @@ struct FeedView: View {
             selectedFeedView
         #endif
     }
-    
+
     #if os(tvOS)
-    
-    var accountsPicker: some View {
-        ForEach(accountsModel.sortedAccounts.filter{ $0.anonymous == false }) { account in
-            Button(action: {
-                AccountsModel.shared.setCurrent(account)
-            }) {
-                HStack {
-                    Text("\(account.description) (\(account.instance.app.rawValue))")
-                    if account == accountsModel.currentAccount {
-                        Image(systemName: "checkmark")
+
+        var accountsPicker: some View {
+            ForEach(accountsModel.sortedAccounts.filter { $0.anonymous == false }) { account in
+                Button(action: {
+                    AccountsModel.shared.setCurrent(account)
+                }) {
+                    HStack {
+                        Text("\(account.description) (\(account.instance.app.rawValue))")
+                        if account == accountsModel.currentAccount {
+                            Image(systemName: "checkmark")
+                        }
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
             }
-            .buttonStyle(PlainButtonStyle())
         }
-    }
-    
-    var feedChannelsView: some View {
-        ScrollViewReader { proxy in
-            VStack {
-                Text("Channels")
-                    .font(.subheadline)
-                if #available(tvOS 17.0, *) {
-                    List(selection: $selectedChannel) {
-                        Button(action: {
-                            self.selectedChannel = nil
-                            self.feedChannelsViewVisible = false
-                        }) {
-                            HStack(spacing: 16) {
-                                Image(systemName: RecentsModel.symbolSystemImage("A"))
-                                    .imageScale(.large)
-                                    .foregroundColor(.accentColor)
-                                    .frame(width: 35, height: 35)
-                                Text("All")
-                                Spacer()
-                                feedCount.unwatchedText
-                            }
-                        }
-                        .padding(.all)
-                        .background(RoundedRectangle(cornerRadius: 8.0)
-                            .fill(self.selectedChannel == nil ? Color.secondary : Color.clear))
-                        .font(.caption)
-                        .buttonStyle(PlainButtonStyle())
-                        .focused(self.$focusedChannel, equals: "all")
 
-                        ForEach(channels, id: \.self) { channel in
+        var feedChannelsView: some View {
+            ScrollViewReader { proxy in
+                VStack {
+                    Text("Channels")
+                        .font(.subheadline)
+                    if #available(tvOS 17.0, *) {
+                        List(selection: $selectedChannel) {
                             Button(action: {
-                                self.selectedChannel = channel
+                                self.selectedChannel = nil
                                 self.feedChannelsViewVisible = false
                             }) {
                                 HStack(spacing: 16) {
-                                    ChannelAvatarView(channel: channel, subscribedBadge: false)
-                                        .frame(width: 50, height: 50)
-                                    Text(channel.name)
-                                        .lineLimit(1)
+                                    Image(systemName: RecentsModel.symbolSystemImage("A"))
+                                        .imageScale(.large)
+                                        .foregroundColor(.accentColor)
+                                        .frame(width: 35, height: 35)
+                                    Text("All")
                                     Spacer()
-                                    if let unwatchedCount = feedCount.unwatchedByChannelText(channel) {
-                                        unwatchedCount
-                                    }
+                                    feedCount.unwatchedText
                                 }
                             }
                             .padding(.all)
                             .background(RoundedRectangle(cornerRadius: 8.0)
-                                .fill(self.selectedChannel == channel ? Color.secondary : Color.clear))
+                                .fill(self.selectedChannel == nil ? Color.secondary : Color.clear))
                             .font(.caption)
                             .buttonStyle(PlainButtonStyle())
-                            .focused(self.$focusedChannel, equals: channel.id)
-                        }
-                    }
-                    .onChange(of: self.focusedChannel) {
-                        if self.focusedChannel == "all" {
-                            withAnimation {
-                                self.selectedChannel = nil
+                            .focused(self.$focusedChannel, equals: "all")
+
+                            ForEach(channels, id: \.self) { channel in
+                                Button(action: {
+                                    self.selectedChannel = channel
+                                    self.feedChannelsViewVisible = false
+                                }) {
+                                    HStack(spacing: 16) {
+                                        ChannelAvatarView(channel: channel, subscribedBadge: false)
+                                            .frame(width: 50, height: 50)
+                                        Text(channel.name)
+                                            .lineLimit(1)
+                                        Spacer()
+                                        if let unwatchedCount = feedCount.unwatchedByChannelText(channel) {
+                                            unwatchedCount
+                                        }
+                                    }
+                                }
+                                .padding(.all)
+                                .background(RoundedRectangle(cornerRadius: 8.0)
+                                    .fill(self.selectedChannel == channel ? Color.secondary : Color.clear))
+                                .font(.caption)
+                                .buttonStyle(PlainButtonStyle())
+                                .focused(self.$focusedChannel, equals: channel.id)
                             }
-                        } else if self.focusedChannel == dismiss_channel_list_id {
-                            self.feedChannelsViewVisible = false
-                        } else {
-                            withAnimation {
-                                self.selectedChannel = channels.first {
-                                    $0.id == self.focusedChannel
+                        }
+                        .onChange(of: self.focusedChannel) {
+                            if self.focusedChannel == "all" {
+                                withAnimation {
+                                    self.selectedChannel = nil
+                                }
+                            } else if self.focusedChannel == dismiss_channel_list_id {
+                                self.feedChannelsViewVisible = false
+                            } else {
+                                withAnimation {
+                                    self.selectedChannel = channels.first {
+                                        $0.id == self.focusedChannel
+                                    }
                                 }
                             }
                         }
-                    }
-                    .onAppear {
-                        guard let selectedChannel = self.selectedChannel else {
-                            return
+                        .onAppear {
+                            guard let selectedChannel = self.selectedChannel else {
+                                return
+                            }
+                            proxy.scrollTo(selectedChannel, anchor: .top)
                         }
-                        proxy.scrollTo(selectedChannel, anchor: .top)
-                    }
-                    .onExitCommand {
-                        withAnimation {
-                            self.feedChannelsViewVisible = false
+                        .onExitCommand {
+                            withAnimation {
+                                self.feedChannelsViewVisible = false
+                            }
                         }
                     }
                 }
             }
         }
-    }
     #endif
 
     var selectedFeedView: some View {

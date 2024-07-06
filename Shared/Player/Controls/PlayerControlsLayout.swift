@@ -30,7 +30,6 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
             #else
                 return isIPad
             #endif
-
         case .large:
             return true
         case .medium:
