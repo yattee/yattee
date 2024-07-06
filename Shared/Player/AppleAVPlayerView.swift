@@ -6,6 +6,7 @@ import SwiftUI
     final class AppleAVPlayerViewControllerDelegate: NSObject, AVPlayerViewControllerDelegate {
         #if os(iOS)
             @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
+            @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
             @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
         #endif
 
@@ -17,13 +18,13 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock && player.lockedOrientation.isNil ||
+                    !honorSystemOrientationLock else { return }
+
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
                     Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }

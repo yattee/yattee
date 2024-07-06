@@ -131,6 +131,7 @@ final class PlayerModel: ObservableObject {
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
+        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
     #endif
 
     @Published var currentChapterIndex: Int?
@@ -506,7 +507,7 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if presentingPlayer, activeBackend == .appleAVPlayer, avPlayerUsesSystemControls, Constants.isIPhone {
-                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                Orientation.lockOrientation(.all, andRotateTo: .portrait)
             }
         #endif
 
@@ -532,7 +533,7 @@ final class PlayerModel: ObservableObject {
         if !presentingPlayer {
             #if os(iOS)
                 if Defaults[.lockPortraitWhenBrowsing] {
-                    Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    Orientation.lockOrientation(.all, andRotateTo: .portrait)
                 } else {
                     Orientation.lockOrientation(.allButUpsideDown)
                 }
@@ -782,15 +783,9 @@ final class PlayerModel: ObservableObject {
 
         func lockOrientationAction() {
             if lockedOrientation.isNil {
-                let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
-                lockedOrientation = orientationMask
-                let orientation = OrientationTracker.shared.currentInterfaceOrientation
-                Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
-                // iOS 16 workaround
-                Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
+                lockedOrientation = OrientationTracker.shared.currentInterfaceOrientationMask
             } else {
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
         }
     #endif
@@ -1092,13 +1087,15 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock && lockedOrientation.isNil ||
+                    !honorSystemOrientationLock else { return }
+
                 if currentVideoIsLandscape {
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
                     Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
+
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
