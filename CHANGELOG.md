@@ -1,7 +1,9 @@
-## Build 186
-* tvOS: Refined Subscriptions View by @patelhiren in https://github.com/yattee/yattee/pull/697
-* More responsive UI when Favorites are used. by @stonerl in https://github.com/yattee/yattee/pull/695
-* Improved conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/696
+## Build 187
+* Allow import of accounts to manually added (not imported) instances
+* Add import export of missing settings
+* tvOS: Allow account picker by long pressing channels button in subscriptions view by @patelhiren in https://github.com/yattee/yattee/pull/704
+* macOS: Fix settings windows layout
+* Fix seek OSD layout on tvOS, revert OSD position
 * Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/694
 
 ## Previous builds
@@ -17,6 +19,9 @@
 * History Setting: hide the recent activity in the sidebar or limit the number of items shown (by @rickykresslein)
 * Fix issues with empty comments (by @stonerl)
 * Improved Invidious comments (by @stonerl)
+* tvOS: Refined Subscriptions View by @patelhiren in https://github.com/yattee/yattee/pull/697
+* More responsive UI when Favorites are used. by @stonerl in https://github.com/yattee/yattee/pull/695
+* Improved conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/696
 * Don't show related in sidebar when disabled in settings by @stonerl in https://github.com/yattee/yattee/pull/635
 * Handle audio session interrupts by other media by @stonerl in https://github.com/yattee/yattee/pull/640
 * Only show Queue header in sidebar view by @stonerl in https://github.com/yattee/yattee/pull/642
