@@ -316,19 +316,19 @@ struct SettingsView: View {
             case .browsing:
                 return 800
             case .player:
-                return 550
+                return 800
             case .controls:
                 return 920
             case .quality:
                 return 420
             case .history:
-                return 500
+                return 600
             case .sponsorBlock:
-                return 700
+                return 970
             case .locations:
                 return 600
             case .advanced:
-                return 500
+                return 550
             case .importExport:
                 return 580
             case .help:

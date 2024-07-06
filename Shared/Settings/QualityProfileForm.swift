@@ -57,7 +57,7 @@ struct QualityProfileForm: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .background(Color.background(scheme: colorScheme))
         #else
-            .frame(width: 400, height: 400)
+            .frame(width: 400, height: 450)
             .padding(.vertical, 10)
         #endif
     }
