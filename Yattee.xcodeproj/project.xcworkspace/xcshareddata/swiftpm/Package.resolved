@@ -25,7 +25,7 @@
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
         "branch" : "master",
-        "revision" : "fd97438a85d44aa4f7186145cdba90e3c36f1c94"
+        "revision" : "dff9930c559aa2d1f7ed818d490d30c8852f57a6"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "b8523c1642f3c142b06dd98443ea7c48343a4dfd",
-        "version" : "5.19.3"
+        "revision" : "be0bcd7823ce56629948491f2eaeaa19979514f7",
+        "version" : "5.19.4"
       }
     },
     {
