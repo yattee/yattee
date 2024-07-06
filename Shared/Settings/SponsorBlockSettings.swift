@@ -74,7 +74,7 @@ struct SponsorBlockSettings: View {
                         )
                     )
                 } label: {
-                    Text("Restore Default Colors …")
+                    Text("Restore Default Colors…")
                         .foregroundColor(.red)
                 }
             #endif
