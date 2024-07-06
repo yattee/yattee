@@ -62,7 +62,7 @@ struct ImportSettingsAccountRow: View {
                         }
                     } else {
                         Group {
-                            if InstancesModel.shared.find(instanceID) != nil {
+                            if InstancesModel.shared.find(instanceID) != nil || InstancesModel.shared.findByURLString(account.urlString) != nil {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)

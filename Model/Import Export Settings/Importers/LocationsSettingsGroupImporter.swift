@@ -68,7 +68,7 @@ struct LocationsSettingsGroupImporter {
                     if let password,
                        !password.isEmpty,
                        let instanceID = account.instanceID,
-                       let instance = InstancesModel.shared.find(instanceID)
+                       let instance = InstancesModel.shared.find(instanceID) ?? InstancesModel.shared.findByURLString(account.urlString)
                     {
                         if !instance.accounts.contains(where: { instanceAccount in
                             let (username, _) = instanceAccount.credentials

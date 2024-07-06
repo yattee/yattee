@@ -42,7 +42,7 @@ final class ImportSettingsSheetViewModel: ObservableObject {
 
         return ((account.password != nil && !account.password!.isEmpty) ||
             importableAccounts.contains(account.id)) && (
-            (InstancesModel.shared.find(instanceID) != nil) ||
+            (InstancesModel.shared.find(instanceID) != nil || InstancesModel.shared.findByURLString(account.urlString) != nil) ||
                 selectedInstances.contains(instanceID)
         )
     }
