@@ -13,6 +13,7 @@ final class AccountValidator: Service {
     var isValidated: Binding<Bool>
     var isValidating: Binding<Bool>
     var error: Binding<String?>?
+    var ignoreCertificateError: Binding<Bool>?
 
     private var appsToValidateInstance = VideosApp.allCases
 
@@ -24,7 +25,8 @@ final class AccountValidator: Service {
         isValid: Binding<Bool>,
         isValidated: Binding<Bool>,
         isValidating: Binding<Bool>,
-        error: Binding<String?>? = nil
+        error: Binding<String?>? = nil,
+        ignoreCertificateError: Binding<Bool>? = nil
     ) {
         self.app = app
         self.url = url
@@ -34,8 +36,17 @@ final class AccountValidator: Service {
         self.isValidated = isValidated
         self.isValidating = isValidating
         self.error = error
+        self.ignoreCertificateError = ignoreCertificateError
 
-        super.init(baseURL: url)
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.requestCachePolicy = .reloadIgnoringLocalCacheData
+
+        let customSession = URLSession(configuration: sessionConfig,
+                                       delegate: ignoreCertificateError?.wrappedValue == true ? PermissiveDelegate() : nil,
+                                       delegateQueue: OperationQueue.main)
+
+        super.init(baseURL: url, networking: URLSessionProvider(session: customSession))
+
         configure()
     }
 
@@ -261,5 +272,13 @@ final class AccountValidator: Service {
 
     var neverGonnaGiveYouUp: Resource {
         resource("\(videoResourceBasePath)/dQw4w9WgXcQ")
+    }
+}
+
+final class PermissiveDelegate: NSObject, URLSessionDelegate {
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+        }
     }
 }
