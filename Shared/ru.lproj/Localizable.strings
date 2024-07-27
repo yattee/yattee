@@ -186,7 +186,7 @@
 "Subscribe" = "Подписаться";
 
 /* Subscriptions title */
-"Subscriptions" = "Подписчики";
+"Subscriptions" = "Подписки";
 "Switch to other public location" = "Переключиться на другую публичную локацию";
 "This cannot be reverted" = "Это не может быть отменено";
 "Switch to public locations" = "Переключить публичные локации";
@@ -342,7 +342,7 @@
 /* Video date filter in search */
 "Hour" = "Час";
 "I am lost" = "Я заблудился";
-"I found a bug /" = "Я нашёл баг /";
+"I found a bug /" = "Я нашёл ошибку /";
 "High" = "Высокое";
 "I have a feature request" = "Я придумал новую функцию";
 "I like this app!" = "Мне нравится это приложение!";
@@ -602,3 +602,18 @@
 "Podcasts" = "Подкасты";
 "Releases" = "Релизы";
 "Add %@" = "Добавить %@";
+"Import Settings..." = "Импортировать Настройки...";
+"Export Settings" = "Экспорт настроек";
+"Accounts passwords (unencrypted)" = "Пароли учётных записей (не зашифрованные)";
+"Other" = "Другое";
+"Other data" = "Другие данные";
+"Export..." = "Экспорт…";
+"Export" = "Экспорт";
+"Platform" = "Платформа";
+"Import" = "Импорт";
+"Icon only" = "Только иконка";
+"Icon and text" = "Иконка и текст";
+"File information" = "Информация о файле";
+"Account already exists" = "Учётная запись уже существует";
+"Chapters (if available)" = "Главы (если доступны)";
+"Password saved in import file" = "Пароль сохранён в файле импорта";
