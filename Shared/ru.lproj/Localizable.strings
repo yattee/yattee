@@ -120,7 +120,7 @@
 "%@ Playlist" = "%@ Плейлист";
 "10 seconds forwards/backwards" = "10 секунд вперёд/назад";
 "Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются для приложения на этом инстансе";
-"Add Location..." = "Добавить локацию...";
+"Add Location..." = "Добавить локацию..";
 "Add Quality Profile" = "Добавить профиль качества";
 "Add to Playlist..." = "Добавить к плейлисту...";
 "Advanced" = "Расширенные";
@@ -607,7 +607,7 @@
 "Accounts passwords (unencrypted)" = "Пароли учётных записей (не зашифрованные)";
 "Other" = "Другое";
 "Other data" = "Другие данные";
-"Export..." = "Экспорт…";
+"Export..." = "Экспортировать…";
 "Export" = "Экспорт";
 "Platform" = "Платформа";
 "Import" = "Импорт";
@@ -617,3 +617,15 @@
 "Account already exists" = "Учётная запись уже существует";
 "Chapters (if available)" = "Главы (если доступны)";
 "Password saved in import file" = "Пароль сохранён в файле импорта";
+"Password required to import" = "Для импорта требуется пароль";
+"Other data include last used playback preferences and listing options" = "Другие данные включают в себя использованные предпочтения проигрывания и опции списка";
+"Are you sure you want to export unencrypted passwords?" = "Вы уверенны что хотите экспортировать не зашифрованные пароли?";
+"Do not share this file with anyone or you can lose access to your accounts. If you don't select to export passwords you will be asked to provide them during import" = "Не делитесь этим файлом с кем-либо, иначе вы можете потерять доступ к своим учётным записям. Если вы не выберете экспорт паролей, вас попросят предоставить их во время импорта";
+"Build" = "Сборка";
+"Action button labels" = "Названия кнопок действия";
+"Custom Location already exists" = "Пользовательская локация уже существует";
+"Custom Location selected for import" = "Пользовательская локация выбрана для импорта";
+"Custom Location not selected for import" = "Пользовательская локация не выбрана для импорта";
+"Export in progress..." = "Экспортируем...";
+"In progress..." = "В прогрессе…";
+"Open vertical chapters expanded" = "Открывать вертикальные главы в развернутом положении";
