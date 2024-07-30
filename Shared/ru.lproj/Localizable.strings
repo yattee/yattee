@@ -19,24 +19,24 @@
 "Any" = "Любой";
 "Apply to all" = "Применить ко всем";
 "Are you sure you want to delete playlist?" = "Вы точно хотите удалить плейлист?";
-"Are you sure you want to unsubscribe from %@?" = "Вы точно хотите описаться от %@?";
-"Autoplaying Next" = "Автоматически проигрывать след. видео";
+"Are you sure you want to unsubscribe from %@?" = "Вы точно хотите отписаться от %@?";
+"Autoplaying Next" = "Автоматически воспроизводится следующее";
 "Backend" = "Бэкэнд";
 "Blue" = "Синий";
 "Button" = "Кнопка";
 "Cancel" = "Отмена";
 "Captions" = "Субтитры";
 "Categories to Skip" = "Категории для пропуска";
-"Cellular" = "Через мобильный интернет";
+"Cellular" = "Сотовая связь";
 "Charging" = "Зарядка";
-"Clear All Recents" = "Очистить все последние записи";
+"Clear All Recents" = "Очистить всё последнее";
 "Close" = "Закрыть";
 "Close PiP when player is opened" = "Закрыть К-в-К, когда плеер открыт";
 
 /* Video sort order in search */
 "Date" = "Дата";
 "Decrease rate" = "Снижение уровня";
-"Decreased opacity" = "Уменьшение непрозрачности";
+"Decreased opacity" = "Прозрачностью";
 "Delete" = "Удалить";
 "Donations" = "Донаты";
 "Done" = "Применить";
@@ -119,7 +119,7 @@
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "10 seconds forwards/backwards" = "10 секунд вперёд/назад";
-"Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются для приложения на этом инстансе";
+"Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются приложением для этого сайта";
 "Add Location..." = "Добавить локацию..";
 "Add Quality Profile" = "Добавить профиль качества";
 "Add to Playlist..." = "Добавить к плейлисту...";
@@ -130,16 +130,16 @@
 "Always use AVPlayer for live videos" = "Всегда использовать AVPlayer для прямых трансляций";
 "Are you sure you want to clear search history?" = "Вы точно хотите очистить историю поиска?";
 "Are you sure you want to clear history of watched videos?" = "Вы точно хотите очистить историю просмотренных видео?";
-"Are you sure you want to restore default quality profiles?" = "Вы точно хотите восстановить настройки по умолчанию для профиля качества?";
+"Are you sure you want to restore default quality profiles?" = "Вы точно хотите восстановить изначальные профили качества?";
 "Automatic" = "Автоматически";
-"Badge" = "Оценка";
-"Badge & Decreased opacity" = "Оценка и уменьшенная непрозрачность";
-"Badge color" = "Цвет оценки";
+"Badge" = "Значком";
+"Badge & Decreased opacity" = "Значком и прозрачностью";
+"Badge color" = "Цвет значка";
 "Based on system color scheme" = "Как в системе";
 "Battery" = "Батарея";
-"Browsing" = "В браузере";
-"Buffering stream..." = "Буферизация прямой трансляции...";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Баги и новые идеи можно отправить на трекер проблем на GitHub. ";
+"Browsing" = "Навигация";
+"Buffering stream..." = "Буферизация потока...";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Об ошибках и новых предложениях можно сообщить на GitHub во вкладке Issues. ";
 "Category" = "Категория";
 "Chapters" = "Главы";
 "Clear" = "Очистить";
@@ -301,12 +301,12 @@
 "Close player when starting PiP" = "Закрыть плеер, когда запущен К-в-К";
 "Close video after playing last in the queue" = "Закрыть видео после проигрывания последнего в очереди";
 "Comments" = "Комментарии";
-"Connected successfully (%@)" = "Подключение завершено (%@)";
+"Connected successfully (%@)" = "Подключение успешно (%@)";
 "Contact" = "Контакт";
-"Connection failed" = "Подключение провалено";
+"Connection failed" = "Подключение не удалось";
 "Continue" = "Продолжить";
 "Continue from %@" = "Продолжить с %@";
-"Contributing" = "Контрибуция";
+"Contributing" = "Внести свой вклад";
 "Controls" = "Управления";
 "Copy %@ link" = "Копировать %@ ссылку";
 "Copy %@ link with time" = "Копировать %@ ссылку со временем";
@@ -324,7 +324,7 @@
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Обсуждения проходят в Discord и Matrix. Это хорошие места для общих вопросов.";
 "Don't use public locations" = "Не использовать публичные локации";
 "Duration" = "Продолжительность";
-"Enable logging" = "Включить логирование";
+"Enable logging" = "Включить ведение журнала";
 "Enter fullscreen in landscape" = "Войти в полноэкранный режим в альбомной ориентации";
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Явные напоминания о необходимости поставить лайк, подписаться или взаимодействовать с ними на любой платной или бесплатной платформе (платформах) (например, нажать на видео).";
 "Filter" = "Фильтр";
@@ -381,7 +381,7 @@
 "Lowest" = "Низшее";
 "Mark as watched" = "Оцените видео";
 "Mark video as watched after playing" = "Оцените видео после просмотра";
-"Mark watched videos with" = "Оцените видео с";
+"Mark watched videos with" = "Отметить просмотренные видео";
 "Matrix Channel" = "Канал на Matrix";
 "Matrix Chat" = "Чат на Matrix";
 
@@ -396,7 +396,7 @@
 "No Playlists" = "Без плейлистов";
 "No description" = "Без описания";
 "No results" = "Без результатов";
-"Nothing" = "Ничего";
+"Nothing" = "Ничем";
 "Normal" = "Обычное";
 "Not available" = "Нет доступа";
 "Not Playing" = "Нет просмотров";
@@ -496,7 +496,7 @@
 "Hide player" = "Скрыть плеер";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска двойного щелчка левой/правой стороной проигрывателя. Изменение настроек управления системой требует перезагрузки.";
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска кнопок-стрелок пульта ДУ (для пульта Siri Remote 2-го поколения или новее). Изменение настроек управления системой требует перезагрузки.";
-"Close Video" = "Закрыть Видео";
+"Close Video" = "Закрыть видео";
 "Open channels with description expanded" = "Открытые каналы с расширенным описанием";
 "Show Next in Queue" = "Показать следующее в очереди";
 "Subscribe/Unsubscribe" = "Подписаться/Отписаться";
@@ -543,7 +543,7 @@
 "Description" = "Описание";
 "Loop one" = "Повторить одно";
 "Close video" = "Закрыть видео";
-"Autoplay next" = "Автоплей следующего";
+"Autoplay next" = "Авто-очередь";
 "Stream" = "Прямая трансляция";
 "Show scroll to top button in comments" = "Показать кнопку прокрутки к верху в комментариях";
 "Enter account credentials to connect..." = "Введите данные аккаунта для подключения...";
