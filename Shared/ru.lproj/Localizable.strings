@@ -10,8 +10,8 @@
 "Add Location" = "Добавить локацию";
 "Add profile..." = "Добавить профиль...";
 "Add to %@" = "Добавить к %@";
-"Add to Favorites" = "Добавить к избранному";
-"Add to Playlist" = "Добавить к плейлисту";
+"Add to Favorites" = "Добавить в избранное";
+"Add to Playlist" = "Добавить в плейлист";
 "Anonymous" = "Анонимный";
 
 /* Video date filter in search
@@ -122,7 +122,7 @@
 "Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются приложением для этого сайта";
 "Add Location..." = "Добавить локацию..";
 "Add Quality Profile" = "Добавить профиль качества";
-"Add to Playlist..." = "Добавить к плейлисту...";
+"Add to Playlist..." = "Добавить в плейлист...";
 "Advanced" = "Расширенные";
 
 /* Trending category, section containing all kinds of videos */
@@ -139,7 +139,7 @@
 "Battery" = "Батарея";
 "Browsing" = "Навигация";
 "Buffering stream..." = "Буферизация потока...";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Об ошибках и новых предложениях можно сообщить на GitHub во вкладке Issues. ";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Об ошибках и предложениях сообщайте на странице проекта в GitHub во вкладке Issues. ";
 "Category" = "Категория";
 "Chapters" = "Главы";
 "Clear" = "Очистить";
