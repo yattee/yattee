@@ -16,7 +16,7 @@
 
 /* Video date filter in search
    Video duration filter in search */
-"Any" = "Любой";
+"Any" = "Любая";
 "Apply to all" = "Применить ко всем";
 "Are you sure you want to delete playlist?" = "Вы точно хотите удалить плейлист?";
 "Are you sure you want to unsubscribe from %@?" = "Вы точно хотите отписаться от %@?";
@@ -34,8 +34,8 @@
 "Close PiP when player is opened" = "Закрыть К-в-К, когда плеер открыт";
 
 /* Video sort order in search */
-"Date" = "Дата";
-"Decrease rate" = "Снижение уровня";
+"Date" = "По дате";
+"Decrease rate" = "Снизить скорость";
 "Decreased opacity" = "Прозрачностью";
 "Delete" = "Удалить";
 "Donations" = "Донаты";
@@ -44,11 +44,11 @@
 "Edit Playlist" = "Редактировать плейлист";
 "Edit Quality Profile" = "Редактировать профиль качества";
 "Edit..." = "Редактировать...";
-"Enable Return YouTube Dislike" = "Включить дизлайки";
+"Enable Return YouTube Dislike" = "Включить Return YouTube Dislike";
 "Error" = "Ошибка";
 "Error when accessing playlist" = "Ошибка при доступе к плейлисту";
 "Favorites" = "Избранное";
-"For videos which feature music as the primary content." = "Для видео, в которых музыка используется в качестве основного контента.";
+"For videos which feature music as the primary content." = "Для видео, основным содержанием которых является музыка.";
 "Highest quality" = "Высшее качество";
 "History" = "История";
 "Honor orientation lock" = "Фиксация ориентации Honor";
@@ -75,7 +75,7 @@
 "Share..." = "Поделиться...";
 
 /* Video duration filter in search */
-"Short" = "Короткое";
+"Short" = "Короткая";
 "Show account username" = "Показать никнэйм аккаунта";
 "Show anonymous accounts" = "Показать анонимные аккаунты";
 "Show channel name" = "Показать имя канала";
@@ -115,7 +115,7 @@
 "Open channel" = "Открыть канал";
 "Inspector" = "Инспектор";
 "Open video description expanded" = "Открыть расширенное описание видео";
-" subscribers" = " подписчики";
+" subscribers" = " подписчиков";
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "10 seconds forwards/backwards" = "10 секунд вперёд/назад";
@@ -131,7 +131,7 @@
 "Are you sure you want to clear search history?" = "Вы точно хотите очистить историю поиска?";
 "Are you sure you want to clear history of watched videos?" = "Вы точно хотите очистить историю просмотренных видео?";
 "Are you sure you want to restore default quality profiles?" = "Вы точно хотите восстановить изначальные профили качества?";
-"Automatic" = "Автоматически";
+"Automatic" = "Автоматический";
 "Badge" = "Значком";
 "Badge & Decreased opacity" = "Значком и прозрачностью";
 "Badge color" = "Цвет значка";
@@ -145,7 +145,7 @@
 "Clear" = "Очистить";
 "Clear All" = "Очистить всё";
 "Clear History" = "Очистить историю";
-"Close PiP and open player when application enters foreground" = "Закрыть К-в-К и открыть плеер, когда приложение не в спящем режиме";
+"Close PiP and open player when application enters foreground" = "Закрыть К-в-К и открыть плеер, когда приложение на переднем плане";
 "Clear Search History" = "Очистить историю поиска";
 "Show Open Videos toolbar button" = "Кнопка \"Показать открытые видео\" на панели инструментов";
 "Buttons labels" = "Ярлыки кнопок";
@@ -199,7 +199,7 @@
 "Thumbnails" = "Миниатюры";
 
 /* Video date filter in search */
-"Today" = "Сегодня";
+"Today" = "За сегодня";
 "Trending" = "Тренды";
 
 /* Player controls layout size for TV */
@@ -216,7 +216,7 @@
 "Very Large" = "Очень большой";
 
 /* Video sort order in search */
-"Views" = "Просмотры";
+"Views" = "По просмотрам";
 "Watched" = "Просмотренные";
 
 /* Selected video is being played */
@@ -224,14 +224,14 @@
 "Yattee %@ (build %@)" = "Yattee %@ (сборка %@)";
 
 /* Video date filter in search */
-"Week" = "Неделя";
+"Week" = "За эту неделю";
 "Welcome" = "Добро пожаловать";
 "Wiki" = "Вики";
 "When partially watched video is played" = "При воспроизведении частично просмотренного видео";
 "Yattee" = "Yattee";
 
 /* Video date filter in search */
-"Year" = "Год";
+"Year" = "За этот год";
 "You can find information about using Yattee in the Wiki pages." = "Вы можете найти информацию об использовании Yattee на страницах вики.";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Вы можете использовать автоматический выбор профиля на основе текущего состояния устройства или переключить его в элементах управления настройками воспроизведения видео.";
 "You need to create an instance and accounts\nto access %@ section" = "Вам нужно создать экземпляр и учетные\nзаписи для доступа к разделу %@";
@@ -299,10 +299,10 @@
 "Close PiP when starting playing other video" = "Закрыть К-в-К, когда воспроизводится другое видео";
 "Close player when closing video" = "Закрыть плеер, когда закрывается видео";
 "Close player when starting PiP" = "Закрыть плеер, когда запущен К-в-К";
-"Close video after playing last in the queue" = "Закрыть видео после проигрывания последнего в очереди";
+"Close video after playing last in the queue" = "Закрыть видео после проигрывания очереди";
 "Comments" = "Комментарии";
 "Connected successfully (%@)" = "Подключение успешно (%@)";
-"Contact" = "Контакт";
+"Contact" = "Обратная связь";
 "Connection failed" = "Подключение не удалось";
 "Continue" = "Продолжить";
 "Continue from %@" = "Продолжить с %@";
@@ -319,8 +319,8 @@
 /* Locations settings, custom instance is selected as current */
 "Custom" = "Пользовательские";
 "Custom Locations" = "Пользовательские локации";
-"Disabled" = "Отключить";
-"Discord Server" = "Сервер на Discord";
+"Disabled" = "Отключены";
+"Discord Server" = "Discord сервер";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Обсуждения проходят в Discord и Matrix. Это хорошие места для общих вопросов.";
 "Don't use public locations" = "Не использовать публичные локации";
 "Duration" = "Продолжительность";
@@ -330,17 +330,17 @@
 "Filter" = "Фильтр";
 "Filter: active" = "Фильтр: активен";
 "Finding something to play..." = "Ищу другие видео...";
-"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Форматы будут выбраны в том порядке, как указано в списке.\nHLS - это адаптивный формат (настройка разрешения не применяется).";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Форматы будут выбраны в порядке, указанном в списке.\nHLS - это адаптивный формат (настройка разрешения не применяется).";
 "Find Other" = "Найти другое";
-"Frontend URL" = "URL инстанса";
-"Fullscreen size" = "Размер видео в полноэкранном";
+"Frontend URL" = "Frontend URL";
+"Fullscreen size" = "Полноэкранный размер";
 "Gaming" = "Игры";
 "Help" = "Помощь";
 "Hide sidebar" = "Скрыть боковую панель";
 "Highest" = "Высшее";
 
 /* Video date filter in search */
-"Hour" = "Час";
+"Hour" = "За последний час";
 "I am lost" = "Я заблудился";
 "I found a bug /" = "Я нашёл ошибку /";
 "High" = "Высокое";
@@ -349,7 +349,7 @@
 "I want to ask a question" = "У меня есть вопрос";
 "If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все соответствующие сведения (особенно: версию приложения, используемое устройство и версию системы, как пришли к ошибке).";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Если вам интересно, что будет в будущих обновлениях, вы можете отслеживать этапы проекта.";
-"Increase rate" = "Увеличение скорости";
+"Increase rate" = "Увеличить скорость";
 "Instance of current account" = "Инстанс текущего аккаунта";
 "Interface" = "Интерфейс";
 "Info" = "Информация";
@@ -377,20 +377,20 @@
 "Low quality" = "Низкое качество";
 
 /* Video duration filter in search */
-"Long" = "Длинное";
+"Long" = "Длинная";
 "Lowest" = "Низшее";
 "Mark as watched" = "Оцените видео";
 "Mark video as watched after playing" = "Оцените видео после просмотра";
 "Mark watched videos with" = "Отметить просмотренные видео";
-"Matrix Channel" = "Канал на Matrix";
-"Matrix Chat" = "Чат на Matrix";
+"Matrix Channel" = "Matrix чат";
+"Matrix Chat" = "Matrix чат";
 
 /* Player controls layout size */
 "Medium" = "Среднее";
 "Medium quality" = "Среднее качество";
 
 /* Video date filter in search */
-"Month" = "Месяц";
+"Month" = "За этот месяц";
 "Milestones" = "Этапы проекта";
 "Next" = "Далее";
 "No Playlists" = "Без плейлистов";
@@ -431,10 +431,10 @@
 "Queue" = "Очередь";
 "Quality Profile" = "Профиль качества";
 "Queue is empty" = "Очередь пуста";
-"Rate" = "Оценить";
+"Rate" = "Скорость";
 
 /* Video sort order in search */
-"Rating" = "Рейтинг";
+"Rating" = "По рейтингу";
 "Recents" = "Недавние";
 "Regular size" = "Обычный размер";
 "Red" = "Красный";
@@ -446,7 +446,7 @@
 "Remove from Playlist" = "Стереть из плейлиста";
 
 /* Video sort order in search */
-"Relevance" = "Актуальность";
+"Relevance" = "По релевантности";
 "Remove from the queue" = "Стереть из очереди";
 "Replies" = "Ответы";
 "Reset search filters" = "Поисковые фильтры по умолчанию";
