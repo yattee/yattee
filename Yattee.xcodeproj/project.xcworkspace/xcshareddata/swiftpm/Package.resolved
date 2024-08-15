@@ -1,5 +1,5 @@
 {
-  "originHash" : "9899ef48b3ee49eae175e25421b8330438e40c30a266d96473b299a6ab7c4188",
+  "originHash" : "515d8e68c4a31658288fb3f94789ee539399b042082c08c39f4c03c27fd8860c",
   "pins" : [
     {
       "identity" : "activelabel.swift",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
         "branch" : "master",
-        "revision" : "fd97438a85d44aa4f7186145cdba90e3c36f1c94"
+        "revision" : "d2e8f5a53c601b43371fdc90277d7f64b0e89a25"
       }
     },
     {
@@ -58,9 +58,9 @@
     {
       "identity" : "mpvkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cxfksword/MPVKit.git",
+      "location" : "https://github.com/mpvkit/MPVKit.git",
       "state" : {
-        "revision" : "f646e4b625e9c8a2ff22a7e0bb5557306300be5d",
+        "revision" : "e436a85611a1d34d676304a6eaf7941a7fc55c60",
         "version" : "0.38.0"
       }
     },
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage",
       "state" : {
-        "revision" : "b8523c1642f3c142b06dd98443ea7c48343a4dfd",
-        "version" : "5.19.3"
+        "revision" : "5191b801aca999b704eb93f118f91468b4570571",
+        "version" : "5.19.6"
       }
     },
     {
@@ -182,5 +182,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
