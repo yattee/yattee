@@ -49,7 +49,7 @@
 "Error when accessing playlist" = "Ошибка при доступе к плейлисту";
 "Favorites" = "Избранное";
 "For videos which feature music as the primary content." = "Для видео, основным содержанием которых является музыка.";
-"Highest quality" = "Высшее качество";
+"Highest quality" = "Наивысшее качество";
 "History" = "История";
 "Honor orientation lock" = "Фиксация ориентации Honor";
 "Locations" = "Локации";
@@ -71,7 +71,7 @@
 "Preferred Formats" = "Предпочитаемые форматы";
 "Profiles" = "Профили";
 "Proxy videos" = "Проксировать видео";
-"Related" = "Связанный";
+"Related" = "Похожие";
 "Share..." = "Поделиться...";
 
 /* Video duration filter in search */
@@ -83,7 +83,7 @@
 "Show playback statistics" = "Показать статистику просмотра";
 "Show sidebar when space permits" = "Показать боковую панель, когда позволяет пространство";
 "Show video length" = "Показать длину видео";
-"Shuffle" = "Переместить";
+"Shuffle" = "Перемешать";
 "Sign In Required" = "Требуется войти";
 
 /* Player controls layout size */
@@ -158,9 +158,9 @@
 "Search history is empty" = "История поиска пуста";
 "Search..." = "Поиск...";
 "Sections" = "Разделы";
-"Seek gesture sensitivity" = "Поиск чувствительности к жестам";
-"Seek gesture speed" = "Поиск скорости жеста";
-"Seek with horizontal swipe on video" = "Поиск с помощью горизонтального свайпа по видео";
+"Seek gesture sensitivity" = "Чувствительность горизонтального свайпа";
+"Seek gesture speed" = "Скорость горизонтального свайпа";
+"Seek with horizontal swipe on video" = "Прокручивать видео горизонтальным свайпом";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Сегменты, обычно находящиеся в начале видео и включающие анимацию, стоп-кадр или клип, которые также можно увидеть в других видео того же создателя.";
 "Select location closest to you:" = "Выберите ближайшее к вам местоположение:";
 
@@ -171,7 +171,7 @@
 "Share %@ link" = "Поделиться %@ ссылкой";
 "Show history" = "Показать историю";
 "Show progress of watching on thumbnails" = "Показать прогресс просмотра на миниатюрах";
-"Shuffle All" = "Переместить всё";
+"Shuffle All" = "Перемешать всё";
 "Sidebar" = "Боковая панель";
 "Sort" = "Сортировать";
 
@@ -181,8 +181,8 @@
 
 /* SponsorBlock category name */
 "Sponsor" = "Спонсорская реклама";
-"Source" = "Исходный код";
-"SponsorBlock API Instance" = "Истанс SponsorBlock API";
+"Source" = "Источник";
+"SponsorBlock API Instance" = "Инстанс SponsorBlock API";
 "Subscribe" = "Подписаться";
 
 /* Subscriptions title */
@@ -337,18 +337,18 @@
 "Gaming" = "Игры";
 "Help" = "Помощь";
 "Hide sidebar" = "Скрыть боковую панель";
-"Highest" = "Высшее";
+"Highest" = "Наивысшая";
 
 /* Video date filter in search */
 "Hour" = "За последний час";
 "I am lost" = "Я заблудился";
 "I found a bug /" = "Я нашёл ошибку /";
-"High" = "Высокое";
-"I have a feature request" = "Я придумал новую функцию";
+"High" = "Высокая";
+"I have a feature request" = "У меня есть предложение";
 "I like this app!" = "Мне нравится это приложение!";
 "I want to ask a question" = "У меня есть вопрос";
-"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все соответствующие сведения (особенно: версию приложения, используемое устройство и версию системы, как пришли к ошибке).";
-"If you are interested what's coming in future updates, you can track project Milestones." = "Если вам интересно, что будет в будущих обновлениях, вы можете отслеживать этапы проекта.";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все необходимые сведения (особенно: версию приложения, используемое устройство, версию операционной системы, а также действия, которые вы выполнили, чтобы обнаружить ошибку).";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Если вас интересует будущее проекта, вы можете следить за разработкой на странице GitHub.";
 "Increase rate" = "Увеличить скорость";
 "Instance of current account" = "Инстанс текущего аккаунта";
 "Interface" = "Интерфейс";
@@ -362,25 +362,25 @@
 
 /* SponsorBlock category name */
 "Intro" = "Интро";
-"Issues Tracker" = "Трекер ошибок";
+"Issues Tracker" = "Отслеживание ошибок";
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Большой лайаут подходит не для всех устройств, и ее использование может привести к тому, что элементы управления не поместятся на экране.";
 
 /* Selected video has just finished playing */
-"Just watched" = "Просто наблюдал";
+"Just watched" = "Только что посмотрел";
 "LIVE" = "ПРЯМАЯ ТРАНСЛЯЦИЯ";
 
 /* Loading stream OSD */
 "Loading streams…" = "Загрузка прямой трансляции…";
 "Loading..." = "Загрузка...";
 "Lock portrait mode" = "Блокировка портретного режима";
-"Low" = "Низкое";
+"Low" = "Низкая";
 "Low quality" = "Низкое качество";
 
 /* Video duration filter in search */
 "Long" = "Длинная";
-"Lowest" = "Низшее";
-"Mark as watched" = "Оцените видео";
-"Mark video as watched after playing" = "Оцените видео после просмотра";
+"Lowest" = "Наименьшая";
+"Mark as watched" = "Отметить как просмотренное";
+"Mark video as watched after playing" = "Отметить видео как просмотренное после воспроизведения";
 "Mark watched videos with" = "Отметить просмотренные видео";
 "Matrix Channel" = "Matrix чат";
 "Matrix Chat" = "Matrix чат";
@@ -397,7 +397,7 @@
 "No description" = "Без описания";
 "No results" = "Без результатов";
 "Nothing" = "Ничем";
-"Normal" = "Обычное";
+"Normal" = "Обычная";
 "Not available" = "Нет доступа";
 "Not Playing" = "Нет просмотров";
 "Only when signed in" = "Только после входа в";
@@ -423,7 +423,7 @@
 "Playlist" = "Плейлист";
 "Playlists" = "Плейлисты";
 "Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Список воспроизведения \"%@\" будет удален.\nЭтого не изменить.";
-"Popular" = "Популярность";
+"Popular" = "Популярное";
 "Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Продвижение продукта или услуги, которые непосредственно связаны с самим создателем. Обычно это включает в себя товары или продвижение монетизированных платформ.";
 "Public Manifest" = "Публичный манифест";
 "Quality" = "Качество";
@@ -440,14 +440,14 @@
 "Red" = "Красный";
 "Refresh" = "Обновить";
 "Regular Size" = "Обычный Размер";
-"Remove" = "Стереть";
-"Remove from Favorites" = "Стереть из избранного";
-"Remove from history" = "Стереть из истории";
-"Remove from Playlist" = "Стереть из плейлиста";
+"Remove" = "Удалить";
+"Remove from Favorites" = "Удалить из избранного";
+"Remove from history" = "Удалить из истории";
+"Remove from Playlist" = "Удалить из плейлиста";
 
 /* Video sort order in search */
 "Relevance" = "По релевантности";
-"Remove from the queue" = "Стереть из очереди";
+"Remove from the queue" = "Удалить из очереди";
 "Replies" = "Ответы";
 "Reset search filters" = "Поисковые фильтры по умолчанию";
 "Reset" = "По умолчанию";
