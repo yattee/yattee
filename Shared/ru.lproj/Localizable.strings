@@ -21,7 +21,7 @@
 "Are you sure you want to delete playlist?" = "Вы точно хотите удалить плейлист?";
 "Are you sure you want to unsubscribe from %@?" = "Вы точно хотите отписаться от %@?";
 "Autoplaying Next" = "Автоматически воспроизводится следующее";
-"Backend" = "Бэкэнд";
+"Backend" = "Backend";
 "Blue" = "Синий";
 "Button" = "Кнопка";
 "Cancel" = "Отмена";
@@ -51,7 +51,7 @@
 "For videos which feature music as the primary content." = "Для видео, основным содержанием которых является музыка.";
 "Highest quality" = "Наивысшее качество";
 "History" = "История";
-"Honor orientation lock" = "Фиксация ориентации Honor";
+"Honor orientation lock" = "Учитывать блокировку ориентации";
 "Locations" = "Локации";
 "More info can be found in:" = "Более подробную информацию можно найти в:";
 "Movies" = "Фильмы";
@@ -70,7 +70,7 @@
 "Play Next" = "Играть следующее";
 "Preferred Formats" = "Предпочитаемые форматы";
 "Profiles" = "Профили";
-"Proxy videos" = "Проксировать видео";
+"Proxy videos" = "Использовать прокси для видео";
 "Related" = "Похожие";
 "Share..." = "Поделиться...";
 
@@ -119,7 +119,7 @@
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "10 seconds forwards/backwards" = "10 секунд вперёд/назад";
-"Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются приложением для этого сайта";
+"Accounts are not supported for the application of this instance" = "Аккаунты не поддерживаются приложением для этого инстанса";
 "Add Location..." = "Добавить локацию..";
 "Add Quality Profile" = "Добавить профиль качества";
 "Add to Playlist..." = "Добавить в плейлист...";
@@ -153,7 +153,7 @@
 "Round corners" = "Закругленные углы";
 "Save" = "Сохранить";
 "Save history of played videos" = "Сохранить историю проигранных видео";
-"Save history of searches, channels and playlists" = "Сохранение истории поиска, каналов и плейлистов";
+"Save history of searches, channels and playlists" = "Сохранить истории поиска, каналов и плейлистов";
 "Search" = "Поиск";
 "Search history is empty" = "История поиска пуста";
 "Search..." = "Поиск...";
@@ -189,10 +189,10 @@
 "Subscriptions" = "Подписки";
 "Switch to other public location" = "Переключиться на другую публичную локацию";
 "This cannot be reverted" = "Это не может быть отменено";
-"Switch to public locations" = "Переключить публичные локации";
-"System controls buttons" = "Кнопки управления системой";
-"System controls show buttons for %@" = "Кнопки управления системой для %@";
-"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приятно это слышать. Доставлять приложения, которыми хотят пользоваться другие люди, - это весело. Вы можете рассмотреть возможность пожертвования проекту или помочь, внеся свой вклад в разработку новых функций.";
+"Switch to public locations" = "Переключиться на публичные локации";
+"System controls buttons" = "Системные кнопки управления";
+"System controls show buttons for %@" = "Системные кнопки управления для %@";
+"That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приятно это слышать. Приятно создавать приложения, которыми хотят пользоваться другие люди. Ви можете рассмотреть возможность пожертвовать проекту или помочь, внеся свой непосредственный вклад в разработку приложения.";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Это не может быть отменено. Возможно, вам потребуется переключаться между представлениями или перезапускать приложение, чтобы увидеть изменения.";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "Эта информация будет обрабатываться только на вашем устройстве и использоваться для подключения вас к серверу в указанной стране.";
 "This will remove all your custom profiles and return their default values. This cannot be reverted." = "Это удалит все ваши пользовательские профили и вернет их значения по умолчанию. Это не может быть отменено.";
@@ -234,7 +234,7 @@
 "Year" = "За этот год";
 "You can find information about using Yattee in the Wiki pages." = "Вы можете найти информацию об использовании Yattee на страницах вики.";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Вы можете использовать автоматический выбор профиля на основе текущего состояния устройства или переключить его в элементах управления настройками воспроизведения видео.";
-"You need to create an instance and accounts\nto access %@ section" = "Вам нужно создать экземпляр и учетные\nзаписи для доступа к разделу %@";
+"You need to create an instance and accounts\nto access %@ section" = "Вам нужно создать инстанс и аккаунты\nдля доступа к %@ разделу";
 "You have no Playlists" = "У вас нет плейлистов";
 "You need to select an account\nto access %@ section" = "Вам нужно выбрать учетную\nзапись для доступа к разделу %@";
 
@@ -244,7 +244,7 @@
 "Unlisted" = "По ссылке";
 "Current Location" = "Текущая локация";
 "Private" = "Лично";
-"SponsorBlock" = "СпонсорБлок";
+"SponsorBlock" = "SponsorBlock";
 "Playback queue is empty" = "Очередь воспроизведения пуста";
 "Playing Next" = "Играет дальше";
 "You can switch between profiles in playback settings controls." = "Вы можете переключаться между профилями в элементах управления настройками воспроизведения.";
@@ -269,7 +269,7 @@
 "No comments" = "Комментариев нет";
 "No chapters information available" = "Информация о главах недоступна";
 "Share Logs..." = "Поделиться логами…";
-"Could not load streams" = "Не удалось загрузить прямые трансляции";
+"Could not load streams" = "Не удалось загрузить потоки";
 "Channel could not be found" = "Не удалось найти канал";
 "Could not open video" = "Не удалось открыть видео";
 "Could not extract channel information" = "Не удалось извлечь информацию о канале";
@@ -277,7 +277,7 @@
 "Could not update your token." = "Не удалось обновить ваш токен.";
 "Could not refresh Trending" = "Не удалось обновить тренды";
 "This URL could not be opened" = "Этот URL-адрес не удалось открыть";
-"For custom locations you can configure Frontend URL in Locations settings" = "Для пользовательских местоположений вы можете настроить URL-адрес интерфейса в настройках местоположений";
+"For custom locations you can configure Frontend URL in Locations settings" = "Для пользовательских локаций вы можете настроить Frontend URL в настройках Локации";
 "Could not open channel" = "Не удалось открыть канал";
 "Could not refresh Popular" = "Не удалось обновить вкладку \"Популярность\"";
 "Could not create share link" = "Не удалось создать ссылку для общего доступа";
@@ -297,7 +297,7 @@
 "Inspector visibility" = "Видимость инспектора";
 "Edit Favorites…" = "Редактирование избранного…";
 "Close PiP when starting playing other video" = "Закрыть К-в-К, когда воспроизводится другое видео";
-"Close player when closing video" = "Закрыть плеер, когда закрывается видео";
+"Close player when closing video" = "Закрыть плеер при закрытии видео";
 "Close player when starting PiP" = "Закрыть плеер, когда запущен К-в-К";
 "Close video after playing last in the queue" = "Закрыть видео после проигрывания очереди";
 "Comments" = "Комментарии";
@@ -326,7 +326,7 @@
 "Duration" = "Продолжительность";
 "Enable logging" = "Включить ведение журнала";
 "Enter fullscreen in landscape" = "Войти в полноэкранный режим в альбомной ориентации";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Явные напоминания о необходимости поставить лайк, подписаться или взаимодействовать с ними на любой платной или бесплатной платформе (платформах) (например, нажать на видео).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Явные напоминания о необходимости поставить лайк, подписаться или взаимодействовать с автором на любой платной или бесплатной платформе (платформах) (например, нажать на видео).";
 "Filter" = "Фильтр";
 "Filter: active" = "Фильтр: активен";
 "Finding something to play..." = "Ищу другие видео...";
@@ -347,8 +347,8 @@
 "I have a feature request" = "У меня есть предложение";
 "I like this app!" = "Мне нравится это приложение!";
 "I want to ask a question" = "У меня есть вопрос";
-"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все необходимые сведения (особенно: версию приложения, используемое устройство, версию операционной системы, а также действия, которые вы выполнили, чтобы обнаружить ошибку).";
-"If you are interested what's coming in future updates, you can track project Milestones." = "Если вас интересует будущее проекта, вы можете следить за разработкой на странице GitHub.";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Если вы сообщаете об ошибке, укажите все необходимые сведения (особенно: версию приложения, используемое устройство, версию операционной системы, а также шаги для воспроизведения этой ошибки).";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Если вам интересно, что будет в будущих обновлениях, вы можете следить за вехами (milestones) проекта на его странице GitHub.";
 "Increase rate" = "Увеличить скорость";
 "Instance of current account" = "Инстанс текущего аккаунта";
 "Interface" = "Интерфейс";
@@ -361,18 +361,18 @@
 "Large" = "Большой";
 
 /* SponsorBlock category name */
-"Intro" = "Интро";
+"Intro" = "Заставка";
 "Issues Tracker" = "Отслеживание ошибок";
-"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Большой лайаут подходит не для всех устройств, и ее использование может привести к тому, что элементы управления не поместятся на экране.";
+"Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Большой размер не подходит для всех устройств, и его использование может привести к тому, что элементы управления не поместятся на экране.";
 
 /* Selected video has just finished playing */
 "Just watched" = "Только что посмотрел";
 "LIVE" = "ПРЯМАЯ ТРАНСЛЯЦИЯ";
 
 /* Loading stream OSD */
-"Loading streams…" = "Загрузка прямой трансляции…";
+"Loading streams…" = "Загрузка потока…";
 "Loading..." = "Загрузка...";
-"Lock portrait mode" = "Блокировка портретного режима";
+"Lock portrait mode" = "Блокировать портретный режим";
 "Low" = "Низкая";
 "Low quality" = "Низкое качество";
 
@@ -382,36 +382,36 @@
 "Mark as watched" = "Отметить как просмотренное";
 "Mark video as watched after playing" = "Отметить видео как просмотренное после воспроизведения";
 "Mark watched videos with" = "Отметить просмотренные видео";
-"Matrix Channel" = "Matrix чат";
+"Matrix Channel" = "Matrix канал";
 "Matrix Chat" = "Matrix чат";
 
 /* Player controls layout size */
-"Medium" = "Среднее";
+"Medium" = "Средний";
 "Medium quality" = "Среднее качество";
 
 /* Video date filter in search */
 "Month" = "За этот месяц";
-"Milestones" = "Этапы проекта";
+"Milestones" = "Вехи (Milestones)";
 "Next" = "Далее";
-"No Playlists" = "Без плейлистов";
-"No description" = "Без описания";
-"No results" = "Без результатов";
+"No Playlists" = "Нет плейлистов";
+"No description" = "Нет описания";
+"No results" = "Нет результатов";
 "Nothing" = "Ничем";
 "Normal" = "Обычная";
 "Not available" = "Нет доступа";
-"Not Playing" = "Нет просмотров";
+"Not Playing" = "Не воспроизводится";
 "Only when signed in" = "Только после входа в";
-"Open \"Playlists\" tab to create new one" = "Открыть вкладку \"Плейлисты\", чтобы создать новый";
-"Open Settings" = "Отрыть настройки";
+"Open \"Playlists\" tab to create new one" = "Откройте вкладку \"Плейлисты\", чтобы создать новый";
+"Open Settings" = "Открыть настройки";
 
 /* Loading stream OSD */
-"Opening %@ stream…" = "Открытие %@ прямой трансляции…";
-"Opening audio stream…" = "Открытие прямой трансляции аудио…";
+"Opening %@ stream…" = "Открытие %@ потока…";
+"Opening audio stream…" = "Открытие аудиопотока…";
 "Orientation" = "Ориентация";
 
 /* SponsorBlock category name */
-"Outro" = "Оутро";
-"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Часть видеоролика, рекламирующего продукт или услугу, не имеющие прямого отношения к создателю. Создатель получит оплату или компенсацию в виде денег или бесплатных продуктов.";
+"Outro" = "Концовка";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Часть видеоролика, рекламирующего продукт или услугу, не имеющие прямого отношения к автору. Автор получит оплату или компенсацию в виде денег или бесплатных продуктов.";
 "Pause when player is closed" = "Пауза при закрытии плеера";
 "Picture in Picture" = "Картинка-в-Картинке";
 "Play" = "Играть";
@@ -422,9 +422,9 @@
 "Player" = "Плеер";
 "Playlist" = "Плейлист";
 "Playlists" = "Плейлисты";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Список воспроизведения \"%@\" будет удален.\nЭтого не изменить.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Плейлист \"%@\" будет удалён.\nНавсегда.";
 "Popular" = "Популярное";
-"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Продвижение продукта или услуги, которые непосредственно связаны с самим создателем. Обычно это включает в себя товары или продвижение монетизированных платформ.";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Продвижение продукта или сервис, которые непосредственно связаны с самим создателем. Обычно это связано с продажей товаров или продвижением подписочной платформы.";
 "Public Manifest" = "Публичный манифест";
 "Quality" = "Качество";
 "Public Locations" = "Публичные локации";
@@ -449,9 +449,9 @@
 "Relevance" = "По релевантности";
 "Remove from the queue" = "Удалить из очереди";
 "Replies" = "Ответы";
-"Reset search filters" = "Поисковые фильтры по умолчанию";
+"Reset search filters" = "Сбросить фильтры поиска";
 "Reset" = "По умолчанию";
-"Reset watched status when playing again" = "Статус просмотра при повторном воспроизведении по умолчанию";
+"Reset watched status when playing again" = "Сбросить состояние просмотра при повторном воспроизведении";
 "Restart" = "Перезапустить";
 "Resolution" = "Разрешение";
 "Restart the app to apply the settings above." = "Перезапустите приложение, чтобы применить выбранные настройки.";
@@ -496,7 +496,7 @@
 "Hide player" = "Скрыть плеер";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска двойного щелчка левой/правой стороной проигрывателя. Изменение настроек управления системой требует перезагрузки.";
 "Gesture settings control skipping interval for remote arrow buttons (for 2nd generation Siri Remote or newer). Changing system controls settings requires restart." = "Настройки жестов управляют интервалом пропуска кнопок-стрелок пульта ДУ (для пульта Siri Remote 2-го поколения или новее). Изменение настроек управления системой требует перезагрузки.";
-"Close Video" = "Закрыть видео";
+"Close Video" = "Закрыть Видео";
 "Open channels with description expanded" = "Открытые каналы с расширенным описанием";
 "Show Next in Queue" = "Показать следующее в очереди";
 "Subscribe/Unsubscribe" = "Подписаться/Отписаться";
@@ -531,7 +531,7 @@
 "Disable filters" = "Отключить фильтры";
 "Are you sure you want to remove %@ from Favorites?" = "Вы уверены, что хотите удалить %@ из избранного?";
 "Keep channels with unwatched videos on top of subscriptions list" = "Сохранять каналы с непросмотренными видеороликами в верхней части списка подписок";
-"Show video context menu options to force selected backend" = "Показывать опции контекстного меню видео для принудительного выбора бэкенда";
+"Show video context menu options to force selected backend" = "Показать опции контекстного меню видео для принудительного выбора backend";
 "Play Now in MPV" = "Играть сейчас в MPV";
 "Play Now in AVPlayer" = "Играть сейчас в AVPlayer";
 "Show channel avatars in videos lists" = "Показывать аватары каналов в списках видео";
