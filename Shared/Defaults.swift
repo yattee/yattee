@@ -607,7 +607,7 @@ enum SponsorBlockColors: String {
     case music_offtopic = "#FF9900" // Orange
 
     // Define all cases, can be used to iterate over the colors
-    static let allCases: [SponsorBlockColors] = [.sponsor, .selfpromo, .interaction, .intro, .outro, .preview, .filler, .music_offtopic]
+    static let allCases: [SponsorBlockColors] = [Self.sponsor, Self.selfpromo, Self.interaction, Self.intro, Self.outro, Self.preview, Self.filler, Self.music_offtopic]
 
     // Create a dictionary with the category names as keys and colors as values
     static let dictionary: [String: String] = {

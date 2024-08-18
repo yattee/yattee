@@ -33,7 +33,7 @@ struct TimelineView: View {
     @State private var dragOffset: Double = 0
     @State private var draggedFrom: Double = 0
 
-    private var start: Double = 0.0
+    private var start = 0.0
     private var height = 8.0
 
     var cornerRadius: Double

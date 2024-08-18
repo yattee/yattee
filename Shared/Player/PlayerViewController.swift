@@ -90,8 +90,9 @@ final class PlayerViewController: UIViewController {
             _ sections: [NowPlayingView.ViewSection],
             title: String
         ) -> UIHostingController<AnyView> {
-            let controller = UIHostingController(rootView:
-                AnyView(
+            let controller = UIHostingController(
+                rootView:
+                AnyV‚iew(
                     NowPlayingView(sections: sections, inInfoViewController: true)
                         .frame(maxHeight: 600)
                         .environmentObject(commentsModel)

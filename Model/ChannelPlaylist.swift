@@ -19,7 +19,7 @@ struct ChannelPlaylist: Identifiable {
             "title": title,
             "thumbnailURL": thumbnailURL?.absoluteString ?? "",
             "channel": channel?.json.object ?? "",
-            "videos": videos.map { $0.json.object },
+            "videos": videos.map(\.json.object),
             "videosCount": String(videosCount ?? 0)
         ]
     }

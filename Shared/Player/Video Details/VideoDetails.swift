@@ -208,6 +208,7 @@ struct VideoDetails: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
+            // swiftlint:disable trailing_closure
             #if !os(tvOS)
                 .tapRecognizer(
                     tapSensitivity: 0.2,
@@ -218,6 +219,7 @@ struct VideoDetails: View {
                     }
                 )
             #endif
+            // swiftlint:enable trailing_closure
 
             VideoActions(video: player.videoForDisplay)
                 .padding(.vertical, 5)

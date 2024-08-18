@@ -42,7 +42,7 @@ final class CommentsModel: ObservableObject {
             .comments(video.videoID, page: page)?
             .load()
             .onSuccess { [weak self] response in
-                guard let self = self else { return }
+                guard let self else { return }
                 if let commentsPage: CommentsPage = response.typedContent() {
                     self.all += commentsPage.comments
                     self.nextPage = commentsPage.nextPage

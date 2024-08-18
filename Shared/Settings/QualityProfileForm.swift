@@ -380,7 +380,7 @@ struct QualityProfileForm: View {
     func submitForm() {
         guard valid else { return }
 
-        let activeFormats = orderedFormats.filter { $0.isActive }.map { $0.format }
+        let activeFormats = orderedFormats.filter(\.isActive).map(\.format)
 
         let formProfile = QualityProfile(
             id: qualityProfile?.id ?? UUID().uuidString,

@@ -6,8 +6,10 @@ extension UIViewController {
     }
 
     public class func swizzleHomeIndicatorProperty() {
-        swizzle(origSelector: #selector(getter: UIViewController.prefersHomeIndicatorAutoHidden),
-                withSelector: #selector(getter: UIViewController.swizzle_prefersHomeIndicatorAutoHidden),
-                forClass: UIViewController.self)
+        swizzle(
+            origSelector: #selector(getter: UIViewController.prefersHomeIndicatorAutoHidden),
+            withSelector: #selector(getter: UIViewController.swizzle_prefersHomeIndicatorAutoHidden),
+            forClass: UIViewController.self
+        )
     }
 }

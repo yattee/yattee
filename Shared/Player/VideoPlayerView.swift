@@ -281,7 +281,7 @@ struct VideoPlayerView: View {
                             }
                             .gesture(player.controls.presentingOverlays ? nil : playerDragGesture)
                         #if os(macOS)
-                            .onAppear(perform: {
+                            .onAppear {
                                 NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) {
                                     hoverThrottle.execute {
                                         if !player.currentItem.isNil, hoveringPlayer {
@@ -291,7 +291,7 @@ struct VideoPlayerView: View {
 
                                     return $0
                                 }
-                            })
+                            }
                         #endif
 
                             .background(Color.black)

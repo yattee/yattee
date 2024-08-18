@@ -81,7 +81,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         configureTransformer(pathPattern("search/suggestions"), requestMethods: [.get]) { (content: Entity<JSON>) -> [String] in
             if let suggestions = content.json.dictionaryValue["suggestions"] {
-                return suggestions.arrayValue.map { $0.stringValue.replacingHTMLEntities }
+                return suggestions.arrayValue.map(\.stringValue).map(\.replacingHTMLEntities)
             }
 
             return []

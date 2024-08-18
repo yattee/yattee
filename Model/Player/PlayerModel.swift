@@ -90,7 +90,7 @@ final class PlayerModel: ObservableObject {
     }}
     @Published var aspectRatio = VideoPlayerView.defaultAspectRatio
     @Published var stream: Stream?
-    @Published var currentRate: Double = 1.0 { didSet { handleCurrentRateChange() } }
+    @Published var currentRate = 1.0 { didSet { handleCurrentRateChange() } }
 
     @Published var qualityProfileSelection: QualityProfile? { didSet { handleQualityProfileChange() } }
 

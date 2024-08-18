@@ -61,7 +61,8 @@ final class AppleAVPlayerViewController: UIViewController {
         _ sections: [NowPlayingView.ViewSection],
         title: String
     ) -> UIHostingController<AnyView> {
-        let controller = UIHostingController(rootView:
+        let controller = UIHostingController(
+            rootView:
             AnyView(
                 NowPlayingView(sections: sections, inInfoViewController: true)
                     .frame(maxHeight: 600)

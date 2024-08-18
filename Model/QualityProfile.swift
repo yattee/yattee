@@ -100,7 +100,7 @@ struct QualityProfileBridge: Defaults.Bridge {
             "name": value.name ?? "",
             "backend": value.backend.rawValue,
             "resolution": value.resolution.rawValue,
-            "formats": value.formats.map { $0.rawValue }.joined(separator: Self.formatsSeparator),
+            "formats": value.formats.map(\.rawValue).joined(separator: Self.formatsSeparator),
             "order": value.order.map { String($0) }.joined(separator: Self.formatsSeparator) // New line
         ]
     }

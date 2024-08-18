@@ -152,7 +152,7 @@ struct Channel: Identifiable, Hashable {
             "subscriptionsText": subscriptionsText as Any,
             "totalViews": totalViews as Any,
             "verified": verified as Any,
-            "videos": videos.map { $0.json.object }
+            "videos": videos.map(\.json.object)
         ]
     }
 

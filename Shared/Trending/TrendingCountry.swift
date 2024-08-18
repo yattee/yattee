@@ -6,7 +6,7 @@ struct TrendingCountry: View {
 
     @StateObject private var store = Store(Country.allCases)
 
-    @State private var query: String = ""
+    @State private var query = ""
     @State private var selection: Country?
 
     @Environment(\.colorScheme) private var colorScheme
