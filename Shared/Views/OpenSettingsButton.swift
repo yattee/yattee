@@ -21,12 +21,7 @@ struct OpenSettingsButton: View {
         }
         .buttonStyle(.plain)
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-            button
-                .buttonStyle(.borderedProminent)
-        } else {
-            button
-        }
+        button.buttonStyle(.borderedProminent)
     }
 }
 

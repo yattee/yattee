@@ -212,9 +212,7 @@ final class PlayerModel: ObservableObject {
         pipController = .init(playerLayer: avPlayerBackend.playerLayer)
         pipController?.delegate = pipDelegate
         #if os(iOS)
-            if #available(iOS 14.2, *) {
-                pipController?.canStartPictureInPictureAutomaticallyFromInline = true
-            }
+            pipController?.canStartPictureInPictureAutomaticallyFromInline = true
         #endif
         currentRate = playerRate
     }

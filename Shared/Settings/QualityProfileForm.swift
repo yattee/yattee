@@ -140,10 +140,6 @@ struct QualityProfileForm: View {
                 Text("Formats can be reordered and will be selected in this order.")
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-            } else if #available(iOS 14.0, *) {
-                Text("Formats will be selected in the order they are listed.")
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             } else {
                 Text("Formats will be selected in the order they are listed.")
                     .foregroundColor(.secondary)
@@ -253,13 +249,7 @@ struct QualityProfileForm: View {
             let list = filteredFormatList
 
             Group {
-                if #available(macOS 12.0, *) {
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list
-                        .listStyle(.inset)
-                }
+                list.listStyle(.inset(alternatesRowBackgrounds: true))
             }
             Spacer()
         #else

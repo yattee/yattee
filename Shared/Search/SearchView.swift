@@ -94,12 +94,7 @@ struct SearchView: View {
                     if accounts.app.supportsSearchFilters {
                         filtersMenu
                     }
-
-                    if #available(macOS 12, *) {
-                        FocusableSearchTextField()
-                    } else {
-                        SearchTextField()
-                    }
+                    FocusableSearchTextField()
                 }
             #endif
         }
@@ -179,11 +174,7 @@ struct SearchView: View {
                 searchMenu
             }
             ToolbarItem(placement: .principal) {
-                if #available(iOS 15, *) {
-                    FocusableSearchTextField()
-                } else {
-                    SearchTextField()
-                }
+                FocusableSearchTextField()
             }
         }
         .navigationBarTitleDisplayMode(.inline)

@@ -37,7 +37,7 @@ struct Seek: View {
             #endif
         }
         .opacity(visible || YatteeApp.isForPreviews ? 1 : 0)
-        .animation(.easeIn)
+        .animation(.easeIn, value: visible || YatteeApp.isForPreviews)
     }
 
     var content: some View {

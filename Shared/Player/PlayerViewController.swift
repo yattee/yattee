@@ -57,9 +57,7 @@ final class PlayerViewController: UIViewController {
         playerView.player = playerModel.player
         playerView.allowsPictureInPicturePlayback = true
         #if os(iOS)
-            if #available(iOS 14.2, *) {
-                playerView.canStartPictureInPictureAutomaticallyFromInline = true
-            }
+            playerView.canStartPictureInPictureAutomaticallyFromInline = true
         #endif
         playerView.delegate = self
 

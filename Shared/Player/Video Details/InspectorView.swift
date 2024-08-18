@@ -80,14 +80,10 @@ struct InspectorView: View {
                 .foregroundColor(.secondary)
             Spacer()
             let value = Text(value).lineLimit(1)
-            if #available(iOS 15.0, macOS 12.0, *) {
-                value
-                #if !os(tvOS)
-                .textSelection(.enabled)
-                #endif
-            } else {
-                value
-            }
+            value
+            #if !os(tvOS)
+            .textSelection(.enabled)
+            #endif
         }
         .font(.caption)
     }

@@ -228,15 +228,10 @@ struct CommentView: View {
             #endif
                 .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
-
-            if #available(iOS 15.0, macOS 12.0, *) {
-                text
-                #if !os(tvOS)
-                .textSelection(.enabled)
-                #endif
-            } else {
-                text
-            }
+            text
+            #if !os(tvOS)
+            .textSelection(.enabled)
+            #endif
         }
     }
 

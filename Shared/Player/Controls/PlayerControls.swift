@@ -256,7 +256,7 @@ struct PlayerControls: View {
                 ThumbnailView(url: url)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .transition(.opacity)
-                    .animation(.default)
+                    .animation(.default, value: player.musicMode)
             } else if player.videoForDisplay == nil {
                 Color.black
             }
