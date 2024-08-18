@@ -5,30 +5,30 @@
 "Continue" = "Продовжити";
 
 /* Locations settings, custom instance is selected as current */
-"Custom" = "Своє";
-" subscribers" = " підписники";
+"Custom" = "Користувальницькі";
+" subscribers" = " підписників";
 "%@ Channel" = "%@ Канал";
 "%@ Playlist" = "%@ Плейлист";
 "%@ subscribers" = "%@ підписників";
 "%lld videos" = "%lld відео";
-"10 seconds forwards/backwards" = "Перемотати 10 секунд";
+"10 seconds forwards/backwards" = "10 секунд вперед/назад";
 "Accounts" = "Акаунти";
-"Accounts are not supported for the application of this instance" = "Акаунти не підтримуються для цього екземпляру";
+"Accounts are not supported for the application of this instance" = "Акаунти не підтримуються програмою для цього інстанса";
 "Add Account" = "Додати акаунт";
 "Add Account..." = "Додати акаунт...";
-"Add Location" = "Нова локація (API)";
-"Add Location..." = "Додати локацію...";
+"Add Location" = "Додати локацію (API)";
+"Add Location..." = "Додати локацію..";
 "Add profile..." = "Додати профіль...";
 "Add Quality Profile" = "Додати профіль якості";
 "Add to %@" = "Додати до %@";
-"Add to Favorites" = "Додати в обране";
+"Add to Favorites" = "Додати в улюблене";
 "Add to Playlist" = "Додати в плейлист";
 "Add to Playlist..." = "Додати в плейлист...";
 "Advanced" = "Розширені";
 
 /* Trending category, section containing all kinds of videos */
-"All" = "Все";
-"Anonymous" = "Анонімно";
+"All" = "Всі";
+"Anonymous" = "Анонімний";
 
 /* Video date filter in search
    Video duration filter in search */
@@ -37,46 +37,46 @@
 "Are you sure you want to clear search history?" = "Ви впевнені, що хочете видалити історію пошуку?";
 "Are you sure you want to delete playlist?" = "Ви впевнені, що хочете видалити плейлист?";
 "Are you sure you want to restore default quality profiles?" = "Ви впевнені, що бажаєте відновити стандартні профілі якості?";
-"Automatic" = "Автоматично";
+"Automatic" = "Автоматичний";
 "Autoplaying Next" = "Автовідтворення наступного";
-"Backend" = "Бекенд";
+"Backend" = "Backend";
 "Badge color" = "Колір значка";
-"Based on system color scheme" = "На основі системної кольорової гами";
-"Battery" = "Заряд";
-"Blue" = "Блакитний";
-"Browsing" = "Перегляд";
+"Based on system color scheme" = "Як в системі";
+"Battery" = "Батарея";
+"Blue" = "Синій";
+"Browsing" = "Навігація";
 "Buffering stream..." = "Буферизація потоку..";
 "Button" = "Кнопка";
-"Cancel" = "Скасування";
+"Cancel" = "Скасувати";
 "Captions" = "Субтитри";
 "Continue from %@" = "Продовжити з %@";
 "Contributing" = "Внесок";
-"Could not load locations manifest" = "Не вдається загрузити маніфест локацій";
+"Could not load locations manifest" = "Не вдалося завантажити маніфест локацій";
 "Country" = "Країна";
-"For videos which feature music as the primary content." = "Для відеороликів, основним змістом яких є музика.";
-"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Формати будуть вибиратися в порядку, як зазначено в списку. \nHLS - адаптивний формат (налаштування роздільної здатності не застосовується).";
-"Frontend URL" = "URL-адреса інтерфейсу";
-"Hide sidebar" = "Сховати сайдбар";
+"For videos which feature music as the primary content." = "Для відео, основним змістом яких є музика.";
+"Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Формати будуть обрані в порядку, зазначеному в списку.\nHLS - адаптивний формат (налаштування роздільної здатності не застосовується).";
+"Frontend URL" = "Frontend URL";
+"Hide sidebar" = "Сховати бічну панель";
 "High" = "Висока";
 "Highest" = "Найвища";
 "Highest quality" = "Найвища якість";
 "History" = "Історія";
 
 /* Video date filter in search */
-"Hour" = "Година";
+"Hour" = "За останню годину";
 "I am lost" = "Я загубився";
 "I found a bug /" = "Я знайшов баг /";
-"I have a feature request" = "В мене є пропозиція";
-"I like this app!" = "Мені подобається цей застосунок!";
+"I have a feature request" = "У мене є пропозиція";
+"I like this app!" = "Мені подобається ця програма!";
 "I want to ask a question" = "Хочу задати питання";
-"If you are interested what's coming in future updates, you can track project Milestones." = "Якщо вам цікаво, що буде в наступних оновленнях, ви можете відстежувати етапи проєкту.";
-"Increase rate" = "Підвищити якість";
-"Info" = "Інфо";
-"Instance of current account" = "Экземпляр поточного акаунта";
-"Picture in Picture" = "Картинка в картинці";
+"If you are interested what's coming in future updates, you can track project Milestones." = "Якщо вам цікаво, що буде в наступних оновленнях, ви можете стежити за віхами (milestones) проекту на його сторінці GitHub.";
+"Increase rate" = "Збільшити швидкість";
+"Info" = "Інфомація";
+"Instance of current account" = "Інстанс поточного акаунта";
+"Picture in Picture" = "Картинка-в-картинці";
 "Play" = "Грати";
 "Play All" = "Грати все";
-"Play in PiP" = "Картинка в картинці";
+"Play in PiP" = "Грати в К-в-К";
 "Play Last" = "Грати останнє";
 "Play Music" = "Грати музику";
 "Play Next" = "Грати наступне";
@@ -84,36 +84,36 @@
 "Playback" = "Відтворення";
 "Player" = "Плеєр";
 "Playlist" = "Плейлист";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Плейлист \"%@\" буде видалений. \nЦе не можна буде скасувати.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Плейлист \"%@\" буде видалений.\nЦе не можна буде скасувати.";
 "Playlists" = "Плейлисти";
 "Popular" = "Популярне";
-"Preferred Formats" = "Пріорітетні формати";
+"Preferred Formats" = "Бажані формати";
 "Profiles" = "Профілі";
 "Proxy videos" = "Використовувати проксі";
-"Public Locations" = "Публічні API";
+"Public Locations" = "Публічні API (локації)";
 "Public Manifest" = "Публічний маніфест";
 "Quality" = "Якість";
 "Quality Profile" = "Профіль якості";
 "Queue" = "Черга";
 "Queue is empty" = "Черга порожня";
-"Rate" = "Якість";
+"Rate" = "Швидкість";
 
 /* Video sort order in search */
-"Rating" = "Рейтинг";
+"Rating" = "По рейтингу";
 "Recents" = "Недавні";
 
 /* Video sort order in search */
-"Relevance" = "Відповідність";
+"Relevance" = "По релевантності";
 "Remove" = "Видалити";
 "Remove from Favorites" = "Видалити з улюблених";
-"Remove from history" = "Відалити з історії";
+"Remove from history" = "Видалити з історії";
 "Remove from Playlist" = "Видалити з плейлиста";
 "Remove from the queue" = "Видалити з черги";
 "Replies" = "Відповіді";
 "Thumbnails" = "Мініатюри";
 
 /* Video date filter in search */
-"Today" = "Сьогодні";
+"Today" = "За сьогодні";
 "Trending" = "Тренди";
 
 /* Player controls layout size for TV */
@@ -121,16 +121,16 @@
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Як правило, в кінці відео, коли з'являються титри.";
 "unknown" = "невідомо";
 "Unsubscribe" = "Відписатися";
-"Upload date" = "Загрузити дату";
+"Upload date" = "Дата завантаження";
 "URL" = "URL";
-"Username" = "Імя користувача";
+"Username" = "Ім'я користувача";
 
 /* Player controls layout size */
 "Very Large" = "Дуже великі";
 "Videos" = "Відео";
 
 /* Video sort order in search */
-"Views" = "Перегляди";
+"Views" = "По переглядам";
 "Watched" = "Переглянуто";
 
 /* Selected video was played on given date */
@@ -140,24 +140,24 @@
 "Watching now" = "Дивлюся зараз";
 
 /* Video date filter in search */
-"Week" = "Тиждень";
-"Welcome" = "Привіт";
+"Week" = "За тиждень";
+"Welcome" = "Ласкаво просимо";
 "Wi-Fi" = "Wi-Fi";
 "Wiki" = "Вікі";
 "Yattee %@ (build %@)" = "Yattee %@ (збірка %@)";
 "You have no Playlists" = "У вас немає плейлистів";
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "У вас немає плейлистів\n\nНатісніть \"Новий плейлист\" для створення";
-"You need to create an instance and accounts\nto access %@ section" = "Необхідно створити екземляри і аккаунти\nдля доступу до %@";
-"You need to select an account\nto access %@ section" = "Потрібно вибрати аккаунт\nдля доступу до %@";
+"You need to create an instance and accounts\nto access %@ section" = "Необхідно створити інстанс та акаунти\nдля доступу до %@ розділу";
+"You need to select an account\nto access %@ section" = "Потрібно вибрати акаунт\nдля доступу до %@ розділу";
 
 
 "Public" = "Публічний";
-"Unlisted" = "Прихований";
+"Unlisted" = "За посиланням";
 "Now Playing" = "Зараз грає";
 "Current Location" = "Поточний API (локація)";
-"Private" = "Видимість плейлиста";
+"Private" = "Приватний";
 "Playback queue is empty" = "Черга перегляду порожня";
-"Playing Next" = "Далі";
+"Playing Next" = "Грає далі";
 "You can switch between profiles in playback settings controls." = "Ви можете змінювати профіль під час перегляду.";
 "Make default" = "Зробити стандартним";
 "Visibility" = "Видимість";
@@ -165,16 +165,16 @@
 "Stream & Player" = "Трансляція і відеоплеєр";
 "Hardware decoder" = "Апаратний декодер";
 "Stream FPS" = "FPS трансляції";
-"Rate & Captions" = "Якість і субтитри";
+"Rate & Captions" = "Швидкість і субтитри";
 "Translations" = "Переклади";
 "Could not open playlist" = "Не вдалося відкрити плейлист";
 "Could not extract video ID" = "Не вдалося отримати ID відео";
-"Always use AVPlayer for live videos" = "Використовуйте AVPlayer для live відео";
+"Always use AVPlayer for live videos" = "Завжди використовувати AVPlayer для прямих ефірів";
 "Are you sure you want to clear history of watched videos?" = "Ви впевнені, що хочете очистити історію переглядів?";
 "Country Name or Code" = "Назва або код країни";
 
 /* Video sort order in search */
-"Date" = "Дата";
+"Date" = "По Даті";
 "Discord Server" = "Discord сервер";
 "Are you sure you want to unsubscribe from %@?" = "Ви впевнені, що хочете відписатися від %@?";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Баги та ідеї можна надсилати на GitHub Issues. ";
@@ -182,32 +182,32 @@
 "Done" = "Готово";
 "Create Playlist" = "Створити плейлист";
 "Current: %@\n%@" = "Зараз: %@\n%@";
-"Custom Locations" = "Свої локації";
+"Custom Locations" = "Користувальницькі локації";
 "Copy %@ link with time" = "Копіювати %@ посилання з часом";
-"Decrease rate" = "Знизити рейт";
-"Decreased opacity" = "Зменшена непрозорість";
+"Decrease rate" = "Знизити швидкість";
+"Decreased opacity" = "Прозорістю";
 "Delete" = "Видалити";
 "Disabled" = "Вимкнено";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Дискусії відбуваються в Discord та Matrix. Це гарні місця для загальних питань.";
-"Don't use public locations" = "Не використовуйте публічні локації";
+"Don't use public locations" = "Не використовувати публічні локації";
 "Donations" = "Донати";
 "Duration" = "Тривалість";
 "Gaming" = "Ігри";
-"Fullscreen size" = "На весь екран";
+"Fullscreen size" = "Повноекранний розмір";
 "Help" = "Допомога";
 "Related" = "Схожі";
-"Honor orientation lock" = "Блокування орієнтації";
-"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Якщо ви повідомляєте про помилку, вказуйте всі відповідні деталі (особливо: версію застосунку, використовуваний пристрій, версію системи і кроки для відтворення).";
-"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Просування продукту або послуги, які безпосередньо пов'язані з самим автором. Зазвичай це стосується товарів або просування монетизованих платформ.";
+"Honor orientation lock" = "Враховувати блокування орієнтації";
+"If you are reporting a bug, include all relevant details (especially: app version, used device and system version, steps to reproduce)." = "Якщо ви повідомляєте про баг, вказуйте всі відповідні деталі (особливо: версію застосунку, використовуваний пристрій, версію системи і кроки для відтворення).";
+"Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms." = "Просування продукту або послуги, які безпосередньо пов'язані з самим автором. Зазвичай це стосується товарів або просування підписочної платформи.";
 "Red" = "Червоний";
-"Refresh" = "Поновити";
+"Refresh" = "Оновити";
 "Regular size" = "Звичайний розмір";
-"Regular Size" = "Звичайний розмір";
-"Used to create links from videos, channels and playlists" = "Використовується для створення посилань на відео, канали ті плейлисти";
+"Regular Size" = "Звичайний Розмір";
+"Used to create links from videos, channels and playlists" = "Використовується для створення посилань на відео, канали та плейлисти";
 
 /* Video date filter in search */
-"Year" = "Рік";
-"You can find information about using Yattee in the Wiki pages." = "Додаткову інформацію про Yattee можна знайти на Вікі-сторінках.";
+"Year" = "За рік";
+"You can find information about using Yattee in the Wiki pages." = "Додаткову інформацію про Yattee можна знайти на просторах Вікі.";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Ви можете використовувати автоматичний вибір профілю якості на основі поточного стану пристрою або перемикати його в налаштуваннях відтворення відео.";
 "When partially watched video is played" = "При відтворенні частково переглянутого відео";
 "Yattee" = "Yattee";
@@ -215,8 +215,8 @@
 "Statistics" = "Статистика";
 "Could not create share link" = "Не вдалося створити посилання";
 "Dropped frames" = "Втрата кадрів";
-"Badge" = "Значок";
-"Badge & Decreased opacity" = "Значок та зменшення непрозорості";
+"Badge" = "Значком";
+"Badge & Decreased opacity" = "Значком та прозорістю";
 "Categories to Skip" = "Категорії для пропуску";
 "Category" = "Категорія";
 "Cellular" = "Сотовий зв'язок";
@@ -229,20 +229,20 @@
 "Clear Search History" = "Очистити історію пошуку";
 "Clear Search History..." = "Очистити історію пошуку...";
 "Clear the queue" = "Очистити чергу";
-"Close PiP and open player when application enters foreground" = "Закрийте PiP і відкрийте плеєр, коли застосунок відкриється";
-"Close player when closing video" = "Закрийте плеєр, коли зупините відео";
-"Close player when starting PiP" = "Закрийте плеєр при старті PiP";
+"Close PiP and open player when application enters foreground" = "Закрити К-в-К і відкрити плеєр, коли застосунок на передньому плані";
+"Close player when closing video" = "Закрити плеєр при закритті відео";
+"Close player when starting PiP" = "Закрити плеєр при старті К-в-К";
 "Close Video" = "Закрити відео";
-"Close video after playing last in the queue" = "Закрити відео після завершення останнього відео в черзі";
+"Close video after playing last in the queue" = "Закрити відео після програвання черги";
 "Comments" = "Коментарі";
-"Contact" = "Контакт";
+"Contact" = "Зворотній зв'язок";
 "Error when accessing playlist" = "Помилка при доступі до плейлиста";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Прямі нагадування залишити лайк, підписатися або взаємодіяти з ними на будь-якій платній або безкоштовній платформі (наприклад, натиснути на відео).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Прямі нагадування залишити лайк, підписатися або взаємодіяти з автором на будь-якій платній чи безкоштовній платформі (платформах) (наприклад, натиснути на відео).";
 "Favorites" = "Улюблене";
-"Filter" = "ФІльтер";
-"Filter: active" = "Фільтер: активний";
+"Filter" = "Фільтр";
+"Filter: active" = "Фільтр: активний";
 "Find Other" = "Найти інше";
-"Finding something to play..." = "Знайти, у що пограти...";
+"Finding something to play..." = "Шукаю що відтворити...";
 
 /* SponsorBlock category name */
 "Interaction" = "Взаємодія";
@@ -268,21 +268,21 @@
 "Lowest" = "Найнища";
 "Mark as watched" = "Позначити як переглянуте";
 "Mark video as watched after playing" = "Помітити відео як переглянуте після перегляду";
-"Mark watched videos with" = "Відмітити переглянуті відео з";
+"Mark watched videos with" = "Відмітити переглянуті відео";
 "Matrix Channel" = "Канал Matrix";
 "Matrix Chat" = "Чат Matrix";
 "Medium quality" = "Середня якість";
-"Milestones" = "Етапи";
+"Milestones" = "Віхи (Milestones)";
 
 /* Video date filter in search */
-"Month" = "Місяці";
+"Month" = "За останній місяць";
 "More info can be found in:" = "Більше інформації можна знайти за посиланням:";
 "Movies" = "Фільми";
 "MPV Documentation" = "Документація MPV";
 "Music" = "Музика";
-"Name" = "Імʼя";
+"Name" = "Ім'я";
 "New Playlist" = "Новий плейлист";
-"Next" = "Наступне";
+"Next" = "Далі";
 "No description" = "Без опису";
 "No Playlists" = "Нема плейлистів";
 "No results" = "Без результатів";
@@ -292,19 +292,19 @@
 "Nothing" = "Нічого";
 
 /* SponsorBlock category name */
-"Offtopic in Music Videos" = "Офтоп в музичних кліпах";
+"Offtopic in Music Videos" = "Не по темі в музичних кліпах";
 "Only when signed in" = "Тільки після авторизації";
-"Open \"Playlists\" tab to create new one" = "Відкрийте розділ \"Плейлисти\" для створення нового";
+"Open \"Playlists\" tab to create new one" = "Відкрити розділ \"Плейлисти\" для створення нового";
 "Open Settings" = "Відрити налаштування";
 
 /* Loading stream OSD */
-"Opening %@ stream…" = "Запуск трансляції %@…";
+"Opening %@ stream…" = "Запуск %@ ефіру…";
 "Opening audio stream…" = "Запуск аудіо трансляції…";
 "Orientation" = "Орієнтація";
 
 /* SponsorBlock category name */
 "Outro" = "Кінцівка";
-"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Частина відеоролика, що рекламує товар або послугу, не пов'язану безпосередньо з каналом. Власник каналу отримає оплату або безкоштовної продукції.";
+"Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "Частина відеоролика, що рекламує товар або послугу, не пов'язану безпосередньо з автором. Власник каналу отримає оплату або безкоштовну продукції.";
 "Password" = "Пароль";
 "Pause" = "Пауза";
 "Pause when entering background" = "Пауза при переключенні на фоновий режим";
@@ -315,7 +315,7 @@
 "Restart" = "Перезавантажити";
 "Restart/Play next" = "Перезапустити/Відтворити далі";
 "Restore default profiles..." = "Відновити стандартні профілі...";
-"Rotate to portrait when exiting fullscreen" = "Перехід до портретного режиму при виході з полноекранного режиму";
+"Rotate to portrait when exiting fullscreen" = "Перехід до портретного режиму при виході з повноекранного режиму";
 "Round corners" = "Закруглення кутів";
 "Save" = "Зберегти";
 "Save history of played videos" = "Зберегти історію переглянутих відео";
@@ -326,24 +326,24 @@
 "Sections" = "Розділи";
 "Seek gesture sensitivity" = "Чутливість жестів";
 "Seek gesture speed" = "Швидкість жестів";
-"Seek with horizontal swipe on video" = "Пошук за допомогою горизонтального свайпу на відео";
+"Seek with horizontal swipe on video" = "Прокручувати відео горизонтальним свайпом";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Сегменти, які зазвичай знаходяться на початку відео, що включають анімацію, стоп-кадр або кліп, які також можна побачити в інших відео того ж каналу.";
 "Select location closest to you:" = "Виберіть найблищу локацію:";
 
 /* SponsorBlock category name */
 "Self-promotion" = "Самореклама";
 "Settings" = "Налаштування";
-"Share %@ link" = "Поділитися посиланням %@";
+"Share %@ link" = "Поділитися %@ посиланням";
 "Share..." = "Поділитися...";
 
 /* Video duration filter in search */
 "Short" = "Короткі";
-"Show history" = "Показувати історію";
-"Show keywords" = "Показувати ключові слова";
-"Show playback statistics" = "Показувати статистику переглядів";
-"Show progress of watching on thumbnails" = "Показувати прогрес перегляду на мініатюрі";
-"Show sidebar when space permits" = "Показувати бокову панель, якщо вистачає простору";
-"Show video length" = "Показувати тривалість відео";
+"Show history" = "Відображати історію";
+"Show keywords" = "Відображати ключові слова";
+"Show playback statistics" = "Відображати статистику переглядів";
+"Show progress of watching on thumbnails" = "Відображати прогрес перегляду на мініатюрі";
+"Show sidebar when space permits" = "Відображати бокову панель, якщо вистачає простору";
+"Show video length" = "Відображати тривалість відео";
 "Shuffle" = "Вперемішку";
 "Shuffle All" = "Перемішати все";
 "Sidebar" = "Бокова панель";
@@ -360,23 +360,23 @@
 /* SponsorBlock category name */
 "Sponsor" = "Спонсор";
 "SponsorBlock" = "SponsorBlock";
-"SponsorBlock API Instance" = "Екземпляр API SponsorBlock";
+"SponsorBlock API Instance" = "Інстанс SponsorBlock API";
 "Subscribe" = "Підписатися";
 
 /* Subscriptions title */
 "Subscriptions" = "Підписки";
 "Switch to other public location" = "Переключитися на іншу публічну локацію";
 "Switch to public locations" = "Переключитися на публічні локації";
-"System controls show buttons for %@" = "На елементах керування системою відображаються кнопки %@";
+"System controls show buttons for %@" = "На системних елементах керування відображаються кнопки %@";
 "This cannot be reverted" = "Це не можна буде скасувати";
 "This information will be processed only on your device and used to connect you to the server in the specified country." = "Ця інформація буде оброблятися тільки на вашому пристрої і буде використовуватися для з'єднання вас з сервером в зазначеній країні.";
-"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Це призведе до видалення всіх ваших користувацьких профілів і повернення їхніх значень до стандартних. Це не може бути скасовано.";
+"This will remove all your custom profiles and return their default values. This cannot be reverted." = "Це призведе до видалення всіх ваших користувацьких профілів і повернення їхніх значень до стандартних. Це не можна буде скасувати.";
 "Cached time" = "Час кешування";
 "Any format" = "Будь-який формат";
 "%@ formats" = "%@ формати";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Плейлист порожній\n\nНатисніть і утримуйте кнопку на відео, а потім натисніть на\n\"Додати до плейлиста\"";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "Плейлист порожній\n\nНатисніть і утримуйте на відео, а потім \n\"Додати до плейлиста\"";
 "Press and hold remote button to open captions and quality menus" = "Натисніть і утримуйте кнопку пульта, щоб відкрити меню субтитрів і якості";
-"Comments are disabled" = "Коментування вимкнуто";
+"Comments are disabled" = "Коментарі вимкнені";
 "No comments" = "Коментарі відсутні";
 "No chapters information available" = "Інформація про епізоди відсутня";
 "Share Logs..." = "Поділитися логами…";
@@ -388,19 +388,19 @@
 "Could not update your token." = "Не вдалося оновити ваш токен.";
 "Could not refresh Trending" = "Не вдалося оновити тренди";
 "For custom locations you can configure Frontend URL in Locations settings" = "Для користувацьких локацій ви можете налаштувати Frontend URL в налаштуваннях локацій";
-"Connected successfully (%@)" = "Успішно підключено (%@)";
-"Close PiP when player is opened" = "Закрийте PiP, поки плеєр відкритий";
-"Close PiP when starting playing other video" = "Закрийте PiP, коли починаєте перегляд іншого відео";
+"Connected successfully (%@)" = "Підключено успішно (%@)";
+"Close PiP when player is opened" = "Закрити К-в-К, поки плеєр відкритий";
+"Close PiP when starting playing other video" = "Закрити К-в-К, коли відтворюється інше відео";
 "Connection failed" = "Помилка при підключенні";
-"Enable logging" = "Ввімкнути запис логів";
+"Enable logging" = "Увімкнути ведення журналу";
 "Edit" = "Редагувати";
 "Edit Playlist" = "Редагувати плейлист";
 "Edit Quality Profile" = "Редагувати профіль якості";
 "Edit..." = "Редагувати...";
 "Error" = "Помилка";
 "Large layout is not suitable for all devices and using it may cause controls not to fit on the screen." = "Великий розмір підходить не для всіх пристроїв і його використання може призвести до того, що елементи керування не будуть поміщатися на екрані.";
-"Enable Return YouTube Dislike" = "Ввімкнути повернення дизлайку YouTube";
-"Enter fullscreen in landscape" = "Увімкнути повноекранний режим в горизонтальному положенні";
+"Enable Return YouTube Dislike" = "Увімкнути Return YouTube Dislike";
+"Enter fullscreen in landscape" = "Увійти в повноекранний режим в альбомній орієнтації";
 "Interface" = "Інтерфейс";
 
 /* Video duration filter in search */
@@ -408,15 +408,15 @@
 
 /* Player controls layout size */
 "Medium" = "Середній";
-"Share %@ link with time" = "Поділитися посиланням %@ з часом";
+"Share %@ link with time" = "Поділитися %@ посиланням з часом";
 "Reset watched status when playing again" = "Скинути статус перегляду при повторному відкритті";
-"Show account username" = "Відображати імʼя акаунту";
-"Restart the app to apply the settings above." = "Перезапустіть застосунок, щоб застосувати нові налаштування.";
-"Show anonymous accounts" = "Показувати анонімні акаунти";
-"Show channel name" = "Показувати назву каналу";
+"Show account username" = "Відображати ім'я акаунту";
+"Restart the app to apply the settings above." = "Перезапустіть програму, щоб застосувати нові налаштування.";
+"Show anonymous accounts" = "Відображати анонімні акаунти";
+"Show channel name" = "Відображати назву каналу";
 "Sign In Required" = "Необхідно увійти в систему";
 "It can be changed later in settings. You can use your own locations too." = "Пізніше це можна змінити в налаштуваннях. Ви також можете використовувати власні локації.";
-"System controls buttons" = "Кнопки керування системою";
+"System controls buttons" = "Системні кнопки керування";
 "That's nice to hear. It is fun to deliver apps other people want to use. You can consider donating to the project or help by contributing to new features development." = "Приємно це чути. Створювати застосунки, якими хочуть користуватися інші люди, дуже приємно. Ви можете розглянути можливість пожертвувати кошти на проєкт або допомогти, взявши участь у розробці нових функцій.";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "Це не можна буде скасувати. Можливо, вам доведеться перемкнутися між режимами перегляду або перезапустити застосунок, щоб побачити зміни.";
 "Keep last played video in the queue after restart" = "Залишати останнє проглянуте відео в черзі після перезапуску";
@@ -429,18 +429,18 @@
 "This video could not be opened" = "Не вдалося відкрити відео";
 "Could not load video" = "Не вдалося завантажити відео";
 "No locations available at the moment" = "Зараз немає доступних API (локацій)";
-"Could not refresh Playlists" = "Не вдалося поновити плейлисти";
+"Could not refresh Playlists" = "Не вдалося оновити плейлисти";
 "If you want this app to be available in your language, join translation project." = "Ви можете змінити або створити свій переклад на сторінці проєкту.";
 "No documents" = "Немає документів";
 "Are you sure you want to remove this document?" = "Ви впевнені, що бажаєте видалити цей документ?";
 "Recent Documents" = "Нещодавні документи";
 "Recent History" = "Останнє з історії";
 "Show Open Videos quick actions" = "Показати швидкі дії з відкритими відео";
-"Show Favorites" = "Показати вибране";
+"Show Favorites" = "Показати улюблене";
 "Home" = "Головна";
 "Share files from Finder on a Mac\nor iTunes on Windows" = "Обмін файлами з Finder на Mac\nабо iTunes на Windows";
 "Show Home" = "Показати головну";
-"URL to Open" = "Відкрити посилання";
+"URL to Open" = "Посилання для відкриття";
 "Enter link to open" = "Введіть посилання для відкриття";
 "Video" = "Відео";
 "Sample Rate" = "Частота дискретизації";
@@ -448,7 +448,7 @@
 "Buttons labels" = "Написи на кнопках";
 "Files" = "Файли";
 "Video Details" = "Детальніше про відео";
-"Show Inspector" = "Показати інспектор";
+"Show Inspector" = "Показати інспектора";
 "Reload manifest" = "Перезавантажити маніфест";
 "Clear Queue before opening" = "Очищати чергу перед відкриттям";
 "Open" = "Відкрити";
@@ -479,7 +479,7 @@
 "Playback history is empty" = "Історія перегляду відсутня";
 "Address" = "Адреса";
 "Actions buttons" = "Кнопки дій";
-"Show sidebar" = "Показ сайдбару";
+"Show sidebar" = "Показати бокову панель";
 "Locations Manifest" = "Маніфест локації";
 "Remove Location" = "Видалити локацію";
 "Open Video" = "Відкрити відео";
@@ -494,15 +494,15 @@
 "Right" = "Праворуч";
 "File" = "Файл";
 "Show only icons" = "Показувати тільки іконки";
-"Edit Favorites…" = "Редагувати обране…";
+"Edit Favorites…" = "Редагувати улюблене…";
 "\"%@\" will be irreversibly removed from this device." = "\"%@\" буде безповоротно видалено з цього пристрою.";
 "Could not delete document" = "Не вдалося видалити документ";
-"Are you sure you want to remove %@ location?" = "Ви впевнені, що хочете видалити локацію %@?";
+"Are you sure you want to remove %@ location?" = "Ви впевнені, що хочете видалити %@ локацію?";
 "Live Streams" = "Наживо";
 "Shorts" = "Shorts";
 "Verified" = "Перевірений";
 "Channel" = "Канал";
-"Open expanded" = "Відкрито розширено";
+"Open expanded" = "Відкрити розширенним";
 "Mark channel feed as unwatched" = "Позначити стрiчку каналу не переглянутою";
 "Mark channel feed as watched" = "Позначити стрiчку каналу переглянутою";
 "Short videos: visible" = "Короткi вiдео: виднi";
@@ -517,10 +517,10 @@
 "Clear all" = "Зачистити все";
 "Right click channel thumbnail to open context menu with more actions" = "Клацніть правою кнопкою миші на мініатюрі каналу, щоб відкрити контекстне меню з іншими діями";
 "Show unwatched feed badges" = "Показати бейджики непроглянутих стрічок";
-"Seeking" = "У пошуках";
+"Seeking" = "Прокрутка";
 "Gesture: fowards" = "Жест: вперед";
 "Controls Buttons" = "Кнопки керування";
-"System controls" = "Керування системою";
+"System controls" = "Системні елементи керування";
 "Controls button: backwards" = "Кнопка керування: назад";
 "Controls button: forwards" = "Кнопка керування: вперед";
 "Gesture: backwards" = "Жест: назад";
@@ -552,18 +552,80 @@
 "Open channel" = "Відкрити канал";
 "Inspector" = "Інспектор";
 "Open video description expanded" = "Відкрити опис відео розширено";
-"Mark all as unwatched" = "Позначити всі не переклянутими";
+"Mark all as unwatched" = "Позначити всі не переглянутими";
 "Mark all as watched" = "Позначити всі переглянутими";
 "Queue - shuffled" = "Черга - перемішана";
 "Playback Settings" = "Налаштування відтворення";
 "Replay" = "Повтор";
 "Fullscreen" = "Повний екран";
-"Lock" = "Замок";
+"Lock" = "Заблокувати";
 "Description" = "Опис";
-"Loop one" = "Цикл один";
+"Loop one" = "Зациклити відео";
 "Autoplay next" = "Автовідтворення далі";
 "Stream" = "Потік";
 "Enter account credentials to connect..." = "Введіть облікові дані для з'єднання...";
-"Seek" = "Шукати";
+"Seek" = "Перемотати відео вперед/назад";
 "Show scroll to top button in comments" = "Показати кнопку прокрутки вгору в коментарях";
-"Enter location address to connect..." = "Введіть адресу розташування для з'єднання...";
+"Enter location address to connect..." = "Введіть адресу локації для з'єднання...";
+"Import Settings..." = "Імпортувати налаштування...";
+"Export Settings" = "Експортувати налаштування";
+"Accounts passwords (unencrypted)" = "Паролі акаунтів (не зашифровані)";
+"Other" = "Інше";
+"Other data" = "Інші дані";
+"Other data include last used playback preferences and listing options" = "Інші дані містять у собі налаштування останнього відтворення та параметри списку";
+"File information" = "Інформація про файл";
+"Build" = "Збірка";
+"Import" = "Імпорт";
+"Action button labels" = "Написи кнопок дій";
+"Icon and text" = "Іконка і текст";
+"Platform" = "Платформа";
+"Password required to import" = "Для імпорту потрібен пароль";
+"Custom Location not selected for import" = "Користувацька локація не обрана для імпорту";
+"Custom Location already exists" = "Користувацька локація вже існує";
+"Custom Location selected for import" = "Користувацька локація обрана для імпорту";
+"Account already exists" = "Акаунт уже існує";
+"Password saved in import file" = "Пароль збережений у файлі імпорту";
+"Export in progress..." = "Експорт у процесі...";
+"In progress..." = "У процесі…";
+"Play Now in AVPlayer" = "Грати зараз в AVPlayer";
+"Opening file…" = "Відкриваю файл…";
+"Show channel avatars in videos lists" = "Показати аватари каналів у списках відео";
+"Keep channels with unwatched videos on top of subscriptions list" = "Тримати канали з непроглянутими відео у верхній частині списку підписок";
+"Show video context menu options to force selected backend" = "Показати опції контекстного меню відео для примусового вибору backend";
+"Play Now in MPV" = "Грати зараз в MPV";
+"Description preview" = "Попередній перегляд опису";
+"No preview" = "Без попереднього перегляду";
+"Open vertical chapters expanded" = "Відкривати вертикальні розділи розгорнутими";
+"Chapters (if available)" = "Розділи (якщо доступні)";
+"Opened File" = "Відкритий файл";
+"File Extension" = "Розширення файлу";
+"Close video and player on end" = "Закрити відео і плеєр в кінці";
+"Public account" = "Публічний акаунт";
+"Browse without account" = "Дивитися без акаунта";
+"Landscape left" = "Альбомна орієнтація зліва";
+"Landscape right" = "Альбомна орієнтація праворуч";
+"Use system controls with AVPlayer" = "Використовувати системні елементи керування за допомогою AVPlayer";
+"Your Accounts" = "Ваші акаунти";
+"Rotate when entering fullscreen on landscape video" = "Повертати під час переходу в повноекранний режим в альбомній орієнтації";
+"No rotation" = "Без поворотів";
+"Show channel avatars in channels lists" = "Показувати аватари каналів у списках каналів";
+"Export..." = "Експортувати…";
+"Are you sure you want to export unencrypted passwords?" = "Ви впевнені, що хочете експортувати не зашифровані паролі?";
+"Icon only" = "Тільки іконка";
+"Do not share this file with anyone or you can lose access to your accounts. If you don't select to export passwords you will be asked to provide them during import" = "Не передавайте цей файл нікому, інакше ви можете втратити доступ до своїх акаунтів. Якщо ви не виберете експорт паролів, вам буде запропоновано ввести їх під час імпорту";
+"Export" = "Експорт";
+"Available" = "Доступно";
+"Startup section" = "Початковий розділ";
+"Home Settings" = "Налаштування головної";
+"Watched: hidden" = "Переглянуті: сховані";
+"Watched: visible" = "Переглянуті: показані";
+"(watched and shorts hidden)" = "(переглянуті та shorts сховані)";
+"Disable filters" = "Вимкнути фільтри";
+"No videos to show" = "Немає відео для показу";
+"(watched hidden)" = "(переглянуті сховані)";
+"(shorts hidden)" = "(shorts сховані)";
+"Limit" = "Ліміт";
+"Are you sure you want to remove %@ from Favorites?" = "Ви впевнені, що хочете видалити %@ з улюбленого?";
+"Podcasts" = "Подкасти";
+"Releases" = "Релізи";
+"Add %@" = "Додати %@";
