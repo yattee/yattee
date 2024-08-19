@@ -19,7 +19,7 @@ struct VideoPlayerView: View {
         static let hiddenOffset = 0.0
     #endif
 
-    static let defaultAspectRatio = 16 / 9.0
+    static let defaultAspectRatio = Constants.aspectRatio16x9
     static var defaultMinimumHeightLeft: Double {
         #if os(macOS)
             335

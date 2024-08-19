@@ -440,7 +440,7 @@ struct VideoCell: View {
             #endif
         }
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
-        .modifier(AspectRatioModifier())
+        .aspectRatio(Constants.aspectRatio16x9, contentMode: .fill)
     }
 
     private var time: String? {
@@ -471,24 +471,6 @@ struct VideoCell: View {
             .lineLimit(lineLimit)
             .truncationMode(.middle)
     }
-
-    struct AspectRatioModifier: ViewModifier {
-        @Environment(\.horizontalCells) private var horizontalCells
-
-        func body(content: Content) -> some View {
-            Group {
-                if horizontalCells {
-                    content
-                } else {
-                    content
-                        .aspectRatio(
-                            VideoPlayerView.defaultAspectRatio,
-                            contentMode: .fill
-                        )
-                }
-            }
-        }
-    }
 }
 
 struct VideoCellThumbnail: View {
@@ -496,7 +478,15 @@ struct VideoCellThumbnail: View {
     @ObservedObject private var thumbnails = ThumbnailsModel.shared
 
     var body: some View {
-        ThumbnailView(url: thumbnails.best(video))
+        GeometryReader { geometry in
+            let (url, quality) = thumbnails.best(video)
+            let aspectRatio = (quality == .default || quality == .high) ? Constants.aspectRatio4x3 : Constants.aspectRatio16x9
+
+            ThumbnailView(url: url)
+                .aspectRatio(aspectRatio, contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+        }
     }
 }
 

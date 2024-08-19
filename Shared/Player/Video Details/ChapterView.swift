@@ -65,7 +65,7 @@ import SwiftUI
         }
 
         static var thumbnailHeight: Double {
-            thumbnailWidth / (16 / 9)
+            thumbnailWidth / Constants.aspectRatio16x9
         }
     }
 
@@ -119,7 +119,7 @@ import SwiftUI
         }
 
         static var thumbnailHeight: Double {
-            thumbnailWidth / 1.7777
+            thumbnailWidth / Constants.aspectRatio16x9
         }
     }
 #endif

@@ -462,12 +462,14 @@ enum ButtonLabelStyle: String, CaseIterable, Defaults.Serializable {
 }
 
 enum ThumbnailsQuality: String, CaseIterable, Defaults.Serializable {
-    case highest, medium, low
+    case highest, high, medium, low
 
     var description: String {
         switch self {
         case .highest:
-            return "Highest quality".localized()
+            return "Best quality".localized()
+        case .high:
+            return "High quality".localized()
         case .medium:
             return "Medium quality".localized()
         case .low:

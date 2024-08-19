@@ -265,7 +265,7 @@ struct PlayerControls: View {
 
     var controlsBackgroundURL: URL? {
         if let video = player.videoForDisplay,
-           let url = thumbnails.best(video)
+           let url = thumbnails.best(video).url
         {
             return url
         }

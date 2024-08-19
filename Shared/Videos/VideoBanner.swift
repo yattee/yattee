@@ -219,20 +219,16 @@ struct VideoBanner: View {
         return watch!.finished ? 0.5 : 1
     }
 
-    private var thumbnailWidth: Double {
-        #if os(tvOS)
-            356
-        #else
-            120
-        #endif
-    }
-
     private var thumbnailHeight: Double {
         #if os(tvOS)
             200
         #else
-            72
+            75
         #endif
+    }
+
+    private var thumbnailWidth: Double {
+        thumbnailHeight * Constants.aspectRatio16x9
     }
 
     private var videoDurationLabel: String? {
