@@ -34,26 +34,27 @@ struct ChannelsView: View {
                         Text(channel.name)
                             .lineLimit(1)
                     }
-                    .backport
+                    #if !os(tvOS)
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedByChannelText(channel) : nil)
+                    #endif
 
                     Group {
                         #if os(tvOS)
-                            Button {
-                                navigation.openChannel(channel, navigationStyle: .tab)
-                            } label: {
-                                label
-                            }
+                        Button {
+                            navigation.openChannel(channel, navigationStyle: .tab)
+                        } label: {
+                            label
+                        }
                         #else
-                            Button {
-                                channelForLink = channel
-                                channelLinkActive = channelForLink != nil
-                            } label: {
-                                label
-                                    .contentShape(Rectangle())
-                                    .foregroundColor(.primary)
-                            }
-                            .buttonStyle(.plain)
+                        Button {
+                            channelForLink = channel
+                            channelLinkActive = channelForLink != nil
+                        } label: {
+                            label
+                                .contentShape(Rectangle())
+                                .foregroundColor(.primary)
+                        }
+                        .buttonStyle(.plain)
                         #endif
                     }
                     .contextMenu {
@@ -94,9 +95,8 @@ struct ChannelsView: View {
                 refreshControl.endRefreshing()
             }
         }
-        .backport
         .refreshable {
-            await subscriptions.load(force: true)
+            subscriptions.load(force: true)
         }
         #endif
         #if !os(tvOS)
@@ -125,7 +125,7 @@ struct ChannelsView: View {
     var header: some View {
         HStack {
             #if os(tvOS)
-                SubscriptionsPageButton()
+            SubscriptionsPageButton()
             #endif
 
             if showCacheStatus {
@@ -138,17 +138,17 @@ struct ChannelsView: View {
             }
 
             #if os(tvOS)
-                if !showCacheStatus {
-                    Spacer()
-                }
-                Button {
-                    subscriptions.load(force: true)
-                } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
-                        .labelStyle(.iconOnly)
-                        .imageScale(.small)
-                        .font(.caption)
-                }
+            if !showCacheStatus {
+                Spacer()
+            }
+            Button {
+                subscriptions.load(force: true)
+            } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+                    .labelStyle(.iconOnly)
+                    .imageScale(.small)
+                    .font(.caption)
+            }
 
             #endif
         }

@@ -100,7 +100,6 @@ struct TrendingView: View {
                 refreshControl.endRefreshing()
             }
         }
-        .backport
         .refreshable {
             DispatchQueue.main.async {
                 resource.load()

@@ -192,9 +192,8 @@ struct FeedView: View {
                     refreshControl.endRefreshing()
                 }
             }
-            .backport
             .refreshable {
-                await feed.loadResources(force: true)
+                feed.loadResources(force: true)
             }
         #endif
         #if !os(tvOS)

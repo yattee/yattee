@@ -35,7 +35,6 @@ struct DocumentsView: View {
         .navigationTitle(directoryLabel)
         .padding(.horizontal)
         .navigationBarTitleDisplayMode(RefreshControl.navigationBarTitleDisplayMode)
-        .backport
         .refreshable {
             DispatchQueue.main.async {
                 self.refresh()

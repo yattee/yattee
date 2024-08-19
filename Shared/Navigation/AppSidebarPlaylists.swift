@@ -38,7 +38,6 @@ struct AppSidebarPlaylists: View {
 
         if accounts.app.userPlaylistsEndpointIncludesVideos, !playlist.videos.isEmpty {
             label
-                .backport
                 .badge(Text("\(playlist.videos.count)"))
         } else {
             label

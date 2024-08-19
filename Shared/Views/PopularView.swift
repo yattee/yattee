@@ -54,7 +54,6 @@ struct PopularView: View {
             .onFailure { self.error = $0 }
             .onSuccess { _ in self.error = nil }
         }
-        .backport
         .refreshable {
             DispatchQueue.main.async {
                 resource?.load()

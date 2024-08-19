@@ -84,7 +84,6 @@ struct Sidebar: View {
                         Label("Subscriptions", systemImage: "star.circle")
                             .accessibility(label: Text("Subscriptions"))
                     }
-                    .backport
                     .badge(showUnwatchedFeedBadges ? feedCount.unwatchedText : nil)
                     .contextMenu {
                         playUnwatchedButton
