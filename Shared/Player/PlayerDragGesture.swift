@@ -32,8 +32,12 @@ extension VideoPlayerView {
                 let horizontalDrag = value.translation.width
 
                 #if os(iOS)
-                    if viewDragOffset > 0, !isVerticalDrag {
-                        isVerticalDrag = true
+                    // Detect if the gesture starts within the top 5% of the screen and the player is in fullscreen mode
+                    if value.startLocation.y <= UIScreen.main.bounds.height * 0.05, PlayerModel.shared.playingFullScreen {
+                        // If it's a downward swipe, do nothing (return early)
+                        if verticalDrag > 0, abs(verticalDrag) > abs(horizontalDrag) {
+                            return
+                        }
                     }
                 #endif
 
