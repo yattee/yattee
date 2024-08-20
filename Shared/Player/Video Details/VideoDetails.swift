@@ -47,6 +47,9 @@ struct VideoDetails: View {
                 .frame(width: 40, height: 40)
                 .buttonStyle(.plain)
                 .padding(.trailing, 5)
+                .simultaneousGesture(
+                    TapGesture() // Ensures the button tap is recognized
+                )
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
@@ -209,9 +212,8 @@ struct VideoDetails: View {
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
             #if !os(tvOS)
-                .tapRecognizer(
-                    tapSensitivity: 0.2,
-                    doubleTapAction: {
+                .simultaneousGesture( // Simultaneous gesture to prioritize button tap
+                    TapGesture(count: 2).onEnded {
                         withAnimation(.default) {
                             fullScreen.toggle()
                         }
