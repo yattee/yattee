@@ -464,8 +464,6 @@ final class MPVBackend: PlayerBackend {
         timeObserverThrottle.execute {
             self.model.updateWatch(time: self.currentTime)
         }
-
-        self.model.updateTime(self.currentTime!)
     }
 
     private func stopClientUpdates() {
