@@ -83,6 +83,9 @@ struct PlayerSettingsGroupImporter {
             }
         #endif
 
+        if let showComments = json["showComments"].bool {
+            Defaults[.showComments] = showComments
+        }
         #if !os(tvOS)
             if let showScrollToTopInComments = json["showScrollToTopInComments"].bool {
                 Defaults[.showScrollToTopInComments] = showScrollToTopInComments

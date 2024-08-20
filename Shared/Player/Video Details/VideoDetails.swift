@@ -189,6 +189,7 @@ struct VideoDetails: View {
     @Default(.showChapterThumbnails) private var showChapterThumbnails
     @Default(.showChapterThumbnailsOnlyWhenDifferent) private var showChapterThumbnailsOnlyWhenDifferent
     @Default(.showRelated) private var showRelated
+    @Default(.showComments) private var showComments
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
     #endif
@@ -284,6 +285,8 @@ struct VideoDetails: View {
         switch page {
         case .queue:
             return !sidebarQueue && player.isAdvanceToNextItemAvailable
+        case .comments:
+            return showComments
         default:
             return !video.isLocal
         }
@@ -362,10 +365,12 @@ struct VideoDetails: View {
                     PlayerQueueView(sidebarQueue: false)
                         .padding(.horizontal)
                 case .comments:
-                    CommentsView()
-                        .onAppear {
-                            comments.loadIfNeeded()
-                        }
+                    if showComments {
+                        CommentsView()
+                            .onAppear {
+                                comments.loadIfNeeded()
+                            }
+                    }
                 }
             }
             .padding(.bottom, 60)
