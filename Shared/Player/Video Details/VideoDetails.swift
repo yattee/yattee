@@ -47,9 +47,12 @@ struct VideoDetails: View {
                 .frame(width: 40, height: 40)
                 .buttonStyle(.plain)
                 .padding(.trailing, 5)
-                .simultaneousGesture(
-                    TapGesture() // Ensures the button tap is recognized
-                )
+                // TODO: when setting tvOS minimum to 16, the platform modifier can be removed
+                #if !os(tvOS)
+                    .simultaneousGesture(
+                        TapGesture() // Ensures the button tap is recognized
+                    )
+                #endif
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
@@ -58,6 +61,14 @@ struct VideoDetails: View {
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .lineLimit(1)
+                            // TODO: when setting tvOS minimum to 16, the platform modifier can be removed
+                            #if !os(tvOS)
+                                .onTapGesture {
+                                    guard let channel = video?.channel else { return }
+                                    NavigationModel.shared.openChannel(channel, navigationStyle: .sidebar)
+                                }
+                                .accessibilityAddTraits(.isButton)
+                            #endif
                         } else if model.videoBeingOpened != nil {
                             Text("Yattee")
                                 .font(.subheadline)
@@ -211,6 +222,7 @@ struct VideoDetails: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
+            // TODO: when setting tvOS minimum to 16, the platform modifier can be removed
             #if !os(tvOS)
                 .simultaneousGesture( // Simultaneous gesture to prioritize button tap
                     TapGesture(count: 2).onEnded {
