@@ -1001,6 +1001,7 @@ final class PlayerModel: ObservableObject {
 
         logger.info("entering fullscreen")
         toggleFullscreen(false, showControls: showControls)
+        self.playingFullScreen = true
     }
 
     func exitFullScreen(showControls: Bool = true) {
@@ -1008,6 +1009,7 @@ final class PlayerModel: ObservableObject {
 
         logger.info("exiting fullscreen")
         toggleFullscreen(true, showControls: showControls)
+        self.playingFullScreen = false
     }
 
     func updateNowPlayingInfo() {

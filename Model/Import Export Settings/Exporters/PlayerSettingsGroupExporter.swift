@@ -7,6 +7,7 @@ final class PlayerSettingsGroupExporter: SettingsGroupExporter {
             "playerInstanceID": Defaults[.playerInstanceID] ?? "",
             "pauseOnHidingPlayer": Defaults[.pauseOnHidingPlayer],
             "closeVideoOnEOF": Defaults[.closeVideoOnEOF],
+            "exitFullscreenOnEOF": Defaults[.exitFullscreenOnEOF],
             "expandVideoDescription": Defaults[.expandVideoDescription],
             "collapsedLinesDescription": Defaults[.collapsedLinesDescription],
             "showChapters": Defaults[.showChapters],

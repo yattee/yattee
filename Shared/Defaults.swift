@@ -75,6 +75,7 @@ extension Defaults.Keys {
     static let expandVideoDescription = Key<Bool>("expandVideoDescription", default: expandVideoDescriptionDefault)
 
     static let collapsedLinesDescription = Key<Int>("collapsedLinesDescription", default: 5)
+    static let exitFullscreenOnEOF = Key<Bool>("exitFullscreenOnEOF", default: true)
 
     static let showChapters = Key<Bool>("showChapters", default: true)
     static let showChapterThumbnails = Key<Bool>("showChapterThumbnails", default: true)

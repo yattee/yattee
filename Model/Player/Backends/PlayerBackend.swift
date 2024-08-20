@@ -123,9 +123,7 @@ extension PlayerBackend {
                     if Defaults[.closeVideoOnEOF] {
                         model.resetQueue()
                         model.hide()
-                    }
-
-                    if !Defaults[.closeVideoOnEOF], Defaults[.exitFullscreenOnEOF], model.playingFullScreen {
+                    } else if Defaults[.exitFullscreenOnEOF], model.playingFullScreen {
                         model.exitFullScreen()
                     }
                 #endif
