@@ -993,15 +993,28 @@ final class PlayerModel: ObservableObject {
     func enterFullScreen(showControls: Bool = true) {
         guard !playingFullScreen else { return }
 
-        logger.info("entering fullscreen")
+        logger.info("Entering fullscreen")
         toggleFullscreen(false, showControls: showControls)
+
+        // Request rotation if needed
+        if Defaults[.rotateToLandscapeOnEnterFullScreen].isRotating {
+            let orientation = Defaults[.rotateToLandscapeOnEnterFullScreen].interfaceOrientationSetting
+            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+        }
     }
 
     func exitFullScreen(showControls: Bool = true) {
         guard playingFullScreen else { return }
 
-        logger.info("exiting fullscreen")
+        logger.info("Exiting fullscreen")
         toggleFullscreen(true, showControls: showControls)
+
+        // Optionally reset orientation to portrait
+        if Defaults[.lockPortraitWhenBrowsing] {
+            Orientation.lockOrientation(.portrait)
+        } else {
+            Orientation.lockOrientation(.allButUpsideDown)
+        }
     }
 
     func updateNowPlayingInfo() {
@@ -1087,26 +1100,35 @@ final class PlayerModel: ObservableObject {
                     return
                 }
 
-                guard rotateToLandscapeOnEnterFullScreen.isRotating && lockedOrientation.isNil else { return }
+                // Check if rotation is needed when entering fullscreen
+                if Defaults[.enterFullscreenInLandscape] {
+                    // Rotate to landscape if needed and orientation is not locked
+                    guard lockedOrientation.isNil else { return }
 
-                if currentVideoIsLandscape {
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
-
+                        let orientation = self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+                    }
+                } else {
+                    // Handle case where fullscreen should not enforce landscape
+                    if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                        avPlayerBackend.controller.exitFullScreen(animated: true)
+                        return
                     }
                 }
             } else {
+                // Exit fullscreen and reset orientation if needed
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
                     avPlayerBackend.controller.exitFullScreen(animated: true)
                     avPlayerBackend.controller.dismiss(animated: true)
                     return
                 }
-                let rotationOrientation = Constants.isIPhone ? UIInterfaceOrientation.portrait : nil
+
+                // Reset orientation to portrait if on iPhone
+                let rotationOrientation: UIInterfaceOrientation? = Constants.isIPhone ? .portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
             }
-
         #endif
     }
 

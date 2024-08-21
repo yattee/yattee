@@ -16,8 +16,7 @@ enum Orientation {
     }
 
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
-        if Defaults[.lockPortraitWhenBrowsing] {
-            // Lock orientation to portrait when browsing
+        if Defaults[.lockPortraitWhenBrowsing], !Defaults[.enterFullscreenInLandscape] {
             lockOrientation(.portrait)
             return
         }

@@ -12,7 +12,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     // Determine supported interface orientations
     func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
         // If portrait lock is enabled, enforce portrait orientation
-        if Defaults[.lockPortraitWhenBrowsing] {
+        if Defaults[.lockPortraitWhenBrowsing], !Defaults[.enterFullscreenInLandscape] {
             return .portrait
         }
 

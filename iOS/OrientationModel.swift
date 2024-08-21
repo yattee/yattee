@@ -1,10 +1,12 @@
 import Defaults
 import Foundation
+import Logging
 import Repeat
 import SwiftUI
 
 final class OrientationModel {
     static let shared = OrientationModel()
+    var logger = Logger(label: "stream.yattee.orientation")
 
     private var lastOrientation: UIInterfaceOrientation?
     private var orientationDebouncer = Debouncer(.milliseconds(300))
@@ -45,11 +47,11 @@ final class OrientationModel {
 
     /// Locks the orientation and optionally rotates to a specific orientation.
     private func lockOrientationAndRotate(_ rotateOrientation: UIInterfaceOrientation) {
-        if Defaults[.lockPortraitWhenBrowsing] {
-            // Lock orientation to portrait when browsing
+        if Defaults[.lockPortraitWhenBrowsing], !Defaults[.enterFullscreenInLandscape] {
+            logger.info("Locking orientation to portrait")
             Orientation.lockOrientation(.portrait)
         } else {
-            // Allow all orientations except upside down
+            logger.info("Locking orientation to all but upside down and rotating to \(rotateOrientation)")
             let mask: UIInterfaceOrientationMask = UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
             Orientation.lockOrientation(mask, andRotateTo: rotateOrientation)
         }
@@ -69,6 +71,7 @@ final class OrientationModel {
 
     private func handleOrientationChange() {
         if Defaults[.lockPortraitWhenBrowsing] {
+            logger.info("Locking orientation to portrait due to browsing setting")
             Orientation.lockOrientation(.portrait)
             return
         }
@@ -85,12 +88,16 @@ final class OrientationModel {
 
         lastOrientation = orientation
 
+        logger.info("Handling orientation change to \(orientation)")
+
         orientationDebouncer.callback = {
             DispatchQueue.main.async {
                 if orientation.isLandscape {
+                    self.logger.info("Entering fullscreen due to landscape orientation")
                     self.player.controls.presentingControls = false
                     self.player.enterFullScreen(showControls: false)
                 } else {
+                    self.logger.info("Exiting fullscreen due to portrait orientation")
                     self.player.exitFullScreen(showControls: false)
                 }
             }
