@@ -10,41 +10,88 @@ enum Orientation {
         if let delegate = AppDelegate.instance {
             delegate.orientationLock = orientation
 
-            let orientationString = orientation == .portrait ? "portrait" : orientation == .landscapeLeft ? "landscapeLeft" :
-                orientation == .landscapeRight ? "landscapeRight" : orientation == .portraitUpsideDown ? "portraitUpsideDown" :
-                orientation == .landscape ? "landscape" : orientation == .all ? "all" : "allButUpsideDown"
-
-            logger.info("locking \(orientationString)")
+            let orientationString = orientationString(for: orientation)
+            logger.info("Locking orientation to \(orientationString)")
         }
     }
 
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
-        lockOrientation(orientation)
-
-        guard let rotateOrientation else {
+        if Defaults[.lockPortraitWhenBrowsing] {
+            // Lock orientation to portrait when browsing
+            lockOrientation(.portrait)
             return
         }
 
-        let orientationString = rotateOrientation == .portrait ? "portrait" : rotateOrientation == .landscapeLeft ? "landscapeLeft" :
-            rotateOrientation == .landscapeRight ? "landscapeRight" : rotateOrientation == .portraitUpsideDown ? "portraitUpsideDown" : "allButUpsideDown"
+        lockOrientation(orientation)
 
-        logger.info("rotating to \(orientationString)")
+        guard let rotateOrientation else { return }
+
+        let orientationString = orientationString(for: rotateOrientation)
+        logger.info("Rotating to \(orientationString)")
 
         if #available(iOS 16, *) {
             guard let windowScene = Self.scene else { return }
-            let rotateOrientationMask = rotateOrientation == .portrait ? UIInterfaceOrientationMask.portrait :
-                rotateOrientation == .landscapeLeft ? .landscapeLeft :
-                rotateOrientation == .landscapeRight ? .landscapeRight :
-                .allButUpsideDown
+            let rotateOrientationMask = orientationMask(for: rotateOrientation)
 
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: rotateOrientationMask)) { error in
-                print("denied rotation \(error)")
+                logger.warning("Denied rotation: \(error)")
             }
         } else {
             UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         }
 
         UINavigationController.attemptRotationToDeviceOrientation()
+    }
+
+    private static func orientationString(for orientation: UIInterfaceOrientationMask) -> String {
+        switch orientation {
+        case .portrait:
+            return "portrait"
+        case .landscapeLeft:
+            return "landscapeLeft"
+        case .landscapeRight:
+            return "landscapeRight"
+        case .portraitUpsideDown:
+            return "portraitUpsideDown"
+        case .landscape:
+            return "landscape"
+        case .all:
+            return "all"
+        case .allButUpsideDown:
+            return "allButUpsideDown"
+        default:
+            return "unknown"
+        }
+    }
+
+    private static func orientationString(for orientation: UIInterfaceOrientation) -> String {
+        switch orientation {
+        case .portrait:
+            return "portrait"
+        case .landscapeLeft:
+            return "landscapeLeft"
+        case .landscapeRight:
+            return "landscapeRight"
+        case .portraitUpsideDown:
+            return "portraitUpsideDown"
+        default:
+            return "unknown"
+        }
+    }
+
+    private static func orientationMask(for orientation: UIInterfaceOrientation) -> UIInterfaceOrientationMask {
+        switch orientation {
+        case .portrait:
+            return .portrait
+        case .landscapeLeft:
+            return .landscapeLeft
+        case .landscapeRight:
+            return .landscapeRight
+        case .portraitUpsideDown:
+            return .portraitUpsideDown
+        default:
+            return .allButUpsideDown
+        }
     }
 
     private static var scene: UIWindowScene? {

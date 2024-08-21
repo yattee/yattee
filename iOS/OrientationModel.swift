@@ -4,33 +4,26 @@ import Repeat
 import SwiftUI
 
 final class OrientationModel {
-    static var shared = OrientationModel()
+    static let shared = OrientationModel()
 
-    var orientation = UIInterfaceOrientation.portrait
-    var lastOrientation: UIInterfaceOrientation?
-    var orientationDebouncer = Debouncer(.milliseconds(300))
-    var orientationObserver: Any?
+    private var lastOrientation: UIInterfaceOrientation?
+    private var orientationDebouncer = Debouncer(.milliseconds(300))
+    private var orientationObserver: Any?
 
-    private var player = PlayerModel.shared
+    private let player = PlayerModel.shared
 
+    /// Configures orientation updates based on accelerometer data.
     func configureOrientationUpdatesBasedOnAccelerometer() {
         let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
-        if currentOrientation.isLandscape,
-           Defaults[.enterFullscreenInLandscape],
-           !Defaults[.honorSystemOrientationLock],
-           !player.playingFullScreen,
-           !player.currentItem.isNil,
-           player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape),
-           !player.playingInPictureInPicture,
-           player.presentingPlayer
-        {
+
+        if shouldEnterFullScreen(for: currentOrientation) {
             DispatchQueue.main.async {
                 self.player.controls.presentingControls = false
                 self.player.enterFullScreen(showControls: false)
             }
 
             player.onPresentPlayer.append {
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
+                self.lockOrientationAndRotate(currentOrientation)
             }
         }
 
@@ -39,55 +32,75 @@ final class OrientationModel {
             object: nil,
             queue: .main
         ) { _ in
-            guard !Defaults[.honorSystemOrientationLock],
-                  self.player.presentingPlayer,
-                  !self.player.playingInPictureInPicture,
-                  self.player.lockedOrientation.isNil
-            else {
-                return
-            }
-
-            let orientation = OrientationTracker.shared.currentInterfaceOrientation
-
-            guard self.lastOrientation != orientation else {
-                return
-            }
-
-            self.lastOrientation = orientation
-
-            DispatchQueue.main.async {
-                guard Defaults[.enterFullscreenInLandscape],
-                      self.player.presentingPlayer
-                else {
-                    return
-                }
-
-                self.orientationDebouncer.callback = {
-                    DispatchQueue.main.async {
-                        if orientation.isLandscape {
-                            self.player.controls.presentingControls = false
-                            self.player.enterFullScreen(showControls: false)
-                        } else {
-                            self.player.exitFullScreen(showControls: false)
-                        }
-                    }
-                }
-
-                self.orientationDebouncer.call()
-            }
+            self.handleOrientationChange()
         }
     }
 
+    /// Stops orientation updates and removes the observer.
     func stopOrientationUpdates() {
-        guard let observer = orientationObserver else { return }
-        NotificationCenter.default.removeObserver(observer)
+        if let observer = orientationObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
-    func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
-        if let rotateOrientation {
-            self.orientation = rotateOrientation
-            lastOrientation = rotateOrientation
+    /// Locks the orientation and optionally rotates to a specific orientation.
+    private func lockOrientationAndRotate(_ rotateOrientation: UIInterfaceOrientation) {
+        if Defaults[.lockPortraitWhenBrowsing] {
+            // Lock orientation to portrait when browsing
+            Orientation.lockOrientation(.portrait)
+        } else {
+            // Allow all orientations except upside down
+            let mask: UIInterfaceOrientationMask = UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+            Orientation.lockOrientation(mask, andRotateTo: rotateOrientation)
         }
-        Orientation.lockOrientation(orientation, andRotateTo: rotateOrientation)
+    }
+
+    // MARK: - Private Methods
+
+    private func shouldEnterFullScreen(for orientation: UIInterfaceOrientation) -> Bool {
+        return orientation.isLandscape &&
+            Defaults[.enterFullscreenInLandscape] &&
+            !Defaults[.honorSystemOrientationLock] &&
+            !player.playingFullScreen &&
+            !player.currentItem.isNil &&
+            (player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape)) &&
+            !player.playingInPictureInPicture &&
+            player.presentingPlayer
+    }
+
+    private func handleOrientationChange() {
+        // Early exit if system lock is honored
+        if Defaults[.honorSystemOrientationLock] {
+            return
+        }
+
+        if Defaults[.lockPortraitWhenBrowsing] {
+            Orientation.lockOrientation(.portrait)
+            return
+        }
+
+        guard player.presentingPlayer, !player.playingInPictureInPicture, player.lockedOrientation.isNil else {
+            return
+        }
+
+        let orientation = OrientationTracker.shared.currentInterfaceOrientation
+
+        guard lastOrientation != orientation else {
+            return
+        }
+
+        lastOrientation = orientation
+
+        orientationDebouncer.callback = {
+            DispatchQueue.main.async {
+                if orientation.isLandscape {
+                    self.player.controls.presentingControls = false
+                    self.player.enterFullScreen(showControls: false)
+                } else {
+                    self.player.exitFullScreen(showControls: false)
+                }
+            }
+        }
+        orientationDebouncer.call()
     }
 }

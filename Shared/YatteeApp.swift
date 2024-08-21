@@ -174,12 +174,6 @@ struct YatteeApp: App {
                 player.restoreQueue()
             }
 
-            DispatchQueue.global(qos: .userInitiated).async {
-                if !Defaults[.saveRecents] {
-                    recents.clear()
-                }
-            }
-
             let startupSection = Defaults[.startupSection]
             var section: TabSelection? = startupSection.tabSelection
 
