@@ -90,10 +90,6 @@ struct PlayerSettingsGroupImporter {
         #endif
 
         #if os(iOS)
-            if let honorSystemOrientationLock = json["honorSystemOrientationLock"].bool {
-                Defaults[.honorSystemOrientationLock] = honorSystemOrientationLock
-            }
-
             if let enterFullscreenInLandscape = json["enterFullscreenInLandscape"].bool {
                 Defaults[.enterFullscreenInLandscape] = enterFullscreenInLandscape
             }

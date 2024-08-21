@@ -16,7 +16,6 @@ struct PlayerSettings: View {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeVideoOnEOF) private var closeVideoOnEOF
     #if os(iOS)
-        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
@@ -200,7 +199,6 @@ struct PlayerSettings: View {
                     if idiom == .pad {
                         enterFullscreenInLandscapeToggle
                     }
-                    honorSystemOrientationLockToggle
                     rotateToLandscapeOnEnterFullScreenPicker
                 }
             #endif
@@ -301,11 +299,6 @@ struct PlayerSettings: View {
     #endif
 
     #if os(iOS)
-        private var honorSystemOrientationLockToggle: some View {
-            Toggle("Follow device orientation lock", isOn: $honorSystemOrientationLock)
-                .disabled(!enterFullscreenInLandscape)
-        }
-
         private var enterFullscreenInLandscapeToggle: some View {
             Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
         }

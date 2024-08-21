@@ -41,7 +41,6 @@ final class PlayerSettingsGroupExporter: SettingsGroupExporter {
         #endif
 
         #if os(iOS)
-            export["honorSystemOrientationLock"].bool = Defaults[.honorSystemOrientationLock]
             export["enterFullscreenInLandscape"].bool = Defaults[.enterFullscreenInLandscape]
             export["rotateToLandscapeOnEnterFullScreen"].string = Defaults[.rotateToLandscapeOnEnterFullScreen].rawValue
         #endif

@@ -60,7 +60,6 @@ final class OrientationModel {
     private func shouldEnterFullScreen(for orientation: UIInterfaceOrientation) -> Bool {
         return orientation.isLandscape &&
             Defaults[.enterFullscreenInLandscape] &&
-            !Defaults[.honorSystemOrientationLock] &&
             !player.playingFullScreen &&
             !player.currentItem.isNil &&
             (player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape)) &&
@@ -69,11 +68,6 @@ final class OrientationModel {
     }
 
     private func handleOrientationChange() {
-        // Early exit if system lock is honored
-        if Defaults[.honorSystemOrientationLock] {
-            return
-        }
-
         if Defaults[.lockPortraitWhenBrowsing] {
             Orientation.lockOrientation(.portrait)
             return

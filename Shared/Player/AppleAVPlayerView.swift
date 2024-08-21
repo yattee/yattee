@@ -6,7 +6,6 @@ import SwiftUI
     final class AppleAVPlayerViewControllerDelegate: NSObject, AVPlayerViewControllerDelegate {
         #if os(iOS)
             @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
-            @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
             @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
         #endif
 
@@ -18,8 +17,7 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                guard rotateToLandscapeOnEnterFullScreen.isRotating && honorSystemOrientationLock && player.lockedOrientation.isNil ||
-                    !honorSystemOrientationLock else { return }
+                guard rotateToLandscapeOnEnterFullScreen.isRotating && player.lockedOrientation.isNil else { return }
 
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
