@@ -34,7 +34,9 @@ final class OrientationModel {
             object: nil,
             queue: .main
         ) { _ in
-            self.handleOrientationChange()
+            if Defaults[.lockPortraitWhenBrowsing] || self.player.presentingPlayer {
+                self.handleOrientationChange()
+            }
         }
     }
 
@@ -70,7 +72,7 @@ final class OrientationModel {
     }
 
     private func handleOrientationChange() {
-        if Defaults[.lockPortraitWhenBrowsing] {
+        if Defaults[.lockPortraitWhenBrowsing], !player.presentingPlayer {
             logger.info("Locking orientation to portrait due to browsing setting")
             Orientation.lockOrientation(.portrait)
             return

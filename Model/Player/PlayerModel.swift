@@ -995,12 +995,6 @@ final class PlayerModel: ObservableObject {
 
         logger.info("Entering fullscreen")
         toggleFullscreen(false, showControls: showControls)
-
-        // Request rotation if needed
-        if Defaults[.rotateToLandscapeOnEnterFullScreen].isRotating {
-            let orientation = Defaults[.rotateToLandscapeOnEnterFullScreen].interfaceOrientationSetting
-            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
-        }
     }
 
     func exitFullScreen(showControls: Bool = true) {
@@ -1008,13 +1002,6 @@ final class PlayerModel: ObservableObject {
 
         logger.info("Exiting fullscreen")
         toggleFullscreen(true, showControls: showControls)
-
-        // Optionally reset orientation to portrait
-        if Defaults[.lockPortraitWhenBrowsing] {
-            Orientation.lockOrientation(.portrait)
-        } else {
-            Orientation.lockOrientation(.allButUpsideDown)
-        }
     }
 
     func updateNowPlayingInfo() {
@@ -1107,7 +1094,9 @@ final class PlayerModel: ObservableObject {
 
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     Delay.by(delay) {
-                        let orientation = self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
+                        let orientation = OrientationTracker.shared.currentInterfaceOrientation == .portrait
+                            ? self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
+                            : OrientationTracker.shared.currentInterfaceOrientation
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 } else {

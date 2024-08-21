@@ -528,7 +528,7 @@ enum FullScreenRotationSetting: String, CaseIterable, Defaults.Serializable {
             case .landscapeRight:
                 return .landscapeRight
             default:
-                return .portrait
+                return .landscapeRight
             }
         }
     #endif

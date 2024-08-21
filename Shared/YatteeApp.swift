@@ -151,6 +151,32 @@ struct YatteeApp: App {
         configured = true
 
         DispatchQueue.main.async {
+            #if os(iOS)
+                DispatchQueue.main.async {
+                    if Defaults[.lockPortraitWhenBrowsing] {
+                        Orientation.lockOrientation(.all, andRotateTo: .portrait)
+                    }
+                }
+            #endif
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                if !Defaults[.saveRecents] {
+                    recents.clear()
+                }
+            }
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                URLBookmarkModel.shared.refreshAll()
+            }
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.migrateHomeHistoryItems()
+            }
+
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.migrateQualityProfiles()
+            }
+
             #if DEBUG
                 SiestaLog.Category.enabled = .common
             #endif
@@ -197,28 +223,8 @@ struct YatteeApp: App {
                 player.presentingPlayer = false
             }
 
-            #if os(iOS)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.all, andRotateTo: .portrait)
-                    }
-                }
-            #endif
-
             // Initialize UserAgentManager
             _ = UserAgentManager.shared
-
-            DispatchQueue.global(qos: .userInitiated).async {
-                URLBookmarkModel.shared.refreshAll()
-            }
-
-            DispatchQueue.global(qos: .userInitiated).async {
-                self.migrateHomeHistoryItems()
-            }
-
-            DispatchQueue.global(qos: .userInitiated).async {
-                self.migrateQualityProfiles()
-            }
         }
     }
 

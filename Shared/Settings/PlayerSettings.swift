@@ -307,7 +307,6 @@ struct PlayerSettings: View {
             Picker("Fullscreen rotation", selection: $rotateToLandscapeOnEnterFullScreen) {
                 Text("Landscape left").tag(FullScreenRotationSetting.landscapeLeft)
                 Text("Landscape right").tag(FullScreenRotationSetting.landscapeRight)
-                Text("No rotation").tag(FullScreenRotationSetting.disabled)
             }
             .modifier(SettingsPickerModifier())
         }
