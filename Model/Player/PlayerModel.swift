@@ -792,7 +792,7 @@ final class PlayerModel: ObservableObject {
             if isOrientationLocked {
                 Orientation.lockOrientation(lockOrientation, andRotateTo: rotationOrientation)
             } else {
-                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .allButUpsideDown : .all)
+                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .allButUpsideDown : .all, andRotateTo: rotationOrientation)
             }
         }
 
