@@ -652,6 +652,10 @@ final class PlayerModel: ObservableObject {
         closing = true
         controls.presentingControls = false
 
+        if playingFullScreen {
+            exitFullScreen()
+        }
+
         self.prepareCurrentItemForHistory(finished: finished)
 
         self.hide()
