@@ -13,22 +13,14 @@ enum PlayerControlsLayout: String, CaseIterable, Defaults.Serializable {
     case smaller
 
     var available: Bool {
-        var isATV = false
-        var isIPad = false
-        #if os(tvOS)
-            isATV = true
-        #endif
-        #if os(iOS)
-            isIPad = UIDevice.current.userInterfaceIdiom == .pad
-        #endif
         switch self {
         case .tvRegular:
-            return isATV
+            return Constants.isAppleTV
         case .veryLarge:
             #if os(macOS)
                 return true
             #else
-                return isIPad
+                return Constants.isIPad
             #endif
         case .large:
             return true

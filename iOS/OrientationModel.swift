@@ -54,7 +54,7 @@ final class OrientationModel {
             Orientation.lockOrientation(.portrait)
         } else {
             logger.info("Locking orientation to all but upside down and rotating to \(rotateOrientation)")
-            let mask: UIInterfaceOrientationMask = UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+            let mask: UIInterfaceOrientationMask = Constants.isIPad ? .all : .allButUpsideDown
             Orientation.lockOrientation(mask, andRotateTo: rotateOrientation)
         }
     }

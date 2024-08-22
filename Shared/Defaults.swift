@@ -20,14 +20,14 @@ extension Defaults.Keys {
     static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
     #if os(iOS)
         static let showDocuments = Key<Bool>("showDocuments", default: false)
-        static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: Constants.isIPhone)
     #endif
 
     #if !os(tvOS)
         #if os(macOS)
             static let accountPickerDisplaysUsernameDefault = true
         #else
-            static let accountPickerDisplaysUsernameDefault = UIDevice.current.userInterfaceIdiom == .pad
+            static let accountPickerDisplaysUsernameDefault = Constants.isIPad
         #endif
         static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: accountPickerDisplaysUsernameDefault)
     #endif
@@ -91,10 +91,10 @@ extension Defaults.Keys {
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
     #if os(iOS)
-        static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: Constants.isIPhone)
         static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>(
             "rotateToLandscapeOnEnterFullScreen",
-            default: UIDevice.current.userInterfaceIdiom == .phone ? .landscapeRight : .disabled
+            default: Constants.isIPhone ? .landscapeRight : .disabled
         )
     #endif
 
@@ -119,8 +119,8 @@ extension Defaults.Keys {
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
 
     #if os(iOS)
-        static let playerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
-        static let fullScreenPlayerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
+        static let playerControlsLayoutDefault = Constants.isIPad ? PlayerControlsLayout.medium : .small
+        static let fullScreenPlayerControlsLayoutDefault = Constants.isIPad ? PlayerControlsLayout.medium : .small
     #elseif os(tvOS)
         static let playerControlsLayoutDefault = PlayerControlsLayout.tvRegular
         static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.tvRegular
@@ -179,7 +179,7 @@ extension Defaults.Keys {
     static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream], order: Array(QualityProfile.Format.allCases.indices))
 
     #if os(iOS)
-        static let qualityProfilesDefault = UIDevice.current.userInterfaceIdiom == .pad ? [
+        static let qualityProfilesDefault = Constants.isIPad ? [
             hd2160pMPVProfile,
             hd1080pMPVProfile,
             hd720pMPVProfile,

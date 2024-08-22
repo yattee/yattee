@@ -169,6 +169,10 @@ struct YatteeApp: App {
                 self.migrateQualityProfiles()
             }
 
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.migrateLockPortrait()
+            }
+
             #if DEBUG
                 SiestaLog.Category.enabled = .common
             #endif
@@ -242,6 +246,16 @@ struct YatteeApp: App {
             var updatedProfile = profile
             updatedProfile.order = Array(QualityProfile.Format.allCases.indices)
             QualityProfilesModel.shared.update(profile, updatedProfile)
+        }
+    }
+
+    func migrateLockPortrait() {
+        if Constants.isIPhone {
+            Defaults[.lockPortraitWhenBrowsing] = true
+            Defaults[.enterFullscreenInLandscape] = true
+            if Defaults[.rotateToLandscapeOnEnterFullScreen] == .disabled {
+                Defaults[.rotateToLandscapeOnEnterFullScreen] = .landscapeRight
+            }
         }
     }
 

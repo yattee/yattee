@@ -106,7 +106,7 @@ public class OrientationTracker {
             return .portrait
         }
 
-        if UIDevice.current.userInterfaceIdiom == .pad && accelerometerData.acceleration.y >= threshold {
+        if Constants.isIPad && accelerometerData.acceleration.y >= threshold {
             // iPad specific upside down portrait
             return .portraitUpsideDown
         }

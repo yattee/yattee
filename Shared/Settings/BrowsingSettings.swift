@@ -160,15 +160,16 @@ struct BrowsingSettings: View {
             #endif
             #if os(iOS)
                 Toggle("Show Documents", isOn: $showDocuments)
-
-                Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
-                    .onChange(of: lockPortraitWhenBrowsing) { lock in
-                        if lock {
-                            Orientation.lockOrientation(.all, andRotateTo: .portrait)
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown)
+                if Constants.isIPad {
+                    Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
+                        .onChange(of: lockPortraitWhenBrowsing) { lock in
+                            if lock {
+                                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                            } else {
+                                Orientation.lockOrientation(.all, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                            }
                         }
-                    }
+                }
             #endif
 
             if !accounts.isEmpty {

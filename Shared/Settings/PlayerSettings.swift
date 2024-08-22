@@ -45,12 +45,6 @@ struct PlayerSettings: View {
 
     @ObservedObject private var accounts = AccountsModel.shared
 
-    #if os(iOS)
-        private var idiom: UIUserInterfaceIdiom {
-            UIDevice.current.userInterfaceIdiom
-        }
-    #endif
-
     #if os(tvOS)
         @State private var isShowingDefaultLanguagePicker = false
         @State private var isShowingFallbackLanguagePicker = false
@@ -162,7 +156,7 @@ struct PlayerSettings: View {
 
             let interface = Section(header: SettingsHeader(text: "Interface".localized())) {
                 #if os(iOS)
-                    if idiom == .pad {
+                    if Constants.isIPad {
                         sidebarPicker
                     }
                 #endif
@@ -189,14 +183,14 @@ struct PlayerSettings: View {
             #elseif os(macOS)
                 interface
             #elseif os(iOS)
-                if idiom == .pad || !accounts.isEmpty {
+                if Constants.isIPad || !accounts.isEmpty {
                     interface
                 }
             #endif
 
             #if os(iOS)
                 Section(header: SettingsHeader(text: "Orientation".localized())) {
-                    if idiom == .pad {
+                    if Constants.isIPad {
                         enterFullscreenInLandscapeToggle
                     }
                     rotateToLandscapeOnEnterFullScreenPicker
