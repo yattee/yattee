@@ -1,8 +1,11 @@
 import CoreMotion
+import Logging
 import UIKit
 
 /// Singleton class to track device orientation changes using the accelerometer.
 public class OrientationTracker {
+    var logger = Logger(label: "stream.yattee.orientation.tracker")
+
     public static let shared = OrientationTracker()
 
     public static let deviceOrientationChangedNotification = NSNotification.Name("DeviceOrientationChangedNotification")
@@ -70,7 +73,7 @@ public class OrientationTracker {
         motionManager.startAccelerometerUpdates(to: queue) { [weak self] accelerometerData, error in
             guard let self else { return }
             guard error == nil, let accelerometerData else {
-                // Consider logging the error
+                self.logger.info("Error: \(String(describing: error))")
                 return
             }
 

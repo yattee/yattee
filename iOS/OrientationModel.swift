@@ -6,7 +6,7 @@ import SwiftUI
 
 final class OrientationModel {
     static let shared = OrientationModel()
-    var logger = Logger(label: "stream.yattee.orientation")
+    var logger = Logger(label: "stream.yattee.orientation.model")
 
     private var lastOrientation: UIInterfaceOrientation?
     private var orientationDebouncer = Debouncer(.milliseconds(300))
