@@ -34,7 +34,8 @@ final class OrientationModel {
             object: nil,
             queue: .main
         ) { _ in
-            if Defaults[.lockPortraitWhenBrowsing] || self.player.presentingPlayer {
+            if !Defaults[.lockPortraitWhenBrowsing] || (self.player.presentingPlayer && !self.player.isOrientationLocked) {
+                self.logger.info("Handle orientation change")
                 self.handleOrientationChange()
             }
         }
@@ -66,7 +67,7 @@ final class OrientationModel {
             Defaults[.enterFullscreenInLandscape] &&
             !player.playingFullScreen &&
             !player.currentItem.isNil &&
-            (player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape)) &&
+            !player.isOrientationLocked &&
             !player.playingInPictureInPicture &&
             player.presentingPlayer
     }
@@ -78,7 +79,7 @@ final class OrientationModel {
             return
         }
 
-        guard player.presentingPlayer, !player.playingInPictureInPicture, player.lockedOrientation.isNil else {
+        guard player.presentingPlayer, !player.playingInPictureInPicture, !player.isOrientationLocked else {
             return
         }
 

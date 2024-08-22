@@ -90,7 +90,7 @@ extension VideoPlayerView {
            player.playingFullScreen
         {
             #if os(iOS)
-                player.lockedOrientation = nil
+                player.isOrientationLocked = false
             #endif
             player.exitFullScreen(showControls: false)
             viewDragOffset = 0

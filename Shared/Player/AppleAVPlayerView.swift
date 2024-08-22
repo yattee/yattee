@@ -17,7 +17,7 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                guard rotateToLandscapeOnEnterFullScreen.isRotating && player.lockedOrientation.isNil else { return }
+                guard rotateToLandscapeOnEnterFullScreen.isRotating, !player.isOrientationLocked else { return }
 
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
@@ -36,7 +36,7 @@ import SwiftUI
                     }
                     if !context.isCancelled {
                         #if os(iOS)
-                            self.player.lockedOrientation = nil
+                            self.player.isOrientationLocked = false
 
                             if Constants.isIPhone {
                                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)

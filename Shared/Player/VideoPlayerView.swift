@@ -65,6 +65,7 @@ struct VideoPlayerView: View {
     @Default(.gestureBackwardSeekDuration) private var gestureBackwardSeekDuration
     @Default(.gestureForwardSeekDuration) private var gestureForwardSeekDuration
     @Default(.avPlayerUsesSystemControls) var avPlayerUsesSystemControls
+    @Default(.lockPortraitWhenBrowsing) var lockPortrait
 
     @ObservedObject var controlsOverlayModel = ControlOverlaysModel.shared // swiftlint:disable:this swiftui_state_private
 
@@ -121,17 +122,26 @@ struct VideoPlayerView: View {
                     #endif
                     viewDragOffset = 0
 
-                    Delay.by(0.2) {
-                        orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
+                    orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
 
-                        if let orientationMask = player.lockedOrientation {
-                            Orientation.lockOrientation(
-                                orientationMask,
-                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
-                            )
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown)
+                    let lockType: UIInterfaceOrientationMask = lockPortrait ? .allButUpsideDown : .all
+
+                    if !player.isOrientationLocked {
+                        let currentOrientation = OrientationTracker.shared.currentInterfaceOrientationMask
+                        let rotateTo: UIInterfaceOrientation
+
+                        switch currentOrientation {
+                        case .landscapeLeft:
+                            rotateTo = .landscapeLeft
+                        case .landscapeRight:
+                            rotateTo = .landscapeRight
+                        default:
+                            rotateTo = .portrait
                         }
+
+                        Orientation.lockOrientation(lockType, andRotateTo: rotateTo)
+                    } else {
+                        Orientation.lockOrientation(lockType)
                     }
                 }
                 .onAnimationCompleted(for: viewDragOffset) {
@@ -242,8 +252,7 @@ struct VideoPlayerView: View {
         }
 
         var playerHeight: Double? {
-            let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
-            let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait
+            let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait
             return fullScreenPlayer ? UIScreen.main.bounds.size.height - (isPortrait ? safeAreaModel.safeArea.top + safeAreaModel.safeArea.bottom : 0) : nil
         }
     #endif

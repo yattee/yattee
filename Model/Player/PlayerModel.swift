@@ -129,7 +129,7 @@ final class PlayerModel: ObservableObject {
     }}
 
     #if os(iOS)
-        @Published var lockedOrientation: UIInterfaceOrientationMask?
+        @Published var isOrientationLocked = false
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
@@ -777,16 +777,9 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         var lockOrientationImage: String {
-            lockedOrientation.isNil ? "lock.rotation.open" : "lock.rotation"
+            isOrientationLocked ? "lock.rotation" : "lock.rotation.open"
         }
 
-        func lockOrientationAction() {
-            if lockedOrientation.isNil {
-                lockedOrientation = OrientationTracker.shared.currentInterfaceOrientationMask
-            } else {
-                lockedOrientation = nil
-            }
-        }
     #endif
 
     func replayAction() {
