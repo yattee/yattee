@@ -89,7 +89,7 @@ public class OrientationTracker {
 
     /// Determines the device orientation based on accelerometer data.
     private func deviceOrientation(for accelerometerData: CMAccelerometerData) -> UIDeviceOrientation {
-        let threshold = 0.75
+        let threshold = 0.55
 
         if accelerometerData.acceleration.x >= threshold {
             // Landscape left
