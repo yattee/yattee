@@ -66,28 +66,50 @@ public class OrientationTracker {
         motionManager = CMMotionManager()
         motionManager.accelerometerUpdateInterval = 0.1
         queue = OperationQueue()
+
+        // Observe when the app enters the background or foreground
+        NotificationCenter.default.addObserver(self, selector: #selector(handleDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     /// Starts tracking device orientation changes.
     public func startDeviceOrientationTracking() {
         motionManager.startAccelerometerUpdates(to: queue) { [weak self] accelerometerData, error in
             guard let self else { return }
-            guard error == nil, let accelerometerData else {
-                self.logger.info("Error: \(String(describing: error))")
-                return
+
+            DispatchQueue.main.async {
+                guard UIApplication.shared.applicationState != .background else {
+                    self.logger.info("Ignored orientation update because the app is in the background.")
+                    return
+                }
+
+                guard error == nil, let accelerometerData else {
+                    self.logger.info("Error: \(String(describing: error))")
+                    return
+                }
+
+                let newDeviceOrientation = self.deviceOrientation(for: accelerometerData)
+                guard newDeviceOrientation != self.currentDeviceOrientation else { return }
+
+                self.currentDeviceOrientation = newDeviceOrientation
+                NotificationCenter.default.post(name: Self.deviceOrientationChangedNotification, object: nil)
             }
-
-            let newDeviceOrientation = self.deviceOrientation(for: accelerometerData)
-            guard newDeviceOrientation != self.currentDeviceOrientation else { return }
-
-            self.currentDeviceOrientation = newDeviceOrientation
-            NotificationCenter.default.post(name: Self.deviceOrientationChangedNotification, object: nil)
         }
     }
 
     /// Stops tracking device orientation changes.
     public func stopDeviceOrientationTracking() {
         motionManager.stopAccelerometerUpdates()
+    }
+
+    @objc private func handleDidEnterBackground() {
+        stopDeviceOrientationTracking()
+        logger.info("Stopped device orientation tracking because the app entered the background.")
+    }
+
+    @objc private func handleWillEnterForeground() {
+        startDeviceOrientationTracking()
+        logger.info("Started device orientation tracking because the app entered the foreground.")
     }
 
     /// Determines the device orientation based on accelerometer data.
@@ -116,5 +138,9 @@ public class OrientationTracker {
 
         // Default to the current device orientation if none of the conditions match
         return currentDeviceOrientation
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
