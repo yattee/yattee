@@ -151,14 +151,6 @@ struct YatteeApp: App {
         configured = true
 
         DispatchQueue.main.async {
-            #if os(iOS)
-                DispatchQueue.main.async {
-                    if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.all, andRotateTo: .portrait)
-                    }
-                }
-            #endif
-
             DispatchQueue.global(qos: .userInitiated).async {
                 if !Defaults[.saveRecents] {
                     recents.clear()

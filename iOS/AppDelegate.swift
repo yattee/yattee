@@ -23,6 +23,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Start orientation tracking
         OrientationTracker.shared.startDeviceOrientationTracking()
+
+        // Check and apply orientation lock if necessary
+        applyInitialOrientationLock()
         #endif
 
         return true
@@ -36,5 +39,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         return false
+    }
+
+    // Function to apply initial orientation lock based on Defaults
+    private func applyInitialOrientationLock() {
+        if Defaults[.lockPortraitWhenBrowsing] {
+            orientationLock = .portrait
+            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+        } else {
+            orientationLock = .all
+        }
     }
 }
