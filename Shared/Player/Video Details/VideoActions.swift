@@ -155,11 +155,11 @@ struct VideoActions: View {
                 #if os(iOS)
                     case .lockOrientation:
                         actionButton(
-                            "Lock", systemImage: player.lockOrientationImage,
-                            active: player.isOrientationLocked
-                        ) {
-                            player.isOrientationLocked.toggle()
-                        }
+                            "Lock",
+                            systemImage: player.lockOrientationImage,
+                            active: player.isOrientationLocked,
+                            action: player.toggleOrientationAction
+                        )
                 #endif
                 case .restart:
                     actionButton("Replay", systemImage: "backward.end.fill", action: player.replayAction)

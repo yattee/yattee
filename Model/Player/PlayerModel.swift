@@ -178,6 +178,7 @@ final class PlayerModel: ObservableObject {
     @Default(.resetWatchedStatusOnPlaying) var resetWatchedStatusOnPlaying
     @Default(.playerRate) var playerRate
     @Default(.systemControlsSeekDuration) var systemControlsSeekDuration
+    @Default(.lockPortraitWhenBrowsing) var lockPortraitWhenBrowsing
 
     #if os(macOS)
         @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
@@ -782,6 +783,17 @@ final class PlayerModel: ObservableObject {
     #if os(iOS)
         var lockOrientationImage: String {
             isOrientationLocked ? "lock.rotation" : "lock.rotation.open"
+        }
+
+        func toggleOrientationAction() {
+            isOrientationLocked.toggle()
+            let lockOrientation = OrientationTracker.shared.currentInterfaceOrientationMask
+            let rotationOrientation = OrientationTracker.shared.currentInterfaceOrientation
+            if isOrientationLocked {
+                Orientation.lockOrientation(lockOrientation, andRotateTo: rotationOrientation)
+            } else {
+                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .allButUpsideDown : .all)
+            }
         }
 
     #endif
