@@ -1089,12 +1089,9 @@ final class PlayerModel: ObservableObject {
 
                 // Check if rotation is needed when entering fullscreen
                 if Defaults[.enterFullscreenInLandscape] {
-                    // Rotate to landscape if needed and orientation is not locked
-                    guard lockedOrientation.isNil else { return }
-
-                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
+                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0.1
                     Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentInterfaceOrientation == .portrait
+                        let orientation = (OrientationTracker.shared.currentInterfaceOrientation == .portrait || OrientationTracker.shared.currentInterfaceOrientation == .portraitUpsideDown)
                             ? self.rotateToLandscapeOnEnterFullScreen.interfaceOrientationSetting
                             : OrientationTracker.shared.currentInterfaceOrientation
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
@@ -1115,8 +1112,11 @@ final class PlayerModel: ObservableObject {
                 }
 
                 // Reset orientation to portrait if on iPhone
-                let rotationOrientation: UIInterfaceOrientation? = Constants.isIPhone ? .portrait : nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
+                #if os(iOS)
+                    let rotationLock: UIInterfaceOrientationMask = Constants.isIPhone ? .allButUpsideDown : .all
+                    let rotationOrientation: UIInterfaceOrientation? = Defaults[.lockPortraitWhenBrowsing] ? .portrait : OrientationTracker.shared.currentInterfaceOrientation
+                    Orientation.lockOrientation(rotationLock, andRotateTo: rotationOrientation)
+                #endif
             }
         #endif
     }
