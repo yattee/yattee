@@ -4,7 +4,7 @@
 "Save history of searches, channels and playlists" = "検索、チャンネル、再生リストの履歴を保存";
 "Statistics" = "統計";
 "Apply to all" = "これをすべてに適用";
-"Reload manifest" = "マニフェストを再読込";
+"Reload manifest" = "定義ファイルを再読込";
 "Left" = "左";
 "Codec" = "コーデック";
 "Add profile..." = "プロファイルの追加...";
@@ -15,8 +15,8 @@
 "%lld videos" = "%lld本の動画";
 "%@ Channel" = "%@ チャンネル";
 "%@ Playlist" = "%@ 再生リスト";
-"Add Location" = "場所を追加";
-"Add Location..." = "場所を追加...";
+"Add Location" = "インスタンスを追加";
+"Add Location..." = "インスタンスを追加...";
 "Advanced" = "高度";
 "Add to Favorites" = "お気に入りに追加";
 "Add to %@" = "%@に追加";
@@ -43,13 +43,13 @@
 "Continue from %@" = "%@から続ける";
 "Comments" = "コメント";
 "Create Playlist" = "再生リストの作成";
-"Could not load locations manifest" = "場所のマニフェストが読み込めません";
+"Could not load locations manifest" = "インスタンスの定義ファイルを読み込めません";
 "Copy %@ link" = "%@ リンクをコピー";
 "Copy %@ link with time" = "%@ リンクを時間指定でコピー";
 "Current: %@\n%@" = "現在: %@\n%@";
 "Decreased opacity" = "透明化";
 "Delete" = "削除";
-"Custom Locations" = "場所の指定";
+"Custom Locations" = "インスタンスの指定";
 "Decrease rate" = "速度を下げる";
 "Done" = "完了";
 "Discord Server" = "Discord のサーバー";
@@ -57,7 +57,7 @@
 "Edit" = "編集";
 "Edit Playlist" = "再生リストを編集";
 "Donations" = "寄付";
-"Don't use public locations" = "公開された場所を使用しない";
+"Don't use public locations" = "公開インスタンスを使用しない";
 "Enable logging" = "ログ記録を有効化";
 "Enable Return YouTube Dislike" = "低評価を表示(Return YouTube Dislike)";
 "Error" = "エラー";
@@ -90,7 +90,7 @@
 "Loading streams…" = "ストリーム読込中…";
 "Lock portrait mode" = "縦モードをロック";
 "LIVE" = "ライブ";
-"Locations" = "場所";
+"Locations" = "インスタンス";
 
 /* Video duration filter in search */
 "Long" = "長い";
@@ -121,7 +121,7 @@
 "Play Music" = "音楽を再生";
 "Profiles" = "プロファイル";
 "Popular" = "人気";
-"Public Manifest" = "公開のマニフェスト";
+"Public Manifest" = "公開の定義ファイル";
 "Queue" = "再生キュー";
 "Red" = "赤";
 "Recents" = "最近";
@@ -144,7 +144,7 @@
 "Seek with horizontal swipe on video" = "動画で水平スワイプでシーク";
 "Search" = "検索";
 "Search..." = "検索...";
-"Select location closest to you:" = "あなたの場所に近い場所を選択:";
+"Select location closest to you:" = "あなたに近い場所を選択します:";
 "Share %@ link" = "%@ リンクを共有";
 "Share %@ link with time" = "%@ リンク 時間指定で共有";
 "Show playback statistics" = "再生データの統計を表示";
@@ -162,7 +162,7 @@
 
 /* Subscriptions title */
 "Subscriptions" = "登録チャンネル";
-"Switch to other public location" = "ほかの公開された場所に切り替え";
+"Switch to other public location" = "ほかの公開インスタンスに変更";
 "This cannot be reverted" = "元に戻せません";
 "This cannot be reverted. You might need to switch between views or restart the app to see changes." = "元に戻せません。変更の確認には、表示を切り替えたり、アプリの再起動が必要なこともあります。";
 "Trending" = "急上昇";
@@ -184,13 +184,13 @@
 "You have no playlists\n\nTap on \"New Playlist\" to create one" = "再生リストなし\n\n作成には「新規再生リスト」をタップ";
 "Private" = "非公開";
 "Unlisted" = "限定公開";
-"Current Location" = "現在の場所";
+"Current Location" = "現在のインスタンス";
 "You can switch between profiles in playback settings controls." = "再生設定の制御からプロファイルを切り替えできます。";
 "Add Channels, Playlists and Searches to Favorites using" = "チャンネル、再生リスト、検索をお気に入りにするには";
 "Stream FPS" = "ストリーム FPS";
 "Dropped frames" = "フレーム落ち";
 "Keep last played video in the queue after restart" = "再起動しても再生待ちの最後の動画を維持";
-"It can be changed later in settings. You can use your own locations too." = "設定は後で変更できます。場所の指定も可能です。";
+"It can be changed later in settings. You can use your own locations too." = "設定は後で変更できます。インスタンスの指定も可能です。";
 "Comments are disabled" = "コメント無効です";
 "Could not refresh Subscriptions" = "登録チャンネルを更新できません";
 "Could not load streams" = "ストリームを開けません";
@@ -201,7 +201,7 @@
 "Could not load video" = "動画を読み込めません";
 "Translations" = "翻訳";
 "Could not refresh Playlists" = "再生リストを更新できません";
-"No locations available at the moment" = "現時点で利用可能な場所がありません";
+"No locations available at the moment" = "現時点で利用可能なインスタンスがありません";
 "Show Open Videos quick actions" = "動画を開くクイック操作を表示";
 "Show Documents" = "文書を表示";
 "Pages toolbar position" = "ページのツールバー位置";
@@ -221,12 +221,12 @@
 "Audio" = "音声";
 "Actions buttons" = "操作ボタン";
 "Default Profile" = "標準のプロファイル";
-"Remove Location" = "場所を削除";
-"Locations Manifest" = "場所のマニフェスト";
+"Remove Location" = "インスタンスを削除";
+"Locations Manifest" = "インスタンスの定義ファイル";
 "Copy%@link" = "%@リンクをコピー";
 "Share%@link" = "%@リンクを共有";
 "\"%@\" will be irreversibly removed from this device." = "「%@」はこの端末から完全に削除されます。";
-"Are you sure you want to remove %@ location?" = "場所 %@ を削除しますか？";
+"Are you sure you want to remove %@ location?" = "インスタンス %@ を削除しますか？";
 "Live Streams" = "ライブ配信";
 "Mark channel feed as watched" = "チャンネルフィードを視聴済みにする";
 "Short videos: visible" = "ショート動画: 表示";
@@ -526,10 +526,10 @@
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "ジェスチャーの設定で、プレイヤーの左右をダブルタップした時のスキップ間隔を変更します。システム制御の設定を変更するには、再起動が必要です。";
 "Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products." = "作成者と直接関係のない製品やサービスを宣伝する部分。作成者は金銭や商品提供によって報酬を受け取ります。";
 "Press and hold remote button to open captions and quality menus" = "リモコンのボタンを長押しすると、字幕と品質のメニューが表示されます";
-"For custom locations you can configure Frontend URL in Locations settings" = "場所を指定するには、場所の設定からフロントエンドのURLを設定します";
-"Public Locations" = "公開された場所";
-"Switch to public locations" = "公開された場所に切り替え";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。\n";
+"For custom locations you can configure Frontend URL in Locations settings" = "インスタンスを指定するには、設定からフロントエンドのURLを設定します";
+"Public Locations" = "公開インスタンス";
+"Switch to public locations" = "公開インタンスに切り替え";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "有料/無料のプラットフォームかを問わず、いいね、登録などを明示的に操作を促す（例: 動画をクリック）。";
 "Proxy videos" = "動画閲覧にプロキシ使用";
 "Sections" = "表示するボタン";
 "System controls show buttons for %@" = "システム制御「%@」用のボタンを表示";
@@ -610,14 +610,14 @@
 "File information" = "ファイル情報";
 "Platform" = "プラットフォーム";
 "Icon and text" = "アイコンと文字";
-"Custom Location not selected for import" = "指定の場所は取り込み用に選択されていません";
+"Custom Location not selected for import" = "指定したインスタンスは取り込み用に選択されていません";
 "Import Settings..." = "設定の取り込み...";
 "Export Settings" = "設定を出力";
 "Accounts passwords (unencrypted)" = "アカウントのパスワード (暗号化なし)";
 "Other" = "ほか";
 "Other data" = "ほかのデータ";
 "Are you sure you want to export unencrypted passwords?" = "暗号化のないパスワードを本当に出力しますか？";
-"Custom Location selected for import" = "指定の場所は取り込み用に選択済み";
+"Custom Location selected for import" = "指定したインスタンスは取り込み用に選択済み";
 "Export" = "出力";
 "Build" = "ビルド";
 "Import" = "取り込み";
@@ -628,4 +628,4 @@
 "Password saved in import file" = "取り込みファイルにパスワードを保存しました";
 "Account already exists" = "アカウントは既に存在します";
 "Do not share this file with anyone or you can lose access to your accounts. If you don't select to export passwords you will be asked to provide them during import" = "このファイルを他の人と共有しないでください。パスワードを出力していなければ、取り込み時にパスワードが求められます";
-"Custom Location already exists" = "指定の場所は既に存在します";
+"Custom Location already exists" = "指定したインスタンスは既に存在します";
