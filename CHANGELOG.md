@@ -1,10 +1,14 @@
-## Build 187
-* Allow import of accounts to manually added (not imported) instances
-* Add import export of missing settings
-* tvOS: Allow account picker by long pressing channels button in subscriptions view by @patelhiren in https://github.com/yattee/yattee/pull/704
-* macOS: Fix settings windows layout
-* Fix seek OSD layout on tvOS, revert OSD position
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/694
+## Build 188
+* Improved thumbnail handling  by @stonerl in https://github.com/yattee/yattee/pull/740
+* iOS: make timestamps in comments touchable by @stonerl in https://github.com/yattee/yattee/pull/741
+* Improvements to opening channels from Videos by @stonerl in https://github.com/yattee/yattee/pull/742
+* Allow hiding comments by @stonerl in https://github.com/yattee/yattee/pull/744
+* Add option to exit fullscreen on end by @stonerl in https://github.com/yattee/yattee/pull/570
+* Only updateWatch status while video is playing by @stonerl in https://github.com/yattee/yattee/pull/745
+* Xcode 16 - update recommended settings  by @stonerl in https://github.com/yattee/yattee/pull/737
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/724
+* Updated dependencies
+* Other minor changes and improvements
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -19,6 +23,11 @@
 * History Setting: hide the recent activity in the sidebar or limit the number of items shown (by @rickykresslein)
 * Fix issues with empty comments (by @stonerl)
 * Improved Invidious comments (by @stonerl)
+* Allow import of accounts to manually added (not imported) instances
+* Add import export of missing settings
+* macOS: Fix settings windows layout
+* Fix seek OSD layout on tvOS, revert OSD position
+* tvOS: Allow account picker by long pressing channels button in subscriptions view by @patelhiren in https://github.com/yattee/yattee/pull/704
 * tvOS: Refined Subscriptions View by @patelhiren in https://github.com/yattee/yattee/pull/697
 * More responsive UI when Favorites are used. by @stonerl in https://github.com/yattee/yattee/pull/695
 * Improved conditional proxying by @stonerl in https://github.com/yattee/yattee/pull/696
