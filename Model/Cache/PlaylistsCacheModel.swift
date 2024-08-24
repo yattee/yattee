@@ -14,6 +14,7 @@ struct PlaylistsCacheModel: CacheModel {
     let storage = try? Storage<String, JSON>(
         diskConfig: Self.diskConfig,
         memoryConfig: Self.memoryConfig,
+        fileManager: FileManager.default,
         transformer: BaseCacheModel.jsonTransformer
     )
 
