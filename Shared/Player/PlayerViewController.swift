@@ -92,7 +92,7 @@ final class PlayerViewController: UIViewController {
         ) -> UIHostingController<AnyView> {
             let controller = UIHostingController(
                 rootView:
-                AnyV‚iew(
+                    AnyV/Users/arek/Developer/Yattee/Shared/Player/PlayerViewController.swift.iew(
                     NowPlayingView(sections: sections, inInfoViewController: true)
                         .frame(maxHeight: 600)
                         .environmentObject(commentsModel)
