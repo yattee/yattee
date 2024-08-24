@@ -69,7 +69,10 @@ final class PlaylistsModel: ObservableObject {
                 .onSuccess { resource in
                     self.error = nil
                     if let playlists: [Playlist] = resource.typedContent() {
-                        self.playlists = playlists
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            self.playlists = playlists
+                        }
                         PlaylistsCacheModel.shared.storePlaylist(account: account, playlists: playlists)
                         onSuccess()
                     }
