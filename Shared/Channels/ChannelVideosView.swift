@@ -380,7 +380,7 @@ struct ChannelVideosView: View {
                                 navigation.sidebarSectionChanged.toggle()
                             }
                         } label: {
-                            Label("Subscribe", systemImage: "circle")
+                            Label("Subscribe", systemImage: "star.circle")
                                 .help("Subscribe")
                             #if os(iOS)
                                 .labelStyle(.automatic)
