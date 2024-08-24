@@ -11,6 +11,7 @@ struct NowPlayingView: View {
     var inInfoViewController = false
 
     @State private var repliesID: Comment.ID?
+    @State private var availableWidth = 0.0
 
     @FetchRequest(sortDescriptors: [.init(key: "watchedAt", ascending: false)])
     var watches: FetchedResults<Watch>
@@ -109,7 +110,7 @@ struct NowPlayingView: View {
                     } else {
                         Section {
                             ForEach(comments.all) { comment in
-                                CommentView(comment: comment, repliesID: $repliesID)
+                                CommentView(comment: comment, repliesID: $repliesID, availableWidth: availableWidth)
                             }
                             if comments.nextPageAvailable {
                                 Text("Scroll to load more...")
@@ -120,6 +121,12 @@ struct NowPlayingView: View {
                                     }
                             }
                         }
+                        .background(GeometryReader { geometry in
+                            Color.clear
+                                .onAppear {
+                                    self.availableWidth = Double(geometry.size.width)
+                                }
+                        })
                     }
                 }
 

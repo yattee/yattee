@@ -131,7 +131,9 @@ struct CommentView: View {
 
             Text(comment.time)
                 .font(.caption2)
+            #if !os(tvOS)
                 .foregroundColor(.secondary)
+            #endif
         }
         .lineLimit(1)
     }
@@ -159,11 +161,11 @@ struct CommentView: View {
                     Text("\(comment.likeCount.formattedAsAbbreviation())")
                 }
                 #if !os(tvOS)
+                .foregroundColor(.secondary)
                 .font(.system(size: 12))
                 #endif
             }
         }
-        .foregroundColor(.secondary)
     }
 
     private var repliesButton: some View {
@@ -181,7 +183,8 @@ struct CommentView: View {
                 Text("Replies")
             }
             #if os(tvOS)
-            .padding(10)
+            .font(.system(size: 26))
+            .padding(.vertical, 3)
             #endif
         }
         .buttonStyle(.plain)
@@ -237,6 +240,8 @@ struct CommentView: View {
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
                         .textSelection(.enabled)
+                #else
+                    Text(comment.text)
                 #endif
             } else {
                 Text(rawText)
