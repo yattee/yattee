@@ -1,9 +1,13 @@
+#if os(iOS)
+    import ActiveLabel
+#endif
 import SDWebImageSwiftUI
 import SwiftUI
 
 struct CommentView: View {
     let comment: Comment
     @Binding var repliesID: Comment.ID?
+    var availableWidth: CGFloat
 
     @State private var subscribed = false
 
@@ -204,7 +208,7 @@ struct CommentView: View {
         Group {
             let last = comments.replies.last
             ForEach(comments.replies) { comment in
-                Self(comment: comment, repliesID: $repliesID)
+                Self(comment: comment, repliesID: $repliesID, availableWidth: availableWidth - 22)
                 #if os(tvOS)
                     .focusable()
                 #endif
@@ -220,22 +224,25 @@ struct CommentView: View {
 
     private var commentText: some View {
         Group {
-            let text = Text(comment.text)
-            #if os(macOS)
-                .font(.system(size: 14))
-            #elseif os(iOS)
-                .font(.system(size: 15))
-            #endif
-                .lineSpacing(3)
-                .fixedSize(horizontal: false, vertical: true)
-
+            let rawText = comment.text
             if #available(iOS 15.0, macOS 12.0, *) {
-                text
-                #if !os(tvOS)
-                .textSelection(.enabled)
+                #if os(iOS)
+                    ActiveLabelCommentRepresentable(
+                        text: rawText,
+                        availableWidth: availableWidth
+                    )
+                #elseif os(macOS)
+                    Text(rawText)
+                        .font(.system(size: 14))
+                        .lineSpacing(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
                 #endif
             } else {
-                text
+                Text(rawText)
+                    .font(.system(size: 15))
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -248,13 +255,78 @@ struct CommentView: View {
     }
 }
 
+#if os(iOS)
+    struct ActiveLabelCommentRepresentable: UIViewRepresentable {
+        var text: String
+        var availableWidth: CGFloat
+
+        @State private var label = ActiveLabel()
+
+        @Environment(\.openURL) private var openURL
+
+        var player = PlayerModel.shared
+
+        func makeUIView(context _: Context) -> some UIView {
+            customizeLabel()
+            return label
+        }
+
+        func updateUIView(_: UIViewType, context _: Context) {
+            label.preferredMaxLayoutWidth = availableWidth
+        }
+
+        func customizeLabel() {
+            label.customize { label in
+                label.enabledTypes = [.url, .timestamp]
+                label.text = text
+                label.font = .systemFont(ofSize: 15)
+                label.lineSpacing = 3
+                label.preferredMaxLayoutWidth = availableWidth
+                label.URLColor = UIColor(Color.accentColor)
+                label.timestampColor = UIColor(Color.accentColor)
+                label.handleURLTap(urlTapHandler(_:))
+                label.handleTimestampTap(timestampTapHandler(_:))
+                label.numberOfLines = 0
+            }
+        }
+
+        private func urlTapHandler(_ url: URL) {
+            var urlToOpen = url
+
+            if var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.scheme = "yattee"
+                if let yatteeURL = components.url {
+                    let parser = URLParser(url: urlToOpen, allowFileURLs: false)
+                    let destination = parser.destination
+                    if destination == .video,
+                       parser.videoID == player.currentVideo?.videoID,
+                       let time = parser.time
+                    {
+                        player.backend.seek(to: Double(time), seekType: .userInteracted)
+                        return
+                    }
+                    if destination != nil {
+                        urlToOpen = yatteeURL
+                    }
+                }
+            }
+
+            openURL(urlToOpen)
+        }
+
+        private func timestampTapHandler(_ timestamp: Timestamp) {
+            player.backend.seek(to: timestamp.timeInterval, seekType: .userInteracted)
+        }
+    }
+#endif
+
 struct CommentView_Previews: PreviewProvider {
     static var fixture: Comment {
         Comment.fixture
     }
 
     static var previews: some View {
-        CommentView(comment: fixture, repliesID: .constant(fixture.id))
+        CommentView(comment: fixture, repliesID: .constant(fixture.id), availableWidth: 375)
             .padding(5)
     }
 }

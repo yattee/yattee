@@ -2734,7 +2734,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					37095E7E291DC85400301883 = {
 						CreatedOnToolsVersion = 14.1;
@@ -4342,7 +4342,6 @@
 		37D4B0ED2671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
@@ -4395,7 +4394,6 @@
 		37D4B0EE2671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
@@ -4526,7 +4524,6 @@
 		37D4B0F32671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 187;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4550,7 +4547,6 @@
 		37D4B0F42671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 187;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4575,7 +4571,6 @@
 		37D4B0F62671614900C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 187;
@@ -4600,7 +4595,6 @@
 		37D4B0F72671614900C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 187;
@@ -4708,7 +4702,6 @@
 		37D4B17E267164B000C925CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 187;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4732,7 +4725,6 @@
 		37D4B17F267164B000C925CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 187;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5042,7 +5034,7 @@
 		};
 		FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/cxfksword/MPVKit.git";
+			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.38.0;
