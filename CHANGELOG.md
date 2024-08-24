@@ -1,4 +1,4 @@
-## Build 188
+## Build 189
 * Improved thumbnail handling  by @stonerl in https://github.com/yattee/yattee/pull/740
 * iOS: make timestamps in comments touchable by @stonerl in https://github.com/yattee/yattee/pull/741
 * Improvements to opening channels from Videos by @stonerl in https://github.com/yattee/yattee/pull/742
@@ -8,6 +8,7 @@
 * Xcode 16 - update recommended settings  by @stonerl in https://github.com/yattee/yattee/pull/737
 * Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/724
 * Updated dependencies
+* Fixed crashes
 * Other minor changes and improvements
 
 ## Previous builds
