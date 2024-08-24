@@ -15,6 +15,7 @@ final class SubscribedChannelsModel: ObservableObject, CacheModel {
     let storage = try? Storage<String, JSON>(
         diskConfig: SubscribedChannelsModel.diskConfig,
         memoryConfig: SubscribedChannelsModel.memoryConfig,
+        fileManager: FileManager.default,
         transformer: BaseCacheModel.jsonTransformer
     )
 
