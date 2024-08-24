@@ -85,6 +85,7 @@ extension Defaults.Keys {
 
     static let playerSidebar = Key<PlayerSidebarSetting>("playerSidebar", default: .defaultValue)
     static let showKeywords = Key<Bool>("showKeywords", default: false)
+    static let showComments = Key<Bool>("showComments", default: true)
     #if !os(tvOS)
         static let showScrollToTopInComments = Key<Bool>("showScrollToTopInComments", default: true)
     #endif

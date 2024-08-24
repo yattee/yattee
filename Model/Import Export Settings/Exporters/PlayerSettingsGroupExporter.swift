@@ -36,6 +36,8 @@ final class PlayerSettingsGroupExporter: SettingsGroupExporter {
             export["pauseOnEnteringBackground"].bool = Defaults[.pauseOnEnteringBackground]
         #endif
 
+        export["showComments"].bool = Defaults[.showComments]
+
         #if !os(tvOS)
             export["showScrollToTopInComments"].bool = Defaults[.showScrollToTopInComments]
         #endif

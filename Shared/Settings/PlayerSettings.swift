@@ -8,6 +8,7 @@ struct PlayerSettings: View {
     @Default(.playerSidebar) private var playerSidebar
 
     @Default(.showKeywords) private var showKeywords
+    @Default(.showComments) private var showComments
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
         @Default(.collapsedLinesDescription) private var collapsedLinesDescription
@@ -175,6 +176,7 @@ struct PlayerSettings: View {
                 if !accounts.isEmpty {
                     keywordsToggle
 
+                    commentsToggle
                     #if !os(tvOS)
                         showScrollToTopInCommentsToggle
                     #endif
@@ -250,9 +252,13 @@ struct PlayerSettings: View {
         .modifier(SettingsPickerModifier())
     }
 
+    private var commentsToggle: some View {
+        Toggle("Show comments", isOn: $showComments)
+    }
+
     #if !os(tvOS)
         private var showScrollToTopInCommentsToggle: some View {
-            Toggle("Show scroll to top button in comments", isOn: $showScrollToTopInComments)
+            Toggle("Show scroll to top button in comments", isOn: $showScrollToTopInComments).disabled(!showComments)
         }
     #endif
 
