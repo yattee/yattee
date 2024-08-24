@@ -111,15 +111,22 @@ extension PlayerBackend {
             model.prepareCurrentItemForHistory(finished: true)
 
             if model.queue.isEmpty {
-                if Defaults[.closeVideoOnEOF] {
-                    #if os(tvOS)
+                #if os(tvOS)
+                    if Defaults[.closeVideoOnEOF] {
                         if model.activeBackend == .appleAVPlayer {
                             model.avPlayerBackend.controller?.dismiss(animated: false)
                         }
-                    #endif
-                    model.resetQueue()
-                    model.hide()
-                }
+                        model.resetQueue()
+                        model.hide()
+                    }
+                #else
+                    if Defaults[.closeVideoOnEOF] {
+                        model.resetQueue()
+                        model.hide()
+                    } else if Defaults[.exitFullscreenOnEOF], model.playingFullScreen {
+                        model.exitFullScreen()
+                    }
+                #endif
             } else {
                 model.advanceToNextItem()
             }

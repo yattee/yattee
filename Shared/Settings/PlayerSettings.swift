@@ -12,6 +12,7 @@ struct PlayerSettings: View {
     #if !os(tvOS)
         @Default(.showScrollToTopInComments) private var showScrollToTopInComments
         @Default(.collapsedLinesDescription) private var collapsedLinesDescription
+        @Default(.exitFullscreenOnEOF) private var exitFullscreenOnEOF
     #endif
     @Default(.expandVideoDescription) private var expandVideoDescription
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
@@ -86,6 +87,9 @@ struct PlayerSettings: View {
                 }
                 pauseOnHidingPlayerToggle
                 closeVideoOnEOFToggle
+                #if !os(tvOS)
+                    exitFullscreenOnEOFToggle
+                #endif
                 #if !os(macOS)
                     pauseOnEnteringBackgroundToogle
                 #endif
@@ -299,6 +303,13 @@ struct PlayerSettings: View {
     private var closeVideoOnEOFToggle: some View {
         Toggle("Close video and player on end", isOn: $closeVideoOnEOF)
     }
+
+    #if !os(tvOS)
+        private var exitFullscreenOnEOFToggle: some View {
+            Toggle("Exit fullscreen on end", isOn: $exitFullscreenOnEOF)
+                .disabled(closeVideoOnEOF)
+        }
+    #endif
 
     #if !os(macOS)
         private var pauseOnEnteringBackgroundToogle: some View {

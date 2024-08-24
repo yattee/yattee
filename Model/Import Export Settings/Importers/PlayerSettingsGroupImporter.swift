@@ -17,6 +17,10 @@ struct PlayerSettingsGroupImporter {
             Defaults[.closeVideoOnEOF] = closeVideoOnEOF
         }
 
+        if let exitFullscreenOnEOF = json["exitFullscreenOnEOF"].bool {
+            Defaults[.exitFullscreenOnEOF] = exitFullscreenOnEOF
+        }
+
         if let expandVideoDescription = json["expandVideoDescription"].bool {
             Defaults[.expandVideoDescription] = expandVideoDescription
         }
