@@ -47,7 +47,7 @@ extension PlayerModel {
     }
 
     func updateWatch(finished: Bool = false, time: CMTime? = nil) {
-        guard let currentVideo, saveHistory else { return }
+        guard let currentVideo, saveHistory, isPlaying else { return }
 
         let id = currentVideo.videoID
         let time = time ?? backend.currentTime
