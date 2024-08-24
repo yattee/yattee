@@ -1,5 +1,5 @@
 {
-  "originHash" : "515d8e68c4a31658288fb3f94789ee539399b042082c08c39f4c03c27fd8860c",
+  "originHash" : "1f99971d9d21cffe56d0033bc5c38e9fcd5ff46ca5f7d19c76f5ba0a268ce4b6",
   "pins" : [
     {
       "identity" : "activelabel.swift",
@@ -58,9 +58,9 @@
     {
       "identity" : "mpvkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mpvkit/MPVKit.git",
+      "location" : "https://github.com/cxfksword/MPVKit",
       "state" : {
-        "revision" : "e436a85611a1d34d676304a6eaf7941a7fc55c60",
+        "revision" : "f646e4b625e9c8a2ff22a7e0bb5557306300be5d",
         "version" : "0.38.0"
       }
     },

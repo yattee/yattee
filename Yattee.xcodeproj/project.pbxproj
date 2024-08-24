@@ -72,8 +72,6 @@
 		3703206627D2BB35007A0CB8 /* PINCache in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206527D2BB35007A0CB8 /* PINCache */; };
 		3703206827D2BB45007A0CB8 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206727D2BB45007A0CB8 /* Defaults */; };
 		3703206A27D2BB49007A0CB8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3703206927D2BB49007A0CB8 /* Alamofire */; };
-		3704BDFF2ABF260C00370FF7 /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3704BDFE2ABF260C00370FF7 /* MPVKit */; };
-		3704BE012ABF263E00370FF7 /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3704BE002ABF263E00370FF7 /* MPVKit */; };
 		3705B180267B4DFB00704544 /* TrendingCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B17F267B4DFB00704544 /* TrendingCountry.swift */; };
 		3705B182267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
 		3705B183267B4E4900704544 /* TrendingCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3705B181267B4E4900704544 /* TrendingCategory.swift */; };
@@ -621,6 +619,9 @@
 		3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104828D3D10600D5F53C /* SDWebImageSwiftUI */; };
 		3797104B28D3D18800D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104A28D3D18800D5F53C /* SDWebImageSwiftUI */; };
 		3797104D28D3D19100D5F53C /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3797104C28D3D19100D5F53C /* SDWebImageSwiftUI */; };
+		3797665B2C79FA6900C10DBD /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3797665A2C79FA6900C10DBD /* MPVKit */; };
+		3797665D2C79FA7500C10DBD /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3797665C2C79FA7500C10DBD /* MPVKit */; };
+		3797665F2C79FA7D00C10DBD /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3797665E2C79FA7D00C10DBD /* MPVKit */; };
 		3797757D268922D100DD52A8 /* Siesta in Frameworks */ = {isa = PBXBuildFile; productRef = 3797757C268922D100DD52A8 /* Siesta */; };
 		37977583268922F600DD52A8 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
 		37977584268922F600DD52A8 /* InvidiousAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37977582268922F600DD52A8 /* InvidiousAPI.swift */; };
@@ -1082,7 +1083,6 @@
 		E27568B92BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
 		E27568BA2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
 		E27568BB2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
-		FA97174C2A494700001FF53D /* MPVKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA97174B2A494700001FF53D /* MPVKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1597,9 +1597,9 @@
 				37BADCA52699FB72009BE4FB /* Alamofire in Frameworks */,
 				377FC7D5267A080300A6BBAF /* SwiftyJSON in Frameworks */,
 				3797104928D3D10600D5F53C /* SDWebImageSwiftUI in Frameworks */,
-				FA97174C2A494700001FF53D /* MPVKit in Frameworks */,
 				37BD07B92698AB2E003EBB87 /* Siesta in Frameworks */,
 				37FB284D2722099E00A57617 /* SDWebImageWebPCoder in Frameworks */,
+				3797665B2C79FA6900C10DBD /* MPVKit in Frameworks */,
 				37CF8B8428535E4F00B71E37 /* SDWebImage in Frameworks */,
 				37C7367A2AC33010007630E1 /* SwiftUIIntrospect in Frameworks */,
 			);
@@ -1624,7 +1624,7 @@
 				375B8AB728B583BD00397B31 /* KeychainAccess in Frameworks */,
 				3703205E27D2BB12007A0CB8 /* SDWebImageWebPCoder in Frameworks */,
 				37CF8B8628535E5A00B71E37 /* SDWebImage in Frameworks */,
-				3704BDFF2ABF260C00370FF7 /* MPVKit in Frameworks */,
+				3797665D2C79FA7500C10DBD /* MPVKit in Frameworks */,
 				3703205C27D2BAF3007A0CB8 /* SwiftyJSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1670,7 +1670,7 @@
 				372915E42687E33E00F5A35B /* Defaults in Frameworks */,
 				3772003B27E8EEC800CB2475 /* libbz2.tbd in Frameworks */,
 				37BADCA9269A570B009BE4FB /* Alamofire in Frameworks */,
-				3704BE012ABF263E00370FF7 /* MPVKit in Frameworks */,
+				3797665F2C79FA7D00C10DBD /* MPVKit in Frameworks */,
 				37D4B19D2671817900C925CA /* SwiftyJSON in Frameworks */,
 				3797757D268922D100DD52A8 /* Siesta in Frameworks */,
 			);
@@ -2584,8 +2584,8 @@
 				377F9F73294403770043F856 /* Cache */,
 				371AC0AB294D1A490085989E /* CachedAsyncImage */,
 				379325D429A265A300181CF1 /* Logging */,
-				FA97174B2A494700001FF53D /* MPVKit */,
 				37C736792AC33010007630E1 /* SwiftUIIntrospect */,
+				3797665A2C79FA6900C10DBD /* MPVKit */,
 			);
 			productName = "Yattee (iOS)";
 			productReference = 37D4B0C92671614900C925CA /* Yattee.app */;
@@ -2623,8 +2623,8 @@
 				374D11E62943C56300CB4350 /* Cache */,
 				371AC0B1294D1C230085989E /* CachedAsyncImage */,
 				379325D629A265AE00181CF1 /* Logging */,
-				3704BDFE2ABF260C00370FF7 /* MPVKit */,
 				37C736772AC32B28007630E1 /* SwiftUIIntrospect */,
+				3797665C2C79FA7500C10DBD /* MPVKit */,
 			);
 			productName = "Yattee (macOS)";
 			productReference = 37D4B0CF2671614900C925CA /* Yattee.app */;
@@ -2702,7 +2702,7 @@
 				377F9F75294403880043F856 /* Cache */,
 				371AC0B3294D1C290085989E /* CachedAsyncImage */,
 				379325D829A265B500181CF1 /* Logging */,
-				3704BE002ABF263E00370FF7 /* MPVKit */,
+				3797665E2C79FA7D00C10DBD /* MPVKit */,
 			);
 			productName = Yattee;
 			productReference = 37D4B158267164AE00C925CA /* Yattee.app */;
@@ -2822,7 +2822,7 @@
 				374D11E52943C56300CB4350 /* XCRemoteSwiftPackageReference "Cache" */,
 				371AC0AA294D1A490085989E /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 				379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */,
-				FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */,
+				379766592C79FA6900C10DBD /* XCRemoteSwiftPackageReference "MPVKit" */,
 			);
 			productRefGroup = 37D4B0CA2671614900C925CA /* Products */;
 			projectDirPath = "";
@@ -4960,6 +4960,14 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		379766592C79FA6900C10DBD /* XCRemoteSwiftPackageReference "MPVKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cxfksword/MPVKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.38.0;
+			};
+		};
 		3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bustoutsolutions/siesta";
@@ -5032,14 +5040,6 @@
 				minimumVersion = 0.3.0;
 			};
 		};
-		FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.38.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -5077,16 +5077,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37BADCA32699FB72009BE4FB /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
-		};
-		3704BDFE2ABF260C00370FF7 /* MPVKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
-			productName = MPVKit;
-		};
-		3704BE002ABF263E00370FF7 /* MPVKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
-			productName = MPVKit;
 		};
 		371AC0AB294D1A490085989E /* CachedAsyncImage */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -5238,6 +5228,21 @@
 			package = 3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
 		};
+		3797665A2C79FA6900C10DBD /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379766592C79FA6900C10DBD /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
+		};
+		3797665C2C79FA7500C10DBD /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379766592C79FA6900C10DBD /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
+		};
+		3797665E2C79FA7D00C10DBD /* MPVKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 379766592C79FA6900C10DBD /* XCRemoteSwiftPackageReference "MPVKit" */;
+			productName = MPVKit;
+		};
 		3797757C268922D100DD52A8 /* Siesta */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */;
@@ -5322,11 +5327,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */;
 			productName = SDWebImagePINPlugin;
-		};
-		FA97174B2A494700001FF53D /* MPVKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FA97174A2A494700001FF53D /* XCRemoteSwiftPackageReference "MPVKit" */;
-			productName = MPVKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 
