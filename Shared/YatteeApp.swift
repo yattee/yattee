@@ -100,7 +100,7 @@ struct YatteeApp: App {
         .commands {
             SidebarCommands()
 
-            CommandGroup(replacing: .newItem, addition: {})
+            CommandGroup(replacing: .newItem) {}
 
             MenuCommands(model: Binding<MenuModel>(get: { MenuModel.shared }, set: { _ in }))
         }

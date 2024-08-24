@@ -74,7 +74,7 @@ extension PlayerModel {
         preservedTime = currentItem.playbackTime
 
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard let video = item.video else {
                 return
             }

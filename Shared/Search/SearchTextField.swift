@@ -15,7 +15,7 @@ struct SearchTextField: View {
                 #if os(macOS)
                     Image(systemName: "magnifyingglass")
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .scaledToFill()
                         .frame(width: 12, height: 12)
                         .padding(.horizontal, 8)
                         .opacity(0.8)

@@ -209,7 +209,7 @@ struct OpenURLHandler {
             return accounts.api.channelByName(name)
         }
 
-        if let instance = InstancesModel.shared.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
+        if let instance = InstancesModel.shared.all.first(where: \.app.supportsOpeningChannelsByName) {
             return instance.anonymous.channelByName(name)
         }
 
@@ -223,7 +223,7 @@ struct OpenURLHandler {
             return accounts.api.channelByUsername(username)
         }
 
-        if let instance = InstancesModel.shared.all.first(where: { $0.app.supportsOpeningChannelsByName }) {
+        if let instance = InstancesModel.shared.all.first(where: \.app.supportsOpeningChannelsByName) {
             return instance.anonymous.channelByUsername(username)
         }
 

@@ -121,7 +121,7 @@ final class FeedModel: ObservableObject, CacheModel {
         backgroundContext.perform { [weak self] in
             guard let self else { return }
 
-            let watched = self.watchFetchRequestResult(feed, context: self.backgroundContext).filter { $0.finished }
+            let watched = self.watchFetchRequestResult(feed, context: self.backgroundContext).filter(\.finished)
             let unwatched = feed.filter { video in !watched.contains { $0.videoID == video.videoID } }
             let unwatchedCount = max(0, feed.count - watched.count)
 

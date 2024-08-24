@@ -22,7 +22,7 @@ struct FeedCacheModel: CacheModel {
             let date = iso8601DateFormatter.string(from: Date())
             logger.info("caching feed \(account.feedCacheKey) -- \(date)")
             let feedTimeObject: JSON = ["date": date]
-            let videosObject: JSON = ["videos": videos.prefix(cacheLimit).map { $0.json.object }]
+            let videosObject: JSON = ["videos": videos.prefix(cacheLimit).map(\.json.object)]
             try? storage?.setObject(feedTimeObject, forKey: feedTimeCacheKey(account.feedCacheKey))
             try? storage?.setObject(videosObject, forKey: account.feedCacheKey)
         }

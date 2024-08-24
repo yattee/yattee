@@ -222,6 +222,7 @@ struct VideoDetails: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
+            // swiftlint:disable trailing_closure
             // TODO: when setting tvOS minimum to 16, the platform modifier can be removed
             #if !os(tvOS)
                 .simultaneousGesture( // Simultaneous gesture to prioritize button tap
@@ -232,6 +233,7 @@ struct VideoDetails: View {
                     }
                 )
             #endif
+            // swiftlint:enable trailing_closure
 
             VideoActions(video: player.videoForDisplay)
                 .padding(.vertical, 5)

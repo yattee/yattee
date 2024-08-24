@@ -38,10 +38,12 @@ final class VideoLayer: CAOpenGLLayer {
         glGetIntegerv(GLenum(GL_DRAW_FRAMEBUFFER_BINDING), &i)
 
         if client.mpvGL != nil {
-            var data = mpv_opengl_fbo(fbo: Int32(i),
-                                      w: Int32(bounds.size.width),
-                                      h: Int32(bounds.size.height),
-                                      internal_format: 0)
+            var data = mpv_opengl_fbo(
+                fbo: Int32(i),
+                w: Int32(bounds.size.width),
+                h: Int32(bounds.size.height),
+                internal_format: 0
+            )
             var params: [mpv_render_param] = [
                 mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: &data),
                 mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: &flip),
@@ -106,8 +108,10 @@ final class VideoLayer: CAOpenGLLayer {
         let displayId = UInt32(NSScreen.main?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as! Int)
 
         CVDisplayLinkCreateWithCGDisplay(displayId, &client.link)
-        CVDisplayLinkSetOutputCallback(client.link!, displayLinkCallback,
-                                       UnsafeMutableRawPointer(Unmanaged.passUnretained(client.layer).toOpaque()))
+        CVDisplayLinkSetOutputCallback(
+            client.link!, displayLinkCallback,
+            UnsafeMutableRawPointer(Unmanaged.passUnretained(client.layer).toOpaque())
+        )
         CVDisplayLinkStart(client.link!)
     }
 

@@ -15,7 +15,7 @@ struct FeedView: View {
     #endif
 
     var videos: [ContentItem] {
-        guard let selectedChannel = selectedChannel else {
+        guard let selectedChannel else {
             return ContentItem.array(of: feed.videos)
         }
         return ContentItem.array(of: feed.videos.filter {
@@ -24,9 +24,7 @@ struct FeedView: View {
     }
 
     var channels: [Channel] {
-        feed.videos.map {
-            $0.channel
-        }.unique()
+        feed.videos.map(\.channel).unique()
     }
 
     @State private var selectedChannel: Channel?
@@ -272,7 +270,7 @@ struct FeedView: View {
     }
 
     var channelHeaderView: some View {
-        guard let selectedChannel = selectedChannel else {
+        guard let selectedChannel else {
             return AnyView(
                 Text("All Channels")
                     .font(.caption)

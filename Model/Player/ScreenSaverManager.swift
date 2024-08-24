@@ -16,10 +16,12 @@ struct ScreenSaverManager {
             return false
         }
 
-        noSleepReturn = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep as CFString,
-                                                    IOPMAssertionLevel(kIOPMAssertionLevelOn),
-                                                    reason as CFString,
-                                                    &noSleepAssertion)
+        noSleepReturn = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypeNoDisplaySleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reason as CFString,
+            &noSleepAssertion
+        )
         return noSleepReturn == kIOReturnSuccess
     }
 

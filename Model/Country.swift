@@ -274,7 +274,7 @@ extension Country {
 
     private static func filteredCountries(_ predicate: (String) -> Bool) -> [Country] {
         Country.allCases
-            .map { $0.name }
+            .map(\.name)
             .filter(predicate)
             .compactMap { string in Country.allCases.first { $0.name == string } }
     }

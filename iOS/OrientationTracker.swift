@@ -65,9 +65,11 @@ public class OrientationTracker {
             guard newDeviceOrientation != self.currentDeviceOrientation else { return }
             self.currentDeviceOrientation = newDeviceOrientation
 
-            NotificationCenter.default.post(name: Self.deviceOrientationChangedNotification,
-                                            object: nil,
-                                            userInfo: nil)
+            NotificationCenter.default.post(
+                name: Self.deviceOrientationChangedNotification,
+                object: nil,
+                userInfo: nil
+            )
         }
     }
 
