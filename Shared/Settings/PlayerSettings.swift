@@ -361,9 +361,9 @@ struct PlayerSettings: View {
 
     private var captionsFontScaleSizePicker: some View {
         Picker("Size", selection: $captionsFontScaleSize) {
-            Text("Small").tag(String("0.5"))
+            Text("Small").tag(String("0.725"))
             Text("Medium").tag(String("1.0"))
-            Text("Large").tag(String("2.0"))
+            Text("Large").tag(String("1.5"))
         }
         .onChange(of: captionsFontScaleSize) { _ in
             PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
