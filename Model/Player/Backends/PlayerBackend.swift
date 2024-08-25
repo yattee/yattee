@@ -1,6 +1,7 @@
 import CoreMedia
 import Defaults
 import Foundation
+import Logging
 #if !os(macOS)
     import UIKit
 #endif
@@ -75,6 +76,10 @@ protocol PlayerBackend {
 }
 
 extension PlayerBackend {
+    var logger: Logger {
+        return Logger(label: "stream.yattee.player.backend")
+    }
+
     func seek(to time: CMTime, seekType: SeekType, completionHandler: ((Bool) -> Void)? = nil) {
         model.seek.registerSeek(at: time, type: seekType, restore: currentTime)
         seek(to: time, seekType: seekType, completionHandler: completionHandler)
@@ -140,55 +145,87 @@ extension PlayerBackend {
     }
 
     func bestPlayable(_ streams: [Stream], maxResolution: ResolutionSetting, formatOrder: [QualityProfile.Format]) -> Stream? {
-        // filter out non-HLS streams and streams with resolution more than maxResolution
-        let nonHLSStreams = streams.filter {
-            $0.kind != .hls && $0.resolution <= maxResolution.value
-        }
+        logger.info("Starting bestPlayable function")
+        logger.info("Total streams received: \(streams.count)")
+        logger.info("Max resolution allowed: \(String(describing: maxResolution.value))")
+        logger.info("Format order: \(formatOrder)")
 
-        // find max resolution and bitrate from non-HLS streams
+        // Filter out non-HLS streams and streams with resolution more than maxResolution
+        let nonHLSStreams = streams.filter {
+            let isHLS = $0.kind == .hls
+            let isWithinResolution = $0.resolution <= maxResolution.value
+            logger.info("Stream ID: \($0.id) - Kind: \(String(describing: $0.kind)) - Resolution: \(String(describing: $0.resolution)) - Bitrate: \($0.bitrate ?? 0)")
+            logger.info("Is HLS: \(isHLS), Is within resolution: \(isWithinResolution)")
+            return !isHLS && isWithinResolution
+        }
+        logger.info("Non-HLS streams after filtering: \(nonHLSStreams.count)")
+
+        // Find max resolution and bitrate from non-HLS streams
         let bestResolutionStream = nonHLSStreams.max { $0.resolution < $1.resolution }
         let bestBitrateStream = nonHLSStreams.max { $0.bitrate ?? 0 < $1.bitrate ?? 0 }
+
+        logger.info("Best resolution stream: \(String(describing: bestResolutionStream?.id)) with resolution: \(String(describing: bestResolutionStream?.resolution))")
+        logger.info("Best bitrate stream: \(String(describing: bestBitrateStream?.id)) with bitrate: \(String(describing: bestBitrateStream?.bitrate))")
 
         let bestResolution = bestResolutionStream?.resolution ?? maxResolution.value
         let bestBitrate = bestBitrateStream?.bitrate ?? bestResolutionStream?.resolution.bitrate ?? maxResolution.value.bitrate
 
-        return streams.map { stream in
+        logger.info("Final best resolution selected: \(String(describing: bestResolution))")
+        logger.info("Final best bitrate selected: \(bestBitrate)")
+
+        let adjustedStreams = streams.map { stream in
             if stream.kind == .hls {
+                logger.info("Adjusting HLS stream ID: \(stream.id)")
                 stream.resolution = bestResolution
                 stream.bitrate = bestBitrate
                 stream.format = .hls
             } else if stream.kind == .stream {
+                logger.info("Adjusting non-HLS stream ID: \(stream.id)")
                 stream.format = .stream
             }
             return stream
         }
-        .filter { stream in
-            stream.resolution <= maxResolution.value
+
+        let filteredStreams = adjustedStreams.filter { stream in
+            let isWithinResolution = stream.resolution <= maxResolution.value
+            logger.info("Filtered stream ID: \(stream.id) - Is within max resolution: \(isWithinResolution)")
+            return isWithinResolution
         }
-        .max { lhs, rhs in
+
+        logger.info("Filtered streams count after adjustments: \(filteredStreams.count)")
+
+        let bestStream = filteredStreams.max { lhs, rhs in
             if lhs.resolution == rhs.resolution {
                 guard let lhsFormat = QualityProfile.Format(rawValue: lhs.format.rawValue),
                       let rhsFormat = QualityProfile.Format(rawValue: rhs.format.rawValue)
                 else {
-                    print("Failed to extract lhsFormat or rhsFormat")
+                    logger.info("Failed to extract lhsFormat or rhsFormat for streams \(lhs.id) and \(rhs.id)")
                     return false
                 }
 
                 let lhsFormatIndex = formatOrder.firstIndex(of: lhsFormat) ?? Int.max
                 let rhsFormatIndex = formatOrder.firstIndex(of: rhsFormat) ?? Int.max
 
+                logger.info("Comparing formats for streams \(lhs.id) and \(rhs.id) - LHS Format Index: \(lhsFormatIndex), RHS Format Index: \(rhsFormatIndex)")
+
                 return lhsFormatIndex > rhsFormatIndex
             }
 
+            logger.info("Comparing resolutions for streams \(lhs.id) and \(rhs.id) - LHS Resolution: \(String(describing: lhs.resolution)), RHS Resolution: \(String(describing: rhs.resolution))")
+
             return lhs.resolution < rhs.resolution
         }
+
+        logger.info("Best stream selected: \(String(describing: bestStream?.id)) with resolution: \(String(describing: bestStream?.resolution)) and format: \(String(describing: bestStream?.format))")
+
+        return bestStream
     }
 
     func updateControls(completionHandler: (() -> Void)? = nil) {
-        print("updating controls")
+        logger.info("updating controls")
 
         guard model.presentingPlayer, !model.controls.presentingOverlays else {
-            print("ignored controls update")
+            logger.info("ignored controls update")
             completionHandler?()
             return
         }
@@ -196,7 +233,7 @@ extension PlayerBackend {
         DispatchQueue.main.async(qos: .userInteractive) {
             #if !os(macOS)
                 guard UIApplication.shared.applicationState != .background else {
-                    print("not performing controls updates in background")
+                    logger.info("not performing controls updates in background")
                     completionHandler?()
                     return
                 }
