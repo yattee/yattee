@@ -191,7 +191,7 @@ struct YatteeApp: App {
 
             NavigationModel.shared.tabSelection = section ?? .search
 
-            DispatchQueue.global(qos: .userInitiated).async {
+            DispatchQueue.main.async {
                 playlists.load()
             }
 
