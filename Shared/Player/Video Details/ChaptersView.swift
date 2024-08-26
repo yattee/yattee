@@ -29,18 +29,14 @@ struct ChaptersView: View {
                     ScrollView(.horizontal) {
                         ScrollViewReader { scrollViewProxy in
                             LazyHStack(spacing: 20) {
-                                chapterViews(for: chapters[...], scrollViewProxy: scrollViewProxy)
+                                chapterViews(for: chapters[...])
                             }
                             .padding(.horizontal, 15)
                             .onAppear {
-                                if let currentChapterIndex = player.currentChapterIndex {
-                                    scrollViewProxy.scrollTo(currentChapterIndex, anchor: .center)
-                                }
+                                scrollToCurrentChapter(scrollViewProxy)
                             }
-                            .onChange(of: player.currentChapterIndex) { currentChapterIndex in
-                                if let index = currentChapterIndex {
-                                    scrollViewProxy.scrollTo(index, anchor: .center)
-                                }
+                            .onChange(of: player.currentChapterIndex) { _ in
+                                scrollToCurrentChapter(scrollViewProxy)
                             }
                         }
                     }
@@ -53,7 +49,8 @@ struct ChaptersView: View {
                         }
                     }
                 #else
-                    Section { chapterViews(for: chapters[...]) }.padding(.horizontal)
+                    Section { chapterViews(for: chapters[...]) }
+                        .padding(.horizontal)
                 #endif
             } else {
                 #if os(iOS)
@@ -80,13 +77,21 @@ struct ChaptersView: View {
     }
 
     #if !os(tvOS)
-        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true, scrollViewProxy _: ScrollViewProxy? = nil) -> some View {
+        private func chapterViews(for chaptersToShow: ArraySlice<Chapter>, opacity: Double = 1.0, clickable: Bool = true) -> some View {
             ForEach(Array(chaptersToShow.indices), id: \.self) { index in
                 let chapter = chaptersToShow[index]
                 ChapterView(chapter: chapter, chapterIndex: index, showThumbnail: showThumbnails)
                     .id(index)
                     .opacity(index == 0 ? 1.0 : opacity)
                     .allowsHitTesting(clickable)
+            }
+        }
+
+        private func scrollToCurrentChapter(_ scrollViewProxy: ScrollViewProxy) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Slight delay to ensure the view is fully rendered
+                if let currentChapterIndex = player.currentChapterIndex {
+                    scrollViewProxy.scrollTo(currentChapterIndex, anchor: .center)
+                }
             }
         }
     #endif
