@@ -1,6 +1,6 @@
 import GLKit
+import Libmpv
 import Logging
-import MPVKit
 import OpenGLES
 
 final class MPVOGLView: GLKView {
