@@ -1,15 +1,8 @@
-## Build 189
-* Improved thumbnail handling  by @stonerl in https://github.com/yattee/yattee/pull/740
-* iOS: make timestamps in comments touchable by @stonerl in https://github.com/yattee/yattee/pull/741
-* Improvements to opening channels from Videos by @stonerl in https://github.com/yattee/yattee/pull/742
-* Allow hiding comments by @stonerl in https://github.com/yattee/yattee/pull/744
-* Add option to exit fullscreen on end by @stonerl in https://github.com/yattee/yattee/pull/570
-* Only updateWatch status while video is playing by @stonerl in https://github.com/yattee/yattee/pull/745
-* Xcode 16 - update recommended settings  by @stonerl in https://github.com/yattee/yattee/pull/737
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/724
-* Updated dependencies
-* Fixed crashes
-* Other minor changes and improvements
+## Build 190
+* Improved stream resolution handling by @stonerl in https://github.com/yattee/yattee/pull/747
+* Fix some potential crashes by @stonerl in https://github.com/yattee/yattee/pull/748
+* Fix regression and improve curentChapter handling by @stonerl in https://github.com/yattee/yattee/pull/749
+* Refined chapter font scaling by @stonerl in https://github.com/yattee/yattee/pull/750
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -28,6 +21,14 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* Improved thumbnail handling  by @stonerl in https://github.com/yattee/yattee/pull/740
+* iOS: make timestamps in comments touchable by @stonerl in https://github.com/yattee/yattee/pull/741
+* Improvements to opening channels from Videos by @stonerl in https://github.com/yattee/yattee/pull/742
+* Allow hiding comments by @stonerl in https://github.com/yattee/yattee/pull/744
+* Add option to exit fullscreen on end by @stonerl in https://github.com/yattee/yattee/pull/570
+* Only updateWatch status while video is playing by @stonerl in https://github.com/yattee/yattee/pull/745
+* Xcode 16 - update recommended settings by @stonerl in https://github.com/yattee/yattee/pull/737
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/724
 * tvOS: Allow account picker by long pressing channels button in subscriptions view by @patelhiren in https://github.com/yattee/yattee/pull/704
 * tvOS: Refined Subscriptions View by @patelhiren in https://github.com/yattee/yattee/pull/697
 * More responsive UI when Favorites are used. by @stonerl in https://github.com/yattee/yattee/pull/695
