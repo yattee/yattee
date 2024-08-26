@@ -127,6 +127,7 @@ extension PlayerModel {
     var streamByQualityProfile: Stream? {
         let profile = qualityProfile ?? .defaultProfile
 
+        // First attempt: Filter by both `canPlay` and `isPreferred`
         if let streamPreferredForProfile = backend.bestPlayable(
             availableStreams.filter { backend.canPlay($0) && profile.isPreferred($0) },
             maxResolution: profile.resolution, formatOrder: profile.formats
@@ -134,7 +135,24 @@ extension PlayerModel {
             return streamPreferredForProfile
         }
 
-        return backend.bestPlayable(availableStreams.filter { backend.canPlay($0) }, maxResolution: profile.resolution, formatOrder: profile.formats)
+        // Fallback: Filter by `canPlay` only
+        let fallbackStream = backend.bestPlayable(
+            availableStreams.filter { backend.canPlay($0) },
+            maxResolution: profile.resolution, formatOrder: profile.formats
+        )
+
+        // If no stream is found, trigger the error handler
+        guard let finalStream = fallbackStream else {
+            let error = RequestError(
+                userMessage: "No supported streams available.",
+                cause: NSError(domain: "stream.yatte.app", code: -1, userInfo: [NSLocalizedDescriptionKey: "No supported streams available"])
+            )
+            videoLoadFailureHandler(error, video: currentVideo)
+            return nil
+        }
+
+        // Return the found stream
+        return finalStream
     }
 
     func advanceToNextItem() {
