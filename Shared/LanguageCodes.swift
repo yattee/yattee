@@ -47,6 +47,7 @@ enum LanguageCodes: String, CaseIterable {
     case Vietnamese = "vi"
     case Xhosa = "xh"
     case Chinese = "zh"
+    case Chinese_Hans = "zh-Hans"
     case Zulu = "zu"
 
     var description: String {
@@ -147,6 +148,8 @@ enum LanguageCodes: String, CaseIterable {
             return "Xhosa"
         case .Chinese:
             return "Chinese"
+        case .Chinese_Hans:
+            return "Chinese (Simplified)"
         case .Zulu:
             return "Zulu"
         }
