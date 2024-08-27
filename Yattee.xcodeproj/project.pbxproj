@@ -4112,7 +4112,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 191;
-				DEVELOPMENT_TEAM = 456BPWQ6U5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
@@ -4124,7 +4123,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.5.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "stonerl.yattee.app.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -4141,9 +4140,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "Open in Yattee/Open in Yattee.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 191;
-				DEVELOPMENT_TEAM = 456BPWQ6U5;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Open in Yattee/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Open in Yattee";
@@ -4155,9 +4155,10 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.5.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "stonerl.yattee.app.Open-in-Yattee";
+				PRODUCT_BUNDLE_IDENTIFIER = "stream.yattee.app.Open-in-Yattee";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stream.yattee.app.Open-in-Yattee";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4356,7 +4357,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 191;
-				DEVELOPMENT_TEAM = 456BPWQ6U5;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -4385,7 +4385,7 @@
 					"-lstdc++",
 					"-Wl,-no_compact_unwind",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = stonerl.yattee.app;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -4406,9 +4406,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "iOS/Yattee (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 191;
-				DEVELOPMENT_TEAM = 456BPWQ6U5;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 78Z5H3M6RJ;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "GLES_SILENCE_DEPRECATION=1";
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4433,9 +4434,10 @@
 					"-lstdc++",
 					"-Wl,-no_compact_unwind",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = stonerl.yattee.app;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app;
 				PRODUCT_NAME = Yattee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stream.yattee.app";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
