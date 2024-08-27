@@ -1083,6 +1083,8 @@
 		E27568B92BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
 		E27568BA2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
 		E27568BB2BFAAC2000BDF0AF /* LanguageCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */; };
+		E27BE4BE2C7C0702006E8B68 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E27BE4BD2C7C0702006E8B68 /* Assets.xcassets */; };
+		E27BE4C02C7C0742006E8B68 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E27BE4BF2C7C0742006E8B68 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1555,6 +1557,8 @@
 		E25028AF2BF790F5002CB9FC /* HTTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatus.swift; sourceTree = "<group>"; };
 		E258F3892BF61BD2005B8C28 /* URLTester.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLTester.swift; sourceTree = "<group>"; };
 		E27568B82BFAAC2000BDF0AF /* LanguageCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageCodes.swift; sourceTree = "<group>"; };
+		E27BE4BD2C7C0702006E8B68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E27BE4BF2C7C0742006E8B68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2125,6 +2129,7 @@
 				3749BF9227ADA142000480FF /* BridgingHeader.h */,
 				37992DC726CC50BC003D4C27 /* Info.plist */,
 				3782430A291E5AFA005DEC1C /* Yattee (iOS).entitlements */,
+				E27BE4BD2C7C0702006E8B68 /* Assets.xcassets */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -2224,6 +2229,7 @@
 				37737785276F9858000521C1 /* Windows.swift */,
 				370F500A27CC176F001B35DC /* BridgingHeader.h */,
 				374C0544272496FD009BDDBE /* Info.plist */,
+				E27BE4BF2C7C0742006E8B68 /* Assets.xcassets */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -2864,6 +2870,7 @@
 			files = (
 				3773B8012ADC076800B5FEF3 /* README in Resources */,
 				37D4B0E82671614900C925CA /* Assets.xcassets in Resources */,
+				E27BE4BE2C7C0702006E8B68 /* Assets.xcassets in Resources */,
 				375B537428DF6CBB004C1D19 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2874,6 +2881,7 @@
 			files = (
 				3773B8022ADC076800B5FEF3 /* README in Resources */,
 				37D4B0E92671614900C925CA /* Assets.xcassets in Resources */,
+				E27BE4C02C7C0742006E8B68 /* Assets.xcassets in Resources */,
 				375B537528DF6CBB004C1D19 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
