@@ -99,6 +99,11 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "demuxer-lavf-analyzeduration", "1"))
         checkError(mpv_set_option_string(mpv, "demuxer-lavf-probe-info", Defaults[.mpvDemuxerLavfProbeInfo]))
 
+        // Disable ytdl, since it causes crashes on macOS.
+        #if os(macOS)
+            checkError(mpv_set_option_string(mpv, "ytdl", "no"))
+        #endif
+
         checkError(mpv_initialize(mpv))
 
         let api = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
