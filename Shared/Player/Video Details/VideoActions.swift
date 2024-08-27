@@ -198,10 +198,10 @@ struct VideoActions: View {
             VStack(spacing: 3) {
                 Image(systemName: systemImage)
                     .frame(width: 20, height: 20)
-                    .foregroundColor(active ? Color("AppRedColor") : .accentColor)
+                    .foregroundColor(active ? Color("AppRedColor") : .primary)
                 if playerActionsButtonLabelStyle.text {
                     Text(name.localized())
-                        .foregroundColor(active ? Color("AppRedColor") : .secondary)
+                        .foregroundColor(active ? Color("AppRedColor") : .primary)
                         .font(.caption2)
                         .allowsTightening(true)
                         .lineLimit(1)
