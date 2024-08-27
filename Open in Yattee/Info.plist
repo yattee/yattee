@@ -13,7 +13,7 @@
     	SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-				ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.url&quot;
+				ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
     	).@count == $extensionItem.attachments.@count
 			).@count &gt; 0</string>
 		</dict>
