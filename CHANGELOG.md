@@ -1,8 +1,7 @@
-## Build 190
-* Improved stream resolution handling by @stonerl in https://github.com/yattee/yattee/pull/747
-* Fix some potential crashes by @stonerl in https://github.com/yattee/yattee/pull/748
-* Fix regression and improve curentChapter handling by @stonerl in https://github.com/yattee/yattee/pull/749
-* Refined chapter font scaling by @stonerl in https://github.com/yattee/yattee/pull/750
+## Build 191
+* Fix mpv crashing on macOS by @stonerl in https://github.com/yattee/yattee/pull/754
+* Refreshed icons for iOS and macOS by @stonerl in https://github.com/yattee/yattee/pull/752
+* Add new MPVKit repo by @stonerl in https://github.com/yattee/yattee/pull/753
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -21,6 +20,10 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* Improved stream resolution handling by @stonerl in https://github.com/yattee/yattee/pull/747
+* Fix some potential crashes by @stonerl in https://github.com/yattee/yattee/pull/748
+* Fix regression and improve curentChapter handling by @stonerl in https://github.com/yattee/yattee/pull/749
+* Refined chapter font scaling by @stonerl in https://github.com/yattee/yattee/pull/750
 * Improved thumbnail handling  by @stonerl in https://github.com/yattee/yattee/pull/740
 * iOS: make timestamps in comments touchable by @stonerl in https://github.com/yattee/yattee/pull/741
 * Improvements to opening channels from Videos by @stonerl in https://github.com/yattee/yattee/pull/742
