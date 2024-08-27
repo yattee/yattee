@@ -1,8 +1,8 @@
 import CoreMedia
 import Defaults
 import Foundation
+import Libmpv
 import Logging
-import MPVKit
 #if !os(macOS)
     import Siesta
     import UIKit

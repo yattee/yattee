@@ -2,9 +2,9 @@ import AVFAudio
 import CoreMedia
 import Defaults
 import Foundation
+import Libmpv
 import Logging
 import MediaPlayer
-import MPVKit
 import Repeat
 import SwiftUI
 

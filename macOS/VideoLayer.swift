@@ -1,7 +1,7 @@
 import Cocoa
-import MPVKit
 import OpenGL.GL
 import OpenGL.GL3
+import Libmpv
 
 final class VideoLayer: CAOpenGLLayer {
     var client: MPVClient!
