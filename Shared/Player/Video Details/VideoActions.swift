@@ -86,6 +86,10 @@ struct VideoActions: View {
         }
     }
 
+    func isAnyActionVisible() -> Bool {
+        return Action.allCases.contains { isVisible($0) }
+    }
+
     func isActionable(_ action: Action) -> Bool {
         switch action {
         case .share:
