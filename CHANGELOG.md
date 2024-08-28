@@ -1,7 +1,10 @@
-## Build 191
+## Build 192
 * Fix mpv crashing on macOS by @stonerl in https://github.com/yattee/yattee/pull/754
 * Refreshed icons for iOS and macOS by @stonerl in https://github.com/yattee/yattee/pull/752
 * Add new MPVKit repo by @stonerl in https://github.com/yattee/yattee/pull/753
+* Add Chinese (Simplified) - zh-Hans to LanguageCodes by @stonerl in https://github.com/yattee/yattee/pull/757
+* Color changes to VideoActions by @stonerl in https://github.com/yattee/yattee/pull/759
+* Hide VideoActions Bar when no buttons is visible by @stonerl in https://github.com/yattee/yattee/pull/760
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
