@@ -235,15 +235,22 @@ struct VideoDetails: View {
                 )
             #endif
             // swiftlint:enable trailing_closure
-
-            VideoActions(video: player.videoForDisplay)
-                .padding(.vertical, 5)
-                .frame(maxHeight: 50)
-                .frame(maxWidth: .infinity)
-                .borderTop(height: 0.5, color: Color("ControlsBorderColor"))
-                .borderBottom(height: 0.5, color: Color("ControlsBorderColor"))
-                .animation(nil, value: player.currentItem)
-                .frame(minWidth: 0, maxWidth: .infinity)
+            if VideoActions().isAnyActionVisible() {
+                VideoActions(video: player.videoForDisplay)
+                    .padding(.vertical, 5)
+                    .frame(maxHeight: 50)
+                    .frame(maxWidth: .infinity)
+                    .borderTop(height: 0.5, color: Color("ControlsBorderColor"))
+                    .borderBottom(height: 0.5, color: Color("ControlsBorderColor"))
+                    .animation(nil, value: player.currentItem)
+                    .frame(minWidth: 0, maxWidth: .infinity)
+            } else {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 0.5)
+                    .frame(maxWidth: .infinity)
+                    .background(Color("ControlsBorderColor"))
+            }
 
             ScrollViewReader { proxy in
                 pageView
