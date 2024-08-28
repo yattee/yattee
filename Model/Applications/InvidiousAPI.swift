@@ -445,6 +445,9 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         urlComponents.scheme = instanceURLComponents.scheme
         urlComponents.host = instanceURLComponents.host
+        urlComponents.user = instanceURLComponents.user
+        urlComponents.password = instanceURLComponents.password
+        urlComponents.port = instanceURLComponents.port
 
         guard let url = urlComponents.url else {
             return nil
@@ -563,13 +566,20 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 return nil
             }
 
-            // some of instances are not configured properly and return thumbnails links
-            // with incorrect scheme
+            // Some instances are not configured properly and return thumbnail links
+            // with an incorrect scheme or a missing port.
             components.scheme = accountUrlComponents.scheme
+            components.port = accountUrlComponents.port
+            
+            // If basic HTTP authentication is used,
+            // the username and password need to be prepended to the URL.
+            components.user = accountUrlComponents.user
+            components.password = accountUrlComponents.password
 
             guard let thumbnailUrl = components.url else {
                 return nil
             }
+            print("Final thumbnail URL: \(thumbnailUrl)")
 
             return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
         }
