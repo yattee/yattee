@@ -247,27 +247,27 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     }
 
     func feed(_ page: Int?) -> Resource? {
-        resource(baseURL: account.url, path: "\(Self.basePath)/auth/feed")
+        resourceWithAuthCheck(baseURL: account.url, path: "\(Self.basePath)/auth/feed")
             .withParam("page", String(page ?? 1))
     }
 
     var feed: Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/feed"))
+        resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/feed"))
     }
 
     var subscriptions: Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
+        resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
     }
 
     func subscribe(_ channelID: String, onCompletion: @escaping () -> Void = {}) {
-        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
+        resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
             .child(channelID)
             .request(.post)
             .onCompletion { _ in onCompletion() }
     }
 
     func unsubscribe(_ channelID: String, onCompletion: @escaping () -> Void) {
-        resource(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
+        resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/subscriptions"))
             .child(channelID)
             .request(.delete)
             .onCompletion { _ in onCompletion() }
@@ -308,11 +308,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return nil
         }
 
-        return resource(baseURL: account.url, path: basePathAppending("auth/playlists"))
+        return resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/playlists"))
     }
 
     func playlist(_ id: String) -> Resource? {
-        resource(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
+        resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/playlists/\(id)"))
     }
 
     func playlistVideos(_ id: String) -> Resource? {
@@ -556,6 +556,30 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         )
     }
 
+    // Determines if the request requires Basic Auth credentials to be removed
+    private func needsBasicAuthRemoval(for path: String) -> Bool {
+        return path.hasPrefix("\(Self.basePath)/auth/")
+    }
+
+    // Creates a resource URL with consideration for removing Basic Auth credentials
+    private func createResourceURL(baseURL: URL, path: String) -> URL {
+        var resourceURL = baseURL
+
+        // Remove Basic Auth credentials if required
+        if needsBasicAuthRemoval(for: path), var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) {
+            urlComponents.user = nil
+            urlComponents.password = nil
+            resourceURL = urlComponents.url ?? baseURL
+        }
+
+        return resourceURL.appendingPathComponent(path)
+    }
+
+    func resourceWithAuthCheck(baseURL: URL, path: String) -> Resource {
+        let sanitizedURL = createResourceURL(baseURL: baseURL, path: path)
+        return super.resource(absoluteURL: sanitizedURL)
+    }
+
     private func extractThumbnails(from details: JSON) -> [Thumbnail] {
         details["videoThumbnails"].arrayValue.compactMap { json in
             guard let url = json["url"].url,
@@ -570,7 +594,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             // with an incorrect scheme or a missing port.
             components.scheme = accountUrlComponents.scheme
             components.port = accountUrlComponents.port
-            
+
             // If basic HTTP authentication is used,
             // the username and password need to be prepended to the URL.
             components.user = accountUrlComponents.user
