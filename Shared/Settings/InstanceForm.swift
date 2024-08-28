@@ -86,6 +86,7 @@ struct InstanceForm: View {
                 .autocapitalization(.none)
                 .keyboardType(.URL)
             #endif
+                .disableAutocorrection(true)
 
             #if os(tvOS)
                 VStack {
