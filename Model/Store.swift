@@ -20,10 +20,16 @@ final class Store<Data>: ResourceObserver, ObservableObject {
     }
 
     func replace(_ items: Data) {
-        all = items
+        // Ensure the change happens on the main thread
+        DispatchQueue.main.async {
+            self.all = items
+        }
     }
 
     func clear() {
-        all = nil
+        // Ensure clearing happens on the main thread
+        DispatchQueue.main.async {
+            self.all = nil
+        }
     }
 }
