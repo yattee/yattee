@@ -102,7 +102,7 @@ final class AVPlayerBackend: PlayerBackend {
 
     private var frequentTimeObserver: Any?
     private var infrequentTimeObserver: Any?
-    private var playerTimeControlStatusObserver: Any?
+    private var playerTimeControlStatusObserver: NSKeyValueObservation?
 
     private var statusObservation: NSKeyValueObservation?
 
@@ -119,6 +119,26 @@ final class AVPlayerBackend: PlayerBackend {
         #if os(iOS)
             controller.player = avPlayer
         #endif
+        logger.info("AVPlayerBackend initialized.")
+    }
+
+    deinit {
+        // Invalidate any observers to avoid memory leaks
+        statusObservation?.invalidate()
+        playerTimeControlStatusObserver?.invalidate()
+
+        // Remove any time observers added to AVPlayer
+        if let frequentObserver = frequentTimeObserver {
+            avPlayer.removeTimeObserver(frequentObserver)
+        }
+        if let infrequentObserver = infrequentTimeObserver {
+            avPlayer.removeTimeObserver(infrequentObserver)
+        }
+
+        // Remove notification observers
+        removeItemDidPlayToEndTimeObserver()
+
+        logger.info("AVPlayerBackend deinitialized.")
     }
 
     func canPlay(_ stream: Stream) -> Bool {
@@ -342,11 +362,8 @@ final class AVPlayerBackend: PlayerBackend {
             self.asset = nil
         }
 
-        let startPlaying = {
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            #endif
 
+        let startPlaying = {
             self.setRate(self.model.currentRate)
 
             guard let item = self.model.playerItem, self.isAutoplaying(item) else { return }
@@ -779,7 +796,7 @@ final class AVPlayerBackend: PlayerBackend {
                     opened = true
                     controller.startPictureInPicture()
                 } else {
-                    print("PiP not possible, waited \(delay) seconds")
+                    self.logger.info("PiP not possible, waited \(delay) seconds")
                 }
             }
         }
