@@ -880,26 +880,29 @@ final class PlayerModel: ObservableObject {
     }
 
     func updateRemoteCommandCenter() {
-        let skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand
-        let skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand
-        let previousTrackCommand = MPRemoteCommandCenter.shared().previousTrackCommand
-        let nextTrackCommand = MPRemoteCommandCenter.shared().nextTrackCommand
+        let commandCenter = MPRemoteCommandCenter.shared()
+        let skipForwardCommand = commandCenter.skipForwardCommand
+        let skipBackwardCommand = commandCenter.skipBackwardCommand
+        let previousTrackCommand = commandCenter.previousTrackCommand
+        let nextTrackCommand = commandCenter.nextTrackCommand
 
         if !remoteCommandCenterConfigured {
             remoteCommandCenterConfigured = true
 
-            #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setCategory(
-                    .playback,
-                    mode: .moviePlayback
-                )
-
-                UIApplication.shared.beginReceivingRemoteControlEvents()
-            #endif
-
             let interval = TimeInterval(systemControlsSeekDuration) ?? 10
             let preferredIntervals = [NSNumber(value: interval)]
 
+            // Remove existing targets to avoid duplicates
+            skipForwardCommand.removeTarget(nil)
+            skipBackwardCommand.removeTarget(nil)
+            previousTrackCommand.removeTarget(nil)
+            nextTrackCommand.removeTarget(nil)
+            commandCenter.playCommand.removeTarget(nil)
+            commandCenter.pauseCommand.removeTarget(nil)
+            commandCenter.togglePlayPauseCommand.removeTarget(nil)
+            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+
+            // Re-add targets for handling commands
             skipForwardCommand.preferredIntervals = preferredIntervals
             skipBackwardCommand.preferredIntervals = preferredIntervals
 
@@ -923,22 +926,22 @@ final class PlayerModel: ObservableObject {
                 return .success
             }
 
-            MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
+            commandCenter.playCommand.addTarget { [weak self] _ in
                 self?.play()
                 return .success
             }
 
-            MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
+            commandCenter.pauseCommand.addTarget { [weak self] _ in
                 self?.pause()
                 return .success
             }
 
-            MPRemoteCommandCenter.shared().togglePlayPauseCommand.addTarget { [weak self] _ in
+            commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
                 self?.togglePlay()
                 return .success
             }
 
-            MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
+            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
                 guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
                 self?.backend.seek(to: event.positionTime, seekType: .userInteracted)
@@ -1017,18 +1020,22 @@ final class PlayerModel: ObservableObject {
             guard activeBackend == .mpv else { return }
         #endif
 
-        #if os(iOS)
-            if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
-                return
-            }
-        #endif
-
         guard let video = currentItem?.video else {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = .none
             return
         }
 
         let currentTime = (backend.currentTime?.seconds.isFinite ?? false) ? backend.currentTime!.seconds : 0
+
+        // Determine the media type based on musicMode
+        let mediaType: NSNumber
+        if musicMode {
+            mediaType = MPMediaType.anyAudio.rawValue as NSNumber
+        } else {
+            mediaType = MPMediaType.anyVideo.rawValue as NSNumber
+        }
+
+        // Prepare the Now Playing info dictionary
         var nowPlayingInfo: [String: AnyObject] = [
             MPMediaItemPropertyTitle: video.displayTitle as AnyObject,
             MPMediaItemPropertyArtist: video.displayAuthor as AnyObject,
@@ -1036,7 +1043,7 @@ final class PlayerModel: ObservableObject {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
-            MPMediaItemPropertyMediaType: MPMediaType.anyVideo.rawValue as AnyObject
+            MPMediaItemPropertyMediaType: mediaType
         ]
 
         if !currentArtwork.isNil {
@@ -1240,7 +1247,7 @@ final class PlayerModel: ObservableObject {
         }
 
         private func destroyKeyPressMonitor() {
-            if let keyPressMonitor = keyPressMonitor {
+            if let keyPressMonitor {
                 NSEvent.removeMonitor(keyPressMonitor)
             }
         }
