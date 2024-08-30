@@ -122,7 +122,7 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func canPlay(_ stream: Stream) -> Bool {
-        stream.kind == .hls || stream.kind == .stream || (stream.kind == .adaptive && stream.format == .mp4)
+        stream.kind == .hls || stream.kind == .stream
     }
 
     func playStream(

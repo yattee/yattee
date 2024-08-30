@@ -301,7 +301,7 @@ struct QualityProfileForm: View {
     func isFormatDisabled(_ format: QualityProfile.Format) -> Bool {
         guard backend == .appleAVPlayer else { return false }
 
-        let avPlayerFormats = [.mp4, .stream, QualityProfile.Format.hls]
+        let avPlayerFormats = [.stream, QualityProfile.Format.hls]
 
         return !avPlayerFormats.contains(format)
     }

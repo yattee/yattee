@@ -684,7 +684,7 @@ final class PlayerModel: ObservableObject {
         }
 
         // First, we need to create an array with supported formats.
-        let formatOrderPiP: [QualityProfile.Format] = [.hls, .stream, .mp4]
+        let formatOrderPiP: [QualityProfile.Format] = [.stream, .hls]
 
         guard let video = currentVideo else { return }
         guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: formatOrderPiP) else { return }
