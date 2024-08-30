@@ -248,29 +248,31 @@ struct PlayerControls: View {
         return [player.playerSize.height - inset, 500].min()!
     }
 
-    @ViewBuilder var controlsBackground: some View {
-        ZStack {
-            if player.musicMode,
-               let url = controlsBackgroundURL
-            {
-                ThumbnailView(url: url)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .transition(.opacity)
-                    .animation(.default)
-            } else if player.videoForDisplay == nil {
-                Color.black
+    @ViewBuilder
+    var controlsBackground: some View {
+        GeometryReader { geometry in
+            ZStack {
+                if player.musicMode,
+                   let video = player.videoForDisplay
+                {
+                    let thumbnail = thumbnails.best(video)
+                    if let url = thumbnail.url,
+                       let quality = thumbnail.quality
+                    {
+                        let aspectRatio = (quality == .default || quality == .high) ? Constants.aspectRatio4x3 : Constants.aspectRatio16x9
+
+                        ThumbnailView(url: url)
+                            .aspectRatio(aspectRatio, contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .transition(.opacity)
+                            .animation(.default)
+                            .clipped()
+                    }
+                } else if player.videoForDisplay == nil {
+                    Color.black
+                }
             }
         }
-    }
-
-    var controlsBackgroundURL: URL? {
-        if let video = player.videoForDisplay,
-           let url = thumbnails.best(video).url
-        {
-            return url
-        }
-
-        return nil
     }
 
     var timeline: some View {
