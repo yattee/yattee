@@ -1057,7 +1057,7 @@ final class PlayerModel: ObservableObject {
 
     func updateCurrentArtwork() {
         guard let video = currentVideo,
-              let thumbnailURL = video.thumbnailURL(quality: .medium)
+              let thumbnailURL = video.thumbnailURL(quality: Constants.isIPhone ? .medium : .maxres)
         else {
             return
         }

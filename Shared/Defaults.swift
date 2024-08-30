@@ -20,14 +20,14 @@ extension Defaults.Keys {
     static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
     #if os(iOS)
         static let showDocuments = Key<Bool>("showDocuments", default: false)
-        static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let lockPortraitWhenBrowsing = Key<Bool>("lockPortraitWhenBrowsing", default: Constants.isIPhone)
     #endif
 
     #if !os(tvOS)
         #if os(macOS)
             static let accountPickerDisplaysUsernameDefault = true
         #else
-            static let accountPickerDisplaysUsernameDefault = UIDevice.current.userInterfaceIdiom == .pad
+            static let accountPickerDisplaysUsernameDefault = Constants.isIPad
         #endif
         static let accountPickerDisplaysUsername = Key<Bool>("accountPickerDisplaysUsername", default: accountPickerDisplaysUsernameDefault)
     #endif
@@ -41,9 +41,9 @@ extension Defaults.Keys {
     static let showChannelAvatarInVideosListing = Key<Bool>("showChannelAvatarInVideosListing", default: true)
 
     static let playerButtonSingleTapGesture = Key<PlayerTapGestureAction>("playerButtonSingleTapGesture", default: .togglePlayer)
-    static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .nothing)
-    static let playerButtonShowsControlButtonsWhenMinimized = Key<Bool>("playerButtonShowsControlButtonsWhenMinimized", default: false)
-    static let playerButtonIsExpanded = Key<Bool>("playerButtonIsExpanded", default: false)
+    static let playerButtonDoubleTapGesture = Key<PlayerTapGestureAction>("playerButtonDoubleTapGesture", default: .togglePlayerVisibility)
+    static let playerButtonShowsControlButtonsWhenMinimized = Key<Bool>("playerButtonShowsControlButtonsWhenMinimized", default: true)
+    static let playerButtonIsExpanded = Key<Bool>("playerButtonIsExpanded", default: true)
     static let playerBarMaxWidth = Key<String>("playerBarMaxWidth", default: "600")
     static let channelOnThumbnail = Key<Bool>("channelOnThumbnail", default: false)
     static let timeOnThumbnail = Key<Bool>("timeOnThumbnail", default: true)
@@ -64,7 +64,7 @@ extension Defaults.Keys {
     static let closeVideoOnEOF = Key<Bool>("closeVideoOnEOF", default: false)
 
     #if !os(macOS)
-        static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: true)
+        static let pauseOnEnteringBackground = Key<Bool>("pauseOnEnteringBackground", default: false)
     #endif
 
     #if os(iOS)
@@ -79,7 +79,7 @@ extension Defaults.Keys {
 
     static let showChapters = Key<Bool>("showChapters", default: true)
     static let showChapterThumbnails = Key<Bool>("showChapterThumbnails", default: true)
-    static let showChapterThumbnailsOnlyWhenDifferent = Key<Bool>("showChapterThumbnailsOnlyWhenDifferent", default: true)
+    static let showChapterThumbnailsOnlyWhenDifferent = Key<Bool>("showChapterThumbnailsOnlyWhenDifferent", default: false)
     static let expandChapters = Key<Bool>("expandChapters", default: true)
     static let showRelated = Key<Bool>("showRelated", default: true)
     static let showInspector = Key<ShowInspectorSetting>("showInspector", default: .onlyLocal)
@@ -94,10 +94,10 @@ extension Defaults.Keys {
 
     #if os(iOS)
         static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
-        static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: UIDevice.current.userInterfaceIdiom == .phone)
+        static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: Constants.isIPhone)
         static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>(
             "rotateToLandscapeOnEnterFullScreen",
-            default: UIDevice.current.userInterfaceIdiom == .phone ? .landscapeRight : .disabled
+            default: Constants.isIPhone ? .landscapeRight : .disabled
         )
     #endif
 
@@ -116,14 +116,14 @@ extension Defaults.Keys {
 
     // MARK: GROUP - Controls
 
-    static let avPlayerUsesSystemControls = Key<Bool>("avPlayerUsesSystemControls", default: true)
+    static let avPlayerUsesSystemControls = Key<Bool>("avPlayerUsesSystemControls", default: Constants.isTvOS)
     static let horizontalPlayerGestureEnabled = Key<Bool>("horizontalPlayerGestureEnabled", default: true)
     static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 30.0)
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
 
     #if os(iOS)
-        static let playerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
-        static let fullScreenPlayerControlsLayoutDefault = UIDevice.current.userInterfaceIdiom == .pad ? PlayerControlsLayout.medium : .small
+        static let playerControlsLayoutDefault = Constants.isIPad ? PlayerControlsLayout.medium : .small
+        static let fullScreenPlayerControlsLayoutDefault = Constants.isIPad ? PlayerControlsLayout.medium : .small
     #elseif os(tvOS)
         static let playerControlsLayoutDefault = PlayerControlsLayout.tvRegular
         static let fullScreenPlayerControlsLayoutDefault = PlayerControlsLayout.tvRegular
@@ -175,61 +175,152 @@ extension Defaults.Keys {
 
     // MARK: GROUP - Quality
 
-    static let hd2160pMPVProfile = QualityProfile(id: "hd2160pMPVProfile", backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
-    static let hd1080pMPVProfile = QualityProfile(id: "hd1080pMPVProfile", backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
-    static let hd720pMPVProfile = QualityProfile(id: "hd720pMPVProfile", backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
-    static let hd720pAVPlayerProfile = QualityProfile(id: "hd720pAVPlayerProfile", backend: .appleAVPlayer, resolution: .hd720p30, formats: [.hls, .stream], order: Array(QualityProfile.Format.allCases.indices))
-    static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.hls, .stream], order: Array(QualityProfile.Format.allCases.indices))
+    static let hd2160p60MPVProfile = QualityProfile(id: "hd2160p60MPVProfile", backend: .mpv, resolution: .hd2160p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd1080p60MPVProfile = QualityProfile(id: "hd1080p60MPVProfile", backend: .mpv, resolution: .hd1080p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd1080pMPVProfile = QualityProfile(id: "hd1080pMPVProfile", backend: .mpv, resolution: .hd1080p30, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd720p60MPVProfile = QualityProfile(id: "hd720p60MPVProfile", backend: .mpv, resolution: .hd720p60, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd720pMPVProfile = QualityProfile(id: "hd720pMPVProfile", backend: .mpv, resolution: .hd720p30, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let sd360pMPVProfile = QualityProfile(id: "sd360pMPVProfile", backend: .mpv, resolution: .sd360p30, formats: QualityProfile.Format.allCases, order: Array(QualityProfile.Format.allCases.indices))
+    static let hd720pAVPlayerProfile = QualityProfile(id: "hd720pAVPlayerProfile", backend: .appleAVPlayer, resolution: .hd720p30, formats: [.stream, .hls], order: Array(QualityProfile.Format.allCases.indices))
+    static let sd360pAVPlayerProfile = QualityProfile(id: "sd360pAVPlayerProfile", backend: .appleAVPlayer, resolution: .sd360p30, formats: [.stream, .hls], order: Array(QualityProfile.Format.allCases.indices))
 
     #if os(iOS)
-        static let qualityProfilesDefault = UIDevice.current.userInterfaceIdiom == .pad ? [
-            hd2160pMPVProfile,
-            hd1080pMPVProfile,
-            hd720pMPVProfile,
-            hd720pAVPlayerProfile,
-            sd360pAVPlayerProfile
-        ] : [
-            hd1080pMPVProfile,
-            hd720pMPVProfile,
-            hd720pAVPlayerProfile,
-            sd360pAVPlayerProfile
-        ]
+        enum QualityProfiles {
+            // iPad-specific settings
+            enum iPad {
+                static let qualityProfilesDefault = [
+                    hd1080p60MPVProfile,
+                    hd1080pMPVProfile,
+                    hd720p60MPVProfile,
+                    hd720pMPVProfile
+                ]
 
-        static let batteryCellularProfileDefault = hd720pAVPlayerProfile.id
-        static let batteryNonCellularProfileDefault = hd720pAVPlayerProfile.id
-        static let chargingCellularProfileDefault = hd720pAVPlayerProfile.id
-        static let chargingNonCellularProfileDefault = hd1080pMPVProfile.id
+                static let batteryCellularProfileDefault = hd720pMPVProfile.id
+                static let batteryNonCellularProfileDefault = hd720p60MPVProfile.id
+                static let chargingCellularProfileDefault = hd1080pMPVProfile.id
+                static let chargingNonCellularProfileDefault = hd1080p60MPVProfile.id
+            }
+
+            // iPhone-specific settings
+            enum iPhone {
+                static let qualityProfilesDefault = [
+                    hd1080p60MPVProfile,
+                    hd1080pMPVProfile,
+                    hd720p60MPVProfile,
+                    hd720pMPVProfile,
+                    sd360pMPVProfile
+                ]
+
+                static let batteryCellularProfileDefault = sd360pMPVProfile.id
+                static let batteryNonCellularProfileDefault = hd720p60MPVProfile.id
+                static let chargingCellularProfileDefault = hd720pMPVProfile.id
+                static let chargingNonCellularProfileDefault = hd1080p60MPVProfile.id
+            }
+
+            // Access the correct profile based on device type
+            static var currentProfile: (qualityProfilesDefault: [QualityProfile], batteryCellularProfileDefault: String, batteryNonCellularProfileDefault: String, chargingCellularProfileDefault: String, chargingNonCellularProfileDefault: String) {
+                if Constants.isIPad {
+                    return (
+                        qualityProfilesDefault: iPad.qualityProfilesDefault,
+                        batteryCellularProfileDefault: iPad.batteryCellularProfileDefault,
+                        batteryNonCellularProfileDefault: iPad.batteryNonCellularProfileDefault,
+                        chargingCellularProfileDefault: iPad.chargingCellularProfileDefault,
+                        chargingNonCellularProfileDefault: iPad.chargingNonCellularProfileDefault
+                    )
+                }
+
+                return (
+                    qualityProfilesDefault: iPhone.qualityProfilesDefault,
+                    batteryCellularProfileDefault: iPhone.batteryCellularProfileDefault,
+                    batteryNonCellularProfileDefault: iPhone.batteryNonCellularProfileDefault,
+                    chargingCellularProfileDefault: iPhone.chargingCellularProfileDefault,
+                    chargingNonCellularProfileDefault: iPhone.chargingNonCellularProfileDefault
+                )
+            }
+        }
+
     #elseif os(tvOS)
-        static let qualityProfilesDefault = [
-            hd2160pMPVProfile,
-            hd1080pMPVProfile,
-            hd720pMPVProfile,
-            hd720pAVPlayerProfile
-        ]
-        static let batteryCellularProfileDefault = hd1080pMPVProfile.id
-        static let batteryNonCellularProfileDefault = hd1080pMPVProfile.id
-        static let chargingCellularProfileDefault = hd1080pMPVProfile.id
-        static let chargingNonCellularProfileDefault = hd1080pMPVProfile.id
+        enum QualityProfiles {
+            // tvOS-specific settings
+            enum tvOS {
+                static let qualityProfilesDefault = [
+                    hd2160p60MPVProfile,
+                    hd1080p60MPVProfile,
+                    hd720p60MPVProfile,
+                    hd720pAVPlayerProfile
+                ]
+
+                static let batteryCellularProfileDefault = hd1080p60MPVProfile.id
+                static let batteryNonCellularProfileDefault = hd1080p60MPVProfile.id
+                static let chargingCellularProfileDefault = hd1080p60MPVProfile.id
+                static let chargingNonCellularProfileDefault = hd1080p60MPVProfile.id
+            }
+
+            // Access the correct profile based on device type
+            static var currentProfile: (qualityProfilesDefault: [QualityProfile], batteryCellularProfileDefault: String, batteryNonCellularProfileDefault: String, chargingCellularProfileDefault: String, chargingNonCellularProfileDefault: String) {
+                (
+                    qualityProfilesDefault: tvOS.qualityProfilesDefault,
+                    batteryCellularProfileDefault: tvOS.batteryCellularProfileDefault,
+                    batteryNonCellularProfileDefault: tvOS.batteryNonCellularProfileDefault,
+                    chargingCellularProfileDefault: tvOS.chargingCellularProfileDefault,
+                    chargingNonCellularProfileDefault: tvOS.chargingNonCellularProfileDefault
+                )
+            }
+        }
     #else
-        static let qualityProfilesDefault = [
-            hd2160pMPVProfile,
-            hd1080pMPVProfile,
-            hd720pMPVProfile,
-            hd720pAVPlayerProfile
-        ]
-        static let batteryCellularProfileDefault = hd1080pMPVProfile.id
-        static let batteryNonCellularProfileDefault = hd1080pMPVProfile.id
-        static let chargingCellularProfileDefault = hd1080pMPVProfile.id
-        static let chargingNonCellularProfileDefault = hd1080pMPVProfile.id
+        enum QualityProfiles {
+            // macOS-specific settings
+            enum macOS {
+                static let qualityProfilesDefault = [
+                    hd2160p60MPVProfile,
+                    hd1080p60MPVProfile,
+                    hd1080pMPVProfile,
+                    hd720p60MPVProfile
+                ]
+
+                static let batteryCellularProfileDefault = hd1080p60MPVProfile.id
+                static let batteryNonCellularProfileDefault = hd1080p60MPVProfile.id
+                static let chargingCellularProfileDefault = hd1080p60MPVProfile.id
+                static let chargingNonCellularProfileDefault = hd1080p60MPVProfile.id
+            }
+
+            // Access the correct profile for other platforms
+            static var currentProfile: (qualityProfilesDefault: [QualityProfile], batteryCellularProfileDefault: String, batteryNonCellularProfileDefault: String, chargingCellularProfileDefault: String, chargingNonCellularProfileDefault: String) {
+                (
+                    qualityProfilesDefault: macOS.qualityProfilesDefault,
+                    batteryCellularProfileDefault: macOS.batteryCellularProfileDefault,
+                    batteryNonCellularProfileDefault: macOS.batteryNonCellularProfileDefault,
+                    chargingCellularProfileDefault: macOS.chargingCellularProfileDefault,
+                    chargingNonCellularProfileDefault: macOS.chargingNonCellularProfileDefault
+                )
+            }
+        }
     #endif
 
-    static let batteryCellularProfile = Key<QualityProfile.ID>("batteryCellularProfile", default: batteryCellularProfileDefault)
-    static let batteryNonCellularProfile = Key<QualityProfile.ID>("batteryNonCellularProfile", default: batteryNonCellularProfileDefault)
-    static let chargingCellularProfile = Key<QualityProfile.ID>("chargingCellularProfile", default: chargingCellularProfileDefault)
-    static let chargingNonCellularProfile = Key<QualityProfile.ID>("chargingNonCellularProfile", default: chargingNonCellularProfileDefault)
-    static let forceAVPlayerForLiveStreams = Key<Bool>("forceAVPlayerForLiveStreams", default: true)
-
-    static let qualityProfiles = Key<[QualityProfile]>("qualityProfiles", default: qualityProfilesDefault)
+    static let batteryCellularProfile = Key<QualityProfile.ID>(
+        "batteryCellularProfile",
+        default: QualityProfiles.currentProfile.batteryCellularProfileDefault
+    )
+    static let batteryNonCellularProfile = Key<QualityProfile.ID>(
+        "batteryNonCellularProfile",
+        default: QualityProfiles.currentProfile.batteryNonCellularProfileDefault
+    )
+    static let chargingCellularProfile = Key<QualityProfile.ID>(
+        "chargingCellularProfile",
+        default: QualityProfiles.currentProfile.chargingCellularProfileDefault
+    )
+    static let chargingNonCellularProfile = Key<QualityProfile.ID>(
+        "chargingNonCellularProfile",
+        default: QualityProfiles.currentProfile.chargingNonCellularProfileDefault
+    )
+    static let forceAVPlayerForLiveStreams = Key<Bool>(
+        "forceAVPlayerForLiveStreams",
+        default: true
+    )
+    static let qualityProfiles = Key<[QualityProfile]>(
+        "qualityProfiles",
+        default: QualityProfiles.currentProfile.qualityProfilesDefault
+    )
 
     // MARK: GROUP - History
 

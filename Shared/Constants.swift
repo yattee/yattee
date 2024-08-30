@@ -39,6 +39,30 @@ enum Constants {
         #endif
     }
 
+    static var isTvOS: Bool {
+        #if os(tvOS)
+            true
+        #else
+            false
+        #endif
+    }
+
+    static var isMacOS: Bool {
+        #if os(macOS)
+            true
+        #else
+            false
+        #endif
+    }
+
+    static var isIOS: Bool {
+        #if os(iOS)
+            true
+        #else
+            false
+        #endif
+    }
+
     static var progressViewScale: Double {
         #if os(macOS)
             0.4

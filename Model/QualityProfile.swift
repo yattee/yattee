@@ -6,12 +6,12 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     static var defaultProfile = Self(id: "default", backend: .mpv, resolution: .hd720p60, formats: [.stream], order: Array(Format.allCases.indices))
 
     enum Format: String, CaseIterable, Identifiable, Defaults.Serializable {
-        case hls
-        case stream
         case avc1
         case mp4
+        case stream
         case av1
         case webm
+        case hls
 
         var id: String {
             rawValue
@@ -30,18 +30,18 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
 
         var streamFormat: Stream.Format? {
             switch self {
-            case .hls:
-                return nil
+            case .av1:
+                return .av1
+            case .mp4:
+                return .mp4
             case .stream:
                 return nil
             case .avc1:
                 return .avc1
-            case .mp4:
-                return .mp4
-            case .av1:
-                return .av1
             case .webm:
                 return .webm
+            case .hls:
+                return nil
             }
         }
     }
@@ -59,14 +59,16 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
     }
 
     var formatsDescription: String {
-        if formats.count == Format.allCases.count {
+        switch formats.count {
+        case Format.allCases.count:
             return "Any format".localized()
-        }
-        if formats.count <= 3 {
+        case 0:
+            return "No format selected".localized()
+        case 1 ... 3:
             return formats.map(\.description).joined(separator: ", ")
+        default:
+            return String(format: "%@ formats".localized(), String(formats.count))
         }
-
-        return String(format: "%@ formats".localized(), String(formats.count))
     }
 
     func isPreferred(_ stream: Stream) -> Bool {
