@@ -5,10 +5,27 @@ final class ThumbnailsModel: ObservableObject {
     static var shared = ThumbnailsModel()
 
     @Published var unloadable = Set<URL>()
+    private var retryCounts = [URL: Int]()
+    private let maxRetries = 3
+    private let retryDelay: TimeInterval = 0.25
 
     func insertUnloadable(_ url: URL) {
-        DispatchQueue.main.async {
-            self.unloadable.insert(url)
+        let retries = (retryCounts[url] ?? 0) + 1
+
+        if retries >= maxRetries {
+            DispatchQueue.main.async {
+                self.unloadable.insert(url)
+                self.retryCounts.removeValue(forKey: url)
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.retryCounts[url] = retries
+            }
+            DispatchQueue.global().asyncAfter(deadline: .now() + retryDelay) {
+                DispatchQueue.main.async {
+                    self.retryCounts[url] = retries
+                }
+            }
         }
     }
 
