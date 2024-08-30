@@ -7,7 +7,7 @@ final class ThumbnailsModel: ObservableObject {
     @Published var unloadable = Set<URL>()
     private var retryCounts = [URL: Int]()
     private let maxRetries = 3
-    private let retryDelay: TimeInterval = 0.25
+    private let retryDelay: TimeInterval = 1.0
 
     func insertUnloadable(_ url: URL) {
         let retries = (retryCounts[url] ?? 0) + 1
