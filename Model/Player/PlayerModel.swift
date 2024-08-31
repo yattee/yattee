@@ -684,7 +684,7 @@ final class PlayerModel: ObservableObject {
         }
 
         // First, we need to create an array with supported formats.
-        let formatOrderPiP: [QualityProfile.Format] = [.hls, .stream, .mp4]
+        let formatOrderPiP: [QualityProfile.Format] = [.stream, .hls]
 
         guard let video = currentVideo else { return }
         guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: formatOrderPiP) else { return }
@@ -1057,7 +1057,7 @@ final class PlayerModel: ObservableObject {
 
     func updateCurrentArtwork() {
         guard let video = currentVideo,
-              let thumbnailURL = video.thumbnailURL(quality: .medium)
+              let thumbnailURL = video.thumbnailURL(quality: Constants.isIPhone ? .medium : .maxres)
         else {
             return
         }
