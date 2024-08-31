@@ -245,6 +245,21 @@ final class MPVBackend: PlayerBackend {
         }
 
         let startPlaying = {
+            #if !os(macOS)
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true)
+
+                    NotificationCenter.default.addObserver(
+                        self,
+                        selector: #selector(self.handleAudioSessionInterruption(_:)),
+                        name: AVAudioSession.interruptionNotification,
+                        object: nil
+                    )
+                } catch {
+                    self.logger.error("Error setting up audio session: \(error)")
+                }
+            #endif
+
             DispatchQueue.main.async { [weak self] in
                 guard let self else {
                     return

@@ -23,7 +23,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             // Configure the audio session for playback
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-                try AVAudioSession.sharedInstance().setActive(true)
             } catch {
                 logger.error("Failed to set audio session category: \(error)")
             }
