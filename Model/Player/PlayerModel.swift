@@ -56,6 +56,7 @@ final class PlayerModel: ObservableObject {
     @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
     @Published var forceBackendOnPlay: PlayerBackendType?
+    @Published var wasFullscreen = false
 
     var avPlayerBackend = AVPlayerBackend()
     var mpvBackend = MPVBackend()
@@ -979,6 +980,17 @@ final class PlayerModel: ObservableObject {
                 avPlayerBackend.bindPlayerToLayer()
             }
 
+            #if os(iOS)
+                if wasFullscreen {
+                    wasFullscreen = false
+                    DispatchQueue.main.async { [weak self] in
+                        Delay.by(0.3) {
+                            self?.enterFullScreen()
+                        }
+                    }
+                }
+            #endif
+
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
             }
@@ -993,6 +1005,15 @@ final class PlayerModel: ObservableObject {
             } else if !playingInPictureInPicture {
                 avPlayerBackend.removePlayerFromLayer()
             }
+            #if os(iOS)
+                guard playingFullScreen else { return }
+                wasFullscreen = playingFullScreen
+                DispatchQueue.main.async { [weak self] in
+                    Delay.by(0.3) {
+                        self?.exitFullScreen(showControls: false)
+                    }
+                }
+            #endif
         }
     #endif
 
