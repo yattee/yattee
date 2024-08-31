@@ -248,13 +248,6 @@ final class MPVBackend: PlayerBackend {
             #if !os(macOS)
                 do {
                     try AVAudioSession.sharedInstance().setActive(true)
-
-                    NotificationCenter.default.addObserver(
-                        self,
-                        selector: #selector(self.handleAudioSessionInterruption(_:)),
-                        name: AVAudioSession.interruptionNotification,
-                        object: nil
-                    )
                 } catch {
                     self.logger.error("Error setting up audio session: \(error)")
                 }
@@ -649,33 +642,4 @@ final class MPVBackend: PlayerBackend {
             logger.info("MPV backend received unhandled property: \(name)")
         }
     }
-
-    #if !os(macOS)
-        @objc func handleAudioSessionInterruption(_ notification: Notification) {
-            logger.info("Audio session interruption received.")
-
-            guard let info = notification.userInfo,
-                  let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt
-            else {
-                logger.info("AVAudioSessionInterruptionTypeKey is missing or not a UInt in userInfo.")
-                return
-            }
-
-            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
-
-            logger.info("Interruption type received: \(String(describing: type))")
-
-            switch type {
-            case .began:
-                pause()
-                logger.info("Audio session interrupted.")
-            default:
-                break
-            }
-        }
-
-        deinit {
-            NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
-        }
-    #endif
 }
