@@ -1,9 +1,12 @@
+import AVFoundation
 import Foundation
+import Logging
 import UIKit
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     var orientationLock = UIInterfaceOrientationMask.all
 
+    private var logger = Logger(label: "stream.yattee.app.delegalate")
     private(set) static var instance: AppDelegate!
 
     func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
@@ -12,11 +15,22 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool { // swiftlint:disable:this discouraged_optional_collection
         Self.instance = self
-        #if os(iOS)
-            UIViewController.swizzleHomeIndicatorProperty()
 
+        #if !os(macOS)
+            UIViewController.swizzleHomeIndicatorProperty()
             OrientationTracker.shared.startDeviceOrientationTracking()
+
+            // Configure the audio session for playback
+            do {
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+            } catch {
+                logger.error("Failed to set audio session category: \(error)")
+            }
+
+            // Begin receiving remote control events
+            UIApplication.shared.beginReceivingRemoteControlEvents()
         #endif
+
         return true
     }
 
