@@ -35,10 +35,14 @@ final class OrientationModel {
                 self.logger.info("Orientation has not changed.")
             }
 
+            if !self.player.presentingPlayer, Defaults[.lockPortraitWhenBrowsing] {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
+
             // Only take action if the player is active and presenting
             guard Defaults[.enterFullscreenInLandscape],
-                  !Defaults[.isOrentationLocked],
                   self.player.presentingPlayer,
+                  !self.player.isOrientationLocked,
                   !self.player.playingInPictureInPicture
             else {
                 self.logger.info("Only updating orientation without actions.")

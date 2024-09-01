@@ -1,4 +1,5 @@
 import AVFoundation
+import Defaults
 import Foundation
 import Logging
 import UIKit
@@ -20,6 +21,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             UIViewController.swizzleHomeIndicatorProperty()
             OrientationTracker.shared.startDeviceOrientationTracking()
             OrientationModel.shared.startOrientationUpdates()
+
+            if !Defaults[.lockPortraitWhenBrowsing] {
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            }
 
             // Configure the audio session for playback
             do {

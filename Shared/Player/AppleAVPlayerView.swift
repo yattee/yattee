@@ -17,7 +17,6 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if PlayerModel.shared.currentVideoIsLandscape {
                     let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
                     // not sure why but first rotation call is ignore so doing rotate to same orientation first

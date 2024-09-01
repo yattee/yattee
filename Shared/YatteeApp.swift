@@ -266,7 +266,7 @@ struct YatteeApp: App {
     }
 
     func migrateRotateToLandscapeOnEnterFullScreen() {
-        if Defaults[.rotateToLandscapeOnEnterFullScreen] == .disabled {
+        if Defaults[.rotateToLandscapeOnEnterFullScreen] != .landscapeRight || Defaults[.rotateToLandscapeOnEnterFullScreen] != .landscapeLeft {
             Defaults[.rotateToLandscapeOnEnterFullScreen] = .landscapeRight
         }
     }

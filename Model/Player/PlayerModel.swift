@@ -131,7 +131,12 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
-        @Default(.isOrentationLocked) var isOrentationLocked
+        @Published var isOrientationLocked: Bool {
+            didSet {
+                Defaults[.isOrientationLocked] = isOrientationLocked
+            }
+        }
+
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
@@ -202,6 +207,10 @@ final class PlayerModel: ObservableObject {
     #endif
 
     init() {
+        #if os(iOS)
+            isOrientationLocked = Defaults[.isOrientationLocked]
+            if isOrientationLocked { lockOrientationAction() }
+        #endif
         #if !os(macOS)
             mpvBackend.controller = mpvController
             mpvBackend.client = mpvController.client
@@ -213,9 +222,6 @@ final class PlayerModel: ObservableObject {
                 name: AVAudioSession.interruptionNotification,
                 object: nil
             )
-
-            // Initialize the orientatin lock
-            if isOrentationLocked { togglePiPAction() }
         #endif
 
         playbackMode = Defaults[.playbackMode]
@@ -797,7 +803,7 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         var lockOrientationImage: String {
-            isOrentationLocked ? "lock.rotation" : "lock.rotation.open"
+            isOrientationLocked ? "lock.rotation" : "lock.rotation.open"
         }
 
         func lockOrientationAction() {
@@ -805,15 +811,14 @@ final class PlayerModel: ObservableObject {
                 let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
                 lockedOrientation = orientationMask
                 let orientation = OrientationTracker.shared.currentInterfaceOrientation
-                Defaults[.isOrentationLocked] = true
                 Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
                 // iOS 16 workaround
                 Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
             } else {
                 lockedOrientation = nil
-                Defaults[.isOrentationLocked] = false
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
+            isOrientationLocked.toggle()
         }
     #endif
 
@@ -1143,12 +1148,10 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
-                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0.1
+                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0.0
                     Delay.by(delay) {
                         let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        // Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
