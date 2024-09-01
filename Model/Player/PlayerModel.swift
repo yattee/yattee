@@ -1127,7 +1127,7 @@ final class PlayerModel: ObservableObject {
                 }
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
-                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
+                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0.1
                     Delay.by(delay) {
                         let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
                         // Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
