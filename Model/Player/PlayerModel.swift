@@ -808,6 +808,7 @@ final class PlayerModel: ObservableObject {
 
         func lockOrientationAction() {
             if lockedOrientation.isNil {
+                isOrientationLocked = true
                 let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
                 lockedOrientation = orientationMask
                 let orientation = OrientationTracker.shared.currentInterfaceOrientation
@@ -815,10 +816,10 @@ final class PlayerModel: ObservableObject {
                 // iOS 16 workaround
                 Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
             } else {
+                isOrientationLocked = false
                 lockedOrientation = nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
-            isOrientationLocked.toggle()
         }
     #endif
 
