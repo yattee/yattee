@@ -64,11 +64,7 @@ extension VideoPlayerView {
 
                 // Toggle fullscreen on upward drag only when not disabled
                 if verticalDrag < -50 {
-                    if player.playingFullScreen {
-                        player.exitFullScreen(showControls: false)
-                    } else {
-                        player.enterFullScreen()
-                    }
+                    player.toggleFullScreenAction()
                     disableGestureTemporarily()
                     return
                 }

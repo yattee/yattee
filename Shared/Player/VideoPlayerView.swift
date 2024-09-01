@@ -111,9 +111,6 @@ struct VideoPlayerView: View {
                 .onChange(of: geometry.size) { _ in
                     self.playerSize = geometry.size
                 }
-                .onChange(of: fullScreenDetails) { value in
-                    player.backend.setNeedsDrawing(!value)
-                }
             #if os(iOS)
                 .onChange(of: player.presentingPlayer) { newValue in
                     if newValue {
@@ -127,19 +124,6 @@ struct VideoPlayerView: View {
                         }
                     #endif
                     viewDragOffset = 0
-
-                    Delay.by(0.2) {
-                        orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
-
-                        if let orientationMask = player.lockedOrientation {
-                            Orientation.lockOrientation(
-                                orientationMask,
-                                andRotateTo: orientationMask == .landscapeLeft ? .landscapeLeft : orientationMask == .landscapeRight ? .landscapeRight : .portrait
-                            )
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown)
-                        }
-                    }
                 }
                 .onAnimationCompleted(for: viewDragOffset) {
                     guard !dragGestureState else { return }
@@ -313,11 +297,14 @@ struct VideoPlayerView: View {
                                 playerSize: player.playerSize,
                                 fullScreen: fullScreenDetails
                             ))
+                            #if os(macOS)
+                            // TODO: Check whether this is needed on macOS.
                             .onDisappear {
                                 if player.presentingPlayer {
                                     player.setNeedsDrawing(true)
                                 }
                             }
+                            #endif
                             .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
                         } else {

@@ -10,6 +10,7 @@ struct BrowsingSettings: View {
     @Default(.showUnwatchedFeedBadges) private var showUnwatchedFeedBadges
     @Default(.keepChannelsWithUnwatchedFeedOnTop) private var keepChannelsWithUnwatchedFeedOnTop
     #if os(iOS)
+        @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
         @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
         @Default(.showDocuments) private var showDocuments
     #endif
@@ -161,14 +162,18 @@ struct BrowsingSettings: View {
             #if os(iOS)
                 Toggle("Show Documents", isOn: $showDocuments)
 
-                Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
-                    .onChange(of: lockPortraitWhenBrowsing) { lock in
-                        if lock {
-                            Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
-                        } else {
-                            Orientation.lockOrientation(.allButUpsideDown)
+                if Constants.isIPad {
+                    Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
+                        .onChange(of: lockPortraitWhenBrowsing) { lock in
+                            if lock {
+                                enterFullscreenInLandscape = true
+                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                            } else {
+                                enterFullscreenInLandscape = false
+                                Orientation.lockOrientation(.allButUpsideDown)
+                            }
                         }
-                    }
+                }
             #endif
 
             if !accounts.isEmpty {

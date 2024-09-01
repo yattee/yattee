@@ -1,16 +1,17 @@
 import AVFoundation
+import Defaults
 import Foundation
 import Logging
 import UIKit
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
-    var orientationLock = UIInterfaceOrientationMask.all
+    var orientationLock = UIInterfaceOrientationMask.allButUpsideDown
 
-    private var logger = Logger(label: "stream.yattee.app.delegalate")
+    private var logger = Logger(label: "stream.yattee.app.delegate")
     private(set) static var instance: AppDelegate!
 
     func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
-        orientationLock
+        return orientationLock
     }
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool { // swiftlint:disable:this discouraged_optional_collection
@@ -19,6 +20,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         #if !os(macOS)
             UIViewController.swizzleHomeIndicatorProperty()
             OrientationTracker.shared.startDeviceOrientationTracking()
+            OrientationModel.shared.startOrientationUpdates()
 
             // Configure the audio session for playback
             do {
