@@ -818,7 +818,7 @@ final class PlayerModel: ObservableObject {
             } else {
                 isOrientationLocked = false
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                Orientation.lockOrientation(Constants.isIPhone ? .allButUpsideDown : .all, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
             }
         }
     #endif

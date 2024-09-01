@@ -39,7 +39,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
             // Allow all orientations after a brief delay to ensure the app starts in portrait
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.orientationLock = .all
+                if Constants.isIPhone {
+                    self.orientationLock = .allButUpsideDown
+                } else {
+                    self.orientationLock = .all
+                }
             }
         #endif
 
