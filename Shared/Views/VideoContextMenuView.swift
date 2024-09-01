@@ -24,14 +24,42 @@ struct VideoContextMenuView: View {
 
     private var backgroundContext = PersistenceController.shared.container.newBackgroundContext()
 
+    @State private var isOverlayVisible = false
+
     init(video: Video) {
         self.video = video
         _watchRequest = video.watchFetchRequest
     }
 
     var body: some View {
-        if video.videoID != Video.fixtureID {
-            contextMenu
+        ZStack {
+            // Conditional overlay to block taps on underlying views
+            if isOverlayVisible {
+                Color.clear
+                    .contentShape(Rectangle())
+                #if !os(tvOS)
+                    // This is not available on tvOS < 16 so we leave out.
+                    // TODO: remove #if when setting the minimum deployment target to >= 16
+                    .onTapGesture {
+                        // Dismiss overlay without triggering other interactions
+                        isOverlayVisible = false
+                    }
+                #endif
+                    .ignoresSafeArea() // Ensure overlay covers the entire screen
+                    .accessibilityLabel("Dismiss context menu")
+                    .accessibilityHint("Tap to close the context")
+                    .accessibilityAddTraits(.isButton)
+            }
+
+            if video.videoID != Video.fixtureID {
+                contextMenu
+                    .onAppear {
+                        isOverlayVisible = true
+                    }
+                    .onDisappear {
+                        isOverlayVisible = false
+                    }
+            }
         }
     }
 
