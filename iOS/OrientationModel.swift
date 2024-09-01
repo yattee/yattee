@@ -36,8 +36,13 @@ final class OrientationModel {
             }
 
             // Only take action if the player is active and presenting
-            guard Defaults[.enterFullscreenInLandscape], self.player.presentingPlayer else {
-                self.logger.info("Player is not presenting or fullscreen in landscape is not allowed, only updating orientation without actions.")
+            guard Defaults[.enterFullscreenInLandscape],
+                  self.player.presentingPlayer,
+                  !Defaults[.honorSystemOrientationLock],
+                  !self.player.playingInPictureInPicture,
+                  self.player.lockedOrientation.isNil
+            else {
+                self.logger.info("Only updating orientation without actions.")
                 return
             }
 
