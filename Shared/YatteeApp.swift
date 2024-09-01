@@ -225,6 +225,18 @@ struct YatteeApp: App {
             DispatchQueue.global(qos: .userInitiated).async {
                 self.migrateQualityProfiles()
             }
+
+            #if os(iOS)
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.migrateRotateToLandscapeOnEnterFullScreen()
+                }
+
+                if Constants.isIPhone {
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        self.migrateLockPortraitWhenBrowsing()
+                    }
+                }
+            #endif
         }
     }
 
@@ -250,6 +262,18 @@ struct YatteeApp: App {
             var updatedProfile = profile
             updatedProfile.order = Array(QualityProfile.Format.allCases.indices)
             QualityProfilesModel.shared.update(profile, updatedProfile)
+        }
+    }
+
+    func migrateRotateToLandscapeOnEnterFullScreen() {
+        if Defaults[.rotateToLandscapeOnEnterFullScreen] == .disabled {
+            Defaults[.rotateToLandscapeOnEnterFullScreen] = .landscapeRight
+        }
+    }
+
+    func migrateLockPortraitWhenBrowsing() {
+        if Defaults[.lockPortraitWhenBrowsing] == false {
+            Defaults[.lockPortraitWhenBrowsing] = true
         }
     }
 

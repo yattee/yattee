@@ -37,10 +37,9 @@ final class OrientationModel {
 
             // Only take action if the player is active and presenting
             guard Defaults[.enterFullscreenInLandscape],
+                  !Defaults[.isOrentationLocked],
                   self.player.presentingPlayer,
-                  !Defaults[.honorSystemOrientationLock],
-                  !self.player.playingInPictureInPicture,
-                  self.player.lockedOrientation.isNil
+                  !self.player.playingInPictureInPicture
             else {
                 self.logger.info("Only updating orientation without actions.")
                 return

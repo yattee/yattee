@@ -93,12 +93,9 @@ extension Defaults.Keys {
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
     #if os(iOS)
-        static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
+        static let isOrentationLocked = Key<Bool>("isOrentationLocked", default: true)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: Constants.isIPhone)
-        static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>(
-            "rotateToLandscapeOnEnterFullScreen",
-            default: Constants.isIPhone ? .landscapeRight : .disabled
-        )
+        static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>("rotateToLandscapeOnEnterFullScreen", default: .landscapeRight)
     #endif
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)

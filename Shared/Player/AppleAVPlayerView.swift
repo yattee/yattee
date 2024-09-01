@@ -37,8 +37,6 @@ import SwiftUI
                     }
                     if !context.isCancelled {
                         #if os(iOS)
-                            self.player.lockedOrientation = nil
-
                             if Constants.isIPhone {
                                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
                             }
