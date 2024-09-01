@@ -5,13 +5,13 @@ import Logging
 import UIKit
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
-    var orientationLock = UIInterfaceOrientationMask.all
+    var orientationLock = UIInterfaceOrientationMask.portrait // Start locked to portrait
 
-    private var logger = Logger(label: "stream.yattee.app.delegalate")
+    private var logger = Logger(label: "stream.yattee.app.delegate")
     private(set) static var instance: AppDelegate!
 
     func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
-        orientationLock
+        return orientationLock
     }
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool { // swiftlint:disable:this discouraged_optional_collection
@@ -22,7 +22,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             OrientationTracker.shared.startDeviceOrientationTracking()
             OrientationModel.shared.startOrientationUpdates()
 
-            if !Defaults[.lockPortraitWhenBrowsing] {
+            // Force lock orientation to portrait if lockPortraitWhenBrowsing is true
+            if Defaults[.lockPortraitWhenBrowsing] {
                 Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
             }
 
@@ -35,6 +36,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
             // Begin receiving remote control events
             UIApplication.shared.beginReceivingRemoteControlEvents()
+
+            // Allow all orientations after a brief delay to ensure the app starts in portrait
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.orientationLock = .all
+            }
         #endif
 
         return true

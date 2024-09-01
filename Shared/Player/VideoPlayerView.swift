@@ -240,7 +240,8 @@ struct VideoPlayerView: View {
         }
 
         var playerHeight: Double? {
-            let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait
+            let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
+            let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait
             return fullScreenPlayer ? UIScreen.main.bounds.size.height - (isPortrait ? safeAreaModel.safeArea.top + safeAreaModel.safeArea.bottom : 0) : nil
         }
     #endif
