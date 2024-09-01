@@ -537,8 +537,6 @@ final class PlayerModel: ObservableObject {
                 } else {
                     Orientation.lockOrientation(.allButUpsideDown)
                 }
-
-                OrientationModel.shared.stopOrientationUpdates()
             #endif
         }
     }
@@ -645,32 +643,37 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
-        pause()
-        videoBeingOpened = nil
-        advancing = false
-        forceBackendOnPlay = nil
-
+        guard !closing else { return }
         closing = true
-        controls.presentingControls = false
 
-        self.prepareCurrentItemForHistory(finished: finished)
+        if playingFullScreen { exitFullScreen() }
 
-        self.hide()
-
-        Delay.by(0.8) { [weak self] in
+        Delay.by(0.3) { [weak self] in
             guard let self else { return }
-            self.closePiP()
+            pause()
+            videoBeingOpened = nil
+            advancing = false
+            forceBackendOnPlay = nil
 
-            withAnimation {
-                self.currentItem = nil
+            controls.presentingControls = false
+
+            self.prepareCurrentItemForHistory(finished: finished)
+            self.hide()
+
+            Delay.by(0.7) { [weak self] in
+                guard let self else { return }
+                if playingInPictureInPicture { self.closePiP() }
+
+                withAnimation {
+                    self.currentItem = nil
+                }
+
+                self.updateNowPlayingInfo()
+                self.backend.closeItem()
+                self.aspectRatio = VideoPlayerView.defaultAspectRatio
+                self.resetAutoplay()
+                self.closing = false
             }
-            self.updateNowPlayingInfo()
-
-            self.backend.closeItem()
-            self.aspectRatio = VideoPlayerView.defaultAspectRatio
-            self.resetAutoplay()
-            self.closing = false
-            self.playingFullScreen = false
         }
     }
 
@@ -1125,10 +1128,9 @@ final class PlayerModel: ObservableObject {
                 guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
                 if currentVideoIsLandscape {
                     let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
                     Delay.by(delay) {
                         let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        // Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
                         Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
                     }
                 }
@@ -1141,7 +1143,6 @@ final class PlayerModel: ObservableObject {
                 let rotationOrientation = Constants.isIPhone ? UIInterfaceOrientation.portrait : nil
                 Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
             }
-
         #endif
     }
 

@@ -122,8 +122,6 @@ struct VideoPlayerView: View {
                     viewDragOffset = 0
 
                     Delay.by(0.2) {
-                        orientationModel.configureOrientationUpdatesBasedOnAccelerometer()
-
                         if let orientationMask = player.lockedOrientation {
                             Orientation.lockOrientation(
                                 orientationMask,

@@ -19,6 +19,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         #if !os(macOS)
             UIViewController.swizzleHomeIndicatorProperty()
             OrientationTracker.shared.startDeviceOrientationTracking()
+            OrientationModel.shared.startOrientationUpdates()
 
             // Configure the audio session for playback
             do {
