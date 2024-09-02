@@ -383,7 +383,7 @@ struct PlayerControls: View {
     }
 
     private var pipButton: some View {
-        button("PiP", systemImage: player.pipImage, action: player.togglePiPAction)
+        button("PiP", systemImage: player.pipImage, active: player.playingInPictureInPicture, action: player.togglePiPAction)
             .disabled(!player.pipPossible)
     }
 

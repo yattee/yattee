@@ -679,38 +679,24 @@ final class PlayerModel: ObservableObject {
         avPlayerBackend.startPictureInPictureOnPlay = false
         avPlayerBackend.startPictureInPictureOnSwitch = false
 
-        if activeBackend == .appleAVPlayer {
+        guard activeBackend != .appleAVPlayer else {
             avPlayerBackend.tryStartingPictureInPicture()
             return
         }
 
-        // First, we need to create an array with supported formats.
-        let formatOrderPiP: [QualityProfile.Format] = [.stream, .hls]
+        avPlayerBackend.startPictureInPictureOnSwitch = true
 
-        guard let video = currentVideo else { return }
-        guard let stream = avPlayerBackend.bestPlayable(availableStreams, maxResolution: .hd720p30, formatOrder: formatOrderPiP) else { return }
-
-        if avPlayerBackend.video == video {
-            if activeBackend != .appleAVPlayer {
-                avPlayerBackend.startPictureInPictureOnSwitch = true
-            }
-            changeActiveBackend(from: activeBackend, to: .appleAVPlayer)
-        } else {
-            avPlayerBackend.startPictureInPictureOnPlay = true
-            playStream(stream, of: video, preservingTime: true, upgrading: true, withBackend: avPlayerBackend)
-        }
-
-        var retryCount = 0
-        _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
-            if let pipController = self?.pipController, pipController.isPictureInPictureActive, self?.avPlayerBackend.isPlaying == true {
-                self?.exitFullScreen()
-                self?.controls.objectWillChange.send()
-                timer.invalidate()
-            } else if retryCount < 3, self?.activeBackend == .appleAVPlayer, self?.avPlayerBackend.startPictureInPictureOnSwitch == false {
-                // If PiP didn't start, try starting it again up to 3 times,
-                self?.avPlayerBackend.startPictureInPictureOnSwitch = true
-                self?.avPlayerBackend.tryStartingPictureInPicture()
-                retryCount += 1
+        saveTime {
+            self.changeActiveBackend(from: .mpv, to: .appleAVPlayer)
+            _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+                if let pipController = self?.pipController, pipController.isPictureInPictureActive, self?.avPlayerBackend.isPlaying == true {
+                    self?.exitFullScreen()
+                    self?.controls.objectWillChange.send()
+                    timer.invalidate()
+                } else if self?.activeBackend == .appleAVPlayer, self?.avPlayerBackend.startPictureInPictureOnSwitch == false {
+                    self?.avPlayerBackend.startPictureInPictureOnSwitch = true
+                    self?.avPlayerBackend.tryStartingPictureInPicture()
+                }
             }
         }
     }
@@ -740,19 +726,27 @@ final class PlayerModel: ObservableObject {
             show()
         #endif
 
-        if previousActiveBackend == .mpv {
-            saveTime {
-                self.changeActiveBackend(from: self.activeBackend, to: .mpv, isInClosePip: true)
-                _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
-                    if self?.activeBackend == .mpv, self?.mpvBackend.isPlaying == true {
-                        self?.backend.closePiP()
-                        self?.controls.resetTimer()
-                        timer.invalidate()
-                    }
+        avPlayerBackend.closePiP()
+        _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+            if self?.activeBackend == .appleAVPlayer, self?.avPlayerBackend.isPlaying == true, self?.playingInPictureInPicture == false {
+                timer.invalidate()
+            }
+        }
+
+        guard previousActiveBackend == .mpv else { return }
+
+        saveTime {
+            self.changeActiveBackend(from: .appleAVPlayer, to: .mpv, isInClosePip: true)
+            _ = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+                if self?.activeBackend == .mpv, self?.mpvBackend.isPlaying == true {
+                    timer.invalidate()
                 }
             }
-        } else {
-            backend.closePiP()
+        }
+
+        // We need to remove the itme from the player, if not it will be displayed when next video goe to PiP.
+        Delay.by(1.0) {
+            self.avPlayerBackend.closeItem()
         }
     }
 
@@ -999,7 +993,10 @@ final class PlayerModel: ObservableObject {
             }
 
             show()
-            closePiP()
+            // Needs to be delayed a bit, otherwise the PiP windows stays open
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.closePiP()
+            }
         }
 
         func handleEnterBackground() {
