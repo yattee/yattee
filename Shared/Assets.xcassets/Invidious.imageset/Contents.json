@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Invidious.svg",
+      "filename" : "Invidious_512x512@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "Invidious_512x512@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "Invidious_512x512@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
