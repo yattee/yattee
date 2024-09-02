@@ -214,14 +214,6 @@ final class PlayerModel: ObservableObject {
         #if !os(macOS)
             mpvBackend.controller = mpvController
             mpvBackend.client = mpvController.client
-
-            // Register for audio session interruption notifications
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(handleAudioSessionInterruption(_:)),
-                name: AVAudioSession.interruptionNotification,
-                object: nil
-            )
         #endif
 
         playbackMode = Defaults[.playbackMode]
@@ -236,10 +228,6 @@ final class PlayerModel: ObservableObject {
             }
         #endif
         currentRate = playerRate
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
     }
 
     func show() {
@@ -1254,42 +1242,6 @@ final class PlayerModel: ObservableObject {
 
         return nil
     }
-
-    #if !os(macOS)
-        @objc func handleAudioSessionInterruption(_ notification: Notification) {
-            logger.info("Audio session interruption received.")
-            logger.info("Notification received: \(notification)")
-
-            guard let info = notification.userInfo,
-                  let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
-                  let type = AVAudioSession.InterruptionType(rawValue: typeValue)
-            else {
-                logger.info("AVAudioSessionInterruptionTypeKey is missing or not a UInt in userInfo.")
-                return
-            }
-
-            logger.info("Interruption type received: \(type)")
-
-            switch type {
-            case .began:
-                logger.info("Audio session interrupted.")
-                // We need to call pause() to set all variables correctly, and play()
-                // directly afterwards, because the .began interrupt is sent after audio
-                // ducking ended and playback would pause. Audio ducking usually happens
-                // when using headphones.
-                pause()
-                play()
-            case .ended:
-                logger.info("Audio session interruption ended.")
-                // We need to call pause() to set all variables correctly.
-                // Otherwise, playback does not resume when the interruption ends.
-                pause()
-                play()
-            default:
-                break
-            }
-        }
-    #endif
 
     #if os(macOS)
         private func assignKeyPressMonitor() {
