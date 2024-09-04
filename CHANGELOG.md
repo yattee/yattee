@@ -1,13 +1,11 @@
-## Build 193
-* Invidious: propper HTTP basic auth support by @stonerl in https://github.com/yattee/yattee/pull/762
-* Apply correct orientation by @stonerl in https://github.com/yattee/yattee/pull/770
-* Circular Invidious logo by @stonerl in https://github.com/yattee/yattee/pull/769
-* Video Thumbnails: retry 3 times fetching from URL by @stonerl in https://github.com/yattee/yattee/pull/768
-* Make thumbnail fill the view in music mode by @stonerl in https://github.com/yattee/yattee/pull/766
-* Changes to defaults by @stonerl in https://github.com/yattee/yattee/pull/767
-* Fixed fullscreen handling for backgrounding by @stonerl in https://github.com/yattee/yattee/pull/772
-* Update now playing info when using system controls – Partial fix for 503 by @stonerl in https://github.com/yattee/yattee/pull/765
-* Fix crash on HLS live playback by @stonerl in https://github.com/yattee/yattee/pull/775
+## Build 194
+* Gestures: swipe up toggles fullscreen by @stonerl in https://github.com/yattee/yattee/pull/778
+* don’t open video when dismissing context menu by @stonerl in https://github.com/yattee/yattee/pull/780
+* mpv: remove video layer when entering background by @stonerl in https://github.com/yattee/yattee/pull/793
+* hi-res invidious logos by @stonerl in https://github.com/yattee/yattee/pull/791
+* enable -O3 by @stonerl in https://github.com/yattee/yattee/pull/794
+* Better audio ducking by @stonerl in https://github.com/yattee/yattee/pull/779
+* fix picture in picture by @stonerl in https://github.com/yattee/yattee/pull/789
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -26,6 +24,15 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* Invidious: propper HTTP basic auth support by @stonerl in https://github.com/yattee/yattee/pull/762
+* Apply correct orientation by @stonerl in https://github.com/yattee/yattee/pull/770
+* Circular Invidious logo by @stonerl in https://github.com/yattee/yattee/pull/769
+* Video Thumbnails: retry 3 times fetching from URL by @stonerl in https://github.com/yattee/yattee/pull/768
+* Make thumbnail fill the view in music mode by @stonerl in https://github.com/yattee/yattee/pull/766
+* Changes to defaults by @stonerl in https://github.com/yattee/yattee/pull/767
+* Fixed fullscreen handling for backgrounding by @stonerl in https://github.com/yattee/yattee/pull/772
+* Update now playing info when using system controls – Partial fix for 503 by @stonerl in https://github.com/yattee/yattee/pull/765
+* Fix crash on HLS live playback by @stonerl in https://github.com/yattee/yattee/pull/775
 * Fix mpv crashing on macOS by @stonerl in https://github.com/yattee/yattee/pull/754
 * Refreshed icons for iOS and macOS by @stonerl in https://github.com/yattee/yattee/pull/752
 * Add new MPVKit repo by @stonerl in https://github.com/yattee/yattee/pull/753
