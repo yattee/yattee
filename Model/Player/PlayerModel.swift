@@ -979,7 +979,11 @@ final class PlayerModel: ObservableObject {
         func handleEnterForeground() {
             setNeedsDrawing(presentingPlayer)
 
-            if !musicMode, activeBackend == .appleAVPlayer {
+            if !musicMode, activeBackend == .mpv {
+                mpvBackend.addVideoTrackFromStream()
+                mpvBackend.setVideoToAuto()
+                mpvBackend.controls.resetTimer()
+            } else if !musicMode, activeBackend == .appleAVPlayer {
                 avPlayerBackend.bindPlayerToLayer()
             }
 
@@ -1005,8 +1009,10 @@ final class PlayerModel: ObservableObject {
         func handleEnterBackground() {
             if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
                 pause()
-            } else if !playingInPictureInPicture {
+            } else if !playingInPictureInPicture, activeBackend == .appleAVPlayer {
                 avPlayerBackend.removePlayerFromLayer()
+            } else if activeBackend == .mpv, !musicMode {
+                mpvBackend.setVideoToNo()
             }
             #if os(iOS)
                 guard playingFullScreen else { return }
