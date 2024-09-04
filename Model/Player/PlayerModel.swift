@@ -228,9 +228,11 @@ final class PlayerModel: ObservableObject {
         currentRate = playerRate
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
-    }
+    #if !os(macOS)
+        deinit {
+            NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+        }
+    #endif
 
     func show() {
         #if os(macOS)
