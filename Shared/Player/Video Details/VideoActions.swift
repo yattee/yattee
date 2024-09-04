@@ -155,7 +155,7 @@ struct VideoActions: View {
                 case .fullScreen:
                     actionButton("Fullscreen", systemImage: player.fullscreenImage, action: player.toggleFullScreenAction)
                 case .pip:
-                    actionButton("PiP", systemImage: player.pipImage, action: player.togglePiPAction)
+                    actionButton("PiP", systemImage: player.pipImage, active: player.playingInPictureInPicture, action: player.togglePiPAction)
                 #if os(iOS)
                     case .lockOrientation:
                         actionButton("Lock", systemImage: player.lockOrientationImage, active: player.lockedOrientation != nil, action: player.lockOrientationAction)
