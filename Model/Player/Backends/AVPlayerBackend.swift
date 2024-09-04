@@ -364,7 +364,11 @@ final class AVPlayerBackend: PlayerBackend {
 
         let startPlaying = {
             #if !os(macOS)
-                try? AVAudioSession.sharedInstance().setActive(true)
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true)
+                } catch {
+                    self.logger.error("Error setting up audio session: \(error)")
+                }
             #endif
 
             self.setRate(self.model.currentRate)
