@@ -139,10 +139,14 @@ class Stream: Equatable, Hashable, Identifiable {
 
         case sd428p30
         case sd428p25
+        case sd426p30
+        case sd426p25
         case sd360p30
         case sd360p25
         case sd320p30
         case sd320p25
+        case sd256p30
+        case sd256p25
         case sd240p30
         case sd240p25
         case sd214p30
@@ -253,7 +257,7 @@ class Stream: Equatable, Hashable, Identifiable {
             case .sd480p30, .sd480p25:
                 return 2_500_000 // 2.5 Mbit/s
 
-            case .sd428p30, .sd428p25:
+            case .sd428p30, .sd428p25, .sd426p30, .sd426p25:
                 return 2_000_000 // 2 Mbit/s
 
             case .sd360p30, .sd360p25:
@@ -262,7 +266,7 @@ class Stream: Equatable, Hashable, Identifiable {
             case .sd320p30, .sd320p25:
                 return 1_200_000 // 1.2 Mbit/s
 
-            case .sd240p30, .sd240p25:
+            case .sd256p30, .sd256p25, .sd240p30, .sd240p25:
                 return 1_000_000 // 1 Mbit/s
 
             case .sd214p30, .sd214p25:
