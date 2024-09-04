@@ -8,7 +8,7 @@ extension VideoPlayerView {
             .updating($dragGestureOffset) { value, state, _ in
                 guard isVerticalDrag else { return }
                 var translation = value.translation
-                translation.height = max(0, translation.height)
+                translation.height = max(-translation.height, translation.height)
                 state = translation
             }
         #endif
@@ -18,7 +18,8 @@ extension VideoPlayerView {
             .onChanged { value in
                 guard player.presentingPlayer,
                       !controlsOverlayModel.presenting,
-                      dragGestureState else { return }
+                      dragGestureState,
+                      !disableToggleGesture else { return }
 
                 if player.controls.presentingControls, !player.musicMode {
                     player.controls.presentingControls = false
@@ -61,19 +62,22 @@ extension VideoPlayerView {
                     return
                 }
 
-                guard verticalDrag > 0 else { return }
-                viewDragOffset = verticalDrag
-
-                if verticalDrag > 60,
-                   player.playingFullScreen
-                {
-                    player.exitFullScreen(showControls: false)
-                    #if os(iOS)
-                        if Constants.isIPhone {
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
-                        }
-                    #endif
+                // Toggle fullscreen on upward drag only when not disabled
+                if verticalDrag < -50 {
+                    if player.playingFullScreen {
+                        player.exitFullScreen(showControls: false)
+                    } else {
+                        player.enterFullScreen()
+                    }
+                    disableGestureTemporarily()
+                    return
                 }
+
+                // Ignore downward swipes when in fullscreen
+                guard verticalDrag > 0 && !player.playingFullScreen else {
+                    return
+                }
+                viewDragOffset = verticalDrag
             }
             .onEnded { _ in
                 onPlayerDragGestureEnded()
@@ -86,16 +90,6 @@ extension VideoPlayerView {
             player.seek.onSeekGestureEnd()
         }
 
-        if viewDragOffset > 60,
-           player.playingFullScreen
-        {
-            #if os(iOS)
-                player.lockedOrientation = nil
-            #endif
-            player.exitFullScreen(showControls: false)
-            viewDragOffset = 0
-            return
-        }
         isVerticalDrag = false
 
         guard player.presentingPlayer,
@@ -115,6 +109,14 @@ extension VideoPlayerView {
             if player.musicMode {
                 player.backend.startControlsUpdates()
             }
+        }
+    }
+
+    // Function to temporarily disable the toggle gesture after a fullscreen change
+    private func disableGestureTemporarily() {
+        disableToggleGesture = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            disableToggleGesture = false
         }
     }
 }
