@@ -10,6 +10,7 @@ final class ConstrolsSettingsGroupExporter: SettingsGroupExporter {
             "seekGestureSpeed": Defaults[.seekGestureSpeed],
             "playerControlsLayout": Defaults[.playerControlsLayout].rawValue,
             "fullScreenPlayerControlsLayout": Defaults[.fullScreenPlayerControlsLayout].rawValue,
+            "playerControlsBackgroundOpacity": Defaults[.playerControlsBackgroundOpacity],
             "systemControlsCommands": Defaults[.systemControlsCommands].rawValue,
             "buttonBackwardSeekDuration": Defaults[.buttonBackwardSeekDuration],
             "buttonForwardSeekDuration": Defaults[.buttonForwardSeekDuration],

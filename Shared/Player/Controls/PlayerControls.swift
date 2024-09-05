@@ -29,6 +29,7 @@ struct PlayerControls: View {
 
     @Default(.playerControlsLayout) private var regularPlayerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
+    @Default(.playerControlsBackgroundOpacity) private var playerControlsBackgroundOpacity
     @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
     @Default(.buttonForwardSeekDuration) private var buttonForwardSeekDuration
 
@@ -270,6 +271,9 @@ struct PlayerControls: View {
                     }
                 } else if player.videoForDisplay == nil {
                     Color.black
+                } else if model.presentingControls {
+                    Color.black.opacity(playerControlsBackgroundOpacity)
+                        .edgesIgnoringSafeArea(.all)
                 }
             }
         }

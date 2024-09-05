@@ -134,6 +134,7 @@ extension Defaults.Keys {
 
     static let playerControlsLayout = Key<PlayerControlsLayout>("playerControlsLayout", default: playerControlsLayoutDefault)
     static let fullScreenPlayerControlsLayout = Key<PlayerControlsLayout>("fullScreenPlayerControlsLayout", default: fullScreenPlayerControlsLayoutDefault)
+    static let playerControlsBackgroundOpacity = Key<Double>("playerControlsBackgroundOpacity", default: 0.2)
 
     static let systemControlsCommands = Key<SystemControlsCommands>("systemControlsCommands", default: .restartAndAdvanceToNext)
 

@@ -38,6 +38,7 @@ struct PlayerControlsSettings: View {
     @Default(.playerControlsAdvanceToNextEnabled) private var playerControlsAdvanceToNextEnabled
     @Default(.playerControlsPlaybackModeEnabled) private var playerControlsPlaybackModeEnabled
     @Default(.playerControlsMusicModeEnabled) private var playerControlsMusicModeEnabled
+    @Default(.playerControlsBackgroundOpacity) private var playerControlsBackgroundOpacity
 
     private var player = PlayerModel.shared
 
@@ -76,6 +77,8 @@ struct PlayerControlsSettings: View {
                 playerControlsLayoutPicker
                 SettingsHeader(text: "Fullscreen size".localized(), secondary: true)
                 fullScreenPlayerControlsLayoutPicker
+                SettingsHeader(text: "Background opacity".localized(), secondary: true)
+                playerControlsBackgroundOpacityPicker
             }
         #endif
 
@@ -197,6 +200,15 @@ struct PlayerControlsSettings: View {
         Picker("Fullscreen size", selection: $fullScreenPlayerControlsLayout) {
             ForEach(PlayerControlsLayout.allCases.filter(\.available), id: \.self) { layout in
                 Text(layout.description).tag(layout.rawValue)
+            }
+        }
+        .modifier(SettingsPickerModifier())
+    }
+
+    private var playerControlsBackgroundOpacityPicker: some View {
+        Picker("Background opacity", selection: $playerControlsBackgroundOpacity) {
+            ForEach(Array(stride(from: 0.0, through: 1.0, by: 0.1)), id: \.self) { value in
+                Text("\(Int(value * 100))%").tag(value)
             }
         }
         .modifier(SettingsPickerModifier())
