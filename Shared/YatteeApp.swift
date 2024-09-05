@@ -204,9 +204,14 @@ struct YatteeApp: App {
             }
 
             #if os(iOS)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     if Defaults[.lockPortraitWhenBrowsing] {
-                        Orientation.lockOrientation(.all, andRotateTo: .portrait)
+                        Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                    } else {
+                        let rotationOrientation =
+                            OrientationTracker.shared.currentDeviceOrientation.rawValue == 4 ? UIInterfaceOrientation.landscapeRight :
+                            (OrientationTracker.shared.currentDeviceOrientation.rawValue == 3 ? UIInterfaceOrientation.landscapeLeft : UIInterfaceOrientation.portrait)
+                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
                     }
                 }
             #endif
@@ -225,6 +230,17 @@ struct YatteeApp: App {
             DispatchQueue.global(qos: .userInitiated).async {
                 self.migrateQualityProfiles()
             }
+
+            #if os(iOS)
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.migrateRotateToLandscapeOnEnterFullScreen()
+                }
+
+                DispatchQueue.global(qos: .userInitiated).async {
+                    self.migrateLockPortraitWhenBrowsing()
+                }
+
+            #endif
         }
     }
 
@@ -252,6 +268,22 @@ struct YatteeApp: App {
             QualityProfilesModel.shared.update(profile, updatedProfile)
         }
     }
+
+    #if os(iOS)
+        func migrateRotateToLandscapeOnEnterFullScreen() {
+            if Defaults[.rotateToLandscapeOnEnterFullScreen] != .landscapeRight || Defaults[.rotateToLandscapeOnEnterFullScreen] != .landscapeLeft {
+                Defaults[.rotateToLandscapeOnEnterFullScreen] = .landscapeRight
+            }
+        }
+
+        func migrateLockPortraitWhenBrowsing() {
+            if Constants.isIPhone {
+                Defaults[.lockPortraitWhenBrowsing] = true
+            } else if Constants.isIPad, Defaults[.lockPortraitWhenBrowsing] {
+                Defaults[.enterFullscreenInLandscape] = true
+            }
+        }
+    #endif
 
     var navigationStyle: NavigationStyle {
         #if os(iOS)

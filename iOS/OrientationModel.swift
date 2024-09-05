@@ -1,10 +1,12 @@
 import Defaults
 import Foundation
+import Logging
 import Repeat
 import SwiftUI
 
 final class OrientationModel {
     static var shared = OrientationModel()
+    let logger = Logger(label: "stream.yattee.orientation.model")
 
     var orientation = UIInterfaceOrientation.portrait
     var lastOrientation: UIInterfaceOrientation?
@@ -13,79 +15,69 @@ final class OrientationModel {
 
     private var player = PlayerModel.shared
 
-    func configureOrientationUpdatesBasedOnAccelerometer() {
-        let currentOrientation = OrientationTracker.shared.currentInterfaceOrientation
-        if currentOrientation.isLandscape,
-           Defaults[.enterFullscreenInLandscape],
-           !Defaults[.honorSystemOrientationLock],
-           !player.playingFullScreen,
-           !player.currentItem.isNil,
-           player.lockedOrientation.isNil || player.lockedOrientation!.contains(.landscape),
-           !player.playingInPictureInPicture,
-           player.presentingPlayer
-        {
-            DispatchQueue.main.async {
-                self.player.controls.presentingControls = false
-                self.player.enterFullScreen(showControls: false)
-            }
-
-            player.onPresentPlayer.append {
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: currentOrientation)
-            }
-        }
-
+    func startOrientationUpdates() {
+        // Ensure the orientation observer is active
         orientationObserver = NotificationCenter.default.addObserver(
             forName: OrientationTracker.deviceOrientationChangedNotification,
             object: nil,
             queue: .main
         ) { _ in
-            guard !Defaults[.honorSystemOrientationLock],
-                  self.player.presentingPlayer,
-                  !self.player.playingInPictureInPicture,
-                  self.player.lockedOrientation.isNil
+            self.logger.info("Notification received: Device orientation changed.")
+
+            // We only allow .portrait and are not showing the player
+            guard (!self.player.presentingPlayer && !Defaults[.lockPortraitWhenBrowsing]) || self.player.presentingPlayer
             else {
                 return
             }
 
             let orientation = OrientationTracker.shared.currentInterfaceOrientation
+            self.logger.info("Current interface orientation: \(orientation)")
 
-            guard self.lastOrientation != orientation else {
+            // Always update lastOrientation to keep track of the latest state
+            if self.lastOrientation != orientation {
+                self.lastOrientation = orientation
+                self.logger.info("Orientation changed to: \(orientation)")
+            } else {
+                self.logger.info("Orientation has not changed.")
+            }
+
+            // Only take action if the player is active and presenting
+            guard (!self.player.isOrientationLocked && !self.player.playingInPictureInPicture) || (!Defaults[.lockPortraitWhenBrowsing] && !self.player.presentingPlayer) || (!Defaults[.lockPortraitWhenBrowsing] && self.player.presentingPlayer && !self.player.isOrientationLocked)
+            else {
+                self.logger.info("Only updating orientation without actions.")
                 return
             }
 
-            self.lastOrientation = orientation
-
             DispatchQueue.main.async {
-                guard Defaults[.enterFullscreenInLandscape],
-                      self.player.presentingPlayer
-                else {
-                    return
-                }
-
                 self.orientationDebouncer.callback = {
                     DispatchQueue.main.async {
                         if orientation.isLandscape {
-                            self.player.controls.presentingControls = false
-                            self.player.enterFullScreen(showControls: false)
+                            if Defaults[.enterFullscreenInLandscape], self.player.presentingPlayer {
+                                self.logger.info("Entering fullscreen because orientation is landscape.")
+                                self.player.controls.presentingControls = false
+                                self.player.enterFullScreen(showControls: false)
+                            }
                             Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
                         } else {
-                            self.player.exitFullScreen(showControls: false)
-                            Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                            self.logger.info("Exiting fullscreen because orientation is portrait.")
+                            if self.player.playingFullScreen {
+                                self.player.exitFullScreen(showControls: false)
+                            }
+                            if Defaults[.lockPortraitWhenBrowsing] {
+                                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+                            } else {
+                                Orientation.lockOrientation(OrientationTracker.shared.currentInterfaceOrientationMask, andRotateTo: orientation)
+                            }
                         }
                     }
                 }
-
                 self.orientationDebouncer.call()
             }
         }
     }
 
-    func stopOrientationUpdates() {
-        guard let observer = orientationObserver else { return }
-        NotificationCenter.default.removeObserver(observer)
-    }
-
     func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
+        logger.info("Locking orientation to: \(orientation), rotating to: \(String(describing: rotateOrientation)).")
         if let rotateOrientation {
             self.orientation = rotateOrientation
             lastOrientation = rotateOrientation

@@ -93,12 +93,9 @@ extension Defaults.Keys {
     static let enableReturnYouTubeDislike = Key<Bool>("enableReturnYouTubeDislike", default: false)
 
     #if os(iOS)
-        static let honorSystemOrientationLock = Key<Bool>("honorSystemOrientationLock", default: true)
+        static let isOrientationLocked = Key<Bool>("isOrientationLocked", default: Constants.isIPhone)
         static let enterFullscreenInLandscape = Key<Bool>("enterFullscreenInLandscape", default: Constants.isIPhone)
-        static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>(
-            "rotateToLandscapeOnEnterFullScreen",
-            default: Constants.isIPhone ? .landscapeRight : .disabled
-        )
+        static let rotateToLandscapeOnEnterFullScreen = Key<FullScreenRotationSetting>("rotateToLandscapeOnEnterFullScreen", default: .landscapeRight)
     #endif
 
     static let closePiPOnNavigation = Key<Bool>("closePiPOnNavigation", default: false)
@@ -613,26 +610,19 @@ enum PlayerTapGestureAction: String, CaseIterable, Defaults.Serializable {
 }
 
 enum FullScreenRotationSetting: String, CaseIterable, Defaults.Serializable {
-    case disabled
     case landscapeLeft
     case landscapeRight
 
     #if os(iOS)
-        var interaceOrientation: UIInterfaceOrientation {
+        var interfaceOrientation: UIInterfaceOrientation {
             switch self {
             case .landscapeLeft:
                 return .landscapeLeft
             case .landscapeRight:
                 return .landscapeRight
-            default:
-                return .portrait
             }
         }
     #endif
-
-    var isRotating: Bool {
-        self != .disabled
-    }
 }
 
 struct WidgetSettings: Defaults.Serializable {

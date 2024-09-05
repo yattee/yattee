@@ -56,7 +56,6 @@ final class PlayerModel: ObservableObject {
     @Published var presentingPlayer = false { didSet { handlePresentationChange() } }
     @Published var activeBackend = PlayerBackendType.mpv
     @Published var forceBackendOnPlay: PlayerBackendType?
-    @Published var wasFullscreen = false
 
     var avPlayerBackend = AVPlayerBackend()
     var mpvBackend = MPVBackend()
@@ -131,6 +130,12 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         @Published var lockedOrientation: UIInterfaceOrientationMask?
+        @Published var isOrientationLocked: Bool {
+            didSet {
+                Defaults[.isOrientationLocked] = isOrientationLocked
+            }
+        }
+
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
 
@@ -201,6 +206,16 @@ final class PlayerModel: ObservableObject {
     #endif
 
     init() {
+        #if os(iOS)
+            isOrientationLocked = Defaults[.isOrientationLocked]
+
+            if isOrientationLocked, Defaults[.lockPortraitWhenBrowsing] {
+                lockedOrientation = UIInterfaceOrientationMask.portrait
+                Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
+            } else if isOrientationLocked {
+                lockOrientationAction()
+            }
+        #endif
         #if !os(macOS)
             mpvBackend.controller = mpvController
             mpvBackend.client = mpvController.client
@@ -517,7 +532,10 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
-        backend.setNeedsDrawing(presentingPlayer)
+        #if !os(iOS)
+            // TODO: Check whether this is neede on tvOS and macOS
+            backend.setNeedsDrawing(presentingPlayer)
+        #endif
 
         #if os(iOS)
             if presentingPlayer, activeBackend == .appleAVPlayer, avPlayerUsesSystemControls, Constants.isIPhone {
@@ -551,8 +569,6 @@ final class PlayerModel: ObservableObject {
                 } else {
                     Orientation.lockOrientation(.allButUpsideDown)
                 }
-
-                OrientationModel.shared.stopOrientationUpdates()
             #endif
         }
     }
@@ -659,32 +675,37 @@ final class PlayerModel: ObservableObject {
     }
 
     func closeCurrentItem(finished: Bool = false) {
-        pause()
-        videoBeingOpened = nil
-        advancing = false
-        forceBackendOnPlay = nil
-
+        guard !closing else { return }
         closing = true
-        controls.presentingControls = false
 
-        self.prepareCurrentItemForHistory(finished: finished)
+        if playingFullScreen { exitFullScreen() }
 
-        self.hide()
-
-        Delay.by(0.8) { [weak self] in
+        Delay.by(0.3) { [weak self] in
             guard let self else { return }
-            self.closePiP()
+            pause()
+            videoBeingOpened = nil
+            advancing = false
+            forceBackendOnPlay = nil
 
-            withAnimation {
-                self.currentItem = nil
+            controls.presentingControls = false
+
+            self.prepareCurrentItemForHistory(finished: finished)
+            self.hide()
+
+            Delay.by(0.7) { [weak self] in
+                guard let self else { return }
+                if playingInPictureInPicture { self.closePiP() }
+
+                withAnimation {
+                    self.currentItem = nil
+                }
+
+                self.updateNowPlayingInfo()
+                self.backend.closeItem()
+                self.aspectRatio = VideoPlayerView.defaultAspectRatio
+                self.resetAutoplay()
+                self.closing = false
             }
-            self.updateNowPlayingInfo()
-
-            self.backend.closeItem()
-            self.aspectRatio = VideoPlayerView.defaultAspectRatio
-            self.resetAutoplay()
-            self.closing = false
-            self.playingFullScreen = false
         }
     }
 
@@ -773,7 +794,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func toggleFullScreenAction() {
-        toggleFullscreen(playingFullScreen, showControls: false)
+        toggleFullscreen(playingFullScreen, showControls: false, initiatedByButton: true)
     }
 
     func togglePiPAction() {
@@ -786,20 +807,21 @@ final class PlayerModel: ObservableObject {
 
     #if os(iOS)
         var lockOrientationImage: String {
-            lockedOrientation.isNil ? "lock.rotation.open" : "lock.rotation"
+            isOrientationLocked ? "lock.rotation" : "lock.rotation.open"
         }
 
         func lockOrientationAction() {
-            if lockedOrientation.isNil {
+            // This makes toggling orientation lock more robust
+            if lockedOrientation.isNil || !isOrientationLocked {
+                isOrientationLocked = true
                 let orientationMask = OrientationTracker.shared.currentInterfaceOrientationMask
                 lockedOrientation = orientationMask
                 let orientation = OrientationTracker.shared.currentInterfaceOrientation
-                Orientation.lockOrientation(orientationMask, andRotateTo: .landscapeLeft)
-                // iOS 16 workaround
-                Orientation.lockOrientation(orientationMask, andRotateTo: orientation)
+                Orientation.lockOrientation(orientationMask, andRotateTo: playingFullScreen ? nil : orientation)
             } else {
+                isOrientationLocked = false
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                Orientation.lockOrientation(.allButUpsideDown)
             }
         }
     #endif
@@ -985,7 +1007,14 @@ final class PlayerModel: ObservableObject {
         }
     #else
         func handleEnterForeground() {
-            setNeedsDrawing(presentingPlayer)
+            #if os(iOS)
+                OrientationTracker.shared.startDeviceOrientationTracking()
+            #endif
+
+            #if os(tvOS)
+                // TODO: Not sure if this is realy needed on tvOS, maybe it can be removed.
+                setNeedsDrawing(presentingPlayer)
+            #endif
 
             if !musicMode, activeBackend == .mpv {
                 mpvBackend.addVideoTrackFromStream()
@@ -994,17 +1023,6 @@ final class PlayerModel: ObservableObject {
             } else if !musicMode, activeBackend == .appleAVPlayer {
                 avPlayerBackend.bindPlayerToLayer()
             }
-
-            #if os(iOS)
-                if wasFullscreen {
-                    wasFullscreen = false
-                    DispatchQueue.main.async { [weak self] in
-                        Delay.by(0.3) {
-                            self?.enterFullScreen()
-                        }
-                    }
-                }
-            #endif
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return
@@ -1018,6 +1036,10 @@ final class PlayerModel: ObservableObject {
         }
 
         func handleEnterBackground() {
+            #if os(iOS)
+                OrientationTracker.shared.stopDeviceOrientationTracking()
+            #endif
+
             if Defaults[.pauseOnEnteringBackground], !playingInPictureInPicture, !musicMode {
                 pause()
             } else if !playingInPictureInPicture, activeBackend == .appleAVPlayer {
@@ -1025,15 +1047,6 @@ final class PlayerModel: ObservableObject {
             } else if activeBackend == .mpv, !musicMode {
                 mpvBackend.setVideoToNo()
             }
-            #if os(iOS)
-                guard playingFullScreen else { return }
-                wasFullscreen = playingFullScreen
-                DispatchQueue.main.async { [weak self] in
-                    Delay.by(0.3) {
-                        self?.exitFullScreen(showControls: false)
-                    }
-                }
-            #endif
         }
     #endif
 
@@ -1124,7 +1137,7 @@ final class PlayerModel: ObservableObject {
         task.resume()
     }
 
-    func toggleFullscreen(_ isFullScreen: Bool, showControls: Bool = true) {
+    func toggleFullscreen(_ isFullScreen: Bool, showControls: Bool = true, initiatedByButton: Bool = false) {
         controls.presentingControls = showControls && isFullScreen
 
         #if os(macOS)
@@ -1139,15 +1152,13 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
-                guard rotateToLandscapeOnEnterFullScreen.isRotating else { return }
+                let lockOrientation = rotateToLandscapeOnEnterFullScreen.interfaceOrientation
                 if currentVideoIsLandscape {
-                    let delay = activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
-                    Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+                    if initiatedByButton {
+                        Orientation.lockOrientation(self.isOrientationLocked ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft) : .landscape)
                     }
+                    let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+                    Orientation.lockOrientation(self.isOrientationLocked ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft) : .landscape, andRotateTo: orientation)
                 }
             } else {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
@@ -1155,10 +1166,12 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.dismiss(animated: true)
                     return
                 }
-                let rotationOrientation = Constants.isIPhone ? UIInterfaceOrientation.portrait : nil
-                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
+                if Defaults[.lockPortraitWhenBrowsing] {
+                    lockedOrientation = UIInterfaceOrientationMask.portrait
+                }
+                let rotationOrientation = Defaults[.lockPortraitWhenBrowsing] ? UIInterfaceOrientation.portrait : nil
+                Orientation.lockOrientation(Defaults[.lockPortraitWhenBrowsing] ? .portrait : .allButUpsideDown, andRotateTo: rotationOrientation)
             }
-
         #endif
     }
 

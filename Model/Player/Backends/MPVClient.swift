@@ -14,6 +14,8 @@ final class MPVClient: ObservableObject {
     }
 
     private var logger = Logger(label: "mpv-client")
+    private var needsDrawingCooldown = false
+    private var needsDrawingWorkItem: DispatchWorkItem?
 
     var mpv: OpaquePointer!
     var mpvGL: OpaquePointer!
@@ -389,10 +391,30 @@ final class MPVClient: ObservableObject {
     }
 
     func setNeedsDrawing(_ needsDrawing: Bool) {
+        // Check if we are currently in a cooldown period
+        guard !needsDrawingCooldown else {
+            logger.info("Not drawing, cooldown in progress")
+            return
+        }
+
         logger.info("needs drawing: \(needsDrawing)")
+
+        // Set the cooldown flag to true and cancel any existing work item
+        needsDrawingCooldown = true
+        needsDrawingWorkItem?.cancel()
+
         #if !os(macOS)
             glView?.needsDrawing = needsDrawing
         #endif
+
+        // Create a new DispatchWorkItem to reset the cooldown flag after 0.1 seconds
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.needsDrawingCooldown = false
+        }
+        needsDrawingWorkItem = workItem
+
+        // Schedule the cooldown reset after 0.1 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: workItem)
     }
 
     func command(

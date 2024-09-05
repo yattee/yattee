@@ -393,7 +393,7 @@ struct PlayerControls: View {
 
     #if os(iOS)
         private var lockOrientationButton: some View {
-            button("Lock Rotation", systemImage: player.lockOrientationImage, active: !player.lockedOrientation.isNil, action: player.lockOrientationAction)
+            button("Lock Rotation", systemImage: player.lockOrientationImage, active: player.isOrientationLocked, action: player.lockOrientationAction)
         }
     #endif
 

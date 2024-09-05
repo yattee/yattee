@@ -18,8 +18,8 @@ struct PlayerSettings: View {
     @Default(.pauseOnHidingPlayer) private var pauseOnHidingPlayer
     @Default(.closeVideoOnEOF) private var closeVideoOnEOF
     #if os(iOS)
-        @Default(.honorSystemOrientationLock) private var honorSystemOrientationLock
         @Default(.enterFullscreenInLandscape) private var enterFullscreenInLandscape
+        @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
         @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
     #endif
     @Default(.closePiPOnNavigation) private var closePiPOnNavigation
@@ -87,7 +87,7 @@ struct PlayerSettings: View {
                 }
                 pauseOnHidingPlayerToggle
                 closeVideoOnEOFToggle
-                #if !os(tvOS)
+                #if os(macOS)
                     exitFullscreenOnEOFToggle
                 #endif
                 #if !os(macOS)
@@ -202,11 +202,12 @@ struct PlayerSettings: View {
             #endif
 
             #if os(iOS)
-                Section(header: SettingsHeader(text: "Orientation".localized())) {
-                    if idiom == .pad {
+                Section(header: SettingsHeader(text: "Fullscreen".localized())) {
+                    if Constants.isIPad {
                         enterFullscreenInLandscapeToggle
                     }
-                    honorSystemOrientationLockToggle
+
+                    exitFullscreenOnEOFToggle
                     rotateToLandscapeOnEnterFullScreenPicker
                 }
             #endif
@@ -318,20 +319,15 @@ struct PlayerSettings: View {
     #endif
 
     #if os(iOS)
-        private var honorSystemOrientationLockToggle: some View {
-            Toggle("Honor orientation lock", isOn: $honorSystemOrientationLock)
-                .disabled(!enterFullscreenInLandscape)
-        }
-
         private var enterFullscreenInLandscapeToggle: some View {
-            Toggle("Enter fullscreen in landscape", isOn: $enterFullscreenInLandscape)
+            Toggle("Enter fullscreen in landscape orientation", isOn: $enterFullscreenInLandscape)
+                .disabled(lockPortraitWhenBrowsing)
         }
 
         private var rotateToLandscapeOnEnterFullScreenPicker: some View {
-            Picker("Rotate when entering fullscreen on landscape video", selection: $rotateToLandscapeOnEnterFullScreen) {
+            Picker("Default orientation", selection: $rotateToLandscapeOnEnterFullScreen) {
                 Text("Landscape left").tag(FullScreenRotationSetting.landscapeLeft)
                 Text("Landscape right").tag(FullScreenRotationSetting.landscapeRight)
-                Text("No rotation").tag(FullScreenRotationSetting.disabled)
             }
             .modifier(SettingsPickerModifier())
         }
