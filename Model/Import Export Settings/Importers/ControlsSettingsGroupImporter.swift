@@ -33,6 +33,10 @@ struct ConstrolsSettingsGroupImporter {
             Defaults[.fullScreenPlayerControlsLayout] = fullScreenPlayerControlsLayout
         }
 
+        if let playerControlsBackgroundOpacity = json["playerControlsBackgroundOpacity"].double {
+            Defaults[.playerControlsBackgroundOpacity] = playerControlsBackgroundOpacity
+        }
+
         if let systemControlsCommandsString = json["systemControlsCommands"].string,
            let systemControlsCommands = SystemControlsCommands(rawValue: systemControlsCommandsString)
         {
