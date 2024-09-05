@@ -1286,7 +1286,10 @@ final class PlayerModel: ObservableObject {
 
     #if os(macOS)
         private func assignKeyPressMonitor() {
-            keyPressMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { keyEvent -> NSEvent? in
+            keyPressMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] keyEvent -> NSEvent? in
+                // Check if the player window is the key window
+                guard let self, let window = Windows.playerWindow, window.isKeyWindow else { return keyEvent }
+
                 switch keyEvent.keyCode {
                 case 124:
                     if !self.liveStreamInAVPlayer {
