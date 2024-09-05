@@ -83,7 +83,7 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "gpu-api", "opengl"))
         checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "0"))
 
-        #if !os(macOS)
+        #if (os(macOS) && arch(x86_64)) || os(iOS) || os(tvOS)
             checkError(mpv_set_option_string(mpv, "opengl-es", "yes"))
         #endif
 
