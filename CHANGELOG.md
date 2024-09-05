@@ -1,11 +1,9 @@
-## Build 194
-* Gestures: swipe up toggles fullscreen by @stonerl in https://github.com/yattee/yattee/pull/778
-* don’t open video when dismissing context menu by @stonerl in https://github.com/yattee/yattee/pull/780
-* mpv: remove video layer when entering background by @stonerl in https://github.com/yattee/yattee/pull/793
-* hi-res invidious logos by @stonerl in https://github.com/yattee/yattee/pull/791
-* enable -O3 by @stonerl in https://github.com/yattee/yattee/pull/794
-* Better audio ducking by @stonerl in https://github.com/yattee/yattee/pull/779
-* fix picture in picture by @stonerl in https://github.com/yattee/yattee/pull/789
+## Build 195
+* iOS: Simplified fullscreen and orientation by @stonerl in https://github.com/yattee/yattee/pull/786
+* macOS: only apply player shortcuts when window is active by @stonerl in https://github.com/yattee/yattee/pull/802
+* player controls: add background opacity selection by @stonerl in https://github.com/yattee/yattee/pull/799
+* add missing Shorts resolutions by @stonerl in https://github.com/yattee/yattee/pull/797
+* use -O1 on macOS by @stonerl in https://github.com/yattee/yattee/pull/801
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -24,6 +22,13 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* Gestures: swipe up toggles fullscreen by @stonerl in https://github.com/yattee/yattee/pull/778
+* don’t open video when dismissing context menu by @stonerl in https://github.com/yattee/yattee/pull/780
+* mpv: remove video layer when entering background by @stonerl in https://github.com/yattee/yattee/pull/793
+* hi-res invidious logos by @stonerl in https://github.com/yattee/yattee/pull/791
+* enable -O3 by @stonerl in https://github.com/yattee/yattee/pull/794
+* Better audio ducking by @stonerl in https://github.com/yattee/yattee/pull/779
+* fix picture in picture by @stonerl in https://github.com/yattee/yattee/pull/789
 * Invidious: propper HTTP basic auth support by @stonerl in https://github.com/yattee/yattee/pull/762
 * Apply correct orientation by @stonerl in https://github.com/yattee/yattee/pull/770
 * Circular Invidious logo by @stonerl in https://github.com/yattee/yattee/pull/769
