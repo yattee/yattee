@@ -34,7 +34,7 @@ enum Orientation {
             let rotateOrientationMask = rotateOrientation == .portrait ? UIInterfaceOrientationMask.portrait :
                 rotateOrientation == .landscapeLeft ? .landscapeLeft :
                 rotateOrientation == .landscapeRight ? .landscapeRight :
-                .allButUpsideDown
+                .all
 
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: rotateOrientationMask)) { error in
                 print("denied rotation \(error)")

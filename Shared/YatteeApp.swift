@@ -211,7 +211,7 @@ struct YatteeApp: App {
                         let rotationOrientation =
                             OrientationTracker.shared.currentDeviceOrientation.rawValue == 4 ? UIInterfaceOrientation.landscapeRight :
                             (OrientationTracker.shared.currentDeviceOrientation.rawValue == 3 ? UIInterfaceOrientation.landscapeLeft : UIInterfaceOrientation.portrait)
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: rotationOrientation)
+                        Orientation.lockOrientation(.all, andRotateTo: rotationOrientation)
                     }
                 }
             #endif

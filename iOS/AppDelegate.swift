@@ -5,7 +5,7 @@ import Logging
 import UIKit
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
-    var orientationLock = UIInterfaceOrientationMask.allButUpsideDown
+    var orientationLock = UIInterfaceOrientationMask.all
 
     private var logger = Logger(label: "stream.yattee.app.delegate")
     private(set) static var instance: AppDelegate!

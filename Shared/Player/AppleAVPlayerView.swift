@@ -22,8 +22,8 @@ import SwiftUI
                     // not sure why but first rotation call is ignore so doing rotate to same orientation first
                     Delay.by(delay) {
                         let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                        Orientation.lockOrientation(.allButUpsideDown, andRotateTo: orientation)
+                        Orientation.lockOrientation(.all, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
+                        Orientation.lockOrientation(.all, andRotateTo: orientation)
                     }
                 }
             }
@@ -37,7 +37,7 @@ import SwiftUI
                     if !context.isCancelled {
                         #if os(iOS)
                             if Constants.isIPhone {
-                                Orientation.lockOrientation(.allButUpsideDown, andRotateTo: .portrait)
+                                Orientation.lockOrientation(.all, andRotateTo: .portrait)
                             }
 
                             if wasPlaying {

@@ -568,7 +568,7 @@ final class PlayerModel: ObservableObject {
                 if lockPortraitWhenBrowsing {
                     Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
                 } else {
-                    Orientation.lockOrientation(.allButUpsideDown)
+                    Orientation.lockOrientation(.all)
                 }
             #endif
         }
@@ -822,7 +822,7 @@ final class PlayerModel: ObservableObject {
             } else {
                 isOrientationLocked = false
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown)
+                Orientation.lockOrientation(.all)
             }
         }
     #endif
@@ -1167,7 +1167,7 @@ final class PlayerModel: ObservableObject {
                     Orientation.lockOrientation(
                         isOrientationLocked
                             ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
-                            : .landscape,
+                            : .all,
                         andRotateTo: orientation
                     )
                 }
@@ -1181,7 +1181,7 @@ final class PlayerModel: ObservableObject {
                     lockedOrientation = UIInterfaceOrientationMask.portrait
                 }
                 let rotationOrientation = lockPortraitWhenBrowsing ? UIInterfaceOrientation.portrait : nil
-                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .portrait : .allButUpsideDown, andRotateTo: rotationOrientation)
+                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .portrait : .all, andRotateTo: rotationOrientation)
             }
         #endif
     }
