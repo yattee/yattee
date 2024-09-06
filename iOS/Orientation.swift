@@ -1,5 +1,4 @@
 import CoreMotion
-import Defaults
 import Logging
 import UIKit
 
