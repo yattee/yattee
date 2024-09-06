@@ -136,8 +136,9 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
-        @Default(.lockPortraitWhenBrowsing) private var lockPortraitWhenBrowsing
+        @Default(.rotateToLandscapeOnEnterFullScreen) var rotateToLandscapeOnEnterFullScreen
+        @Default(.lockPortraitWhenBrowsing) var lockPortraitWhenBrowsing
+        var fullscreenInitiatedByButton = false
     #endif
 
     @Published var currentChapterIndex: Int?
@@ -1150,6 +1151,7 @@ final class PlayerModel: ObservableObject {
         #if os(iOS)
             if playingFullScreen {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                    fullscreenInitiatedByButton = initiatedByButton
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
@@ -1177,7 +1179,7 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.dismiss(animated: true)
                     return
                 }
-                if Defaults[.lockPortraitWhenBrowsing] {
+                if lockPortraitWhenBrowsing {
                     lockedOrientation = UIInterfaceOrientationMask.portrait
                 }
                 let rotationOrientation = lockPortraitWhenBrowsing ? UIInterfaceOrientation.portrait : nil

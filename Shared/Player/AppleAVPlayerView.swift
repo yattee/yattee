@@ -4,11 +4,6 @@ import SwiftUI
 
 #if !os(macOS)
     final class AppleAVPlayerViewControllerDelegate: NSObject, AVPlayerViewControllerDelegate {
-        #if os(iOS)
-            @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
-            @Default(.avPlayerUsesSystemControls) private var avPlayerUsesSystemControls
-        #endif
-
         var player: PlayerModel { .shared }
 
         func playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart(_: AVPlayerViewController) -> Bool {
@@ -17,14 +12,23 @@ import SwiftUI
 
         #if os(iOS)
             func playerViewController(_: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator _: UIViewControllerTransitionCoordinator) {
-                if PlayerModel.shared.currentVideoIsLandscape {
-                    let delay = PlayerModel.shared.activeBackend == .appleAVPlayer && avPlayerUsesSystemControls ? 0.8 : 0
-                    // not sure why but first rotation call is ignore so doing rotate to same orientation first
-                    Delay.by(delay) {
-                        let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
-                        Orientation.lockOrientation(.all, andRotateTo: OrientationTracker.shared.currentInterfaceOrientation)
-                        Orientation.lockOrientation(.all, andRotateTo: orientation)
+                let lockOrientation = player.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+                if player.currentVideoIsLandscape {
+                    if player.fullscreenInitiatedByButton {
+                        Orientation.lockOrientation(player.isOrientationLocked
+                            ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
+                            : .landscape)
                     }
+                    let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape
+                        ? OrientationTracker.shared.currentInterfaceOrientation
+                        : player.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+
+                    Orientation.lockOrientation(
+                        player.isOrientationLocked
+                            ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
+                            : .all,
+                        andRotateTo: orientation
+                    )
                 }
             }
 
@@ -36,9 +40,11 @@ import SwiftUI
                     }
                     if !context.isCancelled {
                         #if os(iOS)
-                            if Constants.isIPhone {
-                                Orientation.lockOrientation(.all, andRotateTo: .portrait)
+                            if self.player.lockPortraitWhenBrowsing {
+                                self.player.lockedOrientation = UIInterfaceOrientationMask.portrait
                             }
+                            let rotationOrientation = self.player.lockPortraitWhenBrowsing ? UIInterfaceOrientation.portrait : nil
+                            Orientation.lockOrientation(self.player.lockPortraitWhenBrowsing ? .portrait : .all, andRotateTo: rotationOrientation)
 
                             if wasPlaying {
                                 self.player.play()
