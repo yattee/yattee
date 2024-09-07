@@ -11,6 +11,7 @@ struct AdvancedSettings: View {
     @Default(.mpvHWdec) private var mpvHWdec
     @Default(.mpvDemuxerLavfProbeInfo) private var mpvDemuxerLavfProbeInfo
     @Default(.mpvInitialAudioSync) private var mpvInitialAudioSync
+    @Default(.mpvSetRefreshToContentFPS) private var mpvSetRefreshToContentFPS
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
@@ -243,6 +244,12 @@ struct AdvancedSettings: View {
                 #if !os(tvOS)
                 .pickerStyle(MenuPickerStyle())
                 #endif
+            }
+
+            Toggle(isOn: $mpvSetRefreshToContentFPS) {
+                HStack {
+                    Text("Sync refresh rate with content FPS – EXPERIMENTAL")
+                }
             }
 
             if mpvEnableLogging {

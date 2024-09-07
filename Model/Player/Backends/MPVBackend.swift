@@ -11,6 +11,7 @@ import SwiftUI
 final class MPVBackend: PlayerBackend {
     static var timeUpdateInterval = 0.5
     static var networkStateUpdateInterval = 0.1
+    static var refreshRateUpdateInterval = 0.5
 
     private var logger = Logger(label: "mpv-backend")
 
@@ -89,6 +90,7 @@ final class MPVBackend: PlayerBackend {
 
     private var clientTimer: Repeater!
     private var networkStateTimer: Repeater!
+    private var refreshRateTimer: Repeater!
 
     private var onFileLoaded: (() -> Void)?
 
@@ -184,21 +186,24 @@ final class MPVBackend: PlayerBackend {
     }
 
     init() {
-        // swiftlint:disable shorthand_optional_binding
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
-            guard let self = self, self.model.activeBackend == .mpv else {
+            guard let self, self.model.activeBackend == .mpv else {
                 return
             }
             self.getTimeUpdates()
         }
 
         networkStateTimer = .init(interval: .seconds(Self.networkStateUpdateInterval), mode: .infinite) { [weak self] _ in
-            guard let self = self, self.model.activeBackend == .mpv else {
+            guard let self, self.model.activeBackend == .mpv else {
                 return
             }
             self.updateNetworkState()
         }
-        // swiftlint:enable shorthand_optional_binding
+
+        refreshRateTimer = .init(interval: .seconds(Self.refreshRateUpdateInterval), mode: .infinite) { [weak self] _ in
+            guard let self, self.model.activeBackend == .mpv else { return }
+            self.checkAndUpdateRefreshRate()
+        }
     }
 
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
@@ -343,8 +348,17 @@ final class MPVBackend: PlayerBackend {
         startClientUpdates()
     }
 
+    func startRefreshRateUpdates() {
+        refreshRateTimer.start()
+    }
+
+    func stopRefreshRateUpdates() {
+        refreshRateTimer.pause()
+    }
+
     func play() {
         startClientUpdates()
+        startRefreshRateUpdates()
 
         if controls.presentingControls {
             startControlsUpdates()
@@ -372,6 +386,7 @@ final class MPVBackend: PlayerBackend {
 
     func pause() {
         stopClientUpdates()
+        stopRefreshRateUpdates()
 
         client?.pause()
         isPaused = true
@@ -391,6 +406,8 @@ final class MPVBackend: PlayerBackend {
     }
 
     func stop() {
+        stopClientUpdates()
+        stopRefreshRateUpdates()
         client?.stop()
         isPlaying = false
         isPaused = false
@@ -471,6 +488,52 @@ final class MPVBackend: PlayerBackend {
             self?.controls.isPlaying = self?.isPlaying ?? false
         }
     }
+
+    private func checkAndUpdateRefreshRate() {
+        guard let screenRefreshRate = client?.getScreenRefreshRate() else {
+            logger.warning("Failed to get screen refresh rate.")
+            return
+        }
+
+        let contentFps = client?.currentContainerFps ?? screenRefreshRate
+
+        guard Defaults[.mpvSetRefreshToContentFPS] else {
+            // If the current refresh rate doesn't match the screen refresh rate, reset it
+            if client?.currentRefreshRate != screenRefreshRate {
+                client?.updateRefreshRate(to: screenRefreshRate)
+                client?.currentRefreshRate = screenRefreshRate
+                #if !os(macOS)
+                    notifyViewToUpdateDisplayLink(with: screenRefreshRate)
+                #endif
+                logger.info("Reset refresh rate to screen's rate: \(screenRefreshRate) Hz")
+            }
+            return
+        }
+
+        // Adjust the refresh rate to match the content if it differs
+        if screenRefreshRate != contentFps {
+            client?.updateRefreshRate(to: contentFps)
+            client?.currentRefreshRate = contentFps
+            #if !os(macOS)
+                notifyViewToUpdateDisplayLink(with: contentFps)
+            #endif
+            logger.info("Adjusted screen refresh rate to match content: \(contentFps) Hz")
+        } else if client?.currentRefreshRate != screenRefreshRate {
+            // Ensure the refresh rate is set back to the screen's rate if no adjustment is needed
+            client?.updateRefreshRate(to: screenRefreshRate)
+            client?.currentRefreshRate = screenRefreshRate
+            #if !os(macOS)
+                notifyViewToUpdateDisplayLink(with: screenRefreshRate)
+            #endif
+            logger.info("Checked and reset refresh rate to screen's rate: \(screenRefreshRate) Hz")
+        }
+    }
+
+    #if !os(macOS)
+        private func notifyViewToUpdateDisplayLink(with refreshRate: Int) {
+            NotificationCenter.default.post(name: .updateDisplayLinkFrameRate, object: nil, userInfo: ["refreshRate": refreshRate])
+        }
+    #endif
 
     func handle(_ event: UnsafePointer<mpv_event>!) {
         logger.info(.init(stringLiteral: "RECEIVED  event: \(String(cString: mpv_event_name(event.pointee.event_id)))"))

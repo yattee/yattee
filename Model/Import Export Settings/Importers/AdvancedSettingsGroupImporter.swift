@@ -41,6 +41,10 @@ struct AdvancedSettingsGroupImporter {
             Defaults[.mpvDemuxerLavfProbeInfo] = mpvDemuxerLavfProbeInfo
         }
 
+        if let mpvSetRefreshToContentFPS = json["mpvSetRefreshToContentFPS"].bool {
+            Defaults[.mpvSetRefreshToContentFPS] = mpvSetRefreshToContentFPS
+        }
+
         if let mpvInitialAudioSync = json["mpvInitialAudioSync"].bool {
             Defaults[.mpvInitialAudioSync] = mpvInitialAudioSync
         }
