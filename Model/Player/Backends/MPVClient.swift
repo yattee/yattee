@@ -42,7 +42,7 @@ final class MPVClient: ObservableObject {
 
         mpv = mpv_create()
         if mpv == nil {
-            print("failed creating context\n")
+            logger.critical("failed creating context\n")
             exit(1)
         }
 
@@ -147,7 +147,7 @@ final class MPVClient: ObservableObject {
             ]
 
             if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
-                print("failed to initialize mpv GL context")
+                logger.critical("failed to initialize mpv GL context")
                 exit(1)
             }
 
@@ -349,6 +349,26 @@ final class MPVClient: ObservableObject {
         return Int(fps.rounded())
     }
 
+    var areSubtitlesAdded: Bool {
+        guard !mpv.isNil else { return false }
+
+        // Retrieve the number of tracks
+        let trackCount = getInt("track-list/count")
+        guard trackCount > 0 else { return false }
+
+        for index in 0 ..< trackCount {
+            // Get the type of each track
+            if let trackType = getString("track-list/\(index)/type"), trackType == "sub" {
+                // Check if the subtitle track is currently selected
+                let selected = getInt("track-list/\(index)/selected")
+                if selected == 1 {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     func logCurrentFps() {
         let fps = currentContainerFps
         logger.info("Current container FPS: \(fps)")
@@ -493,9 +513,9 @@ final class MPVClient: ObservableObject {
                mode.refreshRate > 0
             {
                 refreshRate = Int(mode.refreshRate)
-                print("Screen refresh rate: \(refreshRate) Hz")
+                logger.info("Screen refresh rate: \(refreshRate) Hz")
             } else {
-                print("Failed to get refresh rate from NSScreen.")
+                logger.warning("Failed to get refresh rate from NSScreen.")
             }
         #else
             // iOS implementation using UIScreen with a failover
@@ -505,9 +525,9 @@ final class MPVClient: ObservableObject {
             // Failover: if maximumFramesPerSecond is 0 or an unexpected value
             if refreshRate <= 0 {
                 refreshRate = 60 // Fallback to 60 Hz
-                print("Failed to get refresh rate from UIScreen, falling back to 60 Hz.")
+                logger.warning("Failed to get refresh rate from UIScreen, falling back to 60 Hz.")
             } else {
-                print("Screen refresh rate: \(refreshRate) Hz")
+                logger.info("Screen refresh rate: \(refreshRate) Hz")
             }
         #endif
 

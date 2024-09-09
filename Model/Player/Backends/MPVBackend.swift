@@ -25,7 +25,9 @@ final class MPVBackend: PlayerBackend {
     var video: Video?
     var captions: Captions? { didSet {
         guard let captions else {
-            client?.removeSubs()
+            if client?.areSubtitlesAdded == true {
+                client?.removeSubs()
+            }
             return
         }
         addSubTrack(captions.url)
@@ -615,7 +617,9 @@ final class MPVBackend: PlayerBackend {
     }
 
     func addSubTrack(_ url: URL) {
-        client?.removeSubs()
+        if client?.areSubtitlesAdded == true {
+            client?.removeSubs()
+        }
         client?.addSubTrack(url)
     }
 
