@@ -515,7 +515,8 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
             .dictionaryValue["files"]?.arrayValue.first?
             .dictionaryValue["fileUrl"]?.url
         {
-            streams.append(SingleAssetStream(instance: account.instance, avAsset: AVURLAsset(url: fileURL), resolution: .hd720p30, kind: .stream))
+            let resolution = Stream.Resolution.predefined(.hd720p30)
+            streams.append(SingleAssetStream(instance: account.instance, avAsset: AVURLAsset(url: fileURL), resolution: resolution, kind: .stream))
         }
 
         return streams

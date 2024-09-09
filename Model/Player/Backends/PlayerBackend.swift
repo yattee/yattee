@@ -153,8 +153,9 @@ extension PlayerBackend {
         // Filter out non-HLS streams and streams with resolution more than maxResolution
         let nonHLSStreams = streams.filter {
             let isHLS = $0.kind == .hls
-            // Safely unwrap resolution and maxResolution.value to avoid crashes
-            let isWithinResolution = ($0.resolution != nil && maxResolution.value != nil) ? $0.resolution! <= maxResolution.value! : false
+            // Check if the stream's resolution is within the maximum allowed resolution
+            let isWithinResolution = $0.resolution.map { $0 <= maxResolution.value } ?? false
+
             logger.info("Stream ID: \($0.id) - Kind: \(String(describing: $0.kind)) - Resolution: \(String(describing: $0.resolution)) - Bitrate: \($0.bitrate ?? 0)")
             logger.info("Is HLS: \(isHLS), Is within resolution: \(isWithinResolution)")
             return !isHLS && isWithinResolution
@@ -188,8 +189,8 @@ extension PlayerBackend {
         }
 
         let filteredStreams = adjustedStreams.filter { stream in
-            // Safely unwrap resolution and maxResolution.value to avoid crashes
-            let isWithinResolution = (stream.resolution != nil && maxResolution.value != nil) ? stream.resolution! <= maxResolution.value! : false
+            // Check if the stream's resolution is within the maximum allowed resolution
+            let isWithinResolution = stream.resolution <= maxResolution.value
             logger.info("Filtered stream ID: \(stream.id) - Is within max resolution: \(isWithinResolution)")
             return isWithinResolution
         }
