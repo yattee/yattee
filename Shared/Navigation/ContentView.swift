@@ -169,7 +169,7 @@ struct ContentView: View {
             .statusBarHidden(player.playingFullScreen)
         #endif
         #if os(macOS)
-        .frame(minWidth: 1200)
+        .frame(minWidth: 1200, minHeight: 600)
         #endif
     }
 

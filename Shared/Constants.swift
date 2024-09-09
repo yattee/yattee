@@ -63,6 +63,14 @@ enum Constants {
         #endif
     }
 
+    static var detailsVisibility: Bool {
+        #if os(iOS)
+            false
+        #else
+            true
+        #endif
+    }
+
     static var progressViewScale: Double {
         #if os(macOS)
             0.4
@@ -95,11 +103,11 @@ enum Constants {
         #endif
     }
 
-    static var detailsVisibility: Bool {
-        #if os(iOS)
-            false
+    static var contentViewMinWidth: Double {
+        #if os(macOS)
+            835
         #else
-            true
+            0
         #endif
     }
 

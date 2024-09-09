@@ -152,7 +152,7 @@ struct HomeView: View {
         #endif
         #if os(macOS)
         .background(Color.secondaryBackground)
-        .frame(minWidth: 360)
+        .frame(minWidth: Constants.contentViewMinWidth)
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 HideWatchedButtons()

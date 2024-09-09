@@ -30,6 +30,7 @@ struct SearchView: View {
     @Default(.saveRecents) private var saveRecents
     @Default(.showHome) private var showHome
     @Default(.searchListingStyle) private var searchListingStyle
+    @Default(.showSearchSuggestions) private var showSearchSuggestions
 
     private var videos = [Video]()
 
@@ -38,9 +39,9 @@ struct SearchView: View {
         self.videos = videos
     }
 
-    var body: some View {
-        VStack {
-            #if os(iOS)
+    #if os(iOS)
+        var body: some View {
+            VStack {
                 VStack {
                     if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
                         SearchSuggestions()
@@ -51,27 +52,155 @@ struct SearchView: View {
                 }
                 .backport
                 .scrollDismissesKeyboardInteractively()
-            #else
+            }
+            .environment(\.listingStyle, searchListingStyle)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    if #available(iOS 15, *) {
+                        FocusableSearchTextField()
+                    } else {
+                        SearchTextField()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    searchMenu
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .ignoresSafeArea(.keyboard, edges: .bottom)
+            .navigationTitle("Search")
+            .onAppear {
+                if let query {
+                    state.queryText = query.query
+                    state.resetQuery(query)
+                    updateFavoriteItem()
+                }
+
+                if !videos.isEmpty {
+                    state.store.replace(ContentItem.array(of: videos))
+                }
+            }
+            .onChange(of: accounts.current) { _ in
+                state.reloadQuery()
+            }
+            .onChange(of: state.queryText) { newQuery in
+                if newQuery.isEmpty {
+                    favoriteItem = nil
+                    state.resetQuery()
+                } else {
+                    updateFavoriteItem()
+                }
+                state.loadSuggestions(newQuery)
+            }
+            .onChange(of: searchSortOrder) { order in
+                state.changeQuery { query in
+                    query.sortBy = order
+                    updateFavoriteItem()
+                }
+            }
+            .onChange(of: searchDate) { date in
+                state.changeQuery { query in
+                    query.date = date
+                    updateFavoriteItem()
+                }
+            }
+            .onChange(of: searchDuration) { duration in
+                state.changeQuery { query in
+                    query.duration = duration
+                    updateFavoriteItem()
+                }
+            }
+        }
+
+    #elseif os(tvOS)
+        var body: some View {
+            VStack {
                 ZStack {
                     results
-
-                    #if os(macOS)
-                        if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
-                            HStack {
-                                Spacer()
-                                SearchSuggestions()
-                                    .borderLeading(width: 1, color: Color("ControlsBorderColor"))
-                                    .frame(maxWidth: 280)
-                                    .opacity(state.queryText.isEmpty ? 0 : 1)
-                            }
-                        }
-                    #endif
                 }
-            #endif
+            }
+            .environment(\.listingStyle, searchListingStyle)
+            .onAppear {
+                if let query {
+                    state.queryText = query.query
+                    state.resetQuery(query)
+                    updateFavoriteItem()
+                }
+
+                if !videos.isEmpty {
+                    state.store.replace(ContentItem.array(of: videos))
+                }
+            }
+            .onChange(of: accounts.current) { _ in
+                state.reloadQuery()
+            }
+            .onChange(of: state.queryText) { newQuery in
+                if newQuery.isEmpty {
+                    favoriteItem = nil
+                    state.resetQuery()
+                } else {
+                    updateFavoriteItem()
+                }
+                if showSearchSuggestions {
+                    state.loadSuggestions(newQuery)
+                }
+                searchDebounce.invalidate()
+                recentsDebounce.invalidate()
+
+                searchDebounce.debouncing(2) {
+                    state.changeQuery { query in
+                        query.query = newQuery
+                    }
+                }
+
+                recentsDebounce.debouncing(10) {
+                    recents.addQuery(newQuery)
+                }
+            }
+            .onChange(of: searchSortOrder) { order in
+                state.changeQuery { query in
+                    query.sortBy = order
+                    updateFavoriteItem()
+                }
+            }
+            .onChange(of: searchDate) { date in
+                state.changeQuery { query in
+                    query.date = date
+                    updateFavoriteItem()
+                }
+            }
+            .onChange(of: searchDuration) { duration in
+                state.changeQuery { query in
+                    query.duration = duration
+                    updateFavoriteItem()
+                }
+            }
+            .searchable(text: $state.queryText) {
+                if !state.queryText.isEmpty {
+                    ForEach(state.querySuggestions, id: \.self) { suggestion in
+                        Text(suggestion)
+                            .searchCompletion(suggestion)
+                    }
+                }
+            }
         }
-        .environment(\.listingStyle, searchListingStyle)
-        .toolbar {
-            #if os(macOS)
+
+    #elseif os(macOS)
+        var body: some View {
+            ZStack {
+                results
+                if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText, showSearchSuggestions {
+                    HStack {
+                        Spacer()
+                        SearchSuggestions()
+                            .borderLeading(width: 1, color: Color("ControlsBorderColor"))
+                            .frame(maxWidth: 262)
+                            .opacity(state.queryText.isEmpty ? 0 : 1)
+                    }
+                }
+            }
+            .environment(\.listingStyle, searchListingStyle)
+            .toolbar {
                 ToolbarItemGroup(placement: toolbarPlacement) {
                     ListingStyleButtons(listingStyle: $searchListingStyle)
                     HideWatchedButtons()
@@ -84,7 +213,6 @@ struct SearchView: View {
                             HStack {
                                 Text("Sort:")
                                     .foregroundColor(.secondary)
-
                                 searchSortOrderPicker
                             }
                         }
@@ -101,94 +229,52 @@ struct SearchView: View {
                         SearchTextField()
                     }
                 }
-            #endif
-        }
-        .onAppear {
-            if let query {
-                state.queryText = query.query
-                state.resetQuery(query)
-                updateFavoriteItem()
             }
-
-            if !videos.isEmpty {
-                state.store.replace(ContentItem.array(of: videos))
-            }
-        }
-        .onChange(of: accounts.current) { _ in
-            state.reloadQuery()
-        }
-        .onChange(of: state.queryText) { newQuery in
-            if newQuery.isEmpty {
-                favoriteItem = nil
-                state.resetQuery()
-            } else {
-                updateFavoriteItem()
-            }
-
-            state.loadSuggestions(newQuery)
-
-            #if os(tvOS)
-                searchDebounce.invalidate()
-                recentsDebounce.invalidate()
-
-                searchDebounce.debouncing(2) {
-                    state.changeQuery { query in
-                        query.query = newQuery
-                    }
+            .onAppear {
+                if let query {
+                    state.queryText = query.query
+                    state.resetQuery(query)
+                    updateFavoriteItem()
                 }
 
-                recentsDebounce.debouncing(10) {
-                    recents.addQuery(newQuery)
-                }
-            #endif
-        }
-        .onChange(of: searchSortOrder) { order in
-            state.changeQuery { query in
-                query.sortBy = order
-                updateFavoriteItem()
-            }
-        }
-        .onChange(of: searchDate) { date in
-            state.changeQuery { query in
-                query.date = date
-                updateFavoriteItem()
-            }
-        }
-        .onChange(of: searchDuration) { duration in
-            state.changeQuery { query in
-                query.duration = duration
-                updateFavoriteItem()
-            }
-        }
-        #if os(tvOS)
-        .searchable(text: $state.queryText) {
-            if !state.queryText.isEmpty {
-                ForEach(state.querySuggestions, id: \.self) { suggestion in
-                    Text(suggestion)
-                        .searchCompletion(suggestion)
+                if !videos.isEmpty {
+                    state.store.replace(ContentItem.array(of: videos))
                 }
             }
-        }
-        #else
-        .ignoresSafeArea(.keyboard, edges: .bottom)
-                .navigationTitle("Search")
-        #endif
-        #if os(iOS)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                searchMenu
+            .onChange(of: accounts.current) { _ in
+                state.reloadQuery()
             }
-            ToolbarItem(placement: .principal) {
-                if #available(iOS 15, *) {
-                    FocusableSearchTextField()
+            .onChange(of: state.queryText) { newQuery in
+                if newQuery.isEmpty {
+                    favoriteItem = nil
+                    state.resetQuery()
                 } else {
-                    SearchTextField()
+                    updateFavoriteItem()
+                }
+                state.loadSuggestions(newQuery)
+            }
+            .onChange(of: searchSortOrder) { order in
+                state.changeQuery { query in
+                    query.sortBy = order
+                    updateFavoriteItem()
                 }
             }
+            .onChange(of: searchDate) { date in
+                state.changeQuery { query in
+                    query.date = date
+                    updateFavoriteItem()
+                }
+            }
+            .onChange(of: searchDuration) { duration in
+                state.changeQuery { query in
+                    query.duration = duration
+                    updateFavoriteItem()
+                }
+            }
+            .frame(minWidth: Constants.contentViewMinWidth)
+            .navigationTitle("Search")
         }
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
-    }
+    #endif
 
     #if os(iOS)
         var searchMenu: some View {
@@ -230,11 +316,10 @@ struct SearchView: View {
                 }
             } label: {
                 HStack {
-                    Image(systemName: "magnifyingglass")
                     Image(systemName: "chevron.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .imageScale(.large)
                 }
-                .foregroundColor(.accentColor)
-                .imageScale(.medium)
             }
         }
     #endif

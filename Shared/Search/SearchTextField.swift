@@ -1,64 +1,95 @@
-import Repeat
 import SwiftUI
 
 struct SearchTextField: View {
     private var navigation = NavigationModel.shared
     @ObservedObject private var state = SearchModel.shared
 
-    var body: some View {
-        ZStack {
-            #if os(macOS)
+    #if os(macOS)
+        var body: some View {
+            ZStack {
                 fieldBorder
-            #endif
 
-            HStack(spacing: 0) {
-                #if os(macOS)
+                HStack(spacing: 0) {
                     Image(systemName: "magnifyingglass")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 12, height: 12)
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 6)
                         .opacity(0.8)
-                #endif
-                TextField("Search...", text: $state.queryText) {
-                    state.changeQuery { query in
-                        query.query = state.queryText
-                        navigation.hideKeyboard()
-                    }
-                    RecentsModel.shared.addQuery(state.queryText)
-                }
-                .disableAutocorrection(true)
-                #if os(macOS)
-                    .frame(maxWidth: 190)
-                    .textFieldStyle(.plain)
-                #else
-                    .frame(minWidth: 200)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal, 5)
-                    .padding(.trailing, state.queryText.isEmpty ? 0 : 10)
-                #endif
 
-                if !state.queryText.isEmpty {
-                    clearButton
-                } else {
-                    #if os(macOS)
+                    GeometryReader { geometry in
+                        TextField("Search...", text: $state.queryText) {
+                            state.changeQuery { query in
+                                query.query = state.queryText
+                                navigation.hideKeyboard()
+                            }
+                            RecentsModel.shared.addQuery(state.queryText)
+                        }
+                        .disableAutocorrection(true)
+                        .frame(maxWidth: geometry.size.width - 5)
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, 8)
+                        .frame(height: 27, alignment: .center)
+                    }
+
+                    if !state.queryText.isEmpty {
+                        clearButton
+                    } else {
                         clearButton
                             .opacity(0)
-                    #endif
+                    }
                 }
             }
+            .transaction { t in t.animation = nil }
         }
-        .transaction { t in t.animation = nil }
-    }
+    #else
+        var body: some View {
+            ZStack {
+                HStack {
+                    HStack(spacing: 0) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                            .padding(.leading, 5)
+                            .padding(.trailing, 5)
+                            .imageScale(.medium)
+
+                        TextField("Search...", text: $state.queryText) {
+                            state.changeQuery { query in
+                                query.query = state.queryText
+                                navigation.hideKeyboard()
+                            }
+                            RecentsModel.shared.addQuery(state.queryText)
+                        }
+                        .disableAutocorrection(true)
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, 7)
+
+                        if !state.queryText.isEmpty {
+                            clearButton
+                                .padding(.leading, 5)
+                                .padding(.trailing, 5)
+                        }
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color("SearchTextFieldBackground"))
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.horizontal, 0)
+            }
+            .transaction { t in t.animation = nil }
+        }
+    #endif
 
     private var fieldBorder: some View {
         RoundedRectangle(cornerRadius: 5, style: .continuous)
             .fill(Color.background)
-            .frame(width: 250, height: 32)
+            .frame(width: 250, height: 27)
             .overlay(
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                    .frame(width: 250, height: 31)
+                    .frame(width: 250, height: 27)
             )
     }
 
@@ -67,15 +98,14 @@ struct SearchTextField: View {
             self.state.queryText = ""
         }) {
             Image(systemName: "xmark.circle.fill")
-            #if os(macOS)
-                .imageScale(.small)
-            #else
                 .imageScale(.medium)
-            #endif
         }
         .buttonStyle(PlainButtonStyle())
         #if os(macOS)
-            .padding(.trailing, 10)
+            .padding(.trailing, 5)
+        #elseif os(iOS)
+            .padding(.trailing, 5)
+            .foregroundColor(.gray)
         #endif
             .opacity(0.7)
     }

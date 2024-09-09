@@ -46,6 +46,10 @@ struct BrowsingSettingsGroupImporter {
             Defaults[.startupSection] = startupSection
         }
 
+        if let showSearchSuggestions = json["showSearchSuggestions"].bool {
+            Defaults[.showSearchSuggestions] = showSearchSuggestions
+        }
+
         if let visibleSections = json["visibleSections"].array {
             let sections = visibleSections.compactMap { visibleSectionJSON in
                 if let visibleSectionString = visibleSectionJSON.rawString(options: []),
