@@ -74,6 +74,10 @@ struct SearchTextField: View {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color("SearchTextFieldBackground"))
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("ControlsBorderColor"), lineWidth: 1)
+                    )
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 0)
