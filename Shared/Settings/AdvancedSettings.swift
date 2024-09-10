@@ -14,6 +14,7 @@ struct AdvancedSettings: View {
     @Default(.showCacheStatus) private var showCacheStatus
     @Default(.feedCacheSize) private var feedCacheSize
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
+    @Default(.videoLoadingRetryCount) private var videoLoadingRetryCount
 
     @State private var filesToShare = [MPVClient.logFile]
     @State private var presentingShareSheet = false
@@ -64,6 +65,7 @@ struct AdvancedSettings: View {
     @ViewBuilder var advancedSettings: some View {
         Section(header: SettingsHeader(text: "Advanced")) {
             showPlayNowInBackendButtonsToggle
+            videoLoadingRetryCountField
         }
 
         Section(header: SettingsHeader(text: "MPV"), footer: mpvFooter) {
@@ -279,6 +281,19 @@ struct AdvancedSettings: View {
 
     var showPlayNowInBackendButtonsToggle: some View {
         Toggle("Show video context menu options to force selected backend", isOn: $showPlayNowInBackendContextMenu)
+    }
+
+    private var videoLoadingRetryCountField: some View {
+        HStack {
+            Text("Maximum retries for video loading")
+                .frame(minWidth: 200, alignment: .leading)
+                .multilineTextAlignment(.leading)
+            TextField("Limit", value: $videoLoadingRetryCount, formatter: NumberFormatter())
+                .multilineTextAlignment(.trailing)
+            #if !os(macOS)
+                .keyboardType(.numberPad)
+            #endif
+        }
     }
 
     var showMPVPlaybackStatsToggle: some View {

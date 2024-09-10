@@ -201,6 +201,9 @@ final class PlayerModel: ObservableObject {
     var rateToRestore: Float?
     private var remoteCommandCenterConfigured = false
 
+    // Used in the PlayerModel extension in PlayerQueue
+    var retryAttempts = [String: Int]()
+
     #if os(macOS)
         var keyPressMonitor: Any?
     #endif
