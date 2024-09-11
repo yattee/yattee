@@ -1,9 +1,10 @@
-## Build 195
-* iOS: Simplified fullscreen and orientation by @stonerl in https://github.com/yattee/yattee/pull/786
-* macOS: only apply player shortcuts when window is active by @stonerl in https://github.com/yattee/yattee/pull/802
-* player controls: add background opacity selection by @stonerl in https://github.com/yattee/yattee/pull/799
-* add missing Shorts resolutions by @stonerl in https://github.com/yattee/yattee/pull/797
-* use -O1 on macOS by @stonerl in https://github.com/yattee/yattee/pull/801
+## Build 196
+* Orientation/Fullscreen fixes and cleanup by @stonerl in https://github.com/yattee/yattee/pull/806
+* More robust resolution handling by @stonerl in https://github.com/yattee/yattee/pull/807
+* MPV: improved A/V sync by @stonerl in https://github.com/yattee/yattee/pull/805
+* Retry loading video before presenting error by @stonerl in https://github.com/yattee/yattee/pull/810
+* Refactor Search by @stonerl in https://github.com/yattee/yattee/pull/809
+* Updated dependencies
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -22,6 +23,11 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* iOS: Simplified fullscreen and orientation by @stonerl in https://github.com/yattee/yattee/pull/786
+* macOS: only apply player shortcuts when window is active by @stonerl in https://github.com/yattee/yattee/pull/802
+* player controls: add background opacity selection by @stonerl in https://github.com/yattee/yattee/pull/799
+* add missing Shorts resolutions by @stonerl in https://github.com/yattee/yattee/pull/797
+* use -O1 on macOS by @stonerl in https://github.com/yattee/yattee/pull/801
 * Gestures: swipe up toggles fullscreen by @stonerl in https://github.com/yattee/yattee/pull/778
 * don’t open video when dismissing context menu by @stonerl in https://github.com/yattee/yattee/pull/780
 * mpv: remove video layer when entering background by @stonerl in https://github.com/yattee/yattee/pull/793
