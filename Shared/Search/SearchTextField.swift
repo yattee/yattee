@@ -76,7 +76,7 @@ struct SearchTextField: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color("ControlsBorderColor"), lineWidth: 1)
+                            .stroke(Color(UIColor.secondarySystemBackground), lineWidth: 1)
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
