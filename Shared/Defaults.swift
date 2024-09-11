@@ -358,6 +358,7 @@ extension Defaults.Keys {
     // MARK: Group - Advanced
 
     static let showPlayNowInBackendContextMenu = Key<Bool>("showPlayNowInBackendContextMenu", default: false)
+    static let videoLoadingRetryCount = Key<Int>("videoLoadingRetryCount", default: 10)
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)

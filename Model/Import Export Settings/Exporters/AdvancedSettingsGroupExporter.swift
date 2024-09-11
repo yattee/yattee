@@ -5,6 +5,7 @@ final class AdvancedSettingsGroupExporter: SettingsGroupExporter {
     override var globalJSON: JSON {
         [
             "showPlayNowInBackendContextMenu": Defaults[.showPlayNowInBackendContextMenu],
+            "videoLoadingRetryCount": Defaults[.videoLoadingRetryCount],
             "showMPVPlaybackStats": Defaults[.showMPVPlaybackStats],
             "mpvEnableLogging": Defaults[.mpvEnableLogging],
             "mpvCacheSecs": Defaults[.mpvCacheSecs],

@@ -9,6 +9,10 @@ struct AdvancedSettingsGroupImporter {
             Defaults[.showPlayNowInBackendContextMenu] = showPlayNowInBackendContextMenu
         }
 
+        if let videoLoadingRetryCount = json["videoLoadingRetryCount"].int {
+            Defaults[.videoLoadingRetryCount] = videoLoadingRetryCount
+        }
+
         if let showMPVPlaybackStats = json["showMPVPlaybackStats"].bool {
             Defaults[.showMPVPlaybackStats] = showMPVPlaybackStats
         }

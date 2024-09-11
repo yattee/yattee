@@ -359,6 +359,31 @@ extension PlayerModel {
     }
 
     private func videoLoadFailureHandler(_ error: RequestError, video: Video? = nil) {
+        guard let video else {
+            presentErrorAlert(error)
+            return
+        }
+
+        let videoID = video.videoID
+        let currentRetry = retryAttempts[videoID] ?? 0
+
+        if currentRetry < Defaults[.videoLoadingRetryCount] {
+            retryAttempts[videoID] = currentRetry + 1
+
+            logger.info("Retry attempt \(currentRetry + 1) for video \(videoID) due to error: \(error)")
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self else { return }
+                self.enqueueVideo(video, play: true, prepending: true, loadDetails: true)
+            }
+            return
+        }
+
+        retryAttempts[videoID] = 0
+        presentErrorAlert(error, video: video)
+    }
+
+    private func presentErrorAlert(_ error: RequestError, video: Video? = nil) {
         var message = error.userMessage
         if let errorDictionary = error.json.dictionaryObject,
            let errorMessage = errorDictionary["message"] ?? errorDictionary["error"],
