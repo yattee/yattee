@@ -204,7 +204,7 @@ final class MPVBackend: PlayerBackend {
     typealias AreInIncreasingOrder = (Stream, Stream) -> Bool
 
     func canPlay(_ stream: Stream) -> Bool {
-        stream.resolution != .unknown && stream.format != .av1
+        stream.format != .av1
     }
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading: Bool) {

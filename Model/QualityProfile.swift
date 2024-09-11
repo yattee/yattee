@@ -76,7 +76,8 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
             return true
         }
 
-        let resolutionMatch = !stream.resolution.isNil && resolution.value >= stream.resolution
+        let defaultResolution = Stream.Resolution.custom(height: 720, refreshRate: 30)
+        let resolutionMatch = resolution.value ?? defaultResolution >= stream.resolution
 
         if resolutionMatch, formats.contains(.stream), stream.kind == .stream {
             return true

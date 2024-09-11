@@ -424,18 +424,34 @@ enum ResolutionSetting: String, CaseIterable, Defaults.Serializable {
     case sd240p30
     case sd144p30
 
-    var value: Stream.Resolution! {
-        .init(rawValue: rawValue)
+    var value: Stream.Resolution {
+        if let predefined = Stream.Resolution.PredefinedResolution(rawValue: rawValue) {
+            return .predefined(predefined)
+        }
+        // Provide a default value of 720p 30
+        return .custom(height: 720, refreshRate: 30)
     }
 
     var description: String {
-        switch self {
-        case .hd2160p60:
-            return "4K, 60fps"
-        case .hd2160p30:
-            return "4K"
+        let resolution = value
+        let height = resolution.height
+        let refreshRate = resolution.refreshRate
+
+        // Superscript labels
+        let superscript4K = "⁴ᴷ"
+        let superscriptHD = "ᴴᴰ"
+
+        // Special handling for specific resolutions
+        switch height {
+        case 2160:
+            // 4K superscript after the refresh rate
+            return refreshRate == 30 ? "2160p \(superscript4K)" : "2160p\(refreshRate) \(superscript4K)"
+        case 1440, 1080:
+            // HD superscript after the refresh rate
+            return refreshRate == 30 ? "\(height)p \(superscriptHD)" : "\(height)p\(refreshRate) \(superscriptHD)"
         default:
-            return value.name
+            // Default formatting for other resolutions
+            return refreshRate == 30 ? "\(height)p" : "\(height)p\(refreshRate)"
         }
     }
 }
