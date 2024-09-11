@@ -6,6 +6,8 @@ import Logging
 #if !os(macOS)
     import Siesta
     import UIKit
+#else
+    import AppKit
 #endif
 
 final class MPVClient: ObservableObject {
@@ -29,6 +31,7 @@ final class MPVClient: ObservableObject {
     var backend: MPVBackend!
 
     var seeking = false
+    var currentRefreshRate = 60
 
     func create(frame: CGRect? = nil) {
         #if !os(macOS)
@@ -39,7 +42,7 @@ final class MPVClient: ObservableObject {
 
         mpv = mpv_create()
         if mpv == nil {
-            print("failed creating context\n")
+            logger.critical("failed creating context\n")
             exit(1)
         }
 
@@ -76,6 +79,27 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "user-agent", UserAgentManager.shared.userAgent))
         checkError(mpv_set_option_string(mpv, "initial-audio-sync", Defaults[.mpvInitialAudioSync] ? "yes" : "no"))
 
+        // Enable VSYNC – needed for `video-sync`
+        checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "1"))
+        checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
+        checkError(mpv_set_option_string(mpv, "interpolation", "yes"))
+        checkError(mpv_set_option_string(mpv, "tscale", "mitchell"))
+        checkError(mpv_set_option_string(mpv, "tscale-window", "blackman"))
+        checkError(mpv_set_option_string(mpv, "vd-lavc-framedrop", "nonref"))
+        checkError(mpv_set_option_string(mpv, "display-fps-override", "\(String(getScreenRefreshRate()))"))
+
+        // CPU //
+
+        // Determine number of threads based on system core count
+        let numberOfCores = ProcessInfo.processInfo.processorCount
+        let threads = numberOfCores * 2
+
+        // Log the number of cores and threads
+        logger.info("Number of CPU cores: \(numberOfCores)")
+
+        // Set the number of threads dynamically
+        checkError(mpv_set_option_string(mpv, "vd-lavc-threads", "\(threads)"))
+
         // GPU //
 
         checkError(mpv_set_option_string(mpv, "hwdec", Defaults[.mpvHWdec]))
@@ -83,7 +107,6 @@ final class MPVClient: ObservableObject {
 
         // We set set everything to OpenGL so MPV doesn't have to probe for other APIs.
         checkError(mpv_set_option_string(mpv, "gpu-api", "opengl"))
-        checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "0"))
 
         #if !os(macOS)
             checkError(mpv_set_option_string(mpv, "opengl-es", "yes"))
@@ -114,7 +137,7 @@ final class MPVClient: ObservableObject {
             get_proc_address_ctx: nil
         )
 
-        queue = DispatchQueue(label: "mpv")
+        queue = DispatchQueue(label: "mpv", qos: .userInteractive, attributes: [.concurrent])
 
         withUnsafeMutablePointer(to: &initParams) { initParams in
             var params = [
@@ -124,7 +147,7 @@ final class MPVClient: ObservableObject {
             ]
 
             if mpv_render_context_create(&mpvGL, mpv, &params) < 0 {
-                print("failed to initialize mpv GL context")
+                logger.critical("failed to initialize mpv GL context")
                 exit(1)
             }
 
@@ -320,6 +343,37 @@ final class MPVClient: ObservableObject {
         mpv.isNil ? false : getFlag("eof-reached")
     }
 
+    var currentContainerFps: Int {
+        guard !mpv.isNil else { return 30 }
+        let fps = getDouble("container-fps")
+        return Int(fps.rounded())
+    }
+
+    var areSubtitlesAdded: Bool {
+        guard !mpv.isNil else { return false }
+
+        // Retrieve the number of tracks
+        let trackCount = getInt("track-list/count")
+        guard trackCount > 0 else { return false }
+
+        for index in 0 ..< trackCount {
+            // Get the type of each track
+            if let trackType = getString("track-list/\(index)/type"), trackType == "sub" {
+                // Check if the subtitle track is currently selected
+                let selected = getInt("track-list/\(index)/selected")
+                if selected == 1 {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    func logCurrentFps() {
+        let fps = currentContainerFps
+        logger.info("Current container FPS: \(fps)")
+    }
+
     func seek(relative time: CMTime, completionHandler: ((Bool) -> Void)? = nil) {
         guard !seeking else {
             logger.warning("ignoring seek, another in progress")
@@ -363,7 +417,7 @@ final class MPVClient: ObservableObject {
                 return
             }
 
-            DispatchQueue.main.async { [weak self] in
+            DispatchQueue.main.async(qos: .userInteractive) { [weak self] in
                 guard let self else { return }
                 let model = self.backend.model
                 let aspectRatio = self.aspectRatio > 0 && self.aspectRatio < VideoPlayerView.defaultAspectRatio ? self.aspectRatio : VideoPlayerView.defaultAspectRatio
@@ -440,6 +494,45 @@ final class MPVClient: ObservableObject {
         if let cb = returnValueCallback {
             cb(returnValue)
         }
+    }
+
+    func updateRefreshRate(to refreshRate: Int) {
+        setString("display-fps-override", "\(String(refreshRate))")
+        logger.info("Updated refresh rate during playback to: \(refreshRate) Hz")
+    }
+
+    // Retrieve the screen's current refresh rate dynamically.
+    func getScreenRefreshRate() -> Int {
+        var refreshRate = 60 // Default to 60 Hz in case of failure
+
+        #if os(macOS)
+            // macOS implementation using NSScreen
+            if let screen = NSScreen.main,
+               let displayID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID,
+               let mode = CGDisplayCopyDisplayMode(displayID),
+               mode.refreshRate > 0
+            {
+                refreshRate = Int(mode.refreshRate)
+                logger.info("Screen refresh rate: \(refreshRate) Hz")
+            } else {
+                logger.warning("Failed to get refresh rate from NSScreen.")
+            }
+        #else
+            // iOS implementation using UIScreen with a failover
+            let mainScreen = UIScreen.main
+            refreshRate = mainScreen.maximumFramesPerSecond
+
+            // Failover: if maximumFramesPerSecond is 0 or an unexpected value
+            if refreshRate <= 0 {
+                refreshRate = 60 // Fallback to 60 Hz
+                logger.warning("Failed to get refresh rate from UIScreen, falling back to 60 Hz.")
+            } else {
+                logger.info("Screen refresh rate: \(refreshRate) Hz")
+            }
+        #endif
+
+        currentRefreshRate = refreshRate
+        return refreshRate
     }
 
     func addVideoTrack(_ url: URL) {

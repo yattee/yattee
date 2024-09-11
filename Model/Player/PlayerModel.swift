@@ -534,8 +534,8 @@ final class PlayerModel: ObservableObject {
     }
 
     private func handlePresentationChange() {
-        #if !os(iOS)
-            // TODO: Check whether this is neede on tvOS and macOS
+        #if os(macOS)
+            // TODO: Check whether this is needed on macOS
             backend.setNeedsDrawing(presentingPlayer)
         #endif
 
@@ -1009,22 +1009,20 @@ final class PlayerModel: ObservableObject {
         }
     #else
         func handleEnterForeground() {
+            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+                guard let self = self else { return }
+
+                if !self.musicMode, self.activeBackend == .mpv {
+                    self.mpvBackend.addVideoTrackFromStream()
+                    self.mpvBackend.setVideoToAuto()
+                    self.mpvBackend.controls.resetTimer()
+                } else if !self.musicMode, self.activeBackend == .appleAVPlayer {
+                    self.avPlayerBackend.bindPlayerToLayer()
+                }
+            }
             #if os(iOS)
                 OrientationTracker.shared.startDeviceOrientationTracking()
             #endif
-
-            #if os(tvOS)
-                // TODO: Not sure if this is realy needed on tvOS, maybe it can be removed.
-                setNeedsDrawing(presentingPlayer)
-            #endif
-
-            if !musicMode, activeBackend == .mpv {
-                mpvBackend.addVideoTrackFromStream()
-                mpvBackend.setVideoToAuto()
-                mpvBackend.controls.resetTimer()
-            } else if !musicMode, activeBackend == .appleAVPlayer {
-                avPlayerBackend.bindPlayerToLayer()
-            }
 
             guard closePiPAndOpenPlayerOnEnteringForeground, playingInPictureInPicture else {
                 return

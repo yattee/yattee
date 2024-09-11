@@ -13,6 +13,7 @@ final class AdvancedSettingsGroupExporter: SettingsGroupExporter {
             "mpvDeinterlace": Defaults[.mpvDeinterlace],
             "mpvHWdec": Defaults[.mpvHWdec],
             "mpvDemuxerLavfProbeInfo": Defaults[.mpvDemuxerLavfProbeInfo],
+            "mpvSetRefreshToContentFPS": Defaults[.mpvSetRefreshToContentFPS],
             "mpvInitialAudioSync": Defaults[.mpvInitialAudioSync],
             "showCacheStatus": Defaults[.showCacheStatus],
             "feedCacheSize": Defaults[.feedCacheSize]
