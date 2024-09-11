@@ -1,5 +1,5 @@
 {
-  "originHash" : "515d8e68c4a31658288fb3f94789ee539399b042082c08c39f4c03c27fd8860c",
+  "originHash" : "173de1b718eb898698eaba0221b46be9781899a652725709c8400d3ddfb01980",
   "pins" : [
     {
       "identity" : "activelabel.swift",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
-        "branch" : "master",
-        "revision" : "81a0277cbc6b63f4e0cd6f42c4abefa1011bbfa9"
+        "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
+        "version" : "7.4.0"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pinterest/PINCache",
       "state" : {
-        "branch" : "master",
-        "revision" : "2fb85948463292c2e824148cf17dc62a4c217a94"
+        "revision" : "2fb85948463292c2e824148cf17dc62a4c217a94",
+        "version" : "3.0.4"
       }
     },
     {
@@ -148,10 +148,10 @@
     {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/yattee/swift-log.git",
+      "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "3f3dc1390a2f116894887c352792dc8d5fa9e875"
+        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
+        "version" : "1.6.1"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
-        "version" : "0.12.0"
+        "revision" : "807f73ce09a9b9723f12385e592b4e0aaebd3336",
+        "version" : "1.3.0"
       }
     },
     {
