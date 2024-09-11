@@ -9,7 +9,7 @@ struct FocusableSearchTextField: View {
     var body: some View {
         SearchTextField()
         #if os(macOS)
-            .introspect(.textField, on: .macOS(.v12, .v13, .v14)) { textField in
+            .introspect(.textField, on: .macOS(.v12, .v13, .v14, .v15)) { textField in
                 state.textField = textField
             }
             .onAppear {
@@ -18,7 +18,7 @@ struct FocusableSearchTextField: View {
                 }
             }
         #elseif os(iOS)
-            .introspect(.textField, on: .iOS(.v15, .v16, .v17)) { textField in
+            .introspect(.textField, on: .iOS(.v15, .v16, .v17, .v18)) { textField in
                 state.textField = textField
             }
             .onChange(of: state.focused) { newValue in
