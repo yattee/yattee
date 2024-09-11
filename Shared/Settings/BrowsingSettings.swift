@@ -170,7 +170,7 @@ struct BrowsingSettings: View {
                                 Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
                             } else {
                                 enterFullscreenInLandscape = false
-                                Orientation.lockOrientation(.allButUpsideDown)
+                                Orientation.lockOrientation(.all)
                             }
                         }
                 }

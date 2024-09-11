@@ -136,7 +136,9 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        @Default(.rotateToLandscapeOnEnterFullScreen) private var rotateToLandscapeOnEnterFullScreen
+        @Default(.rotateToLandscapeOnEnterFullScreen) var rotateToLandscapeOnEnterFullScreen
+        @Default(.lockPortraitWhenBrowsing) var lockPortraitWhenBrowsing
+        var fullscreenInitiatedByButton = false
     #endif
 
     @Published var currentChapterIndex: Int?
@@ -209,7 +211,7 @@ final class PlayerModel: ObservableObject {
         #if os(iOS)
             isOrientationLocked = Defaults[.isOrientationLocked]
 
-            if isOrientationLocked, Defaults[.lockPortraitWhenBrowsing] {
+            if isOrientationLocked, lockPortraitWhenBrowsing {
                 lockedOrientation = UIInterfaceOrientationMask.portrait
                 Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
             } else if isOrientationLocked {
@@ -564,10 +566,10 @@ final class PlayerModel: ObservableObject {
 
         if !presentingPlayer {
             #if os(iOS)
-                if Defaults[.lockPortraitWhenBrowsing] {
+                if lockPortraitWhenBrowsing {
                     Orientation.lockOrientation(.portrait, andRotateTo: .portrait)
                 } else {
-                    Orientation.lockOrientation(.allButUpsideDown)
+                    Orientation.lockOrientation(.all)
                 }
             #endif
         }
@@ -821,7 +823,7 @@ final class PlayerModel: ObservableObject {
             } else {
                 isOrientationLocked = false
                 lockedOrientation = nil
-                Orientation.lockOrientation(.allButUpsideDown)
+                Orientation.lockOrientation(.all)
             }
         }
     #endif
@@ -1149,16 +1151,27 @@ final class PlayerModel: ObservableObject {
         #if os(iOS)
             if playingFullScreen {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
+                    fullscreenInitiatedByButton = initiatedByButton
                     avPlayerBackend.controller.enterFullScreen(animated: true)
                     return
                 }
                 let lockOrientation = rotateToLandscapeOnEnterFullScreen.interfaceOrientation
                 if currentVideoIsLandscape {
                     if initiatedByButton {
-                        Orientation.lockOrientation(self.isOrientationLocked ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft) : .landscape)
+                        Orientation.lockOrientation(isOrientationLocked
+                            ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
+                            : .landscape)
                     }
-                    let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape ? OrientationTracker.shared.currentInterfaceOrientation : self.rotateToLandscapeOnEnterFullScreen.interfaceOrientation
-                    Orientation.lockOrientation(self.isOrientationLocked ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft) : .landscape, andRotateTo: orientation)
+                    let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape
+                        ? OrientationTracker.shared.currentInterfaceOrientation
+                        : rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+
+                    Orientation.lockOrientation(
+                        isOrientationLocked
+                            ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
+                            : .all,
+                        andRotateTo: orientation
+                    )
                 }
             } else {
                 if activeBackend == .appleAVPlayer, avPlayerUsesSystemControls {
@@ -1166,11 +1179,11 @@ final class PlayerModel: ObservableObject {
                     avPlayerBackend.controller.dismiss(animated: true)
                     return
                 }
-                if Defaults[.lockPortraitWhenBrowsing] {
+                if lockPortraitWhenBrowsing {
                     lockedOrientation = UIInterfaceOrientationMask.portrait
                 }
-                let rotationOrientation = Defaults[.lockPortraitWhenBrowsing] ? UIInterfaceOrientation.portrait : nil
-                Orientation.lockOrientation(Defaults[.lockPortraitWhenBrowsing] ? .portrait : .allButUpsideDown, andRotateTo: rotationOrientation)
+                let rotationOrientation = lockPortraitWhenBrowsing ? UIInterfaceOrientation.portrait : nil
+                Orientation.lockOrientation(lockPortraitWhenBrowsing ? .portrait : .all, andRotateTo: rotationOrientation)
             }
         #endif
     }
