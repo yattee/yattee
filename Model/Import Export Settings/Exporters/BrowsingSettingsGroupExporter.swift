@@ -11,6 +11,7 @@ final class BrowsingSettingsGroupExporter: SettingsGroupExporter {
             "favorites": Defaults[.favorites].compactMap { jsonFromString(FavoriteItem.bridge.serialize($0)) },
             "widgetsSettings": Defaults[.widgetsSettings].compactMap { widgetSettingsJSON($0) },
             "startupSection": Defaults[.startupSection].rawValue,
+            "showSearchSuggestions": Defaults[.showSearchSuggestions],
             "visibleSections": Defaults[.visibleSections].compactMap { $0.rawValue },
             "showOpenActionsToolbarItem": Defaults[.showOpenActionsToolbarItem],
             "accountPickerDisplaysAnonymousAccounts": Defaults[.accountPickerDisplaysAnonymousAccounts],

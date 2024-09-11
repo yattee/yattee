@@ -18,6 +18,8 @@ final class SearchModel: ObservableObject {
 
     @Published var focused = false
 
+    @Default(.showSearchSuggestions) private var showSearchSuggestions
+
     #if os(iOS)
         var textField: UITextField!
     #elseif os(macOS)
@@ -102,7 +104,7 @@ final class SearchModel: ObservableObject {
     }}
 
     func loadSuggestions(_ query: String) {
-        guard accounts.app.supportsSearchSuggestions else {
+        guard accounts.app.supportsSearchSuggestions, showSearchSuggestions else {
             querySuggestions.removeAll()
             return
         }

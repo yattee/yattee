@@ -38,10 +38,12 @@ struct SubscriptionsView: View {
                         }
                         .pickerStyle(.segmented)
                         .labelStyle(.titleOnly)
-
-                        subscriptionsMenu
                     }
                     .frame(maxWidth: 500)
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    subscriptionsMenu
                 }
 
                 ToolbarItem {
@@ -88,7 +90,7 @@ struct SubscriptionsView: View {
                     SettingsButtons()
                 }
             } label: {
-                HStack(spacing: 12) {
+                HStack {
                     Image(systemName: "chevron.down.circle.fill")
                         .foregroundColor(.accentColor)
                         .imageScale(.large)

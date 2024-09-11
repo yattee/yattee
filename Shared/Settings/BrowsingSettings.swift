@@ -20,6 +20,7 @@ struct BrowsingSettings: View {
     @Default(.showOpenActionsToolbarItem) private var showOpenActionsToolbarItem
     @Default(.visibleSections) private var visibleSections
     @Default(.startupSection) private var startupSection
+    @Default(.showSearchSuggestions) private var showSearchSuggestions
     @Default(.playerButtonSingleTapGesture) private var playerButtonSingleTapGesture
     @Default(.playerButtonDoubleTapGesture) private var playerButtonDoubleTapGesture
     @Default(.playerButtonShowsControlButtonsWhenMinimized) private var playerButtonShowsControlButtonsWhenMinimized
@@ -67,6 +68,7 @@ struct BrowsingSettings: View {
             homeSettings
             if !accounts.isEmpty {
                 startupSectionPicker
+                showSearchSuggestionsToggle
                 visibleSectionsSettings
             }
             let interface = interfaceSettings
@@ -244,6 +246,10 @@ struct BrowsingSettings: View {
             }
             .modifier(SettingsPickerModifier())
         }
+    }
+
+    private var showSearchSuggestionsToggle: some View {
+        Toggle("Show search suggestions", isOn: $showSearchSuggestions)
     }
 
     private func toggleSection(_ section: VisibleSection, value: Bool) {

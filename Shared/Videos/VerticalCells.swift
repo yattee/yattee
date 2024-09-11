@@ -52,7 +52,7 @@ struct VerticalCells<Header: View>: View {
         .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
         #if os(macOS)
             .background(Color.secondaryBackground)
-            .frame(minWidth: 360)
+            .frame(minWidth: Constants.contentViewMinWidth)
         #endif
     }
 
