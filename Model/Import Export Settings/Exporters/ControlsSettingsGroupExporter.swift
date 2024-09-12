@@ -5,6 +5,7 @@ final class ConstrolsSettingsGroupExporter: SettingsGroupExporter {
     override var globalJSON: JSON {
         [
             "avPlayerUsesSystemControls": Defaults[.avPlayerUsesSystemControls],
+            "fullscreenPlayerGestureEnabled": Defaults[.fullscreenPlayerGestureEnabled],
             "horizontalPlayerGestureEnabled": Defaults[.horizontalPlayerGestureEnabled],
             "seekGestureSensitivity": Defaults[.seekGestureSensitivity],
             "seekGestureSpeed": Defaults[.seekGestureSpeed],

@@ -66,6 +66,7 @@ struct VideoPlayerView: View {
     #endif
 
     @Default(.horizontalPlayerGestureEnabled) var horizontalPlayerGestureEnabled
+    @Default(.fullscreenPlayerGestureEnabled) var fullscreenPlayerGestureEnabled
     @Default(.seekGestureSpeed) var seekGestureSpeed
     @Default(.seekGestureSensitivity) var seekGestureSensitivity
     @Default(.playerSidebar) var playerSidebar
