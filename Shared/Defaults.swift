@@ -116,6 +116,7 @@ extension Defaults.Keys {
 
     static let avPlayerUsesSystemControls = Key<Bool>("avPlayerUsesSystemControls", default: Constants.isTvOS)
     static let horizontalPlayerGestureEnabled = Key<Bool>("horizontalPlayerGestureEnabled", default: true)
+    static let fullscreenPlayerGestureEnabled = Key<Bool>("fullscreenPlayerGestureEnabled", default: true)
     static let seekGestureSensitivity = Key<Double>("seekGestureSensitivity", default: 30.0)
     static let seekGestureSpeed = Key<Double>("seekGestureSpeed", default: 0.5)
 
