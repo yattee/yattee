@@ -1322,26 +1322,29 @@ final class PlayerModel: ObservableObject {
             logger.info("Interruption type received: \(type)")
 
             // Check availability for iOS 14.5 or newer to handle interruption reason
-            if #available(iOS 14.5, *) {
-                // Extract the interruption reason, if available
-                if let reasonValue = info[AVAudioSessionInterruptionReasonKey] as? UInt,
-                   let reason = AVAudioSession.InterruptionReason(rawValue: reasonValue)
-                {
-                    logger.info("Interruption reason received: \(reason)")
-                    switch reason {
-                    case .default:
-                        logger.info("Interruption reason: Default or unspecified interruption occurred.")
-                    case .appWasSuspended:
-                        logger.info("Interruption reason: The app was suspended during the interruption.")
-                    @unknown default:
-                        logger.info("Unknown interruption reason received.")
+            // Currently only for debugging purpose
+            #if os(iOS)
+                if #available(iOS 14.5, *) {
+                    // Extract the interruption reason, if available
+                    if let reasonValue = info[AVAudioSessionInterruptionReasonKey] as? UInt,
+                       let reason = AVAudioSession.InterruptionReason(rawValue: reasonValue)
+                    {
+                        logger.info("Interruption reason received: \(reason)")
+                        switch reason {
+                        case .default:
+                            logger.info("Interruption reason: Default or unspecified interruption occurred.")
+                        case .appWasSuspended:
+                            logger.info("Interruption reason: The app was suspended during the interruption.")
+                        @unknown default:
+                            logger.info("Unknown interruption reason received.")
+                        }
+                    } else {
+                        logger.info("AVAudioSessionInterruptionReasonKey is missing or not a UInt in userInfo.")
                     }
                 } else {
-                    logger.info("AVAudioSessionInterruptionReasonKey is missing or not a UInt in userInfo.")
+                    logger.info("Interruption reason handling is not available on this iOS version.")
                 }
-            } else {
-                logger.info("Interruption reason handling is not available on this iOS version.")
-            }
+            #endif
 
             // Handle the specific interruption type
             switch type {
