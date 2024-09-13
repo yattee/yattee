@@ -253,11 +253,7 @@ final class MPVBackend: PlayerBackend {
 
         let startPlaying = {
             #if !os(macOS)
-                do {
-                    try AVAudioSession.sharedInstance().setActive(true)
-                } catch {
-                    self.logger.error("Error setting up audio session: \(error)")
-                }
+                self.model.setAudioSessionActive(true)
             #endif
 
             DispatchQueue.main.async { [weak self] in
@@ -359,6 +355,9 @@ final class MPVBackend: PlayerBackend {
     }
 
     func play() {
+        #if !os(macOS)
+            model.setAudioSessionActive(true)
+        #endif
         startClientUpdates()
         startRefreshRateUpdates()
 
@@ -387,6 +386,9 @@ final class MPVBackend: PlayerBackend {
     }
 
     func pause() {
+        #if !os(macOS)
+            model.setAudioSessionActive(false)
+        #endif
         stopClientUpdates()
         stopRefreshRateUpdates()
 
@@ -408,6 +410,9 @@ final class MPVBackend: PlayerBackend {
     }
 
     func stop() {
+        #if !os(macOS)
+            model.setAudioSessionActive(false)
+        #endif
         stopClientUpdates()
         stopRefreshRateUpdates()
         client?.stop()
