@@ -349,21 +349,15 @@ final class MPVClient: ObservableObject {
         return Int(fps.rounded())
     }
 
-    var areSubtitlesAdded: Bool {
+    func areSubtitlesAdded() async -> Bool {
         guard !mpv.isNil else { return false }
 
-        // Retrieve the number of tracks
-        let trackCount = getInt("track-list/count")
+        let trackCount = await Task(operation: { getInt("track-list/count") }).value
         guard trackCount > 0 else { return false }
 
         for index in 0 ..< trackCount {
-            // Get the type of each track
-            if let trackType = getString("track-list/\(index)/type"), trackType == "sub" {
-                // Check if the subtitle track is currently selected
-                let selected = getInt("track-list/\(index)/selected")
-                if selected == 1 {
-                    return true
-                }
+            if let trackType = await Task(operation: { getString("track-list/\(index)/type") }).value, trackType == "sub" {
+                return true
             }
         }
         return false
@@ -539,12 +533,16 @@ final class MPVClient: ObservableObject {
         command("video-add", args: [url.absoluteString])
     }
 
-    func addSubTrack(_ url: URL) {
-        command("sub-add", args: [url.absoluteString])
+    func addSubTrack(_ url: URL) async {
+        await Task {
+            command("sub-add", args: [url.absoluteString])
+        }.value
     }
 
-    func removeSubs() {
-        command("sub-remove")
+    func removeSubs() async {
+        await Task {
+            command("sub-remove")
+        }.value
     }
 
     func setVideoToAuto() {
