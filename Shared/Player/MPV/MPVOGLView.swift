@@ -11,6 +11,7 @@ final class MPVOGLView: GLKView {
     var mpvGL: UnsafeMutableRawPointer?
     var queue = DispatchQueue(label: "stream.yattee.opengl", qos: .userInteractive)
     var needsDrawing = true
+    private var dirtyRegion: CGRect?
 
     override init(frame: CGRect) {
         guard let context = EAGLContext(api: .openGLES2) else {
@@ -85,6 +86,7 @@ final class MPVOGLView: GLKView {
     @objc private func updateFrame() {
         // Trigger the drawing process if needed
         if needsDrawing {
+            markRegionAsDirty(bounds)
             setNeedsDisplay()
         }
     }
@@ -100,15 +102,59 @@ final class MPVOGLView: GLKView {
         glClear(UInt32(GL_COLOR_BUFFER_BIT))
     }
 
+    // Function to set a dirty region when a part of the screen changes
+    func markRegionAsDirty(_ region: CGRect) {
+        if dirtyRegion == nil {
+            dirtyRegion = region
+        } else {
+            // Expand the dirty region to include the new region
+            dirtyRegion = dirtyRegion!.union(region)
+        }
+    }
+
+    // Logic to decide if only part of the screen needs updating
+    private func needsPartialUpdate() -> Bool {
+        // Check if there is a defined dirty region that needs updating
+        if let dirtyRegion, !dirtyRegion.isEmpty {
+            // Set up glScissor based on dirtyRegion coordinates
+            glScissor(GLint(dirtyRegion.origin.x), GLint(dirtyRegion.origin.y), GLsizei(dirtyRegion.width), GLsizei(dirtyRegion.height))
+            return true
+        }
+        return false
+    }
+
+    // Call this function when you know the entire screen needs updating
+    private func clearDirtyRegion() {
+        dirtyRegion = nil
+    }
+
     override func draw(_: CGRect) {
         guard needsDrawing, let mpvGL else { return }
+
+        // Ensure the correct context is set
+        guard EAGLContext.setCurrent(context) else {
+            logger.error("Failed to set current OpenGL context.")
+            return
+        }
 
         // Bind the default framebuffer
         glGetIntegerv(UInt32(GL_FRAMEBUFFER_BINDING), &defaultFBO!)
 
+        // Ensure the framebuffer is valid
+        guard defaultFBO != nil && defaultFBO! != 0 else {
+            logger.error("Invalid framebuffer ID.")
+            return
+        }
+
         // Get the current viewport dimensions
         var dims: [GLint] = [0, 0, 0, 0]
         glGetIntegerv(GLenum(GL_VIEWPORT), &dims)
+
+        // Check if we need partial updates
+        if needsPartialUpdate() {
+            logger.info("Performing partial update with scissor test.")
+            glEnable(GLenum(GL_SCISSOR_TEST))
+        }
 
         // Set up the OpenGL FBO data
         var data = mpv_opengl_fbo(
@@ -129,9 +175,23 @@ final class MPVOGLView: GLKView {
                     mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
                     mpv_render_param()
                 ]
-                mpv_render_context_render(OpaquePointer(mpvGL), &params)
+                // Call the render function and check for errors
+                let result = mpv_render_context_render(OpaquePointer(mpvGL), &params)
+                if result < 0 {
+                    logger.error("mpv_render_context_render() failed with error code: \(result)")
+                } else {
+                    logger.info("mpv_render_context_render() called successfully.")
+                }
             }
         }
+
+        // Disable the scissor test after rendering if it was enabled
+        if needsPartialUpdate() {
+            glDisable(GLenum(GL_SCISSOR_TEST))
+        }
+
+        // Clear dirty region after drawing
+        clearDirtyRegion()
     }
 }
 
