@@ -56,7 +56,6 @@ extension VideoPlayerView {
                             player.seek.gestureStart = time
                         }
                         let timeSeek = (time / player.playerSize.width) * horizontalDrag * seekGestureSpeed
-
                         player.seek.gestureSeek = timeSeek
                     }
                     return
@@ -78,6 +77,54 @@ extension VideoPlayerView {
             .onEnded { _ in
                 onPlayerDragGestureEnded()
             }
+    }
+
+    var detailsDragGesture: some Gesture {
+        DragGesture(minimumDistance: 30)
+            .onChanged { value in
+                handleDetailsDragChange(value)
+            }
+            .onEnded { value in
+                handleDetailsDragEnd(value)
+            }
+    }
+
+    private func handleDetailsDragChange(_ value: DragGesture.Value) {
+        let maxOffset = -player.playerSize.height
+
+        // Continuous drag update for smooth movement of VideoDetails
+        if fullScreenDetails {
+            // Allow only downward dragging when in fullscreen
+            if value.translation.height > 0 {
+                detailViewDragOffset = min(value.translation.height, abs(maxOffset))
+            }
+        } else {
+            // Allow only upward dragging when not in fullscreen
+            if value.translation.height < 0 {
+                detailViewDragOffset = max(value.translation.height, maxOffset)
+            }
+        }
+    }
+
+    private func handleDetailsDragEnd(_ value: DragGesture.Value) {
+        if value.translation.height < -50, !fullScreenDetails {
+            // Swipe up to enter fullscreen
+            withAnimation(Constants.overlayAnimation) {
+                fullScreenDetails = true
+                detailViewDragOffset = 0
+            }
+        } else if value.translation.height > 50, fullScreenDetails {
+            // Swipe down to exit fullscreen
+            withAnimation(Constants.overlayAnimation) {
+                fullScreenDetails = false
+                detailViewDragOffset = 0
+            }
+        } else {
+            // Reset offset if drag was not significant
+            withAnimation(Constants.overlayAnimation) {
+                detailViewDragOffset = 0
+            }
+        }
     }
 
     func onPlayerDragGestureEnded() {
@@ -108,7 +155,6 @@ extension VideoPlayerView {
         }
     }
 
-    // Function to temporarily disable the toggle gesture after a fullscreen change
     private func disableGestureTemporarily() {
         disableToggleGesture = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

@@ -24,13 +24,12 @@ struct VideoPlayerView: View {
         #if os(macOS)
             335
         #else
-            200
+            140
         #endif
     }
 
     @State private var playerSize: CGSize = .zero { didSet { updateSidebarQueue() } }
     @State private var hoveringPlayer = false
-    @State private var fullScreenDetails = false
     @State private var sidebarQueue = defaultSidebarQueueValue
 
     @Environment(\.colorScheme) private var colorScheme
@@ -51,12 +50,14 @@ struct VideoPlayerView: View {
         @State var isHorizontalDrag = false
         @State var isVerticalDrag = false
         @State var viewDragOffset = Self.hiddenOffset
+        @State var detailViewDragOffset: Double = 0
         // swiftlint:enable private_swiftui_state
 
     #endif
 
     // swiftlint:disable private_swiftui_state
     @State var disableToggleGesture = false
+    @State var fullScreenDetails = false
     // swiftlint:enable private_swiftui_state
 
     @ObservedObject var player = PlayerModel.shared // swiftlint:disable:this swiftui_state_private
@@ -307,6 +308,8 @@ struct VideoPlayerView: View {
                             #endif
                             .id(player.currentVideo?.cacheKey)
                             .transition(.opacity)
+                            .offset(y: detailViewDragOffset)
+                            .gesture(detailsDragGesture)
                         } else {
                             VStack {}
                         }
