@@ -43,7 +43,7 @@ struct PlayerBackendView: View {
                 Color.clear
                     .onAppear { player.playerSize = proxy.size }
                     .onChange(of: proxy.size) { _ in player.playerSize = proxy.size }
-                    .onChange(of: player.controls.presentingOverlays) { _ in player.playerSize = proxy.size }
+                    .onChange(of: player.currentItem?.id) { _ in player.playerSize = proxy.size }
             })
 
             #if !os(tvOS)
