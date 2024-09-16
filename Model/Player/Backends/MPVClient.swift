@@ -79,14 +79,21 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "user-agent", UserAgentManager.shared.userAgent))
         checkError(mpv_set_option_string(mpv, "initial-audio-sync", Defaults[.mpvInitialAudioSync] ? "yes" : "no"))
 
+        // A/V-SYNC //
+
         // Enable VSYNC – needed for `video-sync`
         checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "1"))
         checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
         checkError(mpv_set_option_string(mpv, "interpolation", "yes"))
         checkError(mpv_set_option_string(mpv, "tscale", "mitchell"))
         checkError(mpv_set_option_string(mpv, "tscale-window", "blackman"))
-        checkError(mpv_set_option_string(mpv, "vd-lavc-framedrop", "nonref"))
+        checkError(mpv_set_option_string(mpv, "vd-lavc-framedrop", "no"))
         checkError(mpv_set_option_string(mpv, "display-fps-override", "\(String(getScreenRefreshRate()))"))
+        checkError(mpv_set_option_string(mpv, "video-sync-max-factor", "1.1"))
+        checkError(mpv_set_option_string(mpv, "video-sync-max-video-change", "10"))
+        checkError(mpv_set_option_string(mpv, "audio-buffer", "0.2"))
+        checkError(mpv_set_option_string(mpv, "audio-wait-open", "no"))
+        checkError(mpv_set_option_string(mpv, "force-window", "yes"))
 
         // CPU //
 
