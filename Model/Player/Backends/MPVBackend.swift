@@ -23,15 +23,14 @@ final class MPVBackend: PlayerBackend {
 
     var stream: Stream?
     var video: Video?
-    var captions: Captions? { didSet {
-        guard let captions else {
-            if client?.areSubtitlesAdded == true {
-                client?.removeSubs()
+    var captions: Captions? {
+        didSet {
+            Task {
+                await handleCaptionsChange()
             }
-            return
         }
-        addSubTrack(captions.url)
-    }}
+    }
+
     var currentTime: CMTime?
 
     var loadedVideo = false
@@ -622,10 +621,14 @@ final class MPVBackend: PlayerBackend {
     }
 
     func addSubTrack(_ url: URL) {
-        if client?.areSubtitlesAdded == true {
-            client?.removeSubs()
+        Task {
+            if let areSubtitlesAdded = client?.areSubtitlesAdded {
+                if await areSubtitlesAdded() {
+                    await client?.removeSubs()
+                }
+            }
+            await client?.addSubTrack(url)
         }
-        client?.addSubTrack(url)
     }
 
     func setVideoToAuto() {
@@ -687,6 +690,17 @@ final class MPVBackend: PlayerBackend {
         } else {
             stopMusicMode()
         }
+    }
+
+    private func handleCaptionsChange() async {
+        guard let captions else {
+            if let isSubtitlesAdded = client?.areSubtitlesAdded, await isSubtitlesAdded() {
+                await client?.removeSubs()
+            }
+            return
+        }
+
+        addSubTrack(captions.url)
     }
 
     private func handlePropertyChange(_ name: String, _ property: mpv_event_property) {
