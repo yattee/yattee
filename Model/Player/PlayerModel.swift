@@ -285,6 +285,15 @@ final class PlayerModel: ObservableObject {
             }
         #endif
 
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+
+            if !self.musicMode, self.activeBackend == .mpv {
+                self.mpvBackend.setVideoToAuto()
+                self.mpvBackend.controls.resetTimer()
+            }
+        }
+
         presentingPlayer = true
 
         #if os(macOS)
@@ -306,6 +315,9 @@ final class PlayerModel: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             Delay.by(0.3) {
                 self?.exitFullScreen(showControls: false)
+                if self?.activeBackend == .mpv, !(self?.musicMode ?? false) {
+                    self?.mpvBackend.setVideoToNo()
+                }
             }
         }
 
@@ -1029,10 +1041,9 @@ final class PlayerModel: ObservableObject {
     #else
         func handleEnterForeground() {
             DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
-                if !self.musicMode, self.activeBackend == .mpv {
-                    self.mpvBackend.addVideoTrackFromStream()
+                if !self.musicMode, self.activeBackend == .mpv, presentingPlayer {
                     self.mpvBackend.setVideoToAuto()
                     self.mpvBackend.controls.resetTimer()
                 } else if !self.musicMode, self.activeBackend == .appleAVPlayer {
@@ -1063,7 +1074,7 @@ final class PlayerModel: ObservableObject {
                 pause()
             } else if !playingInPictureInPicture, activeBackend == .appleAVPlayer {
                 avPlayerBackend.removePlayerFromLayer()
-            } else if activeBackend == .mpv, !musicMode {
+            } else if activeBackend == .mpv, !musicMode, presentingPlayer {
                 mpvBackend.setVideoToNo()
             }
         }
