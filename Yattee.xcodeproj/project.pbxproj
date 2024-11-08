@@ -4913,7 +4913,7 @@
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 7.0.0;
+				minimumVersion = 7.3.1;
 			};
 		};
 		372AA40E286D067B0000B1DC /* XCRemoteSwiftPackageReference "Repeat" */ = {
@@ -4928,8 +4928,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hyperoslo/Cache.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.4.0;
 			};
 		};
 		375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
@@ -4944,16 +4944,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pinterest/PINCache";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.4;
 			};
 		};
 		379325D329A265A300181CF1 /* XCRemoteSwiftPackageReference "swift-log" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/yattee/swift-log.git";
+			repositoryURL = "https://github.com/apple/swift-log.git";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.1;
 			};
 		};
 		3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
@@ -4961,7 +4961,7 @@
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
+				minimumVersion = 2.2.7;
 			};
 		};
 		3797757B268922D100DD52A8 /* XCRemoteSwiftPackageReference "siesta" */ = {
@@ -4969,7 +4969,7 @@
 			repositoryURL = "https://github.com/bustoutsolutions/siesta";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.0;
+				minimumVersion = 1.5.2;
 			};
 		};
 		3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */ = {
@@ -4985,7 +4985,7 @@
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				minimumVersion = 5.9.1;
 			};
 		};
 		37BD07C52698B27B003EBB87 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
@@ -4993,7 +4993,7 @@
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.3;
+				minimumVersion = 1.3.0;
 			};
 		};
 		37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
@@ -5001,7 +5001,7 @@
 			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.19.1;
+				minimumVersion = 5.19.7;
 			};
 		};
 		37D4B19B2671817900C925CA /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
@@ -5009,7 +5009,7 @@
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				minimumVersion = 5.0.2;
 			};
 		};
 		37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */ = {
@@ -5017,7 +5017,7 @@
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.1.0;
+				minimumVersion = 5.2.3;
 			};
 		};
 		37FB2847272207F000A57617 /* XCRemoteSwiftPackageReference "SDWebImageWebPCoder" */ = {
@@ -5025,7 +5025,7 @@
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageWebPCoder.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.8.4;
+				minimumVersion = 0.14.6;
 			};
 		};
 		37FB285227220D8400A57617 /* XCRemoteSwiftPackageReference "SDWebImagePINPlugin" */ = {
