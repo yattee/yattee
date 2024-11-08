@@ -1500,6 +1500,7 @@
 		37DD9DA22785BBC900539416 /* NoCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCommentsView.swift; sourceTree = "<group>"; };
 		37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalScrollingFix.swift; sourceTree = "<group>"; };
 		37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsNavigationLink.swift; sourceTree = "<group>"; };
+		37E21DC52CDE528A008DF47C /* ta */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ta; path = ta.lproj/Localizable.strings; sourceTree = "<group>"; };
 		37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedChannelsModel.swift; sourceTree = "<group>"; };
 		37E6D79B2944AE1A00550C3D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStatusHeader.swift; sourceTree = "<group>"; };
@@ -2802,6 +2803,7 @@
 				tr,
 				ru,
 				"zh-Hant",
+				ta,
 			);
 			mainGroup = 37D4B0BC2671614700C925CA;
 			packageReferences = (
@@ -4089,6 +4091,7 @@
 				3767F3332B25058300F257BC /* tr */,
 				3767F3342B2505EF00F257BC /* ru */,
 				37367E582B8F63C200436163 /* zh-Hant */,
+				37E21DC52CDE528A008DF47C /* ta */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
