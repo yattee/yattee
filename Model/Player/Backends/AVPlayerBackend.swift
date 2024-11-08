@@ -181,7 +181,9 @@ final class AVPlayerBackend: PlayerBackend {
         {
             seek(to: 0, seekType: .loopRestart)
         }
-
+        #if !os(macOS)
+            model.setAudioSessionActive(true)
+        #endif
         avPlayer.play()
 
         // Setting hasStarted to true the first time player started
@@ -196,7 +198,9 @@ final class AVPlayerBackend: PlayerBackend {
         guard avPlayer.timeControlStatus != .paused else {
             return
         }
-
+        #if !os(macOS)
+            model.setAudioSessionActive(false)
+        #endif
         avPlayer.pause()
         model.objectWillChange.send()
     }
@@ -210,6 +214,9 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func stop() {
+        #if !os(macOS)
+            model.setAudioSessionActive(false)
+        #endif
         avPlayer.replaceCurrentItem(with: nil)
         hasStarted = false
     }
@@ -364,11 +371,7 @@ final class AVPlayerBackend: PlayerBackend {
 
         let startPlaying = {
             #if !os(macOS)
-                do {
-                    try AVAudioSession.sharedInstance().setActive(true)
-                } catch {
-                    self.logger.error("Error setting up audio session: \(error)")
-                }
+                self.model.setAudioSessionActive(true)
             #endif
 
             self.setRate(self.model.currentRate)

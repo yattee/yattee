@@ -232,6 +232,14 @@ final class PlayerModel: ObservableObject {
                 name: AVAudioSession.interruptionNotification,
                 object: nil
             )
+
+            // Register for audio session route change notifications
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleRouteChange(_:)),
+                name: AVAudioSession.routeChangeNotification,
+                object: AVAudioSession.sharedInstance()
+            )
         #endif
 
         playbackMode = Defaults[.playbackMode]
@@ -250,7 +258,15 @@ final class PlayerModel: ObservableObject {
 
     #if !os(macOS)
         deinit {
-            NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+            NotificationCenter.default.removeObserver(
+                self, name: AVAudioSession.interruptionNotification, object: nil
+            )
+
+            NotificationCenter.default.removeObserver(
+                self,
+                name: AVAudioSession.routeChangeNotification,
+                object: AVAudioSession.sharedInstance()
+            )
         }
     #endif
 
@@ -1276,12 +1292,27 @@ final class PlayerModel: ObservableObject {
     }
 
     #if !os(macOS)
+        func setAudioSessionActive(_ setActive: Bool) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                do {
+                    try AVAudioSession.sharedInstance().setActive(setActive)
+                } catch {
+                    self.logger.error("Error setting up audio session: \(error)")
+                }
+            }
+        }
+
         @objc func handleAudioSessionInterruption(_ notification: Notification) {
             logger.info("Audio session interruption received.")
-            logger.info("Notification received: \(notification)")
+            logger.info("Notification object: \(String(describing: notification.object))")
 
-            guard let info = notification.userInfo,
-                  let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+            guard let info = notification.userInfo else {
+                logger.info("userInfo is missing in the notification.")
+                return
+            }
+
+            // Extract the interruption type
+            guard let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
                   let type = AVAudioSession.InterruptionType(rawValue: typeValue)
             else {
                 logger.info("AVAudioSessionInterruptionTypeKey is missing or not a UInt in userInfo.")
@@ -1290,23 +1321,103 @@ final class PlayerModel: ObservableObject {
 
             logger.info("Interruption type received: \(type)")
 
+            // Check availability for iOS 14.5 or newer to handle interruption reason
+            // Currently only for debugging purpose
+            #if os(iOS)
+                if #available(iOS 14.5, *) {
+                    // Extract the interruption reason, if available
+                    if let reasonValue = info[AVAudioSessionInterruptionReasonKey] as? UInt,
+                       let reason = AVAudioSession.InterruptionReason(rawValue: reasonValue)
+                    {
+                        logger.info("Interruption reason received: \(reason)")
+                        switch reason {
+                        case .default:
+                            logger.info("Interruption reason: Default or unspecified interruption occurred.")
+                        case .appWasSuspended:
+                            logger.info("Interruption reason: The app was suspended during the interruption.")
+                        @unknown default:
+                            logger.info("Unknown interruption reason received.")
+                        }
+                    } else {
+                        logger.info("AVAudioSessionInterruptionReasonKey is missing or not a UInt in userInfo.")
+                    }
+                } else {
+                    logger.info("Interruption reason handling is not available on this iOS version.")
+                }
+            #endif
+
+            // Handle the specific interruption type
             switch type {
             case .began:
-                logger.info("Audio session interrupted.")
-                // We need to call pause() to set all variables correctly, and play()
-                // directly afterwards, because the .began interrupt is sent after audio
-                // ducking ended and playback would pause. Audio ducking usually happens
-                // when using headphones.
                 pause()
-                play()
+                logger.info("Audio session interrupted (began).")
             case .ended:
+                // Extract any interruption options, if available
+                if let optionsValue = info[AVAudioSessionInterruptionOptionKey] as? UInt {
+                    logger.info("Interruption options received: \(optionsValue)")
+                    if optionsValue & AVAudioSession.InterruptionOptions.shouldResume.rawValue != 0 {
+                        play()
+                        logger.info("Interruption option indicates playback should resume automatically.")
+                    } else {
+                        logger.info("Interruption option indicates playback should not resume automatically.")
+                    }
+                } else {
+                    logger.info("AVAudioSessionInterruptionOptionKey is missing or not a UInt in userInfo.")
+                }
                 logger.info("Audio session interruption ended.")
-                // We need to call pause() to set all variables correctly.
-                // Otherwise, playback does not resume when the interruption ends.
-                pause()
-                play()
+                // Check if audio was resumed or if there's any indication of ducking
+                let currentVolume = AVAudioSession.sharedInstance().outputVolume
+                logger.info("Current output volume: \(currentVolume)")
             default:
-                break
+                logger.info("Unknown interruption type received.")
+            }
+        }
+
+        @objc func handleRouteChange(_ notification: Notification) {
+            logger.info("Audio route change received.")
+
+            guard let info = notification.userInfo else {
+                logger.info("userInfo is missing in the notification.")
+                return
+            }
+
+            guard let reasonValue = info[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                  let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue)
+            else {
+                logger.info("AVAudioSessionRouteChangeReasonKey is missing or not a UInt in userInfo.")
+                return
+            }
+
+            logger.info("Route change reason received: \(reason)")
+
+            let currentCategory = AVAudioSession.sharedInstance().category
+            logger.info("Current audio session category before change: \(currentCategory)")
+
+            switch reason {
+            case .categoryChange:
+                logger.info("Audio session category changed.")
+                let newCategory = AVAudioSession.sharedInstance().category
+                logger.info("New audio session category: \(newCategory)")
+            case .oldDeviceUnavailable, .newDeviceAvailable:
+                logger.info("Audio route change may indicate ducking or device change.")
+                let currentRoute = AVAudioSession.sharedInstance().currentRoute
+                logger.info("Current audio route: \(currentRoute)")
+
+                for output in currentRoute.outputs {
+                    logger.info("Output port type: \(output.portType), UID: \(output.uid)")
+                    switch output.portType {
+                    case .headphones, .bluetoothA2DP:
+                        logger.info("Detected port type \(output.portType). Executing play().")
+                        play()
+                    default:
+                        logger.info("Detected port type \(output.portType). Executing pause().")
+                        pause()
+                    }
+                }
+            case .noSuitableRouteForCategory:
+                logger.info("No suitable route for the current category.")
+            default:
+                logger.info("Unhandled route change reason: \(reason)")
             }
         }
     #endif
