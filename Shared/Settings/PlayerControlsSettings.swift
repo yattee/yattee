@@ -8,6 +8,7 @@ struct PlayerControlsSettings: View {
     @Default(.playerControlsLayout) private var playerControlsLayout
     @Default(.fullScreenPlayerControlsLayout) private var fullScreenPlayerControlsLayout
     @Default(.horizontalPlayerGestureEnabled) private var horizontalPlayerGestureEnabled
+    @Default(.fullscreenPlayerGestureEnabled) private var fullscreenPlayerGestureEnabled
     @Default(.seekGestureSpeed) private var seekGestureSpeed
     @Default(.seekGestureSensitivity) private var seekGestureSensitivity
     @Default(.buttonBackwardSeekDuration) private var buttonBackwardSeekDuration
@@ -64,9 +65,10 @@ struct PlayerControlsSettings: View {
 
     @ViewBuilder var sections: some View {
         #if !os(tvOS)
-            Section(header: SettingsHeader(text: "Controls".localized()), footer: controlsLayoutFooter) {
-                #if !os(tvOS)
-                    avPlayerUsesSystemControlsToggle
+            Section(header: SettingsHeader(text: "Player Controls".localized()), footer: controlsLayoutFooter) {
+                avPlayerUsesSystemControlsToggle
+                #if os(iOS)
+                    fullscreenPlayerGestureEnabledToggle
                 #endif
                 horizontalPlayerGestureEnabledToggle
                 SettingsHeader(text: "Seek gesture sensitivity".localized(), secondary: true)
@@ -112,7 +114,7 @@ struct PlayerControlsSettings: View {
     }
 
     var controlsButtonsSection: some View {
-        Section(header: SettingsHeader(text: "Controls Buttons".localized())) {
+        Section(header: SettingsHeader(text: "Player Control Buttons".localized())) {
             controlButtonToggles
         }
     }
@@ -157,8 +159,12 @@ struct PlayerControlsSettings: View {
         #endif
     }
 
+    private var fullscreenPlayerGestureEnabledToggle: some View {
+        Toggle("Swipe up toggles fullscreen", isOn: $fullscreenPlayerGestureEnabled)
+    }
+
     private var horizontalPlayerGestureEnabledToggle: some View {
-        Toggle("Seek with horizontal swipe on video", isOn: $horizontalPlayerGestureEnabled)
+        Toggle("Seek with horizontal swipe", isOn: $horizontalPlayerGestureEnabled)
     }
 
     private var avPlayerUsesSystemControlsToggle: some View {

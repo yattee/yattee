@@ -9,6 +9,10 @@ struct ConstrolsSettingsGroupImporter {
             Defaults[.avPlayerUsesSystemControls] = avPlayerUsesSystemControls
         }
 
+        if let fullscreenPlayerGestureEnabled = json["fullscreenPlayerGestureEnabled"].bool {
+            Defaults[.fullscreenPlayerGestureEnabled] = fullscreenPlayerGestureEnabled
+        }
+
         if let horizontalPlayerGestureEnabled = json["horizontalPlayerGestureEnabled"].bool {
             Defaults[.horizontalPlayerGestureEnabled] = horizontalPlayerGestureEnabled
         }
