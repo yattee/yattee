@@ -80,13 +80,15 @@ final class MPVClient: ObservableObject {
         checkError(mpv_set_option_string(mpv, "initial-audio-sync", Defaults[.mpvInitialAudioSync] ? "yes" : "no"))
 
         // Enable VSYNC – needed for `video-sync`
-        checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "1"))
-        checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
-        checkError(mpv_set_option_string(mpv, "interpolation", "yes"))
-        checkError(mpv_set_option_string(mpv, "tscale", "mitchell"))
-        checkError(mpv_set_option_string(mpv, "tscale-window", "blackman"))
-        checkError(mpv_set_option_string(mpv, "vd-lavc-framedrop", "nonref"))
-        checkError(mpv_set_option_string(mpv, "display-fps-override", "\(String(getScreenRefreshRate()))"))
+        if Defaults[.mpvSetRefreshToContentFPS] {
+            checkError(mpv_set_option_string(mpv, "opengl-swapinterval", "1"))
+            checkError(mpv_set_option_string(mpv, "video-sync", "display-resample"))
+            checkError(mpv_set_option_string(mpv, "interpolation", "yes"))
+            checkError(mpv_set_option_string(mpv, "tscale", "mitchell"))
+            checkError(mpv_set_option_string(mpv, "tscale-window", "blackman"))
+            checkError(mpv_set_option_string(mpv, "vd-lavc-framedrop", "nonref"))
+            checkError(mpv_set_option_string(mpv, "display-fps-override", "\(String(getScreenRefreshRate()))"))
+        }
 
         // CPU //
 
