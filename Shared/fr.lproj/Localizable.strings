@@ -398,7 +398,7 @@
 "Hardware decoder" = "Décodeur matériel";
 "Stream FPS" = "IPS du flux";
 "Cached time" = "Temps mis en cache";
-"Dropped frames" = "Images perdus";
+"Dropped frames" = "Images perdues";
 "Any format" = "Tout formats";
 "Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "La liste de lecture est vide\n\nAppuyez longuement sur une vidéo, puis sur\n\"Ajouter à la liste de lecture\"";
 "Comments are disabled" = "Les commentaires sont désactivés";
