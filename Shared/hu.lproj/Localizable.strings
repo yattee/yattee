@@ -228,8 +228,8 @@
 "Quality Profile" = "Minőségi profil";
 "Queue" = "Várólista";
 "Queue is empty" = "A várólista üres";
-"Rate" = "Értékel";
-"Rating" = "Értékelés";
+"Rate" = "Értékelés";
+"Rating" = "Értékelések";
 "Recents" = "Újdonságok";
 "Red" = "Piros";
 "Refresh" = "Frissítés";
@@ -458,8 +458,8 @@
 "Your Accounts" = "Az Ön fiókjai";
 "Close video and player on end" = "A videó és a lejátszó bezárása a lejátszás befejeztével";
 "Use system controls with AVPlayer" = "A rendszervezérlők használata az AVPlayerrel";
-"Landscape left" = "Fekvő (balra)";
-"Landscape right" = "Fekvő (jobbra)";
+"Landscape left" = "Fekvő balra";
+"Landscape right" = "Fekvő jobbra";
 "No rotation" = "Nincs forgatás";
 "Startup section" = "Indítási szakasz";
 "Home Settings" = "Kezdőlap beállítások";
