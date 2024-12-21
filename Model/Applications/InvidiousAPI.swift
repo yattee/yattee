@@ -498,7 +498,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             indexID: indexID,
             live: json["liveNow"].boolValue,
             upcoming: json["isUpcoming"].boolValue,
-            short: length <= Video.shortLength,
+            short: length <= Video.shortLength && length != 0.0,
             publishedAt: publishedAt,
             likes: json["likeCount"].int,
             dislikes: json["dislikeCount"].int,
