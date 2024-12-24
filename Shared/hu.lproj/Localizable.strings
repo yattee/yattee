@@ -10,7 +10,7 @@
 "No Playlists" = "Nincsenek lejátszási listák";
 "Mark video as watched after playing" = "Jelölje meg a videót megtekintettként lejátszás után";
 "Mark watched videos with" = "Videó megtekintettnek jelölése a következővel";
-"Matrix Channel" = "Mátrix csatorna";
+"Matrix Channel" = "Matrix csatorna";
 "Find Other" = "Egyebek keresése";
 "Hour" = "Óra";
 "Month" = "Hónap";
@@ -56,7 +56,7 @@
 "Add to Playlist..." = "Hozzáadás a lejátszási listához...";
 "Advanced" = "Speciális";
 "All" = "Összes";
-"Always use AVPlayer for live videos" = "Mindig használja az AVPlayer-t az élő videókhoz";
+"Always use AVPlayer for live videos" = "Mindig az AVPlayer-t használjon az élő videókhoz";
 "Anonymous" = "Névtelen";
 "Any" = "Bármely";
 "Apply to all" = "Alkalmazás az összesre";
@@ -121,8 +121,8 @@
 "Decreased opacity" = "Csökkentett átlátszatlanság";
 "Delete" = "Törlés";
 "Disabled" = "Letiltva";
-"Discord Server" = "Discord kiszolgáló";
-"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "A megbeszélések a Discordon és a Mátrixon zajlanak. Ez egy jó hely az általános kérdésekre.";
+"Discord Server" = "Discord-kiszolgáló";
+"Discussions take place in Discord and Matrix. It's a good spot for general questions." = "A megbeszélések a Discordon és a Matrixon zajlanak. Ez egy jó hely az általános kérdésekre.";
 "Could not load locations manifest" = "Nem sikerült betölteni a helyek listáját";
 "Don't use public locations" = "Ne használjon nyilvános helyeket";
 "Donations" = "Adományok";
@@ -181,7 +181,7 @@
 "Low quality" = "Alacsony minőség";
 "Lowest" = "Legalacsonyabb";
 "Mark as watched" = "Megtekintettnek jelölés";
-"Matrix Chat" = "Mátrix csevegés";
+"Matrix Chat" = "Matrix csevegés";
 "Medium" = "Közepes";
 "Medium quality" = "Közepes minőség";
 "Milestones" = "Mérföldkövek";
