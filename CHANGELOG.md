@@ -1,17 +1,10 @@
-## Build 197
+## Build 198
 
 ## What's Changed
-* Allow users to disable fullscreen swipe gesture by @stonerl in https://github.com/yattee/yattee/pull/814
-* Proper audio interrupt and route change handling by @stonerl in https://github.com/yattee/yattee/pull/815
-* Improved subtitle handling by @stonerl in https://github.com/yattee/yattee/pull/817
-* Improvements to MPVGLView by @stonerl in https://github.com/yattee/yattee/pull/818
-* Add drag gestures to video details by @stonerl in https://github.com/yattee/yattee/pull/820
-* Fix uneven playback when using MPV and not syncing refreshrate by @blennster in https://github.com/yattee/yattee/pull/833
-* Norwegian Language by @mmaalo in https://github.com/yattee/yattee/pull/834
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/836
-* Update MPVKit to v0.39.0 by @stonerl in https://github.com/yattee/yattee/pull/824
-* Update SwiftUI-Introspect by @stonerl in https://github.com/yattee/yattee/pull/813
-* Update other packages
+* Stop making videos with unknown length shorts. by @derspyy in https://github.com/yattee/yattee/pull/849
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/845
+* Add Hungarian to locales list
+* Update dependencies
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -30,6 +23,16 @@
 * Add import export of missing settings
 * macOS: Fix settings windows layout
 * Fix seek OSD layout on tvOS, revert OSD position
+* Allow users to disable fullscreen swipe gesture by @stonerl in https://github.com/yattee/yattee/pull/814
+* Proper audio interrupt and route change handling by @stonerl in https://github.com/yattee/yattee/pull/815
+* Improved subtitle handling by @stonerl in https://github.com/yattee/yattee/pull/817
+* Improvements to MPVGLView by @stonerl in https://github.com/yattee/yattee/pull/818
+* Add drag gestures to video details by @stonerl in https://github.com/yattee/yattee/pull/820
+* Fix uneven playback when using MPV and not syncing refreshrate by @blennster in https://github.com/yattee/yattee/pull/833
+* Norwegian Language by @mmaalo in https://github.com/yattee/yattee/pull/834
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/836
+* Update MPVKit to v0.39.0 by @stonerl in https://github.com/yattee/yattee/pull/824
+* Update SwiftUI-Introspect by @stonerl in https://github.com/yattee/yattee/pull/813
 * Orientation/Fullscreen fixes and cleanup by @stonerl in https://github.com/yattee/yattee/pull/806
 * More robust resolution handling by @stonerl in https://github.com/yattee/yattee/pull/807
 * MPV: improved A/V sync by @stonerl in https://github.com/yattee/yattee/pull/805
