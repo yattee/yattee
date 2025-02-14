@@ -300,14 +300,14 @@
 "Rate & Captions" = "Puan ve Altyazılar";
 "Format" = "Format";
 "Right" = "Sağ";
-"Stream FPS" = "";
+"Stream FPS" = "Yayın FPS’i";
 "Cached time" = "Önbelleğe alınan zaman";
 "Sign In Required" = "Giriş yapmanız gerekiyor";
 "Could not create share link" = "Paylaş linki oluşturulamadı";
 "Locations Manifest" = "";
 "When partially watched video is played" = "Video kısmi olarak izlendiyse";
 "Open Video" = "Video aç";
-"Add Channels, Playlists and Searches to Favorites using" = "";
+"Add Channels, Playlists and Searches to Favorites using" = "Kanallar, oynatma listeleri ve favorileri aramayı ekleyin";
 "Always" = "Her zaman";
 
 /* Video date filter in search */
@@ -357,7 +357,7 @@
 "Could not delete document" = "Belge silinemedi";
 "No comments" = "Yorum yok";
 "Could not open Files" = "Dosyalar açılamadı";
-"You need to select an account\nto access %@ section" = "";
+"You need to select an account\nto access %@ section" = "%@ kesitine erişebilmek için \nbir hesap seçmeniz gerekiyor";
 "Reload manifest" = "Yeniden Yükle";
 "Could not refresh Subscriptions" = "Abonelikler yenilenemedi";
 
@@ -423,7 +423,7 @@
 "Show sidebar when space permits" = "Alan olduğu sürece kenar çubuğunu göster";
 "System controls buttons" = "Sistem kontrol butonları";
 "Could not extract channel information" = "Kanal bilgisi çıkarılamadı";
-"Public Locations" = "";
+"Public Locations" = "Herkese Açık Alanlar";
 "You can find information about using Yattee in the Wiki pages." = "Wiki sayfalarında Yattee kullanımı hakkında bilgilere erişebilirsiniz.";
 
 /* Player controls layout size */
@@ -440,7 +440,7 @@
 "Smaller" = "Küçült";
 "Sort" = "Sırala";
 "This cannot be reverted" = "Geriye alınamaz";
-"Public Manifest" = "";
+"Public Manifest" = "Herkese Açık Bildiri";
 "You have no Playlists" = "Çalma listeniz bulunmamaktadır";
 "Watched" = "İzlendi";
 "Could not open video" = "Video açılamadı";
@@ -461,7 +461,7 @@
 "Current Location" = "Şuanki konum";
 "Stream & Player" = "Yayın ve Oynatıcı";
 "Hardware decoder" = "Donanımsal çözücü";
-"Honor orientation lock" = "";
+"Honor orientation lock" = "Yön kilidine sadık kal";
 "Seek with horizontal swipe on video" = "Video üzerinde yatay kaydırma";
 "Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator." = "Genellikle bir videonun başlangıcında bulunan ve aynı içerik oluşturucunun diğer videolarında da görülen bir animasyon, sabit kare veya klip içeren kısımlar.";
 "Switch to public locations" = "Herkese açık konumlara geç";
