@@ -395,7 +395,7 @@
 "Open Video" = "Videó megnyitása";
 "Default Profile" = "Alapértelmezett profil";
 "Share%@link" = "%@ hivatkozás megosztása";
-"\"%@\" will be irreversibly removed from this device." = "A „%@” visszavonhatatlanul eltávolításra kerül erről az eszközről.";
+"\"%@\" will be irreversibly removed from this device." = "A(z) „%@” visszavonhatatlanul eltávolításra kerül erről az eszközről.";
 "Could not delete document" = "A dokumentum törlése nem sikerült";
 "Are you sure you want to remove %@ location?" = "Biztosan törölni szeretné a(z) %@ helyet?";
 "Live Streams" = "Élő közvetítések";
@@ -449,13 +449,13 @@
 "Loop one" = "Ismétlés egyesével";
 "Autoplay next" = "Következő automatikus lejátszása";
 "Stream" = "Közvetítés";
-"Enter location address to connect..." = "Adja meg a hely címét a csatlakozáshoz...";
+"Enter location address to connect..." = "Adja meg a hely címét a kapcsolódáshoz...";
 "Seek" = "Keresés";
 "Opened File" = "Megnyitott fájl";
-"File Extension" = "Fájl kiterjesztés";
+"File Extension" = "Fájl kiterjesztése";
 "Opening file…" = "Fájl megnyitása…";
 "Public account" = "Nyilvános fiók";
-"Your Accounts" = "Az Ön fiókjai";
+"Your Accounts" = "Saját fiókok";
 "Close video and player on end" = "A videó és a lejátszó bezárása a lejátszás befejeztével";
 "Use system controls with AVPlayer" = "A rendszervezérlők használata az AVPlayer-rel";
 "Landscape left" = "Fekvő balra";
@@ -492,7 +492,7 @@
 "Mark channel feed as unwatched" = "Jelölje meg a csatorna hírfolyamot nem megtekintettként";
 "Tap and hold channel thumbnail to open context menu with more actions" = "Koppintson és tartsa lenyomva a csatorna miniatűrjét a további műveletekhez tartozó kontextusmenü megnyitásához";
 "Controls button: backwards" = "Vezérlőgomb: hátra";
-"Enter account credentials to connect..." = "Adja meg a fiók hitelesítő adatait a csatlakozáshoz...";
+"Enter account credentials to connect..." = "Adja meg a fiók hitelesítő adatait a kapcsolódáshoz...";
 "Show scroll to top button in comments" = "Görgetés a tetejére gomb megjelenítése a hozzászólásokban";
 "Browse without account" = "Böngészés fiók nélkül";
 "Watched: visible" = "Megtekintettek: láthatóak";
@@ -524,7 +524,7 @@
 "Are you sure you want to remove this document?" = "Biztosan törölni szeretné ezt a dokumentumot?";
 "Rotate when entering fullscreen on landscape video" = "Forduljon el fekvő módba teljes képernyőre váltáskor";
 "Limit" = "Limit";
-"Are you sure you want to remove %@ from Favorites?" = "Biztosan törölni szeretné a(z) %@-t a Kedvencek közül?";
+"Are you sure you want to remove %@ from Favorites?" = "Biztosan törölni szeretné a(z) %@-t a „Kedvencek” közül?";
 "Keep channels with unwatched videos on top of subscriptions list" = "A nem megtekintett videókkal rendelkező csatornák a feliratkozási lista tetején maradnak";
 "Show video context menu options to force selected backend" = "Videó kontextusmenü beállításainak megjelenítése a kiválasztott háttérprogram kikényszerítéséhez";
 "Play Now in AVPlayer" = "Lejátszás az AVPlayer-ben";
