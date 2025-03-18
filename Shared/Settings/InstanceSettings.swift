@@ -8,6 +8,7 @@ struct InstanceSettings: View {
 
     @State private var frontendURL = ""
     @State private var proxiesVideos = false
+    @State private var invidiousCompanion = false
 
     var body: some View {
         List {
@@ -87,6 +88,16 @@ struct InstanceSettings: View {
                         InstancesModel.shared.setProxiesVideos(instance, newValue)
                     }
             }
+
+            if instance.app == .invidious {
+                invidiousCompanionToggle
+                    .onAppear {
+                        invidiousCompanion = instance.invidiousCompanion
+                    }
+                    .onChange(of: invidiousCompanion) { newValue in
+                        InstancesModel.shared.setInvidiousCompanion(instance, newValue)
+                    }
+            }
         }
         #if os(tvOS)
         .frame(maxWidth: 1000)
@@ -99,6 +110,10 @@ struct InstanceSettings: View {
 
     private var proxiesVideosToggle: some View {
         Toggle("Proxy videos", isOn: $proxiesVideos)
+    }
+    
+    private var invidiousCompanionToggle: some View {
+        Toggle("Invidious companion", isOn: $invidiousCompanion)
     }
 
     private func removeAccount(_ account: Account) {

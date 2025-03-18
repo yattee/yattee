@@ -10,14 +10,16 @@ struct Instance: Defaults.Serializable, Hashable, Identifiable {
     let apiURLString: String
     var frontendURL: String?
     var proxiesVideos: Bool
+    var invidiousCompanion: Bool
 
-    init(app: VideosApp, id: String? = nil, name: String? = nil, apiURLString: String, frontendURL: String? = nil, proxiesVideos: Bool = false) {
+    init(app: VideosApp, id: String? = nil, name: String? = nil, apiURLString: String, frontendURL: String? = nil, proxiesVideos: Bool = false, invidiousCompanion: Bool = false) {
         self.app = app
         self.id = id ?? UUID().uuidString
         self.name = name ?? app.rawValue
         self.apiURLString = apiURLString
         self.frontendURL = frontendURL
         self.proxiesVideos = proxiesVideos
+        self.invidiousCompanion = invidiousCompanion
     }
 
     var apiURL: URL! {

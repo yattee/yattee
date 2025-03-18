@@ -79,6 +79,17 @@ final class InstancesModel: ObservableObject {
         Defaults[.instances][index] = instance
     }
 
+    func setInvidiousCompanion(_ instance: Instance, _ invidiousCompanion: Bool) {
+        guard let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) else {
+            return
+        }
+
+        var instance = Defaults[.instances][index]
+        instance.invidiousCompanion = invidiousCompanion
+
+        Defaults[.instances][index] = instance
+    }
+
     func remove(_ instance: Instance) {
         let accounts = accounts(instance.id)
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {
