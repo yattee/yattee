@@ -16,7 +16,8 @@ struct InstancesBridge: Defaults.Bridge {
             "name": value.name,
             "apiURL": value.apiURLString,
             "frontendURL": value.frontendURL ?? "",
-            "proxiesVideos": value.proxiesVideos ? "true" : "false"
+            "proxiesVideos": value.proxiesVideos ? "true" : "false",
+            "invidiousCompanion": value.invidiousCompanion ? "true" : "false"
         ]
     }
 
@@ -33,7 +34,8 @@ struct InstancesBridge: Defaults.Bridge {
         let name = object["name"] ?? ""
         let frontendURL: String? = object["frontendURL"]!.isEmpty ? nil : object["frontendURL"]
         let proxiesVideos = object["proxiesVideos"] == "true"
+        let invidiousCompanion = object["invidiousCompanion"] == "true"
 
-        return Instance(app: app, id: id, name: name, apiURLString: apiURL, frontendURL: frontendURL, proxiesVideos: proxiesVideos)
+        return Instance(app: app, id: id, name: name, apiURLString: apiURL, frontendURL: frontendURL, proxiesVideos: proxiesVideos, invidiousCompanion: invidiousCompanion)
     }
 }

@@ -655,21 +655,29 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         if json["liveNow"].boolValue {
             return hls
         }
+        let videoId = json["videoId"].stringValue
 
-        return extractFormatStreams(from: json["formatStreams"].arrayValue) +
-            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue) +
+        return extractFormatStreams(from: json["formatStreams"].arrayValue, videoId: videoId) +
+        extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue, videoId: videoId) +
             hls
     }
 
-    private func extractFormatStreams(from streams: [JSON]) -> [Stream] {
+    private func extractFormatStreams(from streams: [JSON], videoId: String?) -> [Stream] {
         streams.compactMap { stream in
             guard let streamURL = stream["url"].url else {
                 return nil
             }
+            let finalURL: URL
+            if let videoId, let itag = stream["itag"].string, account.instance.invidiousCompanion {
+                let companionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(itag)"
+                finalURL = URL(string: companionURLString) ?? streamURL
+            } else {
+                finalURL = streamURL
+            }
 
             return SingleAssetStream(
                 instance: account.instance,
-                avAsset: AVURLAsset(url: streamURL),
+                avAsset: AVURLAsset(url: finalURL),
                 resolution: Stream.Resolution.from(resolution: stream["resolution"].string ?? ""),
                 kind: .stream,
                 encoding: stream["encoding"].string ?? ""
@@ -677,7 +685,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
     }
 
-    private func extractAdaptiveFormats(from streams: [JSON]) -> [Stream] {
+    private func extractAdaptiveFormats(from streams: [JSON], videoId: String?) -> [Stream] {
         let audioStreams = streams
             .filter { $0["type"].stringValue.starts(with: "audio/mp4") }
             .sorted {
@@ -692,15 +700,29 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         return videoStreams.compactMap { videoStream in
             guard let audioAssetURL = audioStream["url"].url,
-                  let videoAssetURL = videoStream["url"].url
+                  let videoAssetURL = videoStream["url"].url,
+                  let audioItag = audioStream["itag"].string,
+                  let videoItag = videoStream["itag"].string
             else {
                 return nil
+            }
+            let finalAudioURL: URL
+            let finalVideoURL: URL
+
+            if let videoId, account.instance.invidiousCompanion {
+                let audioCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(audioItag)"
+                let videoCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(videoItag)"
+                finalAudioURL = URL(string: audioCompanionURLString) ?? audioAssetURL
+                finalVideoURL = URL(string: videoCompanionURLString) ?? videoAssetURL
+            } else {
+                finalAudioURL = audioAssetURL
+                finalVideoURL = videoAssetURL
             }
 
             return Stream(
                 instance: account.instance,
-                audioAsset: AVURLAsset(url: audioAssetURL),
-                videoAsset: AVURLAsset(url: videoAssetURL),
+                audioAsset: AVURLAsset(url: finalAudioURL),
+                videoAsset: AVURLAsset(url: finalVideoURL),
                 resolution: Stream.Resolution.from(resolution: videoStream["resolution"].stringValue),
                 kind: .adaptive,
                 encoding: videoStream["encoding"].string,
@@ -710,6 +732,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             )
         }
     }
+
 
     private func extractHLSStreams(from content: JSON) -> [Stream] {
         if let hlsURL = content.dictionaryValue["hlsUrl"]?.url {

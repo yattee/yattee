@@ -11,6 +11,7 @@ struct InstancesSettings: View {
 
     @State private var frontendURL = ""
     @State private var proxiesVideos = false
+    @State private var invidiousCompanion = false
 
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject private var accounts = AccountsModel.shared
@@ -105,6 +106,16 @@ struct InstancesSettings: View {
                     }
             }
 
+            if selectedInstance != nil, selectedInstance.app == .invidious {
+                invidiousCompanionToggle
+                    .onAppear {
+                        invidiousCompanion = selectedInstance.invidiousCompanion
+                    }
+                    .onChange(of: invidiousCompanion) { newValue in
+                        InstancesModel.shared.setInvidiousCompanion(selectedInstance, newValue)
+                    }
+            }
+
             if selectedInstance != nil, !selectedInstance.app.supportsAccounts {
                 Spacer()
                 Text("Accounts are not supported for the application of this instance")
@@ -190,6 +201,10 @@ struct InstancesSettings: View {
 
     private var proxiesVideosToggle: some View {
         Toggle("Proxy videos", isOn: $proxiesVideos)
+    }
+
+    private var invidiousCompanionToggle: some View {
+        Toggle("Invidious companion", isOn: $invidiousCompanion)
     }
 }
 
