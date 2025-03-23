@@ -658,7 +658,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         let videoId = json["videoId"].stringValue
 
         return extractFormatStreams(from: json["formatStreams"].arrayValue, videoId: videoId) +
-        extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue, videoId: videoId) +
+            extractAdaptiveFormats(from: json["adaptiveFormats"].arrayValue, videoId: videoId) +
             hls
     }
 
@@ -732,7 +732,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             )
         }
     }
-
 
     private func extractHLSStreams(from content: JSON) -> [Stream] {
         if let hlsURL = content.dictionaryValue["hlsUrl"]?.url {

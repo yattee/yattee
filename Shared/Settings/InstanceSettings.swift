@@ -111,7 +111,7 @@ struct InstanceSettings: View {
     private var proxiesVideosToggle: some View {
         Toggle("Proxy videos", isOn: $proxiesVideos)
     }
-    
+
     private var invidiousCompanionToggle: some View {
         Toggle("Invidious companion", isOn: $invidiousCompanion)
     }
