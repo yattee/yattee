@@ -89,7 +89,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
       - run: echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: artifacts
       - uses: ncipollo/release-action@v1
