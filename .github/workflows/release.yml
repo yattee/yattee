@@ -44,7 +44,7 @@ jobs:
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: ${{ matrix.lane }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.lane }} build
           path: fastlane/builds/**/*.ipa
@@ -76,7 +76,7 @@ jobs:
           echo "ZIP_PATH=fastlane/builds/${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}/macOS/Yattee-${{ env.VERSION_NUMBER }}-macOS.zip" >> $GITHUB_ENV
       - name: ZIP build
         run: /usr/bin/ditto -c -k --keepParent ${{ env.APP_PATH }} ${{ env.ZIP_PATH }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mac notarized build
           path: ${{ env.ZIP_PATH }}
