@@ -1,10 +1,8 @@
-## Build 198
+## Build 199
 
 ## What's Changed
-* Stop making videos with unknown length shorts. by @derspyy in https://github.com/yattee/yattee/pull/849
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/845
-* Add Hungarian to locales list
-* Update dependencies
+* Add support for invidious companion by @lifo9 in https://github.com/yattee/yattee/pull/863
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/851
 
 ## Previous builds
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
@@ -58,6 +56,8 @@
 * Changes to defaults by @stonerl in https://github.com/yattee/yattee/pull/767
 * Fixed fullscreen handling for backgrounding by @stonerl in https://github.com/yattee/yattee/pull/772
 * Update now playing info when using system controls – Partial fix for 503 by @stonerl in https://github.com/yattee/yattee/pull/765
+* Stop making videos with unknown length shorts. by @derspyy in https://github.com/yattee/yattee/pull/849
+* Add Hungarian to locales list
 * Fix crash on HLS live playback by @stonerl in https://github.com/yattee/yattee/pull/775
 * Fix mpv crashing on macOS by @stonerl in https://github.com/yattee/yattee/pull/754
 * Refreshed icons for iOS and macOS by @stonerl in https://github.com/yattee/yattee/pull/752
