@@ -386,7 +386,12 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func channelPlaylist(_ id: String) -> Resource? {
         resource(baseURL: account.url, path: basePathAppending("playlists/\(id)"))
     }
-
+    func markWatched(_ videoID: String, onCompletion: @escaping () -> Void = {}) {
+    resourceWithAuthCheck(baseURL: account.url, path: basePathAppending("auth/history"))
+        .child(videoID)
+        .request(.post)
+        .onCompletion { _ in onCompletion() }
+    }
     func search(_ query: SearchQuery, page: String?) -> Resource {
         var resource = resource(baseURL: account.url, path: basePathAppending("search"))
             .withParam("q", searchQuery(query.query))

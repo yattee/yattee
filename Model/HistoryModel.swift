@@ -92,7 +92,15 @@ extension PlayerModel {
             }
 
             watch.watchedAt = Date()
-
+            if finished || (watchWasNew && seconds >= 3) {  
+                // Ensure this is an Invidious video  
+                if currentVideo.app == .invidious, let vid = currentVideo.videoID {  
+                    // Get the correct API instance for this video's origin  
+                    if let api = playerAPI(currentVideo) as? InvidiousAPI {  
+                        api.markWatched(vid)  
+                    }  
+                }  
+            }  
             try? self.backgroundContext.save()
         }
     }
