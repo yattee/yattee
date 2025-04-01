@@ -591,7 +591,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             dislikes: details["dislikes"]?.int,
             streams: extractStreams(from: content),
             related: extractRelated(from: content),
-            chapters: extractChapters(from: content)
+            chapters: extractChapters(from: content),
+            captions: extractCaptions(from: content)
         )
     }
 
@@ -816,6 +817,24 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             }
 
             return Chapter(title: title, image: image, start: start)
+        }
+    }
+    
+    private func extractCaptions(from content: JSON) -> [Captions] {
+        content["subtitles"].arrayValue.compactMap { details in
+            guard let url = details["url"].url,
+                  let code = details["code"].string,
+                  let label = details["name"].string,
+                  var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            else { return nil }
+            
+            components.queryItems = components.queryItems?.map { item in
+                item.name == "fmt" ? URLQueryItem(name: "fmt", value: "srt") : item
+            }
+            
+            guard let newUrl = components.url else { return nil }
+            
+            return Captions(label: label, code: code, url: newUrl)
         }
     }
 
