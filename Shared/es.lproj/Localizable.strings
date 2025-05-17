@@ -14,10 +14,10 @@
    Video duration filter in search */
 "Any" = "Cualquiera";
 "Apply to all" = "Aplicar a todo";
-"Are you sure you want to clear history of watched videos?" = "¿Estás seguro de que quieres borrar el historial de vídeos vistos?";
+"Are you sure you want to clear history of watched videos?" = "¿Confirma que quiere eliminar el historial de vídeos vistos?";
 "Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Si descubres un error o tienes ideas, puedes enviarlas a través de los issues de GitHub. ";
 "Captions" = "Subtítulos";
-"Categories to Skip" = "Categorías a omitir";
+"Categories to Skip" = "Categorías para omitir";
 "Chapters" = "Capítulos";
 "Charging" = "Cargando";
 "Clear" = "Limpiar";
@@ -37,23 +37,23 @@
 "Country Name or Code" = "Nombre o código del país";
 "Create Playlist" = "Crear lista de reproducción";
 "10 seconds forwards/backwards" = "10 segundos hacia detrás/hacia delante";
-"Add to Playlist" = "Añadir a playlist";
-"Add to Playlist..." = "Añadir a playlist...";
+"Add to Playlist" = "Añadir a lista";
+"Add to Playlist..." = "Añadir a lista...";
 "Advanced" = "Avanzado";
 "Always use AVPlayer for live videos" = "Siempre usar AVPlayer para vídeos en vivo";
 
 /* Trending category, section containing all kinds of videos */
 "All" = "Todo";
 "Anonymous" = "Anónimo";
-"Backend" = "Backend";
-"Are you sure you want to delete playlist?" = "¿Estás seguro de que quieres eliminar esta lista de reproducción?";
+"Backend" = "Motor";
+"Are you sure you want to delete playlist?" = "¿Confirma que quiere eliminar esta lista de reproducción?";
 "Automatic" = "Automático";
 "Badge" = "Insignia";
-"Are you sure you want to clear search history?" = "¿Estás seguro de que quieres eliminar tu historial de búsqueda?";
-"Are you sure you want to restore default quality profiles?" = "¿Estás seguro de que quieres restablecer los ajustes por defecto de los perfiles de calidad?";
-"Are you sure you want to unsubscribe from %@?" = "¿Estás seguro de que quieres dejar de estar suscrito a %@?";
+"Are you sure you want to clear search history?" = "¿Confirma que quiere eliminar el historial de búsquedas?";
+"Are you sure you want to restore default quality profiles?" = "¿Confirma que quiere restablecer la configuración predeterminada de los perfiles de calidad?";
+"Are you sure you want to unsubscribe from %@?" = "¿Confirma que quiere cancelar la suscripción a %@?";
 "Cancel" = "Cancelar";
-"Autoplaying Next" = "Autoreproducir el siguiente";
+"Autoplaying Next" = "Reproducir siguiente automáticamente";
 "Based on system color scheme" = "Basado en el tema del sistema";
 "Clear Search History..." = "Limpiar el historial de búsqueda...";
 "Battery" = "Batería";
@@ -120,7 +120,7 @@
 "Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Solicitudes explícitas para dar me gusta, suscribirse o interactuar con ellos en una o más plataformas gratuitas o de pago (por ejemplo, hacer clic en un vídeo).";
 "Formats will be selected in order as listed.\nHLS is an adaptive format (resolution setting does not apply)." = "Los formatos se seleccionarán en orden como se indica.\nHLS es un formato adaptable (no aplica la configuración de resolución).";
 "Fullscreen size" = "Tamaño de pantalla completa";
-"Badge & Decreased opacity" = "Insignia y opacidad dosminuída";
+"Badge & Decreased opacity" = "Insignia y opacidad disminuida";
 "Browsing" = "Navegando por";
 "Buffering stream..." = "Cargando flujo de datos...";
 "Cellular" = "Celular";
@@ -265,7 +265,7 @@
 "Shuffle" = "Mezclar";
 
 /* Loading stream OSD */
-"Loading streams…" = "Cargando secuencias…";
+"Loading streams…" = "Cargando transmisiones…";
 "Public Locations" = "Ubicaciones públicas";
 "Yattee" = "Yattee";
 "No results" = "No hay resultados";
@@ -310,7 +310,7 @@
 "Honor orientation lock" = "Bloqueo de orientación de honor";
 "I found a bug /" = "Encontré un error /";
 "I have a feature request" = "Tengo una solicitud de una nueva función";
-"LIVE" = "VIVO";
+"LIVE" = "EN VIVO";
 
 /* Video duration filter in search */
 "Long" = "Largo";
@@ -378,7 +378,7 @@
 "Low" = "Baja";
 "Mark as watched" = "Marcar como visto";
 "Mark video as watched after playing" = "Marcar video como visto después de reproducirlo";
-"Mark watched videos with" = "Marar videos vistos con";
+"Mark watched videos with" = "Marcar videos vistos con";
 "Matrix Chat" = "Chat matriz";
 "Milestones" = "Hitos";
 "No description" = "Sin descripción";
@@ -386,7 +386,7 @@
 "Not Playing" = "Nada reproduciendo";
 "Normal" = "Normal";
 "Nothing" = "Nada";
-"Only when signed in" = "Solo cuando estás registrado";
+"Only when signed in" = "Solo al acceder a una cuenta";
 "Open Settings" = "Abrir configuración";
 "Player" = "Reproductor";
 "Pause" = "Pausar";
@@ -587,12 +587,12 @@
 "Your Accounts" = "Tus cuentas";
 "Description" = "Descripción";
 "Maximum feed items" = "Número máximo de elementos en el feed";
-"Are you sure you want to remove %@ from Favorites?" = "¿Estás seguro de que quieres eliminar %@ de favoritos?";
+"Are you sure you want to remove %@ from Favorites?" = "¿Confirma que quiere quitar %@ de Favoritos?";
 "Limit" = "Límite";
 "Keep channels with unwatched videos on top of subscriptions list" = "Mantén los canales con los vídeos sin ver en la parte superior de la lista de suscripciones";
 "(shorts hidden)" = "(cortos ocultos)";
 "Disable filters" = "Desactivar los filtros";
-"Podcasts" = "Podcasts";
+"Podcasts" = "Pódcast";
 "Releases" = "Lanzamientos";
 "Show channel avatars in channels lists" = "Mostrar los avatares de los canales en las listas de los canales";
 "Play Now in MPV" = "Reproducir ahora en MPV";
@@ -609,7 +609,7 @@
 "Other" = "Otro";
 "Other data" = "Información adicional";
 "Export..." = "Exportar…";
-"Are you sure you want to export unencrypted passwords?" = "¿Estás seguro de que quieres exportar las contraseñas sin cifrar?";
+"Are you sure you want to export unencrypted passwords?" = "¿Confirma que quiere exportar las contraseñas sin cifrar?";
 "Export" = "Exportar";
 "Build" = "Compilación";
 "Platform" = "Plataforma";
