@@ -15,7 +15,7 @@
 "Any" = "Cualquiera";
 "Apply to all" = "Aplicar a todo";
 "Are you sure you want to clear history of watched videos?" = "¿Confirma que quiere eliminar el historial de vídeos vistos?";
-"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Si descubres un error o tienes ideas, puedes enviarlas a través de los issues de GitHub. ";
+"Bugs and great feature ideas can be sent to the GitHub issues tracker. " = "Si descubre un error o tiene ideas, puede enviarlas a través de los informes de GitHub. ";
 "Captions" = "Subtítulos";
 "Categories to Skip" = "Categorías para omitir";
 "Chapters" = "Capítulos";
@@ -161,7 +161,7 @@
 "Left" = "Izquierda";
 "Video Details" = "Datalles del Video";
 "Only for local files and URLs" = "olo para archivos locales y URLs";
-"\"%@\" will be irreversibly removed from this device." = "\"%@\" será eliminado irreversiblemente de este dispositivo.";
+"\"%@\" will be irreversibly removed from this device." = "«%@» se eliminará irreversiblemente de este dispositivo.";
 
 /* Player controls layout size */
 "Small" = "Achicar";
@@ -192,7 +192,7 @@
 "Round corners" = "Esquinas redondeadas";
 "SponsorBlock" = "Bloque Patrocinador";
 "Statistics" = "Estadísticas";
-"Matrix Channel" = "Canal matriz";
+"Matrix Channel" = "Canal de Matrix";
 "More info can be found in:" = "Se puede encontrar más información en:";
 "Resolution" = "Resolución";
 "Open Videos" = "Abrir Videos";
@@ -379,7 +379,7 @@
 "Mark as watched" = "Marcar como visto";
 "Mark video as watched after playing" = "Marcar video como visto después de reproducirlo";
 "Mark watched videos with" = "Marcar videos vistos con";
-"Matrix Chat" = "Chat matriz";
+"Matrix Chat" = "Chat de Matrix";
 "Milestones" = "Hitos";
 "No description" = "Sin descripción";
 "No Playlists" = "Sin listas de reproducción";
@@ -394,7 +394,7 @@
 "Play Music" = "Reproducir música";
 "Play Next" = "Reproducir siguiente";
 "Playlist" = "Lista de reproducción";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Se eliminará la lista de reproducción \"%@\".\nNo se puede revertir.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "Se eliminará la lista de reproducción «%@».\nNo se puede revertir.";
 "Playlists" = "Listas de reproducción";
 "Popular" = "Popular";
 "Proxy videos" = "Utilizar un proxy para ver los vídeos";
