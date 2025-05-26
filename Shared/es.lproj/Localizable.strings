@@ -164,7 +164,7 @@
 "\"%@\" will be irreversibly removed from this device." = "«%@» se eliminará irreversiblemente de este dispositivo.";
 
 /* Player controls layout size */
-"Small" = "Achicar";
+"Small" = "Pequeño";
 "Now Playing" = "Reproduciendo";
 "Stream & Player" = "Transmisión y reproductor";
 "Picture in Picture" = "Imagen en imagen";
@@ -184,13 +184,13 @@
 "Verified" = "Verificado";
 "History" = "Historial";
 "Locations Manifest" = "Manifiesto de ubicaciones";
-"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "La lista de reproducción está vacía\n\nToca y mantén presionado un video y luego \n\"Agregar a la lista de reproducción\"";
+"Playlist is empty\n\nTap and hold on a video and then \n\"Add to Playlist\"" = "La lista de reproducción está vacía\n\nToque y mantenga presionado un vídeo y luego\n«Añadir a la lista de reproducción»";
 "Play Now" = "Reproducir ahora";
 "Enter link to open" = "Introduce el enlace para abrir";
 "Share..." = "Compartir...";
 "Restore default profiles..." = "Restaurar perfiles predeterminados...";
 "Round corners" = "Esquinas redondeadas";
-"SponsorBlock" = "Bloque Patrocinador";
+"SponsorBlock" = "SponsorBlock";
 "Statistics" = "Estadísticas";
 "Matrix Channel" = "Canal de Matrix";
 "More info can be found in:" = "Se puede encontrar más información en:";
@@ -215,7 +215,7 @@
 "Show playback statistics" = "Mostrar estadísticas de reproducción";
 "Remove Location" = "Eliminar ubicación";
 "Inspector visibility" = "Visibilidad del inspector";
-"Open \"Playlists\" tab to create new one" = "Abra la pestaña \"Listas de reproducción\" para crear una nueva";
+"Open \"Playlists\" tab to create new one" = "Abra la pestaña «Listas» para crear una lista de reproducción";
 "Show Inspector" = "Mostrar inspector";
 
 /* Video date filter in search */
@@ -234,7 +234,7 @@
 "Play in PiP" = "Reproducir en PiP";
 
 /* SponsorBlock category name */
-"Sponsor" = "Sponsor";
+"Sponsor" = "Patrocinador";
 "Rate" = "Valorar";
 "Reload manifest" = "Recargar manifiesto";
 "Playback queue is empty" = "La cola de reproducción está vacía";
@@ -242,7 +242,7 @@
 
 /* Selected video was played on given date */
 "Watched %@" = "Visto %@";
-"You have no playlists\n\nTap on \"New Playlist\" to create one" = "No tienes listas de reproducción\n\nToca \"Nueva lista de reproducción\" para crear una";
+"You have no playlists\n\nTap on \"New Playlist\" to create one" = "No tiene listas de reproducción\n\nToque «Lista nueva» para crear una";
 "I like this app!" = "¡Me gusta esta aplicación!";
 
 /* Video sort order in search */
@@ -419,7 +419,7 @@
 /* Player controls layout size */
 "Smaller" = "Más pequeño";
 "Source" = "Fuente";
-"SponsorBlock API Instance" = "Instancia de API del bloque Sponsor";
+"SponsorBlock API Instance" = "Instancia de API de SponsorBlock";
 "Subscribe" = "Suscribir";
 
 /* Subscriptions title */
