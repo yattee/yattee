@@ -185,6 +185,10 @@ final class MPVBackend: PlayerBackend {
     var audioSampleRate: String {
         client?.audioSampleRate ?? "unknown"
     }
+    
+    var availableAudioTracks: [Stream.AudioTrack] {
+        stream?.audioTracks ?? []
+    }
 
     init() {
         clientTimer = .init(interval: .seconds(Self.timeUpdateInterval), mode: .infinite) { [weak self] _ in
@@ -243,6 +247,9 @@ final class MPVBackend: PlayerBackend {
 
         let updateCurrentStream = {
             DispatchQueue.main.async { [weak self] in
+                if self?.video?.id != video.id {
+                    self?.model.selectedAudioTrackIndex = 0
+                }
                 self?.stream = stream
                 self?.video = video
                 self?.model.stream = stream
@@ -319,6 +326,7 @@ final class MPVBackend: PlayerBackend {
                         startPlaying()
                     }
 
+                    stream.audioAsset = AVURLAsset(url: stream.audioTracks[stream.selectedAudioTrackIndex].url)
                     let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                     let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 
@@ -726,6 +734,15 @@ final class MPVBackend: PlayerBackend {
             }
         default:
             logger.info("MPV backend received unhandled property: \(name)")
+        }
+    }
+
+    func switchAudioTrack(to index: Int) {
+        guard let stream, let video else { return }
+
+        stream.selectedAudioTrackIndex = index
+        model.saveTime { [weak self] in
+            self?.playStream(stream, of: video, preservingTime: true, upgrading: false)
         }
     }
 }

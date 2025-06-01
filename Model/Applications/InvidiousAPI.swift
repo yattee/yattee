@@ -685,50 +685,93 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
     }
 
+    func extractXTags(from urlString: String) -> [String: String] {
+        guard let urlComponents = URLComponents(string: urlString),
+              let queryItems = urlComponents.queryItems,
+              let xtagsValue = queryItems.first(where: { $0.name == "xtags" })?.value else {
+            return [:]
+        }
+
+        guard let decoded = xtagsValue.removingPercentEncoding else { return [:] }
+
+        // Parse key-value pairs (format: key1=value1:key2=value2)
+        // Example: "acont=dubbed-auto:lang=en-US"
+        let pairs = decoded.split(separator: ":")
+        var result: [String: String] = [:]
+        for pair in pairs {
+            let parts = pair.split(separator: "=", maxSplits: 1)
+            if parts.count == 2 {
+                result[String(parts[0])] = String(parts[1])
+            }
+        }
+        return result
+    }
+
     private func extractAdaptiveFormats(from streams: [JSON], videoId: String?) -> [Stream] {
-        let audioStreams = streams
+        let audioTracks = streams
             .filter { $0["type"].stringValue.starts(with: "audio/mp4") }
             .sorted {
                 $0.dictionaryValue["bitrate"]?.int ?? 0 >
                     $1.dictionaryValue["bitrate"]?.int ?? 0
             }
-        guard let audioStream = audioStreams.first else {
+            .compactMap { audioStream -> Stream.AudioTrack? in
+                guard let url = audioStream["url"].url,
+                      let audioItag = audioStream["itag"].string
+                else { return nil }
+
+                let finalURL: URL
+                if let videoId, account.instance.invidiousCompanion {
+                    let audioCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(audioItag)"
+                    finalURL = URL(string: audioCompanionURLString) ?? url
+                } else {
+                    finalURL = url
+                }
+
+                let xTags = extractXTags(from: url.absoluteString)
+
+                return Stream.AudioTrack(
+                    url: finalURL,
+                    content: xTags["acont"],
+                    language: xTags["lang"]
+                )
+            }
+            .sorted {
+                /// Always prefer original audio streams over dubbed ones
+                !$0.isDubbed && $1.isDubbed
+            }
+
+        guard !audioTracks.isEmpty else {
             return .init()
         }
 
         let videoStreams = streams.filter { $0["type"].stringValue.starts(with: "video/") }
 
         return videoStreams.compactMap { videoStream in
-            guard let audioAssetURL = audioStream["url"].url,
-                  let videoAssetURL = videoStream["url"].url,
-                  let audioItag = audioStream["itag"].string,
+            guard let videoAssetURL = videoStream["url"].url,
                   let videoItag = videoStream["itag"].string
             else {
                 return nil
             }
-            let finalAudioURL: URL
             let finalVideoURL: URL
 
             if let videoId, account.instance.invidiousCompanion {
-                let audioCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(audioItag)"
                 let videoCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(videoItag)"
-                finalAudioURL = URL(string: audioCompanionURLString) ?? audioAssetURL
                 finalVideoURL = URL(string: videoCompanionURLString) ?? videoAssetURL
             } else {
-                finalAudioURL = audioAssetURL
                 finalVideoURL = videoAssetURL
             }
 
             return Stream(
                 instance: account.instance,
-                audioAsset: AVURLAsset(url: finalAudioURL),
+                audioAsset: AVURLAsset(url: audioTracks[0].url),
                 videoAsset: AVURLAsset(url: finalVideoURL),
                 resolution: Stream.Resolution.from(resolution: videoStream["resolution"].stringValue),
                 kind: .adaptive,
                 encoding: videoStream["encoding"].string,
                 videoFormat: videoStream["type"].string,
                 bitrate: videoStream["bitrate"].int,
-                requestRange: videoStream["init"].string ?? videoStream["index"].string
+                requestRange: videoStream["init"].string ?? videoStream["index"].string,
+                audioTracks: audioTracks
             )
         }
     }

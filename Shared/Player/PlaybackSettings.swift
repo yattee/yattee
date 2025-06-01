@@ -22,6 +22,7 @@ struct PlaybackSettings: View {
             case increaseRate
             case decreaseRate
             case captions
+            case audioTrack
         }
 
         @FocusState private var focusedField: Field?
@@ -110,6 +111,17 @@ struct PlaybackSettings: View {
                     #if os(tvOS)
                     .focused($focusedField, equals: .stream)
                     #endif
+                }
+
+                if !player.availableAudioTracks.isEmpty {
+                    HStack {
+                        controlsHeader("Audio Track".localized())
+                        Spacer()
+                        audioTrackButton
+                        #if os(tvOS)
+                        .focused($focusedField, equals: .audioTrack)
+                        #endif
+                    }
                 }
 
                 HStack(spacing: 8) {
@@ -452,6 +464,46 @@ struct PlaybackSettings: View {
             }
         }
         .disabled(captions.isEmpty)
+    }
+
+    @ViewBuilder private var audioTrackButton: some View {
+        #if os(macOS)
+            audioTrackPicker
+                .labelsHidden()
+                .frame(maxWidth: 300)
+        #elseif os(iOS)
+            Menu {
+                audioTrackPicker
+            } label: {
+                Text(player.availableAudioTracks[player.selectedAudioTrackIndex].displayLanguage)
+                    .frame(maxWidth: 240, alignment: .trailing)
+            }
+            .transaction { t in t.animation = .none }
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
+            .frame(maxWidth: 240, alignment: .trailing)
+            .frame(height: 40)
+        #else
+            ControlsOverlayButton(focusedField: $focusedField, field: .audioTrack) {
+                Text(player.availableAudioTracks[player.selectedAudioTrackIndex].displayLanguage)
+                    .frame(maxWidth: 320)
+            }
+            .contextMenu {
+                ForEach(Array(player.availableAudioTracks.enumerated()), id: \.offset) { index, track in
+                    Button(track.description) { player.selectedAudioTrackIndex = index }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+        #endif
+    }
+
+    private var audioTrackPicker: some View {
+        Picker("", selection: $player.selectedAudioTrackIndex) {
+            ForEach(Array(player.availableAudioTracks.enumerated()), id: \.offset) { index, track in
+                Text(track.description).tag(index)
+            }
+        }
+        .transaction { t in t.animation = .none }
     }
 }
 

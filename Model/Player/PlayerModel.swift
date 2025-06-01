@@ -210,6 +210,14 @@ final class PlayerModel: ObservableObject {
         var keyPressMonitor: Any?
     #endif
 
+    @Published var selectedAudioTrackIndex = 0 {
+        didSet {
+            if oldValue != selectedAudioTrackIndex {
+                handleAudioTrackChange()
+            }
+        }
+    }
+
     init() {
         #if os(iOS)
             isOrientationLocked = Defaults[.isOrientationLocked]
@@ -1467,4 +1475,12 @@ final class PlayerModel: ObservableObject {
             }
         }
     #endif
+
+    private func handleAudioTrackChange() {
+        (backend as? MPVBackend)?.switchAudioTrack(to: selectedAudioTrackIndex)
+    }
+
+    var availableAudioTracks: [Stream.AudioTrack] {
+        (backend as? MPVBackend)?.availableAudioTracks ?? []
+    }
 }
