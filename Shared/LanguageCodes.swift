@@ -11,6 +11,7 @@ enum LanguageCodes: String, CaseIterable {
     case Greek = "el"
     case English = "en"
     case English_GB = "en-GB"
+    case English_US = "en-US"
     case Spanish = "es"
     case Persian = "fa"
     case Finnish = "fi"
@@ -76,6 +77,8 @@ enum LanguageCodes: String, CaseIterable {
             return "English"
         case .English_GB:
             return "English (United Kingdom)"
+        case .English_US:
+            return "English (United States)"
         case .Spanish:
             return "Spanish"
         case .Persian:
