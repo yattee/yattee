@@ -237,12 +237,12 @@
 /* Video date filter in search */
 "Today" = "Hoje";
 "Trending" = "Em Alta";
-"Unsubscribe" = "Desinscrever";
+"Unsubscribe" = "Desinscrever-se";
 "Upload date" = "Data de upload";
 
 /* Video date filter in search */
 "Week" = "Semana";
-"Subscribe" = "Inscrever";
+"Subscribe" = "Inscrever-se";
 "Thumbnails" = "Miniaturas";
 "Typically near or at the end of the video when the credits pop up and/or endcards are shown." = "Geralmente perto do final ou final do vídeo quando os créditos aparecem e/ou os cartões finais são exibidos.";
 "unknown" = "desconhecido";
@@ -406,7 +406,7 @@
 "Country" = "País";
 "Clear All" = "Limpar Tudo";
 "Clear All Recents" = "Limpar Todos os Recentes";
-"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de dar like, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clicar em um vídeo).";
+"Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video)." = "Lembretes explícitos de curtir, se inscrever ou interagir com eles em qualquer plataforma, paga ou grátis (p.ex. clicar em um vídeo).";
 "Duration" = "Duração";
 "Edit Quality Profile" = "Editar Perfil de Qualidade";
 "Discussions take place in Discord and Matrix. It's a good spot for general questions." = "Discussões acontecem no Discord e no Matrix. É um bom lugar para perguntas gerais.";
@@ -537,7 +537,7 @@
 "Gesture: backwards" = "Gesto: para trás";
 "Always show controls buttons" = "Sempre mostrar botões de controle";
 "Controls button: forwards" = "Botão de controle: para frente";
-"Subscribe/Unsubscribe" = "Inscrever/Desinscrever";
+"Subscribe/Unsubscribe" = "Inscrever-se/Desinscrever-se";
 "Are you sure you want to clear cache?" = "Tem certeza que deseja limpar o cache?";
 "Gesture settings control skipping interval for double click on left/right side of the player. Changing system controls settings requires restart." = "As configurações de gesto controlam o intervalo de pulo para o clique duplo no lado direito/esquerdo do player. Mudar as configurações dos controles do sistema requer reinício.";
 "Loop one" = "Um em loop";
