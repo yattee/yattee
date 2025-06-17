@@ -34,6 +34,7 @@ jobs:
         with:
           ruby-version: '3.0'
           bundler-cache: true
+          cache-version: 1
       - name: Replace signing certificate to AppStore
         run: |
           sed -i '' 's/match Development/match AppStore/' Yattee.xcodeproj/project.pbxproj
@@ -58,6 +59,7 @@ jobs:
         with:
           ruby-version: '3.0'
           bundler-cache: true
+          cache-version: 1
       - name: Replace signing certificate to Direct with Developer ID
         run: |
           sed -i '' 's/match AppStore/match Direct/' Yattee.xcodeproj/project.pbxproj
