@@ -1,10 +1,12 @@
-## Build 199
+## Build 201
 
 ## What's Changed
-* Add support for invidious companion by @lifo9 in https://github.com/yattee/yattee/pull/863
-* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/851
+* MPV audio track switching and fix default audio language by @n3d1117 in https://github.com/yattee/yattee/pull/874
+* Feat: Added caption support for Piped backend by @craftycorvid in https://github.com/yattee/yattee/pull/867
+* Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/877
 
 ## Previous builds
+* Add support for invidious companion by @lifo9 in https://github.com/yattee/yattee/pull/863
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
 * Added Settings Import/Export
   * Export all settings, instances and accounts
