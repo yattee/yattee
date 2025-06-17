@@ -191,6 +191,25 @@ class Stream: Equatable, Hashable, Identifiable {
             return .unknown
         }
     }
+    
+    struct AudioTrack: Hashable, Identifiable {
+        let id = UUID().uuidString
+        let url: URL
+        let content: String?
+        let language: String?
+        
+        var displayLanguage: String {
+            LanguageCodes(rawValue: language ?? "")?.description.capitalized ?? language ?? "Unknown"
+        }
+        
+        var description: String {
+            "\(displayLanguage) (\(content ?? "Unknown"))"
+        }
+        
+        var isDubbed: Bool {
+            content?.lowercased().starts(with: "dubbed") ?? false
+        }
+    }
 
     let id = UUID()
 
@@ -208,6 +227,8 @@ class Stream: Equatable, Hashable, Identifiable {
     var videoFormat: String?
     var bitrate: Int?
     var requestRange: String?
+    var audioTracks: [AudioTrack] = []
+    var selectedAudioTrackIndex = 0
 
     init(
         instance: Instance? = nil,
@@ -220,7 +241,8 @@ class Stream: Equatable, Hashable, Identifiable {
         encoding: String? = nil,
         videoFormat: String? = nil,
         bitrate: Int? = nil,
-        requestRange: String? = nil
+        requestRange: String? = nil,
+        audioTracks: [AudioTrack] = []
     ) {
         self.instance = instance
         self.audioAsset = audioAsset
@@ -233,6 +255,7 @@ class Stream: Equatable, Hashable, Identifiable {
         format = .from(videoFormat ?? "")
         self.bitrate = bitrate
         self.requestRange = requestRange
+        self.audioTracks = audioTracks
     }
 
     var isLocal: Bool {
