@@ -435,8 +435,8 @@
 "Show toggle watch status button" = "Figyelési állapot váltó gomb megjelenítése";
 "List" = "Lista";
 "Cells" = "Cellák";
-"Toggle size" = "Méret váltása";
-"Toggle player" = "Lejátszó váltása";
+"Toggle size" = "Méret be/ki";
+"Toggle player" = "Lejátszó be/ki";
 "Do nothing" = "Ne tegyen semmit";
 "Feed" = "Hírfolyam";
 "Mark all as unwatched" = "Jelölje meg az összeset nem megtekintettnek";
