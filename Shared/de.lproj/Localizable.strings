@@ -600,3 +600,10 @@
 "Podcasts" = "Podcasts";
 "Add %@" = "%@ hinzufügen";
 "Releases" = "Veröffentlichungen";
+"Description preview" = "Beschreibungsvorschau";
+"No preview" = "Keine Vorschau";
+"Chapters (if available)" = "Kapitel (wenn vorhanden)";
+"Import Settings..." = "Einstellungen importieren...";
+"Export Settings" = "Einstellungen exportieren";
+"Other" = "Andere";
+"Icon and text" = "Icon und Text";
