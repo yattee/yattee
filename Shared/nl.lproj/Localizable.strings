@@ -427,7 +427,7 @@
 "Size" = "Grootte";
 "FPS" = "FPS";
 "Sample Rate" = "Sample Rate";
-"Could not find any links to open in your clipboard" = "Kon geen links vinden om te openen in het klembord";
+"Could not find any links to open in your clipboard" = "Geen links op het klembord gevonden om te openen";
 "Address" = "Adres";
 "Show sidebar" = "Toon zijbalk";
 "Locations Manifest" = "Locatie Manifest";
@@ -435,7 +435,7 @@
 "Could not delete document" = "Kon het document niet verwijderen";
 "Verified" = "Geverifiëerd";
 "Channel" = "Kanaal";
-"Open expanded" = "Open uitgeklapt";
+"Open expanded" = "Open uitgebreid";
 "Mark channel feed as unwatched" = "Markeer het kanaal als onbekeken";
 "Mark channel feed as watched" = "Markeer het kanaal als bekeken";
 "Short videos: visible" = "Korte videos: zichtbaar";
@@ -514,7 +514,7 @@
 "Shorts" = "Shorts";
 "Double tap gesture" = "Dubbele tik gebaar";
 "Tap and hold channel thumbnail to open context menu with more actions" = "Tik en houd voorvertoningsafbeelding vast om het contextmenu te openen met meer acties";
-"Always show controls buttons" = "Toon altijd bedieningsknoppen";
+"Always show controls buttons" = "Bedieningsknoppen altijd weergeven";
 "Single tap gesture" = "Enkel tikgebaar";
 "Maximum width expanded" = "Maximale breedte uitgeklapt";
 "Clear all" = "Verwijder alle";
@@ -529,5 +529,5 @@
 "Live Streams" = "Livestreams";
 "Gesture: fowards" = "Gebaar: voorwaarts";
 "Controls Buttons" = "Bedieningsknoppen";
-"Are you sure you want to remove this document?" = "Ben je zeker om dit document te verwijderen?";
-"Are you sure you want to remove %@ location?" = "Ben je zeker om locatie %a te verwijderen?";
+"Are you sure you want to remove this document?" = "Weet je zeker dat je dit document wilt verwijderen?";
+"Are you sure you want to remove %@ location?" = "Weet je zeker dat je locatie %a wilt verwijderen?";
