@@ -303,7 +303,7 @@
 "Wi-Fi" = "Wi-Fi";
 "Wiki" = "Wiki";
 "Yattee" = "Yattee";
-"Yattee %@ (build %@)" = "Yattee %@ (bangun %@)";
+"Yattee %@ (build %@)" = "Yattee %@ (build %@)";
 "Year" = "Tahun";
 "You can find information about using Yattee in the Wiki pages." = "Kamu dapat menemukan informasi tentang penggunaan Yattee di halaman Wiki.";
 "You can use automatic profile selection based on current device status or switch it in video playback settings controls." = "Kamu dapat menggunakan pemilihan profil otomatis berdasarkan status perangkat saat ini atau mengalihkannya dalam kontrol pengaturan pemutaran video.";
