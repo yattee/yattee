@@ -15,7 +15,7 @@
 </div>
 
 ## Features
-* Native user interface built with [SwiftUI](https://developer.apple.com/xcode/swiftui/) with customization settings
+* Native user interface built with [SwiftUI](https://developer.apple.com/swiftui/) with customization settings
 * Player queue and history
 * Player component with custom controls, gestures and support for 4K playback
 * Fullscreen, Picture in Picture and background audio playback
