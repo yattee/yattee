@@ -22,7 +22,7 @@ struct PlayerOverlayModifier: ViewModifier {
     @ViewBuilder var overlay: some View {
         Group {
             ControlsBar(fullScreen: .constant(false), expansionState: $expansionState, playerBar: true)
-                .offset(x: expansionState == .mini && !controlsWhenMinimized ? 10 : 0, y: 0)
+                .offset(x: expansionState == .mini && !controlsWhenMinimized ? 10 : 0, y: -3)
                 .frame(maxWidth: maxWidth, alignment: .trailing)
                 .onAppear {
                     if playerButtonIsExpanded {
