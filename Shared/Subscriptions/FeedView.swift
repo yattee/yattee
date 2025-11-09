@@ -156,7 +156,7 @@ struct FeedView: View {
                                 .focused(self.$focusedChannel, equals: channel.id)
                             }
                     }
-                    .onChange(of: self.focusedChannel) {
+                    .onChange(of: self.focusedChannel) { _ in
                             if self.focusedChannel == "all" {
                                 withAnimation {
                                     self.selectedChannel = nil
@@ -223,21 +223,37 @@ struct FeedView: View {
     var header: some View {
         HStack(spacing: 16) {
             #if os(tvOS)
-                Menu {
-                    accountsPicker
-                } label: {
-                    Label("Channels", systemImage: "filemenu.and.selection")
-                        .labelStyle(.iconOnly)
-                        .imageScale(.small)
-                        .font(.caption)
-                } primaryAction: {
-                    withAnimation {
-                        self.feedChannelsViewVisible = true
-                        self.focusedChannel = selectedChannel?.id ?? "all"
+                if #available(tvOS 17.0, *) {
+                    Menu {
+                        accountsPicker
+                    } label: {
+                        Label("Channels", systemImage: "filemenu.and.selection")
+                            .labelStyle(.iconOnly)
+                            .imageScale(.small)
+                            .font(.caption)
+                    } primaryAction: {
+                        withAnimation {
+                            self.feedChannelsViewVisible = true
+                            self.focusedChannel = selectedChannel?.id ?? "all"
+                        }
                     }
+                    .opacity(feedChannelsViewVisible ? 0 : 1)
+                    .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
+                } else {
+                    Button {
+                        withAnimation {
+                            self.feedChannelsViewVisible = true
+                            self.focusedChannel = selectedChannel?.id ?? "all"
+                        }
+                    } label: {
+                        Label("Channels", systemImage: "filemenu.and.selection")
+                            .labelStyle(.iconOnly)
+                            .imageScale(.small)
+                            .font(.caption)
+                    }
+                    .opacity(feedChannelsViewVisible ? 0 : 1)
+                    .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 }
-                .opacity(feedChannelsViewVisible ? 0 : 1)
-                .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 channelHeaderView
                 if selectedChannel == nil {
                     Spacer()

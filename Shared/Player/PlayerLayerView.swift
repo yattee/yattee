@@ -16,6 +16,11 @@ import Foundation
             player.avPlayerBackend.playerLayer
         }
 
+        override init(frame frameRect: NSRect) {
+            super.init(frame: frameRect)
+            wantsLayer = true
+        }
+
         required init?(coder: NSCoder) {
             super.init(coder: coder)
         }

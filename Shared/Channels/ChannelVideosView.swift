@@ -181,15 +181,19 @@ struct ChannelVideosView: View {
         .navigationTitle(navigationTitle)
         #endif
 
-        return Group {
-            content
-            #if os(tvOS)
-            .background(Color.background(scheme: colorScheme))
-            #endif
-            #if !os(iOS)
-            .focusScope(focusNamespace)
-            #endif
-        }
+        #if os(tvOS)
+            return content
+                .background(Color.background(scheme: colorScheme))
+                .focusScope(focusNamespace)
+        #elseif os(macOS)
+            if #available(macOS 12.0, *) {
+                return content.focusScope(focusNamespace)
+            } else {
+                return content
+            }
+        #else
+            return content
+        #endif
     }
 
     var verticalCellsEdgesIgnoringSafeArea: Edge.Set {

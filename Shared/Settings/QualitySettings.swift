@@ -183,10 +183,17 @@ struct QualitySettings: View {
         }
 
         #if os(macOS)
-            List {
-                list
+            if #available(macOS 12.0, *) {
+                List {
+                    list
+                }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
+            } else {
+                List {
+                    list
+                }
+                .listStyle(.inset)
             }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
         #else
             list
         #endif

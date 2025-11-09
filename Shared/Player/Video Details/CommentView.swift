@@ -238,7 +238,7 @@ struct CommentView: View {
                     .font(.system(size: 14))
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
+                    .modifier(TextSelectionModifier())
             #else
                 Text(comment.text)
             #endif
@@ -252,6 +252,18 @@ struct CommentView: View {
         )
     }
 }
+
+#if os(macOS)
+    struct TextSelectionModifier: ViewModifier {
+        func body(content: Content) -> some View {
+            if #available(macOS 12.0, *) {
+                content.textSelection(.enabled)
+            } else {
+                content
+            }
+        }
+    }
+#endif
 
 #if os(iOS)
     struct ActiveLabelCommentRepresentable: UIViewRepresentable {
