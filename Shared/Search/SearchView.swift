@@ -41,29 +41,33 @@ struct SearchView: View {
 
     #if os(iOS)
         var body: some View {
-            VStack {
+            GeometryReader { geometry in
                 VStack {
-                    if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
-                        SearchSuggestions()
-                            .opacity(state.queryText.isEmpty ? 0 : 1)
-                    } else {
-                        results
+                    VStack {
+                        if accounts.app.supportsSearchSuggestions, state.query.query != state.queryText {
+                            SearchSuggestions()
+                                .opacity(state.queryText.isEmpty ? 0 : 1)
+                        } else {
+                            results
+                        }
                     }
+                    .backport
+                    .scrollDismissesKeyboardInteractively()
                 }
-                .backport
-                .scrollDismissesKeyboardInteractively()
-            }
-            .environment(\.listingStyle, searchListingStyle)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    if #available(iOS 15, *) {
-                        FocusableSearchTextField()
-                    } else {
-                        SearchTextField()
+                .environment(\.listingStyle, searchListingStyle)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        if #available(iOS 15, *) {
+                            FocusableSearchTextField()
+                                .frame(width: searchFieldWidth(geometry.size.width))
+                        } else {
+                            SearchTextField()
+                                .frame(width: searchFieldWidth(geometry.size.width))
+                        }
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    searchMenu
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        searchMenu
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -644,6 +648,26 @@ struct SearchView: View {
             searchSortOrder.rawValue
         ))
     }
+
+    #if os(iOS)
+    private func searchFieldWidth(_ viewWidth: CGFloat) -> CGFloat {
+        // Base padding for internal SearchTextField padding (16pt each side = 32 total)
+        var totalDeduction: CGFloat = 32
+        
+        // Add space for trailing menu button
+        totalDeduction += 44
+        
+        // Add space for sidebar toggle button if in sidebar navigation style
+        if navigationStyle == .sidebar {
+            totalDeduction += 44
+        }
+        
+        // Minimum width to ensure usability
+        let minWidth: CGFloat = 200
+        
+        return max(minWidth, viewWidth - totalDeduction)
+    }
+    #endif
 
     var shouldDisplayHeader: Bool {
         #if os(tvOS)
