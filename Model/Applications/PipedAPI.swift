@@ -680,20 +680,59 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             streams.append(Stream(instance: account.instance, hlsURL: hlsURL))
         }
 
-        let audioStreams = content
+        // Extract all M4A audio streams, sorted by bitrate (highest first)
+        let allAudioStreams = content
             .dictionaryValue["audioStreams"]?
             .arrayValue
             .filter { $0.dictionaryValue["format"]?.string == "M4A" }
-            .filter { stream in
-                let type = stream.dictionaryValue["audioTrackType"]?.string
-                return type == nil || type == "ORIGINAL"
-            }
             .sorted {
                 $0.dictionaryValue["bitrate"]?.int ?? 0 >
                     $1.dictionaryValue["bitrate"]?.int ?? 0
             } ?? []
 
-        guard let audioStream = audioStreams.first else {
+        // Group audio streams by track type and language, keeping highest bitrate for each
+        var audioTracksByType = [String: JSON]()
+        for audioStream in allAudioStreams {
+            let trackType = audioStream.dictionaryValue["audioTrackType"]?.string
+            let trackLocale = audioStream.dictionaryValue["audioTrackLocale"]?.string
+            
+            // Create a unique key for this audio track combination
+            let key = "\(trackType ?? "ORIGINAL")_\(trackLocale ?? "")"
+            
+            // Only keep the first (highest bitrate) stream for each unique track type/locale combination
+            if audioTracksByType[key] == nil {
+                audioTracksByType[key] = audioStream
+            }
+        }
+
+        // Convert to Stream.AudioTrack array
+        let audioTracks: [Stream.AudioTrack] = audioTracksByType.values.compactMap { audioStream in
+            guard let url = audioStream.dictionaryValue["url"]?.url else {
+                return nil
+            }
+            
+            let trackType = audioStream.dictionaryValue["audioTrackType"]?.string
+            let trackLocale = audioStream.dictionaryValue["audioTrackLocale"]?.string
+            
+            return Stream.AudioTrack(
+                url: url,
+                content: trackType,
+                language: trackLocale
+            )
+        }.sorted { track1, track2 in
+            // Sort: ORIGINAL first, then DUBBED, then others
+            if track1.content == "ORIGINAL" && track2.content != "ORIGINAL" {
+                return true
+            } else if track1.content != "ORIGINAL" && track2.content == "ORIGINAL" {
+                return false
+            } else {
+                // If both are same type, sort by language
+                return (track1.language ?? "") < (track2.language ?? "")
+            }
+        }
+
+        // Fallback to first audio stream if no tracks were extracted
+        guard !audioTracks.isEmpty else {
             return streams
         }
 
@@ -705,13 +744,12 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                 continue
             }
 
-            guard let audioAssetUrl = audioStream.dictionaryValue["url"]?.url,
-                  let videoAssetUrl = videoStream.dictionaryValue["url"]?.url
-            else {
+            guard let videoAssetUrl = videoStream.dictionaryValue["url"]?.url else {
                 continue
             }
 
-            let audioAsset = AVURLAsset(url: audioAssetUrl)
+            // Use the first (ORIGINAL) audio track as default
+            let defaultAudioAsset = AVURLAsset(url: audioTracks[0].url)
             let videoAsset = AVURLAsset(url: videoAssetUrl)
 
             let videoOnly = videoStream.dictionaryValue["videoOnly"]?.bool ?? true
@@ -739,13 +777,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                 streams.append(
                     Stream(
                         instance: account.instance,
-                        audioAsset: audioAsset,
+                        audioAsset: defaultAudioAsset,
                         videoAsset: videoAsset,
                         resolution: resolution,
                         kind: .adaptive,
                         videoFormat: videoFormat,
                         bitrate: bitrate,
-                        requestRange: requestRange
+                        requestRange: requestRange,
+                        audioTracks: audioTracks
                     )
                 )
             } else {
