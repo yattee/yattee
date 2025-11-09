@@ -17,7 +17,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.1'
           bundler-cache: true
       - uses: maierj/fastlane-action@v3.0.0
         with:
