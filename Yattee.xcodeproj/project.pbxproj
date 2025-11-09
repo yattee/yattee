@@ -2603,6 +2603,7 @@
 				37D4B0CC2671614900C925CA /* Frameworks */,
 				37D4B0CD2671614900C925CA /* Resources */,
 				370F500927CC1757001B35DC /* Embed Frameworks */,
+				37D965682EC0D1A800B8EBCC /* ShellScript */,
 				372B368D286E03CD00BB84D7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -2987,6 +2988,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		37D965682EC0D1A800B8EBCC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\n# Clean module caches for macOS builds\nif [ \"$PLATFORM_NAME\" = \"macosx\" ]; then\n    echo \"Cleaning Swift module caches...\"\n    rm -rf \"$DERIVED_FILE_DIR/SwiftExplicitPrecompiledModules\"\n    rm -rf \"$BUILD_DIR/../../Intermediates.noindex/SwiftExplicitPrecompiledModules\"\nfi\n\n# Fix framework bundle structure for macOS\n# Converts shallow bundles (iOS-style) to versioned bundles (macOS-style)\n\nset -e\n\nif [ \"$PLATFORM_NAME\" != \"macosx\" ]; then\n    echo \"Skipping framework conversion - not building for macOS\"\n    exit 0\nfi\n\nFRAMEWORKS_DIR=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Frameworks\"\n\nif [ ! -d \"$FRAMEWORKS_DIR\" ]; then\n    echo \"No Frameworks directory found at $FRAMEWORKS_DIR\"\n    exit 0\nfi\n\necho \"Converting frameworks to versioned bundle structure...\"\n\nfor framework in \"$FRAMEWORKS_DIR\"/*.framework; do\n    if [ ! -d \"$framework\" ]; then\n        continue\n    fi\n    \n    FRAMEWORK_NAME=$(basename \"$framework\" .framework)\n    \n    # Check if it's already a versioned bundle\n    if [ -d \"$framework/Versions/Current\" ]; then\n        echo \"✓ $FRAMEWORK_NAME is already a versioned bundle\"\n        continue\n    fi\n    \n    # Check if it's a shallow bundle (has Info.plist at root and no Versions folder)\n    if [ -f \"$framework/Info.plist\" ] && [ ! -d \"$framework/Versions\" ]; then\n        echo \"→ Converting $FRAMEWORK_NAME to versioned bundle...\"\n        \n        # Create versioned structure\n        mkdir -p \"$framework/Versions/A\"\n        \n        # Move the binary if it exists\n        if [ -f \"$framework/$FRAMEWORK_NAME\" ]; then\n            mv \"$framework/$FRAMEWORK_NAME\" \"$framework/Versions/A/\"\n        fi\n        \n        # Create Resources directory and move appropriate files\n        mkdir -p \"$framework/Versions/A/Resources\"\n        \n        # Move Info.plist\n        if [ -f \"$framework/Info.plist\" ]; then\n            mv \"$framework/Info.plist\" \"$framework/Versions/A/Resources/\"\n        fi\n        \n        # Move Headers if they exist\n        if [ -d \"$framework/Headers\" ]; then\n            mv \"$framework/Headers\" \"$framework/Versions/A/\"\n        fi\n        \n        # Move Modules if they exist\n        if [ -d \"$framework/Modules\" ]; then\n            mv \"$framework/Modules\" \"$framework/Versions/A/\"\n        fi\n        \n        # Move any other resource files/folders\n        for item in \"$framework\"/*; do\n            ITEM_NAME=$(basename \"$item\")\n            # Skip if it's the Versions directory or _CodeSignature\n            if [ \"$ITEM_NAME\" != \"Versions\" ] && [ \"$ITEM_NAME\" != \"_CodeSignature\" ]; then\n                if [ -e \"$item\" ]; then\n                    mv \"$item\" \"$framework/Versions/A/Resources/\"\n                fi\n            fi\n        done\n        \n        # Create symlinks\n        cd \"$framework/Versions\"\n        ln -sf \"A\" \"Current\"\n        cd \"$framework\"\n        ln -sf \"Versions/Current/Resources/Info.plist\" \"Info.plist\"\n        ln -sf \"Versions/Current/$FRAMEWORK_NAME\" \"$FRAMEWORK_NAME\"\n        ln -sf \"Versions/Current/Resources\" \"Resources\"\n        \n        # Recreate Headers and Modules symlinks if they exist\n        if [ -d \"Versions/A/Headers\" ]; then\n            ln -sf \"Versions/Current/Headers\" \"Headers\"\n        fi\n        \n        if [ -d \"Versions/A/Modules\" ]; then\n            ln -sf \"Versions/Current/Modules\" \"Modules\"\n        fi\n        \n        echo \"✓ Successfully converted $FRAMEWORK_NAME\"\n    else\n        echo \"⚠ $FRAMEWORK_NAME has unknown structure, skipping\"\n    fi\ndone\n\necho \"Framework conversion complete!\"\n";
 		};
 		37FD43EA2704A2350073EE42 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
