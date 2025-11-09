@@ -66,6 +66,9 @@ struct ChannelsView: View {
                             Label("Unsubscribe", systemImage: "xmark.circle")
                         }
                     }
+                    #if os(iOS)
+                    .modifier(CompactListRowModifier())
+                    #endif
                 }
                 #if os(tvOS)
                 .padding(.horizontal, 50)
@@ -183,6 +186,21 @@ struct ChannelsView: View {
         }
     }
 }
+
+#if os(iOS)
+struct CompactListRowModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 15.0, *) {
+            content
+                .listRowSpacing(0)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        } else {
+            content
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        }
+    }
+}
+#endif
 
 struct ChannelsView_Previews: PreviewProvider {
     static var previews: some View {
