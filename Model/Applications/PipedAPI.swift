@@ -556,7 +556,8 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
            let formattedDate = dateFormatter.date(from: date)
         {
             publishedAt = formattedDate
-        } else {
+            published = ""
+        } else if published.isNil {
             published = (details["uploadedDate"] ?? details["uploadDate"])?.string ?? ""
         }
 
