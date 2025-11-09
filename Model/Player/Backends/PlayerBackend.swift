@@ -158,6 +158,8 @@ extension PlayerBackend {
 
             logger.info("Stream ID: \($0.id) - Kind: \(String(describing: $0.kind)) - Resolution: \(String(describing: $0.resolution)) - Bitrate: \($0.bitrate ?? 0)")
             logger.info("Is HLS: \(isHLS), Is within resolution: \(isWithinResolution)")
+
+            logger.info("video url: \($0.videoAsset?.url.absoluteString ?? "nil"), audio url: \($0.audioAsset?.url.absoluteString ?? "nil")")
             return !isHLS && isWithinResolution
         }
         logger.info("Non-HLS streams after filtering: \(nonHLSStreams.count)")
