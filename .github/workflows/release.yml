@@ -41,7 +41,7 @@ jobs:
           sed -i '' 's/iPhone Developer/iPhone Distribution/' Yattee.xcodeproj/project.pbxproj
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '26.0.1'
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: ${{ matrix.lane }}
@@ -66,7 +66,7 @@ jobs:
           sed -i '' 's/3rd Party Mac Developer Application/Developer ID Application/' Yattee.xcodeproj/project.pbxproj
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '26.0.1'
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
