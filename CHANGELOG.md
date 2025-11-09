@@ -1,11 +1,25 @@
-## Build 201
+## Build 204
 
 ## What's Changed
+* Fix Invidious companion API endpoint path
+* Fix issues with audio tracks in Piped (crash)
+* Improve MPV backend audio track handling
+* Add Liquid Glass effect to player controls bar
+* Use fullScreenCover for Settings and Accounts on tvOS
+* Improve tvOS settings UI styling and navigation
+* Improve fullscreen orientation handling for iOS player
+* Fix published date handling in Piped API
+* Optimize SwiftUI performance throughout the app
+* Improve search field layout and responsiveness
+* Add localization support for Finnish, Indonesian, Korean, Dutch, and Swedish
+* Update dependencies
+
+## Previous builds
+
+**Build 201:**
 * MPV audio track switching and fix default audio language by @n3d1117 in https://github.com/yattee/yattee/pull/874
 * Feat: Added caption support for Piped backend by @craftycorvid in https://github.com/yattee/yattee/pull/867
 * Translations update from Hosted Weblate by @weblate in https://github.com/yattee/yattee/pull/877
-
-## Previous builds
 * Add support for invidious companion by @lifo9 in https://github.com/yattee/yattee/pull/863
 * Add skip, play/pause, and fullscreen shortcuts to macOS player (by @rickykresslein)
 * Added Settings Import/Export
