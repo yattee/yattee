@@ -21,6 +21,7 @@ struct OpenSettingsButton: View {
         }
         .buttonStyle(.plain)
 
+        // swiftlint:disable:next deployment_target
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             button
                 .buttonStyle(.borderedProminent)

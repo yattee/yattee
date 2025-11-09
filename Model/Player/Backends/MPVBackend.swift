@@ -185,7 +185,7 @@ final class MPVBackend: PlayerBackend {
     var audioSampleRate: String {
         client?.audioSampleRate ?? "unknown"
     }
-    
+
     var availableAudioTracks: [Stream.AudioTrack] {
         stream?.audioTracks ?? []
     }
@@ -331,7 +331,7 @@ final class MPVBackend: PlayerBackend {
                         if stream.selectedAudioTrackIndex >= stream.audioTracks.count {
                             stream.selectedAudioTrackIndex = 0
                         }
-                        
+
                         stream.audioAsset = AVURLAsset(url: stream.audioTracks[stream.selectedAudioTrackIndex].url)
                         let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                         let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
@@ -343,7 +343,7 @@ final class MPVBackend: PlayerBackend {
                     } else {
                         // Fallback for streams without separate audio tracks (e.g., single asset streams)
                         let fileToLoad = stream.videoAsset.url
-                        
+
                         client.loadFile(fileToLoad, bitrate: stream.bitrate, kind: stream.kind, sub: captions?.url, time: time, forceSeekable: stream.kind == .hls) { [weak self] _ in
                             self?.isLoadingVideo = true
                             self?.pause()
@@ -754,7 +754,7 @@ final class MPVBackend: PlayerBackend {
 
     func switchAudioTrack(to index: Int) {
         guard let stream, let video else { return }
-        
+
         // Validate the index is within bounds
         guard index >= 0 && index < stream.audioTracks.count else {
             logger.error("Invalid audio track index: \(index), available tracks: \(stream.audioTracks.count)")

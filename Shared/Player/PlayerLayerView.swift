@@ -12,10 +12,6 @@ import Foundation
             wantsLayer = true
         }}
 
-        override init(frame frameRect: CGRect) {
-            super.init(frame: frameRect)
-        }
-
         override func makeBackingLayer() -> CALayer {
             player.avPlayerBackend.playerLayer
         }
@@ -28,11 +24,12 @@ import Foundation
     final class PlayerLayerView: UIView {
         var player: PlayerModel { .shared }
 
+        private var layerAdded = false
+
+        // swiftlint:disable:next unneeded_override
         override init(frame: CGRect) {
             super.init(frame: frame)
         }
-
-        private var layerAdded = false
 
         @available(*, unavailable)
         required init?(coder _: NSCoder) {

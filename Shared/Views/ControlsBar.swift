@@ -350,9 +350,9 @@ extension View {
             self
         }
     }
-    
+
     @ViewBuilder
-    func applyControlsBackground(enabled: Bool, cornerRadius: CGFloat) -> some View {
+    func applyControlsBackground(enabled: Bool, cornerRadius: Double) -> some View {
         if enabled {
             if #available(iOS 26.0, macOS 26.0, tvOS 26.0, *) {
                 // Use Liquid Glass on iOS 26+
@@ -360,29 +360,30 @@ extension View {
                     .regular.interactive(),
                     in: .rect(cornerRadius: cornerRadius)
                 )
-            } else if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
-                // Fallback to ultraThinMaterial for iOS 15+
-                self
-                    .background(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(.ultraThinMaterial)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
-                    )
             } else {
-                // Fallback for iOS 14 and earlier
-                self
-                    .background(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(Color.black.opacity(0.3))
-                            .blur(radius: 10)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
-                    )
+                // Fallback to ultraThinMaterial
+                // swiftlint:disable:next deployment_target
+                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                    self
+                        .background(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(.ultraThinMaterial)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                        )
+                } else {
+                    self
+                        .background(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(Color.gray.opacity(0.3))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                        )
+                }
             }
         } else {
             self.background(Color.clear)

@@ -136,19 +136,9 @@ struct QualityProfileForm: View {
 
     var formatsFooter: some View {
         VStack(alignment: .leading) {
-            if #available(iOS 16.0, *) {
-                Text("Formats can be reordered and will be selected in this order.")
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else if #available(iOS 14.0, *) {
-                Text("Formats will be selected in the order they are listed.")
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Text("Formats will be selected in the order they are listed.")
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text("Formats can be reordered and will be selected in this order.")
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text("**Note:** HLS is an adaptive format where specific resolution settings don't apply.")
                 .foregroundColor(.secondary)
@@ -252,15 +242,8 @@ struct QualityProfileForm: View {
         #if os(macOS)
             let list = filteredFormatList
 
-            Group {
-                if #available(macOS 12.0, *) {
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list
-                        .listStyle(.inset)
-                }
-            }
+            list
+                .listStyle(.inset(alternatesRowBackgrounds: true))
             Spacer()
         #else
             filteredFormatList

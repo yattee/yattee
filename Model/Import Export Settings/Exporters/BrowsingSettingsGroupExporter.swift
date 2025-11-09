@@ -12,7 +12,7 @@ final class BrowsingSettingsGroupExporter: SettingsGroupExporter {
             "widgetsSettings": Defaults[.widgetsSettings].compactMap { widgetSettingsJSON($0) },
             "startupSection": Defaults[.startupSection].rawValue,
             "showSearchSuggestions": Defaults[.showSearchSuggestions],
-            "visibleSections": Defaults[.visibleSections].compactMap { $0.rawValue },
+            "visibleSections": Defaults[.visibleSections].compactMap(\.rawValue),
             "showOpenActionsToolbarItem": Defaults[.showOpenActionsToolbarItem],
             "accountPickerDisplaysAnonymousAccounts": Defaults[.accountPickerDisplaysAnonymousAccounts],
             "showUnwatchedFeedBadges": Defaults[.showUnwatchedFeedBadges],

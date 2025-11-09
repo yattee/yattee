@@ -100,7 +100,7 @@ extension PlayerModel {
                 streamsMenu,
                 playbackModeMenu,
                 switchToMPVAction
-            ].compactMap { $0 }
+            ].compactMap(\.self)
         #endif
     }
 }

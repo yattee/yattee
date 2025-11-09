@@ -7,6 +7,7 @@ struct ControlBackgroundModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if enabled {
+            // swiftlint:disable:next deployment_target
             if #available(iOS 15, macOS 12, *) {
                 content
                     .background(.thinMaterial)

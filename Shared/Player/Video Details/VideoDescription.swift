@@ -58,28 +58,19 @@ struct VideoDescription: View {
 
     @ViewBuilder var textDescription: some View {
         #if canImport(AppKit)
-            Group {
-                if #available(macOS 12, *) {
-                    DescriptionWithLinks(description: description, detailsSize: detailsSize)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(expand ? 500 : collapsedLinesDescription)
-                        .textSelection(.enabled)
-                } else {
-                    Text(description)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(expand ? 500 : collapsedLinesDescription)
-                }
-            }
-            .multilineTextAlignment(.leading)
-            .font(.system(size: 14))
-            .lineSpacing(3)
-            .allowsHitTesting(expand)
+            DescriptionWithLinks(description: description, detailsSize: detailsSize)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(expand ? 500 : collapsedLinesDescription)
+                .textSelection(.enabled)
+                .multilineTextAlignment(.leading)
+                .font(.system(size: 14))
+                .lineSpacing(3)
+                .allowsHitTesting(expand)
         #endif
     }
 
     // If possibe convert URLs to clickable links
     #if canImport(AppKit)
-        @available(macOS 12, *)
         struct DescriptionWithLinks: View {
             let description: String
             let detailsSize: CGSize?

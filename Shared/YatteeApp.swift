@@ -73,15 +73,15 @@ struct YatteeApp: App {
                 )
             #else
                 .onReceive(
-                        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
-                    ) { _ in
-                        player.handleEnterForeground()
-                    }
-                    .onReceive(
-                        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
-                    ) { _ in
-                        player.handleEnterBackground()
-                    }
+                    NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+                ) { _ in
+                    player.handleEnterForeground()
+                }
+                .onReceive(
+                    NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+                ) { _ in
+                    player.handleEnterBackground()
+                }
             #endif
             #if os(iOS)
             .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))

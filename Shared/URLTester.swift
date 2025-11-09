@@ -73,7 +73,6 @@ enum URLTester {
                 return
             }
 
-            // swiftlint:disable:next non_optional_string_data_conversion
             guard let manifest = String(data: data, encoding: .utf8), !manifest.isEmpty else {
                 Logger(label: "stream.yattee.httpRequest").error("Cannot read or empty HLS manifest")
                 completion([])

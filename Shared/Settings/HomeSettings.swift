@@ -287,11 +287,11 @@ struct FavoriteItemEditorButton<LabelView: View>: View {
                 .padding(7)
                 .frame(minWidth: 40, minHeight: 40)
                 .foregroundColor(color)
-                .accessibilityAddTraits(.isButton)
             #if os(iOS)
                 .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(color))
             #endif
                 .contentShape(Rectangle())
+                .accessibilityAddTraits(.isButton)
                 .onTapGesture(perform: onTapGesture)
         #endif
     }

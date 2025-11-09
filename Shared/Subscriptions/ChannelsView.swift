@@ -190,6 +190,7 @@ struct ChannelsView: View {
 #if os(iOS)
 struct CompactListRowModifier: ViewModifier {
     func body(content: Content) -> some View {
+        // swiftlint:disable:next deployment_target
         if #available(iOS 15.0, *) {
             content
                 .listRowSpacing(0)

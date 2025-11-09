@@ -54,7 +54,8 @@ struct ThumbnailView: View {
     }
 
     @ViewBuilder var asyncImageIfAvailable: some View {
-        if #available(iOS 15, macOS 12, *) {
+        // swiftlint:disable:next deployment_target
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             CachedAsyncImage(url: url, urlCache: BaseCacheModel.imageCache) { phase in
                 switch phase {
                 case let .success(image):
@@ -70,7 +71,7 @@ struct ThumbnailView: View {
                 }
             }
         } else {
-            webImage
+            placeholder
         }
     }
 

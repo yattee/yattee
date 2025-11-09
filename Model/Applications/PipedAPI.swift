@@ -695,10 +695,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         for audioStream in allAudioStreams {
             let trackType = audioStream.dictionaryValue["audioTrackType"]?.string
             let trackLocale = audioStream.dictionaryValue["audioTrackLocale"]?.string
-            
+
             // Create a unique key for this audio track combination
             let key = "\(trackType ?? "ORIGINAL")_\(trackLocale ?? "")"
-            
+
             // Only keep the first (highest bitrate) stream for each unique track type/locale combination
             if audioTracksByType[key] == nil {
                 audioTracksByType[key] = audioStream
@@ -710,25 +710,26 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             guard let url = audioStream.dictionaryValue["url"]?.url else {
                 return nil
             }
-            
+
             let trackType = audioStream.dictionaryValue["audioTrackType"]?.string
             let trackLocale = audioStream.dictionaryValue["audioTrackLocale"]?.string
-            
+
             return Stream.AudioTrack(
                 url: url,
                 content: trackType,
                 language: trackLocale
             )
-        }.sorted { track1, track2 in
+        }
+        .sorted { track1, track2 in
             // Sort: ORIGINAL first, then DUBBED, then others
             if track1.content == "ORIGINAL" && track2.content != "ORIGINAL" {
                 return true
-            } else if track1.content != "ORIGINAL" && track2.content == "ORIGINAL" {
-                return false
-            } else {
-                // If both are same type, sort by language
-                return (track1.language ?? "") < (track2.language ?? "")
             }
+            if track1.content != "ORIGINAL" && track2.content == "ORIGINAL" {
+                return false
+            }
+            // If both are same type, sort by language
+            return (track1.language ?? "") < (track2.language ?? "")
         }
 
         // Fallback to first audio stream if no tracks were extracted
@@ -859,7 +860,7 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             return Chapter(title: title, image: image, start: start)
         }
     }
-    
+
     private func extractCaptions(from content: JSON) -> [Captions] {
         content["subtitles"].arrayValue.compactMap { details in
             guard let url = details["url"].url,
@@ -867,13 +868,13 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
                   let label = details["name"].string,
                   var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
             else { return nil }
-            
+
             components.queryItems = components.queryItems?.map { item in
                 item.name == "fmt" ? URLQueryItem(name: "fmt", value: "srt") : item
             }
-            
+
             guard let newUrl = components.url else { return nil }
-            
+
             return Captions(label: label, code: code, url: newUrl)
         }
     }

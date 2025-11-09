@@ -150,10 +150,8 @@ enum Constants {
         let iOS15 = [5]
         let iconName = "go\(type).\(interval)"
 
-        if #available(iOS 15, macOS 12, *) {
-            if iOS15.contains(interval) {
-                return iconName
-            }
+        if iOS15.contains(interval) {
+            return iconName
         }
 
         if allVersions.contains(interval) {

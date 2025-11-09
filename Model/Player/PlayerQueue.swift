@@ -321,7 +321,7 @@ extension PlayerModel {
         }
 
         restoredQueue.append(contentsOf: Defaults[.queue])
-        queue = restoredQueue.compactMap { $0 }
+        queue = restoredQueue.compactMap(\.self)
         queue.forEach { loadQueueVideoDetails($0) }
     }
 

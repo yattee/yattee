@@ -48,11 +48,12 @@ struct PopularView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .refreshControl { refreshControl in
-            resource?.load().onCompletion { _ in
-                refreshControl.endRefreshing()
-            }
-            .onFailure { self.error = $0 }
-            .onSuccess { _ in self.error = nil }
+            resource?.load()
+                .onCompletion { _ in
+                    refreshControl.endRefreshing()
+                }
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
         }
         .backport
         .refreshable {
@@ -80,10 +81,10 @@ struct PopularView: View {
         }
         #else
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    resource?.loadIfNeeded()?
-                        .onFailure { self.error = $0 }
-                        .onSuccess { _ in self.error = nil }
-                }
+            resource?.loadIfNeeded()?
+                .onFailure { self.error = $0 }
+                .onSuccess { _ in self.error = nil }
+        }
         #endif
     }
 

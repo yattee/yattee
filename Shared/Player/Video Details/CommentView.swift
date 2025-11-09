@@ -7,7 +7,7 @@ import SwiftUI
 struct CommentView: View {
     let comment: Comment
     @Binding var repliesID: Comment.ID?
-    var availableWidth: CGFloat
+    var availableWidth: Double
 
     @State private var subscribed = false
 
@@ -228,27 +228,20 @@ struct CommentView: View {
     private var commentText: some View {
         Group {
             let rawText = comment.text
-            if #available(iOS 15.0, macOS 12.0, *) {
-                #if os(iOS)
-                    ActiveLabelCommentRepresentable(
-                        text: rawText,
-                        availableWidth: availableWidth
-                    )
-                #elseif os(macOS)
-                    Text(rawText)
-                        .font(.system(size: 14))
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .textSelection(.enabled)
-                #else
-                    Text(comment.text)
-                #endif
-            } else {
+            #if os(iOS)
+                ActiveLabelCommentRepresentable(
+                    text: rawText,
+                    availableWidth: availableWidth
+                )
+            #elseif os(macOS)
                 Text(rawText)
-                    .font(.system(size: 15))
+                    .font(.system(size: 14))
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-            }
+                    .textSelection(.enabled)
+            #else
+                Text(comment.text)
+            #endif
         }
     }
 
@@ -263,7 +256,7 @@ struct CommentView: View {
 #if os(iOS)
     struct ActiveLabelCommentRepresentable: UIViewRepresentable {
         var text: String
-        var availableWidth: CGFloat
+        var availableWidth: Double
 
         @State private var label = ActiveLabel()
 

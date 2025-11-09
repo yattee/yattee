@@ -5,7 +5,8 @@ extension Backport where Content: View {
         #if os(tvOS)
             content
         #else
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+            // swiftlint:disable:next deployment_target
+            if #available(iOS 15.0, macOS 12.0, *) {
                 content.badge(count)
             } else {
                 content

@@ -38,6 +38,7 @@ struct CommentsView: View {
 
 struct CommentsView_Previews: PreviewProvider {
     static var previews: some View {
+        // swiftlint:disable:next deployment_target
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
             CommentsView()
                 .previewInterfaceOrientation(.landscapeRight)

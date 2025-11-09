@@ -2,7 +2,8 @@ import SwiftUI
 
 extension Backport where Content: View {
     @ViewBuilder func tint(_ color: Color?) -> some View {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+        // swiftlint:disable:next deployment_target
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, *) {
             content.tint(color)
         } else {
             content.foregroundColor(color)

@@ -257,6 +257,7 @@ final class PlayerModel: ObservableObject {
         pipController = .init(playerLayer: avPlayerBackend.playerLayer)
         pipController?.delegate = pipDelegate
         #if os(iOS)
+            // swiftlint:disable:next deployment_target
             if #available(iOS 14.2, *) {
                 pipController?.canStartPictureInPictureAutomaticallyFromInline = true
             }
@@ -1037,7 +1038,7 @@ final class PlayerModel: ObservableObject {
     #else
         func handleEnterForeground() {
             DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 if !self.musicMode, self.activeBackend == .mpv {
                     self.mpvBackend.addVideoTrackFromStream()
@@ -1329,6 +1330,7 @@ final class PlayerModel: ObservableObject {
             // Check availability for iOS 14.5 or newer to handle interruption reason
             // Currently only for debugging purpose
             #if os(iOS)
+                // swiftlint:disable:next deployment_target
                 if #available(iOS 14.5, *) {
                     // Extract the interruption reason, if available
                     if let reasonValue = info[AVAudioSessionInterruptionReasonKey] as? UInt,

@@ -10,7 +10,7 @@ struct SponsorBlockSettingsGroupImporter {
         }
 
         if let sponsorBlockCategories = json["sponsorBlockCategories"].array {
-            Defaults[.sponsorBlockCategories] = Set(sponsorBlockCategories.compactMap { $0.string })
+            Defaults[.sponsorBlockCategories] = Set(sponsorBlockCategories.compactMap(\.string))
         }
 
         if let sponsorBlockColors = json["sponsorBlockColors"].dictionary {

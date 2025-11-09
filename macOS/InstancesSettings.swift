@@ -71,12 +71,8 @@ struct InstancesSettings: View {
                     }
                 }
 
-                if #available(macOS 12.0, *) {
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list
-                }
+                list
+                    .listStyle(.inset(alternatesRowBackgrounds: true))
             }
 
             if selectedInstance != nil, selectedInstance.app.hasFrontendURL {

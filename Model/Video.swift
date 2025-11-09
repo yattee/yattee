@@ -155,7 +155,7 @@ struct Video: Identifiable, Equatable, Hashable {
             "description": description ?? "",
             "genre": genre ?? "",
             "channel": channel.json.object,
-            "thumbnails": thumbnails.compactMap { $0.json.object },
+            "thumbnails": thumbnails.compactMap(\.json.object),
             "indexID": indexID ?? "",
             "live": live,
             "upcoming": upcoming,

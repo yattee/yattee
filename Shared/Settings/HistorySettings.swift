@@ -221,12 +221,12 @@ struct HistorySettings: View {
                     .labelStyle(.iconOnly)
                     .padding(7)
                     .foregroundColor(limitRecents ? .accentColor : .gray)
-                    .accessibilityAddTraits(.isButton)
                 #if os(iOS)
                     .frame(minHeight: 35)
                     .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                 #endif
                     .contentShape(Rectangle())
+                    .accessibilityAddTraits(.isButton)
                     .onTapGesture {
                         value.wrappedValue -= 1
                     }
@@ -253,11 +253,11 @@ struct HistorySettings: View {
                     .labelStyle(.iconOnly)
                     .padding(7)
                     .foregroundColor(limitRecents ? .accentColor : .gray)
-                    .accessibilityAddTraits(.isButton)
                 #if os(iOS)
                     .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                 #endif
                     .contentShape(Rectangle())
+                    .accessibilityAddTraits(.isButton)
                     .onTapGesture {
                         value.wrappedValue += 1
                     }

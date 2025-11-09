@@ -182,17 +182,13 @@ struct ChannelVideosView: View {
         #endif
 
         return Group {
-            if #available(macOS 12.0, *) {
-                content
-                #if os(tvOS)
-                .background(Color.background(scheme: colorScheme))
-                #endif
-                #if !os(iOS)
-                .focusScope(focusNamespace)
-                #endif
-            } else {
-                content
-            }
+            content
+            #if os(tvOS)
+            .background(Color.background(scheme: colorScheme))
+            #endif
+            #if !os(iOS)
+            .focusScope(focusNamespace)
+            #endif
         }
     }
 

@@ -114,6 +114,7 @@ import SwiftUI
         func setupController() {
             controller.delegate = PlayerModel.shared.appleAVPlayerViewControllerDelegate
             controller.allowsPictureInPicturePlayback = true
+            // swiftlint:disable:next deployment_target
             if #available(iOS 14.2, *) {
                 controller.canStartPictureInPictureAutomaticallyFromInline = true
             }

@@ -156,7 +156,7 @@ struct PlayerControlsSettings: View {
             Text("System controls buttons")
                 .font(.headline)
                 .padding(.vertical, 8)
-            
+
             Button(action: { systemControlsCommands = .seek }) {
                 HStack {
                     Text(labelText("Seek".localized()))
@@ -170,8 +170,8 @@ struct PlayerControlsSettings: View {
             }
             .buttonStyle(.plain)
             .padding(.vertical, 4)
-            
-            Button(action: { 
+
+            Button(action: {
                 systemControlsCommands = .restartAndAdvanceToNext
                 player.updateRemoteCommandCenter()
             }) {
@@ -301,12 +301,12 @@ struct PlayerControlsSettings: View {
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
-                        .accessibilityAddTraits(.isButton)
                     #if os(iOS)
                         .frame(minHeight: 35)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                     #endif
                         .contentShape(Rectangle())
+                        .accessibilityAddTraits(.isButton)
                         .onTapGesture {
                             var intValue = Int(value.wrappedValue) ?? 10
                             intValue -= 5
@@ -337,11 +337,11 @@ struct PlayerControlsSettings: View {
                         .labelStyle(.iconOnly)
                         .padding(7)
                         .foregroundColor(.accentColor)
-                        .accessibilityAddTraits(.isButton)
                     #if os(iOS)
                         .background(RoundedRectangle(cornerRadius: 4).strokeBorder(lineWidth: 1).foregroundColor(.accentColor))
                     #endif
                         .contentShape(Rectangle())
+                        .accessibilityAddTraits(.isButton)
                         .onTapGesture {
                             var intValue = Int(value.wrappedValue) ?? 10
                             intValue += 5

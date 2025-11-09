@@ -16,10 +16,11 @@ struct TrendingCountry: View {
         VStack {
             #if !os(tvOS)
                 HStack {
+                    // swiftlint:disable:next deployment_target
                     if #available(iOS 15.0, macOS 12.0, *) {
                         TextField("Country", text: $query, prompt: Text(Self.prompt))
                     } else {
-                        TextField(Self.prompt, text: $query)
+                        TextField("Country", text: $query)
                     }
 
                     Button("Done") { selectCountryAndDismiss() }
@@ -57,12 +58,8 @@ struct TrendingCountry: View {
 
         return Group {
             #if os(macOS)
-                if #available(macOS 12.0, *) {
-                    list
-                        .listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list
-                }
+                list
+                    .listStyle(.inset(alternatesRowBackgrounds: true))
             #else
                 list
             #endif

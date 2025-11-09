@@ -9,7 +9,6 @@ final class UnwatchedFeedCountModel: ObservableObject {
 
     private var accounts = AccountsModel.shared
 
-    // swiftlint:disable empty_count
     var unwatchedText: Text? {
         if let account = accounts.current,
            !account.anonymous,
@@ -32,5 +31,4 @@ final class UnwatchedFeedCountModel: ObservableObject {
         }
         return nil
     }
-    // swiftlint:enable empty_count
 }

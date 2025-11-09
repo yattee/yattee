@@ -84,13 +84,14 @@ struct AdvancedSettings: View {
                     Text("cache-pause-initial")
                     #if !os(tvOS)
                         Image(systemName: "link")
-                            .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
                         #if os(iOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
                             }
                         #elseif os(macOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-initial")!)
                             }
@@ -104,13 +105,14 @@ struct AdvancedSettings: View {
                 Text("cache-secs")
                 #if !os(tvOS)
                     Image(systemName: "link")
-                        .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
                     #if os(iOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
                         }
                     #elseif os(macOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-secs")!)
                         }
@@ -130,13 +132,14 @@ struct AdvancedSettings: View {
                     Text("cache-pause-wait")
                     #if !os(tvOS)
                         Image(systemName: "link")
-                            .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
                         #if os(iOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
                             }
                         #elseif os(macOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-cache-pause-wait")!)
                             }
@@ -157,13 +160,14 @@ struct AdvancedSettings: View {
                     Text("deinterlace")
                     #if !os(tvOS)
                         Image(systemName: "link")
-                            .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
                         #if os(iOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
                             }
                         #elseif os(macOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-deinterlace")!)
                             }
@@ -178,13 +182,14 @@ struct AdvancedSettings: View {
                     Text("initial-audio-sync")
                     #if !os(tvOS)
                         Image(systemName: "link")
-                            .accessibilityAddTraits([.isButton, .isLink])
                             .font(.footnote)
                         #if os(iOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-initial-audio-sync")!)
                             }
                         #elseif os(macOS)
+                            .accessibilityAddTraits([.isButton, .isLink])
                             .onTapGesture {
                                 NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-initial-audio-sync")!)
                             }
@@ -199,13 +204,14 @@ struct AdvancedSettings: View {
 
                 #if !os(tvOS)
                     Image(systemName: "link")
-                        .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
                     #if os(iOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
                         }
                     #elseif os(macOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-hwdec")!)
                         }
@@ -228,13 +234,14 @@ struct AdvancedSettings: View {
 
                 #if !os(tvOS)
                     Image(systemName: "link")
-                        .accessibilityAddTraits([.isButton, .isLink])
                         .font(.footnote)
                     #if os(iOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             UIApplication.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
                         }
                     #elseif os(macOS)
+                        .accessibilityAddTraits([.isButton, .isLink])
                         .onTapGesture {
                             NSWorkspace.shared.open(URL(string: "https://mpv.io/manual/stable/#options-demuxer-lavf-probe-info")!)
                         }

@@ -57,13 +57,8 @@ struct SearchView: View {
                 .environment(\.listingStyle, searchListingStyle)
                 .toolbar {
                     ToolbarItem(placement: .principal) {
-                        if #available(iOS 15, *) {
-                            FocusableSearchTextField()
-                                .frame(width: searchFieldWidth(geometry.size.width))
-                        } else {
-                            SearchTextField()
-                                .frame(width: searchFieldWidth(geometry.size.width))
-                        }
+                        FocusableSearchTextField()
+                            .frame(width: searchFieldWidth(geometry.size.width))
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         searchMenu
@@ -227,11 +222,7 @@ struct SearchView: View {
                         filtersMenu
                     }
 
-                    if #available(macOS 12, *) {
-                        FocusableSearchTextField()
-                    } else {
-                        SearchTextField()
-                    }
+                    FocusableSearchTextField()
                 }
             }
             .onAppear {
@@ -650,21 +641,21 @@ struct SearchView: View {
     }
 
     #if os(iOS)
-    private func searchFieldWidth(_ viewWidth: CGFloat) -> CGFloat {
+    private func searchFieldWidth(_ viewWidth: Double) -> Double {
         // Base padding for internal SearchTextField padding (16pt each side = 32 total)
-        var totalDeduction: CGFloat = 32
-        
+        var totalDeduction: Double = 32
+
         // Add space for trailing menu button
         totalDeduction += 44
-        
+
         // Add space for sidebar toggle button if in sidebar navigation style
         if navigationStyle == .sidebar {
             totalDeduction += 44
         }
-        
+
         // Minimum width to ensure usability
-        let minWidth: CGFloat = 200
-        
+        let minWidth: Double = 200
+
         return max(minWidth, viewWidth - totalDeduction)
     }
     #endif

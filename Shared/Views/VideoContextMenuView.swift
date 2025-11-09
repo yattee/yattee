@@ -309,7 +309,8 @@ struct VideoContextMenuView: View {
             let label = Label("Remove…", systemImage: "trash.fill")
                 .foregroundColor(Color("AppRedColor"))
 
-            if #available(iOS 15, macOS 12, *) {
+            // swiftlint:disable:next deployment_target
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
                 Button(role: .destructive, action: action) { label }
             } else {
                 Button(action: action) { label }

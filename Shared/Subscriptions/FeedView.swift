@@ -110,8 +110,7 @@ struct FeedView: View {
                 VStack {
                     Text("Channels")
                         .font(.subheadline)
-                    if #available(tvOS 17.0, *) {
-                        List(selection: $selectedChannel) {
+                    List(selection: $selectedChannel) {
                             Button(action: {
                                 self.selectedChannel = nil
                                 self.feedChannelsViewVisible = false
@@ -156,8 +155,8 @@ struct FeedView: View {
                                 .buttonStyle(PlainButtonStyle())
                                 .focused(self.$focusedChannel, equals: channel.id)
                             }
-                        }
-                        .onChange(of: self.focusedChannel) {
+                    }
+                    .onChange(of: self.focusedChannel) {
                             if self.focusedChannel == "all" {
                                 withAnimation {
                                     self.selectedChannel = nil
@@ -171,18 +170,17 @@ struct FeedView: View {
                                     }
                                 }
                             }
-                        }
-                        .onAppear {
+                    }
+                    .onAppear {
                             guard let selectedChannel = self.selectedChannel else {
                                 return
                             }
                             proxy.scrollTo(selectedChannel, anchor: .top)
-                        }
-                        .onExitCommand {
+                    }
+                    .onExitCommand {
                             withAnimation {
                                 self.feedChannelsViewVisible = false
                             }
-                        }
                     }
                 }
             }
@@ -218,30 +216,28 @@ struct FeedView: View {
         #if !os(macOS)
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 feed.loadResources()
-        }
+            }
         #endif
     }
 
     var header: some View {
         HStack(spacing: 16) {
             #if os(tvOS)
-                if #available(tvOS 17.0, *) {
-                    Menu {
-                        accountsPicker
-                    } label: {
-                        Label("Channels", systemImage: "filemenu.and.selection")
-                            .labelStyle(.iconOnly)
-                            .imageScale(.small)
-                            .font(.caption)
-                    } primaryAction: {
-                        withAnimation {
-                            self.feedChannelsViewVisible = true
-                            self.focusedChannel = selectedChannel?.id ?? "all"
-                        }
+                Menu {
+                    accountsPicker
+                } label: {
+                    Label("Channels", systemImage: "filemenu.and.selection")
+                        .labelStyle(.iconOnly)
+                        .imageScale(.small)
+                        .font(.caption)
+                } primaryAction: {
+                    withAnimation {
+                        self.feedChannelsViewVisible = true
+                        self.focusedChannel = selectedChannel?.id ?? "all"
                     }
-                    .opacity(feedChannelsViewVisible ? 0 : 1)
-                    .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 }
+                .opacity(feedChannelsViewVisible ? 0 : 1)
+                .frame(minWidth: feedChannelsViewVisible ? 0 : nil, maxWidth: feedChannelsViewVisible ? 0 : nil)
                 channelHeaderView
                 if selectedChannel == nil {
                     Spacer()

@@ -29,6 +29,7 @@ enum Orientation {
 
         logger.info("rotating to \(orientationString)")
 
+        // swiftlint:disable:next deployment_target
         if #available(iOS 16, *) {
             guard let windowScene = Self.scene else { return }
             let rotateOrientationMask = rotateOrientation == .portrait ? UIInterfaceOrientationMask.portrait :

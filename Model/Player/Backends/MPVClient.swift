@@ -354,7 +354,7 @@ final class MPVClient: ObservableObject {
     func areSubtitlesAdded() async -> Bool {
         guard !mpv.isNil else { return false }
 
-        let trackCount = await Task(operation: { getInt("track-list/count") }).value
+        let trackCount = await Task { getInt("track-list/count") }.value
         guard trackCount > 0 else { return false }
 
         for index in 0 ..< trackCount {

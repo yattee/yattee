@@ -502,7 +502,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             publishedAt: publishedAt,
             likes: json["likeCount"].int,
             dislikes: json["dislikeCount"].int,
-            keywords: json["keywords"].arrayValue.compactMap { $0.string },
+            keywords: json["keywords"].arrayValue.compactMap(\.string),
             streams: extractStreams(from: json),
             related: extractRelated(from: json),
             chapters: createChapters(from: description, thumbnails: json),
