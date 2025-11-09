@@ -13,10 +13,21 @@ struct ContentItemView: View {
 
     init(item: ContentItem) {
         self.item = item
-        if item.contentType == .video, let video = item.video {
-            _watchRequest = video.watchFetchRequest
+        // Only create FetchRequest for video items, not for all items
+        if item.contentType == .video, let videoID = item.video?.videoID {
+            let predicate = NSPredicate(format: "videoID = %@", videoID as CVarArg)
+            _watchRequest = FetchRequest<Watch>(
+                sortDescriptors: [],
+                predicate: predicate,
+                animation: .default
+            )
         } else {
-            _watchRequest = Video.fixture.watchFetchRequest
+            // Empty fetch request for non-video items
+            _watchRequest = FetchRequest<Watch>(
+                sortDescriptors: [],
+                predicate: NSPredicate(value: false),
+                animation: .default
+            )
         }
     }
 

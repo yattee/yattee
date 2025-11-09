@@ -115,30 +115,40 @@ struct HomeView: View {
             #endif
         }
         .onAppear {
-            Task {
-                for await _ in Defaults.updates(.favorites) {
-                    favoritesChanged.toggle()
-                }
-                for await _ in Defaults.updates(.widgetsSettings) {
-                    favoritesChanged.toggle()
-                }
+            updateTask = Task {
+                async let favoritesUpdates: Void = {
+                    for await _ in Defaults.updates(.favorites) {
+                        favoritesChanged.toggle()
+                    }
+                }()
+                async let widgetsUpdates: Void = {
+                    for await _ in Defaults.updates(.widgetsSettings) {
+                        favoritesChanged.toggle()
+                    }
+                }()
+                _ = await (favoritesUpdates, widgetsUpdates)
             }
         }
         .onDisappear {
             updateTask?.cancel()
         }
 
-        .onChange(of: player.presentingPlayer) { _ in
-            if player.presentingPlayer {
+        .onChange(of: player.presentingPlayer) { presenting in
+            if presenting {
                 updateTask?.cancel()
             } else {
-                Task {
-                    for await _ in Defaults.updates(.favorites) {
-                        favoritesChanged.toggle()
-                    }
-                    for await _ in Defaults.updates(.widgetsSettings) {
-                        favoritesChanged.toggle()
-                    }
+                updateTask = Task {
+                    async let favoritesUpdates: Void = {
+                        for await _ in Defaults.updates(.favorites) {
+                            favoritesChanged.toggle()
+                        }
+                    }()
+                    async let widgetsUpdates: Void = {
+                        for await _ in Defaults.updates(.widgetsSettings) {
+                            favoritesChanged.toggle()
+                        }
+                    }()
+                    _ = await (favoritesUpdates, widgetsUpdates)
                 }
             }
         }

@@ -5,16 +5,14 @@ import SwiftUI
 struct ThumbnailView: View {
     var url: URL?
     private let thumbnails = ThumbnailsModel.shared
+    private let thumbnailExtension: String?
 
-    var body: some View {
-        if url != nil {
-            viewForThumbnailExtension
-        } else {
-            placeholder
-        }
+    init(url: URL?) {
+        self.url = url
+        self.thumbnailExtension = Self.extractExtension(from: url)
     }
 
-    var thumbnailExtension: String? {
+    private static func extractExtension(from url: URL?) -> String? {
         guard let url,
               let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
 
@@ -22,6 +20,14 @@ struct ThumbnailView: View {
         guard pathComponents.count > 1 else { return nil }
 
         return pathComponents.last
+    }
+
+    var body: some View {
+        if url != nil {
+            viewForThumbnailExtension
+        } else {
+            placeholder
+        }
     }
 
     @ViewBuilder var viewForThumbnailExtension: some View {

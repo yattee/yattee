@@ -15,16 +15,27 @@ struct FeedView: View {
     #endif
 
     var videos: [ContentItem] {
+        let feedVideos = feed.videos
         guard let selectedChannel else {
-            return ContentItem.array(of: feed.videos)
+            return ContentItem.array(of: feedVideos)
         }
-        return ContentItem.array(of: feed.videos.filter {
-            $0.channel.id == selectedChannel.id
-        })
+        return ContentItem.array(of: feedVideos.filter { $0.channel.id == selectedChannel.id })
     }
 
     var channels: [Channel] {
-        feed.videos.map(\.channel).unique()
+        // Optimize by using a Set for uniqueness instead of calling .unique()
+        var seenIds = Set<String>()
+        var uniqueChannels = [Channel]()
+        uniqueChannels.reserveCapacity(feed.videos.count / 10) // Estimate
+
+        for video in feed.videos {
+            let channelId = video.channel.id
+            if !seenIds.contains(channelId) {
+                seenIds.insert(channelId)
+                uniqueChannels.append(video.channel)
+            }
+        }
+        return uniqueChannels
     }
 
     @State private var selectedChannel: Channel?

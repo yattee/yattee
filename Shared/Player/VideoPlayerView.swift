@@ -28,7 +28,7 @@ struct VideoPlayerView: View {
         #endif
     }
 
-    @State private var playerSize: CGSize = .zero { didSet { updateSidebarQueue() } }
+    @State private var playerSize: CGSize = .zero
     @State private var hoveringPlayer = false
     @State private var sidebarQueue = defaultSidebarQueueValue
 
@@ -104,14 +104,16 @@ struct VideoPlayerView: View {
                 content
                     .onAppear {
                         playerSize = geometry.size
+                        updateSidebarQueue()
                     }
             }
             .ignoresSafeArea(.all, edges: .bottom)
             #if os(iOS)
                 .frame(height: playerHeight.isNil ? nil : Double(playerHeight!))
             #endif
-                .onChange(of: geometry.size) { _ in
-                    self.playerSize = geometry.size
+                .onChange(of: geometry.size) { newSize in
+                    self.playerSize = newSize
+                    updateSidebarQueue()
                 }
             #if os(iOS)
                 .onChange(of: player.presentingPlayer) { newValue in

@@ -475,18 +475,14 @@ struct VideoCell: View {
 
 struct VideoCellThumbnail: View {
     let video: Video
-    @ObservedObject private var thumbnails = ThumbnailsModel.shared
+    private var thumbnails: ThumbnailsModel { .shared }
 
     var body: some View {
-        GeometryReader { geometry in
-            let (url, quality) = thumbnails.best(video)
-            let aspectRatio = (quality == .default || quality == .high) ? Constants.aspectRatio4x3 : Constants.aspectRatio16x9
+        let (url, quality) = thumbnails.best(video)
+        let aspectRatio = (quality == .default || quality == .high) ? Constants.aspectRatio4x3 : Constants.aspectRatio16x9
 
-            ThumbnailView(url: url)
-                .aspectRatio(aspectRatio, contentMode: .fill)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
-        }
+        ThumbnailView(url: url)
+            .aspectRatio(aspectRatio, contentMode: .fill)
     }
 }
 

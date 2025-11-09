@@ -197,13 +197,22 @@ struct FavoriteItemView: View {
     }
 
     var limitedItems: [ContentItem] {
-        var items: [ContentItem]
+        let limit = favoritesModel.limit(item)
         if item.section == .history {
-            items = visibleWatches.map { ContentItem(video: player.historyVideo($0.videoID) ?? $0.video) }
+            return Array(visibleWatches.prefix(limit).map { ContentItem(video: player.historyVideo($0.videoID) ?? $0.video) })
         } else {
-            items = store.contentItems.filter { itemVisible($0) }
+            var result = [ContentItem]()
+            result.reserveCapacity(min(store.contentItems.count, limit))
+            for contentItem in store.contentItems {
+                if itemVisible(contentItem) {
+                    result.append(contentItem)
+                    if result.count >= limit {
+                        break
+                    }
+                }
+            }
+            return result
         }
-        return Array(items.prefix(favoritesModel.limit(item)))
     }
 
     func itemVisible(_ item: ContentItem) -> Bool {

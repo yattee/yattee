@@ -57,7 +57,9 @@ struct VerticalCells<Header: View>: View {
     }
 
     var contentItems: [ContentItem] {
-        items.isEmpty ? (allowEmpty ? items : ContentItem.placeholders) : items.sorted { $0 < $1 }
+        // Avoid sorting on every redraw - items should already be sorted from the source
+        // If sorting is truly needed, it should be done once in the model, not in the view
+        items.isEmpty ? (allowEmpty ? items : ContentItem.placeholders) : items
     }
 
     func loadMoreContentItemsIfNeeded(current item: ContentItem) {
