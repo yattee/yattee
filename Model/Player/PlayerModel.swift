@@ -1182,19 +1182,16 @@ final class PlayerModel: ObservableObject {
                 }
                 let lockOrientation = rotateToLandscapeOnEnterFullScreen.interfaceOrientation
                 if currentVideoIsLandscape {
-                    if initiatedByButton {
-                        Orientation.lockOrientation(isOrientationLocked
-                            ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
-                            : .landscape)
-                    }
-                    let orientation = OrientationTracker.shared.currentDeviceOrientation.isLandscape
-                        ? OrientationTracker.shared.currentInterfaceOrientation
-                        : rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+                    let orientation = initiatedByButton
+                        ? rotateToLandscapeOnEnterFullScreen.interfaceOrientation
+                        : (OrientationTracker.shared.currentDeviceOrientation.isLandscape
+                            ? OrientationTracker.shared.currentInterfaceOrientation
+                            : rotateToLandscapeOnEnterFullScreen.interfaceOrientation)
 
                     Orientation.lockOrientation(
                         isOrientationLocked
                             ? (lockOrientation == .landscapeRight ? .landscapeRight : .landscapeLeft)
-                            : .all,
+                            : (initiatedByButton ? .landscape : .all),
                         andRotateTo: orientation
                     )
                 }
