@@ -54,6 +54,7 @@ struct PlaybackSettings: View {
                     Spacer()
                         .frame(maxWidth: 50, alignment: .trailing)
                 }
+                .padding(.top, 10)
 
                 HStack {
                     controlsHeader("Playback Mode".localized())
