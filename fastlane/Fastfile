@@ -270,6 +270,7 @@ platform :mac do
       package: "fastlane/builds/#{version}-#{build}/macOS/#{APP_NAME}.app",
       bundle_id: "#{DEVELOPER_APP_IDENTIFIER}",
       api_key: api_key,
+      print_log: true
     )
   end
 end
