@@ -3,6 +3,9 @@ import SwiftUI
 struct AccountsView: View {
     @StateObject private var model = AccountsViewModel()
     @Environment(\.presentationMode) private var presentationMode
+    #if os(tvOS)
+    @Environment(\.colorScheme) private var colorScheme
+    #endif
 
     var body: some View {
         #if os(macOS)
@@ -28,6 +31,7 @@ struct AccountsView: View {
             }
             #if os(tvOS)
             .frame(maxWidth: 1000)
+            .background(Color.background(scheme: colorScheme).ignoresSafeArea())
             #endif
         #endif
     }

@@ -43,7 +43,7 @@ struct HomeView: View {
                             AccentButton(imageSystemName: "ellipsis") {
                                 NavigationModel.shared.presentingOpenVideos = true
                             }
-                            .frame(maxWidth: 40)	
+                            .frame(maxWidth: 40)
                         }
                     }
                 #endif

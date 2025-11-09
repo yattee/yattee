@@ -63,17 +63,29 @@ struct ContentView: View {
                 WelcomeScreen()
             }
         )
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $navigation.presentingSettings) {
+            SettingsView()
+        }
+        #else
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingSettings) {
                 SettingsView()
             }
         )
+        #endif
         .modifier(ImportSettingsSheetViewModifier(isPresented: $navigation.presentingSettingsImportSheet, settingsFile: $navigation.settingsImportURL))
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $navigation.presentingAccounts) {
+            AccountsView()
+        }
+        #else
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingAccounts) {
                 AccountsView()
             }
         )
+        #endif
         .background(
             EmptyView().sheet(isPresented: $navigation.presentingHomeSettings) {
                 #if os(macOS)

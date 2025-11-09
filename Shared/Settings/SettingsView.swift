@@ -134,6 +134,9 @@ struct SettingsView: View {
                 settingsList
                     .navigationTitle("Settings")
             }
+            #if os(tvOS)
+            .background(Color.background(scheme: colorScheme).ignoresSafeArea())
+            #endif
         #endif
     }
 
