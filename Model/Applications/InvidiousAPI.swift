@@ -669,7 +669,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             }
             let finalURL: URL
             if let videoId, let itag = stream["itag"].string, account.instance.invidiousCompanion {
-                let companionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(itag)"
+                let companionURLString = "\(account.instance.apiURLString)/companion/latest_version?id=\(videoId)&itag=\(itag)"
                 finalURL = URL(string: companionURLString) ?? streamURL
             } else {
                 finalURL = streamURL
@@ -721,7 +721,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
                 let finalURL: URL
                 if let videoId, account.instance.invidiousCompanion {
-                    let audioCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(audioItag)"
+                    let audioCompanionURLString = "\(account.instance.apiURLString)/companion/latest_version?id=\(videoId)&itag=\(audioItag)"
                     finalURL = URL(string: audioCompanionURLString) ?? url
                 } else {
                     finalURL = url
@@ -755,7 +755,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             let finalVideoURL: URL
 
             if let videoId, account.instance.invidiousCompanion {
-                let videoCompanionURLString = "\(account.instance.apiURLString)/latest_version?id=\(videoId)&itag=\(videoItag)"
+                let videoCompanionURLString = "\(account.instance.apiURLString)/companion/latest_version?id=\(videoId)&itag=\(videoItag)"
                 finalVideoURL = URL(string: videoCompanionURLString) ?? videoAssetURL
             } else {
                 finalVideoURL = videoAssetURL
