@@ -22,7 +22,9 @@ struct LocationsSettings: View {
                 List {
                     settings
                 }
-                #if os(iOS)
+                #if os(tvOS)
+                .listStyle(.plain)
+                #elseif os(iOS)
                 .listStyle(.insetGrouped)
                 #endif
             #endif
@@ -42,6 +44,8 @@ struct LocationsSettings: View {
             InstanceForm(savedInstanceID: $savedFormInstanceID)
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1000)
         #endif
         .navigationTitle("Locations")

@@ -23,9 +23,14 @@ struct SponsorBlockSettings: View {
                 List {
                     sections
                 }
+                #if os(tvOS)
+                .listStyle(.plain)
+                #endif
             #endif
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1000)
         #else
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)

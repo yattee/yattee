@@ -31,7 +31,9 @@ struct AdvancedSettings: View {
                 List {
                     advancedSettings
                 }
-                #if os(iOS)
+                #if os(tvOS)
+                .listStyle(.plain)
+                #elseif os(iOS)
                 .sheet(isPresented: $presentingShareSheet) {
                     ShareSheet(activityItems: filesToShare)
                         .id("logs-\(filesToShare.count)")
@@ -41,6 +43,8 @@ struct AdvancedSettings: View {
             #endif
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1000)
         #endif
         .navigationTitle("Advanced")

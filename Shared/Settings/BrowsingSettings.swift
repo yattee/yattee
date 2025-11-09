@@ -52,10 +52,14 @@ struct BrowsingSettings: View {
                 }
                 #if os(iOS)
                 .listStyle(.insetGrouped)
+                #elseif os(tvOS)
+                .listStyle(.plain)
                 #endif
             #endif
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1200)
         #else
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -111,6 +115,9 @@ struct BrowsingSettings: View {
                     NavigationLink(destination: LazyView(HomeSettings())) {
                         Text("Home Settings")
                     }
+                    #if os(tvOS)
+                    .buttonStyle(.plain)
+                    #endif
                 #endif
             }
         }

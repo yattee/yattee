@@ -941,6 +941,9 @@
 		37E04C0F275940FB00172673 /* VerticalScrollingFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */; };
 		37E084AC2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */; };
 		37E084AD2753D95F00039B7D /* AccountsNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */; };
+		37E32DD52EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */; };
+		37E32DD62EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */; };
+		37E32DD72EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */; };
 		37E64DD126D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
 		37E64DD226D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
 		37E64DD326D597EB00C71877 /* SubscribedChannelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */; };
@@ -1502,6 +1505,7 @@
 		37E04C0E275940FB00172673 /* VerticalScrollingFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalScrollingFix.swift; sourceTree = "<group>"; };
 		37E084AB2753D95F00039B7D /* AccountsNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsNavigationLink.swift; sourceTree = "<group>"; };
 		37E21DC52CDE528A008DF47C /* ta */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ta; path = ta.lproj/Localizable.strings; sourceTree = "<group>"; };
+		37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVOSPlainToggleStyle.swift; sourceTree = "<group>"; };
 		37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedChannelsModel.swift; sourceTree = "<group>"; };
 		37E6D79B2944AE1A00550C3D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStatusHeader.swift; sourceTree = "<group>"; };
@@ -1937,6 +1941,7 @@
 				376BE50627347B57009AD608 /* SettingsHeader.swift */,
 				37B044B626F7AB9000E1419D /* SettingsView.swift */,
 				374C053427242D9F009BDDBE /* SponsorBlockSettings.swift */,
+				37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -3303,6 +3308,7 @@
 				373031F528383A89000CFD59 /* PiPDelegate.swift in Sources */,
 				37F5E8BA291BEF69006C15F5 /* BaseCacheModel.swift in Sources */,
 				371AC09F294D13AA0085989E /* UnwatchedFeedCountModel.swift in Sources */,
+				37E32DD72EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */,
 				370015A928BBAE7F000149FD /* ProgressBar.swift in Sources */,
 				37C3A24927235FAA0087A57A /* ChannelPlaylistCell.swift in Sources */,
 				377E17142928265900894889 /* ListRowSeparator+Backport.swift in Sources */,
@@ -3529,6 +3535,7 @@
 				37F961A027BD90BB00058149 /* PlayerBackendType.swift in Sources */,
 				3776924F294630110055EC18 /* ChannelAvatarView.swift in Sources */,
 				37BA221229526A19000DAD1F /* ControlsGradientView.swift in Sources */,
+				37E32DD62EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */,
 				37BC50AD2778BCBA00510953 /* HistoryModel.swift in Sources */,
 				37A362BB2953707F00BDF328 /* ClearQueueButton.swift in Sources */,
 				3752069E285E910600CA655F /* ChapterView.swift in Sources */,
@@ -3854,6 +3861,7 @@
 				377692582946476F0055EC18 /* ChannelPlaylistsCacheModel.swift in Sources */,
 				371B7E5E27596B8400D21217 /* Comment.swift in Sources */,
 				37732FF22703A26300F04329 /* AccountValidationStatus.swift in Sources */,
+				37E32DD52EC0D63600A63F29 /* TVOSPlainToggleStyle.swift in Sources */,
 				371CC76E29466F5A00979C1A /* AccountsViewModel.swift in Sources */,
 				3756C2AC2861151C00E4B059 /* NetworkStateModel.swift in Sources */,
 				37F5E8B8291BE9D0006C15F5 /* URLBookmarkModel.swift in Sources */,

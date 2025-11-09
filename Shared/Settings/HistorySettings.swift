@@ -29,9 +29,16 @@ struct HistorySettings: View {
                 List {
                     sections
                 }
+                #if os(tvOS)
+                .listStyle(.plain)
+                #elseif os(iOS)
+                .listStyle(.insetGrouped)
+                #endif
             #endif
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1000)
         #elseif os(iOS)
         .listStyle(.insetGrouped)

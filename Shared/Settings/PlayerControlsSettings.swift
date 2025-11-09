@@ -53,9 +53,16 @@ struct PlayerControlsSettings: View {
                 List {
                     sections
                 }
+                #if os(tvOS)
+                .listStyle(.plain)
+                #elseif os(iOS)
+                .listStyle(.insetGrouped)
+                #endif
             #endif
         }
         #if os(tvOS)
+        .buttonStyle(.plain)
+        .toggleStyle(TVOSPlainToggleStyle())
         .frame(maxWidth: 1000)
         #elseif os(iOS)
         .listStyle(.insetGrouped)
@@ -143,6 +150,45 @@ struct PlayerControlsSettings: View {
             #endif
         }
 
+        #if os(tvOS)
+        // Custom implementation for tvOS to avoid focus overlay
+        return VStack(alignment: .leading, spacing: 0) {
+            Text("System controls buttons")
+                .font(.headline)
+                .padding(.vertical, 8)
+            
+            Button(action: { systemControlsCommands = .seek }) {
+                HStack {
+                    Text(labelText("Seek".localized()))
+                    Spacer()
+                    if systemControlsCommands == .seek {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.accentColor)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .padding(.vertical, 4)
+            
+            Button(action: { 
+                systemControlsCommands = .restartAndAdvanceToNext
+                player.updateRemoteCommandCenter()
+            }) {
+                HStack {
+                    Text(labelText("Restart/Play next".localized()))
+                    Spacer()
+                    if systemControlsCommands == .restartAndAdvanceToNext {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.accentColor)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .padding(.vertical, 4)
+        }
+        #else
         return Picker("System controls buttons", selection: $systemControlsCommands) {
             Text(labelText("Seek".localized())).tag(SystemControlsCommands.seek)
             Text(labelText("Restart/Play next".localized())).tag(SystemControlsCommands.restartAndAdvanceToNext)
@@ -151,6 +197,7 @@ struct PlayerControlsSettings: View {
             player.updateRemoteCommandCenter()
         }
         .modifier(SettingsPickerModifier())
+        #endif
     }
 
     @ViewBuilder private var controlsLayoutFooter: some View {
