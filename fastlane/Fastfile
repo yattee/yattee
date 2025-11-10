@@ -254,28 +254,20 @@ platform :mac do
       api_key: api_key
     )
 
-    # Build and archive, but skip export to avoid extended attribute issues
-    gym(
+    build_mac_app(
       scheme: "#{APP_NAME} (macOS)",
-      skip_package_pkg: true,
-      skip_archive: false
+      output_directory: "fastlane/builds/#{version}-#{build}/macOS",
+      output_name: "#{APP_NAME}",
+      export_method: "developer-id",
+      export_options: {
+        provisioningProfiles: {
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match Direct #{DEVELOPER_APP_IDENTIFIER} macos"
+        }
+      }
     )
 
-    # Get the app from the archive's InstallationBuildProductsLocation
-    archive_path = lane_context[SharedValues::XCODEBUILD_ARCHIVE]
-    app_path = "#{archive_path}/Products/Applications/#{APP_NAME}.app"
-
-    UI.message("Archive path: #{archive_path}")
-    UI.message("App path: #{app_path}")
-
-    # Create PKG directly from the archived app (before any export processing)
-    pkg_path = File.expand_path("builds/#{version}-#{build}/macOS/#{APP_NAME}.pkg", File.dirname(__FILE__))
-    UI.message("Creating PKG installer from archived app...")
-    sh("productbuild --component '#{app_path}' /Applications --sign 'Developer ID Installer: Arkadiusz Fal (78Z5H3M6RJ)' '#{pkg_path}'")
-    UI.success("Created PKG: #{pkg_path}")
-
     notarize(
-      package: pkg_path,
+      package: "fastlane/builds/#{version}-#{build}/macOS/#{APP_NAME}.app",
       bundle_id: "#{DEVELOPER_APP_IDENTIFIER}",
       api_key: api_key,
       print_log: true
