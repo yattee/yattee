@@ -354,7 +354,8 @@ extension View {
     @ViewBuilder
     func applyControlsBackground(enabled: Bool, cornerRadius: Double) -> some View {
         if enabled {
-            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, *) {
+            #if os(iOS)
+            if #available(iOS 26.0, *) {
                 // Use Liquid Glass on iOS 26+
                 self.glassEffect(
                     .regular.interactive(),
@@ -363,7 +364,7 @@ extension View {
             } else {
                 // Fallback to ultraThinMaterial
                 // swiftlint:disable:next deployment_target
-                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, *) {
+                if #available(iOS 15.0, *) {
                     self
                         .background(
                             RoundedRectangle(cornerRadius: cornerRadius)
@@ -385,6 +386,31 @@ extension View {
                         )
                 }
             }
+            #else
+            // Fallback to ultraThinMaterial for macOS and tvOS
+            // swiftlint:disable:next deployment_target
+            if #available(macOS 12.0, tvOS 15.0, *) {
+                self
+                    .background(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(.ultraThinMaterial)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                    )
+            } else {
+                self
+                    .background(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .fill(Color.gray.opacity(0.3))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                    )
+            }
+            #endif
         } else {
             self.background(Color.clear)
         }
