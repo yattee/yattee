@@ -329,6 +329,14 @@ struct PlayerControls: View {
 
     var buttonsBar: some View {
         HStack(spacing: playerControlsLayout.buttonsSpacing) {
+            #if os(iOS)
+                // On iPad in resizable windows, add leading space to avoid system window controls
+                if Constants.isIPad, !Constants.isWindowFullscreen {
+                    Spacer()
+                        .frame(width: Constants.iPadSystemControlsWidth)
+                }
+            #endif
+
             fullscreenButton
 
             pipButton

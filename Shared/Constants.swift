@@ -39,6 +39,32 @@ enum Constants {
         #endif
     }
 
+    static var isWindowFullscreen: Bool {
+        #if os(iOS)
+            guard let windowScene = UIApplication.shared.connectedScenes
+                .filter({ $0.activationState == .foregroundActive })
+                .compactMap({ $0 as? UIWindowScene })
+                .first,
+                  let window = windowScene.windows.first
+            else {
+                return false
+            }
+
+            let screenBounds = windowScene.screen.bounds
+            let windowBounds = window.frame
+
+            // Check if window size matches screen bounds (accounting for small differences)
+            return abs(windowBounds.width - screenBounds.width) < 1 &&
+                   abs(windowBounds.height - screenBounds.height) < 1
+        #else
+            return false
+        #endif
+    }
+
+    static var iPadSystemControlsWidth: CGFloat {
+        50
+    }
+
     static var isTvOS: Bool {
         #if os(tvOS)
             true
