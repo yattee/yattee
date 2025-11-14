@@ -498,6 +498,10 @@ final class MPVBackend: PlayerBackend {
         currentTime = client?.currentTime
         playerItemDuration = client?.duration
 
+        guard let currentTime else {
+            return
+        }
+
         if controlsUpdates {
             updateControls()
         }
@@ -505,16 +509,14 @@ final class MPVBackend: PlayerBackend {
         model.updateNowPlayingInfo()
 
         handleSegmentsThrottle.execute {
-            if let currentTime {
-                model.handleSegments(at: currentTime)
-            }
+            model.handleSegments(at: currentTime)
         }
 
         timeObserverThrottle.execute {
-            self.model.updateWatch(time: self.currentTime)
+            self.model.updateWatch(time: currentTime)
         }
 
-        self.model.updateTime(self.currentTime!)
+        self.model.updateTime(currentTime)
     }
 
     private func stopClientUpdates() {
