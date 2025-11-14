@@ -411,7 +411,7 @@ struct PlaybackSettings: View {
             }
             .transaction { t in t.animation = .none }
             .buttonStyle(.plain)
-            .frame(height: 40, alignment: .trailing)
+            .frame(width: 140, height: 40, alignment: .trailing)
         #else
             StreamControl(focusedField: $focusedField)
         #endif

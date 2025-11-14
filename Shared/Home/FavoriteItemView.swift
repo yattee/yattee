@@ -34,7 +34,7 @@ struct FavoriteItemView: View {
     var body: some View {
         Group {
             if isVisible {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 0) {
                     itemControl
                         .contextMenu { contextMenu }
                         .contentShape(Rectangle())
@@ -64,24 +64,34 @@ struct FavoriteItemView: View {
                         #else
                             .padding(.horizontal, 15)
                         #endif
+                        .frame(height: expectedContentHeight)
                     } else {
-                        Group {
-                            switch widgetListingStyle {
-                            case .horizontalCells:
-                                HorizontalCells(items: limitedItems)
-                            case .list:
-                                ListView(items: limitedItems)
-                                    .padding(.vertical, 10)
-                                #if os(tvOS)
-                                    .padding(.leading, 40)
-                                #else
-                                    .padding(.horizontal, 15)
-                                #endif
+                        ZStack(alignment: .topLeading) {
+                            // Reserve space immediately to prevent layout shift
+                            Color.clear
+                                .frame(height: expectedContentHeight)
+                            
+                            // Actual content renders within the reserved space
+                            Group {
+                                switch widgetListingStyle {
+                                case .horizontalCells:
+                                    HorizontalCells(items: limitedItems)
+                                case .list:
+                                    ListView(items: limitedItems)
+                                        .padding(.vertical, 10)
+                                    #if os(tvOS)
+                                        .padding(.leading, 40)
+                                    #else
+                                        .padding(.horizontal, 15)
+                                    #endif
+                                }
                             }
+                            .environment(\.inChannelView, inChannelView)
                         }
-                        .environment(\.inChannelView, inChannelView)
+                        .animation(nil, value: store.contentItems.count)
                     }
                 }
+                .animation(nil, value: store.contentItems.count)
                 .contentShape(Rectangle())
                 .onAppear {
                     if item.section == .history {
@@ -231,6 +241,23 @@ struct FavoriteItemView: View {
 
     var widgetListingStyle: WidgetListingStyle {
         favoritesModel.listingStyle(item)
+    }
+
+    var expectedContentHeight: Double {
+        switch widgetListingStyle {
+        case .horizontalCells:
+            #if os(tvOS)
+                return 600
+            #else
+                return 290
+            #endif
+        case .list:
+            // Approximate height for list view items
+            let itemCount = favoritesModel.limit(item)
+            let itemHeight: Double = 70 // Approximate height per item
+            let padding: Double = 20
+            return Double(itemCount) * itemHeight + padding
+        }
     }
 
     func loadCacheAndResource(force: Bool = false) {

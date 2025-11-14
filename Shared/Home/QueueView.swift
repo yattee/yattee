@@ -6,7 +6,7 @@ struct QueueView: View {
     @ObservedObject private var player = PlayerModel.shared
 
     var body: some View {
-        LazyVStack {
+        VStack {
             if !items.isEmpty {
                 Button {
                     withAnimation {

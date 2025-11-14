@@ -10,9 +10,10 @@ struct ListView: View {
                 ContentItemView(item: item)
                     .environment(\.listingStyle, .list)
                     .environment(\.noListingDividers, limit == 1)
-                    .transition(.opacity)
+                    .transition(.identity)
             }
         }
+        .animation(nil, value: limitedItems.count)
     }
 
     var limitedItems: [ContentItem] {

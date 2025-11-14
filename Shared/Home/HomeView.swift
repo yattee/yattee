@@ -30,91 +30,93 @@ struct HomeView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack {
-                #if !os(tvOS)
-                    HStack {
-                        if showOpenActionsInHome {
-                            AccentButton(text: "Files", imageSystemName: "folder") {
-                                NavigationModel.shared.presentingFileImporter = true
-                            }
-                            AccentButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
-                                OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
-                            }
-                            AccentButton(imageSystemName: "ellipsis") {
-                                NavigationModel.shared.presentingOpenVideos = true
-                            }
-                            .frame(maxWidth: 40)
-                        }
-                    }
-                #endif
-
-                #if os(tvOS)
-                    HStack {
-                        if showOpenActionsInHome {
-                            Button {
-                                NavigationModel.shared.presentingOpenVideos = true
-                            } label: {
-                                Label("Open Video", systemImage: "globe")
+            LazyVStack(spacing: 0, pinnedViews: []) {
+                VStack {
+                    #if !os(tvOS)
+                        HStack {
+                            if showOpenActionsInHome {
+                                AccentButton(text: "Files", imageSystemName: "folder") {
+                                    NavigationModel.shared.presentingFileImporter = true
+                                }
+                                AccentButton(text: "Paste", imageSystemName: "doc.on.clipboard.fill") {
+                                    OpenVideosModel.shared.openURLsFromClipboard(playbackMode: .playNow)
+                                }
+                                AccentButton(imageSystemName: "ellipsis") {
+                                    NavigationModel.shared.presentingOpenVideos = true
+                                }
+                                .frame(maxWidth: 40)
                             }
                         }
-                        Button {
-                            NavigationModel.shared.presentingAccounts = true
-                        } label: {
-                            Label("Locations", systemImage: "globe")
-                        }
-                        Spacer()
-                        HideWatchedButtons()
-                        HideShortsButtons()
-                        Button {
-                            NavigationModel.shared.presentingSettings = true
-                        } label: {
-                            Label("Settings", systemImage: "gear")
-                        }
-                    }
-                    #if os(tvOS)
-                    .font(.caption)
-                    .imageScale(.small)
-                    .foregroundColor(.primary)
                     #endif
-                #endif
-            }
-            .padding(.top, 15)
-            #if os(tvOS)
-                .padding(.horizontal, 40)
-            #else
-                .padding(.horizontal, 15)
-            #endif
 
-            if showQueueInHome {
-                QueueView()
+                    #if os(tvOS)
+                        HStack {
+                            if showOpenActionsInHome {
+                                Button {
+                                    NavigationModel.shared.presentingOpenVideos = true
+                                } label: {
+                                    Label("Open Video", systemImage: "globe")
+                                }
+                            }
+                            Button {
+                                NavigationModel.shared.presentingAccounts = true
+                            } label: {
+                                Label("Locations", systemImage: "globe")
+                            }
+                            Spacer()
+                            HideWatchedButtons()
+                            HideShortsButtons()
+                            Button {
+                                NavigationModel.shared.presentingSettings = true
+                            } label: {
+                                Label("Settings", systemImage: "gear")
+                            }
+                        }
+                        .font(.caption)
+                        .imageScale(.small)
+                        .foregroundColor(.primary)
+                    #endif
+                }
+                .padding(.top, 15)
+                .padding(.bottom, 15)
                 #if os(tvOS)
                     .padding(.horizontal, 40)
                 #else
                     .padding(.horizontal, 15)
                 #endif
-            }
 
-            if !accounts.current.isNil, showFavoritesInHome {
-                VStack(alignment: .leading) {
+                if showQueueInHome {
+                    QueueView()
+                    #if os(tvOS)
+                        .padding(.horizontal, 40)
+                    #else
+                        .padding(.horizontal, 15)
+                    #endif
+                }
+
+                if !accounts.current.isNil, showFavoritesInHome {
                     #if os(tvOS)
                         ForEach(Defaults[.favorites]) { item in
                             FavoriteItemView(item: item, favoritesChanged: $favoritesChanged)
+                                .animation(nil, value: favoritesChanged)
                         }
                     #else
                         ForEach(favorites) { item in
                             FavoriteItemView(item: item, favoritesChanged: $favoritesChanged)
+                                .animation(nil, value: favoritesChanged)
                             #if os(macOS)
                                 .workaroundForVerticalScrollingBug()
                             #endif
                         }
                     #endif
                 }
-            }
 
-            #if !os(tvOS)
-                Color.clear.padding(.bottom, 60)
-            #endif
+                #if !os(tvOS)
+                    Color.clear.padding(.bottom, 60)
+                #endif
+            }
         }
+        .animation(nil, value: favoritesChanged)
         .onAppear {
             updateTask = Task {
                 async let favoritesUpdates: Void = {

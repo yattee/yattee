@@ -34,6 +34,7 @@ struct HorizontalCells: View {
         }
         .frame(height: cellHeight)
         .edgesIgnoringSafeArea(.horizontal)
+        .animation(nil, value: contentItems.count)
     }
 
     var contentItems: [ContentItem] {
