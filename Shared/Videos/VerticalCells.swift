@@ -8,6 +8,7 @@ struct VerticalCells<Header: View>: View {
 
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
     @Environment(\.listingStyle) private var listingStyle
+    @Environment(\.navigationStyle) private var navigationStyle
 
     var items = [ContentItem]()
     var allowEmpty = false
@@ -50,7 +51,7 @@ struct VerticalCells<Header: View>: View {
         }
         .animation(nil)
         #if os(iOS)
-            .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+            .edgesIgnoringSafeArea(navigationStyle == .sidebar ? [] : edgesIgnoringSafeArea)
         #endif
         #if os(macOS)
             .background(Color.secondaryBackground)

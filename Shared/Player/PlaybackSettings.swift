@@ -262,6 +262,8 @@ struct PlaybackSettings: View {
         .controlSize(.large)
         .frame(minWidth: 32, minHeight: 28)
         .fixedSize()
+        #elseif os(iOS)
+        .buttonStyle(.plain)
         #else
         .buttonStyle(.bordered)
         .controlSize(.large)
@@ -297,6 +299,8 @@ struct PlaybackSettings: View {
         .controlSize(.large)
         .frame(minWidth: 32, minHeight: 28)
         .fixedSize()
+        #elseif os(iOS)
+        .buttonStyle(.plain)
         #else
         .buttonStyle(.bordered)
         .controlSize(.large)
