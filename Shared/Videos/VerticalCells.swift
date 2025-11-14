@@ -49,7 +49,9 @@ struct VerticalCells<Header: View>: View {
             .padding()
         }
         .animation(nil)
-        .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+        #if os(iOS)
+            .edgesIgnoringSafeArea(edgesIgnoringSafeArea)
+        #endif
         #if os(macOS)
             .background(Color.secondaryBackground)
             .frame(minWidth: Constants.contentViewMinWidth)
