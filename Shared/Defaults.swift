@@ -16,7 +16,7 @@ extension Defaults.Keys {
     static let widgetsSettings = Key<[WidgetSettings]>("widgetsSettings", default: [])
     static let startupSection = Key<StartupSection>("startupSection", default: .home)
     static let showSearchSuggestions = Key<Bool>("showSearchSuggestions", default: true)
-    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.subscriptions, .trending, .playlists])
+    static let visibleSections = Key<Set<VisibleSection>>("visibleSections", default: [.subscriptions, .popular, .playlists])
 
     static let showOpenActionsToolbarItem = Key<Bool>("showOpenActionsToolbarItem", default: false)
     #if os(iOS)
