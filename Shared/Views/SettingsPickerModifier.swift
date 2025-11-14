@@ -15,6 +15,7 @@ struct SettingsPickerModifier: ViewModifier {
         #else
         content
             .labelsHidden()
+            .pickerStyle(.menu)
         #endif
     }
 }

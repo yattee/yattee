@@ -64,10 +64,10 @@ struct PlaybackSettings: View {
                 .padding(.vertical, 10)
 
                 if player.activeBackend == .mpv || !player.avPlayerUsesSystemControls {
-                    HStack {
+                    HStack(alignment: .center) {
                         controlsHeader("Rate".localized())
                         Spacer()
-                        HStack(spacing: rateButtonsSpacing) {
+                        HStack(alignment: .center, spacing: rateButtonsSpacing) {
                             decreaseRateButton
                             #if os(tvOS)
                             .focused($focusedField, equals: .decreaseRate)
@@ -205,8 +205,9 @@ struct PlaybackSettings: View {
     @ViewBuilder private var rateButton: some View {
         #if os(macOS)
             ratePicker
-                .labelsHidden()
-                .frame(maxWidth: 100)
+                .modifier(SettingsPickerModifier())
+                .controlSize(.large)
+                .frame(width: 100, alignment: .center)
         #elseif os(iOS)
             Menu {
                 ratePicker
@@ -241,11 +242,15 @@ struct PlaybackSettings: View {
                 player.currentRate = rate
             }
         } label: {
+            #if os(macOS)
+            Image(systemName: "plus")
+                .imageScale(.large)
+                .frame(width: 16, height: 16)
+            #else
             Label("Increase rate", systemImage: "plus")
-                .foregroundColor(.accentColor)
                 .imageScale(.large)
                 .labelStyle(.iconOnly)
-            #if os(iOS)
+                .foregroundColor(.accentColor)
                 .padding(12)
                 .frame(width: 40, height: 40)
                 .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
@@ -254,6 +259,12 @@ struct PlaybackSettings: View {
         }
         #if os(macOS)
         .buttonStyle(.bordered)
+        .controlSize(.large)
+        .frame(minWidth: 32, minHeight: 28)
+        .fixedSize()
+        #else
+        .buttonStyle(.bordered)
+        .controlSize(.large)
         #endif
         .disabled(increasedRate.isNil)
     }
@@ -266,11 +277,15 @@ struct PlaybackSettings: View {
                 player.currentRate = rate
             }
         } label: {
+            #if os(macOS)
+            Image(systemName: "minus")
+                .imageScale(.large)
+                .frame(width: 16, height: 16)
+            #else
             Label("Decrease rate", systemImage: "minus")
-                .foregroundColor(.accentColor)
                 .imageScale(.large)
                 .labelStyle(.iconOnly)
-            #if os(iOS)
+                .foregroundColor(.accentColor)
                 .padding(12)
                 .frame(width: 40, height: 40)
                 .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
@@ -279,9 +294,14 @@ struct PlaybackSettings: View {
         }
         #if os(macOS)
         .buttonStyle(.bordered)
-        #elseif os(iOS)
+        .controlSize(.large)
+        .frame(minWidth: 32, minHeight: 28)
+        .fixedSize()
+        #else
+        .buttonStyle(.bordered)
+        .controlSize(.large)
         #endif
-            .disabled(decreasedRate.isNil)
+        .disabled(decreasedRate.isNil)
     }
 
     private var rateButtonsSpacing: Double {
@@ -304,9 +324,8 @@ struct PlaybackSettings: View {
         #elseif os(macOS)
             playbackModePicker
                 .modifier(SettingsPickerModifier())
-            #if os(macOS)
-                .frame(maxWidth: 150)
-            #endif
+                .controlSize(.large)
+                .frame(width: 300, alignment: .trailing)
         #else
             Menu {
                 playbackModePicker
@@ -329,8 +348,9 @@ struct PlaybackSettings: View {
     @ViewBuilder private var qualityProfileButton: some View {
         #if os(macOS)
             qualityProfilePicker
-                .labelsHidden()
-                .frame(maxWidth: 300)
+                .modifier(SettingsPickerModifier())
+                .controlSize(.large)
+                .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
             Menu {
                 qualityProfilePicker
@@ -378,8 +398,9 @@ struct PlaybackSettings: View {
     @ViewBuilder private var streamButton: some View {
         #if os(macOS)
             StreamControl()
-                .labelsHidden()
-                .frame(maxWidth: 300)
+                .modifier(SettingsPickerModifier())
+                .controlSize(.large)
+                .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
             Menu {
                 StreamControl()
@@ -400,8 +421,9 @@ struct PlaybackSettings: View {
         let videoCaptions = player.currentVideo?.captions
         #if os(macOS)
             captionsPicker
-                .labelsHidden()
-                .frame(maxWidth: 300)
+                .modifier(SettingsPickerModifier())
+                .controlSize(.large)
+                .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
             Menu {
                 if videoCaptions?.isEmpty == false {
@@ -470,8 +492,9 @@ struct PlaybackSettings: View {
     @ViewBuilder private var audioTrackButton: some View {
         #if os(macOS)
             audioTrackPicker
-                .labelsHidden()
-                .frame(maxWidth: 300)
+                .modifier(SettingsPickerModifier())
+                .controlSize(.large)
+                .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
             Menu {
                 audioTrackPicker

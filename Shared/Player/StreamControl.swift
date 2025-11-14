@@ -20,7 +20,12 @@ struct StreamControl: View {
 
                         ForEach(kinds, id: \.self) { key in
                             ForEach(availableStreamsByKind[key] ?? []) { stream in
-                                Text(stream.description).tag(Stream?.some(stream))
+                                Text(stream.description)
+                                    #if os(macOS)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                    #endif
+                                    .tag(Stream?.some(stream))
                             }
 
                             #if os(macOS)
@@ -36,6 +41,8 @@ struct StreamControl: View {
                     .frame(minWidth: 110)
                     .fixedSize(horizontal: true, vertical: true)
                     .disabled(player.isLoadingAvailableStreams)
+                #elseif os(macOS)
+                    .fixedSize()
                 #endif
             #else
                 ControlsOverlayButton(focusedField: focusedField!, field: .stream) {
