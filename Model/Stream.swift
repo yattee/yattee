@@ -291,8 +291,7 @@ class Stream: Equatable, Hashable, Identifiable {
 
     var description: String {
         guard localURL.isNil else { return resolutionAndFormat }
-        let instanceString = instance.isNil ? "" : " - (\(instance!.description))"
-        return format != .hls ? "\(resolutionAndFormat)\(instanceString)" : "adaptive (HLS)\(instanceString)"
+        return format != .hls ? "\(resolutionAndFormat)" : "adaptive (HLS)"
     }
 
     var resolutionAndFormat: String {
