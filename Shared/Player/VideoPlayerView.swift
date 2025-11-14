@@ -241,6 +241,13 @@ struct VideoPlayerView: View {
         }
 
         var playerHeight: Double? {
+            // On iPad, don't force a specific height in fullscreen mode
+            // This allows the player to properly fit within resizable windows
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                return nil
+            }
+
+            // For iPhone, use screen bounds to ensure proper fullscreen sizing
             let lockedPortrait = player.lockedOrientation?.contains(.portrait) ?? false
             let isPortrait = OrientationTracker.shared.currentInterfaceOrientation.isPortrait || lockedPortrait
             return fullScreenPlayer ? UIScreen.main.bounds.size.height - (isPortrait ? safeAreaModel.safeArea.top + safeAreaModel.safeArea.bottom : 0) : nil
