@@ -71,7 +71,7 @@ struct VideoActions: View {
             return actionButtonPipEnabled
         #if os(iOS)
             case .lockOrientation:
-                return actionButtonLockOrientationEnabled
+                return actionButtonLockOrientationEnabled && !Constants.isIPad
         #endif
         case .restart:
             return actionButtonRestartEnabled
@@ -158,7 +158,9 @@ struct VideoActions: View {
                     actionButton("PiP", systemImage: player.pipImage, active: player.playingInPictureInPicture, action: player.togglePiPAction)
                 #if os(iOS)
                     case .lockOrientation:
-                        actionButton("Lock", systemImage: player.lockOrientationImage, active: player.isOrientationLocked, action: player.lockOrientationAction)
+                        if !Constants.isIPad {
+                            actionButton("Lock", systemImage: player.lockOrientationImage, active: player.isOrientationLocked, action: player.lockOrientationAction)
+                        }
                 #endif
                 case .restart:
                     actionButton("Replay", systemImage: "backward.end.fill", action: player.replayAction)

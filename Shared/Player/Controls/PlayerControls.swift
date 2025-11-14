@@ -333,7 +333,7 @@ struct PlayerControls: View {
 
             pipButton
             #if os(iOS)
-                if playerControlsLockOrientationEnabled {
+                if playerControlsLockOrientationEnabled, !Constants.isIPad {
                     lockOrientationButton
                 }
             #endif

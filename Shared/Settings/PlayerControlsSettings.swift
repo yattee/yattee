@@ -366,7 +366,9 @@ struct PlayerControlsSettings: View {
         }
         Group {
             #if os(iOS)
-                Toggle("Lock orientation", isOn: $actionButtonLockOrientationEnabled)
+                if !Constants.isIPad {
+                    Toggle("Lock orientation", isOn: $actionButtonLockOrientationEnabled)
+                }
             #endif
             Toggle("Restart", isOn: $actionButtonRestartEnabled)
             Toggle("Play next item", isOn: $actionButtonAdvanceToNextItemEnabled)
@@ -378,7 +380,9 @@ struct PlayerControlsSettings: View {
 
     @ViewBuilder private var controlButtonToggles: some View {
         #if os(iOS)
-            Toggle("Lock orientation", isOn: $playerControlsLockOrientationEnabled)
+            if !Constants.isIPad {
+                Toggle("Lock orientation", isOn: $playerControlsLockOrientationEnabled)
+            }
         #endif
         Toggle("Settings", isOn: $playerControlsSettingsEnabled)
         #if !os(tvOS)
