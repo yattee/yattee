@@ -666,11 +666,8 @@ final class MPVClient: ObservableObject {
     func glUpdate(_ ctx: UnsafeMutableRawPointer?) {
         let videoLayer = unsafeBitCast(ctx, to: VideoLayer.self)
 
-        videoLayer.client?.queue?.async {
-            if !videoLayer.isAsynchronous {
-                videoLayer.display()
-            }
-        }
+        // Request a redraw when MPV signals that new content is available
+        videoLayer.requestRedraw()
     }
 #else
     func getProcAddress(_: UnsafeMutableRawPointer?, _ name: UnsafePointer<Int8>?) -> UnsafeMutableRawPointer? {

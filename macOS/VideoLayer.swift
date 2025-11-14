@@ -5,11 +5,15 @@ import OpenGL.GL3
 
 final class VideoLayer: CAOpenGLLayer {
     var client: MPVClient!
+    private var needsRedraw = false
+    private let redrawQueue = DispatchQueue(label: "com.yattee.videolayer.redraw", qos: .userInteractive)
 
     override init() {
         super.init()
         autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
         backgroundColor = NSColor.black.cgColor
+        // Enable asynchronous drawing for better performance
+        isAsynchronous = true
     }
 
     @available(*, unavailable)
@@ -32,6 +36,8 @@ final class VideoLayer: CAOpenGLLayer {
         forLayerTime _: CFTimeInterval,
         displayTime _: UnsafePointer<CVTimeStamp>?
     ) {
+        needsRedraw = false
+        
         var i: GLint = 0
         var flip: CInt = 1
         var ditherDepth = 8
@@ -92,13 +98,23 @@ final class VideoLayer: CAOpenGLLayer {
     }
 
     override func display() {
+        // Mark as needing display without blocking
+        guard !needsRedraw else { return }
+        needsRedraw = true
         super.display()
-        CATransaction.flush()
+    }
+    
+    func requestRedraw() {
+        // Called from MPV's glUpdate callback - use setNeedsDisplay for efficient batching
+        DispatchQueue.main.async { [weak self] in
+            self?.setNeedsDisplay()
+        }
     }
 
     let displayLinkCallback: CVDisplayLinkOutputCallback = { _, _, _, _, _, displayLinkContext -> CVReturn in
         let layer: VideoLayer = unsafeBitCast(displayLinkContext, to: VideoLayer.self)
         if layer.client?.mpvGL != nil {
+            // Just report swap - don't trigger display here to avoid flooding main thread
             mpv_render_context_report_swap(layer.client.mpvGL)
         }
         return kCVReturnSuccess
