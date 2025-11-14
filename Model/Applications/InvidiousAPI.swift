@@ -603,7 +603,6 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             guard let thumbnailUrl = components.url else {
                 return nil
             }
-            print("Final thumbnail URL: \(thumbnailUrl)")
 
             return Thumbnail(url: thumbnailUrl, quality: .init(rawValue: quality)!)
         }
