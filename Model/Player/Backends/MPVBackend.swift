@@ -97,6 +97,12 @@ final class MPVBackend: PlayerBackend {
 
     var controlsUpdates = false
     private var timeObserverThrottle = Throttle(interval: 2)
+    
+    // Retry mechanism
+    private var retryCount = 0
+    private let maxRetries = 3
+    private var currentRetryStream: Stream?
+    private var currentRetryVideo: Video?
 
     var suggestedPlaybackRates: [Double] {
         [0.25, 0.33, 0.5, 0.67, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 4]
@@ -218,6 +224,10 @@ final class MPVBackend: PlayerBackend {
     }
 
     func playStream(_ stream: Stream, of video: Video, preservingTime: Bool, upgrading: Bool) {
+        // Store stream and video for potential retries
+        currentRetryStream = stream
+        currentRetryVideo = video
+        
         #if !os(macOS)
             if model.presentingPlayer {
                 DispatchQueue.main.async {
@@ -582,6 +592,8 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded?()
             startClientUpdates()
             onFileLoaded = nil
+            // Reset retry state on successful load
+            resetRetryState()
 
         case MPV_EVENT_PROPERTY_CHANGE:
             let dataOpaquePtr = OpaquePointer(event.pointee.data)
@@ -597,6 +609,8 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded?()
             startClientUpdates()
             onFileLoaded = nil
+            // Reset retry state on successful playback restart
+            resetRetryState()
 
         case MPV_EVENT_VIDEO_RECONFIG:
             model.updateAspectRatio()
@@ -610,10 +624,7 @@ final class MPVBackend: PlayerBackend {
             if reason != MPV_END_FILE_REASON_STOP {
                 DispatchQueue.main.async { [weak self] in
                     guard let self else { return }
-                    NavigationModel.shared.presentAlert(title: "Error while opening file")
-                    self.model.closeCurrentItem(finished: true)
-                    self.getTimeUpdates()
-                    self.eofPlaybackModeAction()
+                    self.handleFileLoadError()
                 }
             } else {
                 DispatchQueue.main.async { [weak self] in self?.handleEndOfFile() }
@@ -629,6 +640,46 @@ final class MPVBackend: PlayerBackend {
             return
         }
         eofPlaybackModeAction()
+    }
+    
+    private func handleFileLoadError() {
+        guard let stream = currentRetryStream, let video = currentRetryVideo else {
+            // No stream info available, show error immediately
+            NavigationModel.shared.presentAlert(title: "Error while opening file")
+            model.closeCurrentItem(finished: true)
+            getTimeUpdates()
+            eofPlaybackModeAction()
+            return
+        }
+        
+        if retryCount < maxRetries {
+            retryCount += 1
+            let delay = TimeInterval(retryCount * 2) // 2, 4, 6 seconds
+            
+            logger.warning("File load failed. Retry attempt \(retryCount) of \(maxRetries) after \(delay) seconds...")
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self else { return }
+                self.logger.info("Retrying file load (attempt \(self.retryCount))...")
+                self.playStream(stream, of: video, preservingTime: true, upgrading: false)
+            }
+        } else {
+            // All retries exhausted, show error
+            logger.error("File load failed after \(maxRetries) retry attempts")
+            NavigationModel.shared.presentAlert(title: "Error while opening file")
+            model.closeCurrentItem(finished: true)
+            getTimeUpdates()
+            eofPlaybackModeAction()
+            
+            // Reset retry counter for next attempt
+            resetRetryState()
+        }
+    }
+    
+    private func resetRetryState() {
+        retryCount = 0
+        currentRetryStream = nil
+        currentRetryVideo = nil
     }
 
     func setNeedsDrawing(_ needsDrawing: Bool) {
