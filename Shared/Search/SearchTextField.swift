@@ -93,9 +93,16 @@ struct SearchTextField: View {
             .fill(Color.background)
             .frame(height: 27)
             .overlay(
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                    .frame(height: 27)
+                Group {
+                    if #available(macOS 26, *) {
+                        // No border for macOS 26+
+                        EmptyView()
+                    } else {
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                            .frame(height: 27)
+                    }
+                }
             )
     }
 

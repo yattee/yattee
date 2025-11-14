@@ -212,6 +212,13 @@ struct SearchView: View {
                             HStack {
                                 Text("Sort:")
                                     .foregroundColor(.secondary)
+                                    .padding(.leading, {
+                                        if #available(macOS 26, *) {
+                                            return 12
+                                        } else {
+                                            return 0
+                                        }
+                                    }())
                                 searchSortOrderPicker
                             }
                         }
