@@ -154,9 +154,14 @@ extension PlayerBackend {
         let nonHLSStreams = streams.filter {
             let isHLS = $0.kind == .hls
             // Check if the stream's resolution is within the maximum allowed resolution
-            let isWithinResolution = $0.resolution.map { $0 <= maxResolution.value } ?? false
+            // Safety: Ensure resolution exists before comparing
+            guard let streamResolution = $0.resolution else {
+                logger.info("Stream ID: \($0.id) has nil resolution, skipping")
+                return false
+            }
+            let isWithinResolution = streamResolution <= maxResolution.value
 
-            logger.info("Stream ID: \($0.id) - Kind: \(String(describing: $0.kind)) - Resolution: \(String(describing: $0.resolution)) - Bitrate: \($0.bitrate ?? 0)")
+            logger.info("Stream ID: \($0.id) - Kind: \(String(describing: $0.kind)) - Resolution: \(String(describing: streamResolution)) - Bitrate: \($0.bitrate ?? 0)")
             logger.info("Is HLS: \(isHLS), Is within resolution: \(isWithinResolution)")
 
             logger.info("video url: \($0.videoAsset?.url.absoluteString ?? "nil"), audio url: \($0.audioAsset?.url.absoluteString ?? "nil")")
@@ -191,8 +196,13 @@ extension PlayerBackend {
         }
 
         let filteredStreams = adjustedStreams.filter { stream in
+            // Safety check: Ensure stream has a resolution
+            guard let streamResolution = stream.resolution else {
+                logger.info("Filtered stream ID: \(stream.id) has nil resolution, excluding")
+                return false
+            }
             // Check if the stream's resolution is within the maximum allowed resolution
-            let isWithinResolution = stream.resolution <= maxResolution.value
+            let isWithinResolution = streamResolution <= maxResolution.value
             logger.info("Filtered stream ID: \(stream.id) - Is within max resolution: \(isWithinResolution)")
             return isWithinResolution
         }
@@ -200,7 +210,15 @@ extension PlayerBackend {
         logger.info("Filtered streams count after adjustments: \(filteredStreams.count)")
 
         let bestStream = filteredStreams.max { lhs, rhs in
-            if lhs.resolution == rhs.resolution {
+            // Safety check: Ensure both streams have resolutions
+            guard let lhsResolution = lhs.resolution, let rhsResolution = rhs.resolution else {
+                logger.info("One or both streams missing resolution - LHS: \(lhs.id), RHS: \(rhs.id)")
+                // If lhs has no resolution, it's "less than" rhs (prefer rhs)
+                // If rhs has no resolution, it's "less than" lhs (prefer lhs)
+                return lhs.resolution == nil
+            }
+            
+            if lhsResolution == rhsResolution {
                 guard let lhsFormat = QualityProfile.Format(rawValue: lhs.format.rawValue),
                       let rhsFormat = QualityProfile.Format(rawValue: rhs.format.rawValue)
                 else {
@@ -216,9 +234,9 @@ extension PlayerBackend {
                 return lhsFormatIndex > rhsFormatIndex
             }
 
-            logger.info("Comparing resolutions for streams \(lhs.id) and \(rhs.id) - LHS Resolution: \(String(describing: lhs.resolution)), RHS Resolution: \(String(describing: rhs.resolution))")
+            logger.info("Comparing resolutions for streams \(lhs.id) and \(rhs.id) - LHS Resolution: \(String(describing: lhsResolution)), RHS Resolution: \(String(describing: rhsResolution))")
 
-            return lhs.resolution < rhs.resolution
+            return lhsResolution < rhsResolution
         }
 
         logger.info("Best stream selected: \(String(describing: bestStream?.id)) with resolution: \(String(describing: bestStream?.resolution)) and format: \(String(describing: bestStream?.format))")

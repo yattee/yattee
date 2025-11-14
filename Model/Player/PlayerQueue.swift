@@ -52,7 +52,7 @@ extension PlayerModel {
     func playItem(_ item: PlayerQueueItem, at time: CMTime? = nil) {
         advancing = false
 
-        if !playingInPictureInPicture, !currentItem.isNil {
+        if !playingInPictureInPicture, !currentItem.isNil, backend != nil {
             backend.closeItem()
         }
 
@@ -125,6 +125,12 @@ extension PlayerModel {
     }
 
     var streamByQualityProfile: Stream? {
+        // Safety check: Ensure backend is available
+        guard backend != nil else {
+            logger.error("Backend is nil when trying to select stream by quality profile")
+            return nil
+        }
+        
         let profile = qualityProfile ?? .defaultProfile
 
         // First attempt: Filter by both `canPlay` and `isPreferred`
@@ -229,7 +235,9 @@ extension PlayerModel {
             self.removeQueueItems()
         }
 
-        backend.closeItem()
+        if backend != nil {
+            backend.closeItem()
+        }
     }
 
     @discardableResult func enqueueVideo(
