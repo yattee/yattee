@@ -179,8 +179,6 @@ final class MPVOGLView: GLKView {
                 let result = mpv_render_context_render(OpaquePointer(mpvGL), &params)
                 if result < 0 {
                     logger.error("mpv_render_context_render() failed with error code: \(result)")
-                } else {
-                    logger.info("mpv_render_context_render() called successfully.")
                 }
             }
         }

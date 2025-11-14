@@ -509,7 +509,6 @@ final class MPVClient: ObservableObject {
                mode.refreshRate > 0
             {
                 refreshRate = Int(mode.refreshRate)
-                logger.info("Screen refresh rate: \(refreshRate) Hz")
             } else {
                 logger.warning("Failed to get refresh rate from NSScreen.")
             }
@@ -522,8 +521,6 @@ final class MPVClient: ObservableObject {
             if refreshRate <= 0 {
                 refreshRate = 60 // Fallback to 60 Hz
                 logger.warning("Failed to get refresh rate from UIScreen, falling back to 60 Hz.")
-            } else {
-                logger.info("Screen refresh rate: \(refreshRate) Hz")
             }
         #endif
 
