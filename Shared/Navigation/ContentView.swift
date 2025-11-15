@@ -48,7 +48,7 @@ struct ContentView: View {
             #endif
         }
         #if os(iOS)
-        .overlay(videoPlayer)
+        .overlay(videoPlayer.edgesIgnoringSafeArea(.all))
         .sheet(isPresented: $navigation.presentingShareSheet) {
             if let shareURL = navigation.shareURL {
                 ShareSheet(activityItems: [shareURL])
