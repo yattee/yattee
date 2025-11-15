@@ -110,6 +110,9 @@ struct PlayerControls: View {
                         Spacer()
                     }
                     .offset(y: playerControlsLayout.osdVerticalOffset + 5)
+                    #if os(iOS)
+                    .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                    #endif
 
                     Section {
                         #if !os(tvOS)
@@ -121,6 +124,9 @@ struct PlayerControls: View {
                                 seekForwardButton
                             }
                             .font(.system(size: playerControlsLayout.bigButtonFontSize))
+                            #if os(iOS)
+                            .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                            #endif
                         #endif
 
                         ZStack(alignment: .bottom) {
@@ -171,6 +177,9 @@ struct PlayerControls: View {
                             }
                             .zIndex(1)
                             .padding(.top, 2)
+                            #if os(iOS)
+                            .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                            #endif
                             .transition(.opacity)
 
                             HStack(spacing: playerControlsLayout.buttonsSpacing) {
@@ -207,6 +216,9 @@ struct PlayerControls: View {
                                 .offset(y: -playerControlsLayout.timelineHeight - 30)
                             #else
                                 .offset(y: -playerControlsLayout.timelineHeight - 5)
+                                #if os(iOS)
+                                .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                                #endif
                             #endif
                         }
                     }
