@@ -145,11 +145,25 @@ struct BrowsingSettings: View {
         }
 
         func playerBarGesturePicker(_ label: String, selection: Binding<PlayerTapGestureAction>) -> some View {
-            Picker(label, selection: selection) {
-                ForEach(PlayerTapGestureAction.allCases, id: \.rawValue) { action in
-                    Text(action.label.localized()).tag(action)
+            #if os(macOS)
+                HStack {
+                    Text(label)
+                    Spacer()
+                    Picker(label, selection: selection) {
+                        ForEach(PlayerTapGestureAction.allCases, id: \.rawValue) { action in
+                            Text(action.label.localized()).tag(action)
+                        }
+                    }
+                    .modifier(SettingsPickerModifier())
                 }
-            }
+            #else
+                Picker(label, selection: selection) {
+                    ForEach(PlayerTapGestureAction.allCases, id: \.rawValue) { action in
+                        Text(action.label.localized()).tag(action)
+                    }
+                }
+                .modifier(SettingsPickerModifier())
+            #endif
         }
 
         var playerBarFooter: some View {
@@ -220,12 +234,25 @@ struct BrowsingSettings: View {
     }
 
     private var thumbnailsQualityPicker: some View {
-        Picker("Quality", selection: $thumbnailsQuality) {
-            ForEach(ThumbnailsQuality.allCases, id: \.self) { quality in
-                Text(quality.description)
+        #if os(macOS)
+            HStack {
+                Text("Quality")
+                Spacer()
+                Picker("Quality", selection: $thumbnailsQuality) {
+                    ForEach(ThumbnailsQuality.allCases, id: \.self) { quality in
+                        Text(quality.description)
+                    }
+                }
+                .modifier(SettingsPickerModifier())
             }
-        }
-        .modifier(SettingsPickerModifier())
+        #else
+            Picker("Quality", selection: $thumbnailsQuality) {
+                ForEach(ThumbnailsQuality.allCases, id: \.self) { quality in
+                    Text(quality.description)
+                }
+            }
+            .modifier(SettingsPickerModifier())
+        #endif
     }
 
     private var visibleSectionsSettings: some View {
@@ -246,12 +273,25 @@ struct BrowsingSettings: View {
             #if os(tvOS)
                 SettingsHeader(text: "Startup section".localized())
             #endif
-            Picker("Startup section", selection: $startupSection) {
-                ForEach(StartupSection.allCases, id: \.rawValue) { section in
-                    Text(section.label).tag(section)
+            #if os(macOS)
+                HStack {
+                    Text("Startup section")
+                    Spacer()
+                    Picker("Startup section", selection: $startupSection) {
+                        ForEach(StartupSection.allCases, id: \.rawValue) { section in
+                            Text(section.label).tag(section)
+                        }
+                    }
+                    .modifier(SettingsPickerModifier())
                 }
-            }
-            .modifier(SettingsPickerModifier())
+            #else
+                Picker("Startup section", selection: $startupSection) {
+                    ForEach(StartupSection.allCases, id: \.rawValue) { section in
+                        Text(section.label).tag(section)
+                    }
+                }
+                .modifier(SettingsPickerModifier())
+            #endif
         }
     }
 

@@ -110,9 +110,9 @@ struct PlayerSettings: View {
                     #if os(macOS)
                         HStack {
                             Text("Inspector")
+                            Spacer()
                             inspectorVisibilityPicker
                         }
-                        .padding(.leading, 20)
                     #else
                         inspectorVisibilityPicker
                     #endif
@@ -239,29 +239,51 @@ struct PlayerSettings: View {
     }
 
     private var sourcePicker: some View {
-        Picker("Source", selection: $playerInstanceID) {
-            Text("Instance of current account").tag(String?.none)
+        #if os(macOS)
+            HStack {
+                Text("Source")
+                Spacer()
+                Picker("Source", selection: $playerInstanceID) {
+                    Text("Instance of current account").tag(String?.none)
 
-            ForEach(instances) { instance in
-                Text(instance.description).tag(Optional(instance.id))
+                    ForEach(instances) { instance in
+                        Text(instance.description).tag(Optional(instance.id))
+                    }
+                }
+                .modifier(SettingsPickerModifier())
             }
-        }
-        .modifier(SettingsPickerModifier())
+        #else
+            Picker("Source", selection: $playerInstanceID) {
+                Text("Instance of current account").tag(String?.none)
+
+                ForEach(instances) { instance in
+                    Text(instance.description).tag(Optional(instance.id))
+                }
+            }
+            .modifier(SettingsPickerModifier())
+        #endif
     }
 
     private var sidebarPicker: some View {
-        Picker("Sidebar", selection: $playerSidebar) {
-            #if os(macOS)
-                Text("Show sidebar").tag(PlayerSidebarSetting.always)
-            #endif
-
-            #if os(iOS)
-                Text("Show sidebar when space permits").tag(PlayerSidebarSetting.whenFits)
-            #endif
-
-            Text("Hide sidebar").tag(PlayerSidebarSetting.never)
-        }
-        .modifier(SettingsPickerModifier())
+        #if os(macOS)
+            HStack {
+                Text("Sidebar")
+                Spacer()
+                Picker("Sidebar", selection: $playerSidebar) {
+                    Text("Show sidebar").tag(PlayerSidebarSetting.always)
+                    Text("Hide sidebar").tag(PlayerSidebarSetting.never)
+                }
+                .modifier(SettingsPickerModifier())
+            }
+        #else
+            Picker("Sidebar", selection: $playerSidebar) {
+                #if os(iOS)
+                    Text("Show sidebar when space permits").tag(PlayerSidebarSetting.whenFits)
+                #endif
+                Text("Hide sidebar").tag(PlayerSidebarSetting.never)
+            }
+            .modifier(SettingsPickerModifier())
+        #endif
     }
 
     private var commentsToggle: some View {
@@ -363,56 +385,105 @@ struct PlayerSettings: View {
     }
 
     private var captionsFontScaleSizePicker: some View {
-        Picker("Size", selection: $captionsFontScaleSize) {
-            Text("Small").tag(String("0.725"))
-            Text("Medium").tag(String("1.0"))
-            Text("Large").tag(String("1.5"))
-        }
-        .onChange(of: captionsFontScaleSize) { _ in
-            PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
-        }
         #if os(macOS)
-        .labelsHidden()
+            HStack {
+                Text("Size")
+                Spacer()
+                Picker("Size", selection: $captionsFontScaleSize) {
+                    Text("Small").tag(String("0.725"))
+                    Text("Medium").tag(String("1.0"))
+                    Text("Large").tag(String("1.5"))
+                }
+                .onChange(of: captionsFontScaleSize) { _ in
+                    PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
+                }
+                .labelsHidden()
+            }
+        #else
+            Picker("Size", selection: $captionsFontScaleSize) {
+                Text("Small").tag(String("0.725"))
+                Text("Medium").tag(String("1.0"))
+                Text("Large").tag(String("1.5"))
+            }
+            .onChange(of: captionsFontScaleSize) { _ in
+                PlayerModel.shared.mpvBackend.client.setSubFontSize(scaleSize: captionsFontScaleSize)
+            }
         #endif
     }
 
     private var captionsFontColorPicker: some View {
-        Picker("Color", selection: $captionsFontColor) {
-            Text("White").tag(String("#FFFFFF"))
-            Text("Yellow").tag(String("#FFFF00"))
-            Text("Red").tag(String("#FF0000"))
-            Text("Orange").tag(String("#FFA500"))
-            Text("Green").tag(String("#008000"))
-            Text("Blue").tag(String("#0000FF"))
-        }
-        .onChange(of: captionsFontColor) { _ in
-            PlayerModel.shared.mpvBackend.client.setSubFontColor(color: captionsFontColor)
-        }
         #if os(macOS)
-        .labelsHidden()
+            HStack {
+                Text("Color")
+                Spacer()
+                Picker("Color", selection: $captionsFontColor) {
+                    Text("White").tag(String("#FFFFFF"))
+                    Text("Yellow").tag(String("#FFFF00"))
+                    Text("Red").tag(String("#FF0000"))
+                    Text("Orange").tag(String("#FFA500"))
+                    Text("Green").tag(String("#008000"))
+                    Text("Blue").tag(String("#0000FF"))
+                }
+                .onChange(of: captionsFontColor) { _ in
+                    PlayerModel.shared.mpvBackend.client.setSubFontColor(color: captionsFontColor)
+                }
+                .labelsHidden()
+            }
+        #else
+            Picker("Color", selection: $captionsFontColor) {
+                Text("White").tag(String("#FFFFFF"))
+                Text("Yellow").tag(String("#FFFF00"))
+                Text("Red").tag(String("#FF0000"))
+                Text("Orange").tag(String("#FFA500"))
+                Text("Green").tag(String("#008000"))
+                Text("Blue").tag(String("#0000FF"))
+            }
+            .onChange(of: captionsFontColor) { _ in
+                PlayerModel.shared.mpvBackend.client.setSubFontColor(color: captionsFontColor)
+            }
         #endif
     }
 
     #if !os(tvOS)
         private var captionDefaultLanguagePicker: some View {
-            Picker("Default language", selection: $captionsDefaultLanguageCode) {
-                ForEach(LanguageCodes.allCases, id: \.self) { language in
-                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
-                }
-            }
             #if os(macOS)
-            .labelsHidden()
+                HStack {
+                    Text("Default language")
+                    Spacer()
+                    Picker("Default language", selection: $captionsDefaultLanguageCode) {
+                        ForEach(LanguageCodes.allCases, id: \.self) { language in
+                            Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                        }
+                    }
+                    .labelsHidden()
+                }
+            #else
+                Picker("Default language", selection: $captionsDefaultLanguageCode) {
+                    ForEach(LanguageCodes.allCases, id: \.self) { language in
+                        Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                    }
+                }
             #endif
         }
 
         private var captionFallbackLanguagePicker: some View {
-            Picker("Fallback language", selection: $captionsFallbackLanguageCode) {
-                ForEach(LanguageCodes.allCases, id: \.self) { language in
-                    Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
-                }
-            }
             #if os(macOS)
-            .labelsHidden()
+                HStack {
+                    Text("Fallback language")
+                    Spacer()
+                    Picker("Fallback language", selection: $captionsFallbackLanguageCode) {
+                        ForEach(LanguageCodes.allCases, id: \.self) { language in
+                            Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                        }
+                    }
+                    .labelsHidden()
+                }
+            #else
+                Picker("Fallback language", selection: $captionsFallbackLanguageCode) {
+                    ForEach(LanguageCodes.allCases, id: \.self) { language in
+                        Text("\(language.description.capitalized) (\(language.rawValue))").tag(language.rawValue)
+                    }
+                }
             #endif
         }
     #else

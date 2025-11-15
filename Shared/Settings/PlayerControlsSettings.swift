@@ -132,12 +132,25 @@ struct PlayerControlsSettings: View {
         }
 
         Section {
-            Picker("Action button labels", selection: $playerActionsButtonLabelStyle) {
-                ForEach(ButtonLabelStyle.allCases, id: \.rawValue) { style in
-                    Text(style.description).tag(style)
+            #if os(macOS)
+                HStack {
+                    Text("Action button labels")
+                    Spacer()
+                    Picker("Action button labels", selection: $playerActionsButtonLabelStyle) {
+                        ForEach(ButtonLabelStyle.allCases, id: \.rawValue) { style in
+                            Text(style.description).tag(style)
+                        }
+                    }
+                    .modifier(SettingsPickerModifier())
                 }
-            }
-            .modifier(SettingsPickerModifier())
+            #else
+                Picker("Action button labels", selection: $playerActionsButtonLabelStyle) {
+                    ForEach(ButtonLabelStyle.allCases, id: \.rawValue) { style in
+                        Text(style.description).tag(style)
+                    }
+                }
+                .modifier(SettingsPickerModifier())
+            #endif
         }
     }
 
