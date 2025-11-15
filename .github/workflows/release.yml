@@ -42,6 +42,8 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26.0.1'
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: ${{ matrix.lane }}
@@ -67,6 +69,8 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26.0.1'
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
