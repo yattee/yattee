@@ -1,6 +1,49 @@
-## Build 204
+## Build 208
 
 ## What's Changed
+
+**iPad Enhancements:**
+* Enable resizable windows on iPad
+* Improve iPad UI behavior and settings layout
+* Fix horizontal content extending behind sidebar on iPad
+* Add proper padding to player controls and video details in non-fullscreen iPad windows
+* Hide orientation lock controls on iPad (not applicable for iPad)
+
+**iOS Improvements:**
+* Fix video player overlay to respect window fullscreen state
+* Allow video player to extend into safe areas
+* Fix iOS Now Playing Info Center integration for AVPlayer backend
+* Fix button styling and safe area handling
+
+**macOS Improvements:**
+* Fix picker label visibility in settings
+* Improve video layer rendering
+* Add macOS 26 compatibility for search UI
+* Improve playback settings UI controls
+
+**Player & Playback:**
+* Add retry mechanism for file load errors (both MPV and AVPlayer)
+* Fix MPV player vertical positioning in fullscreen mode
+* Improve player controls visibility and layout
+* Add nil safety checks for stream resolution and playback time handling
+* Refactor dirty region handling in MPV video rendering
+* Remove verbose logging from MPV rendering
+
+**UI/UX:**
+* Improve layout stability and reduce unwanted animations
+* Simplify stream description by removing instance info
+* Update default visible sections from trending to popular
+
+**Maintenance:**
+* Update MPVKit dependency
+* Update Ruby dependencies
+* Fix SwiftLint and SwiftFormat violations
+* Fix main actor isolation warnings
+* Update GitHub Actions to latest macOS and Xcode versions
+
+## Previous builds
+
+**Build 204:**
 * Fix Invidious companion API endpoint path
 * Fix issues with audio tracks in Piped (crash)
 * Improve MPV backend audio track handling
@@ -13,8 +56,6 @@
 * Improve search field layout and responsiveness
 * Add localization support for Finnish, Indonesian, Korean, Dutch, and Swedish
 * Update dependencies
-
-## Previous builds
 
 **Build 201:**
 * MPV audio track switching and fix default audio language by @n3d1117 in https://github.com/yattee/yattee/pull/874
