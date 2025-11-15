@@ -104,11 +104,10 @@ final class MPVOGLView: GLKView {
 
     // Function to set a dirty region when a part of the screen changes
     func markRegionAsDirty(_ region: CGRect) {
-        if dirtyRegion == nil {
-            dirtyRegion = region
+        if var dirtyRegion {
+            self.dirtyRegion = dirtyRegion.union(region)
         } else {
-            // Expand the dirty region to include the new region
-            dirtyRegion = dirtyRegion!.union(region)
+            dirtyRegion = region
         }
     }
 
