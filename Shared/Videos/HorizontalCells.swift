@@ -5,6 +5,7 @@ struct HorizontalCells: View {
     var items = [ContentItem]()
 
     @Environment(\.loadMoreContentHandler) private var loadMoreContentHandler
+    @Environment(\.navigationStyle) private var navigationStyle
 
     @Default(.channelOnThumbnail) private var channelOnThumbnail
 
@@ -33,7 +34,7 @@ struct HorizontalCells: View {
             #endif
         }
         .frame(height: cellHeight)
-        .edgesIgnoringSafeArea(.horizontal)
+        .modifier(ConditionalEdgeIgnoringSafeArea(navigationStyle: navigationStyle))
         .animation(nil, value: contentItems.count)
     }
 
@@ -54,6 +55,18 @@ struct HorizontalCells: View {
         #else
             290 - (channelOnThumbnail ? 23 : 0)
         #endif
+    }
+}
+
+struct ConditionalEdgeIgnoringSafeArea: ViewModifier {
+    let navigationStyle: NavigationStyle
+
+    func body(content: Content) -> some View {
+        if navigationStyle == .tab {
+            content.edgesIgnoringSafeArea(.horizontal)
+        } else {
+            content
+        }
     }
 }
 
