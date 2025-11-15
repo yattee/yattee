@@ -422,7 +422,7 @@ final class MPVClient: ObservableObject {
                 #if os(iOS)
                     insets = OrientationTracker.shared.currentInterfaceOrientation.isPortrait ? SafeAreaModel.shared.safeArea.bottom : 0
                 #endif
-                let offsetY = max(0, model.playingFullScreen ? ((model.playerSize.height / 2.0) - ((height + insets) / 2)) : 0)
+                let offsetY = max(0, model.playingFullScreen ? ((model.playerSize.height / 2.0) - (height / 2)) : 0)
                 UIView.animate(withDuration: 0.2, animations: {
                     self.glView?.frame = CGRect(x: 0, y: offsetY, width: roundedWidth, height: height)
                 }) { completion in
