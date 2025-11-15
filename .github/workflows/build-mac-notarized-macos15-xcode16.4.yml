@@ -1,4 +1,4 @@
-name: Build and notarize macOS app
+name: Build and notarize macOS app (macOS 15, Xcode 16.4)
 on:
   workflow_dispatch:
 
@@ -20,7 +20,7 @@ env:
 
 jobs:
   mac_notarized:
-    name: Build and notarize macOS app
+    name: Build and notarize macOS app (macOS 15, Xcode 16.4)
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,10 @@ jobs:
         with:
           xcode-version: '16.4'
       - name: Clear SPM cache
-        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+        run: |
+          rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf .build
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
