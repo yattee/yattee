@@ -121,15 +121,19 @@ struct HomeView: View {
             updateTask = Task {
                 async let favoritesUpdates: Void = {
                     for await _ in Defaults.updates(.favorites) {
-                        favoritesChanged.toggle()
+                        await MainActor.run {
+                            favoritesChanged.toggle()
+                        }
                     }
                 }()
                 async let widgetsUpdates: Void = {
                     for await _ in Defaults.updates(.widgetsSettings) {
-                        favoritesChanged.toggle()
+                        await MainActor.run {
+                            favoritesChanged.toggle()
+                        }
                     }
                 }()
-                _ = await (favoritesUpdates, widgetsUpdates)
+                _ = await(favoritesUpdates, widgetsUpdates)
             }
         }
         .onDisappear {
@@ -143,15 +147,19 @@ struct HomeView: View {
                 updateTask = Task {
                     async let favoritesUpdates: Void = {
                         for await _ in Defaults.updates(.favorites) {
-                            favoritesChanged.toggle()
+                            await MainActor.run {
+                                favoritesChanged.toggle()
+                            }
                         }
                     }()
                     async let widgetsUpdates: Void = {
                         for await _ in Defaults.updates(.widgetsSettings) {
-                            favoritesChanged.toggle()
+                            await MainActor.run {
+                                favoritesChanged.toggle()
+                            }
                         }
                     }()
-                    _ = await (favoritesUpdates, widgetsUpdates)
+                    _ = await(favoritesUpdates, widgetsUpdates)
                 }
             }
         }
