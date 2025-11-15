@@ -412,7 +412,7 @@ struct VideoPlayerView: View {
             if !newValue { player.controls.hideOverlays() }
         }
         #if os(iOS)
-        .statusBar(hidden: fullScreenPlayer)
+        .statusBar(hidden: Constants.isIPad ? Constants.isWindowFullscreen : fullScreenPlayer)
         .backport
         .toolbarBackground(colorScheme == .light ? .white : .black)
         .backport
