@@ -198,9 +198,6 @@ final class AVPlayerBackend: PlayerBackend {
         guard avPlayer.timeControlStatus != .paused else {
             return
         }
-        #if !os(macOS)
-            model.setAudioSessionActive(false)
-        #endif
         avPlayer.pause()
         model.objectWillChange.send()
     }
@@ -214,9 +211,6 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func stop() {
-        #if !os(macOS)
-            model.setAudioSessionActive(false)
-        #endif
         avPlayer.replaceCurrentItem(with: nil)
         hasStarted = false
     }

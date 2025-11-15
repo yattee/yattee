@@ -102,6 +102,8 @@ final class MPVClient: ObservableObject {
         // Set the number of threads dynamically
         checkError(mpv_set_option_string(mpv, "vd-lavc-threads", "\(threads)"))
 
+        // AUDIO //
+
         // GPU //
 
         checkError(mpv_set_option_string(mpv, "hwdec", Defaults[.mpvHWdec]))

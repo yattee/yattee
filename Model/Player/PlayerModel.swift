@@ -409,6 +409,9 @@ final class PlayerModel: ObservableObject {
     }
 
     func play() {
+        if !remoteCommandCenterConfigured {
+            updateRemoteCommandCenter()
+        }
         backend.play()
     }
 
@@ -637,17 +640,24 @@ final class PlayerModel: ObservableObject {
             fromBackend.pause()
         }
 
+        // Update Now Playing when switching backends to ensure the new backend takes control
+        updateNowPlayingInfo()
+
         guard var stream, changingStream else {
             return
         }
 
         if let stream = toBackend.stream, toBackend.video == fromBackend.video {
-            toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero, seekType: .backendSync) { finished in
+            toBackend.seek(to: fromBackend.currentTime?.seconds ?? .zero, seekType: .backendSync) { [weak self] finished in
                 guard finished else {
                     return
                 }
                 if wasPlaying {
                     toBackend.play()
+                    // Update Now Playing after resuming playback on new backend
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        self?.updateNowPlayingInfo()
+                    }
                 }
             }
 
@@ -862,8 +872,6 @@ final class PlayerModel: ObservableObject {
 
     func handleQueueChange() {
         Defaults[.queue] = queue
-
-        updateRemoteCommandCenter()
         controls.objectWillChange.send()
     }
 
@@ -897,7 +905,9 @@ final class PlayerModel: ObservableObject {
     func handlePlaybackModeChange() {
         Defaults[.playbackMode] = playbackMode
 
-        updateRemoteCommandCenter()
+        if currentItem != nil {
+            updateRemoteCommandCenter()
+        }
 
         guard playbackMode == .related else {
             autoplayItem = nil
@@ -953,17 +963,6 @@ final class PlayerModel: ObservableObject {
             let interval = TimeInterval(systemControlsSeekDuration) ?? 10
             let preferredIntervals = [NSNumber(value: interval)]
 
-            // Remove existing targets to avoid duplicates
-            skipForwardCommand.removeTarget(nil)
-            skipBackwardCommand.removeTarget(nil)
-            previousTrackCommand.removeTarget(nil)
-            nextTrackCommand.removeTarget(nil)
-            commandCenter.playCommand.removeTarget(nil)
-            commandCenter.pauseCommand.removeTarget(nil)
-            commandCenter.togglePlayPauseCommand.removeTarget(nil)
-            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
-
-            // Re-add targets for handling commands
             skipForwardCommand.preferredIntervals = preferredIntervals
             skipBackwardCommand.preferredIntervals = preferredIntervals
 
@@ -987,21 +986,25 @@ final class PlayerModel: ObservableObject {
                 return .success
             }
 
+            commandCenter.playCommand.isEnabled = true
             commandCenter.playCommand.addTarget { [weak self] _ in
                 self?.play()
                 return .success
             }
 
+            commandCenter.pauseCommand.isEnabled = true
             commandCenter.pauseCommand.addTarget { [weak self] _ in
                 self?.pause()
                 return .success
             }
 
+            commandCenter.togglePlayPauseCommand.isEnabled = true
             commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
                 self?.togglePlay()
                 return .success
             }
 
+            commandCenter.changePlaybackPositionCommand.isEnabled = true
             commandCenter.changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
                 guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
@@ -1114,7 +1117,8 @@ final class PlayerModel: ObservableObject {
             mediaType = MPMediaType.anyVideo.rawValue as NSNumber
         }
 
-        // Prepare the Now Playing info dictionary
+        let backendIsPlaying = backend.isPlaying
+
         var nowPlayingInfo: [String: AnyObject] = [
             MPMediaItemPropertyTitle: video.displayTitle as AnyObject,
             MPMediaItemPropertyArtist: video.displayAuthor as AnyObject,
@@ -1122,7 +1126,9 @@ final class PlayerModel: ObservableObject {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueCount: queue.count as AnyObject,
             MPNowPlayingInfoPropertyPlaybackQueueIndex: 1 as AnyObject,
-            MPMediaItemPropertyMediaType: mediaType
+            MPMediaItemPropertyMediaType: mediaType,
+            MPNowPlayingInfoPropertyPlaybackRate: (backendIsPlaying ? 1.0 : 0.0) as AnyObject,
+            MPNowPlayingInfoPropertyDefaultPlaybackRate: 1.0 as AnyObject
         ]
 
         if !currentArtwork.isNil {
@@ -1138,7 +1144,9 @@ final class PlayerModel: ObservableObject {
             }
         }
 
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        DispatchQueue.main.async {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        }
     }
 
     func updateCurrentArtwork() {
@@ -1303,7 +1311,7 @@ final class PlayerModel: ObservableObject {
                 do {
                     try AVAudioSession.sharedInstance().setActive(setActive)
                 } catch {
-                    self.logger.error("Error setting up audio session: \(error)")
+                    self.logger.error("Error setting audio session to \(setActive): \(error)")
                 }
             }
         }

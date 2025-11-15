@@ -22,14 +22,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             OrientationTracker.shared.startDeviceOrientationTracking()
             OrientationModel.shared.startOrientationUpdates()
 
-            // Configure the audio session for playback
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+                try AVAudioSession.sharedInstance().setActive(true)
             } catch {
                 logger.error("Failed to set audio session category: \(error)")
             }
 
-            // Begin receiving remote control events
             UIApplication.shared.beginReceivingRemoteControlEvents()
         #endif
 

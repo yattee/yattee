@@ -406,6 +406,10 @@ final class MPVBackend: PlayerBackend {
             seek(to: 0, seekType: .loopRestart)
         }
 
+        #if !os(macOS)
+            model.setAudioSessionActive(true)
+        #endif
+
         client?.play()
 
         isPlaying = true
@@ -418,9 +422,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func pause() {
-        #if !os(macOS)
-            model.setAudioSessionActive(false)
-        #endif
         stopClientUpdates()
         stopRefreshRateUpdates()
 
@@ -442,9 +443,6 @@ final class MPVBackend: PlayerBackend {
     }
 
     func stop() {
-        #if !os(macOS)
-            model.setAudioSessionActive(false)
-        #endif
         stopClientUpdates()
         stopRefreshRateUpdates()
         client?.stop()
