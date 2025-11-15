@@ -97,7 +97,7 @@ final class MPVBackend: PlayerBackend {
 
     var controlsUpdates = false
     private var timeObserverThrottle = Throttle(interval: 2)
-    
+
     // Retry mechanism
     private var retryCount = 0
     private let maxRetries = 3
@@ -227,7 +227,7 @@ final class MPVBackend: PlayerBackend {
         // Store stream and video for potential retries
         currentRetryStream = stream
         currentRetryVideo = video
-        
+
         #if !os(macOS)
             if model.presentingPlayer {
                 DispatchQueue.main.async {
@@ -247,7 +247,7 @@ final class MPVBackend: PlayerBackend {
                 video.captions.first { $0.code.contains(captionsDefaultLanguageCode) }
 
             // If there are still no captions, try to get captions with the fallback language code
-            if captions.isNil && !captionsFallbackLanguageCode.isEmpty {
+            if captions.isNil, !captionsFallbackLanguageCode.isEmpty {
                 captions = video.captions.first { $0.code == captionsFallbackLanguageCode } ??
                     video.captions.first { $0.code.contains(captionsFallbackLanguageCode) }
             }
@@ -369,7 +369,7 @@ final class MPVBackend: PlayerBackend {
                     replaceItem(self.model.preservedTime)
                 }
             } else {
-                replaceItem(self.model.preservedTime)
+                replaceItem(model.preservedTime)
             }
         } else {
             replaceItem(nil)
@@ -400,8 +400,8 @@ final class MPVBackend: PlayerBackend {
         setRate(model.currentRate)
 
         // After the video has ended, hitting play restarts the video from the beginning.
-        if let currentTime, currentTime.seconds.formattedAsPlaybackTime() == model.playerTime.duration.seconds.formattedAsPlaybackTime() &&
-            currentTime.seconds > 0 && model.playerTime.duration.seconds > 0
+        if let currentTime, currentTime.seconds.formattedAsPlaybackTime() == model.playerTime.duration.seconds.formattedAsPlaybackTime(),
+           currentTime.seconds > 0, model.playerTime.duration.seconds > 0
         {
             seek(to: 0, seekType: .loopRestart)
         }
@@ -466,23 +466,23 @@ final class MPVBackend: PlayerBackend {
     func closeItem() {
         pause()
         stop()
-        self.video = nil
-        self.stream = nil
+        video = nil
+        stream = nil
     }
 
     func closePiP() {}
 
     func startControlsUpdates() {
         guard model.presentingPlayer, model.controls.presentingControls, !model.controls.presentingOverlays else {
-            self.logger.info("ignored controls update start")
+            logger.info("ignored controls update start")
             return
         }
-        self.logger.info("starting controls updates")
+        logger.info("starting controls updates")
         controlsUpdates = true
     }
 
     func stopControlsUpdates() {
-        self.logger.info("stopping controls updates")
+        logger.info("stopping controls updates")
         controlsUpdates = false
     }
 
@@ -514,7 +514,7 @@ final class MPVBackend: PlayerBackend {
             self.model.updateWatch(time: currentTime)
         }
 
-        self.model.updateTime(currentTime)
+        model.updateTime(currentTime)
     }
 
     private func stopClientUpdates() {
@@ -641,7 +641,7 @@ final class MPVBackend: PlayerBackend {
         }
         eofPlaybackModeAction()
     }
-    
+
     private func handleFileLoadError() {
         guard let stream = currentRetryStream, let video = currentRetryVideo else {
             // No stream info available, show error immediately
@@ -651,13 +651,13 @@ final class MPVBackend: PlayerBackend {
             eofPlaybackModeAction()
             return
         }
-        
+
         if retryCount < maxRetries {
             retryCount += 1
             let delay = TimeInterval(retryCount * 2) // 2, 4, 6 seconds
-            
+
             logger.warning("File load failed. Retry attempt \(retryCount) of \(maxRetries) after \(delay) seconds...")
-            
+
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                 guard let self else { return }
                 self.logger.info("Retrying file load (attempt \(self.retryCount))...")
@@ -670,12 +670,12 @@ final class MPVBackend: PlayerBackend {
             model.closeCurrentItem(finished: true)
             getTimeUpdates()
             eofPlaybackModeAction()
-            
+
             // Reset retry counter for next attempt
             resetRetryState()
         }
     }
-    
+
     private func resetRetryState() {
         retryCount = 0
         currentRetryStream = nil
@@ -807,7 +807,7 @@ final class MPVBackend: PlayerBackend {
         guard let stream, let video else { return }
 
         // Validate the index is within bounds
-        guard index >= 0 && index < stream.audioTracks.count else {
+        guard index >= 0, index < stream.audioTracks.count else {
             logger.error("Invalid audio track index: \(index), available tracks: \(stream.audioTracks.count)")
             return
         }

@@ -37,7 +37,7 @@ final class VideoLayer: CAOpenGLLayer {
         displayTime _: UnsafePointer<CVTimeStamp>?
     ) {
         needsRedraw = false
-        
+
         var i: GLint = 0
         var flip: CInt = 1
         var ditherDepth = 8
@@ -103,7 +103,7 @@ final class VideoLayer: CAOpenGLLayer {
         needsRedraw = true
         super.display()
     }
-    
+
     func requestRedraw() {
         // Called from MPV's glUpdate callback - use setNeedsDisplay for efficient batching
         DispatchQueue.main.async { [weak self] in

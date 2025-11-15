@@ -722,10 +722,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
         }
         .sorted { track1, track2 in
             // Sort: ORIGINAL first, then DUBBED, then others
-            if track1.content == "ORIGINAL" && track2.content != "ORIGINAL" {
+            if track1.content == "ORIGINAL", track2.content != "ORIGINAL" {
                 return true
             }
-            if track1.content != "ORIGINAL" && track2.content == "ORIGINAL" {
+            if track1.content != "ORIGINAL", track2.content == "ORIGINAL" {
                 return false
             }
             // If both are same type, sort by language

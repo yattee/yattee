@@ -341,6 +341,7 @@ struct ControlsBar_Previews: PreviewProvider {
 }
 
 // MARK: - View Extension for Conditional Modifiers
+
 extension View {
     @ViewBuilder
     func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
@@ -355,16 +356,40 @@ extension View {
     func applyControlsBackground(enabled: Bool, cornerRadius: Double) -> some View {
         if enabled {
             #if os(iOS)
-            if #available(iOS 26.0, *) {
-                // Use Liquid Glass on iOS 26+
-                self.glassEffect(
-                    .regular.interactive(),
-                    in: .rect(cornerRadius: cornerRadius)
-                )
-            } else {
-                // Fallback to ultraThinMaterial
+                if #available(iOS 26.0, *) {
+                    // Use Liquid Glass on iOS 26+
+                    self.glassEffect(
+                        .regular.interactive(),
+                        in: .rect(cornerRadius: cornerRadius)
+                    )
+                } else {
+                    // Fallback to ultraThinMaterial
+                    // swiftlint:disable:next deployment_target
+                    if #available(iOS 15.0, *) {
+                        self
+                            .background(
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .fill(.ultraThinMaterial)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                            )
+                    } else {
+                        background(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(Color.gray.opacity(0.3))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
+                        )
+                    }
+                }
+            #else
+                // Fallback to ultraThinMaterial for macOS and tvOS
                 // swiftlint:disable:next deployment_target
-                if #available(iOS 15.0, *) {
+                if #available(macOS 12.0, tvOS 15.0, *) {
                     self
                         .background(
                             RoundedRectangle(cornerRadius: cornerRadius)
@@ -375,33 +400,7 @@ extension View {
                                 .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
                         )
                 } else {
-                    self
-                        .background(
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color.gray.opacity(0.3))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
-                        )
-                }
-            }
-            #else
-            // Fallback to ultraThinMaterial for macOS and tvOS
-            // swiftlint:disable:next deployment_target
-            if #available(macOS 12.0, tvOS 15.0, *) {
-                self
-                    .background(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .fill(.ultraThinMaterial)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
-                    )
-            } else {
-                self
-                    .background(
+                    background(
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .fill(Color.gray.opacity(0.3))
                     )
@@ -409,10 +408,10 @@ extension View {
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(Color("ControlsBorderColor"), lineWidth: 0.5)
                     )
-            }
+                }
             #endif
         } else {
-            self.background(Color.clear)
+            background(Color.clear)
         }
     }
 }

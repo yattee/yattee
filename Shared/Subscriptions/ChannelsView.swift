@@ -188,19 +188,19 @@ struct ChannelsView: View {
 }
 
 #if os(iOS)
-struct CompactListRowModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        // swiftlint:disable:next deployment_target
-        if #available(iOS 15.0, *) {
-            content
-                .listRowSpacing(0)
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        } else {
-            content
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+    struct CompactListRowModifier: ViewModifier {
+        func body(content: Content) -> some View {
+            // swiftlint:disable:next deployment_target
+            if #available(iOS 15.0, *) {
+                content
+                    .listRowSpacing(0)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            } else {
+                content
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            }
         }
     }
-}
 #endif
 
 struct ChannelsView_Previews: PreviewProvider {

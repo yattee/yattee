@@ -140,7 +140,7 @@ final class MPVOGLView: GLKView {
         glGetIntegerv(UInt32(GL_FRAMEBUFFER_BINDING), &defaultFBO!)
 
         // Ensure the framebuffer is valid
-        guard defaultFBO != nil && defaultFBO! != 0 else {
+        guard defaultFBO != nil, defaultFBO! != 0 else {
             logger.error("Invalid framebuffer ID.")
             return
         }

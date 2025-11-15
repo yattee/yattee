@@ -69,94 +69,94 @@ struct ContentView: View {
         }
         #else
         .background(
-            EmptyView().sheet(isPresented: $navigation.presentingSettings) {
-                SettingsView()
-            }
-        )
+                    EmptyView().sheet(isPresented: $navigation.presentingSettings) {
+                        SettingsView()
+                    }
+                )
         #endif
-        .modifier(ImportSettingsSheetViewModifier(isPresented: $navigation.presentingSettingsImportSheet, settingsFile: $navigation.settingsImportURL))
+                .modifier(ImportSettingsSheetViewModifier(isPresented: $navigation.presentingSettingsImportSheet, settingsFile: $navigation.settingsImportURL))
         #if os(tvOS)
-        .fullScreenCover(isPresented: $navigation.presentingAccounts) {
-            AccountsView()
-        }
-        #else
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingAccounts) {
+            .fullScreenCover(isPresented: $navigation.presentingAccounts) {
                 AccountsView()
             }
-        )
-        #endif
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingHomeSettings) {
-                #if os(macOS)
-                    VStack(alignment: .leading) {
-                        Button("Done") {
-                            navigation.presentingHomeSettings = false
-                        }
-                        .padding()
-                        .keyboardShortcut(.cancelAction)
-
-                        HomeSettings()
+        #else
+            .background(
+                    EmptyView().sheet(isPresented: $navigation.presentingAccounts) {
+                        AccountsView()
                     }
-                    .frame(width: 500, height: 800)
-                #else
-                    NavigationView {
-                        HomeSettings()
-                        #if os(iOS)
-                            .toolbar {
-                                ToolbarItem(placement: .navigation) {
-                                    Button {
-                                        navigation.presentingHomeSettings = false
-                                    } label: {
-                                        Text("Done")
-                                    }
+                )
+        #endif
+                .background(
+                    EmptyView().sheet(isPresented: $navigation.presentingHomeSettings) {
+                        #if os(macOS)
+                            VStack(alignment: .leading) {
+                                Button("Done") {
+                                    navigation.presentingHomeSettings = false
                                 }
+                                .padding()
+                                .keyboardShortcut(.cancelAction)
+
+                                HomeSettings()
+                            }
+                            .frame(width: 500, height: 800)
+                        #else
+                            NavigationView {
+                                HomeSettings()
+                                #if os(iOS)
+                                    .toolbar {
+                                        ToolbarItem(placement: .navigation) {
+                                            Button {
+                                                navigation.presentingHomeSettings = false
+                                            } label: {
+                                                Text("Done")
+                                            }
+                                        }
+                                    }
+                                #endif
                             }
                         #endif
                     }
-                #endif
-            }
-        )
+                )
         #if !os(tvOS)
-        .fileImporter(
-            isPresented: $navigation.presentingFileImporter,
-            allowedContentTypes: [.audiovisualContent],
-            allowsMultipleSelection: true
-        ) { result in
-            do {
-                let selectedFiles = try result.get()
-                let urlsToOpen = selectedFiles.map { url in
-                    if let bookmarkURL = URLBookmarkModel.shared.loadBookmark(url) {
-                        return bookmarkURL
+                .fileImporter(
+                    isPresented: $navigation.presentingFileImporter,
+                    allowedContentTypes: [.audiovisualContent],
+                    allowsMultipleSelection: true
+                ) { result in
+                    do {
+                        let selectedFiles = try result.get()
+                        let urlsToOpen = selectedFiles.map { url in
+                            if let bookmarkURL = URLBookmarkModel.shared.loadBookmark(url) {
+                                return bookmarkURL
+                            }
+
+                            if url.startAccessingSecurityScopedResource() {
+                                URLBookmarkModel.shared.saveBookmark(url)
+                            }
+
+                            return url
+                        }
+
+                        OpenVideosModel.shared.openURLs(urlsToOpen)
+                    } catch {
+                        NavigationModel.shared.presentAlert(title: "Could not open Files")
                     }
 
-                    if url.startAccessingSecurityScopedResource() {
-                        URLBookmarkModel.shared.saveBookmark(url)
-                    }
-
-                    return url
+                    NavigationModel.shared.presentingOpenVideos = false
                 }
-
-                OpenVideosModel.shared.openURLs(urlsToOpen)
-            } catch {
-                NavigationModel.shared.presentAlert(title: "Could not open Files")
-            }
-
-            NavigationModel.shared.presentingOpenVideos = false
-        }
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
-                AddToPlaylistView(video: navigation.videoToAddToPlaylist)
-            }
-        )
-        .background(
-            EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
-                PlaylistFormView(playlist: $navigation.editedPlaylist)
-            }
-        )
+                .background(
+                    EmptyView().sheet(isPresented: $navigation.presentingAddToPlaylist) {
+                        AddToPlaylistView(video: navigation.videoToAddToPlaylist)
+                    }
+                )
+                .background(
+                    EmptyView().sheet(isPresented: $navigation.presentingPlaylistForm) {
+                        PlaylistFormView(playlist: $navigation.editedPlaylist)
+                    }
+                )
         #endif
         #if os(iOS)
-        .background(
+                .background(
             EmptyView().sheet(isPresented: $navigation.presentingPlaybackSettings) {
                 PlaybackSettings()
             }

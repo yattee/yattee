@@ -111,7 +111,7 @@ struct PlayerControls: View {
                     }
                     .offset(y: playerControlsLayout.osdVerticalOffset + 5)
                     #if os(iOS)
-                    .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                        .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
                     #endif
 
                     Section {
@@ -125,7 +125,7 @@ struct PlayerControls: View {
                             }
                             .font(.system(size: playerControlsLayout.bigButtonFontSize))
                             #if os(iOS)
-                            .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                                .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
                             #endif
                         #endif
 
@@ -178,9 +178,9 @@ struct PlayerControls: View {
                             .zIndex(1)
                             .padding(.top, 2)
                             #if os(iOS)
-                            .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                                .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
                             #endif
-                            .transition(.opacity)
+                                .transition(.opacity)
 
                             HStack(spacing: playerControlsLayout.buttonsSpacing) {
                                 #if os(tvOS)
@@ -217,7 +217,7 @@ struct PlayerControls: View {
                             #else
                                 .offset(y: -playerControlsLayout.timelineHeight - 5)
                                 #if os(iOS)
-                                .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
+                                    .padding(.horizontal, Constants.isIPad && !Constants.isWindowFullscreen ? 10 : 0)
                                 #endif
                             #endif
                         }

@@ -186,11 +186,7 @@ struct ChannelVideosView: View {
                 .background(Color.background(scheme: colorScheme))
                 .focusScope(focusNamespace)
         #elseif os(macOS)
-            if #available(macOS 12.0, *) {
-                return content.focusScope(focusNamespace)
-            } else {
-                return content
-            }
+            return content.focusScope(focusNamespace)
         #else
             return content
         #endif

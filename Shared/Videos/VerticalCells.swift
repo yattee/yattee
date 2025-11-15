@@ -54,8 +54,8 @@ struct VerticalCells<Header: View>: View {
             .edgesIgnoringSafeArea(navigationStyle == .sidebar ? [] : edgesIgnoringSafeArea)
         #endif
         #if os(macOS)
-            .background(Color.secondaryBackground)
-            .frame(minWidth: Constants.contentViewMinWidth)
+        .background(Color.secondaryBackground)
+        .frame(minWidth: Constants.contentViewMinWidth)
         #endif
     }
 

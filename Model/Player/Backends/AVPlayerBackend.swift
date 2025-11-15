@@ -190,8 +190,8 @@ final class AVPlayerBackend: PlayerBackend {
         }
 
         // After the video has ended, hitting play restarts the video from the beginning.
-        if currentTime?.seconds.formattedAsPlaybackTime() == model.playerTime.duration.seconds.formattedAsPlaybackTime() &&
-            currentTime!.seconds > 0 && model.playerTime.duration.seconds > 0
+        if currentTime?.seconds.formattedAsPlaybackTime() == model.playerTime.duration.seconds.formattedAsPlaybackTime(),
+           currentTime!.seconds > 0, model.playerTime.duration.seconds > 0
         {
             seek(to: 0, seekType: .loopRestart)
         }

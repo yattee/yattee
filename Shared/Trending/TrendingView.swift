@@ -78,12 +78,12 @@ struct TrendingView: View {
         }
         #else
         .sheet(isPresented: $presentingCountrySelection) {
-            TrendingCountry(selectedCountry: $country)
-                #if os(macOS)
-                    .frame(minWidth: 400, minHeight: 400)
-                #endif
-        }
-        .background(
+                    TrendingCountry(selectedCountry: $country)
+                    #if os(macOS)
+                        .frame(minWidth: 400, minHeight: 400)
+                    #endif
+                }
+                .background(
                     Button("Refresh") {
                         resource.load()
                             .onFailure { self.error = $0 }
@@ -131,10 +131,10 @@ struct TrendingView: View {
         }
         #else
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            resource.loadIfNeeded()?
-                .onFailure { self.error = $0 }
-                .onSuccess { _ in self.error = nil }
-        }
+                    resource.loadIfNeeded()?
+                        .onFailure { self.error = $0 }
+                        .onSuccess { _ in self.error = nil }
+                }
         #endif
     }
 

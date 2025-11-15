@@ -687,7 +687,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func extractXTags(from urlString: String) -> [String: String] {
         guard let urlComponents = URLComponents(string: urlString),
               let queryItems = urlComponents.queryItems,
-              let xtagsValue = queryItems.first(where: { $0.name == "xtags" })?.value else {
+              let xtagsValue = queryItems.first(where: { $0.name == "xtags" })?.value
+        else {
             return [:]
         }
 

@@ -242,11 +242,7 @@ struct QualityProfileForm: View {
         #if os(macOS)
             let list = filteredFormatList
 
-            if #available(macOS 12.0, *) {
-                list.listStyle(.inset(alternatesRowBackgrounds: true))
-            } else {
-                list.listStyle(.inset)
-            }
+            list.listStyle(.inset(alternatesRowBackgrounds: true))
             Spacer()
         #else
             filteredFormatList

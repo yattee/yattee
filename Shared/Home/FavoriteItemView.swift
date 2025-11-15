@@ -64,13 +64,13 @@ struct FavoriteItemView: View {
                         #else
                             .padding(.horizontal, 15)
                         #endif
-                        .frame(height: expectedContentHeight)
+                            .frame(height: expectedContentHeight)
                     } else {
                         ZStack(alignment: .topLeading) {
                             // Reserve space immediately to prevent layout shift
                             Color.clear
                                 .frame(height: expectedContentHeight)
-                            
+
                             // Actual content renders within the reserved space
                             Group {
                                 switch widgetListingStyle {

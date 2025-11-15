@@ -314,17 +314,17 @@ struct VideoPlayerView: View {
                                 )
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                                 #if os(macOS)
-                                // TODO: Check whether this is needed on macOS.
-                                .onDisappear {
-                                    if player.presentingPlayer {
-                                        player.setNeedsDrawing(true)
+                                    // TODO: Check whether this is needed on macOS.
+                                    .onDisappear {
+                                        if player.presentingPlayer {
+                                            player.setNeedsDrawing(true)
+                                        }
                                     }
-                                }
                                 #endif
-                                .id(player.currentVideo?.cacheKey)
-                                .transition(.opacity)
-                                .offset(y: detailViewDragOffset)
-                                .gesture(detailsDragGesture)
+                                    .id(player.currentVideo?.cacheKey)
+                                    .transition(.opacity)
+                                    .offset(y: detailViewDragOffset)
+                                    .gesture(detailsDragGesture)
                             } else {
                                 VStack {}
                             }

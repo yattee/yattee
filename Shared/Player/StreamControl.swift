@@ -21,10 +21,10 @@ struct StreamControl: View {
                         ForEach(kinds, id: \.self) { key in
                             ForEach(availableStreamsByKind[key] ?? []) { stream in
                                 Text(stream.description)
-                                    #if os(macOS)
+                                #if os(macOS)
                                     .lineLimit(1)
                                     .truncationMode(.middle)
-                                    #endif
+                                #endif
                                     .tag(Stream?.some(stream))
                             }
 

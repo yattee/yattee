@@ -256,11 +256,7 @@ struct CommentView: View {
 #if os(macOS)
     struct TextSelectionModifier: ViewModifier {
         func body(content: Content) -> some View {
-            if #available(macOS 12.0, *) {
-                content.textSelection(.enabled)
-            } else {
-                content
-            }
+            content.textSelection(.enabled)
         }
     }
 #endif

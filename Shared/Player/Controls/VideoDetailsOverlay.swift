@@ -20,7 +20,7 @@ struct VideoDetailsOverlay: View {
     }
 
     #if os(iOS)
-        private var overlayLeadingPadding: CGFloat {
+        private var overlayLeadingPadding: Double {
             // On iPad in non-fullscreen mode, add left padding for system controls
             if Constants.isIPad && !Constants.isWindowFullscreen {
                 return Constants.iPadSystemControlsWidth + 15
@@ -28,7 +28,7 @@ struct VideoDetailsOverlay: View {
             return 0
         }
     #else
-        private var overlayLeadingPadding: CGFloat {
+        private var overlayLeadingPadding: Double {
             return 0
         }
     #endif

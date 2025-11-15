@@ -217,7 +217,7 @@ extension PlayerBackend {
                 // If rhs has no resolution, it's "less than" lhs (prefer lhs)
                 return lhs.resolution == nil
             }
-            
+
             if lhsResolution == rhsResolution {
                 guard let lhsFormat = QualityProfile.Format(rawValue: lhs.format.rawValue),
                       let rhsFormat = QualityProfile.Format(rawValue: rhs.format.rawValue)

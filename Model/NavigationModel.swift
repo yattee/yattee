@@ -318,7 +318,7 @@ final class NavigationModel: ObservableObject {
     func multipleTapHandler() {
         switch tabSelection {
         case .search:
-            self.search.focused = true
+            search.focused = true
         default:
             print("not implemented")
         }

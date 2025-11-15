@@ -130,7 +130,7 @@ extension PlayerModel {
             logger.error("Backend is nil when trying to select stream by quality profile")
             return nil
         }
-        
+
         let profile = qualityProfile ?? .defaultProfile
 
         // First attempt: Filter by both `canPlay` and `isPreferred`

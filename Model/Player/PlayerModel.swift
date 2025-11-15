@@ -620,7 +620,7 @@ final class PlayerModel: ObservableObject {
         }
 
         Defaults[.activeBackend] = to
-        self.activeBackend = to
+        activeBackend = to
 
         let fromBackend: PlayerBackend = from == .appleAVPlayer ? avPlayerBackend : mpvBackend
         let toBackend: PlayerBackend = to == .appleAVPlayer ? avPlayerBackend : mpvBackend
@@ -628,13 +628,13 @@ final class PlayerModel: ObservableObject {
         toBackend.cancelLoads()
         fromBackend.cancelLoads()
 
-        if !self.backend.canPlayAtRate(currentRate) {
-            currentRate = self.backend.suggestedPlaybackRates.last { $0 < currentRate } ?? 1.0
+        if !backend.canPlayAtRate(currentRate) {
+            currentRate = backend.suggestedPlaybackRates.last { $0 < currentRate } ?? 1.0
         }
 
-        self.rateToRestore = Float(currentRate)
+        rateToRestore = Float(currentRate)
 
-        self.backend.didChangeTo()
+        backend.didChangeTo()
 
         if wasPlaying {
             fromBackend.pause()
@@ -664,7 +664,7 @@ final class PlayerModel: ObservableObject {
             self.stream = stream
             streamSelection = stream
 
-            self.upgradeToStream(stream, force: true)
+            upgradeToStream(stream, force: true)
 
             return
         }
@@ -1086,7 +1086,7 @@ final class PlayerModel: ObservableObject {
 
         logger.info("entering fullscreen")
         toggleFullscreen(false, showControls: showControls)
-        self.playingFullScreen = true
+        playingFullScreen = true
     }
 
     func exitFullScreen(showControls: Bool = true) {
@@ -1094,7 +1094,7 @@ final class PlayerModel: ObservableObject {
 
         logger.info("exiting fullscreen")
         toggleFullscreen(true, showControls: showControls)
-        self.playingFullScreen = false
+        playingFullScreen = false
     }
 
     func updateNowPlayingInfo() {
@@ -1284,7 +1284,7 @@ final class PlayerModel: ObservableObject {
     }
 
     private func chapterForTime(_ time: Double) -> Int? {
-        guard let chapters = self.videoForDisplay?.chapters else {
+        guard let chapters = videoForDisplay?.chapters else {
             return nil
         }
 

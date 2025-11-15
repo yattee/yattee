@@ -9,7 +9,7 @@ struct ThumbnailView: View {
 
     init(url: URL?) {
         self.url = url
-        self.thumbnailExtension = Self.extractExtension(from: url)
+        thumbnailExtension = Self.extractExtension(from: url)
     }
 
     private static func extractExtension(from url: URL?) -> String? {

@@ -64,10 +64,10 @@ struct PlaybackSettings: View {
                 .padding(.vertical, 10)
 
                 if player.activeBackend == .mpv || !player.avPlayerUsesSystemControls {
-                    HStack(alignment: .center) {
+                    HStack {
                         controlsHeader("Rate".localized())
                         Spacer()
-                        HStack(alignment: .center, spacing: rateButtonsSpacing) {
+                        HStack(spacing: rateButtonsSpacing) {
                             decreaseRateButton
                             #if os(tvOS)
                             .focused($focusedField, equals: .decreaseRate)
@@ -243,18 +243,18 @@ struct PlaybackSettings: View {
             }
         } label: {
             #if os(macOS)
-            Image(systemName: "plus")
-                .imageScale(.large)
-                .frame(width: 16, height: 16)
+                Image(systemName: "plus")
+                    .imageScale(.large)
+                    .frame(width: 16, height: 16)
             #else
-            Label("Increase rate", systemImage: "plus")
-                .imageScale(.large)
-                .labelStyle(.iconOnly)
-                .foregroundColor(.accentColor)
-                .padding(12)
-                .frame(width: 40, height: 40)
-                .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
-                .contentShape(Rectangle())
+                Label("Increase rate", systemImage: "plus")
+                    .imageScale(.large)
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.accentColor)
+                    .padding(12)
+                    .frame(width: 40, height: 40)
+                    .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
+                    .contentShape(Rectangle())
             #endif
         }
         #if os(macOS)
@@ -280,18 +280,18 @@ struct PlaybackSettings: View {
             }
         } label: {
             #if os(macOS)
-            Image(systemName: "minus")
-                .imageScale(.large)
-                .frame(width: 16, height: 16)
+                Image(systemName: "minus")
+                    .imageScale(.large)
+                    .frame(width: 16, height: 16)
             #else
-            Label("Decrease rate", systemImage: "minus")
-                .imageScale(.large)
-                .labelStyle(.iconOnly)
-                .foregroundColor(.accentColor)
-                .padding(12)
-                .frame(width: 40, height: 40)
-                .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
-                .contentShape(Rectangle())
+                Label("Decrease rate", systemImage: "minus")
+                    .imageScale(.large)
+                    .labelStyle(.iconOnly)
+                    .foregroundColor(.accentColor)
+                    .padding(12)
+                    .frame(width: 40, height: 40)
+                    .background(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.accentColor, lineWidth: 1))
+                    .contentShape(Rectangle())
             #endif
         }
         #if os(macOS)

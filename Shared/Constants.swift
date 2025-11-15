@@ -45,7 +45,7 @@ enum Constants {
                 .filter({ $0.activationState == .foregroundActive })
                 .compactMap({ $0 as? UIWindowScene })
                 .first,
-                  let window = windowScene.windows.first
+                let window = windowScene.windows.first
             else {
                 return false
             }
@@ -55,13 +55,13 @@ enum Constants {
 
             // Check if window size matches screen bounds (accounting for small differences)
             return abs(windowBounds.width - screenBounds.width) < 1 &&
-                   abs(windowBounds.height - screenBounds.height) < 1
+                abs(windowBounds.height - screenBounds.height) < 1
         #else
             return false
         #endif
     }
 
-    static var iPadSystemControlsWidth: CGFloat {
+    static var iPadSystemControlsWidth: Double {
         50
     }
 

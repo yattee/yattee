@@ -4,7 +4,7 @@ struct AccountsView: View {
     @StateObject private var model = AccountsViewModel()
     @Environment(\.presentationMode) private var presentationMode
     #if os(tvOS)
-    @Environment(\.colorScheme) private var colorScheme
+        @Environment(\.colorScheme) private var colorScheme
     #endif
 
     var body: some View {

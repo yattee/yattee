@@ -58,11 +58,7 @@ struct TrendingCountry: View {
 
         return Group {
             #if os(macOS)
-                if #available(macOS 12.0, *) {
-                    list.listStyle(.inset(alternatesRowBackgrounds: true))
-                } else {
-                    list.listStyle(.inset)
-                }
+                list.listStyle(.inset(alternatesRowBackgrounds: true))
             #else
                 list
             #endif

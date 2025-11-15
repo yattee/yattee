@@ -16,7 +16,7 @@ import Foundation
             player.avPlayerBackend.playerLayer
         }
 
-        override init(frame frameRect: NSRect) {
+        override init(frame frameRect: CGRect) {
             super.init(frame: frameRect)
             wantsLayer = true
         }
