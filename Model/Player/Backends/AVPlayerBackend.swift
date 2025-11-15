@@ -110,6 +110,14 @@ final class AVPlayerBackend: PlayerBackend {
 
     var controlsUpdates = false
 
+    // Retry mechanism
+    private var retryCount = 0
+    private let maxRetries = 3
+    private var currentRetryStream: Stream?
+    private var currentRetryVideo: Video?
+    private var currentRetryPreservingTime = false
+    private var currentRetryUpgrading = false
+
     init() {
         addFrequentTimeObserver()
         addInfrequentTimeObserver()
@@ -151,6 +159,12 @@ final class AVPlayerBackend: PlayerBackend {
         preservingTime: Bool,
         upgrading: Bool
     ) {
+        // Store stream and video for potential retries
+        currentRetryStream = stream
+        currentRetryVideo = video
+        currentRetryPreservingTime = preservingTime
+        currentRetryUpgrading = upgrading
+
         isLoadingVideo = true
 
         if let url = stream.singleAssetURL {
@@ -265,9 +279,7 @@ final class AVPlayerBackend: PlayerBackend {
                     self?.insertPlayerItem(stream, for: video, preservingTime: preservingTime, upgrading: upgrading)
                 }
             case .failed:
-                DispatchQueue.main.async { [weak self] in
-                    self?.model.playerError = error
-                }
+                self?.handleFileLoadError(error: error)
             default:
                 return
             }
@@ -528,6 +540,9 @@ final class AVPlayerBackend: PlayerBackend {
 
             switch playerItem.status {
             case .readyToPlay:
+                // Reset retry state on successful load
+                self.resetRetryState()
+
                 if self.model.activeBackend == .appleAVPlayer,
                    self.isAutoplaying(playerItem)
                 {
@@ -565,9 +580,7 @@ final class AVPlayerBackend: PlayerBackend {
                 }
 
             case .failed:
-                DispatchQueue.main.async {
-                    self.model.playerError = item.error
-                }
+                self.handleFileLoadError(error: item.error)
 
             default:
                 return
@@ -836,4 +849,44 @@ final class AVPlayerBackend: PlayerBackend {
     func setNeedsDrawing(_: Bool) {}
     func setSize(_: Double, _: Double) {}
     func setNeedsNetworkStateUpdates(_: Bool) {}
+
+    private func handleFileLoadError(error: Error?) {
+        guard let stream = currentRetryStream, let video = currentRetryVideo else {
+            // No stream info available, show error immediately
+            DispatchQueue.main.async {
+                self.model.playerError = error
+            }
+            return
+        }
+
+        if retryCount < maxRetries {
+            retryCount += 1
+            let delay = TimeInterval(retryCount * 2) // 2, 4, 6 seconds
+
+            logger.warning("File load failed. Retry attempt \(retryCount) of \(maxRetries) after \(delay) seconds...")
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self else { return }
+                self.logger.info("Retrying file load (attempt \(self.retryCount))...")
+                self.playStream(stream, of: video, preservingTime: self.currentRetryPreservingTime, upgrading: self.currentRetryUpgrading)
+            }
+        } else {
+            // All retries exhausted, show error
+            logger.error("File load failed after \(maxRetries) retry attempts")
+            DispatchQueue.main.async {
+                self.model.playerError = error
+            }
+
+            // Reset retry counter for next attempt
+            resetRetryState()
+        }
+    }
+
+    private func resetRetryState() {
+        retryCount = 0
+        currentRetryStream = nil
+        currentRetryVideo = nil
+        currentRetryPreservingTime = false
+        currentRetryUpgrading = false
+    }
 }
