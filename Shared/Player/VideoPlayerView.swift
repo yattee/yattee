@@ -268,7 +268,7 @@ struct VideoPlayerView: View {
                     .ignoresSafeArea()
                 #else
                     GeometryReader { geometry in
-                        VStack(spacing: 0) {
+                        ZStack(alignment: .top) {
                             player.playerBackendView
                                 .modifier(
                                     VideoPlayerSizeModifier(
@@ -305,6 +305,7 @@ struct VideoPlayerView: View {
                             #endif
 
                                 .background(Color.black)
+                                .zIndex(1)
 
                             if !detailsHiddenInFullScreen {
                                 VideoDetails(
@@ -313,6 +314,7 @@ struct VideoPlayerView: View {
                                     sidebarQueue: $sidebarQueue
                                 )
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                                .frame(height: geometry.size.height)
                                 #if os(macOS)
                                     // TODO: Check whether this is needed on macOS.
                                     .onDisappear {
@@ -323,8 +325,9 @@ struct VideoPlayerView: View {
                                 #endif
                                     .id(player.currentVideo?.cacheKey)
                                     .transition(.opacity)
-                                    .offset(y: detailViewDragOffset)
+                                    .offset(y: (fullScreenDetails ? 0 : player.playerSize.height) + detailViewDragOffset)
                                     .gesture(detailsDragGesture)
+                                    .zIndex(2) // Ensure details are on top
                             } else {
                                 VStack {}
                             }
