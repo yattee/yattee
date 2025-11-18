@@ -504,7 +504,10 @@ final class MPVBackend: PlayerBackend {
             updateControls()
         }
 
-        model.updateNowPlayingInfo()
+        #if !os(macOS)
+            model.setupAudioSessionForNowPlaying()
+            model.updateNowPlayingInfo()
+        #endif
 
         handleSegmentsThrottle.execute {
             model.handleSegments(at: currentTime)
@@ -594,6 +597,11 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
             // Reset retry state on successful load
             resetRetryState()
+            // Re-activate audio session for Now Playing
+            #if !os(macOS)
+                model.setupAudioSessionForNowPlaying()
+                model.updateNowPlayingInfo()
+            #endif
 
         case MPV_EVENT_PROPERTY_CHANGE:
             let dataOpaquePtr = OpaquePointer(event.pointee.data)
@@ -611,9 +619,21 @@ final class MPVBackend: PlayerBackend {
             onFileLoaded = nil
             // Reset retry state on successful playback restart
             resetRetryState()
+            // Re-activate audio session for Now Playing
+            #if !os(macOS)
+                model.setupAudioSessionForNowPlaying()
+                model.updateNowPlayingInfo()
+            #endif
 
         case MPV_EVENT_VIDEO_RECONFIG:
             model.updateAspectRatio()
+
+        case MPV_EVENT_AUDIO_RECONFIG:
+            // Re-activate audio session when audio is reconfigured
+            #if !os(macOS)
+                model.setupAudioSessionForNowPlaying()
+                model.updateNowPlayingInfo()
+            #endif
 
         case MPV_EVENT_SEEK:
             isSeeking = true

@@ -1149,6 +1149,19 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    func setupAudioSessionForNowPlaying() {
+        #if !os(macOS)
+            do {
+                let audioSession = AVAudioSession.sharedInstance()
+                try audioSession.setCategory(.playback, mode: .moviePlayback, options: [])
+                try audioSession.setActive(true, options: [])
+                logger.info("Audio session activated for Now Playing")
+            } catch {
+                logger.error("Failed to set up audio session: \(error)")
+            }
+        #endif
+    }
+
     func updateCurrentArtwork() {
         guard let video = currentVideo,
               let thumbnailURL = video.thumbnailURL(quality: Constants.isIPhone ? .medium : .maxres)
