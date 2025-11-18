@@ -1507,6 +1507,7 @@
 		37E21DC52CDE528A008DF47C /* ta */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ta; path = ta.lproj/Localizable.strings; sourceTree = "<group>"; };
 		37E32DD42EC0D63600A63F29 /* TVOSPlainToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVOSPlainToggleStyle.swift; sourceTree = "<group>"; };
 		37E64DD026D597EB00C71877 /* SubscribedChannelsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribedChannelsModel.swift; sourceTree = "<group>"; };
+		37E6AF002ECCCCD50001DB2B /* Yattee (macOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Yattee (macOS).entitlements"; sourceTree = "<group>"; };
 		37E6D79B2944AE1A00550C3D /* FeedModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModel.swift; sourceTree = "<group>"; };
 		37E6D79F2944CD3800550C3D /* CacheStatusHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStatusHeader.swift; sourceTree = "<group>"; };
 		37E70922271CD43000D34DDE /* WelcomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreen.swift; sourceTree = "<group>"; };
@@ -2221,6 +2222,7 @@
 		37BE0BD826A214500092E2DB /* macOS */ = {
 			isa = PBXGroup;
 			children = (
+				37E6AF002ECCCCD50001DB2B /* Yattee (macOS).entitlements */,
 				374C0542272496E4009BDDBE /* AppDelegate.swift */,
 				37FD43DB270470B70073EE42 /* InstancesSettings.swift */,
 				37B7CFED2A19789F001B0564 /* MacOSPiPDelegate.swift */,
@@ -4490,7 +4492,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "macOS/Yattee (macOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -4528,7 +4530,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = Shared/Yattee.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "macOS/Yattee (macOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application";
 				CODE_SIGN_STYLE = Manual;
