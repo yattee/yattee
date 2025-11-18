@@ -1220,7 +1220,6 @@ final class PlayerModel: ObservableObject {
 
                 try audioSession.setCategory(.playback, mode: .moviePlayback, options: [])
                 try audioSession.setActive(true, options: [])
-                logger.info("Audio session activated for Now Playing (forceReactivate: \(forceReactivate))")
             } catch {
                 logger.error("Failed to set up audio session: \(error)")
             }

@@ -151,7 +151,6 @@ final class MPVOGLView: GLKView {
 
         // Check if we need partial updates
         if needsPartialUpdate() {
-            logger.info("Performing partial update with scissor test.")
             glEnable(GLenum(GL_SCISSOR_TEST))
         }
 
