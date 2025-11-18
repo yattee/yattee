@@ -640,8 +640,45 @@ final class PlayerModel: ObservableObject {
             fromBackend.pause()
         }
 
-        // Update Now Playing when switching backends to ensure the new backend takes control
-        updateNowPlayingInfo()
+        // When switching away from AVPlayer, clear its current item to release Now Playing control
+        #if !os(macOS)
+            if from == .appleAVPlayer && to == .mpv {
+                avPlayerBackend.avPlayer.replaceCurrentItem(with: nil)
+
+                // Clear Now Playing info entirely before MPV takes over
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+                MPNowPlayingInfoCenter.default().playbackState = .stopped
+
+                logger.info("Cleared AVPlayer's Now Playing control")
+
+                // Schedule Now Playing setup after a brief delay, but don't block stream loading
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let self else { return }
+
+                    // Re-activate audio session when switching to MPV to ensure Now Playing controls work
+                    // Force deactivate/reactivate to take control from AVPlayer
+                    self.setupAudioSessionForNowPlaying(forceReactivate: true)
+                    // Reset and re-enable remote commands to take control from AVPlayer
+                    self.updateRemoteCommandCenter(reset: true)
+                    // Set up Now Playing for MPV
+                    self.updateNowPlayingInfo()
+
+                    logger.info("Set up Now Playing for MPV backend")
+                }
+                // Continue to load the stream (don't return early)
+            } else if to == .mpv {
+                // Re-activate audio session when switching to MPV to ensure Now Playing controls work
+                // Force deactivate/reactivate to take control from AVPlayer
+                setupAudioSessionForNowPlaying(forceReactivate: true)
+                // Re-enable remote commands to take control from AVPlayer
+                updateRemoteCommandCenter()
+                updateNowPlayingInfo()
+            } else {
+                updateNowPlayingInfo()
+            }
+        #else
+            updateNowPlayingInfo()
+        #endif
 
         guard var stream, changingStream else {
             return
@@ -656,6 +693,12 @@ final class PlayerModel: ObservableObject {
                     toBackend.play()
                     // Update Now Playing after resuming playback on new backend
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        #if !os(macOS)
+                            if to == .mpv {
+                                self?.setupAudioSessionForNowPlaying(forceReactivate: true)
+                                self?.updateRemoteCommandCenter(reset: true)
+                            }
+                        #endif
                         self?.updateNowPlayingInfo()
                     }
                 }
@@ -950,12 +993,26 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func updateRemoteCommandCenter() {
+    func updateRemoteCommandCenter(reset: Bool = false) {
         let commandCenter = MPRemoteCommandCenter.shared()
         let skipForwardCommand = commandCenter.skipForwardCommand
         let skipBackwardCommand = commandCenter.skipBackwardCommand
         let previousTrackCommand = commandCenter.previousTrackCommand
         let nextTrackCommand = commandCenter.nextTrackCommand
+
+        // If resetting (e.g., after AVPlayer was active), remove all targets and re-add them
+        if reset {
+            logger.info("Resetting remote command center to reclaim control from AVPlayer")
+            commandCenter.playCommand.removeTarget(nil)
+            commandCenter.pauseCommand.removeTarget(nil)
+            commandCenter.togglePlayPauseCommand.removeTarget(nil)
+            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+            skipForwardCommand.removeTarget(nil)
+            skipBackwardCommand.removeTarget(nil)
+            previousTrackCommand.removeTarget(nil)
+            nextTrackCommand.removeTarget(nil)
+            remoteCommandCenterConfigured = false
+        }
 
         if !remoteCommandCenterConfigured {
             remoteCommandCenterConfigured = true
@@ -986,25 +1043,21 @@ final class PlayerModel: ObservableObject {
                 return .success
             }
 
-            commandCenter.playCommand.isEnabled = true
             commandCenter.playCommand.addTarget { [weak self] _ in
                 self?.play()
                 return .success
             }
 
-            commandCenter.pauseCommand.isEnabled = true
             commandCenter.pauseCommand.addTarget { [weak self] _ in
                 self?.pause()
                 return .success
             }
 
-            commandCenter.togglePlayPauseCommand.isEnabled = true
             commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
                 self?.togglePlay()
                 return .success
             }
 
-            commandCenter.changePlaybackPositionCommand.isEnabled = true
             commandCenter.changePlaybackPositionCommand.addTarget { [weak self] remoteEvent in
                 guard let event = remoteEvent as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
@@ -1013,6 +1066,12 @@ final class PlayerModel: ObservableObject {
                 return .success
             }
         }
+
+        // Always re-enable commands to ensure they work after backend switches
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
 
         switch Defaults[.systemControlsCommands] {
         case .seek:
@@ -1149,13 +1208,19 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    func setupAudioSessionForNowPlaying() {
+    func setupAudioSessionForNowPlaying(forceReactivate: Bool = false) {
         #if !os(macOS)
             do {
                 let audioSession = AVAudioSession.sharedInstance()
+
+                // If forcing reactivation (e.g., after backend switch), deactivate first
+                if forceReactivate {
+                    try? audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+                }
+
                 try audioSession.setCategory(.playback, mode: .moviePlayback, options: [])
                 try audioSession.setActive(true, options: [])
-                logger.info("Audio session activated for Now Playing")
+                logger.info("Audio session activated for Now Playing (forceReactivate: \(forceReactivate))")
             } catch {
                 logger.error("Failed to set up audio session: \(error)")
             }
