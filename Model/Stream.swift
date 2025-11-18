@@ -203,7 +203,7 @@ class Stream: Equatable, Hashable, Identifiable {
         }
 
         var description: String {
-            "\(displayLanguage) (\(content ?? "Unknown"))"
+            "\(displayLanguage) (\(content ?? "Original"))"
         }
 
         var isDubbed: Bool {
