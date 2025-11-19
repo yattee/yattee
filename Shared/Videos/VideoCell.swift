@@ -39,7 +39,7 @@ struct VideoCell: View {
         Button(action: playAction) {
             content
             #if os(tvOS)
-            .frame(width: 580, height: channelOnThumbnail ? 470 : 500)
+            .frame(width: 550, height: channelOnThumbnail ? 446 : 480)
             #endif
         }
         .opacity(contentOpacity)

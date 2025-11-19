@@ -84,7 +84,7 @@ struct VerticalCells<Header: View>: View {
         #if os(iOS)
             return verticalSizeClass == .regular ? 320 : 800
         #elseif os(tvOS)
-            return 600
+            return 560
         #else
             return 320
         #endif
@@ -92,7 +92,7 @@ struct VerticalCells<Header: View>: View {
 
     var adaptiveGridItemMaximumSize: Double {
         #if os(tvOS)
-            return 600
+            return 560
         #else
             return .infinity
         #endif
