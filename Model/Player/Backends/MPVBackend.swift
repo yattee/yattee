@@ -338,11 +338,11 @@ final class MPVBackend: PlayerBackend {
 
                     // Handle streams with multiple audio tracks
                     if !stream.audioTracks.isEmpty {
-                        if stream.selectedAudioTrackIndex >= stream.audioTracks.count {
-                            stream.selectedAudioTrackIndex = 0
-                        }
+                        // Ensure the index is within bounds to prevent race conditions
+                        let safeIndex = min(max(0, stream.selectedAudioTrackIndex), stream.audioTracks.count - 1)
+                        stream.selectedAudioTrackIndex = safeIndex
 
-                        stream.audioAsset = AVURLAsset(url: stream.audioTracks[stream.selectedAudioTrackIndex].url)
+                        stream.audioAsset = AVURLAsset(url: stream.audioTracks[safeIndex].url)
                         let fileToLoad = self.model.musicMode ? stream.audioAsset.url : stream.videoAsset.url
                         let audioTrack = self.model.musicMode ? nil : stream.audioAsset.url
 

@@ -458,7 +458,7 @@ struct ControlsOverlay: View {
             Menu {
                 audioTrackPicker
             } label: {
-                Text(player.availableAudioTracks[player.selectedAudioTrackIndex].displayLanguage)
+                Text(player.selectedAudioTrack?.displayLanguage ?? "Original")
                     .frame(maxWidth: 240, alignment: .trailing)
             }
             .transaction { t in t.animation = .none }
@@ -468,7 +468,7 @@ struct ControlsOverlay: View {
             .frame(height: 40)
         #else
             ControlsOverlayButton(focusedField: $focusedField, field: .audioTrack) {
-                Text(player.availableAudioTracks[player.selectedAudioTrackIndex].displayLanguage)
+                Text(player.selectedAudioTrack?.displayLanguage ?? "Original")
                     .frame(maxWidth: 320)
             }
             .contextMenu {

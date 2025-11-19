@@ -1575,4 +1575,11 @@ final class PlayerModel: ObservableObject {
     var availableAudioTracks: [Stream.AudioTrack] {
         (backend as? MPVBackend)?.availableAudioTracks ?? []
     }
+
+    var selectedAudioTrack: Stream.AudioTrack? {
+        let tracks = availableAudioTracks
+        guard !tracks.isEmpty else { return nil }
+        let safeIndex = min(max(0, selectedAudioTrackIndex), tracks.count - 1)
+        return tracks[safeIndex]
+    }
 }
