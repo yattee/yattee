@@ -44,13 +44,13 @@ struct ThumbnailView: View {
 
     var webImage: some View {
         WebImage(url: url)
-            .resizable()
             .onFailure { _ in
                 if let url {
                     thumbnails.insertUnloadable(url)
                 }
             }
             .placeholder { placeholder }
+            .resizable()
     }
 
     @ViewBuilder var asyncImageIfAvailable: some View {
@@ -76,6 +76,8 @@ struct ThumbnailView: View {
     }
 
     var placeholder: some View {
-        Rectangle().fill(Color("PlaceholderColor"))
+        Rectangle()
+            .fill(Color("PlaceholderColor"))
+            .aspectRatio(Constants.aspectRatio16x9, contentMode: .fit)
     }
 }

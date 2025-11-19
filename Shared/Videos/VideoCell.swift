@@ -429,17 +429,15 @@ struct VideoCell: View {
             }
             .lineLimit(1)
         }
+        .aspectRatio(Constants.aspectRatio16x9, contentMode: .fit)
     }
 
     private var thumbnailImage: some View {
-        Group {
-            VideoCellThumbnail(video: video)
-
+        VideoCellThumbnail(video: video)
             #if os(tvOS)
-                .frame(minHeight: 320)
+            .frame(minHeight: 320)
             #endif
-        }
-        .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
+            .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
     }
 
     private var time: String? {
@@ -477,11 +475,13 @@ struct VideoCellThumbnail: View {
     private var thumbnails: ThumbnailsModel { .shared }
 
     var body: some View {
-        let (url, quality) = thumbnails.best(video)
-        let aspectRatio = (quality == .default || quality == .high) ? Constants.aspectRatio4x3 : Constants.aspectRatio16x9
+        let (url, _) = thumbnails.best(video)
 
         ThumbnailView(url: url)
-            .aspectRatio(aspectRatio, contentMode: .fill)
+            .scaledToFill()
+            .frame(maxWidth: .infinity)
+            .aspectRatio(Constants.aspectRatio16x9, contentMode: .fit)
+            .clipped()
     }
 }
 
