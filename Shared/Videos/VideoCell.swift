@@ -440,7 +440,6 @@ struct VideoCell: View {
             #endif
         }
         .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
-        .aspectRatio(Constants.aspectRatio16x9, contentMode: .fill)
     }
 
     private var time: String? {
