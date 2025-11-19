@@ -1394,7 +1394,11 @@ final class PlayerModel: ObservableObject {
         func setAudioSessionActive(_ setActive: Bool) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 do {
-                    try AVAudioSession.sharedInstance().setActive(setActive)
+                    let audioSession = AVAudioSession.sharedInstance()
+                    if setActive {
+                        try audioSession.setCategory(.playback, mode: .moviePlayback)
+                    }
+                    try audioSession.setActive(setActive)
                 } catch {
                     self.logger.error("Error setting audio session to \(setActive): \(error)")
                 }

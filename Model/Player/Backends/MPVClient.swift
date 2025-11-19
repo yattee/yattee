@@ -135,12 +135,6 @@ final class MPVClient: ObservableObject {
 
         checkError(mpv_initialize(mpv))
 
-        #if !os(macOS)
-            // Set up audio session for Now Playing support
-            backend?.model.setupAudioSessionForNowPlaying()
-            backend?.model.updateNowPlayingInfo()
-        #endif
-
         let api = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
         var initParams = mpv_opengl_init_params(
             get_proc_address: getProcAddress,
