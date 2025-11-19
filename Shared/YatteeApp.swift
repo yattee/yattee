@@ -162,6 +162,23 @@ struct YatteeApp: App {
 
             SDWebImageManager.defaultImageCache = PINCache(name: "stream.yattee.app")
 
+            NotificationCenter.default.addObserver(
+                forName: .accountConfigurationComplete,
+                object: nil,
+                queue: .main
+            ) { _ in
+                let startupSection = Defaults[.startupSection]
+                var section: TabSelection? = startupSection.tabSelection
+
+                #if os(macOS)
+                    if section == .playlists {
+                        section = .search
+                    }
+                #endif
+
+                NavigationModel.shared.tabSelection = section ?? .search
+            }
+
             if !Defaults[.lastAccountIsPublic] {
                 AccountsModel.shared.configureAccount()
             }
@@ -179,17 +196,6 @@ struct YatteeApp: App {
                     recents.clear()
                 }
             }
-
-            let startupSection = Defaults[.startupSection]
-            var section: TabSelection? = startupSection.tabSelection
-
-            #if os(macOS)
-                if section == .playlists {
-                    section = .search
-                }
-            #endif
-
-            NavigationModel.shared.tabSelection = section ?? .search
 
             DispatchQueue.main.async {
                 playlists.load()

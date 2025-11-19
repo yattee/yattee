@@ -135,6 +135,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
             FeedModel.shared.onAccountChange()
             SubscribedChannelsModel.shared.onAccountChange()
             PlaylistsModel.shared.onAccountChange()
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
         }
     }
 
@@ -149,6 +153,9 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
               let username,
               let password
         else {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
             return
         }
 
@@ -184,11 +191,14 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
                 self.configure()
 
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+
             case let .failure(error):
                 NavigationModel.shared.presentAlert(
                     title: "Account Error",
                     message: error.localizedDescription
                 )
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
             }
         }
     }

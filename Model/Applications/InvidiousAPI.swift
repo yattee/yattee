@@ -152,6 +152,10 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             FeedModel.shared.onAccountChange()
             SubscribedChannelsModel.shared.onAccountChange()
             PlaylistsModel.shared.onAccountChange()
+
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
         }
     }
 
@@ -160,6 +164,9 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         guard !account.anonymous,
               (account.token?.isEmpty ?? true) || force
         else {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
             return
         }
 
@@ -172,6 +179,9 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 title: "Account Error",
                 message: "Remove and add your account again in Settings."
             )
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
             return
         }
 
@@ -212,6 +222,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                 }
 
                 self.configure()
+
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
             }
     }
 

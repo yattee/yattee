@@ -174,6 +174,9 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
         guard !account.anonymous,
               (account.token?.isEmpty ?? true) || force
         else {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
             return
         }
 
@@ -186,6 +189,9 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
                 title: "Account Error",
                 message: "Remove and add your account again in Settings."
             )
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
+            }
             return
         }
 
@@ -194,6 +200,7 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
                 title: "Account Error",
                 message: message ?? "\(response?.response?.statusCode ?? -1) - \(response?.error?.errorDescription ?? "unknown")\nIf this issue persists, try removing and adding your account again in Settings."
             )
+            NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
         }
 
         AF
@@ -226,6 +233,8 @@ final class PeerTubeAPI: Service, ObservableObject, VideosAPI {
                 }
 
                 self.configure()
+
+                NotificationCenter.default.post(name: .accountConfigurationComplete, object: nil)
             }
     }
 

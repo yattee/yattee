@@ -207,6 +207,9 @@
 		37319F0627103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		37319F0727103F94004ECCD0 /* PlayerQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37319F0427103F94004ECCD0 /* PlayerQueue.swift */; };
 		3732BFD028B83763009F3F4D /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3732BFCF28B83763009F3F4D /* KeychainAccess */; };
+		3736882B2ECE7947006B1D1F /* Notification+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3736882A2ECE7947006B1D1F /* Notification+Names.swift */; };
+		3736882C2ECE7947006B1D1F /* Notification+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3736882A2ECE7947006B1D1F /* Notification+Names.swift */; };
+		3736882D2ECE7947006B1D1F /* Notification+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3736882A2ECE7947006B1D1F /* Notification+Names.swift */; };
 		3738535429451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535529451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
 		3738535629451DC800D2D0CB /* BookmarksCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */; };
@@ -1215,6 +1218,7 @@
 		373197D82732015300EF734F /* RelatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedView.swift; sourceTree = "<group>"; };
 		37319F0427103F94004ECCD0 /* PlayerQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueue.swift; sourceTree = "<group>"; };
 		37367E582B8F63C200436163 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		3736882A2ECE7947006B1D1F /* Notification+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Names.swift"; sourceTree = "<group>"; };
 		3738535329451DC800D2D0CB /* BookmarksCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCacheModel.swift; sourceTree = "<group>"; };
 		373C8FE3275B955100CB5936 /* CommentsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsPage.swift; sourceTree = "<group>"; };
 		373CFACA26966264003CB2C6 /* SearchQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchQuery.swift; sourceTree = "<group>"; };
@@ -2240,6 +2244,7 @@
 		37C7A9022679058300E721B4 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				3736882A2ECE7947006B1D1F /* Notification+Names.swift */,
 				379775922689365600DD52A8 /* Array+Next.swift */,
 				37DCD3162A191A180059A470 /* AVPlayerViewController+FullScreen.swift */,
 				376578842685429C00D4EA09 /* CaseIterable+Next.swift */,
@@ -3297,6 +3302,7 @@
 				37BA794F26DC3E0E002A0235 /* Int+Format.swift in Sources */,
 				378E9C3C2945565500B2D696 /* SubscriptionsView.swift in Sources */,
 				37D6025928C17375009E8D98 /* PlaybackStatsView.swift in Sources */,
+				3736882D2ECE7947006B1D1F /* Notification+Names.swift in Sources */,
 				37F49BA326CAA59B00304AC0 /* Playlist+Fixtures.swift in Sources */,
 				374C053B2724614F009BDDBE /* PlayerTVMenu.swift in Sources */,
 				37A9965A26D6F8CA006E3224 /* HorizontalCells.swift in Sources */,
@@ -3644,6 +3650,7 @@
 				37A81BFA294BD1440081D322 /* WatchView.swift in Sources */,
 				3700155C271B0D4D0049C794 /* PipedAPI.swift in Sources */,
 				376BE50C27349108009AD608 /* BrowsingSettings.swift in Sources */,
+				3736882C2ECE7947006B1D1F /* Notification+Names.swift in Sources */,
 				3710A55629488C7D006F8025 /* PlaceholderListItem.swift in Sources */,
 				37EBD8CB27AF26C200F1C24B /* MPVBackend.swift in Sources */,
 				37D4B19826717E1500C925CA /* Video.swift in Sources */,
@@ -3942,6 +3949,7 @@
 				37C7A1D7267BFD9D0010EAD6 /* SponsorBlockSegment.swift in Sources */,
 				3756C2A82861131100E4B059 /* NetworkState.swift in Sources */,
 				376578932685490700D4EA09 /* PlaylistsView.swift in Sources */,
+				3736882B2ECE7947006B1D1F /* Notification+Names.swift in Sources */,
 				37E75CCD2B6AEB01003A6237 /* RecentlyOpenedExporter.swift in Sources */,
 				377FF891291A99580028EB0B /* HistoryView.swift in Sources */,
 				37CC3F47270CE30600608308 /* PlayerQueueItem.swift in Sources */,
