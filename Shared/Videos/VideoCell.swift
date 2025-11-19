@@ -429,7 +429,6 @@ struct VideoCell: View {
             }
             .lineLimit(1)
         }
-        .aspectRatio(Constants.aspectRatio16x9, contentMode: .fit)
     }
 
     private var thumbnailImage: some View {
@@ -478,10 +477,7 @@ struct VideoCellThumbnail: View {
         let (url, _) = thumbnails.best(video)
 
         ThumbnailView(url: url)
-            .scaledToFill()
-            .frame(maxWidth: .infinity)
-            .aspectRatio(Constants.aspectRatio16x9, contentMode: .fit)
-            .clipped()
+            .aspectRatio(Constants.aspectRatio16x9, contentMode: .fill)
     }
 }
 
