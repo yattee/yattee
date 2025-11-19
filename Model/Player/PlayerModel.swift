@@ -440,11 +440,19 @@ final class PlayerModel: ObservableObject {
 
         #if os(iOS)
             if !playingInPictureInPicture, showingPlayer {
-                onPresentPlayer.append { [weak self] in
-                    changeBackendHandler?()
-                    self?.playNow(video, at: time)
+                if presentingPlayer {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                        guard let self else { return }
+                        changeBackendHandler?()
+                        self.playNow(video, at: time)
+                    }
+                } else {
+                    onPresentPlayer.append { [weak self] in
+                        changeBackendHandler?()
+                        self?.playNow(video, at: time)
+                    }
+                    show()
                 }
-                show()
                 return
             }
         #endif
