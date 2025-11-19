@@ -76,7 +76,7 @@ struct MenuCommands: Commands {
             Button(togglePlayerLabel) {
                 PlayerModel.shared.togglePlayer()
             }
-            .keyboardShortcut("o")
+            .keyboardShortcut("p", modifiers: [.command, .shift])
         }
     }
 
