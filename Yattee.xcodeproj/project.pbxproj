@@ -5034,7 +5034,7 @@
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.0;
+				minimumVersion = 26.0.0;
 			};
 		};
 		37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
