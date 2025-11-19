@@ -532,7 +532,10 @@ final class PipedAPI: Service, ObservableObject, VideosAPI {
 
         let channelId = details["uploaderUrl"]?.string?.components(separatedBy: "/").last ?? "unknown"
 
-        let thumbnails: [Thumbnail] = Thumbnail.Quality.allCases.compactMap {
+        let qualities = [
+            Thumbnail.Quality.maxresdefault, .high, .medium, .default, .start, .middle, .end
+        ]
+        let thumbnails: [Thumbnail] = qualities.compactMap {
             if let url = buildThumbnailURL(from: content, quality: $0) {
                 return Thumbnail(url: url, quality: $0)
             }
