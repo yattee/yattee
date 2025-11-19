@@ -73,7 +73,7 @@ extension PlayerModel {
         for stream in streams {
             streamProcessingQueue.async(group: streamProcessingGroup) {
                 let forbiddenAssetTestGroup = DispatchGroup()
-                if !hasAllowedAsset, !hasForbiddenAsset, !instance.proxiesVideos, stream.format != Stream.Format.unknown {
+                if !hasAllowedAsset, !hasForbiddenAsset, !instance.proxiesVideos, stream.format != nil && stream.format != Stream.Format.unknown {
                     let (nonHLSAssets, hlsURLs) = self.getAssets(from: [stream])
                     if let firstStream = nonHLSAssets.first {
                         let asset = firstStream.0

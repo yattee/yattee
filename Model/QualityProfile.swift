@@ -81,6 +81,11 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
             return false
         }
 
+        // Safety check: Ensure stream has a format
+        guard let streamFormat = stream.format else {
+            return false
+        }
+
         let defaultResolution = Stream.Resolution.custom(height: 720, refreshRate: 30)
         let resolutionMatch = resolution.value ?? defaultResolution >= streamResolution
 
@@ -88,7 +93,7 @@ struct QualityProfile: Hashable, Identifiable, Defaults.Serializable {
             return true
         }
 
-        let formatMatch = formats.compactMap(\.streamFormat).contains(stream.format)
+        let formatMatch = formats.compactMap(\.streamFormat).contains(streamFormat)
 
         return resolutionMatch && formatMatch
     }
