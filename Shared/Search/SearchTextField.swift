@@ -55,9 +55,9 @@ struct SearchTextField: View {
                 TextField("Search...", text: $state.queryText) {
                     state.changeQuery { query in
                         query.query = state.queryText
-                        navigation.hideKeyboard()
                     }
                     RecentsModel.shared.addQuery(state.queryText)
+                    navigation.hideKeyboard()
                 }
                 .disableAutocorrection(true)
                 .textFieldStyle(.plain)

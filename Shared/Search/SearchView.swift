@@ -49,10 +49,10 @@ struct SearchView: View {
                                 .opacity(state.queryText.isEmpty ? 0 : 1)
                         } else {
                             results
+                                .backport
+                                .scrollDismissesKeyboardInteractively()
                         }
                     }
-                    .backport
-                    .scrollDismissesKeyboardInteractively()
                 }
                 .environment(\.listingStyle, searchListingStyle)
                 .toolbar {
