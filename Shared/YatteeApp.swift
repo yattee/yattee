@@ -237,6 +237,10 @@ struct YatteeApp: App {
                 self.migrateQualityProfiles()
             }
 
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.cleanupDisabledFeatures()
+            }
+
             #if os(iOS)
                 DispatchQueue.global(qos: .userInitiated).async {
                     self.migrateRotateToLandscapeOnEnterFullScreen()
@@ -290,6 +294,34 @@ struct YatteeApp: App {
             }
         }
     #endif
+
+    func cleanupDisabledFeatures() {
+        // Remove trending from visible sections if feature flag is disabled
+        if !FeatureFlags.trendingEnabled {
+            var visibleSections = Defaults[.visibleSections]
+            if visibleSections.contains(.trending) {
+                visibleSections.remove(.trending)
+                Defaults[.visibleSections] = visibleSections
+            }
+
+            // Reset startup section if set to trending
+            if Defaults[.startupSection] == .trending {
+                Defaults[.startupSection] = .home
+            }
+
+            // Remove trending favorites
+            let trendingFavorites = favorites.all.filter { item in
+                if case .trending = item.section {
+                    return true
+                }
+                return false
+            }
+
+            for favorite in trendingFavorites {
+                favorites.remove(favorite)
+            }
+        }
+    }
 
     var navigationStyle: NavigationStyle {
         #if os(iOS)
