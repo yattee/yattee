@@ -1,7 +1,17 @@
-## Build 209
+## Build 210
 
 ## What's Changed
 
+* Trending and Hide Shorts was disabled due to changes in the video apps API
+* Fix iPad iOS 18 keyboard dismissal issue in search
+* Fix audio session interrupting other apps on launch
+* Fix thumbnail loading for video details
+* Fix thumbnail aspect ratio to prevent stretching and layout jumps
+* Fix keyboard shortcut conflict for Show Player command
+
+## Previous builds
+
+**Build 209:**
 * Fix Now Playing controls for both MPV and AVPlayer backends
 * Fix thumbnail sizing and aspect ratio issues in video cells (#896)
 * Adjust tvOS video cell dimensions for better layout
@@ -9,8 +19,6 @@
 * Fix audio track label showing "Original" instead of "Unknown"
 * Simplify fullscreen handling for iOS
 * Add macOS-specific entitlements for MPV backend
-
-## Previous builds
 
 **Build 208:**
 * Enable resizable windows on iPad
