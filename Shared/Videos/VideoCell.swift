@@ -433,9 +433,9 @@ struct VideoCell: View {
 
     private var thumbnailImage: some View {
         VideoCellThumbnail(video: video)
-            #if os(tvOS)
+        #if os(tvOS)
             .frame(minHeight: 320)
-            #endif
+        #endif
             .mask(RoundedRectangle(cornerRadius: thumbnailRoundingCornerRadius))
     }
 

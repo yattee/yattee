@@ -8,6 +8,15 @@ disabled_rules:
   - multiline_arguments
   - implicit_return
   - closure_end_indentation
+  - discarded_notification_center_observer  # Observer intentionally lives for app lifetime
+  # Disable deprecated rules in favor of their renamed versions
+  - operator_whitespace  # renamed to function_name_whitespace
+  - redundant_optional_initialization  # renamed to implicit_optional_initialization
+
+opt_in_rules:
+  - function_name_whitespace
+  - implicit_optional_initialization
+
 excluded:
   - Vendor
   - Tests Apple TV

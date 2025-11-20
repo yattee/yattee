@@ -223,6 +223,7 @@ struct FeedView: View {
     var header: some View {
         HStack(spacing: 16) {
             #if os(tvOS)
+                // swiftlint:disable:next deployment_target
                 if #available(tvOS 17.0, *) {
                     Menu {
                         accountsPicker

@@ -650,7 +650,7 @@ final class PlayerModel: ObservableObject {
 
         // When switching away from AVPlayer, clear its current item to release Now Playing control
         #if !os(macOS)
-            if from == .appleAVPlayer && to == .mpv {
+            if from == .appleAVPlayer, to == .mpv {
                 avPlayerBackend.avPlayer.replaceCurrentItem(with: nil)
 
                 // Clear Now Playing info entirely before MPV takes over
