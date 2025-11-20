@@ -36,11 +36,12 @@ struct MenuCommands: Commands {
             .disabled(!AccountsModel.shared.app.supportsPopular)
             .keyboardShortcut("3")
 
-            Button("Trending") {
-                setTabSelection(.trending)
+            if FeatureFlags.trendingEnabled {
+                Button("Trending") {
+                    setTabSelection(.trending)
+                }
+                .keyboardShortcut("4")
             }
-            .disabled(!FeatureFlags.trendingEnabled)
-            .keyboardShortcut("4")
 
             Button("Search") {
                 setTabSelection(.search)
