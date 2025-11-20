@@ -126,7 +126,7 @@ struct AppTabNavigation: View {
             LazyView(TrendingView())
         }
         .tabItem {
-            Label("Trending", systemImage: "chart.bar.fill")
+            Label("Trending", systemImage: "arrow.up.right.circle.fill")
                 .accessibility(label: Text("Trending"))
         }
         .tag(TabSelection.trending)

@@ -103,7 +103,7 @@ struct Sidebar: View {
 
                 if visibleSections.contains(.trending) {
                     NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
-                        Label("Trending", systemImage: "chart.bar")
+                        Label("Trending", systemImage: "arrow.up.right.circle.fill")
                             .accessibility(label: Text("Trending"))
                     }
                     .id("trending")
