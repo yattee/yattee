@@ -37,7 +37,7 @@ struct AppTabNavigation: View {
                         popularNavigationView
                     }
 
-                    if visibleSections.contains(.trending) {
+                    if FeatureFlags.trendingEnabled && visibleSections.contains(.trending) {
                         trendingNavigationView
                     }
 

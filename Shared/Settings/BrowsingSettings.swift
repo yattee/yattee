@@ -258,11 +258,13 @@ struct BrowsingSettings: View {
     private var visibleSectionsSettings: some View {
         Section(header: SettingsHeader(text: "Sections".localized())) {
             ForEach(VisibleSection.allCases, id: \.self) { section in
-                MultiselectRow(
-                    title: section.title,
-                    selected: visibleSections.contains(section)
-                ) { value in
-                    toggleSection(section, value: value)
+                if section != .trending || FeatureFlags.trendingEnabled {
+                    MultiselectRow(
+                        title: section.title,
+                        selected: visibleSections.contains(section)
+                    ) { value in
+                        toggleSection(section, value: value)
+                    }
                 }
             }
         }
@@ -279,7 +281,9 @@ struct BrowsingSettings: View {
                     Spacer()
                     Picker("Startup section", selection: $startupSection) {
                         ForEach(StartupSection.allCases, id: \.rawValue) { section in
-                            Text(section.label).tag(section)
+                            if section != .trending || FeatureFlags.trendingEnabled {
+                                Text(section.label).tag(section)
+                            }
                         }
                     }
                     .modifier(SettingsPickerModifier())
@@ -287,7 +291,9 @@ struct BrowsingSettings: View {
             #else
                 Picker("Startup section", selection: $startupSection) {
                     ForEach(StartupSection.allCases, id: \.rawValue) { section in
-                        Text(section.label).tag(section)
+                        if section != .trending || FeatureFlags.trendingEnabled {
+                            Text(section.label).tag(section)
+                        }
                     }
                 }
                 .modifier(SettingsPickerModifier())

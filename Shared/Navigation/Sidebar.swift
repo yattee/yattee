@@ -101,7 +101,7 @@ struct Sidebar: View {
                     .id("popular")
                 }
 
-                if visibleSections.contains(.trending) {
+                if FeatureFlags.trendingEnabled && visibleSections.contains(.trending) {
                     NavigationLink(destination: LazyView(TrendingView()), tag: TabSelection.trending, selection: $navigation.tabSelection) {
                         Label("Trending", systemImage: "arrow.up.right.circle.fill")
                             .accessibility(label: Text("Trending"))

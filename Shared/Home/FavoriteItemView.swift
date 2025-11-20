@@ -353,7 +353,7 @@ struct FavoriteItemView: View {
         case .history:
             return false
         case .trending:
-            return visibleSections.contains(.trending)
+            return FeatureFlags.trendingEnabled && visibleSections.contains(.trending)
         case .subscriptions:
             return visibleSections.contains(.subscriptions) && accounts.signedIn
         case .popular:

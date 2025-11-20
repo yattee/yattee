@@ -29,7 +29,7 @@ struct TVNavigationView: View {
                             .tag(TabSelection.popular)
                     }
 
-                    if visibleSections.contains(.trending) {
+                    if FeatureFlags.trendingEnabled && visibleSections.contains(.trending) {
                         LazyView(TrendingView())
                             .tabItem { Text("Trending") }
                             .tag(TabSelection.trending)

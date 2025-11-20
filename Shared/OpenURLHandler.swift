@@ -74,6 +74,7 @@ struct OpenURLHandler {
                 focusMainWindow()
             #endif
         case .trending:
+            guard FeatureFlags.trendingEnabled else { return }
             navigation.hideViewsAboveBrowser()
             navigation.tabSelection = .trending
             #if os(macOS)

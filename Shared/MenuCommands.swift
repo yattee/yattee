@@ -39,6 +39,7 @@ struct MenuCommands: Commands {
             Button("Trending") {
                 setTabSelection(.trending)
             }
+            .disabled(!FeatureFlags.trendingEnabled)
             .keyboardShortcut("4")
 
             Button("Search") {
