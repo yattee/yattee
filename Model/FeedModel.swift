@@ -235,7 +235,7 @@ final class FeedModel: ObservableObject, CacheModel {
         let watches = watchFetchRequestResult(videos, context: backgroundContext)
         let watchesIDs = watches.map(\.videoID)
         let unwatched = videos.filter { video in
-            if Defaults[.hideShorts], video.short {
+            if FeatureFlags.hideShortsEnabled, Defaults[.hideShorts], video.short {
                 return false
             }
 

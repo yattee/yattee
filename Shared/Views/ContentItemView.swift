@@ -54,7 +54,7 @@ struct ContentItemView: View {
             return false
         }
 
-        guard hideShorts, item.contentType == .video, let video = item.video else {
+        guard FeatureFlags.hideShortsEnabled, hideShorts, item.contentType == .video, let video = item.video else {
             return true
         }
 

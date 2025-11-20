@@ -5,22 +5,24 @@ struct HideShortsButtons: View {
     @Default(.hideShorts) private var hideShorts
 
     var body: some View {
-        Button {
-            hideShorts.toggle()
-        } label: {
-            Group {
-                if hideShorts {
-                    Label("Short videos: hidden", systemImage: "bolt.slash.fill")
-                        .help("Short videos: hidden")
-                } else {
-                    Label("Short videos: visible", systemImage: "bolt.fill")
-                        .help("Short videos: visible")
+        if FeatureFlags.hideShortsEnabled {
+            Button {
+                hideShorts.toggle()
+            } label: {
+                Group {
+                    if hideShorts {
+                        Label("Short videos: hidden", systemImage: "bolt.slash.fill")
+                            .help("Short videos: hidden")
+                    } else {
+                        Label("Short videos: visible", systemImage: "bolt.fill")
+                            .help("Short videos: visible")
+                    }
                 }
+                #if os(tvOS)
+                .font(.caption)
+                .imageScale(.small)
+                #endif
             }
-            #if os(tvOS)
-            .font(.caption)
-            .imageScale(.small)
-            #endif
         }
     }
 }

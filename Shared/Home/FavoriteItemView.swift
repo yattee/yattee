@@ -50,9 +50,11 @@ struct FavoriteItemView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(.secondary)
 
-                            if hideShorts || hideWatched {
+                            if (FeatureFlags.hideShortsEnabled && hideShorts) || hideWatched {
                                 AccentButton(text: "Disable filters", maxWidth: nil, verticalPadding: 0, minHeight: 30) {
-                                    hideShorts = false
+                                    if FeatureFlags.hideShortsEnabled {
+                                        hideShorts = false
+                                    }
                                     hideWatched = false
                                     reloadVisibleWatches()
                                 }
@@ -107,7 +109,7 @@ struct FavoriteItemView: View {
                     resource?.removeObservers(ownedBy: store)
                 }
                 .onChange(of: player.currentVideo) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
-                .onChange(of: hideShorts) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
+                .onChange(of: hideShorts) { _ in if !player.presentingPlayer && FeatureFlags.hideShortsEnabled { reloadVisibleWatches() } }
                 .onChange(of: hideWatched) { _ in if !player.presentingPlayer { reloadVisibleWatches() } }
                 // Delay is necessary to update the list with the new items.
                 .onChange(of: favoritesChanged) { _ in if !player.presentingPlayer { Delay.by(1.0) { reloadVisibleWatches() } } }
@@ -135,9 +137,9 @@ struct FavoriteItemView: View {
 
     var emptyItemsText: String {
         var filterText = ""
-        if hideShorts && hideWatched {
+        if FeatureFlags.hideShortsEnabled && hideShorts && hideWatched {
             filterText = "(watched and shorts hidden)"
-        } else if hideShorts {
+        } else if FeatureFlags.hideShortsEnabled && hideShorts {
             filterText = "(shorts hidden)"
         } else if hideWatched {
             filterText = "(watched hidden)"
@@ -227,7 +229,7 @@ struct FavoriteItemView: View {
             return false
         }
 
-        guard hideShorts, item.contentType == .video, let video = item.video else {
+        guard FeatureFlags.hideShortsEnabled, hideShorts, item.contentType == .video, let video = item.video else {
             return true
         }
 
