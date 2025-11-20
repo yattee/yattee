@@ -95,7 +95,7 @@ struct Sidebar: View {
 
                 if visibleSections.contains(.popular), accounts.app.supportsPopular {
                     NavigationLink(destination: LazyView(PopularView()), tag: TabSelection.popular, selection: $navigation.tabSelection) {
-                        Label("Popular", systemImage: "arrow.up.right.circle")
+                        Label("Popular", systemImage: "chart.bar.fill")
                             .accessibility(label: Text("Popular"))
                     }
                     .id("popular")

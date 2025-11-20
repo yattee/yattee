@@ -104,7 +104,7 @@ struct PopularView: View {
             } label: {
                 HStack(spacing: 12) {
                     HStack(spacing: 6) {
-                        Image(systemName: "arrow.up.right.circle.fill")
+                        Image(systemName: "chart.bar.fill")
                             .foregroundColor(.primary)
                             .imageScale(.small)
 
