@@ -365,11 +365,9 @@ struct ControlsOverlay: View {
                        let language = LanguageCodes(rawValue: captions.code)
                     {
                         Text("\(language.description.capitalized) (\(language.rawValue))")
-                            .foregroundColor(.accentColor)
                     } else {
                         if player.currentVideo?.captions.isEmpty == false {
                             Text("Disabled")
-                                .foregroundColor(.accentColor)
                         } else {
                             Text("Not available")
                         }

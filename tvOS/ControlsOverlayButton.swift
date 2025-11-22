@@ -24,6 +24,7 @@ struct ControlsOverlayButton<LabelView: View>: View {
         if let onSelect {
             Button(action: onSelect) {
                 label
+                    .foregroundColor(isFocused ? .black : .white)
                     .padding()
                     .frame(width: 400)
             }
@@ -31,12 +32,12 @@ struct ControlsOverlayButton<LabelView: View>: View {
             .focused(focusedField, equals: field)
         } else {
             label
+                .foregroundColor(isFocused ? .black : .white)
                 .padding()
                 .frame(width: 400)
                 .focusable()
                 .focused(focusedField, equals: field)
-                .background(isFocused ? Color.white : Color.secondary)
-                .foregroundColor(isFocused ? Color.black : Color.white)
+                .background(isFocused ? Color.white : Color.gray.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
         }
     }
@@ -47,8 +48,7 @@ struct TVButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(isFocused ? Color.white : Color.secondary)
-            .foregroundColor(isFocused ? Color.black : Color.white)
+            .background(isFocused ? Color.white : Color.gray.opacity(0.5))
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
