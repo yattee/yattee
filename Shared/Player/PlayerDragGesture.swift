@@ -16,6 +16,16 @@ extension VideoPlayerView {
                 state = true
             }
             .onChanged { value in
+                #if os(iOS)
+                    // In fullscreen, ignore gestures that start in the top notification center area
+                    // to allow system notification center gesture to work
+                    if player.playingFullScreen {
+                        if value.startLocation.y < Constants.notificationCenterZoneHeight {
+                            return
+                        }
+                    }
+                #endif
+
                 guard player.presentingPlayer,
                       !controlsOverlayModel.presenting,
                       dragGestureState,

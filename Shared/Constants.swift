@@ -6,6 +6,7 @@ enum Constants {
     static let overlayAnimation = Animation.linear(duration: 0.2)
     static let aspectRatio16x9 = 16.0 / 9.0
     static let aspectRatio4x3 = 4.0 / 3.0
+    static let notificationCenterZoneHeight: Double = 60
 
     static var isAppleTV: Bool {
         #if os(iOS)
