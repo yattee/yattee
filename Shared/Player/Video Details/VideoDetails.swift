@@ -189,6 +189,7 @@ struct VideoDetails: View {
     @Environment(\.navigationStyle) private var navigationStyle
     #if os(iOS)
         @Environment(\.verticalSizeClass) private var verticalSizeClass
+        @ObservedObject private var safeAreaModel = SafeAreaModel.shared
     #endif
 
     @Environment(\.colorScheme) private var colorScheme
@@ -397,7 +398,11 @@ struct VideoDetails: View {
                     }
                 }
             }
+            #if os(iOS)
+            .padding(.bottom, fullScreen ? max(60, safeAreaModel.safeArea.bottom + 20) : player.playerSize.height + safeAreaModel.safeArea.bottom + 20)
+            #else
             .padding(.bottom, 60)
+            #endif
         }
         #if os(iOS)
         .onAppear {
