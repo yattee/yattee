@@ -858,7 +858,14 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
     private func extractCaptions(from content: JSON) -> [Captions] {
         content["captions"].arrayValue.compactMap { details in
-            guard let url = URL(string: details["url"].stringValue, relativeTo: account.url) else { return nil }
+            var urlString = details["url"].stringValue
+
+            // Prefix with /companion if enabled
+            if account.instance.invidiousCompanion {
+                urlString = "/companion" + urlString
+            }
+
+            guard let url = URL(string: urlString, relativeTo: account.url) else { return nil }
 
             return Captions(
                 label: details["label"].stringValue,
