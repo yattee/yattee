@@ -66,7 +66,6 @@ struct FavoriteItemView: View {
                         #else
                             .padding(.horizontal, 15)
                         #endif
-                            .frame(height: expectedContentHeight)
                     } else {
                         ZStack(alignment: .topLeading) {
                             // Reserve space immediately to prevent layout shift
