@@ -5,8 +5,6 @@ struct ControlsOverlay: View {
     @ObservedObject private var player = PlayerModel.shared
     private var model = PlayerControlsModel.shared
 
-    @State private var availableCaptions: [Captions] = []
-    @State private var isLoadingCaptions = true
     @State private var contentSize: CGSize = .zero
 
     @Default(.showMPVPlaybackStats) private var showMPVPlaybackStats
@@ -378,11 +376,11 @@ struct ControlsOverlay: View {
                         Text("\(language.description.capitalized) (\(language.rawValue))")
                             .foregroundColor(.accentColor)
                     } else {
-                        if captionsBinding.wrappedValue == nil {
-                            Text("Not available")
-                        } else {
+                        if player.currentVideo?.captions.isEmpty == false {
                             Text("Disabled")
                                 .foregroundColor(.accentColor)
+                        } else {
+                            Text("Not available")
                         }
                     }
                 }
@@ -391,7 +389,7 @@ struct ControlsOverlay: View {
             .contextMenu {
                 Button("Disabled") { captionsBinding.wrappedValue = nil }
 
-                ForEach(availableCaptions) { caption in
+                ForEach(player.currentVideo?.captions ?? []) { caption in
                     Button(caption.description) { captionsBinding.wrappedValue = caption }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -400,7 +398,7 @@ struct ControlsOverlay: View {
     }
 
     @ViewBuilder private var captionsPicker: some View {
-        let captions = availableCaptions
+        let captions = player.currentVideo?.captions ?? []
         Picker("Captions", selection: captionsBinding) {
             if captions.isEmpty {
                 Text("Not available").tag(Captions?.none)
@@ -412,31 +410,6 @@ struct ControlsOverlay: View {
             }
         }
         .disabled(captions.isEmpty)
-        .onAppear {
-            loadCaptions()
-        }
-    }
-
-    private func loadCaptions() {
-        isLoadingCaptions = true
-
-        // Fetch captions asynchronously
-        Task {
-            let fetchedCaptions = await fetchCaptions()
-            await MainActor.run {
-                // Update state on the main thread
-                self.availableCaptions = fetchedCaptions
-                self.isLoadingCaptions = false
-            }
-        }
-    }
-
-    private func fetchCaptions() async -> [Captions] {
-        // Access currentVideo from the main actor context
-        await MainActor.run {
-            // Safely access the main actor-isolated currentVideo property
-            player.currentVideo?.captions ?? []
-        }
     }
 
     private var captionsBinding: Binding<Captions?> {
