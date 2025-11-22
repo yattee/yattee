@@ -21,7 +21,10 @@ struct ControlsOverlay: View {
         }
 
         @FocusState private var focusedField: Field?
-        @State private var presentingButtonHintAlert = false
+        @State private var presentingQualityProfileMenu = false
+        @State private var presentingStreamMenu = false
+        @State private var presentingCaptionsMenu = false
+        @State private var presentingAudioTrackMenu = false
     #endif
 
     var body: some View {
@@ -102,19 +105,9 @@ struct ControlsOverlay: View {
             #if os(tvOS)
             .padding(.horizontal, 40)
             #endif
-
-            #if os(tvOS)
-                Text("Press and hold remote button to open captions and quality menus")
-                    .frame(maxWidth: 400)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            #endif
         }
-        .frame(maxHeight: overlayHeight)
+        .frame(maxHeight: contentSize.height)
         #if os(tvOS)
-            .alert(isPresented: $presentingButtonHintAlert) {
-                Alert(title: Text("Press and hold to open this menu"))
-            }
             .onAppear {
                 focusedField = .qualityProfile
             }
@@ -123,14 +116,6 @@ struct ControlsOverlay: View {
 
     private var rateAndCaptionsLabel: String {
         player.activeBackend == .mpv ? "Rate & Captions" : "Playback Rate"
-    }
-
-    private var overlayHeight: Double {
-        #if os(tvOS)
-            contentSize.height + 80.0
-        #else
-            contentSize.height
-        #endif
     }
 
     private func controlsHeader(_ text: String) -> some View {
@@ -277,23 +262,25 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            ControlsOverlayButton(focusedField: $focusedField, field: .qualityProfile) {
+            ControlsOverlayButton(
+                focusedField: $focusedField,
+                field: .qualityProfile,
+                onSelect: { presentingQualityProfileMenu = true }
+            ) {
                 Text(player.qualityProfileSelection?.description ?? "Automatic".localized())
                     .lineLimit(1)
                     .frame(maxWidth: 320)
             }
-            .contextMenu {
+            .alert("Quality Profile", isPresented: $presentingQualityProfileMenu) {
                 Button("Automatic") { player.qualityProfileSelection = nil }
 
                 ForEach(qualityProfiles) { qualityProfile in
-                    Button {
+                    Button(qualityProfile.description) {
                         player.qualityProfileSelection = qualityProfile
-                    } label: {
-                        Text(qualityProfile.description)
                     }
-
-                    Button("Cancel", role: .cancel) {}
                 }
+
+                Button("Cancel", role: .cancel) {}
             }
         #endif
     }
@@ -328,7 +315,7 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            StreamControl(focusedField: $focusedField)
+            StreamControl(focusedField: $focusedField, presentingStreamMenu: $presentingStreamMenu)
         #endif
     }
 
@@ -367,7 +354,11 @@ struct ControlsOverlay: View {
             .modifier(ControlBackgroundModifier())
             .mask(RoundedRectangle(cornerRadius: 3))
         #else
-            ControlsOverlayButton(focusedField: $focusedField, field: .captions) {
+            ControlsOverlayButton(
+                focusedField: $focusedField,
+                field: .captions,
+                onSelect: { presentingCaptionsMenu = true }
+            ) {
                 HStack(spacing: 8) {
                     Image(systemName: "text.bubble")
                     if let captions = captionsBinding.wrappedValue,
@@ -386,7 +377,7 @@ struct ControlsOverlay: View {
                 }
                 .frame(maxWidth: 320)
             }
-            .contextMenu {
+            .alert("Captions", isPresented: $presentingCaptionsMenu) {
                 Button("Disabled") { captionsBinding.wrappedValue = nil }
 
                 ForEach(player.currentVideo?.captions ?? []) { caption in
@@ -440,11 +431,15 @@ struct ControlsOverlay: View {
             .frame(maxWidth: 240, alignment: .trailing)
             .frame(height: 40)
         #else
-            ControlsOverlayButton(focusedField: $focusedField, field: .audioTrack) {
+            ControlsOverlayButton(
+                focusedField: $focusedField,
+                field: .audioTrack,
+                onSelect: { presentingAudioTrackMenu = true }
+            ) {
                 Text(player.selectedAudioTrack?.displayLanguage ?? "Original")
                     .frame(maxWidth: 320)
             }
-            .contextMenu {
+            .alert("Audio Track", isPresented: $presentingAudioTrackMenu) {
                 ForEach(Array(player.availableAudioTracks.enumerated()), id: \.offset) { index, track in
                     Button(track.description) { player.selectedAudioTrackIndex = index }
                 }

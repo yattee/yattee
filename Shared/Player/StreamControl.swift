@@ -3,9 +3,11 @@ import SwiftUI
 struct StreamControl: View {
     #if os(tvOS)
         var focusedField: FocusState<ControlsOverlay.Field?>.Binding?
+        @Binding var presentingStreamMenu: Bool
 
-        init(focusedField: FocusState<ControlsOverlay.Field?>.Binding?) {
+        init(focusedField: FocusState<ControlsOverlay.Field?>.Binding?, presentingStreamMenu: Binding<Bool>) {
             self.focusedField = focusedField
+            _presentingStreamMenu = presentingStreamMenu
         }
     #endif
 
@@ -45,16 +47,20 @@ struct StreamControl: View {
                     .fixedSize()
                 #endif
             #else
-                ControlsOverlayButton(focusedField: focusedField!, field: .stream) {
+                ControlsOverlayButton(
+                    focusedField: focusedField!,
+                    field: .stream,
+                    onSelect: { presentingStreamMenu = true }
+                ) {
                     Text(player.streamSelection?.shortQuality ?? "loading")
                         .frame(maxWidth: 320)
                 }
-                .contextMenu {
+                .alert("Stream Quality", isPresented: $presentingStreamMenu) {
                     ForEach(streams) { stream in
                         Button(stream.description) { player.streamSelection = stream }
                     }
 
-                    Button("Close", role: .cancel) {}
+                    Button("Cancel", role: .cancel) {}
                 }
             #endif
         }
@@ -79,7 +85,7 @@ struct StreamControl: View {
 struct StreamControl_Previews: PreviewProvider {
     static var previews: some View {
         #if os(tvOS)
-            StreamControl(focusedField: .none)
+            StreamControl(focusedField: .none, presentingStreamMenu: .constant(false))
                 .injectFixtureEnvironmentObjects()
         #else
             StreamControl()
