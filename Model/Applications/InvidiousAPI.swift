@@ -52,11 +52,13 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
         }
 
         configureTransformer(pathPattern("popular"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(self.extractVideo)
+            let videos = content.json.arrayValue.map(self.extractVideo)
+            return self.account.instance.hideVideosWithoutDuration ? videos.filter { $0.length > 0 } : videos
         }
 
         configureTransformer(pathPattern("trending"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
-            content.json.arrayValue.map(self.extractVideo)
+            let videos = content.json.arrayValue.map(self.extractVideo)
+            return self.account.instance.hideVideosWithoutDuration ? videos.filter { $0.length > 0 } : videos
         }
 
         configureTransformer(pathPattern("search"), requestMethods: [.get]) { (content: Entity<JSON>) -> SearchPage in
@@ -70,7 +72,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
                     return ContentItem(playlist: self.extractChannelPlaylist(from: json))
                 }
                 if type == "video" {
-                    return ContentItem(video: self.extractVideo(from: json))
+                    let video = self.extractVideo(from: json)
+                    if self.account.instance.hideVideosWithoutDuration, video.length == 0 {
+                        return nil
+                    }
+                    return ContentItem(video: video)
                 }
 
                 return nil
@@ -101,7 +107,8 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
 
         configureTransformer(pathPattern("auth/feed"), requestMethods: [.get]) { (content: Entity<JSON>) -> [Video] in
             if let feedVideos = content.json.dictionaryValue["videos"] {
-                return feedVideos.arrayValue.map(self.extractVideo)
+                let videos = feedVideos.arrayValue.map(self.extractVideo)
+                return self.account.instance.hideVideosWithoutDuration ? videos.filter { $0.length > 0 } : videos
             }
 
             return []
@@ -875,7 +882,11 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
             return ContentItem(playlist: extractChannelPlaylist(from: json))
         }
         if type == "video" {
-            return ContentItem(video: extractVideo(from: json))
+            let video = extractVideo(from: json)
+            if account.instance.hideVideosWithoutDuration, video.length == 0 {
+                return nil
+            }
+            return ContentItem(video: video)
         }
 
         return nil

@@ -25,11 +25,9 @@ final class SearchModel: ObservableObject {
     var accounts: AccountsModel { .shared }
     private var resource: Resource!
 
-    init() {
-    }
+    init() {}
 
-    deinit {
-    }
+    deinit {}
 
     var isLoading: Bool {
         resource?.isLoading ?? false

@@ -90,6 +90,17 @@ final class InstancesModel: ObservableObject {
         Defaults[.instances][index] = instance
     }
 
+    func setHideVideosWithoutDuration(_ instance: Instance, _ hideVideosWithoutDuration: Bool) {
+        guard let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) else {
+            return
+        }
+
+        var instance = Defaults[.instances][index]
+        instance.hideVideosWithoutDuration = hideVideosWithoutDuration
+
+        Defaults[.instances][index] = instance
+    }
+
     func remove(_ instance: Instance) {
         let accounts = accounts(instance.id)
         if let index = Defaults[.instances].firstIndex(where: { $0.id == instance.id }) {

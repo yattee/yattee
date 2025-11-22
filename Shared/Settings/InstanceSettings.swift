@@ -9,6 +9,7 @@ struct InstanceSettings: View {
     @State private var frontendURL = ""
     @State private var proxiesVideos = false
     @State private var invidiousCompanion = false
+    @State private var hideVideosWithoutDuration = false
 
     var body: some View {
         List {
@@ -97,6 +98,16 @@ struct InstanceSettings: View {
                     .onChange(of: invidiousCompanion) { newValue in
                         InstancesModel.shared.setInvidiousCompanion(instance, newValue)
                     }
+
+                Section(footer: Text("This can be used to hide shorts".localized())) {
+                    hideVideosWithoutDurationToggle
+                        .onAppear {
+                            hideVideosWithoutDuration = instance.hideVideosWithoutDuration
+                        }
+                        .onChange(of: hideVideosWithoutDuration) { newValue in
+                            InstancesModel.shared.setHideVideosWithoutDuration(instance, newValue)
+                        }
+                }
             }
         }
         #if os(tvOS)
@@ -114,6 +125,10 @@ struct InstanceSettings: View {
 
     private var invidiousCompanionToggle: some View {
         Toggle("Invidious companion", isOn: $invidiousCompanion)
+    }
+
+    private var hideVideosWithoutDurationToggle: some View {
+        Toggle("Experimental: Hide videos without duration", isOn: $hideVideosWithoutDuration)
     }
 
     private func removeAccount(_ account: Account) {
