@@ -6,6 +6,12 @@ enum Orientation {
     static var logger = Logger(label: "stream.yattee.orientation")
 
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+        // Orientation locking is only for iPhone, not iPad
+        guard Constants.isIPhone else {
+            logger.info("skipping orientation lock on iPad")
+            return
+        }
+
         if let delegate = AppDelegate.instance {
             delegate.orientationLock = orientation
 
@@ -18,6 +24,12 @@ enum Orientation {
     }
 
     static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation? = nil) {
+        // Orientation locking and rotation is only for iPhone, not iPad
+        guard Constants.isIPhone else {
+            logger.info("skipping orientation lock and rotation on iPad")
+            return
+        }
+
         lockOrientation(orientation)
 
         guard let rotateOrientation else {

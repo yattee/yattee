@@ -185,7 +185,7 @@ struct BrowsingSettings: View {
             #if os(iOS)
                 Toggle("Show Documents", isOn: $showDocuments)
 
-                if Constants.isIPad {
+                if Constants.isIPhone {
                     Toggle("Lock portrait mode", isOn: $lockPortraitWhenBrowsing)
                         .onChange(of: lockPortraitWhenBrowsing) { lock in
                             if lock {
