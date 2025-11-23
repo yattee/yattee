@@ -154,7 +154,9 @@ struct VideoContextMenuView: View {
         }
 
         #if os(tvOS)
-            Button("Cancel", role: .cancel) {}
+            if #unavailable(tvOS 18.0) {
+                Button("Cancel", role: .cancel) {}
+            }
         #endif
     }
 
