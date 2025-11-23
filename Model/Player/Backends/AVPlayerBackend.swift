@@ -178,6 +178,12 @@ final class AVPlayerBackend: PlayerBackend {
         return stream.kind == .hls || stream.kind == .stream
     }
 
+    func isFastLoadingFormat(_ stream: Stream) -> Bool {
+        // HLS and stream formats load quickly
+        // Non-streamable MP4/AVC1 formats may take a long time
+        return stream.kind == .hls || stream.kind == .stream
+    }
+
     func playStream(
         _ stream: Stream,
         of video: Video,

@@ -133,6 +133,26 @@ extension PlayerModel {
 
         let profile = qualityProfile ?? .defaultProfile
 
+        // For AVPlayer, prefer fast-loading formats (HLS/stream) over non-streamable formats
+        // to avoid long loading times when switching backends
+        if activeBackend == .appleAVPlayer, let avBackend = backend as? AVPlayerBackend {
+            // Try to find a fast-loading stream first
+            let fastLoadingStreams = availableStreams.filter { backend.canPlay($0) && avBackend.isFastLoadingFormat($0) }
+            if let fastStream = backend.bestPlayable(
+                fastLoadingStreams.filter { profile.isPreferred($0) },
+                maxResolution: profile.resolution, formatOrder: profile.formats
+            ) {
+                return fastStream
+            }
+            // Fallback to any fast-loading stream
+            if let fastStream = backend.bestPlayable(
+                fastLoadingStreams,
+                maxResolution: profile.resolution, formatOrder: profile.formats
+            ) {
+                return fastStream
+            }
+        }
+
         // First attempt: Filter by both `canPlay` and `isPreferred`
         if let streamPreferredForProfile = backend.bestPlayable(
             availableStreams.filter { backend.canPlay($0) && profile.isPreferred($0) },
