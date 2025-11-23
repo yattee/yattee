@@ -109,22 +109,7 @@ struct ChannelPlaylistView: View {
 
     #if os(iOS)
         private var playlistMenu: some View {
-            Menu {
-                playButtons
-
-                favoriteButton
-
-                ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
-
-                Section {
-                    HideWatchedButtons()
-                    HideShortsButtons()
-                }
-
-                Section {
-                    SettingsButtons()
-                }
-            } label: {
+            ZStack {
                 HStack(spacing: 12) {
                     if let url = store.item?.thumbnailURL ?? playlist.thumbnailURL {
                         ThumbnailView(url: url)
@@ -141,8 +126,43 @@ struct ChannelPlaylistView: View {
                         .imageScale(.small)
                 }
                 .frame(maxWidth: 320)
-                .transaction { t in t.animation = nil }
+
+                Menu {
+                    playButtons
+
+                    favoriteButton
+
+                    ListingStyleButtons(listingStyle: $channelPlaylistListingStyle)
+
+                    Section {
+                        HideWatchedButtons()
+                        HideShortsButtons()
+                    }
+
+                    Section {
+                        SettingsButtons()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        if let url = store.item?.thumbnailURL ?? playlist.thumbnailURL {
+                            ThumbnailView(url: url)
+                                .frame(width: 60, height: 30)
+                                .clipShape(RoundedRectangle(cornerRadius: 2))
+                        }
+
+                        Text(playlist.title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+
+                        Image(systemName: "chevron.down.circle.fill")
+                            .foregroundColor(.accentColor)
+                            .imageScale(.small)
+                    }
+                    .frame(maxWidth: 320)
+                    .opacity(0)
+                }
             }
+            .transaction { t in t.animation = nil }
         }
     #endif
 

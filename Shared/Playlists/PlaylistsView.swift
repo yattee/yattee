@@ -190,40 +190,7 @@ struct PlaylistsView: View {
     #if os(iOS)
         var playlistsMenu: some View {
             let title = currentPlaylist?.title ?? "Playlists"
-            return Menu {
-                Menu {
-                    selectPlaylistButton
-                } label: {
-                    Label(title, systemImage: "list.and.film")
-                }
-                Section {
-                    if let currentPlaylist {
-                        playButtons
-
-                        editPlaylistButton
-
-                        if let account = accounts.current {
-                            FavoriteButton(item: FavoriteItem(section: .playlist(account.id, currentPlaylist.id)))
-                                .id(currentPlaylist.id)
-                        }
-                    }
-                }
-
-                if accounts.signedIn {
-                    newPlaylistButton
-                }
-
-                ListingStyleButtons(listingStyle: $playlistListingStyle)
-
-                Section {
-                    HideWatchedButtons()
-                    HideShortsButtons()
-                }
-
-                Section {
-                    SettingsButtons()
-                }
-            } label: {
+            return ZStack {
                 HStack(spacing: 12) {
                     HStack(spacing: 6) {
                         Image(systemName: "list.and.film")
@@ -239,9 +206,61 @@ struct PlaylistsView: View {
                 .imageScale(.small)
                 .lineLimit(1)
                 .frame(maxWidth: 320)
-                .transaction { t in t.animation = nil }
+
+                Menu {
+                    Menu {
+                        selectPlaylistButton
+                    } label: {
+                        Label(title, systemImage: "list.and.film")
+                    }
+                    Section {
+                        if let currentPlaylist {
+                            playButtons
+
+                            editPlaylistButton
+
+                            if let account = accounts.current {
+                                FavoriteButton(item: FavoriteItem(section: .playlist(account.id, currentPlaylist.id)))
+                                    .id(currentPlaylist.id)
+                            }
+                        }
+                    }
+
+                    if accounts.signedIn {
+                        newPlaylistButton
+                    }
+
+                    ListingStyleButtons(listingStyle: $playlistListingStyle)
+
+                    Section {
+                        HideWatchedButtons()
+                        HideShortsButtons()
+                    }
+
+                    Section {
+                        SettingsButtons()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "list.and.film")
+
+                            Text(title)
+                                .font(.headline)
+                        }
+                        .foregroundColor(.primary)
+
+                        Image(systemName: "chevron.down.circle.fill")
+                            .foregroundColor(.accentColor)
+                    }
+                    .imageScale(.small)
+                    .lineLimit(1)
+                    .frame(maxWidth: 320)
+                    .opacity(0)
+                }
+                .disabled(!accounts.signedIn)
             }
-            .disabled(!accounts.signedIn)
+            .transaction { t in t.animation = nil }
         }
     #endif
 

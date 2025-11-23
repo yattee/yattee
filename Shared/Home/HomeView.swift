@@ -211,19 +211,7 @@ struct HomeView: View {
 
     #if os(iOS)
         var homeMenu: some View {
-            Menu {
-                Section {
-                    HideWatchedButtons()
-                    HideShortsButtons()
-                }
-                Section {
-                    Button {
-                        navigation.presentingHomeSettings = true
-                    } label: {
-                        Label("Home Settings", systemImage: "gear")
-                    }
-                }
-            } label: {
+            ZStack {
                 HStack(spacing: 12) {
                     Text("Home")
                         .foregroundColor(.primary)
@@ -233,8 +221,33 @@ struct HomeView: View {
                         .foregroundColor(.accentColor)
                         .imageScale(.small)
                 }
-                .transaction { t in t.animation = nil }
+
+                Menu {
+                    Section {
+                        HideWatchedButtons()
+                        HideShortsButtons()
+                    }
+                    Section {
+                        Button {
+                            navigation.presentingHomeSettings = true
+                        } label: {
+                            Label("Home Settings", systemImage: "gear")
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("Home")
+                            .foregroundColor(.primary)
+                            .font(.headline)
+
+                        Image(systemName: "chevron.down.circle.fill")
+                            .foregroundColor(.accentColor)
+                            .imageScale(.small)
+                    }
+                    .opacity(0)
+                }
             }
+            .transaction { t in t.animation = nil }
         }
     #endif
 }

@@ -168,22 +168,7 @@ struct TrendingView: View {
 
     #if os(iOS)
         var trendingMenu: some View {
-            Menu {
-                countryButton
-
-                categoryButton
-
-                ListingStyleButtons(listingStyle: $trendingListingStyle)
-
-                Section {
-                    HideWatchedButtons()
-                    HideShortsButtons()
-                }
-
-                Section {
-                    SettingsButtons()
-                }
-            } label: {
+            ZStack {
                 HStack(spacing: 12) {
                     Text("\(country.flag) \(country.name)")
                         .font(.headline)
@@ -194,6 +179,35 @@ struct TrendingView: View {
                         .imageScale(.small)
                 }
                 .frame(maxWidth: 320)
+
+                Menu {
+                    countryButton
+
+                    categoryButton
+
+                    ListingStyleButtons(listingStyle: $trendingListingStyle)
+
+                    Section {
+                        HideWatchedButtons()
+                        HideShortsButtons()
+                    }
+
+                    Section {
+                        SettingsButtons()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("\(country.flag) \(country.name)")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+
+                        Image(systemName: "chevron.down.circle.fill")
+                            .foregroundColor(.accentColor)
+                            .imageScale(.small)
+                    }
+                    .frame(maxWidth: 320)
+                    .opacity(0)
+                }
             }
         }
     #endif

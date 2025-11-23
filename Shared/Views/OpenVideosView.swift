@@ -144,10 +144,15 @@ struct OpenVideosView: View {
                 Spacer()
             #endif
             #if os(iOS)
-                Menu {
-                    playbackModePicker
-                } label: {
+                ZStack {
                     Text(playbackMode.description)
+
+                    Menu {
+                        playbackModePicker
+                    } label: {
+                        Text(playbackMode.description)
+                            .opacity(0)
+                    }
                 }
             #else
                 playbackModePicker
