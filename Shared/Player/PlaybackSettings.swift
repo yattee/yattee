@@ -209,16 +209,22 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 100, alignment: .center)
         #elseif os(iOS)
-            Menu {
-                ratePicker
-            } label: {
+            ZStack {
                 Text(player.rateLabel(player.currentRate))
                     .foregroundColor(.primary)
                     .frame(width: 70)
+
+                Menu {
+                    ratePicker
+                } label: {
+                    Text(player.rateLabel(player.currentRate))
+                        .foregroundColor(.primary)
+                        .frame(width: 70)
+                        .opacity(0)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
-            .foregroundColor(.primary)
             .frame(width: 70, height: 40)
         #else
             Text(player.rateLabel(player.currentRate))
@@ -331,12 +337,20 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 300, alignment: .trailing)
         #else
-            Menu {
-                playbackModePicker
-            } label: {
+            ZStack {
                 Label(player.playbackMode.description.localized(), systemImage: player.playbackMode.systemImage)
+                    .foregroundColor(.accentColor)
+
+                Menu {
+                    playbackModePicker
+                } label: {
+                    Label(player.playbackMode.description.localized(), systemImage: player.playbackMode.systemImage)
+                        .foregroundColor(.accentColor)
+                        .opacity(0)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
         #endif
     }
 
@@ -356,15 +370,22 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
-            Menu {
-                qualityProfilePicker
-            } label: {
+            ZStack {
                 Text(player.qualityProfileSelection?.description ?? "Automatic".localized())
+                    .foregroundColor(.accentColor)
                     .frame(maxWidth: 240, alignment: .trailing)
+
+                Menu {
+                    qualityProfilePicker
+                } label: {
+                    Text(player.qualityProfileSelection?.description ?? "Automatic".localized())
+                        .foregroundColor(.accentColor)
+                        .frame(maxWidth: 240, alignment: .trailing)
+                        .opacity(0)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
-            .foregroundColor(.accentColor)
             .frame(maxWidth: 240, alignment: .trailing)
             .frame(height: 40)
         #else
@@ -406,15 +427,22 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
-            Menu {
-                StreamControl()
-            } label: {
+            ZStack {
                 Text(player.streamSelection?.resolutionAndFormat ?? "loading...")
-                    .frame(width: 140, height: 40, alignment: .trailing)
                     .foregroundColor(player.streamSelection == nil ? .secondary : .accentColor)
+                    .frame(width: 140, height: 40, alignment: .trailing)
+
+                Menu {
+                    StreamControl()
+                } label: {
+                    Text(player.streamSelection?.resolutionAndFormat ?? "loading...")
+                        .foregroundColor(player.streamSelection == nil ? .secondary : .accentColor)
+                        .frame(width: 140, height: 40, alignment: .trailing)
+                        .opacity(0)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
             .frame(width: 140, height: 40, alignment: .trailing)
         #else
             StreamControl(focusedField: $focusedField)
@@ -429,18 +457,13 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
-            Menu {
-                if videoCaptions?.isEmpty == false {
-                    captionsPicker
-                }
-            } label: {
+            ZStack {
                 HStack(spacing: 4) {
                     Image(systemName: "text.bubble")
                     if let captions = player.captions,
                        let language = LanguageCodes(rawValue: captions.code)
                     {
                         Text("\(language.description.capitalized) (\(language.rawValue))")
-                            .foregroundColor(.accentColor)
                     } else {
                         if videoCaptions?.isEmpty == true {
                             Text("Not available")
@@ -449,13 +472,38 @@ struct PlaybackSettings: View {
                         }
                     }
                 }
+                .foregroundColor(.accentColor)
                 .frame(alignment: .trailing)
                 .frame(height: 40)
-                .disabled(videoCaptions?.isEmpty == true)
+
+                Menu {
+                    if videoCaptions?.isEmpty == false {
+                        captionsPicker
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "text.bubble")
+                        if let captions = player.captions,
+                           let language = LanguageCodes(rawValue: captions.code)
+                        {
+                            Text("\(language.description.capitalized) (\(language.rawValue))")
+                        } else {
+                            if videoCaptions?.isEmpty == true {
+                                Text("Not available")
+                            } else {
+                                Text("Disabled")
+                            }
+                        }
+                    }
+                    .foregroundColor(.accentColor)
+                    .frame(alignment: .trailing)
+                    .frame(height: 40)
+                    .opacity(0)
+                    .disabled(videoCaptions?.isEmpty == true)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
-            .foregroundColor(.accentColor)
         #else
             ControlsOverlayButton(focusedField: $focusedField, field: .captions) {
                 HStack(spacing: 8) {
@@ -500,15 +548,22 @@ struct PlaybackSettings: View {
                 .controlSize(.large)
                 .frame(width: 300, alignment: .trailing)
         #elseif os(iOS)
-            Menu {
-                audioTrackPicker
-            } label: {
+            ZStack {
                 Text(player.selectedAudioTrack?.displayLanguage ?? "Original")
+                    .foregroundColor(.accentColor)
                     .frame(maxWidth: 240, alignment: .trailing)
+
+                Menu {
+                    audioTrackPicker
+                } label: {
+                    Text(player.selectedAudioTrack?.displayLanguage ?? "Original")
+                        .foregroundColor(.accentColor)
+                        .frame(maxWidth: 240, alignment: .trailing)
+                        .opacity(0)
+                }
+                .buttonStyle(.plain)
+                .transaction { t in t.animation = .none }
             }
-            .transaction { t in t.animation = .none }
-            .buttonStyle(.plain)
-            .foregroundColor(.accentColor)
             .frame(maxWidth: 240, alignment: .trailing)
             .frame(height: 40)
         #else
