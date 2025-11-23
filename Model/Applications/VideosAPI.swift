@@ -114,6 +114,10 @@ extension VideosAPI {
            let frontendURL = URL(string: frontendURLString)
         {
             urlComponents = URLComponents(url: frontendURL, resolvingAgainstBaseURL: false)
+            // Ensure port is not included when sharing to external frontends like YouTube
+            if frontendURLString.contains("youtube.com") {
+                urlComponents?.port = nil
+            }
         } else if let instanceComponents = account?.instance?.urlComponents {
             urlComponents = instanceComponents
         }
