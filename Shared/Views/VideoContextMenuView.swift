@@ -34,19 +34,19 @@ struct VideoContextMenuView: View {
     var body: some View {
         ZStack {
             #if os(iOS)
-            // Conditional overlay to block taps on underlying views
-            if isOverlayVisible {
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // Dismiss overlay without triggering other interactions
-                        isOverlayVisible = false
-                    }
-                    .ignoresSafeArea() // Ensure overlay covers the entire screen
-                    .accessibilityLabel("Dismiss context menu")
-                    .accessibilityHint("Tap to close the context")
-                    .accessibilityAddTraits(.isButton)
-            }
+                // Conditional overlay to block taps on underlying views
+                if isOverlayVisible {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            // Dismiss overlay without triggering other interactions
+                            isOverlayVisible = false
+                        }
+                        .ignoresSafeArea() // Ensure overlay covers the entire screen
+                        .accessibilityLabel("Dismiss context menu")
+                        .accessibilityHint("Tap to close the context")
+                        .accessibilityAddTraits(.isButton)
+                }
             #endif
 
             if video.videoID != Video.fixtureID {
