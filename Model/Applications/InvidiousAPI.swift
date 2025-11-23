@@ -409,7 +409,7 @@ final class InvidiousAPI: Service, ObservableObject, VideosAPI {
     func search(_ query: SearchQuery, page: String?) -> Resource {
         var resource = resource(baseURL: account.url, path: basePathAppending("search"))
             .withParam("q", searchQuery(query.query))
-            .withParam("sort_by", query.sortBy.parameter)
+            .withParam("sort", query.sortBy.parameter)
             .withParam("type", "all")
 
         if let date = query.date, date != .any {
