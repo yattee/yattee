@@ -2847,7 +2847,7 @@
 				3765917827237D07009F956E /* XCRemoteSwiftPackageReference "PINCache" */,
 				37CF8B8228535E4F00B71E37 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				372AA40E286D067B0000B1DC /* XCRemoteSwiftPackageReference "Repeat" */,
-				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
+				37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */,
 				3799AC0728B03CEC001376F9 /* XCRemoteSwiftPackageReference "ActiveLabel.swift" */,
 				375B8AAF28B57F4200397B31 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				3797104728D3D10600D5F53C /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
@@ -5079,7 +5079,7 @@
 				minimumVersion = 5.0.2;
 			};
 		};
-		37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
+		37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -5361,7 +5361,7 @@
 		};
 		37EE6DC428A305AD00BFD632 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
+			package = 37EE6DC328A305AD00BFD632 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
 		37FB2848272207F000A57617 /* SDWebImageWebPCoder */ = {
