@@ -6,6 +6,7 @@ final class AdvancedSettingsGroupExporter: SettingsGroupExporter {
         [
             "showPlayNowInBackendContextMenu": Defaults[.showPlayNowInBackendContextMenu],
             "videoLoadingRetryCount": Defaults[.videoLoadingRetryCount],
+            "avPlayerAllowsNonStreamableFormats": Defaults[.avPlayerAllowsNonStreamableFormats],
             "showMPVPlaybackStats": Defaults[.showMPVPlaybackStats],
             "mpvEnableLogging": Defaults[.mpvEnableLogging],
             "mpvCacheSecs": Defaults[.mpvCacheSecs],

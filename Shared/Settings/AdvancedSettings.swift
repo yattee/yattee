@@ -16,10 +16,12 @@ struct AdvancedSettings: View {
     @Default(.feedCacheSize) private var feedCacheSize
     @Default(.showPlayNowInBackendContextMenu) private var showPlayNowInBackendContextMenu
     @Default(.videoLoadingRetryCount) private var videoLoadingRetryCount
+    @Default(.avPlayerAllowsNonStreamableFormats) private var avPlayerAllowsNonStreamableFormats
 
     @State private var filesToShare = [MPVClient.logFile]
     @State private var presentingShareSheet = false
 
+    @ObservedObject private var player = PlayerModel.shared
     private var settings = SettingsModel.shared
 
     var body: some View {
@@ -71,6 +73,10 @@ struct AdvancedSettings: View {
         Section(header: SettingsHeader(text: "Advanced")) {
             showPlayNowInBackendButtonsToggle
             videoLoadingRetryCountField
+        }
+
+        Section(header: SettingsHeader(text: "AVPlayer"), footer: avPlayerNonStreamableFormatsFooter) {
+            avPlayerAllowsNonStreamableFormatsToggle
         }
 
         Section(header: SettingsHeader(text: "MPV"), footer: mpvFooter) {
@@ -369,6 +375,22 @@ struct AdvancedSettings: View {
     var cacheSize: some View {
         Text(String(format: "Total size: %@".localized(), BaseCacheModel.shared.totalSizeFormatted))
             .foregroundColor(.secondary)
+    }
+
+    var avPlayerAllowsNonStreamableFormatsToggle: some View {
+        Toggle("Enable non-streamable formats (MP4/AVC1)", isOn: $avPlayerAllowsNonStreamableFormats)
+            .onChange(of: avPlayerAllowsNonStreamableFormats) { _ in
+                // Trigger refresh of available streams when setting changes
+                if let video = player.currentVideo {
+                    player.loadAvailableStreams(video)
+                }
+            }
+    }
+
+    @ViewBuilder var avPlayerNonStreamableFormatsFooter: some View {
+        Text("Non-streamable video formats (MP4/AVC1) may take a long time to start playback with AVPlayer. These formats require downloading metadata before playback can begin. Limited to 1080p maximum. For better performance with these formats, use MPV backend instead.")
+            .foregroundColor(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 

@@ -11,6 +11,8 @@ import SwiftUI
 final class AVPlayerBackend: PlayerBackend {
     static let assetKeysToLoad = ["tracks", "playable", "duration"]
 
+    @Default(.avPlayerAllowsNonStreamableFormats) private var allowsNonStreamableFormats
+
     private var logger = Logger(label: "avplayer-backend")
 
     var model: PlayerModel { .shared }
@@ -150,7 +152,30 @@ final class AVPlayerBackend: PlayerBackend {
     }
 
     func canPlay(_ stream: Stream) -> Bool {
-        stream.kind == .hls || stream.kind == .stream
+        // AVPlayer has a fundamental limitation with MP4/AVC1 progressive downloads:
+        // If the moov atom is at the end of the file (common case), it must download
+        // the entire file before playback can start. MPV doesn't have this limitation.
+        // By default, reject non-HLS MP4/AVC1 streams unless user explicitly enables them.
+
+        // Check if this is a non-streamable format (MP4/AVC1) that isn't HLS
+        let isNonStreamableFormat = stream.kind != .hls && (stream.format == .mp4 || stream.format == .avc1)
+
+        if isNonStreamableFormat && !allowsNonStreamableFormats {
+            return false
+        }
+
+        // If non-streamable formats are enabled, allow MP4/AVC1 adaptive streams
+        // but limit to 1080p maximum (higher resolutions can't be played properly)
+        if isNonStreamableFormat && allowsNonStreamableFormats {
+            let maxHeight = 1080
+            if let resolution = stream.resolution, resolution.height > maxHeight {
+                return false
+            }
+            return true
+        }
+
+        // AVPlayer works well with HLS and stream formats
+        return stream.kind == .hls || stream.kind == .stream
     }
 
     func playStream(
@@ -304,12 +329,12 @@ final class AVPlayerBackend: PlayerBackend {
         preservingTime: Bool = false,
         model: PlayerModel
     ) {
+        model.logger.info("loading \(type.rawValue) track")
+
         asset.loadValuesAsynchronously(forKeys: Self.assetKeysToLoad) { [weak self] in
             guard let self else {
                 return
             }
-            model.logger.info("loading \(type.rawValue) track")
-
             let assetTracks = asset.tracks(withMediaType: type)
 
             guard let compositionTrack = self.composition.addMutableTrack(

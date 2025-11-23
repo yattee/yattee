@@ -360,7 +360,7 @@ struct SettingsView: View {
             case .locations:
                 return 600
             case .advanced:
-                return 630
+                return 700
             case .importExport:
                 return 580
             case .help:

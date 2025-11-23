@@ -192,7 +192,8 @@ extension Defaults.Keys {
                     hd1080p60MPVProfile,
                     hd1080pMPVProfile,
                     hd720p60MPVProfile,
-                    hd720pMPVProfile
+                    hd720pMPVProfile,
+                    hd720pAVPlayerProfile
                 ]
 
                 static let batteryCellularProfileDefault = hd720pMPVProfile.id
@@ -208,7 +209,8 @@ extension Defaults.Keys {
                     hd1080pMPVProfile,
                     hd720p60MPVProfile,
                     hd720pMPVProfile,
-                    sd360pMPVProfile
+                    sd360pMPVProfile,
+                    hd720pAVPlayerProfile
                 ]
 
                 static let batteryCellularProfileDefault = sd360pMPVProfile.id
@@ -361,6 +363,7 @@ extension Defaults.Keys {
 
     static let showPlayNowInBackendContextMenu = Key<Bool>("showPlayNowInBackendContextMenu", default: false)
     static let videoLoadingRetryCount = Key<Int>("videoLoadingRetryCount", default: 10)
+    static let avPlayerAllowsNonStreamableFormats = Key<Bool>("avPlayerAllowsNonStreamableFormats", default: false)
 
     static let showMPVPlaybackStats = Key<Bool>("showMPVPlaybackStats", default: false)
     static let mpvEnableLogging = Key<Bool>("mpvEnableLogging", default: false)

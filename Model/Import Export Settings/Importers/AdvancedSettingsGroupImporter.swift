@@ -13,6 +13,10 @@ struct AdvancedSettingsGroupImporter {
             Defaults[.videoLoadingRetryCount] = videoLoadingRetryCount
         }
 
+        if let avPlayerAllowsNonStreamableFormats = json["avPlayerAllowsNonStreamableFormats"].bool {
+            Defaults[.avPlayerAllowsNonStreamableFormats] = avPlayerAllowsNonStreamableFormats
+        }
+
         if let showMPVPlaybackStats = json["showMPVPlaybackStats"].bool {
             Defaults[.showMPVPlaybackStats] = showMPVPlaybackStats
         }
