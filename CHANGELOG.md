@@ -1,3 +1,35 @@
+## Build 211
+
+## What's Changed
+
+### iOS Fixes
+* Fix menu text disappearing in navigation headers and playback settings
+* Fix fullscreen gesture collision with notification center by adding 60pt safe zone at top
+* Fix comments scrolling issue - comments at bottom of video details view are now fully accessible
+* Restrict orientation locking to iPhone only (hide on iPad)
+
+### tvOS Fixes
+* Improve controls overlay with single-press menus for quality, stream, captions, and audio track selection
+* Fix controls overlay button text legibility
+* Fix captions list always showing as unavailable in MPV
+
+### API & Backend Fixes
+* Fix Invidious search API parameters (sort_by→sort, upload_date→date, view_count→views)
+* Fix Invidious captions URL when companion is enabled
+* Fix YouTube share links incorrectly including port from Invidious instance
+
+### UI & Layout
+* Fix home view empty sections taking excessive vertical space
+
+### Advanced Settings
+* Add experimental setting to hide videos without duration in Invidious instance settings (can be used to filter shorts)
+* Add optional AVPlayer support for non-streamable MP4/AVC1 formats in advanced settings with warnings about slow loading
+
+### Dependencies
+* Update dependencies
+
+## Previous builds
+
 ## Build 210
 
 ## What's Changed
