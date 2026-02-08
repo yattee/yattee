@@ -288,7 +288,7 @@ private struct PreviewButtonView: View {
                         .frame(width: spacerWidth)
                 }
             } else if configuration.buttonType == .timeDisplay {
-                Text("0:00 / 3:45")
+                Text(verbatim: "0:00 / 3:45")
                     .font(fontStyle.font(size: size * 0.6, weight: .medium))
                     .foregroundStyle(.white.opacity(0.9))
             } else if configuration.buttonType == .brightness || configuration.buttonType == .volume {
@@ -340,7 +340,7 @@ private struct PreviewButtonView: View {
                     .fill(.white.opacity(0.3))
                     .frame(width: avatarSize, height: avatarSize)
                     .overlay {
-                        Text("Y")
+                        Text(verbatim: "Y")
                             .font(.system(size: size * 0.7, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.8))
                     }
@@ -350,14 +350,14 @@ private struct PreviewButtonView: View {
             if settings.showTitle || settings.showSourceName {
                 VStack(alignment: .leading, spacing: 1) {
                     if settings.showTitle {
-                        Text("Video Title")
+                        Text(verbatim: "Video Title")
                             .font(fontStyle.font(size: size * 0.55, weight: .medium))
                             .foregroundStyle(.white.opacity(0.9))
                             .lineLimit(1)
                     }
 
                     if settings.showSourceName {
-                        Text("Channel Name")
+                        Text(verbatim: "Channel Name")
                             .font(fontStyle.font(size: size * 0.45))
                             .foregroundStyle(.white.opacity(0.6))
                             .lineLimit(1)

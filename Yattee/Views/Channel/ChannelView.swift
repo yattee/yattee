@@ -780,7 +780,7 @@ struct ChannelView: View {
                     if let subscriberCount = channel.subscriberCount {
                         Text(CountFormatter.compact(subscriberCount))
                             .fontWeight(.bold)
-                        + Text(" ")
+                        + Text(verbatim: " ")
                         + Text(String(localized: "channel.subscribers"))
                     }
 

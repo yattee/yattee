@@ -155,7 +155,7 @@ struct TVPlayerProgressBar: View {
                         Circle()
                             .fill(.red)
                             .frame(width: 8, height: 8)
-                        Text("LIVE")
+                        Text(String(localized: "player.live"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.red)
                     }
@@ -171,11 +171,11 @@ struct TVPlayerProgressBar: View {
 
                 // Scrub hint when focused (only for non-live)
                 if !isLive && isFocused && !isScrubbing {
-                    Text("Press to scrub")
+                    Text(String(localized: "player.tvos.scrubHint"))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.5))
                 } else if !isLive && isScrubbing {
-                    Text("Swipe ← → • press to seek")
+                    Text(String(localized: "player.tvos.seekHint"))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.7))
                 }

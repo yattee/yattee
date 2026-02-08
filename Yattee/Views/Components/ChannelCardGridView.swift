@@ -63,7 +63,7 @@ struct ChannelCardGridView: View {
                         }
                     } else {
                         // Reserve space with invisible text
-                        Text(" ")
+                        Text(verbatim: " ")
                             .font(subscriberFont)
                     }
                 }

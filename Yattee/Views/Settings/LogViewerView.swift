@@ -241,7 +241,7 @@ private struct LogEntryDetailView: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }
@@ -300,7 +300,7 @@ private struct LogFiltersSheet: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }

@@ -45,7 +45,7 @@ struct QueueManagementSheet: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }

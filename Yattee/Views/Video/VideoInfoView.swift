@@ -1596,7 +1596,7 @@ struct VideoInfoView: View {
                         Button(role: .cancel) {
                             showingCommentsSheet = false
                         } label: {
-                            Label("Close", systemImage: "xmark")
+                            Label(String(localized: "common.close"), systemImage: "xmark")
                                 .labelStyle(.iconOnly)
                         }
                     }

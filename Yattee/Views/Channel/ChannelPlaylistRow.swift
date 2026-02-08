@@ -76,7 +76,7 @@ struct ChannelPlaylistRow: View {
                     }
 
                     if style == .compact {
-                        Text("\(playlist.videoCount) videos")
+                        Text("playlist.videoCount \(playlist.videoCount)")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     } else {

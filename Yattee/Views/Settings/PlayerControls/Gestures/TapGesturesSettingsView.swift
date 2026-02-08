@@ -191,7 +191,7 @@ struct TapGesturesSettingsView: View {
                     Button(role: .cancel) {
                         selectedZonePosition = nil
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }

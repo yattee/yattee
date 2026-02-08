@@ -267,7 +267,7 @@ struct iCloudSettingsView: View {
         Section {
             // iCloud Account Status
             HStack {
-                Label("Account", systemImage: "person.crop.circle")
+                Label(String(localized: "settings.icloud.account"), systemImage: "person.crop.circle")
                 Spacer()
                 HStack(spacing: 6) {
                     accountStatusIcon
@@ -278,7 +278,7 @@ struct iCloudSettingsView: View {
             
             // Sync Status
             HStack {
-                Label("Status", systemImage: "arrow.triangle.2.circlepath")
+                Label(String(localized: "settings.icloud.status"), systemImage: "arrow.triangle.2.circlepath")
                 Spacer()
                 HStack(spacing: 6) {
                     syncStatusIcon
@@ -290,9 +290,9 @@ struct iCloudSettingsView: View {
             // Pending Changes (if any)
             if let count = cloudKitSync?.pendingChangesCount, count > 0 {
                 HStack {
-                    Label("Pending", systemImage: "clock")
+                    Label(String(localized: "settings.icloud.pending"), systemImage: "clock")
                     Spacer()
-                    Text("\(count) item\(count == 1 ? "" : "s")")
+                    Text(verbatim: "\(count) item\(count == 1 ? "" : "s")")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -300,7 +300,7 @@ struct iCloudSettingsView: View {
             // Last Sync (automatic)
             if let lastSync = cloudKitSync?.lastSyncDate {
                 HStack {
-                    Label("Last Synced", systemImage: "checkmark.circle")
+                    Label(String(localized: "settings.icloud.lastSynced"), systemImage: "checkmark.circle")
                     Spacer()
                     Text(lastSync, style: .relative)
                         .foregroundStyle(.secondary)
@@ -338,13 +338,13 @@ struct iCloudSettingsView: View {
             Button {
                 syncNow()
             } label: {
-                Label("Sync Now", systemImage: syncNowIcon)
+                Label(String(localized: "settings.icloud.syncNow"), systemImage: syncNowIcon)
             }
             .disabled(cloudKitSync?.isSyncing == true)
             
         } footer: {
             if let lastSync = lastManualSyncRelative {
-                Text("Last manual sync: \(lastSync)")
+                Text(String(localized: "settings.icloud.lastManualSync \(lastSync)"))
             }
         }
         .animation(.easeInOut(duration: 0.3), value: cloudKitSync?.syncStatus)
@@ -423,7 +423,7 @@ struct iCloudSettingsView: View {
                 HStack {
                     Image(systemName: "exclamationmark.circle.fill")
                         .foregroundStyle(.red)
-                    Text("Sync Error")
+                    Text(String(localized: "settings.icloud.syncError"))
                         .foregroundStyle(.primary)
                     Spacer()
                     Image(systemName: expandedError ? "chevron.up" : "chevron.down")
@@ -446,7 +446,7 @@ struct iCloudSettingsView: View {
                             await cloudKitSync?.sync()
                         }
                     } label: {
-                        Label("Retry Sync", systemImage: "arrow.clockwise")
+                        Label(String(localized: "settings.icloud.retrySync"), systemImage: "arrow.clockwise")
                             .font(.caption)
                     }
                     .buttonStyle(.bordered)

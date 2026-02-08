@@ -81,9 +81,9 @@ struct VideoListContent<Content: View>: View {
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 120, height: 68)
                         VStack(alignment: .leading) {
-                            Text("Video Title \(index + 1)")
+                            Text(verbatim: "Video Title \(index + 1)")
                                 .font(.subheadline)
-                            Text("Channel Name")
+                            Text(verbatim: "Channel Name")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -112,9 +112,9 @@ struct VideoListContent<Content: View>: View {
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 120, height: 68)
                         VStack(alignment: .leading) {
-                            Text("Video Title \(index + 1)")
+                            Text(verbatim: "Video Title \(index + 1)")
                                 .font(.subheadline)
-                            Text("Channel Name")
+                            Text(verbatim: "Channel Name")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

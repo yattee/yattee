@@ -337,7 +337,7 @@ struct RemoteControlView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Text("\(Int(ago))s ago")
+                    Text("remoteControl.lastSeen \(Int(ago))")
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.tertiary)
                 }

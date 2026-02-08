@@ -80,7 +80,7 @@ struct HomeView: View {
                     Image(systemName: "gear")
                 }
                 .accessibilityIdentifier("home.settingsButton")
-                .accessibilityLabel("Settings")
+                .accessibilityLabel(String(localized: "settings.title"))
                 .liquidGlassTransitionSource(id: "homeSettings", in: sheetTransition)
             }
             #endif
@@ -1137,7 +1137,7 @@ struct HomeView: View {
                     )
                 } label: {
                     HStack(spacing: 4) {
-                        Text("\(contentType.localizedTitle) from \(instance.displayName)")
+                        Text(verbatim: "\(contentType.localizedTitle) - \(instance.displayName)")
                             .fontWeight(.semibold)
                         Image(systemName: "chevron.right")
                             .font(.caption)
@@ -1145,7 +1145,6 @@ struct HomeView: View {
                     .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.plain)
-                .padding(.horizontal, 32)
                 .padding(.top, 16)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1201,7 +1200,7 @@ struct HomeView: View {
                             HStack {
                                 Image(systemName: source.type.systemImage)
                                     .foregroundStyle(.secondary)
-                                Text("Browse \(source.name)")
+                                Text("mediaSources.browse \(source.name)")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .foregroundStyle(.tertiary)

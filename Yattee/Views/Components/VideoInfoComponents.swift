@@ -49,16 +49,16 @@ struct VideoStatsRow: View {
                 Text(publishedText)
                     .onTapGesture { showFormattedDate.toggle() }
             } else if isLoadingAPIStats {
-                Text("2 weeks ago")
+                Text(verbatim: "2 weeks ago")
                     .redacted(reason: .placeholder)
             }
 
             // View count
             if let viewCount = video.formattedViewCount {
-                Text("•")
+                Text(verbatim: "•")
                 Text("video.views \(viewCount)")
             } else if isLoadingAPIStats {
-                Text("•")
+                Text(verbatim: "•")
                 Text("video.views 1.2M")
                     .redacted(reason: .placeholder)
             }

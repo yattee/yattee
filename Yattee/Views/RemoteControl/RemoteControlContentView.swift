@@ -343,7 +343,7 @@ private struct DeviceRowContent: View {
 #Preview {
     NavigationStack {
         RemoteControlContentView(navigationStyle: .link)
-            .navigationTitle("Remote Control")
+            .navigationTitle(String(localized: "remoteControl.title"))
     }
     .appEnvironment(.preview)
 }

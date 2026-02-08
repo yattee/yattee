@@ -193,7 +193,7 @@ extension BlurredImageBackground {
                 .fill(.gray)
                 .frame(width: 280, height: 158)
 
-            Text("Video Title")
+            Text(verbatim: "Video Title")
                 .font(.headline)
         }
     }

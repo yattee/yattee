@@ -61,7 +61,7 @@ struct DownloadsView: View {
                 flatDownloadsList(manager, settings: settings)
             }
         }
-        .searchable(text: $searchText, prompt: Text("Search downloads"))
+        .searchable(text: $searchText, prompt: Text(String(localized: "downloads.search.placeholder")))
         .onChange(of: selectedDownload) { _, newValue in
             if let download = newValue {
                 if let result = downloadManager?.videoAndStream(for: download) {
