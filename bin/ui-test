@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# UI Test Runner for Yattee
+#
+# Usage:
+#   ./bin/ui-test [options]
+#
+# Options:
+#   --device NAME          Simulator device (default: iPhone 17 Pro)
+#   --generate-baseline    Capture new baseline screenshots
+#   --skip-build           Skip building the app (use existing build)
+#   --keep-simulator       Don't shutdown simulator after tests
+#   --keep-app-data        Preserve app data between runs (skip uninstall)
+#   --tag TAG              Run only tests with specific tag (e.g., smoke, visual)
+#   --help                 Show this help message
+#
+
+require 'optparse'
+
+options = {
+  device: 'iPhone 17 Pro'
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
+
+  opts.on('--device NAME', 'Simulator device (default: iPhone 17 Pro)') do |device|
+    options[:device] = device
+  end
+
+  opts.on('--generate-baseline', 'Capture new baseline screenshots') do
+    options[:generate_baseline] = true
+  end
+
+  opts.on('--skip-build', 'Skip building the app') do
+    options[:skip_build] = true
+  end
+
+  opts.on('--keep-simulator', "Don't shutdown simulator after tests") do
+    options[:keep_simulator] = true
+  end
+
+  opts.on('--keep-app-data', 'Preserve app data between runs (skip uninstall)') do
+    options[:keep_app_data] = true
+  end
+
+  opts.on('--tag TAG', 'Run only tests with specific tag') do |tag|
+    options[:tag] = tag
+  end
+
+  opts.on('-h', '--help', 'Show this help message') do
+    puts opts
+    exit
+  end
+end.parse!
+
+# Set environment variables for RSpec to pick up
+ENV['UI_TEST_DEVICE'] = options[:device]
+ENV['GENERATE_BASELINE'] = '1' if options[:generate_baseline]
+ENV['SKIP_BUILD'] = '1' if options[:skip_build]
+ENV['KEEP_SIMULATOR'] = '1' if options[:keep_simulator]
+ENV['KEEP_APP_DATA'] = '1' if options[:keep_app_data]
+
+# Build RSpec command
+rspec_args = ['bundle', 'exec', 'rspec', 'spec/ui', '--format', 'documentation']
+
+if options[:tag]
+  rspec_args << '--tag'
+  rspec_args << options[:tag]
+end
+
+# Change to project directory
+Dir.chdir(File.expand_path('..', __dir__))
+
+# Run RSpec
+exec(*rspec_args)
