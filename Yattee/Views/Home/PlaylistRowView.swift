@@ -37,7 +37,7 @@ struct PlaylistRowView: View {
                     .font(.headline)
                     .lineLimit(1)
 
-                Text("\(playlist.videoCount) videos • \(playlist.formattedTotalDuration)")
+                Text("playlist.videoCountDuration \(playlist.videoCount) \(playlist.formattedTotalDuration)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
             }

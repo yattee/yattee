@@ -91,7 +91,7 @@ struct MediaBrowserView: View {
                     showViewOptions = true
                 } label: {
                     Label(
-                        "View Options",
+                        String(localized: "viewOptions.title"),
                         systemImage: showOnlyPlayable
                             ? "line.3.horizontal.decrease.circle.fill"
                             : "line.3.horizontal.decrease.circle"

@@ -4,18 +4,6 @@
     "" : {
 
     },
-    " " : {
-
-    },
-    " / " : {
-
-    },
-    "-%@" : {
-
-    },
-    "/" : {
-
-    },
     "%@" : {
 
     },
@@ -59,39 +47,6 @@
         }
       }
     },
-    "%@ from %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ from %2$@"
-          }
-        }
-      }
-    },
-    "%@ subscribers" : {
-
-    },
-    "%@: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@: %2$lld"
-          }
-        }
-      }
-    },
-    "%@: %llds" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@: %2$llds"
-          }
-        }
-      }
-    },
     "%@%llds" : {
       "localizations" : {
         "en" : {
@@ -104,35 +59,6 @@
     },
     "%lld" : {
 
-    },
-    "%lld item%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld item%2$@"
-          }
-        }
-      }
-    },
-    "%lld pt" : {
-
-    },
-    "%lld replies" : {
-
-    },
-    "%lld videos" : {
-
-    },
-    "%lld videos • %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld videos • %2$@"
-          }
-        }
-      }
     },
     "%lld/%lld" : {
       "localizations" : {
@@ -159,9 +85,6 @@
     "%llds" : {
 
     },
-    "%llds ago" : {
-
-    },
     "%llu.%llu" : {
       "localizations" : {
         "en" : {
@@ -172,28 +95,10 @@
         }
       }
     },
-    "•" : {
-
-    },
-    "• %@" : {
-
-    },
-    "↑↓ scroll • click to close" : {
-
-    },
     "+%lld" : {
 
     },
-    "0:00 / 3:45" : {
-
-    },
     "1.2M subscribers" : {
-
-    },
-    "2 weeks ago" : {
-
-    },
-    "Account" : {
 
     },
     "alert.openVideo.message %@" : {
@@ -212,22 +117,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Video?"
-          }
-        }
-      }
-    },
-    "Apple HLS" : {
-
-    },
-    "AUTO" : {
-
-    },
-    "availW: %lld fullW: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "availW: %1$lld fullW: %2$lld"
           }
         }
       }
@@ -521,27 +410,15 @@
         }
       }
     },
-    "Browse %@" : {
-
-    },
-    "Cancel" : {
-
-    },
-    "centerOff: %lld btmExtra: %lld" : {
+    "bookmarks.search.placeholder" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "centerOff: %1$lld btmExtra: %2$lld"
+            "state" : "translated",
+            "value" : "Search bookmarks"
           }
         }
       }
-    },
-    "Channel" : {
-
-    },
-    "Channel Name" : {
-
     },
     "channel.menu.disableNotifications" : {
       "localizations" : {
@@ -780,6 +657,56 @@
         }
       }
     },
+    "channel.view" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Channel"
+          }
+        }
+      }
+    },
+    "channels.search.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search channels"
+          }
+        }
+      }
+    },
+    "channelStrip.size.compact" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "channelStrip.size.large" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large"
+          }
+        }
+      }
+    },
+    "channelStrip.size.normal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
     "channelView.loadError" : {
       "comment" : "Error message when loading channel fails",
       "localizations" : {
@@ -790,21 +717,6 @@
           }
         }
       }
-    },
-    "click to expand" : {
-
-    },
-    "Close" : {
-
-    },
-    "Comments" : {
-
-    },
-    "Comments disabled" : {
-
-    },
-    "Comments unavailable" : {
-
     },
     "comments.disabled" : {
       "comment" : "Shown when comments are disabled for a video",
@@ -860,12 +772,32 @@
         }
       }
     },
+    "comments.replyCount %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld replies"
+          }
+        }
+      }
+    },
     "comments.showReplies %lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show %lld replies"
+          }
+        }
+      }
+    },
+    "comments.unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments unavailable"
           }
         }
       }
@@ -956,6 +888,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "common.channel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Channel"
           }
         }
       }
@@ -1215,6 +1157,26 @@
         }
       }
     },
+    "common.unit.points" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pt"
+          }
+        }
+      }
+    },
+    "common.videoTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Title"
+          }
+        }
+      }
+    },
     "common.yes" : {
       "comment" : "Yes",
       "localizations" : {
@@ -1222,19 +1184,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yes"
-          }
-        }
-      }
-    },
-    "Community" : {
-
-    },
-    "Compact" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compact"
           }
         }
       }
@@ -1260,9 +1209,6 @@
           }
         }
       }
-    },
-    "Controls (cyan):" : {
-
     },
     "controls.button.addToPlaylist" : {
       "localizations" : {
@@ -1864,25 +1810,6 @@
         }
       }
     },
-    "DASH" : {
-
-    },
-    "Debug" : {
-
-    },
-    "Description" : {
-
-    },
-    "Disabled" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disabled"
-          }
-        }
-      }
-    },
     "discovery.empty.description" : {
       "comment" : "Description when no network shares are found",
       "localizations" : {
@@ -2025,9 +1952,6 @@
           }
         }
       }
-    },
-    "Download: %@" : {
-
     },
     "download.error.audioRequired" : {
       "localizations" : {
@@ -2221,6 +2145,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retry"
+          }
+        }
+      }
+    },
+    "downloads.search.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search downloads"
           }
         }
       }
@@ -2513,26 +2447,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Feed"
-          }
-        }
-      }
-    },
-    "fullH: %lld offset: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "fullH: %1$lld offset: %2$lld"
-          }
-        }
-      }
-    },
-    "geom W:%lld H:%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "geom W:%1$lld H:%2$lld"
           }
         }
       }
@@ -3406,8 +3320,15 @@
         }
       }
     },
-    "HLS" : {
-
+    "history.search.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search history"
+          }
+        }
+      }
     },
     "home.bookmarks.empty" : {
       "comment" : "Empty bookmarks message",
@@ -3839,6 +3760,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recent History"
+          }
+        }
+      }
+    },
+    "home.removeConfirmation.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Home?"
           }
         }
       }
@@ -4525,9 +4456,6 @@
         }
       }
     },
-    "Info" : {
-
-    },
     "Initializing player..." : {
 
     },
@@ -4684,41 +4612,6 @@
           }
         }
       }
-    },
-    "Large" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Large"
-          }
-        }
-      }
-    },
-    "Last manual sync: %@" : {
-
-    },
-    "Last Synced" : {
-
-    },
-    "Layout (yellow):" : {
-
-    },
-    "leadSA: %lld trailSA: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "leadSA: %1$lld trailSA: %2$lld"
-          }
-        }
-      }
-    },
-    "LIVE" : {
-
-    },
-    "Load more replies" : {
-
     },
     "login.email" : {
       "comment" : "Email field label in login form",
@@ -5060,6 +4953,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "View Options"
+          }
+        }
+      }
+    },
+    "mediaSources.browse %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse %@"
           }
         }
       }
@@ -5589,18 +5492,6 @@
         }
       }
     },
-    "MPEG-DASH (Best for MPV)" : {
-
-    },
-    "MPV Debug" : {
-
-    },
-    "MPV Debug Stats" : {
-
-    },
-    "MUXED" : {
-
-    },
     "my-server.example.com" : {
 
     },
@@ -5620,19 +5511,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This media source may have been removed."
-          }
-        }
-      }
-    },
-    "No comments" : {
-
-    },
-    "Normal" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Normal"
           }
         }
       }
@@ -5713,15 +5591,6 @@
           }
         }
       }
-    },
-    "Off" : {
-
-    },
-    "OK" : {
-
-    },
-    "On" : {
-
     },
     "onboarding.cloud.complete.description" : {
       "comment" : "iCloud sync complete description on onboarding",
@@ -6328,12 +6197,6 @@
         }
       }
     },
-    "orient: %@" : {
-
-    },
-    "ORIGINAL" : {
-
-    },
     "peertube.explore.added" : {
       "localizations" : {
         "en" : {
@@ -6413,9 +6276,6 @@
           }
         }
       }
-    },
-    "Pending" : {
-
     },
     "pill.addButton.header" : {
       "localizations" : {
@@ -6527,16 +6387,6 @@
         }
       }
     },
-    "pinned: %@ vis: %@ side: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "pinned: %1$@ vis: %2$@ side: %3$@"
-          }
-        }
-      }
-    },
     "player.autoplay.cancel" : {
       "comment" : "Cancel autoplay button",
       "localizations" : {
@@ -6623,6 +6473,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comments"
+          }
+        }
+      }
+    },
+    "player.controls.subtitles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtitles"
+          }
+        }
+      }
+    },
+    "player.debug.stats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MPV Debug Stats"
+          }
+        }
+      }
+    },
+    "player.debug.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MPV Debug"
+          }
+        }
+      }
+    },
+    "player.debug.titleShort" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
           }
         }
       }
@@ -6794,6 +6684,16 @@
     },
     "player.expandedSheet" : {
 
+    },
+    "player.live" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LIVE"
+          }
+        }
+      }
     },
     "player.miniPlayer" : {
 
@@ -7021,6 +6921,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Try %@"
+          }
+        }
+      }
+    },
+    "player.tvos.scrubHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press to scrub"
+          }
+        }
+      }
+    },
+    "player.tvos.seekHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swipe ← → • press to seek"
+          }
+        }
+      }
+    },
+    "player.tvos.volumeDown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vol -"
+          }
+        }
+      }
+    },
+    "player.tvos.volumeUp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vol +"
           }
         }
       }
@@ -7292,6 +7232,16 @@
         }
       }
     },
+    "playlist.videoCountDuration %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld videos • %@"
+          }
+        }
+      }
+    },
     "playlists.empty.description" : {
       "comment" : "Description shown when user has no playlists",
       "localizations" : {
@@ -7335,15 +7285,6 @@
           }
         }
       }
-    },
-    "Press to scrub" : {
-
-    },
-    "pt" : {
-
-    },
-    "Quality" : {
-
     },
     "queue.action.addToQueue" : {
       "comment" : "Add to queue action in action sheet",
@@ -7585,9 +7526,6 @@
         }
       }
     },
-    "Remote Control" : {
-
-    },
     "remoteControl.closeVideo" : {
       "comment" : "Button label",
       "localizations" : {
@@ -7709,6 +7647,16 @@
         }
       }
     },
+    "remoteControl.lastSeen %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%llds ago"
+          }
+        }
+      }
+    },
     "remoteControl.noDevicesFooter" : {
       "comment" : "Footer when no devices",
       "localizations" : {
@@ -7808,6 +7756,16 @@
         }
       }
     },
+    "remoteControl.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remote Control"
+          }
+        }
+      }
+    },
     "remoteControl.tryReconnect" : {
       "comment" : "Button label",
       "localizations" : {
@@ -7818,12 +7776,6 @@
           }
         }
       }
-    },
-    "Remove" : {
-
-    },
-    "Remove from Home?" : {
-
     },
     "resume.action.continueAt %@" : {
       "comment" : "Continue watching action with timestamp",
@@ -7846,21 +7798,6 @@
           }
         }
       }
-    },
-    "Retry Sync" : {
-
-    },
-    "Search bookmarks" : {
-
-    },
-    "Search channels" : {
-
-    },
-    "Search downloads" : {
-
-    },
-    "Search history" : {
-
     },
     "search.clearAllRecents" : {
       "comment" : "Button to clear all recent searches, channels, and playlists",
@@ -8271,8 +8208,15 @@
         }
       }
     },
-    "Settings" : {
-
+    "settings.about.community" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
+          }
+        }
+      }
     },
     "settings.about.mpvInfo" : {
       "localizations" : {
@@ -10793,6 +10737,16 @@
         }
       }
     },
+    "settings.icloud.account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
     "settings.icloud.categories.footer" : {
       "comment" : "Footer explaining sync categories",
       "localizations" : {
@@ -11041,6 +10995,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "When enabled, your settings, instances, subscriptions, and watch history will sync across all your devices using iCloud."
+          }
+        }
+      }
+    },
+    "settings.icloud.lastManualSync %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last manual sync: %@"
+          }
+        }
+      }
+    },
+    "settings.icloud.lastSynced" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Synced"
+          }
+        }
+      }
+    },
+    "settings.icloud.pending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
+    },
+    "settings.icloud.retrySync" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Sync"
+          }
+        }
+      }
+    },
+    "settings.icloud.status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
+    "settings.icloud.syncError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync Error"
+          }
+        }
+      }
+    },
+    "settings.icloud.syncNow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync Now"
           }
         }
       }
@@ -13623,6 +13647,16 @@
         }
       }
     },
+    "settings.subtitles.fontSize %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pt"
+          }
+        }
+      }
+    },
     "settings.subtitles.italic" : {
       "localizations" : {
         "en" : {
@@ -14234,6 +14268,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add WebDAV Share"
+          }
+        }
+      }
+    },
+    "sources.bandwidth.download %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download: %@"
+          }
+        }
+      }
+    },
+    "sources.bandwidth.upload %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload: %@"
           }
         }
       }
@@ -15494,12 +15548,6 @@
         }
       }
     },
-    "Status" : {
-
-    },
-    "STREAM" : {
-
-    },
     "stream.adaptive" : {
       "localizations" : {
         "en" : {
@@ -15526,6 +15574,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default"
+          }
+        }
+      }
+    },
+    "stream.audio.original" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ORIGINAL"
+          }
+        }
+      }
+    },
+    "stream.badge.muxed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MUXED"
+          }
+        }
+      }
+    },
+    "stream.badge.stream" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STREAM"
+          }
+        }
+      }
+    },
+    "stream.format.appleHLS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple HLS"
+          }
+        }
+      }
+    },
+    "stream.format.dash" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DASH"
+          }
+        }
+      }
+    },
+    "stream.format.hls" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HLS"
+          }
+        }
+      }
+    },
+    "stream.format.mpegDash" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MPEG-DASH (Best for MPV)"
+          }
+        }
+      }
+    },
+    "stream.subtitle.auto" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AUTO"
           }
         }
       }
@@ -15867,9 +15995,6 @@
         }
       }
     },
-    "Subtitles" : {
-
-    },
     "subtitles.default" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -15880,9 +16005,6 @@
           }
         }
       }
-    },
-    "Swipe ← → • press to seek" : {
-
     },
     "swipeAction.addToBookmarks" : {
       "localizations" : {
@@ -15973,12 +16095,6 @@
           }
         }
       }
-    },
-    "Sync Error" : {
-
-    },
-    "Sync Now" : {
-
     },
     "tabBar.item.bookmarks" : {
       "comment" : "Tab bar item title for bookmarks",
@@ -16132,22 +16248,22 @@
         }
       }
     },
-    "toast.download.fileMissing.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download file missing — streaming instead"
-          }
-        }
-      }
-    },
     "toast.download.completedWithWarnings.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download Completed (Some Assets Failed)"
+          }
+        }
+      }
+    },
+    "toast.download.fileMissing.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download file missing — streaming instead"
           }
         }
       }
@@ -16235,16 +16351,6 @@
         }
       }
     },
-    "topPad: %lld btmPad: %lld wide: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "topPad: %1$lld btmPad: %2$lld wide: %3$@"
-          }
-        }
-      }
-    },
     "trending.title" : {
       "comment" : "Trending view title",
       "localizations" : {
@@ -16255,12 +16361,6 @@
           }
         }
       }
-    },
-    "Upload: %@" : {
-
-    },
-    "Video Title" : {
-
     },
     "video.badge.live" : {
       "comment" : "Label for live streams",
@@ -16963,22 +17063,6 @@
         }
       }
     },
-    "vidTop: %lld vidH: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "vidTop: %1$lld vidH: %2$lld"
-          }
-        }
-      }
-    },
-    "View Channel" : {
-
-    },
-    "View Options" : {
-
-    },
     "viewOptions.channelStrip" : {
       "localizations" : {
         "en" : {
@@ -17120,22 +17204,6 @@
         }
       }
     },
-    "vis: %@ fitH: %lld effVH: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "vis: %1$@ fitH: %2$lld effVH: %3$lld"
-          }
-        }
-      }
-    },
-    "Vol -" : {
-
-    },
-    "Vol +" : {
-
-    },
     "wideLayoutPanel.alignmentButton.moveLeft" : {
       "localizations" : {
         "en" : {
@@ -17175,22 +17243,6 @@
           }
         }
       }
-    },
-    "winSA T:%lld B:%lld L:%lld R:%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "winSA T:%1$lld B:%2$lld L:%3$lld R:%4$lld"
-          }
-        }
-      }
-    },
-    "Y" : {
-
-    },
-    "Yattee" : {
-
     }
   },
   "version" : "1.0"

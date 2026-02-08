@@ -51,7 +51,7 @@ struct SubtitlesSettingsView: View {
             // tvOS uses Picker instead of Slider (Slider unavailable)
             Picker(String(localized: "settings.subtitles.fontSize"), selection: $settings.fontSize) {
                 ForEach([20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100], id: \.self) { size in
-                    Text("\(size) pt").tag(size)
+                    Text("settings.subtitles.fontSize \(size)").tag(size)
                 }
             }
             .onChange(of: settings.fontSize) { _, _ in saveSettings() }
@@ -73,7 +73,7 @@ struct SubtitlesSettingsView: View {
                         .frame(width: 60)
                         .multilineTextAlignment(.center)
                         .onChange(of: settings.fontSize) { _, _ in saveSettings() }
-                    Text("pt")
+                    Text(String(localized: "common.unit.points"))
                         .foregroundStyle(.secondary)
                 }
             }

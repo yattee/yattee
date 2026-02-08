@@ -74,7 +74,7 @@ struct SettingsView: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }
@@ -184,7 +184,7 @@ struct SettingsView: View {
 
                     Section {
                         VStack(spacing: 4) {
-                            Text("Yattee")
+                            Text(verbatim: "Yattee")
                                 .font(.headline)
                             Text("\(appVersion) (\(buildNumber))")
                                 .font(.subheadline)
@@ -205,7 +205,7 @@ struct SettingsView: View {
                         Button(role: .cancel) {
                             dismiss()
                         } label: {
-                            Label("Close", systemImage: "xmark")
+                            Label(String(localized: "common.close"), systemImage: "xmark")
                                 .labelStyle(.iconOnly)
                         }
                         .accessibilityIdentifier("settings.doneButton")

@@ -233,7 +233,7 @@ struct TVPlayerControlsView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "captions.bubble")
                         .font(.system(size: 28))
-                    Text("Subtitles")
+                    Text(String(localized: "player.controls.subtitles"))
                         .font(.caption)
                 }
             }
@@ -247,7 +247,7 @@ struct TVPlayerControlsView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "ant.circle")
                         .font(.system(size: 28))
-                    Text("Debug")
+                    Text(String(localized: "player.debug.titleShort"))
                         .font(.caption)
                 }
             }
@@ -281,7 +281,7 @@ struct TVPlayerControlsView: View {
                     VStack(spacing: 6) {
                         Image(systemName: "speaker.minus")
                             .font(.system(size: 28))
-                        Text("Vol -")
+                        Text(String(localized: "player.tvos.volumeDown"))
                             .font(.caption)
                     }
                 }
@@ -299,7 +299,7 @@ struct TVPlayerControlsView: View {
                     VStack(spacing: 6) {
                         Image(systemName: "speaker.plus")
                             .font(.system(size: 28))
-                        Text("Vol +")
+                        Text(String(localized: "player.tvos.volumeUp"))
                             .font(.caption)
                     }
                 }

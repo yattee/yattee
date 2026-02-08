@@ -17,7 +17,7 @@ struct AboutView: View {
                 communityLink("GitHub", icon: "github", url: "https://github.com/yattee/yattee")
                 communityLink("Discord", icon: "discord", url: "https://yattee.stream/discord")
             } header: {
-                Text("Community")
+                Text(String(localized: "settings.about.community"))
             }
 
             Section {

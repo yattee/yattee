@@ -612,14 +612,14 @@ struct PlayerControlsView: View {
                 // Position at bottom-left to avoid overlap with yellow layout debug
                 if showPlayerAreaDebug {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Controls (cyan):")
+                        Text(verbatim: "Controls (cyan):")
                             .fontWeight(.bold)
-                        Text("winSA T:\(Int(safeArea.top)) B:\(Int(safeArea.bottom)) L:\(Int(safeArea.left)) R:\(Int(safeArea.right))")
-                        Text("topPad: \(Int(topPadding)) btmPad: \(Int(bottomPadding)) wide: \(isWideScreenLayout ? "Y" : "N")")
-                        Text("geom W:\(Int(geometry.size.width)) H:\(Int(geometry.size.height))")
-                        Text("vidTop: \(Int(effectiveVideoTop)) vidH: \(Int(effectiveVideoHeight))")
-                        Text("centerOff: \(Int(centerYOffset)) btmExtra: \(Int(bottomExtraPadding))")
-                        Text("vis: \(isPanelVisible ? "Y" : "N") fitH: \(Int(videoFitHeight ?? -1)) effVH: \(Int(effectiveVideoHeight))")
+                        Text(verbatim: "winSA T:\(Int(safeArea.top)) B:\(Int(safeArea.bottom)) L:\(Int(safeArea.left)) R:\(Int(safeArea.right))")
+                        Text(verbatim: "topPad: \(Int(topPadding)) btmPad: \(Int(bottomPadding)) wide: \(isWideScreenLayout ? "Y" : "N")")
+                        Text(verbatim: "geom W:\(Int(geometry.size.width)) H:\(Int(geometry.size.height))")
+                        Text(verbatim: "vidTop: \(Int(effectiveVideoTop)) vidH: \(Int(effectiveVideoHeight))")
+                        Text(verbatim: "centerOff: \(Int(centerYOffset)) btmExtra: \(Int(bottomExtraPadding))")
+                        Text(verbatim: "vis: \(isPanelVisible ? "Y" : "N") fitH: \(Int(videoFitHeight ?? -1)) effVH: \(Int(effectiveVideoHeight))")
                     }
                     .font(.system(size: 9, weight: .medium, design: .monospaced))
                     .foregroundStyle(.cyan)

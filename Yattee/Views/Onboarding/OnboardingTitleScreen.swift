@@ -26,7 +26,7 @@ struct OnboardingTitleScreen: View {
                         .frame(width: iconSize, height: iconSize)
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 
-                    Text("Yattee")
+                    Text(verbatim: "Yattee")
                         .font(.largeTitle)
                         .fontWeight(.bold)
 

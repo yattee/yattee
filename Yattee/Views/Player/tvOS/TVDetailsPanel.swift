@@ -185,7 +185,7 @@ struct TVDetailsPanel: View {
 
                 // Subscriber count
                 if let subscriberCount = video?.author.subscriberCount {
-                    Text("\(CountFormatter.compact(subscriberCount)) subscribers")
+                    Text("channel.subscriberCount \(CountFormatter.compact(subscriberCount))")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.6))
                 }
@@ -200,7 +200,7 @@ struct TVDetailsPanel: View {
                     navigateToChannel(video.author)
                 }
             } label: {
-                Text("View Channel")
+                Text(String(localized: "channel.view"))
                     .font(.callout)
                     .fontWeight(.medium)
             }
@@ -272,7 +272,7 @@ struct TVDetailsPanel: View {
                 )
                 .padding(.vertical, 16)
             } else {
-                Text("Comments unavailable")
+                Text(String(localized: "comments.unavailable"))
                     .font(.body)
                     .foregroundStyle(.white.opacity(0.5))
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -476,7 +476,7 @@ struct TVCommentsListView: View {
             Image(systemName: "bubble.left.and.exclamationmark.bubble.right")
                 .font(.title2)
                 .foregroundStyle(.white.opacity(0.5))
-            Text("Comments disabled")
+            Text(String(localized: "comments.disabled"))
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.5))
         }
@@ -506,7 +506,7 @@ struct TVCommentsListView: View {
             Image(systemName: "bubble.left.and.bubble.right")
                 .font(.title2)
                 .foregroundStyle(.white.opacity(0.5))
-            Text("No comments")
+            Text(String(localized: "comments.empty"))
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.5))
         }
@@ -707,7 +707,7 @@ struct TVFocusableCommentView: View {
                         HStack(spacing: 4) {
                             Image(systemName: showReplies ? "chevron.up" : "chevron.down")
                                 .font(.caption2)
-                            Text("\(comment.replyCount) replies")
+                            Text("comments.replyCount \(comment.replyCount)")
                                 .font(.caption)
                         }
                         .foregroundStyle(.blue)
@@ -749,7 +749,7 @@ struct TVFocusableCommentView: View {
                 Button {
                     Task { await loadReplies() }
                 } label: {
-                    Text("Load more replies")
+                    Text(String(localized: "comments.loadMoreReplies"))
                         .font(.caption)
                         .foregroundStyle(.blue)
                 }

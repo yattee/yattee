@@ -102,7 +102,7 @@ struct ManageChannelsView: View {
         .navigationTitle(String(localized: "subscriptions.channels.title"))
         #if !os(tvOS)
         .toolbarTitleDisplayMode(.inlineLarge)
-        .searchable(text: $searchText, prompt: Text("Search channels"))
+        .searchable(text: $searchText, prompt: Text(String(localized: "channels.search.placeholder")))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

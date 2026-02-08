@@ -602,7 +602,7 @@ struct ControlsSectionRenderer: View {
                     Circle()
                         .fill(.red)
                         .frame(width: 6, height: 6)
-                    Text("LIVE")
+                    Text(String(localized: "player.live"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.red)
                 }
@@ -622,7 +622,7 @@ struct ControlsSectionRenderer: View {
                             .font(timeFont)
                             .foregroundStyle(.white)
 
-                        Text(" / ")
+                        Text(verbatim: " / ")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
 
@@ -638,7 +638,7 @@ struct ControlsSectionRenderer: View {
                             .font(timeFont)
                             .foregroundStyle(.white)
 
-                        Text(" / ")
+                        Text(verbatim: " / ")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
 
@@ -653,11 +653,11 @@ struct ControlsSectionRenderer: View {
                             .font(timeFont)
                             .foregroundStyle(.white)
 
-                        Text(" / ")
+                        Text(verbatim: " / ")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
 
-                        Text("-\(formattedRemainingTime)")
+                        Text(verbatim: "-\(formattedRemainingTime)")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
                     }
@@ -669,11 +669,11 @@ struct ControlsSectionRenderer: View {
                             .font(timeFont)
                             .foregroundStyle(.white)
 
-                        Text(" / ")
+                        Text(verbatim: " / ")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
 
-                        Text("-\(formattedRemainingTime)")
+                        Text(verbatim: "-\(formattedRemainingTime)")
                             .font(timeFont)
                             .foregroundStyle(.white.opacity(0.7))
                     }

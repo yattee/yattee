@@ -16,7 +16,7 @@ struct RemoteDevicesSheet: View {
         DynamicSheetContainer {
             NavigationStack {
                 RemoteControlContentView(navigationStyle: .selection($selectedDevice))
-                    .navigationTitle("Remote Control")
+                    .navigationTitle(String(localized: "remoteControl.title"))
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
                     #endif
@@ -28,7 +28,7 @@ struct RemoteDevicesSheet: View {
                             Button(role: .cancel) {
                                 dismiss()
                             } label: {
-                                Label("Close", systemImage: "xmark")
+                                Label(String(localized: "common.close"), systemImage: "xmark")
                                     .labelStyle(.iconOnly)
                             }
                         }

@@ -728,13 +728,13 @@ private struct EditFileSourceContent: View {
                         .foregroundStyle(.green)
                     if bandwidth.hasWriteAccess {
                         if let upload = bandwidth.formattedUploadSpeed {
-                            Label("Upload: \(upload)", systemImage: "arrow.up.circle")
+                            Label(String(localized: "sources.bandwidth.upload \(upload)"), systemImage: "arrow.up.circle")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                     }
                     if let download = bandwidth.formattedDownloadSpeed {
-                        Label("Download: \(download)", systemImage: "arrow.down.circle")
+                        Label(String(localized: "sources.bandwidth.download \(download)"), systemImage: "arrow.down.circle")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

@@ -214,7 +214,7 @@ struct MacOSControlBar: View {
                     Circle()
                         .fill(.red)
                         .frame(width: 6, height: 6)
-                    Text("LIVE")
+                    Text(String(localized: "player.live"))
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.red)
                 }

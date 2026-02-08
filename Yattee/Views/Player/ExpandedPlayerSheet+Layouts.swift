@@ -1486,17 +1486,17 @@ extension ExpandedPlayerSheet {
                 .overlay(alignment: panelSide == .right ? .topLeading : .topTrailing) {
                     if appEnvironment?.settingsManager.showPlayerAreaDebug == true {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Layout (yellow):")
+                            Text(verbatim: "Layout (yellow):")
                                 .fontWeight(.bold)
-                            Text("leadSA: \(Int(leadingSafeArea)) trailSA: \(Int(trailingSafeArea))")
-                            Text("availW: \(Int(availableWidth)) fullW: \(Int(fullWidth))")
-                            Text("fullH: \(Int(fullHeight)) offset: \(Int(controlsOffset))")
-                            Text("pinned: \(isPanelPinned ? "Y" : "N") vis: \(isPanelVisible ? "Y" : "N") side: \(panelSide == .left ? "L" : "R")")
+                            Text(verbatim: "leadSA: \(Int(leadingSafeArea)) trailSA: \(Int(trailingSafeArea))")
+                            Text(verbatim: "availW: \(Int(availableWidth)) fullW: \(Int(fullWidth))")
+                            Text(verbatim: "fullH: \(Int(fullHeight)) offset: \(Int(controlsOffset))")
+                            Text(verbatim: "pinned: \(isPanelPinned ? "Y" : "N") vis: \(isPanelVisible ? "Y" : "N") side: \(panelSide == .left ? "L" : "R")")
                             #if os(iOS)
                             let orientation = UIApplication.shared.connectedScenes
                                 .compactMap { $0 as? UIWindowScene }
                                 .first?.interfaceOrientation
-                            Text("orient: \(orientation == .landscapeLeft ? "LL" : orientation == .landscapeRight ? "LR" : "P")")
+                            Text(verbatim: "orient: \(orientation == .landscapeLeft ? "LL" : orientation == .landscapeRight ? "LR" : "P")")
                             #endif
                         }
                         .font(.system(size: 9, weight: .medium, design: .monospaced))

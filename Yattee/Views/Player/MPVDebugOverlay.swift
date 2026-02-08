@@ -105,11 +105,11 @@ struct MPVDebugOverlay: View {
             // Header with close button (non-tvOS only - tvOS has button at bottom)
             HStack(spacing: 4) {
                 #if os(tvOS)
-                Text("MPV Debug Stats")
+                Text(String(localized: "player.debug.stats"))
                     .font(.system(size: headerSize, weight: .semibold, design: .monospaced))
                     .foregroundStyle(primaryTextColor)
                 #else
-                Text(isLandscape ? "MPV Debug" : "Debug")
+                Text(String(localized: isLandscape ? "player.debug.title" : "player.debug.titleShort"))
                     .font(.system(size: headerSize, weight: .semibold, design: .monospaced))
                     .foregroundStyle(primaryTextColor)
 
@@ -168,7 +168,7 @@ struct MPVDebugOverlay: View {
             HStack(spacing: 12) {
                 Image(systemName: "xmark.circle")
                     .font(.system(size: closeButtonSize))
-                Text("Close")
+                Text(String(localized: "common.close"))
                     .font(.system(size: rowSize, weight: .medium))
             }
             .foregroundStyle(.white)

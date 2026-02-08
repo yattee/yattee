@@ -58,7 +58,7 @@ struct InstancePickerSheet: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label("Close", systemImage: "xmark")
+                        Label(String(localized: "common.close"), systemImage: "xmark")
                             .labelStyle(.iconOnly)
                     }
                 }
@@ -95,7 +95,7 @@ private struct PickerInstanceRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Text("•")
+                    Text(verbatim: "•")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
 

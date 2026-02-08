@@ -139,7 +139,7 @@ struct HistoryListView: View {
         .navigationTitle(String(localized: "home.history.title"))
         #if !os(tvOS)
         .toolbarTitleDisplayMode(.inlineLarge)
-        .searchable(text: $searchText, prompt: Text("Search history"))
+        .searchable(text: $searchText, prompt: Text(String(localized: "history.search.placeholder")))
         .toolbar {
             // View options button (always visible)
             ToolbarItem(placement: .primaryAction) {
