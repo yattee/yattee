@@ -13,18 +13,18 @@ import SwiftUI
 /// For completed downloads, uses VideoRowView with tap zone support (thumbnail plays, text opens info).
 /// For active downloads, shows custom progress UI with no tap actions.
 struct DownloadRowView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let download: Download
     let isActive: Bool
     var onDelete: (() -> Void)? = nil
-    
+
     // Queue context (optional, enables auto-play when provided)
     var queueSource: QueueSource? = nil
     var sourceLabel: String? = nil
     var videoList: [Video]? = nil
     var videoIndex: Int? = nil
     var loadMoreVideos: LoadMoreVideosCallback? = nil
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     // Cache watch progress to avoid CoreData fetches on every re-render
     @State private var cachedWatchProgress: Double?

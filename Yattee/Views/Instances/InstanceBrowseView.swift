@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct InstanceBrowseView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let instance: Instance
     let initialTab: BrowseTab?
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Namespace private var sheetTransition
 
+    @Namespace private var sheetTransition
     @State private var selectedTab: BrowseTab = .popular
     @State private var popularVideos: [Video] = []
     @State private var trendingVideos: [Video] = []
@@ -282,14 +283,14 @@ struct InstanceBrowseView: View {
             }
         }
         .sheet(isPresented: $showFilterSheet) {
-            SearchFiltersSheet(filters: Binding(
-                get: { searchViewModel?.filters ?? .defaults },
-                set: { searchViewModel?.filters = $0 }
-            )) {
+            SearchFiltersSheet(onApply: {
                 Task {
                     await searchViewModel?.search(query: searchText)
                 }
-            }
+            }, filters: Binding(
+                get: { searchViewModel?.filters ?? .defaults },
+                set: { searchViewModel?.filters = $0 }
+            ))
             #if !os(tvOS)
             .presentationDetents([.medium, .large])
             #endif

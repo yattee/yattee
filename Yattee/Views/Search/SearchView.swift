@@ -144,17 +144,17 @@ struct SearchView: View {
         }
         .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
         .sheet(isPresented: $showFilterSheet) {
-            SearchFiltersSheet(filters: Binding(
+            SearchFiltersSheet(onApply: {
+                if hasResults {
+                    Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+                }
+            }, filters: Binding(
                 get: { searchViewModel?.filters ?? .defaults },
                 set: { newFilters in
                     searchViewModel?.filters = newFilters
                     saveFilters(newFilters)
                 }
-            ), onApply: {
-                if hasResults {
-                    Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
-                }
-            })
+            ))
             .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showViewOptions) {
@@ -1169,9 +1169,11 @@ struct SearchView: View {
 // MARK: - Search Filters Sheet
 
 struct SearchFiltersSheet: View {
-    @Binding var filters: SearchFilters
-    let onApply: () -> Void
     @Environment(\.dismiss) private var dismiss
+
+    let onApply: () -> Void
+
+    @Binding var filters: SearchFilters
 
     var body: some View {
         NavigationStack {

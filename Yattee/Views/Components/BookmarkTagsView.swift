@@ -9,10 +9,10 @@ import SwiftUI
 
 /// Read-only display of bookmark tags with optional overflow indicator.
 struct BookmarkTagsView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let tags: [String]
     var maxVisible: Int = 3
-    
-    @Environment(\.appEnvironment) private var appEnvironment
     
     private var accentColor: Color {
         appEnvironment?.settingsManager.accentColor.color ?? .accentColor

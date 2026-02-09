@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct SettingsView: View {
-    var showCloseButton: Bool = true
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
+
+    var showCloseButton: Bool = true
 
     #if os(macOS)
     @State private var selectedSection: SettingsSection? = .sources

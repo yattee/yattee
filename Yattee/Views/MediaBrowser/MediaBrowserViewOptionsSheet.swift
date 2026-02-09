@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct MediaBrowserViewOptionsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let sourceType: MediaSourceType
+
     @Binding var sortOrder: MediaBrowserSortOrder
     @Binding var sortAscending: Bool
     @Binding var showOnlyPlayable: Bool
-    let sourceType: MediaSourceType
-
-    @Environment(\.dismiss) private var dismiss
 
     private var availableSortOptions: [MediaBrowserSortOrder] {
         MediaBrowserSortOrder.availableOptions(for: sourceType)
@@ -89,10 +90,10 @@ struct MediaBrowserViewOptionsSheet: View {
     @Previewable @State var showOnlyPlayable = false
 
     MediaBrowserViewOptionsSheet(
+        sourceType: .localFolder,
         sortOrder: $sortOrder,
         sortAscending: $sortAscending,
-        showOnlyPlayable: $showOnlyPlayable,
-        sourceType: .localFolder
+        showOnlyPlayable: $showOnlyPlayable
     )
 }
 
@@ -102,9 +103,9 @@ struct MediaBrowserViewOptionsSheet: View {
     @Previewable @State var showOnlyPlayable = false
 
     MediaBrowserViewOptionsSheet(
+        sourceType: .webdav,
         sortOrder: $sortOrder,
         sortAscending: $sortAscending,
-        showOnlyPlayable: $showOnlyPlayable,
-        sourceType: .webdav
+        showOnlyPlayable: $showOnlyPlayable
     )
 }

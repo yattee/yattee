@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ExpandedCommentsView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let videoID: String
     let onClose: () -> Void
     var onDismissOffsetChanged: ((CGFloat) -> Void)? = nil
@@ -17,8 +19,6 @@ struct ExpandedCommentsView: View {
     // Panel resize drag callbacks
     var onDragChanged: ((CGFloat) -> Void)? = nil
     var onDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     @State private var showScrollButton = false
     @State private var scrollToTopTrigger: Int = 0

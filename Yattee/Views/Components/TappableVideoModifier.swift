@@ -18,6 +18,8 @@ struct ResumeSheetData: Identifiable {
 /// When queue is enabled and not empty, shows a sheet with queue options.
 /// When queue is empty or disabled, plays the video directly and queues subsequent videos.
 struct TappableVideoModifier: ViewModifier {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let video: Video
     var startTime: Double? = nil
     var customActions: [VideoContextAction] = []
@@ -31,16 +33,15 @@ struct TappableVideoModifier: ViewModifier {
     var videoList: [Video]? = nil
     /// Index of this video in the list
     var videoIndex: Int? = nil
-    
+
     /// Callback to load more videos via continuation
     nonisolated(unsafe) var loadMoreVideos: LoadMoreVideosCallback? = nil
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var showingQueueSheet = false
-    
+
     // Resume action sheet state - using item-based sheet to ensure data is available when presented
     @State private var resumeSheetData: ResumeSheetData? = nil
-    
+
     // Password alert state (for WebDAV sources)
     @State private var showingPasswordAlert = false
     @State private var sourceNeedingPassword: MediaSource?

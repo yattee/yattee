@@ -13,6 +13,8 @@ import SwiftUI
 #if os(iOS) || os(macOS)
 
 struct WideScreenPlayerLayout<PlayerContent: View>: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let playerControlsLayout: PlayerControlsLayout
 
     @ViewBuilder let playerContent: (
@@ -30,8 +32,6 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     // Callbacks for panel actions
     let onChannelTap: (() -> Void)?
     let onFullscreen: (() -> Void)?
-
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var controlsVisible = false
     @State private var isPanelVisible = false // Local state synced with settingsManager
     @State private var lastVideoId: String? // Track video ID to detect actual video changes

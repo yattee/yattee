@@ -9,12 +9,12 @@ import SwiftUI
 
 /// A sheet that appears when playing a partially watched video, offering options to resume or start over.
 struct ResumeActionSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
     let video: Video
     let resumeTime: TimeInterval
     let onContinue: () -> Void
     let onStartOver: () -> Void
-
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {

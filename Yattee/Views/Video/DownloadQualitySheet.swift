@@ -9,11 +9,6 @@ import SwiftUI
 
 #if !os(tvOS)
 struct DownloadQualitySheet: View {
-    let video: Video
-    var streams: [Stream] = []
-    var captions: [Caption] = []
-    var dislikeCount: Int?
-
     enum DownloadTab: String, CaseIterable {
         case video
         case audio
@@ -30,6 +25,11 @@ struct DownloadQualitySheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let video: Video
+    var streams: [Stream] = []
+    var captions: [Caption] = []
+    var dislikeCount: Int?
 
     @State private var selectedTab: DownloadTab = .video
     @State private var selectedVideoStream: Stream?

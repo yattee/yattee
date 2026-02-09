@@ -9,12 +9,13 @@ import SwiftUI
 import NukeUI
 
 struct CommentView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let comment: Comment
     let videoID: String?
     let source: ContentSource?
     let isReply: Bool
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var replies: [Comment] = []
     @State private var isLoadingReplies = false
     @State private var showReplies = false

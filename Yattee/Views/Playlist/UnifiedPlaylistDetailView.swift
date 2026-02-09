@@ -46,10 +46,10 @@ enum PlaylistSource: Hashable {
 }
 
 struct UnifiedPlaylistDetailView: View {
-    let source: PlaylistSource
-
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dismiss) private var dismiss
+
+    let source: PlaylistSource
 
     // MARK: - Shared State
 

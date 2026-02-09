@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct QualitySelectorView: View {
+    // MARK: - Environment
+
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.appEnvironment) private var appEnvironment
+
     // MARK: - Properties
 
     let streams: [Stream]
@@ -39,10 +44,7 @@ struct QualitySelectorView: View {
     /// Whether to show the segmented tab picker (false for focused single-tab mode)
     var showTabPicker: Bool = true
 
-    // MARK: - Environment & State
-
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.appEnvironment) private var appEnvironment
+    // MARK: - State
     @State var selectedTab: QualitySelectorTab = .video
     @State var selectedVideoStream: Stream?
     @State var selectedAudioStream: Stream?

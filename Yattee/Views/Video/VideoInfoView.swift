@@ -15,11 +15,11 @@ enum VideoInfoInitMode: Sendable {
 }
 
 struct VideoInfoView: View {
-    private let initMode: VideoInfoInitMode
-
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.videoQueueContext) private var videoQueueContext
-    
+
+    private let initMode: VideoInfoInitMode
+
     // Video loading state (for videoID mode)
     @State private var loadedVideo: Video?
     @State private var isLoadingInitialVideo = false

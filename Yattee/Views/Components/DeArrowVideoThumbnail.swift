@@ -19,6 +19,8 @@ import SwiftUI
 /// tracks dictionary access per-key, so this view only re-renders when THIS video's
 /// progress changes - not when any other download progresses.
 struct DeArrowVideoThumbnail: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let video: Video
 
     var cornerRadius: CGFloat = 8
@@ -26,7 +28,6 @@ struct DeArrowVideoThumbnail: View {
     var duration: String? = nil
     var durationAlignment: Alignment = .bottomLeading
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var isWatched = false
 
     private var deArrowProvider: DeArrowBrandingProvider? {

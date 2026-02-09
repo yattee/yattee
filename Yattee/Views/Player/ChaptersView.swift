@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ChaptersView: View {
+    @Environment(\.dismiss) private var dismiss
+
     let chapters: [VideoChapter]
     let currentTime: TimeInterval
     let storyboard: Storyboard?
     let onChapterTap: (VideoChapter) async -> Void
-
-    @Environment(\.dismiss) private var dismiss
     @State private var sheetsLoaded = false
 
     var body: some View {

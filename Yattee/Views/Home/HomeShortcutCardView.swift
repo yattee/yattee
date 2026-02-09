@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct HomeShortcutCardView<StatusIndicator: View>: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    #if os(tvOS)
+    @Environment(\.isFocused) private var isFocused
+    #endif
+
     let icon: String
     let title: String
     let count: Int
@@ -27,11 +32,6 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         self.subtitle = subtitle
         self.statusIndicator = statusIndicator
     }
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    #if os(tvOS)
-    @Environment(\.isFocused) private var isFocused
-    #endif
 
     // Platform-specific styling
     #if os(tvOS)

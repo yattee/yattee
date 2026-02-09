@@ -12,13 +12,13 @@ import SwiftUI
 /// A floating button that toggles the panel between left and right sides.
 /// Mirrors the style of PanelPinButton: 36pt glass circle, same shadow and haptic.
 struct PanelAlignmentButton: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let panelSide: FloatingPanelSide
     let onAlignmentToggle: () -> Void
 
     /// Whether the drag handle is currently active (being dragged or hovered).
     @Binding var isDragHandleActive: Bool
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     /// Button diameter
     private static let buttonSize: CGFloat = 36

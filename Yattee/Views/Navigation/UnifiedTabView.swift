@@ -13,9 +13,10 @@ import SwiftUI
 
 #if os(iOS)
 struct UnifiedTabView: View {
-    @Binding var selectedTab: AppTab
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    @Binding var selectedTab: AppTab
 
     // Sidebar manager for dynamic content
     @State private var sidebarManager = SidebarManager()
@@ -297,8 +298,9 @@ extension MiniPlayerMinimizeBehavior {
 
 #if os(macOS)
 struct UnifiedTabView: View {
-    @Binding var selectedTab: AppTab
     @Environment(\.appEnvironment) private var appEnvironment
+
+    @Binding var selectedTab: AppTab
 
     // Sidebar manager for dynamic content
     @State private var sidebarManager = SidebarManager()
@@ -517,8 +519,9 @@ struct UnifiedTabView: View {
 
 #if os(tvOS)
 struct UnifiedTabView: View {
-    @Binding var selectedTab: AppTab
     @Environment(\.appEnvironment) private var appEnvironment
+
+    @Binding var selectedTab: AppTab
 
     // Sidebar manager for dynamic content
     @State private var sidebarManager = SidebarManager()

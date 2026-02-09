@@ -9,10 +9,10 @@ import SwiftUI
 import NukeUI
 
 struct PlaylistSelectorSheet: View {
-    let video: Video
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let video: Video
 
     @State private var playlists: [LocalPlaylist] = []
     @State private var showingNewPlaylist = false

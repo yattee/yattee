@@ -24,10 +24,10 @@ struct PlaylistFormSheet: View {
         }
     }
 
+    @Environment(\.dismiss) private var dismiss
+
     let mode: Mode
     let onSave: (String, String?) -> Void
-
-    @Environment(\.dismiss) private var dismiss
 
     @State private var title: String = ""
     @State private var descriptionText: String = ""

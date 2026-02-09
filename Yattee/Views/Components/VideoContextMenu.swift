@@ -41,13 +41,14 @@ enum VideoContextMenuContext {
 
 /// View modifier that attaches VideoContextMenu and its required sheets.
 struct VideoContextMenuModifier: ViewModifier {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let video: Video
     var customActions: [VideoContextAction] = []
     var context: VideoContextMenuContext = .default
     var startTime: Double? = nil
     var watchProgress: Double? = nil
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var showingPlaylistSheet = false
     @State private var showingDownloadSheet = false
     @State private var showingDeleteDownloadConfirmation = false
@@ -128,6 +129,8 @@ struct VideoContextMenuModifier: ViewModifier {
 /// The actual menu content (uses bindings from parent for sheet presentation).
 /// All observable values are snapshotted at init time to prevent redraws during playback.
 struct VideoContextMenuContent: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let video: Video
     var customActions: [VideoContextAction] = []
     var context: VideoContextMenuContext = .default
@@ -136,8 +139,6 @@ struct VideoContextMenuContent: View {
     @Binding var showingDownloadSheet: Bool
     @Binding var showingDeleteDownloadConfirmation: Bool
     @Binding var downloadToDelete: Download?
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     // MARK: - Snapshotted Values (captured at init to prevent observation)
 
@@ -592,13 +593,14 @@ extension View {
 /// A dropdown menu view for videos, showing context menu actions.
 /// Used in player views where the video is already playing.
 struct VideoContextMenuView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let video: Video
     let accentColor: Color
     var buttonSize: CGFloat = 32
     var buttonBackgroundStyle: ButtonBackgroundStyle = .none
     var theme: ControlsTheme = .dark
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @State private var showingPlaylistSheet = false
     @State private var showingDownloadSheet = false
     @State private var showingDeleteDownloadConfirmation = false
