@@ -1,0 +1,55 @@
+name: Update AltStore source
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  update_altstore:
+    name: Update AltStore source
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Get version info from latest release
+        run: |
+          TAG=$(gh release view --json tagName --jq '.tagName')
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "VERSION_NUMBER=${TAG%-*}" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=${TAG##*-}" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get IPA size from release
+        run: |
+          SIZE=$(gh release view "${{ env.TAG }}" --json assets --jq '.assets[] | select(.name == "Yattee.ipa") | .size')
+          echo "IPA_SIZE=${SIZE:-0}" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update altstore-source.json
+        run: |
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
+          jq --arg version "${{ env.VERSION_NUMBER }}" \
+             --arg build "${{ env.BUILD_NUMBER }}" \
+             --arg date "$DATE" \
+             --arg url "https://github.com/yattee/yattee/releases/download/${{ env.TAG }}/Yattee.ipa" \
+             --argjson size "${{ env.IPA_SIZE }}" \
+             '.apps[0].versions = [{
+               version: $version,
+               buildVersion: $build,
+               date: $date,
+               localizedDescription: "",
+               downloadURL: $url,
+               size: $size,
+               minOSVersion: "18.0"
+             }] + [.apps[0].versions[] | select(.version != $version or .buildVersion != $build)]' \
+             altstore-source.json > altstore-source.tmp && mv altstore-source.tmp altstore-source.json
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add altstore-source.json
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update AltStore source for ${{ env.VERSION_NUMBER }} (${{ env.BUILD_NUMBER }})"
+          git push

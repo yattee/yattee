@@ -138,4 +138,7 @@ jobs:
           tag: ${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}
           prerelease: true
           bodyFile: CHANGELOG.md
+  update_altstore:
+    needs: ['release']
+    uses: ./.github/workflows/update-altstore.yml
 
