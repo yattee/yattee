@@ -32,39 +32,33 @@ RSpec.describe 'App Launch', :smoke do
     UITest::Simulator.shutdown(@udid) if @udid && !UITest::Config.keep_simulator?
   end
 
-  describe 'Library tab' do
-    it 'displays the Library navigation bar' do
-      # With toolbarTitleDisplayMode(.inlineLarge), the title is an AXHeading with AXLabel "Library"
-      # but no AXUniqueId, so we check for the text instead
-      expect(@axe).to have_text('Library')
+  describe 'Home tab' do
+    it 'displays the Home navigation bar' do
+      expect(@axe).to have_text('Home')
     end
 
     it 'displays the Tab Bar' do
       expect(@axe).to have_text('Tab Bar')
     end
 
-    it 'displays the Playlists card' do
-      expect(@axe).to have_element('library.card.playlists')
+    it 'displays the Open Link shortcut' do
+      expect(@axe).to have_element('home.shortcut.openURL')
     end
 
-    it 'displays the Bookmarks card' do
-      expect(@axe).to have_element('library.card.bookmarks')
+    it 'displays the Bookmarks shortcut' do
+      expect(@axe).to have_element('home.shortcut.bookmarks')
     end
 
-    it 'displays the History card' do
-      expect(@axe).to have_element('library.card.history')
+    it 'displays the History shortcut' do
+      expect(@axe).to have_element('home.shortcut.history')
     end
 
-    it 'displays the Downloads card' do
-      expect(@axe).to have_element('library.card.downloads')
-    end
-
-    it 'displays the Channels card' do
-      expect(@axe).to have_element('library.card.channels')
+    it 'displays the Settings button' do
+      expect(@axe).to have_element('home.settingsButton')
     end
 
     it 'matches the baseline screenshot', :visual do
-      screenshot = @axe.screenshot('app-launch-library')
+      screenshot = @axe.screenshot('app-launch-home')
       expect(screenshot).to match_baseline
     end
   end

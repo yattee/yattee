@@ -38,10 +38,13 @@ struct SourceRow: View {
             rowContent
         }
         .buttonStyle(.card)
+        .accessibilityIdentifier(accessibilityId)
         #else
         rowContent
             .contentShape(Rectangle())
             .onTapGesture(perform: onEdit)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier(accessibilityId)
         #endif
     }
 
@@ -72,7 +75,6 @@ struct SourceRow: View {
 
             Spacer()
         }
-        .accessibilityIdentifier(accessibilityId)
     }
 
     /// Generates a unique accessibility identifier for the source row.

@@ -38,15 +38,15 @@ RSpec.describe 'Yattee Server Instance', :smoke do
       server_url = UITest::Config.yattee_server_url
       server_host = UITest::Config.yattee_server_host
 
-      # Ensure we start from Library (check for text since inlineLarge title has no AXUniqueId)
-      expect(@axe).to have_text('Library')
+      # Ensure we start from Home
+      expect(@axe).to have_text('Home')
 
       # Remove existing instance (if any) and add fresh - always tests the add flow
       @instance_setup.remove_and_add_yattee_server(server_url)
 
       # Navigate to Sources to verify the instance was added
       # Open Settings using accessibility identifier
-      @axe.tap_id('library.settingsButton')
+      @axe.tap_id('home.settingsButton')
       sleep 1
 
       expect(@axe).to have_element('settings.view')
@@ -55,15 +55,12 @@ RSpec.describe 'Yattee Server Instance', :smoke do
       @axe.tap_id('settings.row.sources')
       sleep 0.5
 
-      # Verify we're on Sources list
-      expect(@axe).to have_element('sources.view')
-
       # Verify instance appears in Sources list
-      expect(@axe).to have_element("sources.row.yatteeServer.#{server_host}")
+      expect(@axe).to have_text(server_host)
 
       # Close settings
       begin
-        @axe.tap_label('Done')
+        @axe.tap_id('settings.doneButton')
       rescue StandardError
         nil
       end

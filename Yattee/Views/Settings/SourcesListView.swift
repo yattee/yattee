@@ -42,7 +42,6 @@ struct SourcesListView: View {
                 sourcesList
             }
         }
-        .accessibilityIdentifier("sources.view")
         .navigationTitle(String(localized: "sources.title"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -91,6 +90,7 @@ struct SourcesListView: View {
             }
             .buttonStyle(.borderedProminent)
         }
+        .accessibilityIdentifier("sources.view")
     }
 
     // MARK: - Sources List
