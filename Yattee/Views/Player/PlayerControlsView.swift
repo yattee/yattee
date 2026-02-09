@@ -551,7 +551,7 @@ struct PlayerControlsView: View {
                 if !isCompactVertical {
                     // Calculate available height for sliders
                     // Use full video area height for sliders (extends into letterbox areas)
-                    let sliderBasisHeight = effectiveVideoHeight
+                    let sliderBasisHeight = min(effectiveVideoHeight, geometry.size.height)
                     let baseSliderAreaHeight = sliderBasisHeight - 48 - 100
                     // When videoFitHeight provided (panel/drag): use stable sizing within video
                     // When nil (fullscreen): target 250pt sliders when there's extra space
