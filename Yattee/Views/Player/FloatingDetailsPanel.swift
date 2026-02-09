@@ -19,6 +19,9 @@ private struct PanelHeightKey: PreferenceKey {
 }
 
 struct FloatingDetailsPanel: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.colorScheme) private var systemColorScheme
+
     let onPinToggle: () -> Void
     let onAlignmentToggle: () -> Void
     let isPinned: Bool
@@ -33,9 +36,6 @@ struct FloatingDetailsPanel: View {
 
     // Player controls layout for pill settings
     let playerControlsLayout: PlayerControlsLayout
-
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.colorScheme) private var systemColorScheme
     @State private var isCommentsExpanded: Bool = false
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false

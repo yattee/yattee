@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct MediaBrowserView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let source: MediaSource
     let initialPath: String
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
     @State private var currentPath: String
     @State private var files: [MediaFile] = []
@@ -103,10 +104,10 @@ struct MediaBrowserView: View {
         }
         .sheet(isPresented: $showViewOptions) {
             MediaBrowserViewOptionsSheet(
+                sourceType: source.type,
                 sortOrder: $sortOrder,
                 sortAscending: $sortAscending,
-                showOnlyPlayable: $showOnlyPlayable,
-                sourceType: source.type
+                showOnlyPlayable: $showOnlyPlayable
             )
             .liquidGlassSheetContent(sourceID: "mediaBrowserViewOptions", in: sheetTransition)
         }

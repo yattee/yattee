@@ -13,6 +13,9 @@ import SwiftUI
 /// Download status is automatically shown from the download manager.
 /// On iOS/macOS, supports configurable tap zones for thumbnail and text area.
 struct VideoRowView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.videoQueueContext) private var videoQueueContext
+
     let video: Video
     var style: VideoRowStyle = .regular
     var watchProgress: Double? = nil
@@ -23,9 +26,6 @@ struct VideoRowView: View {
     var index: Int? = nil
     /// When true, disables internal tap handling so parent view can handle all taps.
     var disableInternalTapHandling: Bool = false
-
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.videoQueueContext) private var videoQueueContext
 
     // Platform-specific fonts
     #if os(tvOS)

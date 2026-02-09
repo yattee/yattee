@@ -10,12 +10,12 @@ import SwiftUI
 /// A bookmark card for grid/horizontal scroll layouts.
 /// Displays video content via VideoCardView with additional tags/notes.
 struct BookmarkCardView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let bookmark: Bookmark
     var watchProgress: Double? = nil
     /// Use compact styling for dense grids (3+ columns).
     var isCompact: Bool = false
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     private var accentColor: Color {
         appEnvironment?.settingsManager.accentColor.color ?? .accentColor

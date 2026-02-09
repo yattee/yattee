@@ -12,14 +12,14 @@ import SwiftUI
 /// A floating pin button that appears on the divider edge between player and panel.
 /// Features auto-hide behavior with 3s timer, reappearing on drag handle interaction.
 struct PanelPinButton: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let isPinned: Bool
     let panelSide: FloatingPanelSide
     let onPinToggle: () -> Void
 
     /// Whether the drag handle is currently active (being dragged or hovered).
     @Binding var isDragHandleActive: Bool
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     /// Button diameter
     private static let buttonSize: CGFloat = 36

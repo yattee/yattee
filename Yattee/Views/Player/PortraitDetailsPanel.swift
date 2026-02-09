@@ -11,6 +11,8 @@ import SwiftUI
 #if os(iOS)
 
 struct PortraitDetailsPanel: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let onChannelTap: (() -> Void)?
     let playerControlsLayout: PlayerControlsLayout
     let onFullscreen: (() -> Void)?
@@ -19,8 +21,6 @@ struct PortraitDetailsPanel: View {
     var onDragChanged: ((CGFloat) -> Void)?
     var onDragEnded: ((CGFloat, CGFloat) -> Void)?
     var onDragCancelled: (() -> Void)?
-
-    @Environment(\.appEnvironment) private var appEnvironment
     @GestureState private var isDraggingHandle: Bool = false
     @State private var isCommentsExpanded: Bool = false
     @State private var showFormattedDate = false

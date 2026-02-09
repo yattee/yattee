@@ -9,11 +9,11 @@ import SwiftUI
 
 #if !os(tvOS)
 struct BatchDownloadQualitySheet: View {
-    let videoCount: Int
-    let onConfirm: (DownloadQuality, Bool) -> Void
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let videoCount: Int
+    let onConfirm: (DownloadQuality, Bool) -> Void
 
     @State private var selectedQuality: DownloadQuality = .best
     @State private var includeSubtitles = false

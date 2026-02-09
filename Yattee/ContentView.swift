@@ -142,10 +142,10 @@ struct ContentView: View {
 /// Compact width (iPhone, iPad Stage Manager small): CompactTabView with settings-based customization
 /// Regular width (iPad full, iPad larger windows): UnifiedTabView with sidebar adaptable
 struct iOS18AdaptiveTabView: View {
-    let appEnvironment: AppEnvironment
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    // Mini player sheet state (synced with NavigationCoordinator)
+    let appEnvironment: AppEnvironment
+
     @State private var showingMiniPlayerQueueSheet = false
     @State private var showingMiniPlayerPlaylistSheet = false
 
@@ -267,10 +267,10 @@ struct iOS18AdaptiveTabView: View {
 /// Uses UnifiedTabView with sidebarAdaptable for regular width, CompactTabView for compact.
 @available(iOS 26.1, *)
 struct iOS26AdaptiveTabView: View {
-    let appEnvironment: AppEnvironment
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    // Mini player sheet state (synced with NavigationCoordinator)
+    let appEnvironment: AppEnvironment
+
     @State private var showingMiniPlayerQueueSheet = false
     @State private var showingMiniPlayerPlaylistSheet = false
 

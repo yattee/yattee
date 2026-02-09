@@ -9,11 +9,11 @@ import SwiftUI
 
 /// A sheet that appears when tapping a video, offering options to play or add to queue.
 struct QueueActionSheet: View {
-    let video: Video
-    var queueSource: QueueSource?
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let video: Video
+    var queueSource: QueueSource?
 
     var body: some View {
         VStack(spacing: 0) {

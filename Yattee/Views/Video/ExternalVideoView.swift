@@ -10,10 +10,10 @@ import SwiftUI
 /// View for extracting and playing videos from external sites (non-YouTube/PeerTube).
 /// Uses Yattee Server's yt-dlp integration to extract video information.
 struct ExternalVideoView: View {
-    let url: URL
-
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dismiss) private var dismiss
+
+    let url: URL
 
     @State private var isLoading = true
     @State private var errorMessage: String?

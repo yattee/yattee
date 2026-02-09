@@ -28,6 +28,9 @@ private struct CachedChannelHeader {
 }
 
 struct ChannelView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     let channelID: String
     let source: ContentSource
     /// URL for external channel extraction (nil for YouTube/Invidious channels)
@@ -38,9 +41,7 @@ struct ChannelView: View {
         channelURL != nil
     }
 
-    @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var channel: Channel?
     @State private var selectedTab: ChannelTab = .videos
     @State private var isLoading = true

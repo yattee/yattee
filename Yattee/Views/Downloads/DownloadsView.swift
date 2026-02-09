@@ -339,13 +339,13 @@ private struct ActiveDownloadsSectionContentView: View {
 /// Only accesses manager.completedDownloads, so won't re-render when activeDownloads progress updates.
 /// Generates rows directly for VideoListContainer (no Section wrapper).
 private struct CompletedDownloadsSectionContentView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let manager: DownloadManager
     let settings: DownloadSettings
     let searchText: String
     let listStyle: VideoListStyle
     let isGroupedMode: Bool
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     private var completedFiltered: [Download] {
         guard !searchText.isEmpty else { return manager.completedDownloads }

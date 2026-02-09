@@ -10,10 +10,10 @@ import SwiftUI
 struct OnboardingMigrationScreen: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
-    @Binding var items: [LegacyImportItem]
     let onContinue: () -> Void
     let onSkip: () -> Void
 
+    @Binding var items: [LegacyImportItem]
     @State private var isImporting = false
     @State private var importProgress: Double = 0.0
     @State private var showingResultSheet = false
@@ -352,9 +352,9 @@ struct OnboardingMigrationScreen: View {
     ]
 
     OnboardingMigrationScreen(
-        items: $items,
         onContinue: {},
-        onSkip: {}
+        onSkip: {},
+        items: $items
     )
     .appEnvironment(.preview)
 }

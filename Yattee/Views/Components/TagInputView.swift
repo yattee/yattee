@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct TagInputView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     @Binding var tags: [String]
     var isFocused: Bool = false
-
-    @Environment(\.appEnvironment) private var appEnvironment
 
     @State private var inputText: String = ""
     @State private var showMaxTagsWarning = false

@@ -45,9 +45,9 @@ struct OnboardingSheetView: View {
             // Migration screen is now page 2 (when present)
             if hasLegacyData, let binding = Binding($legacyItems) {
                 OnboardingMigrationScreen(
-                    items: binding,
                     onContinue: advanceToNextPage,
-                    onSkip: advanceToNextPage
+                    onSkip: advanceToNextPage,
+                    items: binding
                 )
                 .tag(2)
             }

@@ -9,8 +9,9 @@ import SwiftUI
 
 /// Shows source badge only when user has multiple sources configured.
 struct SourceBadge: View {
-    let source: ContentSource
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let source: ContentSource
 
     var body: some View {
         if shouldShowBadge {

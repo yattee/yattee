@@ -13,6 +13,9 @@ import SwiftUI
 /// Download status is automatically shown from the download manager.
 /// On iOS/macOS, supports configurable tap zones for thumbnail and text area.
 struct VideoCardView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.videoQueueContext) private var videoQueueContext
+
     let video: Video
     var watchProgress: Double? = nil
     /// Use compact styling for dense grids (3+ columns).
@@ -21,9 +24,6 @@ struct VideoCardView: View {
     var customMetadata: String? = nil
     /// Custom duration text to show on thumbnail (e.g., remaining time). If nil, uses video.formattedDuration.
     var customDuration: String? = nil
-
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.videoQueueContext) private var videoQueueContext
 
     // Platform-specific fonts
     #if os(tvOS)

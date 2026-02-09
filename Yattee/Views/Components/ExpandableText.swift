@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ExpandableText: View {
-    let text: String
-    var lineLimit: Int = 2
-    @Binding var isExpanded: Bool
-
     @Environment(\.font) private var font
 
+    let text: String
+    var lineLimit: Int = 2
+
+    @Binding var isExpanded: Bool
     @State private var fullHeight: CGFloat = 0
     @State private var truncatedHeight: CGFloat = 0
 
