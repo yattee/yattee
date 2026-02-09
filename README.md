@@ -1,28 +1,37 @@
 <div align="center">
-  <!-- TODO: new logo asset -->
-  <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
+  <img src="Assets/yattee-logo.png" width="150" height="150" alt="Yattee logo">
   <h1>Yattee</h1>
-  <p>Privacy-focused video player for iOS, macOS, and tvOS</p>
+  <p>Privacy-focused video player for iPhone, iPad, Mac, and Apple TV</p>
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/yattee)](https://github.com/yattee/yattee/pulls)
-[![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#Yattee:matrix.org)
 
 [![Discord](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
 
-<!-- TODO: new screenshot assets -->
-![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
 </div>
+
+## Install
+
+<a href="https://yattee.stream/beta2">
+  <img src="https://developer.apple.com/assets/elements/icons/testflight/testflight-64x64_2x.png" height="40" alt="TestFlight">
+</a>
+
+[Join the TestFlight beta](https://yattee.stream/beta2)
+
+<!-- App Store link coming soon -->
+
+<!-- TODO: new screenshot assets -->
 
 ## Features
 
 **Playback**
-- 4K video with custom MPV-based player
+- 4K video with custom MPV-based player (H.264, H.265, VP9, AV1)
 - Picture in Picture, background audio, fullscreen
 - Playback queue, history, resume from last position
 - Chapter navigation, playback speed, subtitles and captions
 - Gesture controls (seek, volume, brightness)
+- Seek preview with storyboards
 
 **Content Sources**
 - YouTube via Invidious, Piped, or self-hosted Yattee Server
@@ -40,19 +49,21 @@
 
 **Library**
 - Subscriptions with per-channel notifications
-- Bookmarks, playlists, watch history
-- Search across all configured sources
+- Bookmarks with tags and notes, playlists, watch history
+- Unified search across all configured sources
 - Import/export subscriptions (JSON, CSV, OPML)
 
 **Downloads & Sync**
-- Offline video and audio downloads
-- iCloud sync for bookmarks, subscriptions, and history across devices
+- Offline video and audio downloads with quality selection
+- iCloud sync for bookmarks, subscriptions, history, and settings across devices
 - Handoff continuity between iPhone, iPad, Mac, and Apple TV
 
-**Platforms**
+**Apple Ecosystem**
 - iOS 18+ / macOS 15+ / tvOS 18+
 - Native SwiftUI on every platform
-- Customizable home layout, accent colors, and player controls
+- Customizable home layout, accent colors, player controls, and app icon
+- Clipboard URL detection and deep linking (`yattee://`)
+- Remote control between devices on your network
 
 ## Yattee Server
 
@@ -82,6 +93,8 @@ Check out the [yattee-server](https://github.com/yattee/yattee-server) repositor
 ## Contributing
 
 Browse the [issues](https://github.com/yattee/yattee/issues) list or open a new one to discuss your idea. Every contribution is welcome.
+
+See [AGENTS.md](AGENTS.md) for developer setup and project architecture.
 
 Join [Discord](https://yattee.stream/discord) or the [Matrix channel](https://matrix.to/#/#yattee:matrix.org) if you need advice or want to discuss the project.
 
