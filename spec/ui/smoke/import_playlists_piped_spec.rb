@@ -43,7 +43,7 @@ RSpec.describe 'Import Playlists from Piped', :smoke do
       @instance_setup.send(:navigate_to_sources)
 
       # Tap the Piped row (using helper due to iOS 26 multiple-match issue)
-      @instance_setup.send(:tap_first_element_with_id, "sources.row.piped.#{UITest::Config.piped_host}")
+      @instance_setup.send(:tap_element_containing_text, UITest::Config.piped_host)
       sleep 0.8
 
       # Wait for EditSourceView
@@ -71,7 +71,7 @@ RSpec.describe 'Import Playlists from Piped', :smoke do
       @instance_setup.send(:navigate_to_sources)
 
       # Tap the Piped row (using helper due to iOS 26 multiple-match issue)
-      @instance_setup.send(:tap_first_element_with_id, "sources.row.piped.#{UITest::Config.piped_host}")
+      @instance_setup.send(:tap_element_containing_text, UITest::Config.piped_host)
       sleep 0.8
 
       # Wait for EditSourceView

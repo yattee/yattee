@@ -38,15 +38,15 @@ RSpec.describe 'Piped Instance', :smoke do
       piped_url = UITest::Config.piped_url
       piped_host = UITest::Config.piped_host
 
-      # Ensure we start from Library (check for text since inlineLarge title has no AXUniqueId)
-      expect(@axe).to have_text('Library')
+      # Ensure we start from Home
+      expect(@axe).to have_text('Home')
 
       # Remove existing instance (if any) and add fresh - always tests the add flow
       @instance_setup.remove_and_add_piped(piped_url)
 
       # Navigate to Sources to verify the instance was added
       # Open Settings using accessibility identifier
-      @axe.tap_id('library.settingsButton')
+      @axe.tap_id('home.settingsButton')
       sleep 1
 
       expect(@axe).to have_element('settings.view')
@@ -55,15 +55,12 @@ RSpec.describe 'Piped Instance', :smoke do
       @axe.tap_id('settings.row.sources')
       sleep 0.5
 
-      # Verify we're on Sources list
-      expect(@axe).to have_element('sources.view')
-
       # Verify instance appears in Sources list
-      expect(@axe).to have_element("sources.row.piped.#{piped_host}")
+      expect(@axe).to have_text(piped_host)
 
       # Close settings
       begin
-        @axe.tap_label('Done')
+        @axe.tap_id('settings.doneButton')
       rescue StandardError
         nil
       end

@@ -75,7 +75,12 @@ module UITest
         # Terminate if already running
         terminate(udid: udid, silent: true)
 
-        output, status = Open3.capture2e('xcrun', 'simctl', 'launch', udid, Config.bundle_id)
+        # Skip onboarding in tests by passing launch argument
+        # iOS apps accept UserDefaults overrides via launch arguments
+        output, status = Open3.capture2e(
+          'xcrun', 'simctl', 'launch', udid, Config.bundle_id,
+          '-onboardingCompleted', 'YES'
+        )
 
         raise AppError, "Launch failed: #{output}" unless status.success?
 

@@ -7,7 +7,7 @@ module UITest
   # Provides methods to navigate through Settings and add/verify instances.
   class InstanceSetup
     # Coordinates for iPhone 17 Pro (393pt width)
-    # Settings gear button in Library toolbar (top-right)
+    # Settings gear button in Home toolbar (top-right)
     SETTINGS_BUTTON_COORDS = { x: 380, y: 70 }.freeze
 
     def initialize(axe)
@@ -19,7 +19,7 @@ module UITest
     # @return [Boolean] true if instance exists
     def yattee_server_exists?(host)
       navigate_to_sources
-      exists = @axe.element_exists?("sources.row.yatteeServer.#{host}")
+      exists = @axe.text_visible?(host)
       close_settings
       exists
     end
@@ -29,34 +29,72 @@ module UITest
     def add_yattee_server(url)
       navigate_to_sources
 
-      # Tap Add Source button in toolbar (using coordinates - iOS 26 doesn't expose toolbar buttons in accessibility tree)
-      # The button is in the top-right of the navigation bar at approximately (370, 105)
-      @axe.tap_coordinates(x: 370, y: 105)
+      # Tap Add Source button (toolbar or empty state)
+      tap_add_source_button
       sleep 0.8
 
-      # Wait for AddSourceView to appear
-      wait_for_element('addSource.urlField')
+      # Select Remote Server from the source type list
+      select_remote_server_tab
+
+      # Wait for URL field to appear
+      wait_for_element('addRemoteServer.urlField')
 
       # Enter URL in text field
-      @axe.tap_id('addSource.urlField')
+      @axe.tap_id('addRemoteServer.urlField')
       sleep 0.5
       @axe.type(url)
       sleep 0.5
 
-      # Tap Detect & Add button
-      @axe.tap_id('addSource.actionButton')
+      # Tap Detect button to identify server type
+      @axe.tap_id('addRemoteServer.detectButton')
       sleep 0.5
 
       # Wait for detection to complete
-      # Use longer timeout for first detection (network cold start)
       result = wait_for_detection(timeout: 20)
       raise "Detection failed: #{result}" if result == :error
 
-      # The sheet auto-dismisses on success
-      # If we're already back on sources.view, no need to wait or close
-      sleep 1.5 unless @axe.element_exists?('sources.view')
+      # Enter Yattee Server credentials if available
+      username = Config.yattee_server_username
+      password = Config.yattee_server_password
+      raise 'Yattee Server credentials not configured (set YATTEE_SERVER_USERNAME and YATTEE_SERVER_PASSWORD)' unless username && password
 
-      # Close Settings (return to Library)
+      sleep 0.5
+
+      # Find and fill credential fields by locating text fields after the "Authentication" header
+      auth_fields = find_auth_text_fields
+      raise 'Could not find username/password fields' if auth_fields.length < 2
+
+      # First field is username, second is password
+      username_frame = auth_fields[0]['frame']
+      password_frame = auth_fields[1]['frame']
+
+      # Tap and fill username
+      @axe.tap_coordinates(
+        x: username_frame['x'] + (username_frame['width'] / 2),
+        y: username_frame['y'] + (username_frame['height'] / 2)
+      )
+      sleep 0.3
+      @axe.type(username)
+      sleep 0.3
+
+      # Tap and fill password
+      @axe.tap_coordinates(
+        x: password_frame['x'] + (password_frame['width'] / 2),
+        y: password_frame['y'] + (password_frame['height'] / 2)
+      )
+      sleep 0.3
+      @axe.type(password)
+      sleep 0.3
+
+      # Wait for action button and tap it
+      wait_for_element('addRemoteServer.actionButton')
+      @axe.tap_id('addRemoteServer.actionButton')
+      sleep 0.5
+
+      # Wait for credential validation and sheet dismiss
+      wait_for_add_complete(timeout: 20)
+
+      # Close Settings (return to Home)
       close_settings
     end
 
@@ -101,7 +139,7 @@ module UITest
     # @return [Boolean] true if instance exists
     def invidious_exists?(host)
       navigate_to_sources
-      exists = @axe.element_exists?("sources.row.invidious.#{host}")
+      exists = @axe.text_visible?(host)
       close_settings
       exists
     end
@@ -156,7 +194,7 @@ module UITest
 
       # Tap on Invidious instance row to open EditSourceView
       # Due to iOS 26 accessibility issues, use coordinates from the element
-      tap_first_element_with_id("sources.row.invidious.#{host}")
+      tap_element_containing_text(host)
       sleep 0.8
 
       # Check if "Log Out" is visible (indicates logged in)
@@ -181,7 +219,7 @@ module UITest
 
       # Tap on Invidious instance row to open EditSourceView
       # Due to iOS 26 accessibility issues, use coordinates from the element
-      tap_first_element_with_id("sources.row.invidious.#{host}")
+      tap_element_containing_text(host)
       sleep 0.8
 
       # Wait for EditSourceView
@@ -326,7 +364,7 @@ module UITest
 
       puts '  Login succeeded'
 
-      # Close edit sheet and return to Library
+      # Close edit sheet and return to Home
       # After successful login, we're on EditSourceView - need to go back to Sources
       # Try Back button first (for navigation-based sheets)
       begin
@@ -342,8 +380,8 @@ module UITest
       close_settings
       sleep 0.5
 
-      # Verify we're back on Library, attempt recovery if not
-      unless @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+      # Verify we're back on Home, attempt recovery if not
+      unless @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
         dismiss_any_sheets
         sleep 0.5
       end
@@ -370,7 +408,7 @@ module UITest
     # @return [Boolean] true if instance exists
     def piped_exists?(host)
       navigate_to_sources
-      exists = @axe.element_exists?("sources.row.piped.#{host}")
+      exists = @axe.text_visible?(host)
       close_settings
       exists
     end
@@ -425,7 +463,7 @@ module UITest
 
       # Tap on Piped instance row to open EditSourceView
       # Due to iOS 26 accessibility issues, use coordinates from the element
-      tap_first_element_with_id("sources.row.piped.#{host}")
+      tap_element_containing_text(host)
       sleep 0.8
 
       # Check if "Log Out" is visible (indicates logged in)
@@ -450,7 +488,7 @@ module UITest
 
       # Tap on Piped instance row to open EditSourceView
       # Due to iOS 26 accessibility issues, use coordinates from the element
-      tap_first_element_with_id("sources.row.piped.#{host}")
+      tap_element_containing_text(host)
       sleep 0.8
 
       # Wait for EditSourceView
@@ -595,7 +633,7 @@ module UITest
 
       puts '  Login succeeded'
 
-      # Close edit sheet and return to Library
+      # Close edit sheet and return to Home
       # After successful login, we're on EditSourceView - need to go back to Sources
       # Try Back button first (for navigation-based sheets)
       begin
@@ -611,8 +649,8 @@ module UITest
       close_settings
       sleep 0.5
 
-      # Verify we're back on Library, attempt recovery if not
-      unless @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+      # Verify we're back on Home, attempt recovery if not
+      unless @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
         dismiss_any_sheets
         sleep 0.5
       end
@@ -650,6 +688,39 @@ module UITest
       # Try swipe down
       @axe.swipe(start_x: 200, start_y: 300, end_x: 200, end_y: 700, duration: 0.3)
       sleep 0.5
+    end
+
+    # Tap the first element whose label contains the given text
+    # @param text [String] Text to search for in element labels
+    def tap_element_containing_text(text)
+      tree = @axe.describe_ui
+      element = find_element_with_label_text(tree, text)
+      raise UITest::Axe::AxeError, "No element found with text '#{text}'" unless element
+
+      frame = element['frame']
+      x = frame['x'] + (frame['width'] / 2)
+      y = frame['y'] + (frame['height'] / 2)
+      @axe.tap_coordinates(x: x, y: y)
+    end
+
+    # Recursively find the first element whose AXLabel contains the given text
+    def find_element_with_label_text(node, text)
+      case node
+      when Hash
+        if node['AXLabel']&.include?(text) && node['frame']
+          return node
+        end
+        node.each_value do |value|
+          result = find_element_with_label_text(value, text)
+          return result if result
+        end
+      when Array
+        node.each do |item|
+          result = find_element_with_label_text(item, text)
+          return result if result
+        end
+      end
+      nil
     end
 
     # Tap the first element matching an accessibility identifier
@@ -694,46 +765,51 @@ module UITest
     def add_instance(url)
       navigate_to_sources
 
-      # Tap Add Source button in toolbar (using coordinates - iOS 26 doesn't expose toolbar buttons in accessibility tree)
-      # The button is in the top-right of the navigation bar at approximately (370, 105)
-      @axe.tap_coordinates(x: 370, y: 105)
+      # Tap Add Source button (toolbar or empty state)
+      tap_add_source_button
       sleep 0.8
 
-      # Wait for AddSourceView to appear
-      wait_for_element('addSource.urlField')
+      # Select Remote Server from the source type list
+      select_remote_server_tab
+
+      # Wait for URL field to appear
+      wait_for_element('addRemoteServer.urlField')
 
       # Enter URL in text field
-      @axe.tap_id('addSource.urlField')
+      @axe.tap_id('addRemoteServer.urlField')
       sleep 0.5
       @axe.type(url)
       sleep 0.5
 
-      # Tap Detect & Add button
-      @axe.tap_id('addSource.actionButton')
+      # Tap Detect button to identify server type
+      @axe.tap_id('addRemoteServer.detectButton')
       sleep 0.5
 
       # Wait for detection to complete
-      # Use longer timeout for first detection (network cold start)
       result = wait_for_detection(timeout: 20)
       raise "Detection failed: #{result}" if result == :error
 
-      # The sheet auto-dismisses on success
-      # If we're already back on sources.view, no need to wait or close
-      sleep 1.5 unless @axe.element_exists?('sources.view')
+      # Wait for action button to appear, then tap it
+      wait_for_element('addRemoteServer.actionButton')
+      @axe.tap_id('addRemoteServer.actionButton')
+      sleep 0.5
 
-      # Close Settings (return to Library)
+      # Wait for sheet to dismiss after adding
+      wait_for_add_complete(timeout: 20)
+
+      # Close Settings (return to Home)
       close_settings
     end
 
-    # Generic method to remove an instance by row ID
-    # @param row_id [String] Full accessibility identifier for the row
-    # @param host [String] Host name for logging
+    # Generic method to remove an instance by host text
+    # @param row_id [String] Full accessibility identifier for the row (unused, kept for API compat)
+    # @param host [String] Host name for logging and text-based lookup
     # @return [Boolean] true if removed, false if not found
     def remove_instance(row_id, host)
       navigate_to_sources
 
-      # Verify the row exists
-      unless @axe.element_exists?(row_id)
+      # Verify the row exists (using text since accessibilityIdentifier doesn't expose as AXUniqueId)
+      unless @axe.text_visible?(host)
         puts "  Instance not found: #{host}"
         close_settings
         return false
@@ -759,13 +835,13 @@ module UITest
       true
     end
 
-    # Navigate from Library to Settings > Sources
+    # Navigate from Home to Settings > Sources
     def navigate_to_sources
-      # Ensure we're on Library tab
-      ensure_on_library
+      # Ensure we're on Home tab
+      ensure_on_home
 
       # Tap Settings button using accessibility identifier
-      @axe.tap_id('library.settingsButton')
+      @axe.tap_id('home.settingsButton')
       sleep 1
 
       # Wait for Settings view
@@ -773,22 +849,24 @@ module UITest
 
       # Tap Sources row
       @axe.tap_id('settings.row.sources')
-      sleep 0.5
+      sleep 1
 
-      # Wait for Sources list view
-      wait_for_element('sources.view')
+      # Wait for Sources list to load
+      # sources.view works for empty state (ContentUnavailableView)
+      # For populated list, check for the "Remote Servers" section header text
+      wait_for_sources_list
     end
 
-    # Ensure we're on the Library tab
-    def ensure_on_library
-      # Check for Library navigation title (text, since inlineLarge has no AXUniqueId) or a library card
-      return if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+    # Ensure we're on the Home tab
+    def ensure_on_home
+      # Check for Home navigation title or a home element
+      return if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
 
       # Try to dismiss any sheets/modals
       dismiss_any_sheets
 
       # Final check - use a longer timeout
-      wait_for_library
+      wait_for_home
     end
 
     # Try various methods to dismiss sheets/modals
@@ -797,16 +875,16 @@ module UITest
       begin
         @axe.tap_id('settings.doneButton')
         sleep 0.5
-        return if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+        return if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
       rescue UITest::Axe::AxeError
         # Not found
       end
 
       # Try Done by label
       begin
-        @axe.tap_label('Done')
+        @axe.tap_id('settings.doneButton')
         sleep 0.5
-        return if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+        return if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
       rescue UITest::Axe::AxeError
         # Not found
       end
@@ -814,22 +892,22 @@ module UITest
       # Try swipe down to dismiss
       @axe.swipe(start_x: 200, start_y: 300, end_x: 200, end_y: 700, duration: 0.3)
       sleep 0.5
-      return if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+      return if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
 
       # Last resort: home button
       @axe.home_button
       sleep 1
     end
 
-    # Wait for Library view to appear
-    def wait_for_library(timeout: Config.element_timeout)
+    # Wait for Home view to appear
+    def wait_for_home(timeout: Config.element_timeout)
       start_time = Time.now
 
       loop do
-        # Check for Library title (text, since inlineLarge has no AXUniqueId) or a library card
-        return true if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+        # Check for Home title or a home element
+        return true if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
 
-        raise "Library not found after #{timeout} seconds" if Time.now - start_time > timeout
+        raise "Home not found after #{timeout} seconds" if Time.now - start_time > timeout
 
         sleep 0.3
       end
@@ -840,7 +918,7 @@ module UITest
       # Try swipe down to dismiss the sheet (most reliable)
       @axe.swipe(start_x: 200, start_y: 300, end_x: 200, end_y: 700, duration: 0.3)
       sleep 0.5
-      return if @axe.text_visible?('Library') || @axe.element_exists?('library.card.playlists')
+      return if @axe.text_visible?('Home') || @axe.element_exists?('home.settingsButton')
 
       # Try Done button by ID
       begin
@@ -853,7 +931,7 @@ module UITest
 
       # Try Done by label
       begin
-        @axe.tap_label('Done')
+        @axe.tap_id('settings.doneButton')
         sleep 0.5
       rescue UITest::Axe::AxeError
         # Not found
@@ -868,22 +946,15 @@ module UITest
 
       loop do
         # Check for success (detected type shown)
-        if @axe.element_exists?('addSource.detectedType')
+        if @axe.element_exists?('addRemoteServer.detectedType')
           puts "  Detection succeeded after #{(Time.now - start_time).round(1)}s"
           return :success
         end
 
         # Check for error
-        if @axe.element_exists?('addSource.detectionError')
+        if @axe.element_exists?('addRemoteServer.detectionError')
           puts "  Detection failed with error after #{(Time.now - start_time).round(1)}s"
           return :error
-        end
-
-        # Check if the AddSourceView sheet was auto-dismissed after successful detection
-        # This happens when the instance is added - the sheet closes automatically
-        if @axe.element_exists?('sources.view') && !@axe.element_exists?('addSource.urlField')
-          puts "  Detection succeeded (sheet auto-dismissed) after #{(Time.now - start_time).round(1)}s"
-          return :success
         end
 
         # Check for timeout
@@ -892,6 +963,118 @@ module UITest
 
         sleep 0.5
       end
+    end
+
+    # Wait for the add source sheet to dismiss after tapping Add Source
+    # @param timeout [Integer] Timeout in seconds
+    def wait_for_add_complete(timeout: 20)
+      start_time = Time.now
+
+      loop do
+        # Check if the add form has been dismissed (URL field no longer visible)
+        unless @axe.element_exists?('addRemoteServer.urlField')
+          puts "  Source added successfully after #{(Time.now - start_time).round(1)}s"
+          return
+        end
+
+        elapsed = Time.now - start_time
+        raise "Adding source timed out after #{timeout} seconds" if elapsed > timeout
+
+        sleep 0.5
+      end
+    end
+
+    # Wait for Sources list to be visible (works for both empty and populated states)
+    def wait_for_sources_list(timeout: Config.element_timeout)
+      start_time = Time.now
+
+      loop do
+        # Empty state has sources.view on ContentUnavailableView
+        return true if @axe.element_exists?('sources.view')
+
+        # Populated state: check for section headers or instance rows
+        return true if @axe.text_visible?('Remote Servers')
+        return true if @axe.text_visible?('Local & Network')
+
+        raise "Sources list not found after #{timeout} seconds" if Time.now - start_time > timeout
+
+        sleep 0.3
+      end
+    end
+
+    # Find the authentication text fields (username/password) after the "Authentication" header
+    # @return [Array<Hash>] Array of text field elements
+    def find_auth_text_fields
+      tree = @axe.describe_ui
+      fields = []
+      found_auth_header = false
+
+      collect_auth_fields = lambda do |node|
+        return unless node.is_a?(Hash)
+
+        # Look for "Authentication" heading
+        if node['role'] == 'AXHeading' && node['AXLabel']&.include?('Authentication')
+          found_auth_header = true
+        end
+
+        # Collect text fields after the auth header
+        if found_auth_header && node['role'] == 'AXTextField'
+          fields << node
+        end
+
+        # Stop after finding the action button (past the auth section)
+        return if node['AXUniqueId'] == 'addRemoteServer.actionButton'
+
+        (node['children'] || []).each { |child| collect_auth_fields.call(child) }
+      end
+
+      if tree.is_a?(Array)
+        tree.each { |root| collect_auth_fields.call(root) }
+      end
+
+      fields
+    end
+
+    # Debug helper to print UI element tree
+    def print_element_tree(node, depth = 0)
+      return unless node.is_a?(Hash)
+
+      uid = node['AXUniqueId']
+      label = node['AXLabel']
+      role = node['role']
+      frame = node['frame'] || {}
+      puts "    #{'  ' * depth}#{uid || '(none)'} [#{role}] (#{frame['x']&.round},#{frame['y']&.round} #{frame['width']&.round}x#{frame['height']&.round}) - #{label}"
+      (node['children'] || []).each { |child| print_element_tree(child, depth + 1) }
+    end
+
+    # Tap Add Source button - handles both empty state (body button) and non-empty state (toolbar button)
+    def tap_add_source_button
+      # Try the body button label first (works for empty state)
+      begin
+        @axe.tap_label('Add Source')
+        return
+      rescue UITest::Axe::AxeError
+        # Not found - try toolbar button
+      end
+
+      # Try the toolbar + button by ID
+      begin
+        @axe.tap_id('sources.addButton')
+        return
+      rescue UITest::Axe::AxeError
+        # Not found - try coordinates
+      end
+
+      # Fallback: tap the toolbar + button by coordinates (top-right area)
+      # On iPhone 17 Pro (402pt width), the + button is in the nav bar at ~(370, 93)
+      @axe.tap_coordinates(x: 370, y: 93)
+    end
+
+    # Navigate to the Remote Server form in the AddSourceView
+    # The AddSourceView shows a list of source types
+    def select_remote_server_tab
+      @axe.tap_label('Add Remote Server')
+      sleep 0.5
     end
 
     # Wait for an element to appear

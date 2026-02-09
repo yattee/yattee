@@ -72,6 +72,21 @@ module UITest
         URI.parse(yattee_server_url).host
       end
 
+      # Yattee Server username for testing (configurable via env)
+      def yattee_server_username
+        ENV.fetch('YATTEE_SERVER_USERNAME', nil)
+      end
+
+      # Yattee Server password for testing (configurable via env)
+      def yattee_server_password
+        ENV.fetch('YATTEE_SERVER_PASSWORD', nil)
+      end
+
+      # Whether Yattee Server credentials are configured
+      def yattee_server_credentials?
+        yattee_server_username && yattee_server_password
+      end
+
       # Invidious URL for testing (configurable via env)
       def invidious_url
         ENV.fetch('INVIDIOUS_URL', 'https://invidious.home.arekf.net')
