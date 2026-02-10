@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'cgi'
 require_relative '../spec_helper'
 
 RSpec.describe 'URL Schemes', :smoke do
@@ -231,7 +232,7 @@ RSpec.describe 'URL Schemes with Backend', :url_backend do
     end
   end
 
-  # Open a URL and dismiss the iOS "Open in Yattee?" system confirmation dialog
+  # Open a yattee:// URL and dismiss the iOS "Open in Yattee?" system confirmation dialog
   def open_url(url)
     UITest::Simulator.open_url(@udid, url)
     sleep 0.8
@@ -251,6 +252,13 @@ RSpec.describe 'URL Schemes with Backend', :url_backend do
       @axe.tap_coordinates(x: pos[:x], y: pos[:y])
       sleep 0.5
     end
+  end
+
+  # Wrap an HTTPS URL in yattee://open?url= scheme so simctl routes it to the app
+  # instead of Safari. This tests the app's YouTube URL parsing via URLRouter.
+  def open_youtube_url(url)
+    encoded = CGI.escape(url)
+    open_url("yattee://open?url=#{encoded}")
   end
 
   # Navigate back to Home tab
@@ -288,25 +296,21 @@ RSpec.describe 'URL Schemes with Backend', :url_backend do
     end
   end
 
-  # Wait for any content to load (not an empty state)
+  # Wait for content to load (channel/playlist views with actual data)
   def wait_for_content_loaded(timeout: 20)
     start_time = Time.now
 
     loop do
-      # Content loaded if we see video titles, channel names, etc.
-      # Check that we're not just on an empty/loading screen
       tree = @axe.describe_ui
       tree_str = tree.to_s
 
-      # Look for signs of loaded content (not just nav titles)
-      has_content = tree_str.include?('AXImage') ||
-                    tree_str.include?('AXStaticText') && tree_str.length > 2000
-
-      return true if has_content
+      # A loaded channel/playlist view has a large tree (video thumbnails, titles, etc.)
+      # Skeleton/loading views are much smaller (< 2000 chars)
+      return true if tree_str.length > 2000
 
       if Time.now - start_time > timeout
         @axe.screenshot('debug-content-load-timeout')
-        raise "Content did not load after #{timeout} seconds"
+        raise "Content did not load after #{timeout} seconds (tree length: #{tree_str.length})"
       end
 
       sleep 1
@@ -315,10 +319,25 @@ RSpec.describe 'URL Schemes with Backend', :url_backend do
 
   # Close player if open, then navigate home
   def cleanup_after_video
+    # Try closing expanded player
     if @player.player_expanded?
       @player.close_player
-      sleep 0.5
+      sleep 1
+      # Verify it actually closed, retry if needed
+      if @player.player_expanded?
+        @player.close_player
+        sleep 1
+      end
     end
+
+    # Dismiss any remaining sheets/modals (e.g. video info overlays)
+    begin
+      @axe.swipe(start_x: 200, start_y: 200, end_x: 200, end_y: 800, duration: 0.3)
+      sleep 0.5
+    rescue UITest::Axe::AxeError
+      # Ignore if swipe fails
+    end
+
     navigate_to_home
   end
 
@@ -329,63 +348,55 @@ RSpec.describe 'URL Schemes with Backend', :url_backend do
 
     it 'opens video via yattee://video/{id}' do
       open_url('yattee://video/dQw4w9WgXcQ')
-      sleep 3
-      wait_for_content_loaded
+      @player.wait_for_player_expanded(timeout: 20)
       @axe.screenshot('url-scheme-video')
     end
 
     it 'opens channel via yattee://channel/{id}' do
       open_url('yattee://channel/UC_x5XG1OV2P6uZZ5FSM9Ttw')
-      sleep 3
-      wait_for_content_loaded
+      wait_for_content_loaded(timeout: 20)
       @axe.screenshot('url-scheme-channel')
     end
 
     it 'opens playlist via yattee://playlist/{id}' do
       open_url('yattee://playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf')
-      sleep 3
-      wait_for_content_loaded
+      wait_for_content_loaded(timeout: 20)
       @axe.screenshot('url-scheme-playlist')
     end
   end
 
-  describe 'YouTube URL parsing' do
+  describe 'YouTube URL parsing via yattee://open?url=' do
     after(:each) do
       cleanup_after_video
     end
 
-    it 'opens video via youtube.com/watch URL' do
-      open_url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-      sleep 3
-      wait_for_content_loaded
+    it 'parses youtube.com/watch URL and opens video' do
+      open_youtube_url('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+      @player.wait_for_player_expanded(timeout: 20)
       @axe.screenshot('url-scheme-youtube-watch')
     end
 
-    it 'opens video via youtu.be short URL' do
-      open_url('https://youtu.be/dQw4w9WgXcQ')
-      sleep 3
-      wait_for_content_loaded
+    it 'parses youtu.be short URL and opens video' do
+      open_youtube_url('https://youtu.be/dQw4w9WgXcQ')
+      @player.wait_for_player_expanded(timeout: 20)
       @axe.screenshot('url-scheme-youtube-short')
     end
 
-    it 'opens video via youtube.com/shorts URL' do
-      open_url('https://www.youtube.com/shorts/dQw4w9WgXcQ')
-      sleep 3
-      wait_for_content_loaded
+    it 'parses youtube.com/shorts URL and opens video' do
+      open_youtube_url('https://www.youtube.com/shorts/dQw4w9WgXcQ')
+      @player.wait_for_player_expanded(timeout: 20)
       @axe.screenshot('url-scheme-youtube-shorts')
     end
 
-    it 'opens playlist via youtube.com/playlist URL' do
-      open_url('https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf')
-      sleep 3
-      wait_for_content_loaded
+    it 'parses youtube.com/playlist URL and opens playlist' do
+      open_youtube_url('https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf')
+      wait_for_content_loaded(timeout: 20)
       @axe.screenshot('url-scheme-youtube-playlist')
     end
 
-    it 'opens channel via youtube.com/@handle URL' do
-      open_url('https://www.youtube.com/@Google')
-      sleep 3
-      wait_for_content_loaded
+    it 'parses youtube.com/@handle URL and opens channel' do
+      open_youtube_url('https://www.youtube.com/@Google')
+      wait_for_content_loaded(timeout: 20)
       @axe.screenshot('url-scheme-youtube-handle')
     end
   end
