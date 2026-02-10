@@ -35,6 +35,14 @@ module UITest
         udid
       end
 
+      # Open a URL in the simulator (triggers deep link handling)
+      # @param udid [String] UDID of the simulator
+      # @param url [String] URL to open
+      def open_url(udid, url)
+        output, status = Open3.capture2e('xcrun', 'simctl', 'openurl', udid, url)
+        raise SimulatorError, "openurl failed: #{output}" unless status.success?
+      end
+
       # Shutdown a simulator by UDID
       # @param udid [String] UDID of the simulator
       def shutdown(udid)
