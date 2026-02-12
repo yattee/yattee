@@ -780,12 +780,17 @@ struct VideoInfoView: View {
                     .fontWeight(.medium)
                     .lineLimit(1)
 
-                if let subscribers = enrichedAuthor.formattedSubscriberCount {
-                    Text(subscribers)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                Group {
+                    if let subscribers = enrichedAuthor.formattedSubscriberCount {
+                        Text(subscribers)
+                    } else if isLoadingVideoDetails && video.supportsAPIStats {
+                        Text("1.2M subscribers")
+                            .redacted(reason: .placeholder)
+                    }
                 }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
             }
         }
     }
