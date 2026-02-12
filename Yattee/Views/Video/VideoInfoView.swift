@@ -558,7 +558,7 @@ struct VideoInfoView: View {
     @ViewBuilder
     private var blurredThumbnailBackground: some View {
         BlurredImageBackground(
-            url: displayedVideo?.bestThumbnail?.url,
+            url: displayedVideo.flatMap { appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: $0) } ?? displayedVideo?.bestThumbnail?.url,
             videoID: displayedVideo?.id.videoID,
             blurRadius: BlurredImageBackground.platformBlurRadius,
             scale: 1.8,
