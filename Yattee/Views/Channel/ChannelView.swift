@@ -1013,6 +1013,7 @@ struct ChannelView: View {
             ForEach(playlists) { playlist in
                 NavigationLink(value: NavigationDestination.playlist(.remote(playlist.id, instance: nil, title: playlist.title))) {
                     PlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+                        .contentShape(Rectangle())
                 }
                 .zoomTransitionSource(id: playlist.id)
                 .buttonStyle(.plain)
@@ -1364,6 +1365,7 @@ struct ChannelView: View {
                 case .playlist(let playlist):
                 NavigationLink(value: NavigationDestination.playlist(.remote(playlist.id, instance: nil, title: playlist.title))) {
                         PlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+                            .contentShape(Rectangle())
                     }
                     .zoomTransitionSource(id: playlist.id)
                     .buttonStyle(.plain)

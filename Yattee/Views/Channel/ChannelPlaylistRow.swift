@@ -88,6 +88,7 @@ struct ChannelPlaylistRow: View {
 
                 Spacer()
             }
+            .contentShape(Rectangle())
         }
         .zoomTransitionSource(id: playlist.id)
         .buttonStyle(.plain)
