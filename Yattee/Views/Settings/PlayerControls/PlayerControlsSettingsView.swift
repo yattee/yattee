@@ -519,7 +519,10 @@ private struct SystemControlsSection: View {
             .onChange(of: systemControlsMode) { _, newMode in
                 guard newMode != viewModel.systemControlsMode else { return }
                 viewModel.updateSystemControlsModeSync(newMode)
-                appEnvironment?.playerService.reconfigureSystemControls()
+                appEnvironment?.playerService.reconfigureSystemControls(
+                    mode: newMode,
+                    duration: viewModel.systemControlsSeekDuration
+                )
             }
 
             if systemControlsMode == .seek {
@@ -535,7 +538,10 @@ private struct SystemControlsSection: View {
                 .onChange(of: systemControlsSeekDuration) { _, newDuration in
                     guard newDuration != viewModel.systemControlsSeekDuration else { return }
                     viewModel.updateSystemControlsSeekDurationSync(newDuration)
-                    appEnvironment?.playerService.reconfigureSystemControls()
+                    appEnvironment?.playerService.reconfigureSystemControls(
+                        mode: viewModel.systemControlsMode,
+                        duration: newDuration
+                    )
                 }
             }
         } header: {

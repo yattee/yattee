@@ -274,9 +274,18 @@ final class NowPlayingService {
 
     /// Configures remote commands based on current settings.
     /// Call this method when settings change to reconfigure the commands.
-    func configureRemoteCommands() {
+    func configureRemoteCommands(
+        mode: SystemControlsMode? = nil,
+        duration: SystemControlsSeekDuration? = nil
+    ) {
         // Remove existing targets to prevent duplicate handlers
         removeAllTargets()
+
+        // If explicit values provided, use them directly (bypasses debounce)
+        if let mode, let duration {
+            configureRemoteCommandsWithSettings(mode: mode, duration: duration)
+            return
+        }
 
         // Read settings from active preset's cached global settings
         if let layoutService = playerControlsLayoutService {
