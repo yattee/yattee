@@ -256,6 +256,8 @@ struct InstanceBrowseView: View {
             loadWatchEntries()
         }
         .onChange(of: selectedTab) { _, _ in
+            isLoading = true
+            errorMessage = nil
             Task { await startContentLoad() }
         }
         #if os(iOS)
@@ -949,9 +951,11 @@ struct InstanceBrowseView: View {
                 userPlaylists = playlists
             }
         } catch is CancellationError {
-            // Task was cancelled (e.g., by SwiftUI during pull-to-refresh) — don't show error
+            // Task was cancelled — another load is taking over, don't touch state
+            return
         } catch let error as APIError where error == .cancelled {
-            // HTTP request was cancelled — don't show error
+            // HTTP request was cancelled — another load is taking over, don't touch state
+            return
         } catch {
             errorMessage = error.localizedDescription
         }
