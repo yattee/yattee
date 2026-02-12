@@ -1441,21 +1441,18 @@ struct VideoInfoView: View {
         CollapsibleSection(title: String(localized: "videoInfo.section.relatedVideos"), isExpanded: $isRelatedExpanded) {
             LazyVStack(spacing: 12) {
                 ForEach(Array(videos.enumerated()), id: \.element.id) { index, relatedVideo in
-                    Button {
-                        let queueContext = VideoQueueContext(
-                            video: relatedVideo,
+                    VideoRowView(video: relatedVideo, style: .regular)
+                        .tappableVideo(
+                            relatedVideo,
                             queueSource: .manual,
                             sourceLabel: String(localized: "videoInfo.section.relatedVideos"),
                             videoList: videos,
                             videoIndex: index,
-                            startTime: nil,
                             loadMoreVideos: nil
                         )
-                        navigationCoordinator?.navigate(to: .video(.loaded(relatedVideo), queueContext: queueContext))
-                    } label: {
-                        VideoRowView(video: relatedVideo, style: .regular, disableInternalTapHandling: true)
-                    }
-                    .buttonStyle(.plain)
+                        #if !os(tvOS)
+                        .videoSwipeActions(video: relatedVideo)
+                        #endif
 
                     if index < videos.count - 1 {
                         Divider()
