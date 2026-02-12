@@ -175,9 +175,41 @@ actor InvidiousAPI: InstanceAPI {
     }
 
     func playlist(id: String, instance: Instance) async throws -> Playlist {
-        let endpoint = GenericEndpoint.get("/api/v1/playlists/\(id)")
-        let response: InvidiousPlaylist = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.toPlaylist(baseURL: instance.url)
+        let firstEndpoint = GenericEndpoint.get("/api/v1/playlists/\(id)")
+        let firstResponse: InvidiousPlaylist = try await httpClient.fetch(firstEndpoint, baseURL: instance.url)
+        var allVideos = firstResponse.videos ?? []
+        let maxPages = 50
+
+        if firstResponse.videoCount > 0 {
+            var page = 2
+            while page <= maxPages {
+                let endpoint = GenericEndpoint.get("/api/v1/playlists/\(id)", query: ["page": String(page)])
+                let response: InvidiousPlaylist = try await httpClient.fetch(endpoint, baseURL: instance.url)
+                let pageVideos = response.videos ?? []
+                if pageVideos.isEmpty { break }
+                allVideos.append(contentsOf: pageVideos)
+                page += 1
+            }
+        }
+
+        // Invidious pagination uses overlapping pages — deduplicate by playlist index
+        var seenIndices = Set<Int>()
+        allVideos = allVideos.filter { item in
+            if case .video(let video) = item, let index = video.index {
+                return seenIndices.insert(index).inserted
+            }
+            return true
+        }
+
+        return InvidiousPlaylist(
+            playlistId: firstResponse.playlistId,
+            title: firstResponse.title,
+            description: firstResponse.description,
+            author: firstResponse.author,
+            authorId: firstResponse.authorId,
+            videoCount: firstResponse.videoCount,
+            videos: allVideos
+        ).toPlaylist(baseURL: instance.url)
     }
 
     /// Fetches a user's playlist using authenticated endpoint.
@@ -188,13 +220,50 @@ actor InvidiousAPI: InstanceAPI {
     ///   - sid: The session ID from login
     /// - Returns: The playlist with videos
     func userPlaylist(id: String, instance: Instance, sid: String) async throws -> Playlist {
-        let endpoint = GenericEndpoint.get("/api/v1/auth/playlists/\(id)")
-        let response: InvidiousPlaylist = try await httpClient.fetch(
-            endpoint,
-            baseURL: instance.url,
-            customHeaders: ["Cookie": "SID=\(sid)"]
+        let headers = ["Cookie": "SID=\(sid)"]
+        let firstEndpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists/\(id)",
+            queryItems: nil,
+            headers: headers
         )
-        return response.toPlaylist(baseURL: instance.url)
+        let firstResponse: InvidiousPlaylist = try await httpClient.fetch(firstEndpoint, baseURL: instance.url)
+        var allVideos = firstResponse.videos ?? []
+        let maxPages = 50
+
+        if firstResponse.videoCount > 0 {
+            var page = 2
+            while page <= maxPages {
+                let endpoint = GenericEndpoint(
+                    path: "/api/v1/auth/playlists/\(id)",
+                    queryItems: [URLQueryItem(name: "page", value: String(page))],
+                    headers: headers
+                )
+                let response: InvidiousPlaylist = try await httpClient.fetch(endpoint, baseURL: instance.url)
+                let pageVideos = response.videos ?? []
+                if pageVideos.isEmpty { break }
+                allVideos.append(contentsOf: pageVideos)
+                page += 1
+            }
+        }
+
+        // Invidious pagination uses overlapping pages — deduplicate by playlist index
+        var seenIndices = Set<Int>()
+        allVideos = allVideos.filter { item in
+            if case .video(let video) = item, let index = video.index {
+                return seenIndices.insert(index).inserted
+            }
+            return true
+        }
+
+        return InvidiousPlaylist(
+            playlistId: firstResponse.playlistId,
+            title: firstResponse.title,
+            description: firstResponse.description,
+            author: firstResponse.author,
+            authorId: firstResponse.authorId,
+            videoCount: firstResponse.videoCount,
+            videos: allVideos
+        ).toPlaylist(baseURL: instance.url)
     }
 
     func comments(videoID: String, instance: Instance, continuation: String?) async throws -> CommentsPage {
@@ -286,8 +355,9 @@ actor InvidiousAPI: InstanceAPI {
             "password": password,
             "action": "signin"
         ]
+        let formAllowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
         let bodyString = bodyComponents
-            .map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? $0.value)" }
+            .map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: formAllowed) ?? $0.value)" }
             .joined(separator: "&")
 
         guard let bodyData = bodyString.data(using: .utf8) else {
@@ -627,6 +697,7 @@ private struct InvidiousAuthFeedResponse: Decodable, Sendable {
 
 private struct InvidiousVideo: Decodable, Sendable {
     let videoId: String
+    let index: Int?
     let title: String
     let description: String?
     let author: String
