@@ -119,11 +119,6 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
             return nil
         }
 
-        LoggingService.shared.debug(
-            "Retrieved credentials for Yattee Server instance",
-            category: .keychain,
-            details: "instanceID=\(instance.id)"
-        )
         return credential
     }
 
