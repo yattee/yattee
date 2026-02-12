@@ -185,18 +185,6 @@ struct RemoteControlView: View {
             ToolbarItem(placement: .principal) {
                 deviceHeader
             }
-            ToolbarItem(placement: .primaryAction) {
-                Button(role: .destructive) {
-                    Task {
-                        await remoteControl?.closeVideo(on: device)
-                        dismiss()
-                    }
-                } label: {
-                    Label(String(localized: "remoteControl.closeVideo"), systemImage: "xmark")
-                        .labelStyle(.iconOnly)
-                }
-                .disabled(remoteState.videoID == nil)
-            }
         }
     }
 
@@ -358,95 +346,112 @@ struct RemoteControlView: View {
 
     @ViewBuilder
     private var nowPlayingSection: some View {
-        VStack(spacing: 12) {
-            HStack {
-                // Thumbnail - only show if there's an active video
-                if remoteState.videoID != nil,
-                   let thumbnailURL = remoteState.thumbnailURL ?? device.currentVideoThumbnailURL {
-                    AsyncImage(url: thumbnailURL) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(16/9, contentMode: .fit)
-                                .clipShape(.rect(cornerRadius: 8))
-                        case .failure:
-                            thumbnailPlaceholder
-                        case .empty:
-                            thumbnailPlaceholder
-                                .overlay(ProgressView())
-                        @unknown default:
-                            thumbnailPlaceholder
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 12) {
+                HStack {
+                    // Thumbnail - only show if there's an active video
+                    if remoteState.videoID != nil,
+                       let thumbnailURL = remoteState.thumbnailURL ?? device.currentVideoThumbnailURL {
+                        AsyncImage(url: thumbnailURL) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(16/9, contentMode: .fit)
+                                    .clipShape(.rect(cornerRadius: 8))
+                            case .failure:
+                                thumbnailPlaceholder
+                            case .empty:
+                                thumbnailPlaceholder
+                                    .overlay(ProgressView())
+                            @unknown default:
+                                thumbnailPlaceholder
+                            }
                         }
-                    }
-                    .frame(maxWidth: 120)
-                } else {
-                    thumbnailPlaceholder
                         .frame(maxWidth: 120)
-                }
-                
-                // Video info - only show details if there's an active video
-                VStack(alignment: .leading, spacing: 4) {
-                    if remoteState.videoID != nil {
-                        Text(remoteState.videoTitle ?? device.currentVideoTitle ?? String(localized: "remoteControl.noVideo"))
-                            .font(.headline)
-                            .lineLimit(2)
-                        
-                        if let channel = remoteState.channelName {
-                            Text(channel)
-                                .font(.subheadline)
+                    } else {
+                        thumbnailPlaceholder
+                            .frame(maxWidth: 120)
+                    }
+
+                    // Video info - only show details if there's an active video
+                    VStack(alignment: .leading, spacing: 4) {
+                        if remoteState.videoID != nil {
+                            Text(remoteState.videoTitle ?? device.currentVideoTitle ?? String(localized: "remoteControl.noVideo"))
+                                .font(.headline)
+                                .lineLimit(2)
+
+                            if let channel = remoteState.channelName {
+                                Text(channel)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } else {
+                            Text(String(localized: "remoteControl.noVideo"))
+                                .font(.headline)
                                 .foregroundStyle(.secondary)
                         }
-                    } else {
-                        Text(String(localized: "remoteControl.noVideo"))
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            // Scrubber
-            VStack(spacing: 4) {
-                #if os(tvOS)
-                ProgressView(value: displayCurrentTime, total: max(remoteState.duration, 1))
+                // Scrubber
+                VStack(spacing: 4) {
+                    #if os(tvOS)
+                    ProgressView(value: displayCurrentTime, total: max(remoteState.duration, 1))
+                        .tint(.accentColor)
+                    #else
+                    Slider(
+                        value: Binding(
+                            get: { displayCurrentTime },
+                            set: { newValue in
+                                scrubTime = newValue
+                                if !isScrubbing {
+                                    isScrubbing = true
+                                }
+                            }
+                        ),
+                        in: 0...max(remoteState.duration, 1),
+                        onEditingChanged: { editing in
+                            if !editing {
+                                // User released - send seek command
+                                estimatedCurrentTime = scrubTime
+                                Task {
+                                    await remoteControl?.seek(to: scrubTime, on: device)
+                                }
+                                isScrubbing = false
+                            }
+                        }
+                    )
                     .tint(.accentColor)
-                #else
-                Slider(
-                    value: Binding(
-                        get: { displayCurrentTime },
-                        set: { newValue in
-                            scrubTime = newValue
-                            if !isScrubbing {
-                                isScrubbing = true
-                            }
-                        }
-                    ),
-                    in: 0...max(remoteState.duration, 1),
-                    onEditingChanged: { editing in
-                        if !editing {
-                            // User released - send seek command
-                            estimatedCurrentTime = scrubTime
-                            Task {
-                                await remoteControl?.seek(to: scrubTime, on: device)
-                            }
-                            isScrubbing = false
-                        }
-                    }
-                )
-                .tint(.accentColor)
-                .disabled(remoteState.duration == 0)
-                #endif
+                    .disabled(remoteState.duration == 0)
+                    #endif
 
-                HStack {
-                    Text(formatTime(displayCurrentTime))
-                    Spacer()
-                    Text("-" + formatTime(remoteState.duration - displayCurrentTime))
+                    HStack {
+                        Text(formatTime(displayCurrentTime))
+                        Spacer()
+                        Text("-" + formatTime(remoteState.duration - displayCurrentTime))
+                    }
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
                 }
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
             }
+            .padding()
+            .padding(.top, 8)
+
+            // Close video button
+            Button(role: .destructive) {
+                Task {
+                    await remoteControl?.closeVideo(on: device)
+                    dismiss()
+                }
+            } label: {
+                Label(String(localized: "remoteControl.closeVideo"), systemImage: "xmark")
+                    .labelStyle(.iconOnly)
+                    .font(.caption)
+            }
+            .disabled(remoteState.videoID == nil)
+            .padding(12)
         }
-        .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
