@@ -152,10 +152,17 @@ struct TVDetailsPanel: View {
 
     // MARK: - Channel Row
 
+    /// Author enriched with cached channel data (avatar, subscriber count) from local stores.
+    private var enrichedAuthor: Author? {
+        guard let video else { return nil }
+        guard let dataManager = appEnvironment?.dataManager else { return video.author }
+        return video.author.enriched(using: dataManager)
+    }
+
     private var channelRow: some View {
         HStack(spacing: 16) {
             // Channel avatar
-            if let thumbnailURL = video?.author.thumbnailURL {
+            if let thumbnailURL = enrichedAuthor?.thumbnailURL {
                 AsyncImage(url: thumbnailURL) { image in
                     image
                         .resizable()
@@ -179,12 +186,12 @@ struct TVDetailsPanel: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 // Channel name
-                Text(video?.author.name ?? "")
+                Text(enrichedAuthor?.name ?? "")
                     .font(.headline)
                     .foregroundStyle(.white)
 
                 // Subscriber count
-                if let subscriberCount = video?.author.subscriberCount {
+                if let subscriberCount = enrichedAuthor?.subscriberCount {
                     Text("channel.subscriberCount \(CountFormatter.compact(subscriberCount))")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.6))
