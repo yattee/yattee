@@ -19,8 +19,8 @@ struct MediaBrowserView: View {
     @State private var isLoading = false
     @State private var error: MediaSourceError?
     @State private var showOnlyPlayable: Bool
-    @State private var sortOrder: MediaBrowserSortOrder = .name
-    @State private var sortAscending = true
+    @State private var sortOrder: MediaBrowserSortOrder
+    @State private var sortAscending: Bool
     @State private var showViewOptions = false
 
     private var listStyle: VideoListStyle {
@@ -31,7 +31,19 @@ struct MediaBrowserView: View {
         self.source = source
         self.initialPath = path
         _currentPath = State(initialValue: path)
-        _showOnlyPlayable = State(initialValue: showOnlyPlayable)
+
+        let defaults = UserDefaults.standard
+        let key = "mediaBrowser.\(source.id.uuidString)"
+
+        if let raw = defaults.string(forKey: "\(key).sortOrder"),
+           let saved = MediaBrowserSortOrder(rawValue: raw) {
+            _sortOrder = State(initialValue: saved)
+        } else {
+            _sortOrder = State(initialValue: .name)
+        }
+
+        _sortAscending = State(initialValue: defaults.object(forKey: "\(key).sortAscending") as? Bool ?? true)
+        _showOnlyPlayable = State(initialValue: defaults.object(forKey: "\(key).showOnlyPlayable") as? Bool ?? showOnlyPlayable)
     }
 
     /// Files filtered and sorted based on current settings.
@@ -114,6 +126,15 @@ struct MediaBrowserView: View {
         .task {
             await loadFiles()
         }
+        .onChange(of: sortOrder) { _, newValue in
+            savePreference(newValue.rawValue, forKey: "sortOrder")
+        }
+        .onChange(of: sortAscending) { _, newValue in
+            savePreference(newValue, forKey: "sortAscending")
+        }
+        .onChange(of: showOnlyPlayable) { _, newValue in
+            savePreference(newValue, forKey: "showOnlyPlayable")
+        }
     }
 
     private var navigationTitle: String {
@@ -171,6 +192,12 @@ struct MediaBrowserView: View {
             }
             .padding(.bottom, 16)
         }
+    }
+
+    // MARK: - Preferences
+
+    private func savePreference(_ value: Any, forKey suffix: String) {
+        UserDefaults.standard.set(value, forKey: "mediaBrowser.\(source.id.uuidString).\(suffix)")
     }
 
     // MARK: - Loading
