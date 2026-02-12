@@ -303,6 +303,7 @@ final class PlayerService {
 
                 // Update state with full video details and selected stream
                 state.setCurrentVideo(fullVideo, stream: selectedStream, audioStream: selectedAudioStream)
+                CachedChannelData.cacheAuthor(fullVideo.author)
                 state.videoDetailsState = .loaded
                 lockDurationIfNeeded(for: fullVideo, stream: selectedStream)
 

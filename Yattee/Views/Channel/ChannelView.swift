@@ -8,25 +8,6 @@
 import SwiftUI
 import NukeUI
 
-/// Cached channel data for showing header immediately while loading.
-private struct CachedChannelHeader {
-    let name: String
-    let thumbnailURL: URL?
-    let bannerURL: URL?
-
-    init(from subscription: Subscription) {
-        name = subscription.name
-        thumbnailURL = subscription.avatarURL
-        bannerURL = subscription.bannerURL
-    }
-
-    init(from recentChannel: RecentChannel) {
-        name = recentChannel.name
-        thumbnailURL = recentChannel.thumbnailURLString.flatMap { URL(string: $0) }
-        bannerURL = nil  // RecentChannel doesn't store banner
-    }
-}
-
 struct ChannelView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -52,7 +33,7 @@ struct ChannelView: View {
     @State private var showingUnsubscribeConfirmation = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollToTop: Bool = false
-    @State private var cachedHeader: CachedChannelHeader?
+    @State private var cachedHeader: CachedChannelData?
 
     // View options (persisted)
     @AppStorage("channel.layout") private var layout: VideoListLayout = .list
@@ -393,7 +374,7 @@ struct ChannelView: View {
 
     /// Shows cached header with a spinner below while loading full channel data.
     @ViewBuilder
-    private func loadingContent(_ cached: CachedChannelHeader) -> some View {
+    private func loadingContent(_ cached: CachedChannelData) -> some View {
         GeometryReader { geometry in
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -1526,11 +1507,7 @@ struct ChannelView: View {
         isSubscribed = subscription != nil
 
         // Load cached header data for immediate display
-        if let subscription {
-            cachedHeader = CachedChannelHeader(from: subscription)
-        } else if let recentChannel = appEnvironment.dataManager.recentChannelEntry(forChannelID: channelID) {
-            cachedHeader = CachedChannelHeader(from: recentChannel)
-        }
+        cachedHeader = CachedChannelData.load(for: channelID, using: appEnvironment.dataManager)
 
         // Fetch channel and videos independently to handle partial failures gracefully
         async let channelTask: Result<Channel, Error> = await {
@@ -1576,7 +1553,7 @@ struct ChannelView: View {
                         id: ChannelID(source: source, channelID: channelID),
                         name: cached.name,
                         description: nil,
-                        subscriberCount: nil,
+                        subscriberCount: cached.subscriberCount,
                         thumbnailURL: cached.thumbnailURL,
                         bannerURL: cached.bannerURL
                     )

@@ -92,6 +92,8 @@ struct VideoStatsRow: View {
 
 /// Displays channel info with avatar, name, subscriber count, and context menu.
 struct VideoChannelRow: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let author: Author
     let source: ContentSource
     let yatteeServerURL: URL?
@@ -100,6 +102,12 @@ struct VideoChannelRow: View {
     let accentColor: Color
     var showSubscriberCount: Bool = true
     var isLoadingDetails: Bool = false
+
+    /// Author enriched with cached channel data (avatar, subscriber count) from local stores.
+    private var enrichedAuthor: Author {
+        guard let dataManager = appEnvironment?.dataManager else { return author }
+        return author.enriched(using: dataManager)
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -129,21 +137,21 @@ struct VideoChannelRow: View {
     private var channelContent: some View {
         HStack(spacing: 10) {
             ChannelAvatarView(
-                author: author,
+                author: enrichedAuthor,
                 size: 40,
                 yatteeServerURL: yatteeServerURL,
                 source: source
             )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(author.name)
+                Text(enrichedAuthor.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .lineLimit(1)
 
                 if showSubscriberCount {
                     Group {
-                        if let subscribers = author.formattedSubscriberCount {
+                        if let subscribers = enrichedAuthor.formattedSubscriberCount {
                             Text(subscribers)
                         } else if isLoadingDetails && video.supportsAPIStats {
                             Text("1.2M subscribers")

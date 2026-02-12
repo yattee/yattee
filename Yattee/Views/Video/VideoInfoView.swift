@@ -765,21 +765,22 @@ struct VideoInfoView: View {
 
     /// Channel row content used in both tappable and non-tappable variants
     private func channelRowContent(for video: Video) -> some View {
-        HStack(spacing: 10) {
+        let enrichedAuthor = appEnvironment.map { video.author.enriched(using: $0.dataManager) } ?? video.author
+        return HStack(spacing: 10) {
             ChannelAvatarView(
-                author: video.author,
+                author: enrichedAuthor,
                 size: 40,
                 yatteeServerURL: yatteeServerURL,
                 source: video.authorSource
             )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(video.author.name)
+                Text(enrichedAuthor.name)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .lineLimit(1)
 
-                if let subscribers = video.author.formattedSubscriberCount {
+                if let subscribers = enrichedAuthor.formattedSubscriberCount {
                     Text(subscribers)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -1784,6 +1785,7 @@ struct VideoInfoView: View {
                 // Use extractURL method - just use the video part
                 let (fullVideo, _, _) = try await contentService.extractURL(originalURL, instance: instance)
                 loadedVideoDetails[videoID] = fullVideo
+                CachedChannelData.cacheAuthor(fullVideo.author)
             } catch {
                 // Fail silently - use partial video data we have
             }
@@ -1807,6 +1809,7 @@ struct VideoInfoView: View {
                 instance: instance
             )
             loadedVideoDetails[videoID] = fullVideo
+            CachedChannelData.cacheAuthor(fullVideo.author)
         } catch {
             // Fail silently - just use the partial video data we have
         }
