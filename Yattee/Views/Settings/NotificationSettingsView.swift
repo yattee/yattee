@@ -160,6 +160,7 @@ struct ManageChannelNotificationsView: View {
     @State private var subscriptions: [Subscription] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var refreshID = UUID()
 
     private var subscriptionService: SubscriptionService? { appEnvironment?.subscriptionService }
 
@@ -194,15 +195,44 @@ struct ManageChannelNotificationsView: View {
                 ForEach(subscriptions, id: \.channelID) { subscription in
                     ChannelNotificationToggle(subscription: subscription)
                 }
+                .id(refreshID)
             }
         }
         .navigationTitle(String(localized: "settings.notifications.manageChannels.title"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .toolbar {
+            if !subscriptions.isEmpty {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button {
+                            setAllNotifications(enabled: true)
+                        } label: {
+                            Label(String(localized: "settings.notifications.enableAll"), systemImage: "bell.fill")
+                        }
+                        Button {
+                            setAllNotifications(enabled: false)
+                        } label: {
+                            Label(String(localized: "settings.notifications.disableAll"), systemImage: "bell.slash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+        }
         .task {
             await loadSubscriptionsAsync()
         }
+    }
+
+    private func setAllNotifications(enabled: Bool) {
+        guard let dataManager = appEnvironment?.dataManager else { return }
+        for subscription in subscriptions {
+            dataManager.setNotificationsEnabled(enabled, for: subscription.channelID)
+        }
+        refreshID = UUID()
     }
 
     /// Loads subscriptions from the current subscription account provider.
