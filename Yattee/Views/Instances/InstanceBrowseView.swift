@@ -36,6 +36,7 @@ struct InstanceBrowseView: View {
     @State private var feedPage = 1
     @State private var hasMoreFeedResults = true
     @State private var isLoadingMoreFeed = false
+    @State private var contentLoadTask: Task<Void, Never>?
     @State private var feedLoadedVideoCount = 0  // Track count when last load was triggered
     
     // View options (persisted per instance)
@@ -101,10 +102,10 @@ struct InstanceBrowseView: View {
 
     var body: some View {
         let backgroundStyle: ListBackgroundStyle = listStyle == .inset ? .grouped : .plain
-        backgroundStyle.color
-            .ignoresSafeArea()
-            .overlay(
-                GeometryReader { geometry in
+        GeometryReader { geometry in
+            backgroundStyle.color
+                .ignoresSafeArea()
+                .overlay(
                     ScrollView {
                         VStack(spacing: 0) {
                             // Tab picker (hidden during search)
@@ -186,11 +187,14 @@ struct InstanceBrowseView: View {
                             }
                         }
                     }
-                    .onChange(of: geometry.size.width, initial: true) { _, newWidth in
-                        viewWidth = newWidth
+                    .refreshable {
+                        await startContentLoad(forceRefresh: true)
                     }
-                }
-            )
+                )
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
+        }
         .navigationTitle(instance.displayName)
         #if !os(tvOS)
         .toolbarTitleDisplayMode(.inlineLarge)
@@ -246,16 +250,13 @@ struct InstanceBrowseView: View {
             // Load watch entries for hide watched feature
             loadWatchEntries()
             
-            await loadContent()
+            await startContentLoad()
         }
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadWatchEntries()
         }
         .onChange(of: selectedTab) { _, _ in
-            Task { await loadContent() }
-        }
-        .refreshable {
-            await loadContent(forceRefresh: true)
+            Task { await startContentLoad() }
         }
         #if os(iOS)
         .searchable(
@@ -596,7 +597,7 @@ struct InstanceBrowseView: View {
             Text(error)
         } actions: {
             Button(String(localized: "common.retry")) {
-                Task { await loadContent(forceRefresh: true) }
+                Task { await startContentLoad(forceRefresh: true) }
             }
             .buttonStyle(.bordered)
         }
@@ -821,7 +822,17 @@ struct InstanceBrowseView: View {
         watchEntriesMap = appEnvironment?.dataManager.watchEntriesMap() ?? [:]
     }
 
-    private func loadContent(forceRefresh: Bool = false) async {
+    private func startContentLoad(forceRefresh: Bool = false) async {
+        // Cancel any in-flight load before starting a new one
+        contentLoadTask?.cancel()
+        let task = Task {
+            await performLoadContent(forceRefresh: forceRefresh)
+        }
+        contentLoadTask = task
+        await task.value
+    }
+
+    private func performLoadContent(forceRefresh: Bool = false) async {
         guard let appEnvironment else {
             errorMessage = "App not initialized"
             isLoading = false
@@ -842,7 +853,7 @@ struct InstanceBrowseView: View {
             return
         }
 
-        isLoading = true
+        isLoading = !hasData  // Only show loading spinner when no existing data
         errorMessage = nil
 
         do {
@@ -865,8 +876,8 @@ struct InstanceBrowseView: View {
                 if forceRefresh {
                     feedPage = 1
                     hasMoreFeedResults = true
-                    feedVideos = []
-                    selectedFeedChannelID = nil
+                    // Don't clear feedVideos here — keep old data visible
+                    // until the API call succeeds and replaces it.
                 }
 
                 // Load subscriptions and feed based on instance type
@@ -937,6 +948,10 @@ struct InstanceBrowseView: View {
                 let playlists = try await api.userPlaylists(instance: instance, sid: credential)
                 userPlaylists = playlists
             }
+        } catch is CancellationError {
+            // Task was cancelled (e.g., by SwiftUI during pull-to-refresh) — don't show error
+        } catch let error as APIError where error == .cancelled {
+            // HTTP request was cancelled — don't show error
         } catch {
             errorMessage = error.localizedDescription
         }
