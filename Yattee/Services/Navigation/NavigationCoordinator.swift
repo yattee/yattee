@@ -120,6 +120,9 @@ final class NavigationCoordinator {
     /// Progress bar frame in screen coordinates (for gesture conflict resolution).
     var progressBarFrame: CGRect = .zero
 
+    /// Comments overlay frame in screen coordinates (for gesture conflict resolution).
+    var commentsFrame: CGRect = .zero
+
     /// Current panscan value from UIKit pinch gesture (0.0 = fit, 1.0 = fill).
     /// Updated by ExpandedPlayerWindow's pinch gesture handler.
     var pinchPanscan: Double = 0.0

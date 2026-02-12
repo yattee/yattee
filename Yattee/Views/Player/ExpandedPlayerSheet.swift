@@ -269,6 +269,23 @@ struct ExpandedPlayerSheet: View {
             }
             .opacity(isVisible ? 1 : 0)
             .allowsHitTesting(isVisible)
+            .background(
+                GeometryReader { commentsGeometry in
+                    Color.clear
+                        .onChange(of: commentsGeometry.frame(in: .global)) { _, newFrame in
+                            if isCommentsExpanded {
+                                navigationCoordinator?.commentsFrame = newFrame
+                            }
+                        }
+                        .onChange(of: isCommentsExpanded) { _, expanded in
+                            if expanded {
+                                navigationCoordinator?.commentsFrame = commentsGeometry.frame(in: .global)
+                            } else {
+                                navigationCoordinator?.commentsFrame = .zero
+                            }
+                        }
+                }
+            )
         }
         .ignoresSafeArea(edges: .bottom)
     }
@@ -770,6 +787,7 @@ private struct PlayerEventHandlersModifier: ViewModifier {
             playerState?.commentsState = .idle
             playerState?.commentsContinuation = nil
             isCommentsExpanded = false
+            navigationCoordinator?.commentsFrame = .zero
             isPanelExpanded = false
             panelExpandOffset = 0
         }

@@ -150,6 +150,8 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     var getProgressBarFrame: (() -> CGRect)?
     /// Returns true if a seek gesture is currently active (blocks pinch gesture)
     var isSeekGestureActive: (() -> Bool)?
+    /// Returns the comments overlay frame in screen coordinates (for gesture conflict resolution)
+    var getCommentsFrame: (() -> CGRect)?
 
     // Main window scaling callbacks (Apple Music-style effect)
     var onMainWindowScaleChanged: ((CGFloat) -> Void)?
@@ -341,9 +343,17 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
             return false
         }
 
-        // Don't begin dismiss gesture when comments are expanded (they handle their own dismiss)
+        // When comments are expanded, only block dismiss if touch is within comments frame
         if isCommentsExpanded?() == true {
-            return false
+            let commentsFrame = getCommentsFrame?() ?? .zero
+            if !commentsFrame.isEmpty {
+                let touchLocation = panGesture.location(in: nil)
+                if commentsFrame.contains(touchLocation) {
+                    return false
+                }
+            } else {
+                return false // No frame info — fall back to blanket blocking
+            }
         }
 
         // Don't begin dismiss gesture when adjusting volume/brightness sliders
@@ -839,6 +849,9 @@ final class ExpandedPlayerWindowManager {
         }
         handler.isSeekGestureActive = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.isSeekGestureActive ?? false
+        }
+        handler.getCommentsFrame = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.commentsFrame ?? .zero
         }
         // Main window scaling callbacks for interactive drag
         handler.onMainWindowScaleChanged = { [weak self] progress in

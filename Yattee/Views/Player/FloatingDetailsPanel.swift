@@ -495,6 +495,23 @@ struct FloatingDetailsPanel: View {
         }
         .opacity(expanded ? 1 : 0)
         .allowsHitTesting(expanded)
+        .background(
+            GeometryReader { commentsGeometry in
+                Color.clear
+                    .onChange(of: commentsGeometry.frame(in: .global)) { _, newFrame in
+                        if isCommentsExpanded {
+                            appEnvironment?.navigationCoordinator.commentsFrame = newFrame
+                        }
+                    }
+                    .onChange(of: isCommentsExpanded) { _, expanded in
+                        if expanded {
+                            appEnvironment?.navigationCoordinator.commentsFrame = commentsGeometry.frame(in: .global)
+                        } else {
+                            appEnvironment?.navigationCoordinator.commentsFrame = .zero
+                        }
+                    }
+            }
+        )
     }
 
     // MARK: - Video Info
@@ -558,6 +575,7 @@ struct FloatingDetailsPanel: View {
     }
 
     private func collapseComments() {
+        appEnvironment?.navigationCoordinator.commentsFrame = .zero
         // Use same animation as player sheet dismiss (0.3s, no bounce)
         withAnimation(.smooth(duration: 0.3)) {
             isCommentsExpanded = false

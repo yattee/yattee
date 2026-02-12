@@ -256,6 +256,23 @@ struct PortraitDetailsPanel: View {
                 }
                 .opacity(expanded ? 1 : 0)
                 .allowsHitTesting(expanded)
+                .background(
+                    GeometryReader { commentsGeometry in
+                        Color.clear
+                            .onChange(of: commentsGeometry.frame(in: .global)) { _, newFrame in
+                                if isCommentsExpanded {
+                                    appEnvironment?.navigationCoordinator.commentsFrame = newFrame
+                                }
+                            }
+                            .onChange(of: isCommentsExpanded) { _, expanded in
+                                if expanded {
+                                    appEnvironment?.navigationCoordinator.commentsFrame = commentsGeometry.frame(in: .global)
+                                } else {
+                                    appEnvironment?.navigationCoordinator.commentsFrame = .zero
+                                }
+                            }
+                    }
+                )
             }
             .animation(.smooth(duration: 0.3), value: isCommentsExpanded)
             .onChange(of: video.id) { _, _ in
@@ -521,6 +538,7 @@ struct PortraitDetailsPanel: View {
     }
 
     private func collapseComments() {
+        appEnvironment?.navigationCoordinator.commentsFrame = .zero
         withAnimation(.smooth(duration: 0.3)) {
             isCommentsExpanded = false
         }
