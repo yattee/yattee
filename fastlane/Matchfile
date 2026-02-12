@@ -1,0 +1,3 @@
+git_url(ENV['CERTIFICATES_GIT_URL'])
+storage_mode("git")
+type("appstore")
