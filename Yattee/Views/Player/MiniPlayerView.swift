@@ -28,6 +28,9 @@ struct MiniPlayerView: View {
 
     private var currentVideo: Video? { playerState?.currentVideo }
 
+    /// Whether PiP is currently active
+    private var isPiPActive: Bool { playerState?.pipState == .active }
+
     /// Whether video preview should be shown (video ready and player not expanded/expanding)
     private var shouldShowVideoPreview: Bool {
         guard let state = playerState else { return false }
@@ -257,11 +260,6 @@ struct MiniPlayerView: View {
     @ViewBuilder
     private var videoPreviewView: some View {
         ZStack {
-            // Thumbnail layer - shown when video not ready or during expand animation
-            thumbnailView
-                .opacity(shouldShowVideoPreview ? 0 : 1)
-                .animation(.easeInOut(duration: 0.15), value: shouldShowVideoPreview)
-
             // Video layer - mounted during collapse or when ready to show
             // Keep it in hierarchy during collapse so the container can receive the player view
             if let backend = playerService?.currentBackend as? MPVBackend,
@@ -269,8 +267,15 @@ struct MiniPlayerView: View {
                shouldMountVideoView {
                 MPVRenderViewRepresentable(backend: backend, playerState: playerState)
                     .allowsHitTesting(false)
-                    // No animation on video opacity - show immediately when ready
             }
+
+            // Thumbnail layer - on top so it can cover the black MPV view during PiP
+            // Shown when video not ready, during expand animation, or during PiP
+            thumbnailView
+                .opacity(shouldShowVideoPreview && !isPiPActive ? 0 : 1)
+                .animation(.easeInOut(duration: 0.15), value: shouldShowVideoPreview)
+                .animation(.easeInOut(duration: 0.25), value: isPiPActive)
+                .allowsHitTesting(false)
         }
         .onChange(of: navigationCoordinator?.isPlayerCollapsing) { _, isCollapsing in
             // When collapse animation finishes, resume rendering if video preview should be shown
