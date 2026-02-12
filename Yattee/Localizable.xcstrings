@@ -11354,6 +11354,28 @@
         }
       }
     },
+    "settings.notifications.disableAll" : {
+      "comment" : "Button to disable notifications for all channels",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable All"
+          }
+        }
+      }
+    },
+    "settings.notifications.enableAll" : {
+      "comment" : "Button to enable notifications for all channels",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable All"
+          }
+        }
+      }
+    },
     "settings.notifications.noSubscriptions.description" : {
       "comment" : "Description when no subscriptions exist",
       "localizations" : {
