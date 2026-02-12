@@ -31,6 +31,7 @@ extension ExpandedPlayerSheet {
 
     /// Collapses the comments overlay.
     func collapseComments() {
+        navigationCoordinator?.commentsFrame = .zero
         // Use same animation as player sheet dismiss (0.3s, no bounce)
         withAnimation(.smooth(duration: 0.3)) {
             isCommentsExpanded = false

@@ -481,6 +481,9 @@ extension ExpandedPlayerSheet {
                                         withTransaction(transaction) {
                                             isPortraitPanelVisible = false
                                             navigationCoordinator?.isPortraitPanelVisible = false
+                                            isCommentsExpanded = false
+                                            navigationCoordinator?.isCommentsExpanded = false
+                                            navigationCoordinator?.commentsFrame = .zero
                                             panelDragOffset = 0
                                             videoYOffset = 0  // Reset offset (centerY is now the base)
                                         }
