@@ -102,7 +102,7 @@ extension SettingsManager {
             if let cached = _miniPlayerMinimizeBehavior as? MiniPlayerMinimizeBehavior { return cached }
             guard let rawValue = localDefaults.string(forKey: "miniPlayerMinimizeBehavior"),
                   let behavior = MiniPlayerMinimizeBehavior(rawValue: rawValue) else {
-                return .onScrollDown // Default
+                return .never // Default
             }
             return behavior
         }

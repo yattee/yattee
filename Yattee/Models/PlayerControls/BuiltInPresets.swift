@@ -11,7 +11,7 @@ extension LayoutPreset {
     /// Bump this version whenever any built-in preset definition changes.
     /// On launch, the app compares this against the last-applied version
     /// and replaces stale built-in presets with fresh copies from code.
-    static let builtInPresetsVersion = 3
+    static let builtInPresetsVersion = 5
 
     // MARK: - Built-in Preset IDs
 
@@ -32,6 +32,10 @@ extension LayoutPreset {
                 visibilityMode: .wideOnly
             ),
             .flexibleSpacer(),
+            ControlButtonConfiguration(
+                buttonType: .contextMenu,
+                visibilityMode: .wideOnly
+            ),
             .defaultConfiguration(for: .orientationLock),
             .defaultConfiguration(for: .close)
         ]
@@ -51,10 +55,6 @@ extension LayoutPreset {
                 visibilityMode: .wideOnly
             ),
             .flexibleSpacer(),
-            ControlButtonConfiguration(
-                buttonType: .contextMenu,
-                visibilityMode: .wideOnly
-            ),
             .defaultConfiguration(for: .settings),
             .defaultConfiguration(for: .pictureInPicture),
             .defaultConfiguration(for: .fullscreen)

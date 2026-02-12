@@ -72,7 +72,8 @@ struct MiniPlayerSettings: Codable, Hashable, Sendable {
     /// Default buttons for the mini player: play/pause and play next.
     private static let defaultButtons: [ControlButtonConfiguration] = [
         ControlButtonConfiguration(buttonType: .playPause),
-        ControlButtonConfiguration(buttonType: .playNext)
+        ControlButtonConfiguration(buttonType: .playNext),
+        ControlButtonConfiguration(buttonType: .close)
     ]
 
     /// Default mini player settings.
