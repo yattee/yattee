@@ -4908,6 +4908,7 @@
       }
     },
     "mediaBrowser.viewOptions.filters" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11299,6 +11300,17 @@
         }
       }
     },
+    "settings.notifications.disableAll" : {
+      "comment" : "Button to disable notifications for all channels",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable All"
+          }
+        }
+      }
+    },
     "settings.notifications.enable" : {
       "comment" : "Toggle to enable background notifications",
       "localizations" : {
@@ -11306,6 +11318,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable Notifications"
+          }
+        }
+      }
+    },
+    "settings.notifications.enableAll" : {
+      "comment" : "Button to enable notifications for all channels",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable All"
           }
         }
       }
@@ -11350,28 +11373,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Channel Notifications"
-          }
-        }
-      }
-    },
-    "settings.notifications.disableAll" : {
-      "comment" : "Button to disable notifications for all channels",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disable All"
-          }
-        }
-      }
-    },
-    "settings.notifications.enableAll" : {
-      "comment" : "Button to enable notifications for all channels",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable All"
           }
         }
       }
