@@ -349,16 +349,16 @@ actor InvidiousAPI: InstanceAPI {
     ///   - instance: The Invidious instance to log in to
     /// - Returns: The session ID (SID) cookie value
     func login(email: String, password: String, instance: Instance) async throws -> String {
-        // Build form-urlencoded body
-        let bodyComponents = [
-            "email": email,
-            "password": password,
-            "action": "signin"
+        // Build form-urlencoded body using URLComponents for standard encoding
+        var components = URLComponents()
+        components.queryItems = [
+            URLQueryItem(name: "email", value: email),
+            URLQueryItem(name: "password", value: password),
+            URLQueryItem(name: "action", value: "signin")
         ]
-        let formAllowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
-        let bodyString = bodyComponents
-            .map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: formAllowed) ?? $0.value)" }
-            .joined(separator: "&")
+        // URLQueryItem leaves '+' unencoded, but in form-urlencoded '+' means space
+        let bodyString = components.percentEncodedQuery?
+            .replacingOccurrences(of: "+", with: "%2B") ?? ""
 
         guard let bodyData = bodyString.data(using: .utf8) else {
             throw APIError.invalidRequest
