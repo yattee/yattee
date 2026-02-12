@@ -1,6 +1,27 @@
 name: Build and release to TestFlight and GitHub
 on:
   workflow_dispatch:
+    inputs:
+      build_ios:
+        description: 'Build iOS (TestFlight)'
+        type: boolean
+        default: true
+      build_tvos:
+        description: 'Build tvOS (TestFlight)'
+        type: boolean
+        default: false
+      build_mac_beta:
+        description: 'Build macOS (TestFlight)'
+        type: boolean
+        default: false
+      build_mac_notarized:
+        description: 'Build macOS (notarized)'
+        type: boolean
+        default: false
+      create_release:
+        description: 'Create GitHub release'
+        type: boolean
+        default: true
 
 env:
   APP_NAME: Yattee
@@ -20,13 +41,9 @@ env:
   TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
 
 jobs:
-  testflight:
-    strategy:
-      matrix:
-        # disabled mac beta lane
-        # lane: ['mac beta', 'ios beta', 'tvos beta']
-        lane: ['ios beta', 'tvos beta']
-    name: Releasing ${{ matrix.lane }} version to TestFlight
+  ios_beta:
+    if: ${{ inputs.build_ios }}
+    name: Release iOS to TestFlight
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,45 +52,72 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
           cache-version: 1
-      - name: Replace signing certificate to AppStore
+      - name: Set signing to manual for CI
         run: |
-          sed -i '' 's/match Development/match AppStore/' Yattee.xcodeproj/project.pbxproj
-          sed -i '' 's/iPhone Developer/iPhone Distribution/' Yattee.xcodeproj/project.pbxproj
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.0.1'
-      - name: Install iOS/tvOS platform SDKs if missing
-        run: |
-          sudo xcodebuild -downloadPlatform iOS || true
-          sudo xcodebuild -downloadPlatform tvOS || true
-      - name: Resolve SPM dependencies (retry around SPM binary-target race)
-        run: |
-          case "${{ matrix.lane }}" in
-            "ios beta") SCHEME="Yattee (iOS)" ;;
-            "tvos beta") SCHEME="Yattee (tvOS)" ;;
-            *) SCHEME="Yattee (iOS)" ;;
-          esac
-          set +e
-          for attempt in 1 2 3; do
-            rm -rf ~/Library/Caches/org.swift.swiftpm ~/Library/org.swift.swiftpm ~/Library/Developer/Xcode/DerivedData
-            echo "::group::Resolve attempt $attempt for $SCHEME"
-            xcodebuild -resolvePackageDependencies -project Yattee.xcodeproj -scheme "$SCHEME"
-            RC=$?
-            echo "::endgroup::"
-            [ $RC -eq 0 ] && exit 0
-            echo "Attempt $attempt failed (rc=$RC), retrying after 15s..."
-            sleep 15
-          done
-          exit 1
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
         with:
-          lane: ${{ matrix.lane }}
+          lane: ios beta
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.lane }} build
+          name: ios-beta-build
           path: fastlane/builds/**/*.ipa
           if-no-files-found: ignore
+
+  tvos_beta:
+    if: ${{ inputs.build_tvos }}
+    name: Release tvOS to TestFlight
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 1
+      - name: Set signing to manual for CI
+        run: |
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: tvos beta
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tvos-beta-build
+          path: fastlane/builds/**/*.ipa
+          if-no-files-found: ignore
+
+  mac_beta:
+    if: ${{ inputs.build_mac_beta }}
+    name: Release macOS to TestFlight
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 1
+      - name: Set signing to manual for CI
+        run: |
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: mac beta
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-beta-build
+          path: fastlane/builds/**/*.pkg
+          if-no-files-found: ignore
+
   mac_notarized:
+    if: ${{ inputs.build_mac_notarized }}
     name: Build and notarize macOS app
     runs-on: macos-latest
     steps:
@@ -83,27 +127,11 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
           cache-version: 1
-      - name: Replace signing certificate to Direct with Developer ID
+      - name: Set signing to manual with Developer ID
         run: |
-          sed -i '' 's/match AppStore/match Direct/' Yattee.xcodeproj/project.pbxproj
-          sed -i '' 's/3rd Party Mac Developer Application/Developer ID Application/' Yattee.xcodeproj/project.pbxproj
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.0.1'
-      - name: Resolve SPM dependencies (retry around SPM binary-target race)
-        run: |
-          set +e
-          for attempt in 1 2 3; do
-            rm -rf ~/Library/Caches/org.swift.swiftpm ~/Library/org.swift.swiftpm ~/Library/Developer/Xcode/DerivedData
-            echo "::group::Resolve attempt $attempt for Yattee (macOS)"
-            xcodebuild -resolvePackageDependencies -project Yattee.xcodeproj -scheme "Yattee (macOS)"
-            RC=$?
-            echo "::endgroup::"
-            [ $RC -eq 0 ] && exit 0
-            echo "Attempt $attempt failed (rc=$RC), retrying after 15s..."
-            sleep 15
-          done
-          exit 1
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Clear SPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
@@ -117,11 +145,13 @@ jobs:
         run: /usr/bin/ditto -c -k --keepParent ${{ env.APP_PATH }} ${{ env.ZIP_PATH }}
       - uses: actions/upload-artifact@v4
         with:
-          name: mac notarized build
+          name: mac-notarized-build
           path: ${{ env.ZIP_PATH }}
           if-no-files-found: error
+
   release:
-    needs: ['testflight', 'mac_notarized']
+    if: ${{ inputs.create_release && !cancelled() }}
+    needs: ['ios_beta', 'tvos_beta', 'mac_beta', 'mac_notarized']
     name: Create GitHub release
     runs-on: ubuntu-latest
     steps:
@@ -133,12 +163,12 @@ jobs:
           path: artifacts
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: artifacts/**/*.ipa,artifacts/**/*.zip
+          artifacts: artifacts/**/*.ipa,artifacts/**/*.zip,artifacts/**/*.pkg
           commit: main
           tag: ${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}
           prerelease: true
           bodyFile: CHANGELOG.md
+
   update_altstore:
     needs: ['release']
     uses: ./.github/workflows/update-altstore.yml
-
