@@ -615,8 +615,6 @@ final class ExpandedPlayerWindowManager {
         // Offset to keep the view centered vertically after scaling
         let offsetY = (windowHeight * scaleAmount) / 2
 
-        LoggingService.shared.logPlayer("[WindowScale] scaleMainWindow(\(progress)) - scale: \(scale), offsetY: \(offsetY), windowHeight: \(windowHeight)")
-
         // Apply corner radius proportional to progress
         presentingView.layer.cornerRadius = clampedProgress * scaledCornerRadius
         presentingView.layer.masksToBounds = true
