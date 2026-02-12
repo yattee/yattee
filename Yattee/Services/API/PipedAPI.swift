@@ -121,8 +121,33 @@ actor PipedAPI: InstanceAPI {
 
     func playlist(id: String, instance: Instance) async throws -> Playlist {
         let endpoint = GenericEndpoint.get("/playlists/\(id)")
-        let response: PipedPlaylistResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.toPlaylist(instanceURL: instance.url)
+        let firstResponse: PipedPlaylistResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        var allStreams = firstResponse.relatedStreams ?? []
+        let maxPages = 50
+
+        var nextpage = firstResponse.nextpage
+        var page = 1
+        while let token = nextpage, page < maxPages {
+            let nextEndpoint = GenericEndpoint.get("/nextpage/playlists/\(id)", query: ["nextpage": token])
+            let nextResponse: PipedPlaylistNextPageResponse = try await httpClient.fetch(nextEndpoint, baseURL: instance.url)
+            let pageStreams = nextResponse.relatedStreams ?? []
+            if pageStreams.isEmpty { break }
+            allStreams.append(contentsOf: pageStreams)
+            nextpage = nextResponse.nextpage
+            page += 1
+        }
+
+        return PipedPlaylistResponse(
+            name: firstResponse.name,
+            description: firstResponse.description,
+            uploader: firstResponse.uploader,
+            uploaderUrl: firstResponse.uploaderUrl,
+            uploaderAvatar: firstResponse.uploaderAvatar,
+            videos: firstResponse.videos,
+            relatedStreams: allStreams,
+            thumbnailUrl: firstResponse.thumbnailUrl,
+            nextpage: nil
+        ).toPlaylist(instanceURL: instance.url)
     }
 
     func comments(videoID: String, instance: Instance, continuation: String?) async throws -> CommentsPage {
@@ -341,13 +366,43 @@ actor PipedAPI: InstanceAPI {
     ///   - authToken: The auth token from login
     /// - Returns: Playlist with videos
     func userPlaylist(id: String, instance: Instance, authToken: String) async throws -> Playlist {
-        let endpoint = GenericEndpoint(
+        let headers = ["Authorization": authToken]
+        let firstEndpoint = GenericEndpoint(
             path: "/playlists/\(id)",
             method: .get,
-            headers: ["Authorization": authToken]
+            headers: headers
         )
-        let response: PipedPlaylistResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.toPlaylist(instanceURL: instance.url, playlistID: id)
+        let firstResponse: PipedPlaylistResponse = try await httpClient.fetch(firstEndpoint, baseURL: instance.url)
+        var allStreams = firstResponse.relatedStreams ?? []
+        let maxPages = 50
+
+        var nextpage = firstResponse.nextpage
+        var page = 1
+        while let token = nextpage, page < maxPages {
+            let nextEndpoint = GenericEndpoint(
+                path: "/nextpage/playlists/\(id)",
+                queryItems: [URLQueryItem(name: "nextpage", value: token)],
+                headers: headers
+            )
+            let nextResponse: PipedPlaylistNextPageResponse = try await httpClient.fetch(nextEndpoint, baseURL: instance.url)
+            let pageStreams = nextResponse.relatedStreams ?? []
+            if pageStreams.isEmpty { break }
+            allStreams.append(contentsOf: pageStreams)
+            nextpage = nextResponse.nextpage
+            page += 1
+        }
+
+        return PipedPlaylistResponse(
+            name: firstResponse.name,
+            description: firstResponse.description,
+            uploader: firstResponse.uploader,
+            uploaderUrl: firstResponse.uploaderUrl,
+            uploaderAvatar: firstResponse.uploaderAvatar,
+            videos: firstResponse.videos,
+            relatedStreams: allStreams,
+            thumbnailUrl: firstResponse.thumbnailUrl,
+            nextpage: nil
+        ).toPlaylist(instanceURL: instance.url, playlistID: id)
     }
 }
 
@@ -885,6 +940,7 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
     let videos: Int?
     let relatedStreams: [PipedPlaylistItem]?
     let thumbnailUrl: String?
+    let nextpage: String?
 
     nonisolated func toPlaylist(instanceURL: URL, playlistID: String? = nil) -> Playlist {
         // Extract only valid videos, skipping malformed items
@@ -911,6 +967,12 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
             videos: validVideos
         )
     }
+}
+
+/// Response from `/nextpage/playlists/{id}?nextpage=...` for paginated playlist videos.
+private struct PipedPlaylistNextPageResponse: Decodable, Sendable {
+    let relatedStreams: [PipedPlaylistItem]?
+    let nextpage: String?
 }
 
 /// User playlist from Piped `/user/playlists` endpoint.
