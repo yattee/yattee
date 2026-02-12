@@ -24,17 +24,14 @@ struct MediaBrowserViewOptionsSheet: View {
         NavigationStack {
             Form {
                 Section {
+                    Toggle("mediaBrowser.viewOptions.showOnlyPlayable", isOn: $showOnlyPlayable)
                     Picker("mediaBrowser.viewOptions.sortBy", selection: $sortOrder) {
                         ForEach(availableSortOptions) { order in
                             Label(order.displayName, systemImage: order.systemImage)
                                 .tag(order)
                         }
                     }
-                } header: {
-                    Text("mediaBrowser.viewOptions.sortBy")
-                }
 
-                Section {
                     Picker("mediaBrowser.viewOptions.order", selection: $sortAscending) {
                         Label(String(localized: "mediaBrowser.viewOptions.ascending"), systemImage: "arrow.up")
                             .tag(true)
@@ -44,14 +41,6 @@ struct MediaBrowserViewOptionsSheet: View {
                     .pickerStyle(.segmented)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                } header: {
-                    Text("mediaBrowser.viewOptions.order")
-                }
-
-                Section {
-                    Toggle("mediaBrowser.viewOptions.showOnlyPlayable", isOn: $showOnlyPlayable)
-                } header: {
-                    Text("mediaBrowser.viewOptions.filters")
                 }
             }
             .navigationTitle("mediaBrowser.viewOptions.title")
@@ -70,7 +59,7 @@ struct MediaBrowserViewOptionsSheet: View {
             }
         }
         #if os(iOS)
-        .presentationDetents([.medium])
+        .presentationDetents([.height(280)])
         .presentationDragIndicator(.visible)
         #endif
         .onAppear {
