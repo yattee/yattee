@@ -2062,8 +2062,11 @@ final class PlayerService {
 
     /// Reconfigures system control buttons (Control Center, Lock Screen) based on current settings.
     /// Call this when system controls settings change.
-    func reconfigureSystemControls() {
-        nowPlayingService.configureRemoteCommands()
+    func reconfigureSystemControls(
+        mode: SystemControlsMode? = nil,
+        duration: SystemControlsSeekDuration? = nil
+    ) {
+        nowPlayingService.configureRemoteCommands(mode: mode, duration: duration)
     }
 
     /// Observer for preset changes to reconfigure system controls.
@@ -2073,6 +2076,9 @@ final class PlayerService {
     func setPlayerControlsLayoutService(_ service: PlayerControlsLayoutService) {
         self.playerControlsLayoutService = service
         nowPlayingService.playerControlsLayoutService = service
+
+        // Reconfigure with the actual saved settings now that layout service is available
+        nowPlayingService.configureRemoteCommands()
 
         // Observe preset changes to reconfigure system controls
         presetChangeObserver = NotificationCenter.default.addObserver(
