@@ -47,7 +47,7 @@ env:
 jobs:
   determine_build_number:
     name: Determine build number
-    runs-on: macos-latest
+    runs-on: macos-26
     outputs:
       build_number: ${{ steps.calc.outputs.build_number }}
       version_number: ${{ steps.version.outputs.version_number }}
@@ -77,7 +77,7 @@ jobs:
     if: ${{ inputs.build_ios }}
     needs: [determine_build_number]
     name: Release iOS to TestFlight
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -103,7 +103,7 @@ jobs:
     if: ${{ inputs.build_tvos }}
     needs: [determine_build_number]
     name: Release tvOS to TestFlight
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -129,7 +129,7 @@ jobs:
     if: ${{ inputs.build_mac_beta }}
     needs: [determine_build_number]
     name: Release macOS to TestFlight
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -155,7 +155,7 @@ jobs:
     if: ${{ inputs.build_mac_notarized }}
     needs: [determine_build_number]
     name: Build and notarize macOS app
-    runs-on: macos-latest
+    runs-on: macos-26
     env:
       BUILD_NUMBER: ${{ needs.determine_build_number.outputs.build_number }}
       VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
