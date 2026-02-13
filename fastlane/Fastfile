@@ -115,6 +115,7 @@ platform :ios do
       use_automatic_signing: false,
       path: XCODEPROJ,
       team_id: TEAM_ID,
+      code_sign_identity: "Apple Distribution",
       profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER}",
       targets: [SCHEME]
     )
@@ -123,6 +124,7 @@ platform :ios do
       use_automatic_signing: false,
       path: XCODEPROJ,
       team_id: TEAM_ID,
+      code_sign_identity: "Apple Distribution",
       profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER}.ShareExtension",
       targets: ["YatteeShareExtension"]
     )
@@ -184,6 +186,7 @@ platform :tvos do
       use_automatic_signing: false,
       path: XCODEPROJ,
       team_id: TEAM_ID,
+      code_sign_identity: "Apple Distribution",
       profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER} tvos",
       targets: [SCHEME]
     )
@@ -246,6 +249,7 @@ platform :mac do
       use_automatic_signing: false,
       path: XCODEPROJ,
       team_id: TEAM_ID,
+      code_sign_identity: "Apple Distribution",
       profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER} macos",
       targets: [SCHEME]
     )
@@ -304,6 +308,7 @@ platform :mac do
       use_automatic_signing: false,
       path: XCODEPROJ,
       team_id: TEAM_ID,
+      code_sign_identity: "Developer ID Application",
       profile_name: "match Direct #{DEVELOPER_APP_IDENTIFIER} macos",
       targets: [SCHEME]
     )
