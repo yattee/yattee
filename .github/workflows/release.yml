@@ -205,8 +205,10 @@ jobs:
           git config --local user.name "github-actions[bot]"
           sed -i 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ env.BUILD_NUMBER }}/' Yattee.xcodeproj/project.pbxproj
           git add Yattee.xcodeproj/project.pbxproj
-          git commit -m "Bump build number to ${{ env.BUILD_NUMBER }}"
-          git push origin ${{ github.ref_name }}
+          git diff --cached --quiet && echo "Build number already up to date" || {
+            git commit -m "Bump build number to ${{ env.BUILD_NUMBER }}"
+            git push origin ${{ github.ref_name }}
+          }
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
