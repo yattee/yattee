@@ -40,12 +40,17 @@ extension DataManager {
     /// Deletes a local playlist.
     func deletePlaylist(_ playlist: LocalPlaylist) {
         let playlistID = playlist.id
+        let itemIDs = playlist.sortedItems.map { $0.id }
+
         modelContext.delete(playlist)
         save()
-        
-        // Queue for CloudKit deletion
+
+        // Queue playlist and all its items for CloudKit deletion
         cloudKitSync?.queuePlaylistDelete(playlistID: playlistID)
-        
+        for itemID in itemIDs {
+            cloudKitSync?.queuePlaylistItemDelete(itemID: itemID)
+        }
+
         NotificationCenter.default.post(name: .playlistsDidChange, object: nil)
     }
 

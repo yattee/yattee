@@ -1412,6 +1412,13 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         var successCount = 0
 
         for var deferredItem in deferredPlaylistItems {
+            // Drop items whose parent playlist is pending deletion
+            let playlistRecordName = "playlist-\(deferredItem.playlistID)"
+            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+                LoggingService.shared.logCloudKit("Dropping deferred item (parent playlist pending delete): \(deferredItem.itemID)")
+                continue
+            }
+
             // Increment retry count
             deferredItem.retryCount += 1
 
@@ -1501,14 +1508,23 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         let saveNames = UserDefaults.standard.stringArray(forKey: pendingSaveRecordNamesKey) ?? []
         let deleteNames = UserDefaults.standard.stringArray(forKey: pendingDeleteRecordNamesKey) ?? []
 
+        // Reconstruct pending deletes from persisted record names
+        if !deleteNames.isEmpty {
+            let zone = CKRecordZone(zoneName: RecordType.zoneName)
+            for name in deleteNames {
+                let recordID = CKRecord.ID(recordName: name, zoneID: zone.zoneID)
+                if !pendingDeletes.contains(where: { $0.recordName == name }) {
+                    pendingDeletes.append(recordID)
+                }
+            }
+        }
+
         // Also check for deferred playlist items
         loadDeferredItems()
         let hasDeferredItems = !deferredPlaylistItems.isEmpty
 
         if !saveNames.isEmpty || !deleteNames.isEmpty || hasDeferredItems {
             LoggingService.shared.logCloudKit("Recovered \(saveNames.count) pending saves, \(deleteNames.count) pending deletes, \(deferredPlaylistItems.count) deferred items from previous session")
-            // Trigger immediate sync to process any recovered changes
-            // The actual records will be recreated from local data during sync
             Task {
                 await sync()
             }
@@ -1993,6 +2009,16 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         // Persist remaining deferred items for next sync
         persistDeferredItems()
 
+        // Clean up placeholders whose parent playlist is pending deletion
+        let allPlaylists = dataManager.playlists()
+        for playlist in allPlaylists where playlist.isPlaceholder {
+            let playlistRecordName = "playlist-\(playlist.id.uuidString)"
+            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+                dataManager.deletePlaylist(playlist)
+                LoggingService.shared.logCloudKit("Cleaned up placeholder for deleted playlist: \(playlist.id)")
+            }
+        }
+
         // Apply deletions
         for deletion in changes.deletions {
             await applyRemoteDeletion(deletion.recordID, to: dataManager)
@@ -2010,6 +2036,22 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     /// Returns the result indicating success, deferral (for playlist items without parent), or failure.
     @discardableResult
     private func applyRemoteRecord(_ record: CKRecord, to dataManager: DataManager) async -> ApplyRecordResult {
+        // Skip records that are pending local deletion
+        if pendingDeletes.contains(where: { $0.recordName == record.recordID.recordName }) {
+            LoggingService.shared.logCloudKit("Skipping incoming record (pending local delete): \(record.recordID.recordName)")
+            return .success
+        }
+
+        // For playlist items, also skip if parent playlist is pending deletion
+        if record.recordType == RecordType.localPlaylistItem,
+           let playlistIDString = record["playlistID"] as? String {
+            let playlistRecordName = "playlist-\(playlistIDString)"
+            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+                LoggingService.shared.logCloudKit("Skipping playlist item (parent playlist pending delete): \(record.recordID.recordName)")
+                return .success
+            }
+        }
+
         do {
             switch record.recordType {
             case RecordType.subscription:
