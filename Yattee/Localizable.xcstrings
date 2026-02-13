@@ -1810,36 +1810,6 @@
         }
       }
     },
-    "settings.icloud.dev.badge" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DEV"
-          }
-        }
-      }
-    },
-    "settings.icloud.dev.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Using CloudKit development environment. Data is separate from production."
-          }
-        }
-      }
-    },
-    "settings.icloud.dev.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Development Environment"
-          }
-        }
-      }
-    },
     "discovery.empty.description" : {
       "comment" : "Description when no network shares are found",
       "localizations" : {
@@ -4933,17 +4903,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descending"
-          }
-        }
-      }
-    },
-    "mediaBrowser.viewOptions.filters" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filters"
           }
         }
       }
@@ -10938,6 +10897,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable Sync for This Category?"
+          }
+        }
+      }
+    },
+    "settings.icloud.dev.badge" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DEV"
+          }
+        }
+      }
+    },
+    "settings.icloud.dev.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using CloudKit development environment. Data is separate from production."
+          }
+        }
+      }
+    },
+    "settings.icloud.dev.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Development Environment"
           }
         }
       }
