@@ -198,7 +198,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    if: ${{ inputs.create_release && !cancelled() }}
+    if: ${{ inputs.create_release && !cancelled() && !failure() }}
     needs: [determine_build_number, ios_beta, tvos_beta, mac_beta, mac_notarized]
     name: Create GitHub release
     runs-on: ubuntu-latest
