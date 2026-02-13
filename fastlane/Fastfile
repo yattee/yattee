@@ -41,6 +41,25 @@ before_all do
   update_fastlane
 end
 
+desc "Get latest TestFlight build number across all platforms"
+lane :latest_build_number do
+  api_key = app_store_connect_api_key(
+    key_id: DEVELOPER_KEY_ID,
+    issuer_id: DEVELOPER_KEY_ISSUER_ID,
+    key_content: DEVELOPER_KEY_CONTENT,
+    is_key_content_base64: true
+  )
+
+  ios_build = latest_testflight_build_number(api_key: api_key, app_identifier: DEVELOPER_APP_IDENTIFIER, platform: "ios")
+  tvos_build = latest_testflight_build_number(api_key: api_key, app_identifier: DEVELOPER_APP_IDENTIFIER, platform: "appletvos")
+  macos_build = latest_testflight_build_number(api_key: api_key, app_identifier: DEVELOPER_APP_IDENTIFIER, platform: "osx")
+
+  max_build = [ios_build, tvos_build, macos_build].max
+  File.write("latest_build_number.txt", max_build.to_s)
+  UI.success("Latest TestFlight build number: #{max_build}")
+  max_build
+end
+
 desc "Bump build number and commit"
 lane :bump_build do
   increment_build_number(xcodeproj: XCODEPROJ)

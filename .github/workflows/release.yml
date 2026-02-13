@@ -23,6 +23,10 @@ on:
         type: boolean
         default: true
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 env:
   APP_NAME: Yattee
   FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
@@ -41,8 +45,37 @@ env:
   TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
 
 jobs:
+  determine_build_number:
+    name: Determine build number
+    runs-on: macos-latest
+    outputs:
+      build_number: ${{ steps.calc.outputs.build_number }}
+      version_number: ${{ steps.version.outputs.version_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 1
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: latest_build_number
+      - name: Calculate next build number
+        id: calc
+        run: |
+          LATEST=$(cat latest_build_number.txt)
+          NEXT=$((LATEST + 1))
+          echo "build_number=$NEXT" >> $GITHUB_OUTPUT
+      - name: Read version number
+        id: version
+        run: |
+          VERSION=$(grep -m 1 MARKETING_VERSION Yattee.xcodeproj/project.pbxproj | cut -d' ' -f3 | sed 's/;//g')
+          echo "version_number=$VERSION" >> $GITHUB_OUTPUT
+
   ios_beta:
     if: ${{ inputs.build_ios }}
+    needs: [determine_build_number]
     name: Release iOS to TestFlight
     runs-on: macos-latest
     steps:
@@ -55,6 +88,9 @@ jobs:
       - name: Set signing to manual for CI
         run: |
           sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Set build number
+        run: |
+          sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
@@ -68,6 +104,7 @@ jobs:
 
   tvos_beta:
     if: ${{ inputs.build_tvos }}
+    needs: [determine_build_number]
     name: Release tvOS to TestFlight
     runs-on: macos-latest
     steps:
@@ -80,6 +117,9 @@ jobs:
       - name: Set signing to manual for CI
         run: |
           sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Set build number
+        run: |
+          sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
@@ -93,6 +133,7 @@ jobs:
 
   mac_beta:
     if: ${{ inputs.build_mac_beta }}
+    needs: [determine_build_number]
     name: Release macOS to TestFlight
     runs-on: macos-latest
     steps:
@@ -105,6 +146,9 @@ jobs:
       - name: Set signing to manual for CI
         run: |
           sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Set build number
+        run: |
+          sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
@@ -118,8 +162,12 @@ jobs:
 
   mac_notarized:
     if: ${{ inputs.build_mac_notarized }}
+    needs: [determine_build_number]
     name: Build and notarize macOS app
     runs-on: macos-latest
+    env:
+      BUILD_NUMBER: ${{ needs.determine_build_number.outputs.build_number }}
+      VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -130,14 +178,14 @@ jobs:
       - name: Set signing to manual with Developer ID
         run: |
           sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
+      - name: Set build number
+        run: |
+          sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ env.BUILD_NUMBER }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
-      - run: |
-          echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
-          echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
       - run: |
           echo "APP_PATH=fastlane/builds/${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}/macOS/Yattee.app" >> $GITHUB_ENV
           echo "ZIP_PATH=fastlane/builds/${{ env.VERSION_NUMBER }}-${{ env.BUILD_NUMBER }}/macOS/Yattee-${{ env.VERSION_NUMBER }}-macOS.zip" >> $GITHUB_ENV
@@ -151,13 +199,26 @@ jobs:
 
   release:
     if: ${{ inputs.create_release && !cancelled() }}
-    needs: ['ios_beta', 'tvos_beta', 'mac_beta', 'mac_notarized']
+    needs: [determine_build_number, ios_beta, tvos_beta, mac_beta, mac_notarized]
     name: Create GitHub release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      BUILD_NUMBER: ${{ needs.determine_build_number.outputs.build_number }}
+      VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
     steps:
       - uses: actions/checkout@v4
-      - run: echo "BUILD_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 CURRENT_PROJECT_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
-      - run: echo "VERSION_NUMBER=$(cat Yattee.xcodeproj/project.pbxproj | grep -m 1 MARKETING_VERSION | cut -d' ' -f3 | sed 's/;//g')" >> $GITHUB_ENV
+        with:
+          token: ${{ secrets.GIT_AUTHORIZATION }}
+      - name: Commit build number
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          sed -i 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ env.BUILD_NUMBER }}/' Yattee.xcodeproj/project.pbxproj
+          git add Yattee.xcodeproj/project.pbxproj
+          git commit -m "Bump build number to ${{ env.BUILD_NUMBER }}"
+          git push
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -170,5 +231,5 @@ jobs:
           bodyFile: CHANGELOG.md
 
   update_altstore:
-    needs: ['release']
+    needs: [release]
     uses: ./.github/workflows/update-altstore.yml
