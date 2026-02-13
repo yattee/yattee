@@ -111,6 +111,22 @@ platform :ios do
       api_key: api_key
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER}",
+      targets: [SCHEME]
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER}.ShareExtension",
+      targets: ["YatteeShareExtension"]
+    )
+
     build_app(
       scheme: SCHEME,
       destination: "generic/platform=iOS",
@@ -162,6 +178,14 @@ platform :tvos do
       keychain_name: TEMP_KEYCHAIN_USER,
       keychain_password: TEMP_KEYCHAIN_PASSWORD,
       api_key: api_key
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER} tvos",
+      targets: [SCHEME]
     )
 
     build_app(
@@ -218,6 +242,14 @@ platform :mac do
       api_key: api_key
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER} macos",
+      targets: [SCHEME]
+    )
+
     build_mac_app(
       scheme: SCHEME,
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
@@ -266,6 +298,14 @@ platform :mac do
       keychain_name: TEMP_KEYCHAIN_USER,
       keychain_password: TEMP_KEYCHAIN_PASSWORD,
       api_key: api_key
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      profile_name: "match Direct #{DEVELOPER_APP_IDENTIFIER} macos",
+      targets: [SCHEME]
     )
 
     build_mac_app(

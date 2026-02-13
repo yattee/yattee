@@ -85,9 +85,6 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
           cache-version: 1
-      - name: Set signing to manual for CI
-        run: |
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
       - name: Set build number
         run: |
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
@@ -114,9 +111,6 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
           cache-version: 1
-      - name: Set signing to manual for CI
-        run: |
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
       - name: Set build number
         run: |
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
@@ -143,9 +137,6 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
           cache-version: 1
-      - name: Set signing to manual for CI
-        run: |
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
       - name: Set build number
         run: |
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
@@ -175,9 +166,6 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
           cache-version: 1
-      - name: Set signing to manual with Developer ID
-        run: |
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/' Yattee.xcodeproj/project.pbxproj
       - name: Set build number
         run: |
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ env.BUILD_NUMBER }}/' Yattee.xcodeproj/project.pbxproj
