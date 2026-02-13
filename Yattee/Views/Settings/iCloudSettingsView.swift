@@ -50,6 +50,16 @@ struct iCloudSettingsView: View {
 
     var body: some View {
         List {
+            #if DEBUG
+            Section {
+                Label(String(localized: "settings.icloud.dev.title"), systemImage: "hammer.fill")
+                    .foregroundStyle(.orange)
+                    .font(.subheadline)
+            } footer: {
+                Text(String(localized: "settings.icloud.dev.footer"))
+            }
+            #endif
+
             Section {
                 Toggle(isOn: Binding(
                     get: { settingsManager?.iCloudSyncEnabled ?? false },

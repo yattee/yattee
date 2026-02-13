@@ -110,7 +110,18 @@ struct SettingsView: View {
                         NavigationLink {
                             iCloudSettingsView()
                         } label: {
-                            Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
+                            HStack {
+                                Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
+                                #if DEBUG
+                                Spacer()
+                                Text(String(localized: "settings.icloud.dev.badge"))
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(.orange, in: Capsule())
+                                #endif
+                            }
                         }
 
                         NavigationLink {
