@@ -94,6 +94,27 @@ struct ChannelID: Codable, Hashable, Sendable {
     }
 }
 
+extension Channel {
+    /// Returns a copy with `thumbnailURL` filled from cached channel data if currently nil.
+    @MainActor
+    func enrichedThumbnail(using dataManager: DataManager) -> Channel {
+        guard thumbnailURL == nil else { return self }
+        guard let cached = CachedChannelData.load(for: id.channelID, using: dataManager) else {
+            return self
+        }
+        return Channel(
+            id: id,
+            name: name,
+            description: description,
+            subscriberCount: subscriberCount ?? cached.subscriberCount,
+            videoCount: videoCount,
+            thumbnailURL: cached.thumbnailURL,
+            bannerURL: bannerURL ?? cached.bannerURL,
+            isVerified: isVerified
+        )
+    }
+}
+
 extension ChannelID: Identifiable {
     var id: String {
         switch source {

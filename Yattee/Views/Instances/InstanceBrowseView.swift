@@ -67,10 +67,22 @@ struct InstanceBrowseView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
-    /// Auth header for Yattee Server instances
+    /// The first enabled Yattee Server instance (for avatar URLs).
+    private var yatteeServer: Instance? {
+        appEnvironment?.instancesManager.enabledYatteeServerInstances.first
+    }
+    private var yatteeServerURL: URL? { yatteeServer?.url }
+
+    /// Auth header for Yattee Server instances (when browsing a Yattee Server directly)
     private var yatteeServerAuthHeader: String? {
         guard instance.type == .yatteeServer else { return nil }
         return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: instance)
+    }
+
+    /// Auth header for avatar loading (uses Yattee Server for YouTube channel avatars)
+    private var avatarAuthHeader: String? {
+        guard let server = yatteeServer else { return nil }
+        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
     }
 
     enum BrowseTab: String, CaseIterable, Identifiable {
@@ -425,7 +437,7 @@ struct InstanceBrowseView: View {
                         channelID: subscription.id.channelID,
                         name: subscription.name,
                         avatarURL: subscription.thumbnailURL,
-                        serverURL: instance.url,
+                        serverURL: yatteeServerURL,
                         isSelected: selectedFeedChannelID == subscription.id.channelID,
                         avatarSize: 44,
                         onTap: {
@@ -441,7 +453,7 @@ struct InstanceBrowseView: View {
                             )
                         },
                         onUnsubscribe: nil,
-                        authHeader: yatteeServerAuthHeader
+                        authHeader: avatarAuthHeader
                     )
                 }
             }
@@ -929,7 +941,7 @@ struct InstanceBrowseView: View {
                     return
                 }
 
-                feedSubscriptions = subscriptionChannels
+                feedSubscriptions = subscriptionChannels.map { $0.enrichedThumbnail(using: appEnvironment.dataManager) }
                 feedVideos = videos
                 prefetchBranding(for: videos)
             case .playlists:
