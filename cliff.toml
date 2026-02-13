@@ -1,0 +1,46 @@
+# git-cliff configuration for Yattee changelog generation
+# https://git-cliff.org/docs/configuration
+
+[changelog]
+header = ""
+body = """
+{%- if version %}
+## What's Changed
+{%- else %}
+## What's Changed
+{%- endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | split(pat=" ") | slice(start=1) | join(sep=" ") }}
+{% for commit in commits %}
+* {{ commit.message | split(pat="\n") | first }}
+{%- endfor %}
+{% endfor %}
+"""
+trim = true
+
+[git]
+conventional_commits = false
+filter_unconventional = false
+split_commits = false
+sort_commits = "newest"
+
+commit_parsers = [
+    # Skip noise commits
+    { message = "^Bump build number", skip = true },
+    { message = "^Fix build number", skip = true },
+    { message = "^Update localizable", skip = true },
+    { message = "^Fix locales", skip = true },
+    { message = "^Merge pull request", skip = true },
+    { message = "^Update changelog", skip = true },
+    { message = "^Remove excessive logging", skip = true },
+    { message = "^Auto-increment build number", skip = true },
+
+    # Categorize by commit message prefix
+    { message = "^(?i:Add|Show|Persist|Implement)\\b", group = "0 New Features" },
+    { message = "^(?i:Update|Change|Move|Improve)\\b", group = "1 Improvements" },
+    { message = "^(?i:Fix)\\b", group = "2 Bug Fixes" },
+    { message = "^(?i:Refactor)\\b", group = "3 Development" },
+
+    # Catch-all
+    { message = ".*", group = "4 Other" },
+]

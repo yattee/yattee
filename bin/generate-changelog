@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# Generate Changelog
+#
+# Generates CHANGELOG.md from git commits since the last tagged release
+# using git-cliff for deterministic, regex-based commit categorization.
+#
+# Usage:
+#   ./bin/generate-changelog              # Write CHANGELOG.md and open in $EDITOR
+#   ./bin/generate-changelog --dry-run    # Print to stdout only
+#   ./bin/generate-changelog --from TAG   # Use a specific base tag
+#
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+dry_run=false
+from_tag=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        --from)
+            from_tag="$2"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: $0 [--dry-run] [--from TAG]"
+            echo ""
+            echo "  --dry-run    Print to stdout instead of writing file"
+            echo "  --from TAG   Base tag (default: latest tag)"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Determine base tag
+if [[ -z "$from_tag" ]]; then
+    from_tag=$(git tag --sort=-creatordate | head -1)
+    if [[ -z "$from_tag" ]]; then
+        echo "Error: no git tags found" >&2
+        exit 1
+    fi
+fi
+
+# Build git-cliff arguments
+cliff_args=(--config cliff.toml --unreleased "${from_tag}..HEAD")
+
+if "$dry_run"; then
+    git-cliff "${cliff_args[@]}"
+else
+    git-cliff "${cliff_args[@]}" --output CHANGELOG.md
+    count=$(git log "${from_tag}..HEAD" --oneline | wc -l | tr -d ' ')
+    echo "Wrote CHANGELOG.md (${count} commits from ${from_tag}..HEAD)"
+
+    if [[ -n "${EDITOR:-}" ]]; then
+        exec "$EDITOR" CHANGELOG.md
+    fi
+fi
