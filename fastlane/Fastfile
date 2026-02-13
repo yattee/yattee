@@ -38,7 +38,7 @@ end
 add_extra_platforms(platforms: [:tvos])
 
 before_all do
-  update_fastlane
+  # Skipping update_fastlane in CI for stability
 end
 
 desc "Get latest TestFlight build number across all platforms"
@@ -55,7 +55,9 @@ lane :latest_build_number do
   macos_build = latest_testflight_build_number(api_key: api_key, app_identifier: DEVELOPER_APP_IDENTIFIER, platform: "osx")
 
   max_build = [ios_build, tvos_build, macos_build].max
-  File.write("latest_build_number.txt", max_build.to_s)
+  # Write to repo root (Fastfile is in fastlane/ subdir)
+  output_path = File.expand_path("../latest_build_number.txt", __dir__)
+  File.write(output_path, max_build.to_s)
   UI.success("Latest TestFlight build number: #{max_build}")
   max_build
 end
