@@ -63,7 +63,19 @@ struct OnboardingSheetView: View {
         #elseif os(iOS)
         .tabViewStyle(.page(indexDisplayMode: .never))
         #endif
+        #if os(tvOS)
+        .background(Color.black.ignoresSafeArea())
+        .overlay(alignment: .topLeading) {
+            Button(String(localized: "onboarding.skip")) {
+                completeOnboarding()
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .padding(40)
+        }
+        #endif
         .interactiveDismissDisabled()
+        #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(String(localized: "onboarding.skip")) {
@@ -71,6 +83,7 @@ struct OnboardingSheetView: View {
                 }
             }
         }
+        #endif
         .task {
             guard !hasCheckedLegacyData else { return }
             hasCheckedLegacyData = true
