@@ -206,7 +206,9 @@ struct SettingsView: View {
                     }
                 }
             }
+            #if !os(tvOS)
             .navigationTitle(String(localized: "settings.title"))
+            #endif
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif

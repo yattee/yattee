@@ -136,8 +136,8 @@ struct HistoryListView: View {
             }
             #endif
         }
-        .navigationTitle(String(localized: "home.history.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "home.history.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "history.search.placeholder")))
         .toolbar {

@@ -53,8 +53,8 @@ struct MediaSourcesView: View {
                 sourcesList
             }
         }
-        .navigationTitle(String(localized: "sources.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "sources.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
