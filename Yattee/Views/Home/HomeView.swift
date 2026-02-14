@@ -62,13 +62,13 @@ struct HomeView: View {
 
     var body: some View {
         mainContent
+        #if !os(tvOS)
         .navigationTitle(String(localized: "tabs.home"))
         .navigationSubtitleIfAvailable(
             settingsManager?.incognitoModeEnabled == true
                 ? String(localized: "home.incognitoMode.subtitle")
                 : nil
         )
-        #if !os(tvOS)
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {

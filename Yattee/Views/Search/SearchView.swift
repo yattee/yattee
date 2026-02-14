@@ -127,8 +127,8 @@ struct SearchView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle(String(localized: "tabs.search"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "tabs.search"))
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {

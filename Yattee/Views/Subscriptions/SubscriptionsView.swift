@@ -214,8 +214,8 @@ struct SubscriptionsView: View {
                         await feedCache.refresh(using: appEnvironment)
                         LoggingService.shared.info("Pull-to-refresh completed", category: .general)
                     }
-                    .navigationTitle(String(localized: "tabs.subscriptions"))
                     #if !os(tvOS)
+                    .navigationTitle(String(localized: "tabs.subscriptions"))
                     .toolbarTitleDisplayMode(.inlineLarge)
                     #endif
                     .toolbar {

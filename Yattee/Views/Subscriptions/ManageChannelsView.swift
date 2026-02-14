@@ -99,8 +99,8 @@ struct ManageChannelsView: View {
                 viewWidth = newWidth
             }
         }
-        .navigationTitle(String(localized: "subscriptions.channels.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "subscriptions.channels.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "channels.search.placeholder")))
         .toolbar {

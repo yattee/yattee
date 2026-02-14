@@ -137,8 +137,8 @@ struct BookmarksListView: View {
             }
             #endif
         }
-        .navigationTitle(String(localized: "home.bookmarks.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "home.bookmarks.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "bookmarks.search.placeholder")))
         .toolbar {
