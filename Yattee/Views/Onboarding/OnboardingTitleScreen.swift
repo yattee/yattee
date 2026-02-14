@@ -10,6 +10,10 @@ import SwiftUI
 struct OnboardingTitleScreen: View {
     let onContinue: () -> Void
 
+    #if os(tvOS)
+    @FocusState private var continueButtonFocused: Bool
+    #endif
+
     var body: some View {
         GeometryReader { geometry in
             let iconSize = min(max(geometry.size.height * 0.13, 60), 140)
@@ -67,15 +71,26 @@ struct OnboardingTitleScreen: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
+                        #if os(tvOS)
+                        .background(Color.accentColor.opacity(0.2))
+                        #else
                         .background(Color.accentColor)
                         .foregroundStyle(.white)
+                        #endif
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
+                #if os(tvOS)
+                .buttonStyle(.card)
+                .focused($continueButtonFocused)
+                #endif
                 .padding(.horizontal)
                 .padding(.bottom)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
+            #if os(tvOS)
+            .onAppear { continueButtonFocused = true }
+            #endif
         }
     }
 }
