@@ -84,7 +84,8 @@ final class LegacyDataMigrationService {
                 legacyInstanceID: instance.id,
                 instanceType: instanceType,
                 url: url,
-                name: instance.name.isEmpty ? nil : instance.name
+                name: instance.name.isEmpty ? nil : instance.name,
+                proxiesVideos: instance.proxiesVideos
             )
             items.append(item)
         }
@@ -184,7 +185,8 @@ final class LegacyDataMigrationService {
             type: item.instanceType,
             url: item.url,
             name: item.name,
-            isEnabled: true
+            isEnabled: true,
+            proxiesVideos: item.proxiesVideos
         )
 
         // Add to instances manager

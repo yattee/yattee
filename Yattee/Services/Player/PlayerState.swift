@@ -451,6 +451,16 @@ final class PlayerState {
         }
     }
 
+    /// Updates the current stream without changing the video.
+    func updateCurrentStream(_ stream: Stream) {
+        currentStream = stream
+    }
+
+    /// Updates the current audio stream without changing the video.
+    func updateCurrentAudioStream(_ stream: Stream) {
+        currentAudioStream = stream
+    }
+
     /// Whether the playback has failed.
     var isFailed: Bool {
         if case .failed = playbackState { return true }

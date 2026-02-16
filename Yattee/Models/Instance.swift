@@ -73,6 +73,9 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
     /// Whether to allow invalid/self-signed SSL certificates.
     var allowInvalidCertificates: Bool
 
+    /// Whether to route video streams through this instance instead of connecting directly to YouTube CDN.
+    var proxiesVideos: Bool
+
     // MARK: - Initialization
 
     init(
@@ -83,7 +86,8 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         isEnabled: Bool = true,
         dateAdded: Date = Date(),
         apiKey: String? = nil,
-        allowInvalidCertificates: Bool = false
+        allowInvalidCertificates: Bool = false,
+        proxiesVideos: Bool = false
     ) {
         self.id = id
         self.type = type
@@ -93,6 +97,20 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         self.dateAdded = dateAdded
         self.apiKey = apiKey
         self.allowInvalidCertificates = allowInvalidCertificates
+        self.proxiesVideos = proxiesVideos
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        type = try container.decode(InstanceType.self, forKey: .type)
+        url = try container.decode(URL.self, forKey: .url)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        isEnabled = try container.decode(Bool.self, forKey: .isEnabled)
+        dateAdded = try container.decode(Date.self, forKey: .dateAdded)
+        apiKey = try container.decodeIfPresent(String.self, forKey: .apiKey)
+        allowInvalidCertificates = try container.decode(Bool.self, forKey: .allowInvalidCertificates)
+        proxiesVideos = try container.decodeIfPresent(Bool.self, forKey: .proxiesVideos) ?? false
     }
 
     // MARK: - Computed Properties
@@ -147,6 +165,11 @@ extension Instance {
     /// Whether this instance supports the popular videos endpoint.
     var supportsPopular: Bool {
         type == .invidious || type == .yatteeServer
+    }
+
+    /// Whether this instance supports proxying video streams through itself.
+    var supportsVideoProxying: Bool {
+        type == .invidious || type == .piped
     }
 }
 
