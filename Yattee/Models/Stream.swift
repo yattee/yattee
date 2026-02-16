@@ -189,6 +189,32 @@ struct StreamResolution: Codable, Hashable, Sendable, Comparable, CustomStringCo
     }
 }
 
+// MARK: - URL Rewriting
+
+extension Stream {
+    /// Creates a copy of this stream with a different URL.
+    /// Used for proxying streams through an instance.
+    func withURL(_ newURL: URL) -> Stream {
+        Stream(
+            url: newURL,
+            resolution: resolution,
+            format: format,
+            videoCodec: videoCodec,
+            audioCodec: audioCodec,
+            bitrate: bitrate,
+            fileSize: fileSize,
+            isAudioOnly: isAudioOnly,
+            isLive: isLive,
+            mimeType: mimeType,
+            audioLanguage: audioLanguage,
+            audioTrackName: audioTrackName,
+            isOriginalAudio: isOriginalAudio,
+            httpHeaders: httpHeaders,
+            fps: fps
+        )
+    }
+}
+
 // MARK: - Preview Data
 
 extension Stream {

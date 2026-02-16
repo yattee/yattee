@@ -53,6 +53,9 @@ final class PlayerService {
     /// Available streams for the current video.
     private(set) var availableStreams: [Stream] = []
 
+    /// Original (unproxied) streams from the API, used to re-apply proxy when settings change.
+    private var originalStreams: [Stream] = []
+
     /// Available captions for the current video.
     private(set) var availableCaptions: [Caption] = []
 
@@ -186,6 +189,7 @@ final class PlayerService {
 
         // Clear streams
         availableStreams = []
+        originalStreams = []
 
         // Set video in state but keep idle (not loading)
         state.setCurrentVideo(video, stream: nil)
@@ -564,6 +568,7 @@ final class PlayerService {
         state.reset()
         state.clearHistory()
         availableStreams = []
+        originalStreams = []
         availableCaptions = []
         folderFilesCache.removeAll()
         downloadedSubtitlesCache.removeAll()
@@ -1657,7 +1662,48 @@ final class PlayerService {
         // Fetch full video details, streams, captions, and storyboards in a single API call
         // (for Invidious, this is a single request; for other backends, calls are made in parallel)
         let result = try await contentService.videoWithStreamsAndCaptionsAndStoryboards(id: video.id.videoID, instance: instance)
-        return (result.video, result.streams, result.captions, result.storyboards)
+
+        // Store original (unproxied) streams so we can re-apply proxy when settings change
+        self.originalStreams = result.streams
+
+        // Apply proxy URL rewriting for instances that support it
+        let streams = await InvidiousAPI.proxyStreamsIfNeeded(result.streams, instance: instance)
+
+        return (result.video, streams, result.captions, result.storyboards)
+    }
+
+    /// Re-applies proxy URL rewriting to cached streams when instance settings change.
+    /// Uses the stored `originalStreams` to derive the correct URLs without re-fetching from the API.
+    private func reapplyProxyToStreams() async {
+        guard !originalStreams.isEmpty,
+              let video = state.currentVideo,
+              let instance = try? await findInstance(for: video) else { return }
+
+        let newStreams = await InvidiousAPI.proxyStreamsIfNeeded(originalStreams, instance: instance)
+
+        // Update available streams (preserve any downloaded/local file streams)
+        let downloadedStreams = availableStreams.filter { $0.url.isFileURL }
+        availableStreams = downloadedStreams + newStreams
+
+        // Update current stream URL if it changed
+        if let currentStream = state.currentStream,
+           let matchingNew = newStreams.first(where: { $0.resolution == currentStream.resolution && $0.format == currentStream.format }) {
+            if matchingNew.url != currentStream.url {
+                state.updateCurrentStream(matchingNew)
+                LoggingService.shared.logPlayer("Updated current stream URL after proxy setting change")
+            }
+        }
+
+        // Update current audio stream URL if it changed
+        if let currentAudio = state.currentAudioStream,
+           let matchingNew = newStreams.first(where: { $0.resolution == currentAudio.resolution && $0.format == currentAudio.format && $0.isAudioOnly == true }) {
+            if matchingNew.url != currentAudio.url {
+                state.updateCurrentAudioStream(matchingNew)
+                LoggingService.shared.logPlayer("Updated current audio stream URL after proxy setting change")
+            }
+        }
+
+        LoggingService.shared.logPlayer("Re-applied proxy settings: \(newStreams.count) streams updated")
     }
 
     /// Creates a stream for media source videos (WebDAV, SMB, or local folder).
@@ -2029,6 +2075,18 @@ final class PlayerService {
     /// Sets the instances manager for finding instances.
     func setInstancesManager(_ manager: InstancesManager) {
         self.instancesManager = manager
+
+        // Observe instance setting changes (e.g. proxy toggle) to re-apply proxy to cached streams
+        instanceChangeObserver = NotificationCenter.default.addObserver(
+            forName: .instancesDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
+                await self?.reapplyProxyToStreams()
+            }
+        }
     }
 
     /// Sets the media sources manager for WebDAV/SMB/local folder playback.
@@ -2069,6 +2127,9 @@ final class PlayerService {
     ) {
         nowPlayingService.configureRemoteCommands(mode: mode, duration: duration)
     }
+
+    /// Observer for instance setting changes to re-apply proxy to cached streams.
+    private var instanceChangeObserver: NSObjectProtocol?
 
     /// Observer for preset changes to reconfigure system controls.
     private var presetChangeObserver: NSObjectProtocol?

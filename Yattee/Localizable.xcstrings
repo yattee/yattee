@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "-%@" : {
+
+    },
     "%@" : {
 
     },
@@ -94,6 +97,12 @@
           }
         }
       }
+    },
+    "• %@" : {
+
+    },
+    "↑↓ scroll • click to close" : {
+
     },
     "+%lld" : {
 
@@ -420,6 +429,9 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
     "channel.menu.disableNotifications" : {
       "localizations" : {
         "en" : {
@@ -717,6 +729,12 @@
           }
         }
       }
+    },
+    "click to expand" : {
+
+    },
+    "Comments" : {
+
     },
     "comments.disabled" : {
       "comment" : "Shown when comments are disabled for a video",
@@ -1809,6 +1827,9 @@
           }
         }
       }
+    },
+    "Description" : {
+
     },
     "discovery.empty.description" : {
       "comment" : "Description when no network shares are found",
@@ -4456,6 +4477,9 @@
         }
       }
     },
+    "Info" : {
+
+    },
     "Initializing player..." : {
 
     },
@@ -4612,6 +4636,9 @@
           }
         }
       }
+    },
+    "LIVE" : {
+
     },
     "login.email" : {
       "comment" : "Email field label in login form",
@@ -5581,6 +5608,15 @@
           }
         }
       }
+    },
+    "Off" : {
+
+    },
+    "OK" : {
+
+    },
+    "On" : {
+
     },
     "onboarding.cloud.complete.description" : {
       "comment" : "iCloud sync complete description on onboarding",
@@ -7276,6 +7312,9 @@
         }
       }
     },
+    "Quality" : {
+
+    },
     "queue.action.addToQueue" : {
       "comment" : "Add to queue action in action sheet",
       "localizations" : {
@@ -7767,6 +7806,9 @@
         }
       }
     },
+    "Remove" : {
+
+    },
     "resume.action.continueAt %@" : {
       "comment" : "Continue watching action with timestamp",
       "localizations" : {
@@ -7788,6 +7830,15 @@
           }
         }
       }
+    },
+    "Search bookmarks" : {
+
+    },
+    "Search channels" : {
+
+    },
+    "Search history" : {
+
     },
     "search.clearAllRecents" : {
       "comment" : "Button to clear all recent searches, channels, and playlists",
@@ -14598,6 +14649,17 @@
         }
       }
     },
+    "sources.field.proxiesVideos" : {
+      "comment" : "Toggle label for video proxy option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proxy videos"
+          }
+        }
+      }
+    },
     "sources.field.password" : {
       "comment" : "Field label for password",
       "localizations" : {
@@ -14726,6 +14788,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable for servers with self-signed or invalid SSL certificates. Only use for trusted servers."
+          }
+        }
+      }
+    },
+    "sources.footer.proxiesVideos" : {
+      "comment" : "Footer text explaining video proxy option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route video streams through this instance instead of connecting directly. Enable if direct video playback is blocked."
           }
         }
       }
@@ -14902,6 +14975,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import"
+          }
+        }
+      }
+    },
+    "sources.header.proxy" : {
+      "comment" : "Section header for video proxy settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Proxy"
           }
         }
       }

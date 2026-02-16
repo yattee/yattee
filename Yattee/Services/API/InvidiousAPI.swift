@@ -541,6 +541,78 @@ actor InvidiousAPI: InstanceAPI {
     }
 }
 
+// MARK: - Video Proxy
+
+extension InvidiousAPI {
+    /// Rewrites a stream URL to route through the given instance.
+    /// Replaces the scheme, host, and port with the instance's, keeping the original path and query.
+    static func proxiedURL(instance: Instance, originalURL: URL) -> URL {
+        var components = URLComponents(url: originalURL, resolvingAgainstBaseURL: true) ?? URLComponents()
+        let instanceComponents = URLComponents(url: instance.url, resolvingAgainstBaseURL: true)
+        components.scheme = instanceComponents?.scheme ?? "https"
+        components.host = instanceComponents?.host
+        components.port = instanceComponents?.port
+        return components.url ?? originalURL
+    }
+
+    /// Checks if a URL points to a YouTube CDN (googlevideo.com or youtube.com).
+    /// Only these URLs should be proxied — URLs already on the instance should not be.
+    static func isYouTubeCDNURL(_ url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return host.hasSuffix("googlevideo.com") || host.hasSuffix("youtube.com")
+    }
+
+    /// Performs a HEAD request to detect if a URL returns HTTP 403 (Forbidden).
+    /// Used for auto-detecting when ISPs block direct YouTube CDN access.
+    static func isForbidden(_ url: URL) async -> Bool {
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 5
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                return httpResponse.statusCode == 403
+            }
+        } catch {
+            // Network errors are not 403 — don't proxy on timeout or other failures
+        }
+        return false
+    }
+
+    /// Applies proxy URL rewriting to an array of streams if needed.
+    /// - Parameters:
+    ///   - streams: The original streams from the API
+    ///   - instance: The instance to proxy through
+    /// - Returns: Streams with YouTube CDN URLs rewritten to go through the instance
+    static func proxyStreamsIfNeeded(_ streams: [Stream], instance: Instance) async -> [Stream] {
+        guard instance.supportsVideoProxying else { return streams }
+
+        // Find first YouTube CDN URL for 403 detection
+        let firstCDNURL = streams.first(where: { isYouTubeCDNURL($0.url) })?.url
+
+        let shouldProxy: Bool
+        if instance.proxiesVideos {
+            shouldProxy = true
+            LoggingService.shared.info("Proxying streams through \(instance.displayName) (user-enabled)", category: .player)
+        } else if let cdnURL = firstCDNURL, await isForbidden(cdnURL) {
+            shouldProxy = true
+            LoggingService.shared.info("Proxying streams through \(instance.displayName) (auto-detected 403)", category: .player)
+        } else {
+            shouldProxy = false
+        }
+
+        guard shouldProxy else { return streams }
+
+        return streams.map { stream in
+            if isYouTubeCDNURL(stream.url) {
+                return stream.withURL(proxiedURL(instance: instance, originalURL: stream.url))
+            }
+            return stream
+        }
+    }
+}
+
 // MARK: - Redirect Blocker
 
 /// URLSession delegate that prevents automatic redirect following.

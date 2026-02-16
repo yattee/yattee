@@ -34,6 +34,7 @@ private struct EditRemoteServerContent: View {
     @State private var name: String
     @State private var isEnabled: Bool
     @State private var allowInvalidCertificates: Bool
+    @State private var proxiesVideos: Bool
 
     // Yattee Server credentials
     @State private var yatteeServerUsername: String = ""
@@ -68,6 +69,7 @@ private struct EditRemoteServerContent: View {
         _name = State(initialValue: instance.name ?? "")
         _isEnabled = State(initialValue: instance.isEnabled)
         _allowInvalidCertificates = State(initialValue: instance.allowInvalidCertificates)
+        _proxiesVideos = State(initialValue: instance.proxiesVideos)
     }
 
     var body: some View {
@@ -266,6 +268,23 @@ private struct EditRemoteServerContent: View {
                 Text(String(localized: "sources.footer.allowInvalidCertificates"))
             }
 
+            if instance.supportsVideoProxying {
+                Section {
+                    #if os(tvOS)
+                    TVSettingsToggle(
+                        title: String(localized: "sources.field.proxiesVideos"),
+                        isOn: $proxiesVideos
+                    )
+                    #else
+                    Toggle(String(localized: "sources.field.proxiesVideos"), isOn: $proxiesVideos)
+                    #endif
+                } header: {
+                    Text(String(localized: "sources.header.proxy"))
+                } footer: {
+                    Text(String(localized: "sources.footer.proxiesVideos"))
+                }
+            }
+
             Section {
                 Button {
                     testConnection()
@@ -413,6 +432,7 @@ private struct EditRemoteServerContent: View {
         updated.name = name.isEmpty ? nil : name
         updated.isEnabled = isEnabled
         updated.allowInvalidCertificates = allowInvalidCertificates
+        updated.proxiesVideos = proxiesVideos
 
         // Save Yattee Server credentials if provided
         if instance.type == .yatteeServer && !yatteeServerUsername.isEmpty && !yatteeServerPassword.isEmpty {

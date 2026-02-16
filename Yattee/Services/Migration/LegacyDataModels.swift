@@ -99,6 +99,9 @@ struct LegacyImportItem: Identifiable, Sendable {
     /// User-defined name for the instance
     let name: String?
 
+    /// Whether this instance proxies videos
+    var proxiesVideos: Bool = false
+
     /// Whether this item is selected for import
     var isSelected: Bool = true
 
