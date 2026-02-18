@@ -102,7 +102,10 @@ actor PipedAPI: InstanceAPI {
             let endpoint = GenericEndpoint.get("/nextpage/channel/\(id)", query: ["nextpage": continuation])
             let response: PipedNextPageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
             return ChannelVideosPage(
-                videos: response.relatedStreams.map { $0.toVideo(instanceURL: instance.url) },
+                videos: response.relatedStreams.compactMap { item in
+                    if case .video(let video) = item { return video.toVideo(instanceURL: instance.url) }
+                    return nil
+                },
                 continuation: response.nextpage
             )
         } else {
@@ -113,7 +116,10 @@ actor PipedAPI: InstanceAPI {
                 channelTabsCache[id] = tabs
             }
             return ChannelVideosPage(
-                videos: response.relatedStreams?.map { $0.toVideo(instanceURL: instance.url) } ?? [],
+                videos: response.relatedStreams?.compactMap { item in
+                    if case .video(let video) = item { return video.toVideo(instanceURL: instance.url) }
+                    return nil
+                } ?? [],
                 continuation: response.nextpage
             )
         }
@@ -557,7 +563,7 @@ private struct PipedStreamResponse: Decodable, Sendable {
     let livestream: Bool?
     let videoStreams: [PipedVideoStream]?
     let audioStreams: [PipedAudioStream]?
-    let relatedStreams: [PipedVideo]?
+    let relatedStreams: [PipedVideoItem]?
 
     var videoId: String? {
         // Extract from thumbnail URL as fallback
@@ -573,8 +579,13 @@ private struct PipedStreamResponse: Decodable, Sendable {
     }
 
     nonisolated func toVideo(instanceURL: URL, videoId: String? = nil) -> Video {
-        // Convert related streams, limiting to 12
-        let related: [Video]? = relatedStreams?.prefix(12).map { $0.toVideo(instanceURL: instanceURL) }
+        // Convert related streams, skipping malformed items, limiting to 12
+        let related: [Video]? = relatedStreams?.compactMap { item -> Video? in
+            if case .video(let video) = item {
+                return video.toVideo(instanceURL: instanceURL)
+            }
+            return nil
+        }.prefix(12).map { $0 }
 
         let resolvedVideoId = videoId ?? self.videoId ?? ""
         let thumbnails: [Thumbnail] = {
@@ -801,7 +812,7 @@ private struct PipedChannelResponse: Decodable, Sendable {
     let verified: Bool?
     let avatarUrl: String?
     let bannerUrl: String?
-    let relatedStreams: [PipedVideo]?
+    let relatedStreams: [PipedVideoItem]?
     let nextpage: String?
     let tabs: [PipedChannelTab]?
 
@@ -828,7 +839,7 @@ private struct PipedChannelTab: Decodable, Sendable {
 
 /// Response from `/nextpage/channel/{id}?nextpage=...` for paginated channel videos.
 private struct PipedNextPageResponse: Decodable, Sendable {
-    let relatedStreams: [PipedVideo]
+    let relatedStreams: [PipedVideoItem]
     let nextpage: String?
 }
 
@@ -917,8 +928,8 @@ private struct PipedTabPage {
     let continuation: String?
 }
 
-/// Item within a Piped playlist - gracefully handles malformed items.
-private enum PipedPlaylistItem: Decodable, Sendable {
+/// Wrapper for PipedVideo that gracefully handles malformed items.
+private enum PipedVideoItem: Decodable, Sendable {
     case video(PipedVideo)
     case unknown
 
@@ -938,7 +949,7 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
     let uploaderUrl: String?
     let uploaderAvatar: String?
     let videos: Int?
-    let relatedStreams: [PipedPlaylistItem]?
+    let relatedStreams: [PipedVideoItem]?
     let thumbnailUrl: String?
     let nextpage: String?
 
@@ -971,7 +982,7 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
 
 /// Response from `/nextpage/playlists/{id}?nextpage=...` for paginated playlist videos.
 private struct PipedPlaylistNextPageResponse: Decodable, Sendable {
-    let relatedStreams: [PipedPlaylistItem]?
+    let relatedStreams: [PipedVideoItem]?
     let nextpage: String?
 }
 
