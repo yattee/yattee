@@ -254,16 +254,19 @@ actor ContentService: ContentServiceProtocol {
         if instance.type == .yatteeServer {
             return try await yatteeServerAPI(for: instance).proxyStreams(videoID: videoID, instance: instance)
         }
-        return try await streams(videoID: videoID, instance: instance)
+        let fetchedStreams = try await streams(videoID: videoID, instance: instance)
+        return await InvidiousAPI.proxyStreamsIfNeeded(fetchedStreams, instance: instance)
     }
 
     /// Fetches video details, proxy streams, captions, and storyboards (Yattee Server only).
-    /// For other backends, falls back to regular streams.
+    /// For other backends, applies Invidious proxy rewriting if enabled.
     func videoWithProxyStreamsAndCaptionsAndStoryboards(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
         if instance.type == .yatteeServer {
             return try await yatteeServerAPI(for: instance).videoWithProxyStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
         }
-        return try await videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
+        var result = try await videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
+        result.streams = await InvidiousAPI.proxyStreamsIfNeeded(result.streams, instance: instance)
+        return result
     }
 
     /// Fetches video details, streams, and captions in a single API call (Invidious and Yattee Server).
