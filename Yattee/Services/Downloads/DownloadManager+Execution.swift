@@ -99,10 +99,41 @@ extension DownloadManager {
         resumeData: Data?,
         httpHeaders: [String: String]? = nil
     ) {
+        guard urlSession != nil else {
+            LoggingService.shared.logDownloadError(
+                "[Downloads] URLSession is nil in startStreamDownload (\(phase))",
+                error: DownloadError.downloadFailed("URLSession not available - session may be invalidated")
+            )
+            handleDownloadError(
+                downloadID: downloadID,
+                phase: phase,
+                error: DownloadError.downloadFailed("URLSession not available")
+            )
+            return
+        }
+
         let task: URLSessionDownloadTask
 
         if let resumeData {
-            task = urlSession.downloadTask(withResumeData: resumeData)
+            var caughtException: NSException?
+            var resumeTask: URLSessionDownloadTask?
+            let success = tryCatchObjCException({
+                resumeTask = self.urlSession.downloadTask(withResumeData: resumeData)
+            }, &caughtException)
+
+            guard success, let resumeTask else {
+                LoggingService.shared.logDownloadError(
+                    "[Downloads] NSException creating resume task (\(phase))",
+                    error: DownloadError.downloadFailed("CFNetwork exception: \(caughtException?.reason ?? "unknown")")
+                )
+                handleDownloadError(
+                    downloadID: downloadID,
+                    phase: phase,
+                    error: DownloadError.downloadFailed("Failed to create download task: \(caughtException?.reason ?? "unknown")")
+                )
+                return
+            }
+            task = resumeTask
         } else {
             // Starting fresh without resumeData - reset progress for this phase
             // to avoid jumping when saved progress conflicts with new URLSession progress
@@ -128,7 +159,26 @@ extension DownloadManager {
                     request.setValue(value, forHTTPHeaderField: key)
                 }
             }
-            task = urlSession.downloadTask(with: request)
+
+            var caughtException: NSException?
+            var newTask: URLSessionDownloadTask?
+            let success = tryCatchObjCException({
+                newTask = self.urlSession.downloadTask(with: request)
+            }, &caughtException)
+
+            guard success, let newTask else {
+                LoggingService.shared.logDownloadError(
+                    "[Downloads] NSException creating download task (\(phase))",
+                    error: DownloadError.downloadFailed("CFNetwork exception: \(caughtException?.reason ?? "unknown")")
+                )
+                handleDownloadError(
+                    downloadID: downloadID,
+                    phase: phase,
+                    error: DownloadError.downloadFailed("Failed to create download task: \(caughtException?.reason ?? "unknown")")
+                )
+                return
+            }
+            task = newTask
         }
 
         task.taskDescription = "\(downloadID.uuidString):\(phase.rawValue)"

@@ -148,8 +148,9 @@ final class DownloadManager: NSObject {
         self.downloadSettings = settings
         // Invalidate old session before creating new one with correct settings
         urlSession?.invalidateAndCancel()
+        urlSession = nil
         setupSession()
-        
+
         // Resume interrupted downloads only on initial setup
         if isInitialSetup {
             resumeInterruptedDownloads()
@@ -186,8 +187,9 @@ final class DownloadManager: NSObject {
             }
         }
 
-        // 3. Invalidate the old session
-        urlSession.invalidateAndCancel()
+        // 3. Invalidate the old session (use finishTasksAndInvalidate since downloads are already paused)
+        urlSession?.finishTasksAndInvalidate()
+        urlSession = nil
 
         // 4. Create new session with updated cellular config
         setupSession()
