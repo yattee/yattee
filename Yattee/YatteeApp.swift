@@ -50,6 +50,10 @@ struct YatteeApp: App {
     init() {
         // Configure Nuke image loading pipeline
         ImageLoadingService.shared.configure()
+
+        // Register background tasks early — Apple requires BGTaskScheduler.register()
+        // to be called during the app launch sequence, before the run loop starts.
+        appEnvironment.backgroundRefreshManager.registerBackgroundTasks()
     }
 
     var body: some Scene {
@@ -252,9 +256,6 @@ struct YatteeApp: App {
     private func registerBackgroundTasksIfNeeded() {
         guard !backgroundTasksRegistered else { return }
         backgroundTasksRegistered = true
-
-        // Register background tasks
-        appEnvironment.backgroundRefreshManager.registerBackgroundTasks()
 
         // If notifications are enabled, schedule the first refresh
         #if os(iOS)
