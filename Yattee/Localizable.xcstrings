@@ -10953,6 +10953,7 @@
       }
     },
     "settings.icloud.dev.badge" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10963,6 +10964,7 @@
       }
     },
     "settings.icloud.dev.footer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10973,6 +10975,7 @@
       }
     },
     "settings.icloud.dev.title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14649,17 +14652,6 @@
         }
       }
     },
-    "sources.field.proxiesVideos" : {
-      "comment" : "Toggle label for video proxy option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Proxy videos"
-          }
-        }
-      }
-    },
     "sources.field.password" : {
       "comment" : "Field label for password",
       "localizations" : {
@@ -14700,6 +14692,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Password (required)"
+          }
+        }
+      }
+    },
+    "sources.field.proxiesVideos" : {
+      "comment" : "Toggle label for video proxy option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proxy videos"
           }
         }
       }
@@ -14792,17 +14795,6 @@
         }
       }
     },
-    "sources.footer.proxiesVideos" : {
-      "comment" : "Footer text explaining video proxy option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Route video streams through this instance instead of connecting directly. Enable if direct video playback is blocked."
-          }
-        }
-      }
-    },
     "sources.footer.auth" : {
       "comment" : "Footer text for authentication section",
       "localizations" : {
@@ -14843,6 +14835,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select a folder from Files app to add to your sources."
+          }
+        }
+      }
+    },
+    "sources.footer.proxiesVideos" : {
+      "comment" : "Footer text explaining video proxy option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route video streams through this instance instead of connecting directly. Enable if direct video playback is blocked."
           }
         }
       }
