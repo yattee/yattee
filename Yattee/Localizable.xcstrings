@@ -4,9 +4,6 @@
     "" : {
 
     },
-    "-%@" : {
-
-    },
     "%@" : {
 
     },
@@ -97,12 +94,6 @@
           }
         }
       }
-    },
-    "• %@" : {
-
-    },
-    "↑↓ scroll • click to close" : {
-
     },
     "+%lld" : {
 
@@ -429,9 +420,6 @@
         }
       }
     },
-    "Cancel" : {
-
-    },
     "channel.menu.disableNotifications" : {
       "localizations" : {
         "en" : {
@@ -729,12 +717,6 @@
           }
         }
       }
-    },
-    "click to expand" : {
-
-    },
-    "Comments" : {
-
     },
     "comments.disabled" : {
       "comment" : "Shown when comments are disabled for a video",
@@ -1091,6 +1073,16 @@
         }
       }
     },
+    "common.off" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
     "common.ok" : {
       "comment" : "OK button",
       "localizations" : {
@@ -1098,6 +1090,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "common.on" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
           }
         }
       }
@@ -1128,6 +1130,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refresh"
+          }
+        }
+      }
+    },
+    "common.remove" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
           }
         }
       }
@@ -1827,9 +1839,6 @@
           }
         }
       }
-    },
-    "Description" : {
-
     },
     "discovery.empty.description" : {
       "comment" : "Description when no network shares are found",
@@ -4477,9 +4486,6 @@
         }
       }
     },
-    "Info" : {
-
-    },
     "Initializing player..." : {
 
     },
@@ -4636,9 +4642,6 @@
           }
         }
       }
-    },
-    "LIVE" : {
-
     },
     "login.email" : {
       "comment" : "Email field label in login form",
@@ -5609,15 +5612,6 @@
         }
       }
     },
-    "Off" : {
-
-    },
-    "OK" : {
-
-    },
-    "On" : {
-
-    },
     "onboarding.cloud.complete.description" : {
       "comment" : "iCloud sync complete description on onboarding",
       "localizations" : {
@@ -6503,6 +6497,26 @@
         }
       }
     },
+    "player.controls.info" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "player.controls.quality" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality"
+          }
+        }
+      }
+    },
     "player.controls.subtitles" : {
       "localizations" : {
         "en" : {
@@ -6594,6 +6608,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Description"
+          }
+        }
+      }
+    },
+    "player.description.clickToExpand" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "click to expand"
+          }
+        }
+      }
+    },
+    "player.description.scrollToClose" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "↑↓ scroll • click to close"
           }
         }
       }
@@ -6947,6 +6981,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Try %@"
+          }
+        }
+      }
+    },
+    "player.tab.comments" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
+    "player.tab.info" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
           }
         }
       }
@@ -7311,9 +7365,6 @@
           }
         }
       }
-    },
-    "Quality" : {
-
     },
     "queue.action.addToQueue" : {
       "comment" : "Add to queue action in action sheet",
@@ -7806,9 +7857,6 @@
         }
       }
     },
-    "Remove" : {
-
-    },
     "resume.action.continueAt %@" : {
       "comment" : "Continue watching action with timestamp",
       "localizations" : {
@@ -7831,14 +7879,25 @@
         }
       }
     },
-    "Search bookmarks" : {
-
+    "search.bookmarks.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search bookmarks"
+          }
+        }
+      }
     },
-    "Search channels" : {
-
-    },
-    "Search history" : {
-
+    "search.channels.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search channels"
+          }
+        }
+      }
     },
     "search.clearAllRecents" : {
       "comment" : "Button to clear all recent searches, channels, and playlists",
@@ -8062,6 +8121,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search"
+          }
+        }
+      }
+    },
+    "search.history.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search history"
           }
         }
       }

@@ -88,7 +88,7 @@ struct BookmarksListView: View {
             VStack(spacing: 0) {
                 // tvOS: Inline search field and action button for better focus navigation
                 HStack(spacing: 24) {
-                    TextField("Search bookmarks", text: $searchText)
+                    TextField("search.bookmarks.placeholder", text: $searchText)
                         .textFieldStyle(.plain)
 
                     Button {

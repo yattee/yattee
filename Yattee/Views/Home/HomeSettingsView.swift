@@ -739,7 +739,7 @@ private struct TVHomeItemRow: View {
                 .buttonStyle(TVCompactButtonStyle())
                 .alert(String(localized: "home.removeConfirmation.title"), isPresented: $showingDeleteConfirmation) {
                     Button(String(localized: "common.cancel"), role: .cancel) { }
-                    Button("Remove", role: .destructive) {
+                    Button("common.remove", role: .destructive) {
                         onDelete?()
                     }
                 }

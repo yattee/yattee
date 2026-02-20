@@ -219,7 +219,7 @@ struct TVPlayerControlsView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 28))
-                    Text("Quality")
+                    Text("player.controls.quality")
                         .font(.caption)
                 }
             }
@@ -261,7 +261,7 @@ struct TVPlayerControlsView: View {
                 VStack(spacing: 6) {
                     Image(systemName: "info.circle")
                         .font(.system(size: 28))
-                    Text("Info")
+                    Text("player.controls.info")
                         .font(.caption)
                 }
             }

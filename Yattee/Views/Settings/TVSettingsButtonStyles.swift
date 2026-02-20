@@ -75,10 +75,10 @@ struct TVSettingsTextField: View {
             } else {
                 TextField(title, text: $editText)
             }
-            Button("OK") {
+            Button("common.ok") {
                 text = editText
             }
-            Button("Cancel", role: .cancel) { }
+            Button("common.cancel", role: .cancel) { }
         }
     }
 }
@@ -136,7 +136,7 @@ struct TVSettingsToggle: View {
             HStack {
                 Text(title)
                 Spacer()
-                Text(isOn ? "On" : "Off")
+                Text(isOn ? "common.on" : "common.off")
                     .foregroundStyle(.secondary)
             }
         }

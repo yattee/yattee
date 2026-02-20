@@ -85,7 +85,7 @@ struct HistoryListView: View {
             VStack(spacing: 0) {
                 // tvOS: Inline search field and action button for better focus navigation
                 HStack(spacing: 24) {
-                    TextField("Search history", text: $searchText)
+                    TextField("search.history.placeholder", text: $searchText)
                         .textFieldStyle(.plain)
 
                     Button {
