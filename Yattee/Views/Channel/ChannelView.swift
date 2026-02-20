@@ -381,10 +381,17 @@ struct ChannelView: View {
                     header(name: cached.name, thumbnailURL: cached.thumbnailURL, bannerURL: cached.bannerURL)
                         .id("channelTop")
 
-                    // Centered spinner for content area
+                    // Show tab picker during loading (doesn't depend on channel)
+                    if supportsChannelTabs {
+                        contentTypePicker
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                    }
+
+                    // Centered spinner for content area below tabs
                     ProgressView()
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 60)
+                        .padding(.top, 40)
                 }
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
@@ -418,11 +425,56 @@ struct ChannelView: View {
                 }
                 .opacity(collapsedTitleOpacity)
             }
+
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
+                .liquidGlassTransitionSource(id: "channelViewOptions", in: sheetTransition)
+            }
+
+            #if !os(tvOS)
+            if #available(iOS 26, macOS 26, *) {
+                ToolbarSpacer(.fixed, placement: .primaryAction)
+            }
+            #endif
+
+            ToolbarItem(placement: .primaryAction) {
+                channelMenu
+            }
         }
+        .sheet(isPresented: $showViewOptions) {
+            ViewOptionsSheet(
+                layout: $layout,
+                rowStyle: $rowStyle,
+                gridColumns: $gridColumns,
+                hideWatched: $hideWatched,
+                maxGridColumns: gridConfig.maxColumns
+            )
+            .liquidGlassSheetContent(sourceID: "channelViewOptions", in: sheetTransition)
+        }
+        #if os(iOS)
+        .toolbarBackground(collapseProgress > 0.8 ? .visible : .hidden, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .modifier(ChannelScrollOffsetModifier(
             scrollOffset: $scrollOffset,
             isPlayerExpanded: appEnvironment?.navigationCoordinator.isPlayerExpanded ?? false
         ))
+        .confirmationDialog(
+            String(localized: "channel.unsubscribe.confirmation.title"),
+            isPresented: $showingUnsubscribeConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "channel.unsubscribe.confirmation.action"), role: .destructive) {
+                unsubscribe()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "channel.unsubscribe.confirmation.message"))
+        }
     }
 
     // MARK: - Header
