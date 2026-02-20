@@ -41,9 +41,9 @@ struct TVDetailsPanel: View {
             // Tab picker (hidden when description scroll is locked)
             if !isDescriptionScrollLocked {
                 Picker("", selection: $selectedTab) {
-                    Text("Info").tag(TVDetailsTab.info)
+                    Text("player.tab.info").tag(TVDetailsTab.info)
                     if video?.supportsComments == true {
-                        Text("Comments").tag(TVDetailsTab.comments)
+                        Text("player.tab.comments").tag(TVDetailsTab.comments)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -258,7 +258,7 @@ struct TVDetailsPanel: View {
 
             // Live indicator
             if video?.isLive == true {
-                Label("LIVE", systemImage: "dot.radiowaves.left.and.right")
+                Label("player.live", systemImage: "dot.radiowaves.left.and.right")
                     .foregroundStyle(.red)
             }
         }
@@ -379,14 +379,14 @@ struct TVScrollableDescription: View {
     private var descriptionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Description")
+                Text("player.description")
                     .font(.headline)
                     .foregroundStyle(.white.opacity(0.7))
 
                 Spacer()
 
                 if isFocused {
-                    Text(isScrollLocked ? "↑↓ scroll • click to close" : "click to expand")
+                    Text(isScrollLocked ? "player.description.scrollToClose" : "player.description.clickToExpand")
                         .font(.callout)
                         .foregroundStyle(.white.opacity(0.5))
                 }
