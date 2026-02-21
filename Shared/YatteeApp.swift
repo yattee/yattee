@@ -37,6 +37,8 @@ struct YatteeApp: App {
     #elseif os(iOS)
         @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
         @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #elseif os(tvOS)
+        @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #endif
 
     @State private var configured = false
@@ -86,12 +88,10 @@ struct YatteeApp: App {
             #if os(iOS)
             .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
             #endif
-            #if !os(tvOS)
             .onOpenURL { url in
                 URLBookmarkModel.shared.saveBookmark(url)
                 OpenURLHandler(navigationStyle: navigationStyle).handle(url)
             }
-            #endif
         }
         #if os(iOS)
         .handlesExternalEvents(matching: Set(["*"]))

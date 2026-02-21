@@ -43,6 +43,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		01DEEPLNK553TVOS0001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DEEPLNK553TVOS0002 /* AppDelegate.swift */; };
 		1B81344D4D2A0B0363850A9E /* FeatureFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D886FD1371688A42060DF82 /* FeatureFlags.swift */; };
 		2446210B2B03C320154634A5 /* FeatureFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D886FD1371688A42060DF82 /* FeatureFlags.swift */; };
 		3528A0FEB2B02A52B715041C /* FeatureFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D886FD1371688A42060DF82 /* FeatureFlags.swift */; };
@@ -1165,6 +1166,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01DEEPLNK553TVOS0002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3700155A271B0D4D0049C794 /* PipedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipedAPI.swift; sourceTree = "<group>"; };
 		3700155E271B12DD0049C794 /* SiestaConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiestaConfiguration.swift; sourceTree = "<group>"; };
 		37001562271B1F250049C794 /* AccountsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsModel.swift; sourceTree = "<group>"; };
@@ -2379,6 +2381,7 @@
 		37D4B159267164AE00C925CA /* tvOS */ = {
 			isa = PBXGroup;
 			children = (
+				01DEEPLNK553TVOS0002 /* AppDelegate.swift */,
 				37D6025C28C17719009E8D98 /* ControlsOverlayButton.swift */,
 				3730D89F2712E2B70020ED53 /* NowPlayingView.swift */,
 				37BAB54B269B39FD00E75ED1 /* TVNavigationView.swift */,
@@ -3801,6 +3804,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01DEEPLNK553TVOS0001 /* AppDelegate.swift in Sources */,
 				37579D5F27864F5F00FD0B98 /* Help.swift in Sources */,
 				370015AB28BBAE7F000149FD /* ProgressBar.swift in Sources */,
 				375EC95F289EEEE000751258 /* QualityProfile.swift in Sources */,
