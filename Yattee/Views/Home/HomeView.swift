@@ -134,6 +134,16 @@ struct HomeView: View {
                 loadData()
             }
         }
+        .onChange(of: appEnvironment?.navigationCoordinator.selectedTab) { _, newTab in
+            if newTab == .home {
+                loadData()
+            }
+        }
+        .onChange(of: showingCustomizeHome) { _, isShowing in
+            if !isShowing {
+                loadData()
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .bookmarksDidChange)) { _ in
             loadBookmarksData()
         }

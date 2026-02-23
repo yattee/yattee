@@ -23,6 +23,7 @@ extension DataManager {
             let existing = try modelContext.fetch(descriptor)
             if let existingEntry = existing.first {
                 existingEntry.updateProgress(seconds: seconds, duration: duration)
+                save()
             } else {
                 let newEntry = WatchEntry.from(video: video)
                 newEntry.watchedSeconds = seconds
@@ -30,8 +31,10 @@ extension DataManager {
                     newEntry.duration = duration
                 }
                 modelContext.insert(newEntry)
+                save()
+                // Notify HomeView when a new entry is inserted (not on every progress update)
+                NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
             }
-            save()
             // Note: No CloudKit queueing - use updateWatchProgress() when sync is needed
         } catch {
             LoggingService.shared.logCloudKitError("Failed to update watch progress locally", error: error)
