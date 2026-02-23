@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.scenePhase) private var scenePhase
     @Namespace private var sheetTransition
     @State private var playlists: [LocalPlaylist] = []
     @State private var bookmarksCount: Int = 0
@@ -116,6 +117,11 @@ struct HomeView: View {
         #endif
         .onAppear {
             loadData()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                loadData()
+            }
         }
         .task {
             await feedCache.loadFromDiskIfNeeded()
