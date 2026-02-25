@@ -117,12 +117,14 @@ struct PeerTubeInstancesExploreView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if displayedInstances.isEmpty {
             ContentUnavailableView {
                 Label(String(localized: "peertube.explore.noResults"), systemImage: "magnifyingglass")
             } description: {
                 Text(String(localized: "peertube.explore.noResults.description"))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             instancesList
         }

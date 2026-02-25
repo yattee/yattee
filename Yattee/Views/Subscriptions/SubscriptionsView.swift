@@ -423,7 +423,7 @@ struct SubscriptionsView: View {
                 } description: {
                     Text(String(localized: "subscriptions.noVideosFromChannel.description"))
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 40)
             } else {
                 ForEach(Array(filteredVideos.enumerated()), id: \.element.id) { index, video in
@@ -596,7 +596,7 @@ struct SubscriptionsView: View {
             } description: {
                 Text(String(localized: "subscriptions.noVideosFromChannel.description"))
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         } else {
             VideoGridContent(columns: gridConfig.effectiveColumns) {
@@ -691,7 +691,7 @@ struct SubscriptionsView: View {
         } description: {
             Text(String(localized: "subscriptions.empty.description"))
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 40)
     }
 
@@ -702,7 +702,7 @@ struct SubscriptionsView: View {
         } description: {
             Text(String(localized: "subscriptions.yatteeServerRequired.description"))
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 40)
     }
 
@@ -713,7 +713,7 @@ struct SubscriptionsView: View {
         } description: {
             Text(String(localized: "subscriptions.notAuthenticated.description"))
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 40)
     }
 
@@ -727,7 +727,7 @@ struct SubscriptionsView: View {
                 Task { await loadFeed(forceRefresh: true) }
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 40)
     }
 

@@ -657,6 +657,7 @@ struct SearchView: View {
         } description: {
             Text(String(localized: "search.noResults.description"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier("search.noResults")
     }
 
@@ -670,6 +671,7 @@ struct SearchView: View {
                 Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     /// Queue source for search results

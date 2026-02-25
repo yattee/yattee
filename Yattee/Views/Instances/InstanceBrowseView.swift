@@ -590,6 +590,7 @@ struct InstanceBrowseView: View {
         } description: {
             Text(String(localized: "playlists.empty.description"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Empty View
@@ -600,6 +601,7 @@ struct InstanceBrowseView: View {
         } description: {
             Text(String(localized: "instance.browse.noVideos"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Error View
@@ -615,6 +617,7 @@ struct InstanceBrowseView: View {
             }
             .buttonStyle(.bordered)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Search Results
@@ -778,6 +781,7 @@ struct InstanceBrowseView: View {
         } description: {
             Text(String(localized: "search.hint.description"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     @ViewBuilder
@@ -815,6 +819,7 @@ struct InstanceBrowseView: View {
         } description: {
             Text(String(localized: "search.noResults.description"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func searchErrorView(_ error: String) -> some View {
@@ -828,6 +833,7 @@ struct InstanceBrowseView: View {
             }
             .buttonStyle(.bordered)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Data Loading

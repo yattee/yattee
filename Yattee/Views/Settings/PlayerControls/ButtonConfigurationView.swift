@@ -72,6 +72,7 @@ struct ButtonConfigurationView: View {
                 String(localized: "settings.playerControls.buttonNotFound"),
                 systemImage: "exclamationmark.triangle"
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

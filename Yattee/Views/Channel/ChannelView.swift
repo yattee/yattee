@@ -841,6 +841,7 @@ struct ChannelView: View {
                 ContentUnavailableView {
                     Label(String(localized: "channel.noDescription"), systemImage: "text.alignleft")
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 40)
             }
         }
@@ -869,6 +870,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noVideos"), systemImage: "play.rectangle")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         } else if !filteredVideos.isEmpty {
             VideoListContent(listStyle: listStyle) {
@@ -965,6 +967,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noVideos"), systemImage: "play.rectangle")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         }
 
@@ -1006,6 +1009,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noPlaylists"), systemImage: "list.bullet.rectangle")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         } else if !playlists.isEmpty {
             VideoListContent(listStyle: listStyle) {
@@ -1068,6 +1072,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noPlaylists"), systemImage: "list.bullet.rectangle")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         }
 
@@ -1110,6 +1115,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noShorts"), systemImage: "bolt")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         } else if !filteredShorts.isEmpty {
             VideoListContent(listStyle: listStyle) {
@@ -1186,6 +1192,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noShorts"), systemImage: "bolt")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         }
 
@@ -1228,6 +1235,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noStreams"), systemImage: "video")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         } else if !filteredStreams.isEmpty {
             VideoListContent(listStyle: listStyle) {
@@ -1304,6 +1312,7 @@ struct ChannelView: View {
             ContentUnavailableView {
                 Label(String(localized: "channel.noStreams"), systemImage: "video")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.vertical, 40)
         }
 
@@ -1329,6 +1338,7 @@ struct ChannelView: View {
                 .padding(.vertical, 40)
         } else if searchResults.items.isEmpty {
             ContentUnavailableView.search(text: searchText)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 40)
         } else {
             switch layout {
@@ -1519,6 +1529,7 @@ struct ChannelView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Helpers

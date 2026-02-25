@@ -182,6 +182,7 @@ struct ManageChannelNotificationsView: View {
                 } description: {
                     Text(errorMessage)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if subscriptions.isEmpty {
                 ContentUnavailableView {
                     Label(
@@ -191,6 +192,7 @@ struct ManageChannelNotificationsView: View {
                 } description: {
                     Text(String(localized: "settings.notifications.noSubscriptions.description"))
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ForEach(subscriptions, id: \.channelID) { subscription in
                     ChannelNotificationToggle(subscription: subscription)

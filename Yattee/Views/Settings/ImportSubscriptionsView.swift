@@ -109,6 +109,7 @@ struct ImportSubscriptionsView: View {
             }
             .buttonStyle(.bordered)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.errorMessage)
     }
 
@@ -118,6 +119,7 @@ struct ImportSubscriptionsView: View {
             systemImage: "person.2.slash",
             description: Text(String(localized: "import.subscriptions.emptyDescription"))
         )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.emptyState)
     }
 

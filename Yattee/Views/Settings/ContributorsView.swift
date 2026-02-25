@@ -47,6 +47,7 @@ struct ContributorsView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             contributorsList
         }

@@ -49,6 +49,7 @@ struct MediaSourcesView: View {
                     }
                     .buttonStyle(.borderedProminent)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 sourcesList
             }

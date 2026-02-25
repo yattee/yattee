@@ -76,6 +76,7 @@ struct PlaylistsListView: View {
             }
             .buttonStyle(.borderedProminent)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - List Content

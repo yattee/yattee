@@ -38,6 +38,7 @@ struct LegacyDataImportView: View {
                     systemImage: "doc.questionmark",
                     description: Text(String(localized: "migration.noDataFoundDescription"))
                 )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 importContent
             }
