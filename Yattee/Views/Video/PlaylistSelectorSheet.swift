@@ -74,6 +74,7 @@ struct PlaylistSelectorSheet: View {
                             } description: {
                                 Text(String(localized: "playlist.empty.description"))
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                     }
                 }

@@ -283,6 +283,7 @@ struct MiniPlayerButtonConfigurationView: View {
                 String(localized: "settings.playerControls.buttonNotFound"),
                 systemImage: "exclamationmark.triangle"
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

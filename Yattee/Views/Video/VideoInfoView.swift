@@ -532,6 +532,7 @@ struct VideoInfoView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Header Section

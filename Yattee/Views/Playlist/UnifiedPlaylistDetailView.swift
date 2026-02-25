@@ -136,6 +136,7 @@ struct UnifiedPlaylistDetailView: View {
                     systemImage: "list.bullet.rectangle",
                     description: Text(String(localized: "playlist.notFound.description"))
                 )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .navigationTitle(title.isEmpty ? String(localized: "playlist.title") : title)
@@ -507,6 +508,7 @@ struct UnifiedPlaylistDetailView: View {
         } description: {
             Text(String(localized: "playlist.empty.description"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, 40)
     }
 
@@ -547,6 +549,7 @@ struct UnifiedPlaylistDetailView: View {
             }
             .buttonStyle(.bordered)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Data Loading

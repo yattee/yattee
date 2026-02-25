@@ -180,12 +180,14 @@ struct BookmarksListView: View {
     private var emptyView: some View {
         if !searchText.isEmpty {
             ContentUnavailableView.search(text: searchText)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             ContentUnavailableView {
                 Label(String(localized: "home.bookmarks.title"), systemImage: "bookmark")
             } description: {
                 Text(String(localized: "home.bookmarks.empty"))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

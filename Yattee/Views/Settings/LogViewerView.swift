@@ -109,6 +109,7 @@ struct LogViewerView: View {
                         Text(String(localized: "settings.advanced.logs.disabled"))
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(loggingService.filteredEntries) { entry in
                     LogEntryRow(entry: entry)

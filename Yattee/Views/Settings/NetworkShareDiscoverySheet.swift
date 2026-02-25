@@ -81,6 +81,7 @@ struct NetworkShareDiscoverySheet: View {
                                 service.startDiscovery()
                             }
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 } else {
                     // Group shares by type
@@ -124,6 +125,7 @@ struct NetworkShareDiscoverySheet: View {
             } description: {
                 Text(String(localized: "discovery.unavailable.description"))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

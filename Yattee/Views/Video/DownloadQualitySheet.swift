@@ -415,6 +415,7 @@ struct DownloadQualitySheet: View {
             } description: {
                 Text(String(localized: "download.noStreams.description"))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(spacing: 0) {
                 ForEach(Array(videoStreams.enumerated()), id: \.element.url) { index, stream in
@@ -448,6 +449,7 @@ struct DownloadQualitySheet: View {
             ContentUnavailableView {
                 Label(String(localized: "download.noAudio.title"), systemImage: "speaker.slash")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(spacing: 0) {
                 ForEach(Array(audioStreams.enumerated()), id: \.element.url) { index, stream in

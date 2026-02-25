@@ -30,6 +30,7 @@ struct TranslationContributorsView: View {
             ContentUnavailableView {
                 Label(String(localized: "settings.translators.empty"), systemImage: "globe")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             contributorsList
         }

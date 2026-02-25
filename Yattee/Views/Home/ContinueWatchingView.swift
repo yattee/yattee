@@ -108,6 +108,7 @@ struct ContinueWatchingView: View {
         } description: {
             Text(String(localized: "home.continueWatching.empty"))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var listContent: some View {

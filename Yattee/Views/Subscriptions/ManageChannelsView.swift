@@ -91,6 +91,7 @@ struct ManageChannelsView: View {
                     } description: {
                         Text(String(localized: "subscriptions.channels.empty"))
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     channelsView
                 }
@@ -232,6 +233,7 @@ struct ManageChannelsView: View {
             Group {
                 if filteredChannels.isEmpty {
                     ContentUnavailableView.search(text: searchText)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     switch layout {
                     case .list:
@@ -247,6 +249,7 @@ struct ManageChannelsView: View {
         Group {
             if filteredChannels.isEmpty {
                 ContentUnavailableView.search(text: searchText)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 switch layout {
                 case .list:

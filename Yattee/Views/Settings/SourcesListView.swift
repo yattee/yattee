@@ -90,6 +90,7 @@ struct SourcesListView: View {
             }
             .buttonStyle(.borderedProminent)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier("sources.view")
     }
 

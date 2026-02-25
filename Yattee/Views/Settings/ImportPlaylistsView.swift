@@ -138,6 +138,7 @@ struct ImportPlaylistsView: View {
             }
             .buttonStyle(.bordered)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.errorMessage)
     }
 
@@ -147,6 +148,7 @@ struct ImportPlaylistsView: View {
             systemImage: "list.bullet.rectangle",
             description: Text(String(localized: "import.playlists.emptyDescription"))
         )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.emptyState)
     }
 

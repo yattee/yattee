@@ -206,12 +206,14 @@ struct HistoryListView: View {
     private var emptyView: some View {
         if !searchText.isEmpty {
             ContentUnavailableView.search(text: searchText)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             ContentUnavailableView {
                 Label(String(localized: "home.history.title"), systemImage: "clock")
             } description: {
                 Text(String(localized: "home.history.empty"))
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

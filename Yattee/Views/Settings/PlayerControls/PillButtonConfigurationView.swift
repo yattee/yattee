@@ -41,6 +41,7 @@ struct PillButtonConfigurationView: View {
                 String(localized: "settings.playerControls.buttonNotFound"),
                 systemImage: "exclamationmark.triangle"
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

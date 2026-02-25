@@ -71,12 +71,14 @@ struct MediaBrowserView: View {
                     }
                     .buttonStyle(.borderedProminent)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if files.isEmpty {
                 ContentUnavailableView {
                     Label(String(localized: "mediaBrowser.emptyFolder"), systemImage: "folder")
                 } description: {
                     Text(String(localized: "mediaBrowser.emptyFolder.description"))
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 fileList
             }
