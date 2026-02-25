@@ -60,8 +60,10 @@ struct YatteeApp: App {
         WindowGroup {
             ContentView()
                 .appEnvironment(appEnvironment)
+                #if !os(tvOS)
                 .preferredColorScheme(appEnvironment.settingsManager.theme.colorScheme)
                 .tint(appEnvironment.settingsManager.accentColor.color)
+                #endif
                 #if os(macOS)
                 // Required on the view to prevent new windows on URL open
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
