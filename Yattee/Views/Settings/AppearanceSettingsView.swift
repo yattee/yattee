@@ -14,7 +14,9 @@ struct AppearanceSettingsView: View {
         Form {
             if let settings = appEnvironment?.settingsManager {
                 // Theme section
+                #if !os(tvOS)
                 ThemeSection(settings: settings)
+                #endif
 
                 // App icon section (iOS only)
                 #if os(iOS)
@@ -22,7 +24,9 @@ struct AppearanceSettingsView: View {
                 #endif
 
                 // Accent color section
+                #if !os(tvOS)
                 AccentColorSection(settings: settings)
+                #endif
 
                 // List style section
                 ListStyleSection(settings: settings)
