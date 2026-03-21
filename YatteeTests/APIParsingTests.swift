@@ -627,7 +627,7 @@ struct MediaSourceTests {
     func mediaSourceTypeSystemImages() {
         #expect(MediaSourceType.webdav.systemImage == "externaldrive.connected.to.line.below")
         #expect(MediaSourceType.localFolder.systemImage == "folder")
-        #expect(MediaSourceType.smb.systemImage == "network")
+        #expect(MediaSourceType.smb.systemImage == "externaldrive.connected.to.line.below")
     }
 
     @Test("MediaSource URL display string")
