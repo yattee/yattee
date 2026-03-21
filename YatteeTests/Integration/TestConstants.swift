@@ -11,7 +11,7 @@ import Foundation
 /// Constants for integration testing against a real Invidious instance.
 enum IntegrationTestConstants {
     /// Test Invidious instance URL (from CLAUDE.md).
-    static let testInstanceURL = URL(string: "https://invidious.home.arekf.net")!
+    static let testInstanceURL = URL(string: "https://i01.s.yattee.stream")!
 
     /// Test instance for API calls.
     static let testInstance = Instance(
