@@ -368,6 +368,7 @@ struct ChannelView: View {
         } message: {
             Text(String(localized: "channel.unsubscribe.confirmation.message"))
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Loading Content
@@ -475,6 +476,7 @@ struct ChannelView: View {
         } message: {
             Text(String(localized: "channel.unsubscribe.confirmation.message"))
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Header

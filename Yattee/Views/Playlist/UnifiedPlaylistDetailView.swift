@@ -173,6 +173,7 @@ struct UnifiedPlaylistDetailView: View {
                 }
             }
         }
+        .presentationCompactAdaptation(.sheet)
         .task {
             await loadPlaylist()
         }

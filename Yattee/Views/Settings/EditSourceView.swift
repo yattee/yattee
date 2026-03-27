@@ -334,6 +334,7 @@ private struct EditRemoteServerContent: View {
             }
             Button(String(localized: "common.cancel"), role: .cancel) {}
         }
+        .presentationCompactAdaptation(.sheet)
         .sheet(isPresented: $showLoginSheet) {
             InstanceLoginView(instance: instance) { credential in
                 appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
@@ -366,6 +367,7 @@ private struct EditRemoteServerContent: View {
         } message: {
             Text(String(localized: "sources.yatteeServer.warning.message"))
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Computed Properties
@@ -733,6 +735,7 @@ private struct EditFileSourceContent: View {
             }
             Button(String(localized: "common.cancel"), role: .cancel) {}
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     @ViewBuilder

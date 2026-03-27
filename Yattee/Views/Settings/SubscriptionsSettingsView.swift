@@ -111,6 +111,7 @@ struct SubscriptionsSettingsView: View {
         } message: {
             Text(String(localized: "settings.subscriptions.account.switch.message"))
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Account Section

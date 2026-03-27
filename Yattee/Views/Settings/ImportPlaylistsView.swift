@@ -77,6 +77,7 @@ struct ImportPlaylistsView: View {
                     Task { await addAllPlaylists() }
                 }
             }
+            .presentationCompactAdaptation(.sheet)
             .confirmationDialog(
                 String(localized: "import.playlists.mergeWarning.title"),
                 isPresented: $showMergeWarning,
@@ -97,6 +98,7 @@ struct ImportPlaylistsView: View {
                     Text(String(localized: "import.playlists.mergeWarning.message \(playlist.title)"))
                 }
             }
+            .presentationCompactAdaptation(.sheet)
             .task {
                 await loadPlaylists()
             }

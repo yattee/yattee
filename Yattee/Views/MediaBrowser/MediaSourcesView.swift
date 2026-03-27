@@ -91,6 +91,7 @@ struct MediaSourcesView: View {
                 pendingDeleteSource = nil
             }
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Private

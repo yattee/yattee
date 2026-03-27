@@ -539,6 +539,11 @@ final class PlayerState {
         queue.remove(at: index)
     }
 
+    /// Removes a video from the queue by its ID.
+    func removeFromQueue(id: QueuedVideo.ID) {
+        queue.removeAll { $0.id == id }
+    }
+
     /// Updates a queue item with preloaded video details and streams.
     /// Preserves the item's ID for stable SwiftUI identity.
     func updateQueueItemWithPreload(at index: Int, video: Video, stream: Stream?, audioStream: Stream?) {

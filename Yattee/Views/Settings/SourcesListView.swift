@@ -75,6 +75,7 @@ struct SourcesListView: View {
                 pendingDeleteSource = nil
             }
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Empty State

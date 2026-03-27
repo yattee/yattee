@@ -5,6 +5,7 @@
 //  Row view for displaying bookmarked videos with tags and notes.
 //
 
+import SwiftData
 import SwiftUI
 
 /// Row view for displaying bookmarked videos.
@@ -30,15 +31,21 @@ struct BookmarkRowView: View {
         appEnvironment?.settingsManager.accentColor.color ?? .accentColor
     }
 
+    private var isBookmarkValid: Bool {
+        bookmark.modelContext != nil && !bookmark.isDeleted
+    }
+
     private var video: Video {
         bookmark.toVideo()
     }
 
     private var hasTags: Bool {
-        !bookmark.tags.isEmpty
+        guard isBookmarkValid else { return false }
+        return !bookmark.tags.isEmpty
     }
 
     private var hasNote: Bool {
+        guard isBookmarkValid else { return false }
         if let note = bookmark.note, !note.isEmpty {
             return true
         }
@@ -56,6 +63,12 @@ struct BookmarkRowView: View {
     }
 
     var body: some View {
+        if isBookmarkValid {
+            content
+        }
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Video row content
             videoRowContent

@@ -103,6 +103,7 @@ struct AddRemoteServerView: View {
         } message: {
             Text(String(localized: "sources.yatteeServer.warning.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         #else
         formContent
             .navigationTitle(String(localized: "sources.addRemoteServer"))
@@ -118,6 +119,7 @@ struct AddRemoteServerView: View {
             } message: {
                 Text(String(localized: "sources.yatteeServer.warning.message"))
             }
+            .presentationCompactAdaptation(.sheet)
         #endif
     }
 

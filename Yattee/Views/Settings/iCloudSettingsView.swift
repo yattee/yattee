@@ -101,6 +101,7 @@ struct iCloudSettingsView: View {
         } message: {
             Text(String(localized: "settings.icloud.enable.confirmation.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         .confirmationDialog(
             String(localized: "settings.icloud.disable.confirmation.title"),
             isPresented: $showingDisableConfirmation,
@@ -113,6 +114,7 @@ struct iCloudSettingsView: View {
         } message: {
             Text(String(localized: "settings.icloud.disable.confirmation.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         // Confirmation for categories that replace local data (instances, settings, media sources)
         .confirmationDialog(
             String(localized: "settings.icloud.category.enable.title"),
@@ -134,6 +136,7 @@ struct iCloudSettingsView: View {
         } message: {
             Text(String(localized: "settings.icloud.category.enable.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         // Confirmation for categories that upload/merge local data (subscriptions, bookmarks, playlists, history)
         .confirmationDialog(
             String(localized: "settings.icloud.category.sync.title"),
@@ -155,6 +158,7 @@ struct iCloudSettingsView: View {
         } message: {
             Text(String(localized: "settings.icloud.category.sync.message"))
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Sync Categories Section

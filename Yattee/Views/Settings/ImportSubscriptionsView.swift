@@ -68,6 +68,7 @@ struct ImportSubscriptionsView: View {
                     addAllSubscriptions()
                 }
             }
+            .presentationCompactAdaptation(.sheet)
             .task {
                 await loadSubscriptions()
             }

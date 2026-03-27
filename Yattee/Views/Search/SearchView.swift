@@ -615,6 +615,7 @@ struct SearchView: View {
                     }
                     Button(String(localized: "common.cancel"), role: .cancel) {}
                 }
+                .presentationCompactAdaptation(.sheet)
             }
         }
     }
