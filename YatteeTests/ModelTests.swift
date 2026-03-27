@@ -248,6 +248,32 @@ struct InstanceTests {
         #expect(simpleHost?.scheme == "https")
     }
 
+    @Test("Instance URL normalization preserves embedded credentials")
+    func normalizeSourceURLPreservesCredentials() {
+        let url = Instance.normalizeSourceURL("https://user:pass@server.com")
+        #expect(url?.user == "user")
+        #expect(url?.password == "pass")
+        #expect(url?.host == "server.com")
+    }
+
+    @Test("Instance displayURL strips credentials")
+    func displayURLStripsCredentials() {
+        let instance = Instance(
+            type: .invidious,
+            url: URL(string: "https://user:pass@server.com")!
+        )
+        #expect(instance.displayURL == "https://server.com")
+    }
+
+    @Test("Instance displayURL returns absoluteString when no credentials")
+    func displayURLWithoutCredentials() {
+        let instance = Instance(
+            type: .invidious,
+            url: URL(string: "https://server.com")!
+        )
+        #expect(instance.displayURL == "https://server.com")
+    }
+
     @Test("Instance display name uses custom name if set")
     func displayNameCustom() {
         let instance = Instance(
