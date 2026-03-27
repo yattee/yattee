@@ -119,6 +119,17 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         name ?? url.host ?? url.absoluteString
     }
 
+    /// Returns the URL string with embedded credentials stripped for safe display in the UI.
+    var displayURL: String {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              components.user != nil else {
+            return url.absoluteString
+        }
+        components.user = nil
+        components.password = nil
+        return components.url?.absoluteString ?? url.absoluteString
+    }
+
     var contentSource: ContentSource {
         type.contentSource(for: url)
     }
@@ -267,10 +278,6 @@ extension Instance {
         if components.path.hasSuffix("/") {
             components.path = String(components.path.dropLast())
         }
-
-        // Strip embedded credentials (security best practice)
-        components.user = nil
-        components.password = nil
 
         return components.url
     }

@@ -124,7 +124,7 @@ private struct EditRemoteServerContent: View {
         Form {
             Section {
                 LabeledContent(String(localized: "sources.field.type"), value: instance.type.displayName)
-                LabeledContent(String(localized: "sources.field.url"), value: instance.url.absoluteString)
+                LabeledContent(String(localized: "sources.field.url"), value: instance.displayURL)
             }
 
             Section {
