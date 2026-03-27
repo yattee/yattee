@@ -122,6 +122,11 @@ final class QueueManager {
         playerState?.removeFromQueue(at: index)
     }
 
+    /// Removes a video from the queue by its ID.
+    func removeFromQueue(id: QueuedVideo.ID) {
+        playerState?.removeFromQueue(id: id)
+    }
+
     /// Moves a queue item from one position to another.
     func moveQueueItem(from sourceIndex: Int, to destinationIndex: Int) {
         playerState?.moveQueueItem(from: sourceIndex, to: destinationIndex)

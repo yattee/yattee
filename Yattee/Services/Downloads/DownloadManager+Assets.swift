@@ -74,7 +74,7 @@ extension DownloadManager {
             }
 
             // If VTT parsing failed, fall back to direct URLs (may not work if blocked)
-            if imageURLs.isEmpty {
+            if imageURLs.isEmpty, storyboard.storyboardCount > 0 {
                 for sheetIndex in 0..<storyboard.storyboardCount {
                     if let url = storyboard.directSheetURL(for: sheetIndex) {
                         imageURLs.append(url)

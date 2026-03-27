@@ -318,6 +318,7 @@ private struct EditMPVOptionSheet: View {
                 }
                 Button(String(localized: "common.cancel"), role: .cancel) {}
             }
+            .presentationCompactAdaptation(.sheet)
         }
         #if os(macOS)
         .frame(minWidth: 400, minHeight: 200)

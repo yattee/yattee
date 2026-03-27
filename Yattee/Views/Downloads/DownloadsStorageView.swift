@@ -87,6 +87,7 @@ struct DownloadsStorageView: View {
         } message: {
             Text("settings.downloads.storage.deleteWatched.message \(watchedDownloads.count) \(formatBytes(watchedDownloadsSize))")
         }
+        .presentationCompactAdaptation(.sheet)
         .confirmationDialog(
             String(localized: "settings.downloads.storage.deleteAll"),
             isPresented: $showingDeleteAllConfirmation,
@@ -101,6 +102,7 @@ struct DownloadsStorageView: View {
         } message: {
             Text("settings.downloads.storage.deleteAll.message \(completedDownloads.count) \(formatBytes(allDownloadsSize))")
         }
+        .presentationCompactAdaptation(.sheet)
     }
 
     // MARK: - Delete Menu

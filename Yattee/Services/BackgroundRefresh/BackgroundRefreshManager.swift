@@ -43,6 +43,7 @@ final class BackgroundRefreshManager {
 
     func registerBackgroundTasks() {
         #if os(iOS)
+        guard !ProcessInfo.processInfo.isMacCatalystApp else { return }
         registerIOSBackgroundTask()
         #elseif os(macOS)
         registerMacOSBackgroundActivity()
@@ -64,6 +65,7 @@ final class BackgroundRefreshManager {
     }
 
     func scheduleIOSBackgroundRefresh() {
+        guard !ProcessInfo.processInfo.isMacCatalystApp else { return }
         let request = BGAppRefreshTaskRequest(identifier: Self.backgroundTaskIdentifier)
         // Request to run in ~15 minutes (system decides actual timing)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
@@ -77,6 +79,7 @@ final class BackgroundRefreshManager {
     }
 
     func cancelIOSBackgroundRefresh() {
+        guard !ProcessInfo.processInfo.isMacCatalystApp else { return }
         BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: Self.backgroundTaskIdentifier)
         LoggingService.shared.debug("Cancelled iOS background refresh", category: .notifications)
     }
@@ -156,6 +159,7 @@ final class BackgroundRefreshManager {
 
     func handleNotificationsEnabledChanged(_ enabled: Bool) {
         #if os(iOS)
+        guard !ProcessInfo.processInfo.isMacCatalystApp else { return }
         if enabled {
             scheduleIOSBackgroundRefresh()
         } else {

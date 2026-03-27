@@ -45,6 +45,7 @@ struct DeveloperSettingsView: View {
         } message: {
             Text(String(localized: "settings.advanced.data.removeDuplicates.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         .alert(
             String(localized: "settings.advanced.data.deduplicationComplete"),
             isPresented: $showingDeduplicationResult
@@ -71,6 +72,7 @@ struct DeveloperSettingsView: View {
         } message: {
             Text(String(localized: "settings.advanced.data.resetICloud.message"))
         }
+        .presentationCompactAdaptation(.sheet)
         .alert(
             String(localized: "settings.advanced.data.iCloudReset"),
             isPresented: $showingResetiCloudComplete

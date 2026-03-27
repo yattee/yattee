@@ -192,6 +192,7 @@ struct HistoryListView: View {
                 selectedClearOption = nil
             }
         }
+        .presentationCompactAdaptation(.sheet)
         .onAppear {
             loadHistory()
         }

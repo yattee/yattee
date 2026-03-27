@@ -135,7 +135,9 @@ struct QueueManagementSheet: View {
                                 index: index + 1, // +1 because "Now Playing" is shown as position 1
                                 isCurrentlyPlaying: false,
                                 onRemove: {
-                                    queueManager?.removeFromQueue(at: index)
+                                    withAnimation {
+                                        queueManager?.removeFromQueue(id: queuedVideo.id)
+                                    }
                                 },
                                 onTap: {
                                     playVideo(at: index)

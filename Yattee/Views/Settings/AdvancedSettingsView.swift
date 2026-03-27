@@ -49,6 +49,7 @@ struct AdvancedSettingsView: View {
             }
             Button(String(localized: "common.cancel"), role: .cancel) {}
         }
+        .presentationCompactAdaptation(.sheet)
         .onAppear {
             userAgentText = settingsManager.customUserAgent
             #if !os(tvOS)
@@ -68,6 +69,7 @@ struct AdvancedSettingsView: View {
         } message: {
             Text(String(localized: "settings.advanced.storage.deleteOrphaned.message \(orphanedFilesCount) \(formatBytes(orphanedFilesSize))"))
         }
+        .presentationCompactAdaptation(.sheet)
         .alert(
             String(localized: "settings.advanced.storage.cleanupComplete"),
             isPresented: $showingOrphanCleanupResult
