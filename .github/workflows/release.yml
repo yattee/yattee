@@ -198,7 +198,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_AUTHORIZATION }}
+          token: ${{ secrets.REPO_TOKEN }}
       - name: Commit build number
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
