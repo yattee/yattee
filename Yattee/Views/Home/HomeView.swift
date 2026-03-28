@@ -1161,6 +1161,7 @@ struct HomeView: View {
                     .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.plain)
+                .padding(.horizontal, listStyle == .inset ? 32 : 16)
                 .padding(.top, 16)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
