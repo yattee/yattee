@@ -7,22 +7,53 @@
 
 import SwiftUI
 
+/// Glass capsule showing the current chapter title during seeking.
+struct ChapterCapsuleView: View {
+    let title: String
+    let buttonBackground: ButtonBackgroundStyle
+
+    var body: some View {
+        Text(title)
+            .font(.caption)
+            .fontWeight(.medium)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .glassBackground(
+                buttonBackground.glassStyle ?? .regular,
+                in: .capsule,
+                fallback: .ultraThinMaterial,
+                colorScheme: .dark
+            )
+            .shadow(radius: 4)
+    }
+
+    /// Returns this capsule positioned so its center follows `xTarget`,
+    /// clamped to stay within `margin` of each edge of `availableWidth`.
+    func positioned(xTarget: CGFloat, availableWidth: CGFloat, margin: CGFloat = 8) -> some View {
+        self
+            .alignmentGuide(.leading) { d in
+                let targetLeading = xTarget - d.width / 2
+                let clampedLeading = max(margin, min(availableWidth - d.width - margin, targetLeading))
+                return -clampedLeading
+            }
+            .frame(width: availableWidth, alignment: .leading)
+    }
+}
+
 /// Preview thumbnail displayed above the seek bar during scrubbing/hovering.
+
 struct SeekPreviewView: View {
     let storyboard: Storyboard
     let seekTime: TimeInterval
     let storyboardService: StoryboardService
     let buttonBackground: ButtonBackgroundStyle
     let theme: ControlsTheme
-    let chapters: [VideoChapter]
 
     @State private var thumbnail: PlatformImage?
     @State private var loadTask: Task<Void, Never>?
-
-    /// The current chapter based on seek time.
-    private var currentChapter: VideoChapter? {
-        chapters.last { $0.startTime <= seekTime }
-    }
 
     private var formattedTime: String {
         let totalSeconds = Int(seekTime)
@@ -40,21 +71,8 @@ struct SeekPreviewView: View {
     private let thumbnailWidth: CGFloat = 160
 
     var body: some View {
+        // Thumbnail with timestamp overlay
         VStack(spacing: 4) {
-            // Chapter name (only shown if chapters exist)
-            // Constrained to thumbnail width to prevent expanding the preview
-            if let chapter = currentChapter {
-                Text(chapter.title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
-                    .frame(maxWidth: thumbnailWidth)
-            }
-
-            // Thumbnail with timestamp overlay
             ZStack(alignment: .bottom) {
                 Group {
                     if let thumbnail {
@@ -92,7 +110,6 @@ struct SeekPreviewView: View {
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
-        .padding(.top, currentChapter != nil ? 2 : 0)
         .glassBackground(
             buttonBackground.glassStyle ?? .regular,
             in: .rect(cornerRadius: 8),

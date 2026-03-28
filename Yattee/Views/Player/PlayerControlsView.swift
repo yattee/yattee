@@ -946,12 +946,24 @@ struct PlayerControlsView: View {
                 seekTime: seekTime,
                 storyboardService: StoryboardService.shared,
                 buttonBackground: activeLayout.globalSettings.buttonBackground,
-                theme: activeLayout.globalSettings.theme,
-                chapters: playerState.chapters
+                theme: activeLayout.globalSettings.theme
             )
             .position(x: xPosition, y: yPosition)
             .transition(.opacity.combined(with: .scale(scale: 0.9)))
             .animation(.easeInOut(duration: 0.15), value: isDragging)
+
+            // Chapter capsule follows storyboard x but clamps to screen edges
+            if let chapter = chapterForSeekTime(seekTime) {
+                let capsuleY = yPosition - previewHeight / 2 - 6 - 12
+                ChapterCapsuleView(
+                    title: chapter.title,
+                    buttonBackground: activeLayout.globalSettings.buttonBackground
+                )
+                .positioned(xTarget: xPosition, availableWidth: geometry.size.width)
+                .position(x: geometry.size.width / 2, y: capsuleY)
+                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                .animation(.easeInOut(duration: 0.15), value: isDragging)
+            }
         }
     }
 
@@ -966,12 +978,27 @@ struct PlayerControlsView: View {
         SeekTimePreviewView(
             seekTime: seekTime,
             buttonBackground: activeLayout.globalSettings.buttonBackground,
-            theme: activeLayout.globalSettings.theme,
-            chapters: playerState.chapters
+            theme: activeLayout.globalSettings.theme
         )
         .position(x: xPosition, y: yPosition)
         .transition(.opacity.combined(with: .scale(scale: 0.9)))
         .animation(.easeInOut(duration: 0.15), value: isDragging)
+
+        if let chapter = chapterForSeekTime(seekTime) {
+            let capsuleY = yPosition - 24
+            ChapterCapsuleView(
+                title: chapter.title,
+                buttonBackground: activeLayout.globalSettings.buttonBackground
+            )
+            .positioned(xTarget: xPosition, availableWidth: geometry.size.width)
+            .position(x: geometry.size.width / 2, y: capsuleY)
+            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            .animation(.easeInOut(duration: 0.15), value: isDragging)
+        }
+    }
+
+    private func chapterForSeekTime(_ seekTime: TimeInterval) -> VideoChapter? {
+        playerState.chapters.last { $0.startTime <= seekTime }
     }
 
     private var displayProgress: Double {
@@ -1087,22 +1114,25 @@ struct PlayerControlsView: View {
             }
 
             // Seek gesture preview (top-aligned)
-            VStack {
-                GestureSeekPreviewView(
-                    storyboard: playerState.preferredStoryboard,
-                    currentTime: seekGestureStartTime,
-                    seekTime: seekGesturePreviewTime,
-                    duration: playerState.duration,
-                    storyboardService: StoryboardService.shared,
-                    buttonBackground: activeLayout.globalSettings.buttonBackground,
-                    theme: activeLayout.globalSettings.theme,
-                    chapters: playerState.chapters,
-                    isActive: isSeekGestureActive
-                )
-                .padding(.top, 16)
-                Spacer()
+            GeometryReader { gestureGeometry in
+                VStack {
+                    GestureSeekPreviewView(
+                        storyboard: playerState.preferredStoryboard,
+                        currentTime: seekGestureStartTime,
+                        seekTime: seekGesturePreviewTime,
+                        duration: playerState.duration,
+                        storyboardService: StoryboardService.shared,
+                        buttonBackground: activeLayout.globalSettings.buttonBackground,
+                        theme: activeLayout.globalSettings.theme,
+                        chapters: playerState.chapters,
+                        isActive: isSeekGestureActive,
+                        availableWidth: gestureGeometry.size.width
+                    )
+                    .padding(.top, 16)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaPadding(.top)
         }
         // Allow taps to pass through feedback visuals to gesture recognizer below

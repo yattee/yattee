@@ -20,20 +20,31 @@ struct GestureSeekPreviewView: View {
     let theme: ControlsTheme
     let chapters: [VideoChapter]
     let isActive: Bool
+    var availableWidth: CGFloat = 320
 
     @State private var opacity: Double = 0
 
+    private var currentChapter: VideoChapter? {
+        chapters.last { $0.startTime <= seekTime }
+    }
+
     var body: some View {
-        Group {
-            // Only show if storyboard is available
+        VStack(spacing: 6) {
+            if let chapter = currentChapter {
+                ChapterCapsuleView(
+                    title: chapter.title,
+                    buttonBackground: buttonBackground
+                )
+                .frame(maxWidth: availableWidth - 16)
+            }
+
             if let storyboard {
                 SeekPreviewView(
                     storyboard: storyboard,
                     seekTime: seekTime,
                     storyboardService: storyboardService,
                     buttonBackground: buttonBackground,
-                    theme: theme,
-                    chapters: chapters
+                    theme: theme
                 )
             }
         }

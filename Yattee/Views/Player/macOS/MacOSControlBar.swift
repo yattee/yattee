@@ -111,8 +111,16 @@ struct MacOSControlBar: View {
                     let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
                     let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
 
+                    let storyboardCenterX = clampedX + previewWidth / 2
+
                     seekPreviewView(storyboard: storyboard)
                         .offset(x: clampedX, y: -150)
+
+                    if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= previewProgress * playerState.duration }) {
+                        ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
+                            .positioned(xTarget: storyboardCenterX, availableWidth: geometry.size.width)
+                            .offset(y: -176)
+                    }
                 }
             } else if (isDragging || isHoveringProgress),
                       !playerState.isLive {
@@ -127,15 +135,22 @@ struct MacOSControlBar: View {
                     let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
                     let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
 
+                    let timeCenterX = clampedX + previewWidth / 2
+
                     SeekTimePreviewView(
                         seekTime: previewProgress * playerState.duration,
                         buttonBackground: .none,
-                        theme: .dark,
-                        chapters: showChapters ? playerState.chapters : []
+                        theme: .dark
                     )
                     .offset(x: clampedX, y: -60)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
+
+                    if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= previewProgress * playerState.duration }) {
+                        ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
+                            .positioned(xTarget: timeCenterX, availableWidth: geometry.size.width)
+                            .offset(y: -86)
+                    }
                 }
             }
         }
@@ -331,8 +346,7 @@ struct MacOSControlBar: View {
             seekTime: seekTime,
             storyboardService: StoryboardService.shared,
             buttonBackground: .none,
-            theme: .dark,
-            chapters: showChapters ? playerState.chapters : []
+            theme: .dark
         )
         .transition(.opacity.combined(with: .scale(scale: 0.9)))
         .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
