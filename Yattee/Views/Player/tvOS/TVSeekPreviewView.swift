@@ -23,19 +23,6 @@ struct TVSeekPreviewView: View {
         chapters.last { $0.startTime <= seekTime }
     }
 
-    private var formattedTime: String {
-        let totalSeconds = Int(seekTime)
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
-        }
-    }
-
     private let thumbnailWidth: CGFloat = 320
 
     var body: some View {
@@ -69,7 +56,7 @@ struct TVSeekPreviewView: View {
                 }
 
                 // Timestamp overlaid at bottom center (larger for TV)
-                Text(formattedTime)
+                Text(seekTime.formattedAsTimestamp)
                     .font(.system(size: 36, weight: .medium))
                     .monospacedDigit()
                     .foregroundStyle(.white)

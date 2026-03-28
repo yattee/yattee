@@ -55,19 +55,6 @@ struct SeekPreviewView: View {
     @State private var thumbnail: PlatformImage?
     @State private var loadTask: Task<Void, Never>?
 
-    private var formattedTime: String {
-        let totalSeconds = Int(seekTime)
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
-        }
-    }
-
     private let thumbnailWidth: CGFloat = 160
 
     var body: some View {
@@ -95,7 +82,7 @@ struct SeekPreviewView: View {
                 .clipped()
 
                 // Timestamp overlaid at bottom center
-                Text(formattedTime)
+                Text(seekTime.formattedAsTimestamp)
                     .font(.caption)
                     .fontWeight(.medium)
                     .monospacedDigit()

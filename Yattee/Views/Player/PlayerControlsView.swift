@@ -1118,7 +1118,6 @@ struct PlayerControlsView: View {
                 VStack {
                     GestureSeekPreviewView(
                         storyboard: playerState.preferredStoryboard,
-                        currentTime: seekGestureStartTime,
                         seekTime: seekGesturePreviewTime,
                         duration: playerState.duration,
                         storyboardService: StoryboardService.shared,
