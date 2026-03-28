@@ -254,7 +254,7 @@ final class PlayerState {
         if isLive {
             return "LIVE"
         }
-        return formatTime(currentTime)
+        return currentTime.formattedAsTimestamp
     }
 
     /// Formatted duration string.
@@ -263,12 +263,12 @@ final class PlayerState {
         if isLive {
             return "LIVE"
         }
-        return formatTime(duration)
+        return duration.formattedAsTimestamp
     }
 
     /// Formatted remaining time string.
     var formattedRemainingTime: String {
-        "-" + formatTime(max(0, duration - currentTime))
+        "-" + max(0, duration - currentTime).formattedAsTimestamp
     }
 
     // MARK: - Playback Settings
@@ -625,20 +625,6 @@ final class PlayerState {
         queue.first
     }
 
-    // MARK: - Private
-
-    private func formatTime(_ time: TimeInterval) -> String {
-        let totalSeconds = Int(time)
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
-        }
-    }
 }
 
 /// Represents a chapter in a video.

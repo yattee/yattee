@@ -12,7 +12,6 @@ import SwiftUI
 /// Shows only the storyboard thumbnail with timestamp overlay.
 struct GestureSeekPreviewView: View {
     let storyboard: Storyboard?
-    let currentTime: TimeInterval
     let seekTime: TimeInterval
     let duration: TimeInterval
     let storyboardService: StoryboardService
@@ -70,7 +69,6 @@ struct GestureSeekPreviewView: View {
 
         GestureSeekPreviewView(
             storyboard: nil,
-            currentTime: 120,
             seekTime: 180,
             duration: 600,
             storyboardService: StoryboardService(),

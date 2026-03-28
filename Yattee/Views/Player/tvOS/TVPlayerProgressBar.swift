@@ -160,7 +160,7 @@ struct TVPlayerProgressBar: View {
                             .foregroundStyle(.red)
                     }
                 } else {
-                    Text(formatTime(displayTime))
+                    Text(displayTime.formattedAsTimestamp)
                         .monospacedDigit()
                         .font(.subheadline)
                         .fontWeight(isScrubbing ? .semibold : .regular)
@@ -184,7 +184,7 @@ struct TVPlayerProgressBar: View {
 
                 // Remaining time (only for non-live)
                 if !isLive {
-                    Text("-\(formatTime(max(0, duration - displayTime)))")
+                    Text("-\(max(0, duration - displayTime).formattedAsTimestamp)")
                         .monospacedDigit()
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.7))
@@ -202,7 +202,7 @@ struct TVPlayerProgressBar: View {
                     .transition(.scale.combined(with: .opacity))
                 } else {
                     // Fallback when no storyboard available
-                    Text(formatTime(scrubTime ?? currentTime))
+                    Text((scrubTime ?? currentTime).formattedAsTimestamp)
                         .font(.system(size: 48, weight: .medium))
                         .monospacedDigit()
                         .foregroundStyle(.white)
@@ -329,19 +329,6 @@ struct TVPlayerProgressBar: View {
         }
     }
 
-    // MARK: - Formatting
-
-    private func formatTime(_ time: TimeInterval) -> String {
-        let totalSeconds = Int(max(0, time))
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        }
-        return String(format: "%d:%02d", minutes, seconds)
-    }
 }
 
 // MARK: - Pan Gesture View

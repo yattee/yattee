@@ -238,22 +238,9 @@ struct VideoInfoView: View {
         let resumeAction = appEnvironment?.settingsManager.resumeAction ?? .continueWatching
         switch resumeAction {
         case .continueWatching, .ask:
-            return String(localized: "resume.action.continueAt \(formatTime(savedProgress))")
+            return String(localized: "resume.action.continueAt \(savedProgress.formattedAsTimestamp)")
         case .startFromBeginning:
             return String(localized: "video.context.play")
-        }
-    }
-    
-    /// Formats a time interval as MM:SS or H:MM:SS.
-    private func formatTime(_ time: TimeInterval) -> String {
-        let hours = Int(time) / 3600
-        let minutes = (Int(time) % 3600) / 60
-        let seconds = Int(time) % 60
-        
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
         }
     }
 

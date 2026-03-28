@@ -95,61 +95,34 @@ struct MacOSControlBar: View {
         .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
         // Seek preview overlay - positioned above the control bar
         .overlay(alignment: .bottom) {
-            if let storyboard = playerState.preferredStoryboard,
-               (isDragging || isHoveringProgress),
-               !playerState.isLive {
+            if (isDragging || isHoveringProgress), !playerState.isLive {
                 GeometryReader { geometry in
-                    let previewProgress = isDragging ? dragProgress : hoverProgress
-                    // Progress bar spans full width minus padding and time labels
-                    // Time labels ~50px each, spacing ~16px = ~116px total for labels
-                    let horizontalPadding: CGFloat = 16
-                    let timeLabelWidth: CGFloat = 50
-                    let spacing: CGFloat = 8
-                    let progressBarOffset: CGFloat = horizontalPadding + timeLabelWidth + spacing
-                    let progressBarWidth: CGFloat = geometry.size.width - (2 * horizontalPadding) - (2 * timeLabelWidth) - (2 * spacing)
-                    let previewWidth: CGFloat = 176 // 160 + 16 padding
-                    let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
-                    let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
+                    let pos = seekPreviewPosition(geometry: geometry, previewWidth: playerState.preferredStoryboard != nil ? 176 : 80)
 
-                    let storyboardCenterX = clampedX + previewWidth / 2
+                    if let storyboard = playerState.preferredStoryboard {
+                        seekPreviewView(storyboard: storyboard)
+                            .offset(x: pos.clampedX, y: -150)
 
-                    seekPreviewView(storyboard: storyboard)
-                        .offset(x: clampedX, y: -150)
+                        if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= pos.progress * playerState.duration }) {
+                            ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
+                                .positioned(xTarget: pos.centerX, availableWidth: geometry.size.width)
+                                .offset(y: -176)
+                        }
+                    } else {
+                        SeekTimePreviewView(
+                            seekTime: pos.progress * playerState.duration,
+                            buttonBackground: .none,
+                            theme: .dark
+                        )
+                        .offset(x: pos.clampedX, y: -60)
+                        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                        .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
 
-                    if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= previewProgress * playerState.duration }) {
-                        ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
-                            .positioned(xTarget: storyboardCenterX, availableWidth: geometry.size.width)
-                            .offset(y: -176)
-                    }
-                }
-            } else if (isDragging || isHoveringProgress),
-                      !playerState.isLive {
-                GeometryReader { geometry in
-                    let previewProgress = isDragging ? dragProgress : hoverProgress
-                    let horizontalPadding: CGFloat = 16
-                    let timeLabelWidth: CGFloat = 50
-                    let spacing: CGFloat = 8
-                    let progressBarOffset: CGFloat = horizontalPadding + timeLabelWidth + spacing
-                    let progressBarWidth: CGFloat = geometry.size.width - (2 * horizontalPadding) - (2 * timeLabelWidth) - (2 * spacing)
-                    let previewWidth: CGFloat = 80
-                    let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
-                    let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
-
-                    let timeCenterX = clampedX + previewWidth / 2
-
-                    SeekTimePreviewView(
-                        seekTime: previewProgress * playerState.duration,
-                        buttonBackground: .none,
-                        theme: .dark
-                    )
-                    .offset(x: clampedX, y: -60)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                    .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
-
-                    if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= previewProgress * playerState.duration }) {
-                        ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
-                            .positioned(xTarget: timeCenterX, availableWidth: geometry.size.width)
-                            .offset(y: -86)
+                        if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= pos.progress * playerState.duration }) {
+                            ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
+                                .positioned(xTarget: pos.centerX, availableWidth: geometry.size.width)
+                                .offset(y: -86)
+                        }
                     }
                 }
             }
@@ -334,6 +307,21 @@ struct MacOSControlBar: View {
             }
         }
         .frame(height: 20)
+    }
+
+    private func seekPreviewPosition(
+        geometry: GeometryProxy,
+        previewWidth: CGFloat
+    ) -> (progress: Double, clampedX: CGFloat, centerX: CGFloat) {
+        let previewProgress = isDragging ? dragProgress : hoverProgress
+        let horizontalPadding: CGFloat = 16
+        let timeLabelWidth: CGFloat = 50
+        let spacing: CGFloat = 8
+        let progressBarOffset = horizontalPadding + timeLabelWidth + spacing
+        let progressBarWidth = geometry.size.width - (2 * horizontalPadding) - (2 * timeLabelWidth) - (2 * spacing)
+        let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
+        let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
+        return (previewProgress, clampedX, clampedX + previewWidth / 2)
     }
 
     @ViewBuilder

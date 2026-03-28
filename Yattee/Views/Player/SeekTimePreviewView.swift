@@ -13,21 +13,8 @@ struct SeekTimePreviewView: View {
     let buttonBackground: ButtonBackgroundStyle
     let theme: ControlsTheme
 
-    private var formattedTime: String {
-        let totalSeconds = Int(seekTime)
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
-        }
-    }
-
     var body: some View {
-        Text(formattedTime)
+        Text(seekTime.formattedAsTimestamp)
             .font(.system(size: 16, weight: .medium))
             .monospacedDigit()
             .foregroundStyle(.white)
