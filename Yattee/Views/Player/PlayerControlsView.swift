@@ -883,6 +883,8 @@ struct PlayerControlsView: View {
             .overlay {
                 if !playerState.isLive, let storyboard = playerState.preferredStoryboard {
                     seekPreviewOverlay(storyboard: storyboard, geometry: geometry)
+                } else if !playerState.isLive, isDragging {
+                    seekTimePreviewOverlay(geometry: geometry)
                 }
             }
             .gesture(
@@ -951,6 +953,25 @@ struct PlayerControlsView: View {
             .transition(.opacity.combined(with: .scale(scale: 0.9)))
             .animation(.easeInOut(duration: 0.15), value: isDragging)
         }
+    }
+
+    @ViewBuilder
+    private func seekTimePreviewOverlay(geometry: GeometryProxy) -> some View {
+        let seekTime = dragProgress * playerState.duration
+        let previewWidth: CGFloat = 80
+        let halfWidth = previewWidth / 2
+        let xPosition = max(halfWidth, min(geometry.size.width - halfWidth, geometry.size.width * dragProgress))
+        let yPosition: CGFloat = -20
+
+        SeekTimePreviewView(
+            seekTime: seekTime,
+            buttonBackground: activeLayout.globalSettings.buttonBackground,
+            theme: activeLayout.globalSettings.theme,
+            chapters: playerState.chapters
+        )
+        .position(x: xPosition, y: yPosition)
+        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+        .animation(.easeInOut(duration: 0.15), value: isDragging)
     }
 
     private var displayProgress: Double {
