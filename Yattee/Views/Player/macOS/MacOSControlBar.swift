@@ -114,6 +114,29 @@ struct MacOSControlBar: View {
                     seekPreviewView(storyboard: storyboard)
                         .offset(x: clampedX, y: -150)
                 }
+            } else if (isDragging || isHoveringProgress),
+                      !playerState.isLive {
+                GeometryReader { geometry in
+                    let previewProgress = isDragging ? dragProgress : hoverProgress
+                    let horizontalPadding: CGFloat = 16
+                    let timeLabelWidth: CGFloat = 50
+                    let spacing: CGFloat = 8
+                    let progressBarOffset: CGFloat = horizontalPadding + timeLabelWidth + spacing
+                    let progressBarWidth: CGFloat = geometry.size.width - (2 * horizontalPadding) - (2 * timeLabelWidth) - (2 * spacing)
+                    let previewWidth: CGFloat = 80
+                    let xOffset = progressBarOffset + (progressBarWidth * previewProgress) - (previewWidth / 2)
+                    let clampedX = max(0, min(geometry.size.width - previewWidth, xOffset))
+
+                    SeekTimePreviewView(
+                        seekTime: previewProgress * playerState.duration,
+                        buttonBackground: .none,
+                        theme: .dark,
+                        chapters: showChapters ? playerState.chapters : []
+                    )
+                    .offset(x: clampedX, y: -60)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
+                }
             }
         }
     }
