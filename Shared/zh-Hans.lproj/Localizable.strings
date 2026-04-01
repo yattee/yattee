@@ -48,7 +48,7 @@
 "Chapters" = "章节";
 "Charging" = "充电";
 "Clear" = "清除";
-"Clear All" = "清除所有";
+"Clear All" = "全部清除";
 "Clear All Recents" = "清除最近所有";
 "Clear History" = "清除历史记录";
 "Clear Search History" = "清除搜索历史记录";
@@ -515,7 +515,7 @@
 "Show video context menu options to force selected backend" = "显示视频内容目录选项来强制选择的后端";
 "Gesture: backwards" = "手势：向后";
 "Maximum width expanded" = "最大宽度展开";
-"Clear all" = "清除所有APP缓存";
+"Clear all" = "全部清除";
 "Total size: %@" = "总大小：%@";
 "Gesture settings control skipping interval for double tap gesture on left/right side of the player. Changing system controls settings requires restart." = "手势设置控制玩家左右两侧双击手势的跳过间隔。更改系统控制设置需要重新启动。";
 "Play next item" = "播放下一个";
