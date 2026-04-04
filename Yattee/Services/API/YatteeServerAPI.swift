@@ -402,6 +402,8 @@ struct ServerFeedVideo: Decodable, Sendable {
     let videoThumbnails: [YatteeThumbnail]?
     let extractor: String
     let videoUrl: String?
+    let isUpcoming: Bool?
+    let premiereTimestamp: Int64?
 
     func toVideo() -> Video? {
         // Determine content source based on extractor
@@ -427,8 +429,8 @@ struct ServerFeedVideo: Decodable, Sendable {
             likeCount: nil,
             thumbnails: videoThumbnails?.map { $0.toThumbnail() } ?? [],
             isLive: false,
-            isUpcoming: false,
-            scheduledStartTime: nil
+            isUpcoming: isUpcoming ?? false,
+            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
         )
     }
 }

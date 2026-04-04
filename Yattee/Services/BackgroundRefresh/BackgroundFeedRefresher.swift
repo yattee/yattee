@@ -122,7 +122,8 @@ final class BackgroundFeedRefresher {
             let newVideos: [(video: Video, channelName: String)] = response.videos.compactMap { serverVideo in
                 guard let video = serverVideo.toVideo(),
                       let publishedAt = video.publishedAt,
-                      publishedAt > lastCheckDate else {
+                      publishedAt > lastCheckDate,
+                      publishedAt <= Date() else {
                     return nil
                 }
                 dateFilteredCount += 1
@@ -218,9 +219,10 @@ final class BackgroundFeedRefresher {
                 }
                 channelFilteredCount += 1
 
-                // Only include videos published after last check
+                // Only include videos published after last check and not in the future
                 guard let publishedAt = video.publishedAt,
-                      publishedAt > lastCheckDate else {
+                      publishedAt > lastCheckDate,
+                      publishedAt <= Date() else {
                     return nil
                 }
                 dateFilteredCount += 1
@@ -318,9 +320,10 @@ final class BackgroundFeedRefresher {
                 }
                 channelFilteredCount += 1
 
-                // Only include videos published after last check
+                // Only include videos published after last check and not in the future
                 guard let publishedAt = video.publishedAt,
-                      publishedAt > lastCheckDate else {
+                      publishedAt > lastCheckDate,
+                      publishedAt <= Date() else {
                     return nil
                 }
                 dateFilteredCount += 1
@@ -376,6 +379,16 @@ final class BackgroundFeedRefresher {
         }
 
         var videosToNotify = newVideos
+
+        // Filter out upcoming/premiere videos that haven't aired yet
+        let upcomingCount = videosToNotify.count
+        videosToNotify = videosToNotify.filter { !$0.video.isUpcoming }
+        if upcomingCount - videosToNotify.count > 0 {
+            LoggingService.shared.debug(
+                "Filtered \(upcomingCount - videosToNotify.count) upcoming/premiere videos from notifications",
+                category: .notifications
+            )
+        }
 
         // Filter out videos the user has already started or finished watching
         if let appEnvironment {
