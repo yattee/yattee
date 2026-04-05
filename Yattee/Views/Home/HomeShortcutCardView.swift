@@ -90,13 +90,11 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
                             }
                         }
 
-                        if hasSubtitle {
-                            Text(subtitle)
-                                .font(subtitleFont)
-                                .foregroundStyle(.secondary)
-                        }
+                        Text(hasSubtitle ? subtitle : " ")
+                            .font(subtitleFont)
+                            .foregroundStyle(.secondary)
+                            .opacity(hasSubtitle ? 1 : 0)
                     }
-                    .frame(minHeight: subtitleMinHeight, alignment: hasSubtitle ? .top : .center)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             } else {
