@@ -112,6 +112,46 @@ module UITest
         invidious_email && invidious_password
       end
 
+      # Invidious URL for an instance fronted by HTTP Basic Auth (configurable via env)
+      def invidious_basic_auth_url
+        ENV.fetch('INVIDIOUS_BASIC_AUTH_URL', 'https://i03.s.yattee.stream')
+      end
+
+      # Extract host from the basic-auth Invidious URL
+      def invidious_basic_auth_host
+        URI.parse(invidious_basic_auth_url).host
+      end
+
+      # HTTP Basic Auth username for the proxy in front of the Invidious instance
+      def invidious_basic_auth_username
+        ENV.fetch('INVIDIOUS_BASIC_AUTH_USERNAME', nil)
+      end
+
+      # HTTP Basic Auth password for the proxy in front of the Invidious instance
+      def invidious_basic_auth_password
+        ENV.fetch('INVIDIOUS_BASIC_AUTH_PASSWORD', nil)
+      end
+
+      # Whether the basic-auth proxy credentials for Invidious are configured
+      def invidious_basic_auth_credentials?
+        invidious_basic_auth_username && invidious_basic_auth_password
+      end
+
+      # Invidious account email/username behind the basic-auth proxy
+      def invidious_proxied_email
+        ENV.fetch('INVIDIOUS_PROXIED_EMAIL', nil)
+      end
+
+      # Invidious account password behind the basic-auth proxy
+      def invidious_proxied_password
+        ENV.fetch('INVIDIOUS_PROXIED_PASSWORD', nil)
+      end
+
+      # Whether the proxied Invidious account credentials are configured
+      def invidious_proxied_credentials?
+        invidious_proxied_email && invidious_proxied_password
+      end
+
       # Piped URL for testing (configurable via env)
       def piped_url
         ENV.fetch('PIPED_URL', 'https://pipedapi.home.arekf.net')

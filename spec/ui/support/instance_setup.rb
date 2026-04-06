@@ -186,6 +186,73 @@ module UITest
       remove_instance("sources.row.invidious.#{host}", host)
     end
 
+    # Add an Invidious instance whose detection is fronted by HTTP Basic Auth.
+    # Drives the new RemoteServerUIState.basicAuthRequired path: type the URL,
+    # tap Detect, fill the basic-auth fields when the Retry Detection button
+    # appears, retry, then tap Add Source.
+    # @param url [String] Full URL of the Invidious instance
+    # @param username [String] HTTP Basic Auth username
+    # @param password [String] HTTP Basic Auth password
+    def add_invidious_with_basic_auth(url, username:, password:)
+      navigate_to_sources
+
+      tap_add_source_button
+      sleep 0.8
+
+      select_remote_server_tab
+
+      wait_for_element('addRemoteServer.urlField')
+
+      @axe.tap_id('addRemoteServer.urlField')
+      sleep 0.5
+      @axe.type(url)
+      sleep 0.5
+
+      @axe.tap_id('addRemoteServer.detectButton')
+
+      # First detection should fail with .basicAuthRequired — the Retry Detection
+      # button appears together with the username/password fields.
+      wait_for_element('addRemoteServer.retryDetectionButton', timeout: 20)
+
+      sleep 0.3
+
+      fields = find_basic_auth_text_fields
+      raise 'Could not find basic-auth username/password fields' if fields.length < 2
+
+      fill_field(fields[0], username)
+      fill_field(fields[1], password)
+
+      @axe.tap_id('addRemoteServer.retryDetectionButton')
+      sleep 0.5
+
+      # After a successful retry, detection should reveal the standard form.
+      result = wait_for_detection(timeout: 20)
+      raise "Detection retry failed: #{result}" if result == :error
+
+      wait_for_element('addRemoteServer.actionButton')
+      @axe.tap_id('addRemoteServer.actionButton')
+      sleep 0.5
+
+      wait_for_add_complete(timeout: 20)
+      close_settings
+    end
+
+    # Remove the basic-auth Invidious instance if it exists, then add it fresh.
+    # @param url [String] Full URL of the Invidious instance
+    # @param username [String] HTTP Basic Auth username
+    # @param password [String] HTTP Basic Auth password
+    def remove_and_add_invidious_with_basic_auth(url, username:, password:)
+      host = URI.parse(url).host
+
+      if invidious_exists?(host)
+        puts "  Removing existing Invidious instance: #{host}"
+        remove_invidious(host)
+      end
+
+      puts "  Adding Invidious instance behind basic auth: #{url}"
+      add_invidious_with_basic_auth(url, username: username, password: password)
+    end
+
     # Check if logged in to Invidious instance
     # @param host [String] Host portion of the server URL
     # @return [Boolean] true if logged in
@@ -1033,6 +1100,56 @@ module UITest
       end
 
       fields
+    end
+
+    # Find the username/password text fields under the "HTTP Basic Authentication"
+    # section header in AddRemoteServerView. Mirrors find_auth_text_fields but
+    # anchored on the localized header used for non-Yattee-Server instance types.
+    # Falls back to a plain "Authentication" header for Yattee Server forms.
+    # @return [Array<Hash>] Array of text field elements
+    def find_basic_auth_text_fields
+      tree = @axe.describe_ui
+      fields = []
+      found_header = false
+
+      collect = lambda do |node|
+        return unless node.is_a?(Hash)
+
+        if node['role'] == 'AXHeading' &&
+           (node['AXLabel']&.include?('HTTP Basic Authentication') ||
+            node['AXLabel']&.include?('Authentication'))
+          found_header = true
+        end
+
+        if found_header && (node['role'] == 'AXTextField' || node['role'] == 'AXSecureTextField')
+          fields << node
+        end
+
+        return if node['AXUniqueId'] == 'addRemoteServer.actionButton' ||
+                  node['AXUniqueId'] == 'addRemoteServer.retryDetectionButton'
+
+        (node['children'] || []).each { |child| collect.call(child) }
+      end
+
+      if tree.is_a?(Array)
+        tree.each { |root| collect.call(root) }
+      end
+
+      fields
+    end
+
+    # Tap a text field discovered via the accessibility tree and type into it.
+    # @param field [Hash] Element hash from describe_ui (must have a 'frame')
+    # @param text [String] Text to type after focusing the field
+    def fill_field(field, text)
+      frame = field['frame']
+      @axe.tap_coordinates(
+        x: frame['x'] + (frame['width'] / 2),
+        y: frame['y'] + (frame['height'] / 2)
+      )
+      sleep 0.3
+      @axe.type(text)
+      sleep 0.3
     end
 
     # Debug helper to print UI element tree
