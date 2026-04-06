@@ -491,9 +491,11 @@ final class SubscriptionFeedCache {
         }
 
         do {
-            let yatteeServerAPI = YatteeServerAPI(httpClient: HTTPClient())
-            let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance)
-            await yatteeServerAPI.setAuthHeader(authHeader)
+            let httpClient = HTTPClient()
+            if let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance) {
+                await httpClient.setDefaultHeaders(["Authorization": authHeader])
+            }
+            let yatteeServerAPI = YatteeServerAPI(httpClient: httpClient)
             LoggingService.shared.debug("refreshFromStatelessServer: Calling postFeed for \(channelRequests.count) channels", category: .general)
             let response = try await yatteeServerAPI.postFeed(
                 channels: channelRequests,
@@ -555,9 +557,11 @@ final class SubscriptionFeedCache {
         let statusChannels = channels.map {
             StatelessChannelStatusRequest(channelId: $0.channelId, site: $0.site)
         }
-        let yatteeServerAPI = YatteeServerAPI(httpClient: HTTPClient())
-        let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance)
-        await yatteeServerAPI.setAuthHeader(authHeader)
+        let httpClient = HTTPClient()
+        if let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance) {
+            await httpClient.setDefaultHeaders(["Authorization": authHeader])
+        }
+        let yatteeServerAPI = YatteeServerAPI(httpClient: httpClient)
 
         let maxRetries = 5
         var retryCount = 0

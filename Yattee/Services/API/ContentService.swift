@@ -68,60 +68,49 @@ actor ContentService: ContentServiceProtocol {
 
     // MARK: - Routing
 
+    /// Builds a per-instance HTTPClient with the basic-auth `Authorization` header baked in,
+    /// or returns nil if no basic-auth credentials are configured for the instance.
+    /// Used to inject reverse-proxy basic auth uniformly across all backends.
+    private func httpClientWithBasicAuth(for instance: Instance) async -> HTTPClient? {
+        guard let authHeader = await basicAuthCredentialsManager?.basicAuthHeader(for: instance) else {
+            return nil
+        }
+        let client = httpClientFactory.createClient(for: instance)
+        await client.setDefaultHeaders(["Authorization": authHeader])
+        return client
+    }
+
     /// Returns an API client configured for the instance's SSL and auth requirements.
     private func api(for instance: Instance) async -> any InstanceAPI {
-        // For Yattee Server, use the dedicated method that handles auth
-        if instance.type == .yatteeServer {
-            return await yatteeServerAPI(for: instance)
-        }
-
-        // For instances with standard SSL, use cached default API clients
-        if !instance.allowInvalidCertificates {
-            switch instance.type {
-            case .invidious:
-                return defaultInvidiousAPI
-            case .piped:
-                return defaultPipedAPI
-            case .peertube:
-                return defaultPeerTubeAPI
-            case .yatteeServer:
-                fatalError("Should be handled above")
-            }
-        }
-
-        // For instances with allowInvalidCertificates, create API with insecure HTTPClient
-        let insecureClient = httpClientFactory.createClient(for: instance)
         switch instance.type {
         case .invidious:
-            return InvidiousAPI(httpClient: insecureClient)
+            return await invidiousAPI(for: instance)
         case .piped:
-            return PipedAPI(httpClient: insecureClient)
+            return await pipedAPI(for: instance)
         case .peertube:
-            return PeerTubeAPI(httpClient: insecureClient)
+            return await peerTubeAPI(for: instance)
         case .yatteeServer:
-            fatalError("Should be handled above")
+            return await yatteeServerAPI(for: instance)
         }
     }
 
     /// Returns a YatteeServerAPI configured for the instance's SSL and auth requirements.
     private func yatteeServerAPI(for instance: Instance) async -> YatteeServerAPI {
-        let api: YatteeServerAPI
-        if !instance.allowInvalidCertificates {
-            api = defaultYatteeServerAPI
-        } else {
-            let insecureClient = httpClientFactory.createClient(for: instance)
-            api = YatteeServerAPI(httpClient: insecureClient)
+        if let authClient = await httpClientWithBasicAuth(for: instance) {
+            return YatteeServerAPI(httpClient: authClient)
         }
-
-        // Fetch auth header directly from credentials manager (avoids race condition on app startup)
-        let authHeader = await basicAuthCredentialsManager?.basicAuthHeader(for: instance)
-        await api.setAuthHeader(authHeader)
-
-        return api
+        if !instance.allowInvalidCertificates {
+            return defaultYatteeServerAPI
+        }
+        let insecureClient = httpClientFactory.createClient(for: instance)
+        return YatteeServerAPI(httpClient: insecureClient)
     }
 
-    /// Returns an InvidiousAPI configured for the instance's SSL requirements.
-    private func invidiousAPI(for instance: Instance) -> InvidiousAPI {
+    /// Returns an InvidiousAPI configured for the instance's SSL and auth requirements.
+    private func invidiousAPI(for instance: Instance) async -> InvidiousAPI {
+        if let authClient = await httpClientWithBasicAuth(for: instance) {
+            return InvidiousAPI(httpClient: authClient)
+        }
         if !instance.allowInvalidCertificates {
             return defaultInvidiousAPI
         }
@@ -129,8 +118,11 @@ actor ContentService: ContentServiceProtocol {
         return InvidiousAPI(httpClient: insecureClient)
     }
 
-    /// Returns a PipedAPI configured for the instance's SSL requirements.
-    private func pipedAPI(for instance: Instance) -> PipedAPI {
+    /// Returns a PipedAPI configured for the instance's SSL and auth requirements.
+    private func pipedAPI(for instance: Instance) async -> PipedAPI {
+        if let authClient = await httpClientWithBasicAuth(for: instance) {
+            return PipedAPI(httpClient: authClient)
+        }
         if !instance.allowInvalidCertificates {
             return defaultPipedAPI
         }
@@ -138,8 +130,11 @@ actor ContentService: ContentServiceProtocol {
         return PipedAPI(httpClient: insecureClient)
     }
 
-    /// Returns a PeerTubeAPI configured for the instance's SSL requirements.
-    private func peerTubeAPI(for instance: Instance) -> PeerTubeAPI {
+    /// Returns a PeerTubeAPI configured for the instance's SSL and auth requirements.
+    private func peerTubeAPI(for instance: Instance) async -> PeerTubeAPI {
+        if let authClient = await httpClientWithBasicAuth(for: instance) {
+            return PeerTubeAPI(httpClient: authClient)
+        }
         if !instance.allowInvalidCertificates {
             return defaultPeerTubeAPI
         }
@@ -286,7 +281,7 @@ actor ContentService: ContentServiceProtocol {
             return try await yatteeServerAPI(for: instance).videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
         case .piped:
             // Piped fallback - make separate calls (no storyboard support)
-            let pipedAPI = pipedAPI(for: instance)
+            let pipedAPI = await pipedAPI(for: instance)
             async let videoTask = pipedAPI.video(id: id, instance: instance)
             async let streamsTask = pipedAPI.streams(videoID: id, instance: instance)
             async let captionsTask = pipedAPI.captions(videoID: id, instance: instance)
@@ -298,7 +293,7 @@ actor ContentService: ContentServiceProtocol {
 
         case .peertube:
             // PeerTube fallback - make separate calls (no storyboard support)
-            let peerTubeAPI = peerTubeAPI(for: instance)
+            let peerTubeAPI = await peerTubeAPI(for: instance)
             async let videoTask = peerTubeAPI.video(id: id, instance: instance)
             async let streamsTask = peerTubeAPI.streams(videoID: id, instance: instance)
             async let captionsTask = peerTubeAPI.captions(videoID: id, instance: instance)

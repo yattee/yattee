@@ -438,9 +438,11 @@ struct ManageChannelsView: View {
         guard !channelIDs.isEmpty else { return }
 
         do {
-            let api = YatteeServerAPI(httpClient: HTTPClient())
-            let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: yatteeServer)
-            await api.setAuthHeader(authHeader)
+            let httpClient = HTTPClient()
+            if let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: yatteeServer) {
+                await httpClient.setDefaultHeaders(["Authorization": authHeader])
+            }
+            let api = YatteeServerAPI(httpClient: httpClient)
             let response = try await api.channelsMetadata(channelIDs: channelIDs, instance: yatteeServer)
 
             // Update subscriptions in SwiftData

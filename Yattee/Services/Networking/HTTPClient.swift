@@ -16,6 +16,12 @@ actor HTTPClient {
     private var userAgent: String?
     private var randomizeUserAgentPerRequest: Bool = false
 
+    /// Headers automatically applied to every request from this client.
+    /// Per-call `customHeaders` override these on key conflict.
+    /// Used to bake an HTTP Basic Auth `Authorization` header into a per-instance client
+    /// when the instance sits behind a reverse proxy that requires basic auth.
+    private var defaultHeaders: [String: String] = [:]
+
     // MARK: - Initialization
 
     init(session: URLSession = .shared, decoder: JSONDecoder = .init()) {
@@ -39,6 +45,12 @@ actor HTTPClient {
     /// - Parameter enabled: If true, ignores the fixed userAgent and generates a new random one per request.
     func setRandomizeUserAgentPerRequest(_ enabled: Bool) {
         self.randomizeUserAgentPerRequest = enabled
+    }
+
+    /// Sets headers to be applied to every request from this client.
+    /// Per-call `customHeaders` override these on key conflict.
+    func setDefaultHeaders(_ headers: [String: String]) {
+        self.defaultHeaders = headers
     }
 
     // MARK: - Public Methods
@@ -104,7 +116,13 @@ actor HTTPClient {
             mutableRequest.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         }
 
-        // Apply custom headers (e.g., X-API-Key for authenticated requests)
+        // Apply default headers first (e.g., basic auth bound to a per-instance client)
+        for (key, value) in defaultHeaders {
+            mutableRequest.setValue(value, forHTTPHeaderField: key)
+        }
+
+        // Apply custom headers (e.g., X-API-Key for authenticated requests).
+        // These override default headers on key conflict.
         if let customHeaders {
             for (key, value) in customHeaders {
                 mutableRequest.setValue(value, forHTTPHeaderField: key)
