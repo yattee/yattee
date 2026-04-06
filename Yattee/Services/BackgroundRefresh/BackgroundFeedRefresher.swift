@@ -102,7 +102,7 @@ final class BackgroundFeedRefresher {
 
         do {
             let yatteeServerAPI = YatteeServerAPI(httpClient: HTTPClient())
-            let authHeader = appEnvironment.yatteeServerCredentialsManager.basicAuthHeader(for: yatteeServer)
+            let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: yatteeServer)
             await yatteeServerAPI.setAuthHeader(authHeader)
             let response = try await yatteeServerAPI.postFeed(
                 channels: channelRequests,

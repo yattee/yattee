@@ -41,10 +41,10 @@ actor ContentService: ContentServiceProtocol {
     private let defaultPeerTubeAPI: PeerTubeAPI
     private let defaultYatteeServerAPI: YatteeServerAPI
 
-    /// Credentials manager for fetching Yattee Server auth headers on demand.
-    private let yatteeServerCredentialsManager: YatteeServerCredentialsManager?
+    /// Credentials manager for fetching basic auth headers on demand.
+    private let basicAuthCredentialsManager: BasicAuthCredentialsManager?
 
-    init(httpClient: HTTPClient, yatteeServerCredentialsManager: YatteeServerCredentialsManager? = nil) {
+    init(httpClient: HTTPClient, basicAuthCredentialsManager: BasicAuthCredentialsManager? = nil) {
         // Legacy init - create factory internally
         self.httpClientFactory = HTTPClientFactory()
         self.defaultHTTPClient = httpClient
@@ -52,10 +52,10 @@ actor ContentService: ContentServiceProtocol {
         self.defaultPipedAPI = PipedAPI(httpClient: httpClient)
         self.defaultPeerTubeAPI = PeerTubeAPI(httpClient: httpClient)
         self.defaultYatteeServerAPI = YatteeServerAPI(httpClient: httpClient)
-        self.yatteeServerCredentialsManager = yatteeServerCredentialsManager
+        self.basicAuthCredentialsManager = basicAuthCredentialsManager
     }
 
-    init(httpClientFactory: HTTPClientFactory, yatteeServerCredentialsManager: YatteeServerCredentialsManager? = nil) {
+    init(httpClientFactory: HTTPClientFactory, basicAuthCredentialsManager: BasicAuthCredentialsManager? = nil) {
         self.httpClientFactory = httpClientFactory
         // Create default client for instances that don't need insecure SSL
         self.defaultHTTPClient = httpClientFactory.createClient(allowInvalidCertificates: false)
@@ -63,7 +63,7 @@ actor ContentService: ContentServiceProtocol {
         self.defaultPipedAPI = PipedAPI(httpClient: defaultHTTPClient)
         self.defaultPeerTubeAPI = PeerTubeAPI(httpClient: defaultHTTPClient)
         self.defaultYatteeServerAPI = YatteeServerAPI(httpClient: defaultHTTPClient)
-        self.yatteeServerCredentialsManager = yatteeServerCredentialsManager
+        self.basicAuthCredentialsManager = basicAuthCredentialsManager
     }
 
     // MARK: - Routing
@@ -114,7 +114,7 @@ actor ContentService: ContentServiceProtocol {
         }
 
         // Fetch auth header directly from credentials manager (avoids race condition on app startup)
-        let authHeader = await yatteeServerCredentialsManager?.basicAuthHeader(for: instance)
+        let authHeader = await basicAuthCredentialsManager?.basicAuthHeader(for: instance)
         await api.setAuthHeader(authHeader)
 
         return api

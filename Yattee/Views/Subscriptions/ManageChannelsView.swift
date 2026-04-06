@@ -45,7 +45,7 @@ struct ManageChannelsView: View {
     private var yatteeServerURL: URL? { yatteeServer?.url }
     private var yatteeServerAuthHeader: String? {
         guard let server = yatteeServer else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     /// Channels filtered by search query and sorted by selected order.
@@ -439,7 +439,7 @@ struct ManageChannelsView: View {
 
         do {
             let api = YatteeServerAPI(httpClient: HTTPClient())
-            let authHeader = appEnvironment.yatteeServerCredentialsManager.basicAuthHeader(for: yatteeServer)
+            let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: yatteeServer)
             await api.setAuthHeader(authHeader)
             let response = try await api.channelsMetadata(channelIDs: channelIDs, instance: yatteeServer)
 

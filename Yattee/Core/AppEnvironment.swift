@@ -47,7 +47,7 @@ final class AppEnvironment {
     let handoffManager: HandoffManager
     let invidiousCredentialsManager: InvidiousCredentialsManager
     let pipedCredentialsManager: PipedCredentialsManager
-    let yatteeServerCredentialsManager: YatteeServerCredentialsManager
+    let basicAuthCredentialsManager: BasicAuthCredentialsManager
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
@@ -82,12 +82,12 @@ final class AppEnvironment {
         instances.setSettingsManager(settings)
         self.instancesManager = instances
 
-        // Initialize Yattee Server Credentials Manager early (needed for ContentService)
-        let yatteeServerCreds = YatteeServerCredentialsManager()
-        yatteeServerCreds.settingsManager = settings
-        self.yatteeServerCredentialsManager = yatteeServerCreds
+        // Initialize Basic Auth Credentials Manager early (needed for ContentService)
+        let basicAuthCreds = BasicAuthCredentialsManager()
+        basicAuthCreds.settingsManager = settings
+        self.basicAuthCredentialsManager = basicAuthCreds
 
-        let contentSvc = ContentService(httpClient: client, yatteeServerCredentialsManager: yatteeServerCreds)
+        let contentSvc = ContentService(httpClient: client, basicAuthCredentialsManager: basicAuthCreds)
         self.contentService = contentSvc
         self.instanceDetector = InstanceDetector(httpClient: client)
         self.navigationCoordinator = navigationCoordinator ?? NavigationCoordinator()
@@ -374,7 +374,7 @@ final class AppEnvironment {
         case .piped:
             return pipedCredentialsManager
         case .yatteeServer:
-            return yatteeServerCredentialsManager
+            return basicAuthCredentialsManager
         default:
             return nil
         }

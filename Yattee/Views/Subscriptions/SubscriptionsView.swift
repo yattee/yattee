@@ -52,7 +52,7 @@ struct SubscriptionsView: View {
     private var yatteeServerURL: URL? { yatteeServer?.url }
     private var yatteeServerAuthHeader: String? {
         guard let server = yatteeServer else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     /// Generates a unique ID based on instances configuration.

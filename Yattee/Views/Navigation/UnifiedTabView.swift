@@ -54,7 +54,7 @@ struct UnifiedTabView: View {
 
     private var yatteeServerAuthHeader: String? {
         guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     var body: some View {
@@ -329,7 +329,7 @@ struct UnifiedTabView: View {
 
     private var yatteeServerAuthHeader: String? {
         guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     var body: some View {
@@ -554,7 +554,7 @@ struct UnifiedTabView: View {
 
     private var yatteeServerAuthHeader: String? {
         guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     var body: some View {

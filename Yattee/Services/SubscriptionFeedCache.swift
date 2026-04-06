@@ -492,7 +492,7 @@ final class SubscriptionFeedCache {
 
         do {
             let yatteeServerAPI = YatteeServerAPI(httpClient: HTTPClient())
-            let authHeader = appEnvironment.yatteeServerCredentialsManager.basicAuthHeader(for: instance)
+            let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance)
             await yatteeServerAPI.setAuthHeader(authHeader)
             LoggingService.shared.debug("refreshFromStatelessServer: Calling postFeed for \(channelRequests.count) channels", category: .general)
             let response = try await yatteeServerAPI.postFeed(
@@ -556,7 +556,7 @@ final class SubscriptionFeedCache {
             StatelessChannelStatusRequest(channelId: $0.channelId, site: $0.site)
         }
         let yatteeServerAPI = YatteeServerAPI(httpClient: HTTPClient())
-        let authHeader = appEnvironment.yatteeServerCredentialsManager.basicAuthHeader(for: instance)
+        let authHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance)
         await yatteeServerAPI.setAuthHeader(authHeader)
 
         let maxRetries = 5

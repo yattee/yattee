@@ -346,7 +346,7 @@ private struct EditRemoteServerContent: View {
 
             // Load existing Yattee Server credentials
             if instance.type == .yatteeServer,
-               let credentials = appEnvironment?.yatteeServerCredentialsManager.credentials(for: instance) {
+               let credentials = appEnvironment?.basicAuthCredentialsManager.credentials(for: instance) {
                 yatteeServerUsername = credentials.username
                 yatteeServerPassword = credentials.password
             }
@@ -438,7 +438,7 @@ private struct EditRemoteServerContent: View {
 
         // Save Yattee Server credentials if provided
         if instance.type == .yatteeServer && !yatteeServerUsername.isEmpty && !yatteeServerPassword.isEmpty {
-            appEnvironment?.yatteeServerCredentialsManager.setCredentials(
+            appEnvironment?.basicAuthCredentialsManager.setCredentials(
                 username: yatteeServerUsername,
                 password: yatteeServerPassword,
                 for: instance

@@ -529,7 +529,7 @@ struct AddRemoteServerView: View {
                             allowInvalidCertificates: allowInvalidCertificates
                         )
 
-                        appEnvironment.yatteeServerCredentialsManager.setCredentials(
+                        appEnvironment.basicAuthCredentialsManager.setCredentials(
                             username: yatteeServerUsername,
                             password: yatteeServerPassword,
                             for: instance

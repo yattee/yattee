@@ -290,7 +290,7 @@ private struct ChannelNotificationToggle: View {
 
     private var authHeader: String? {
         guard let server = yatteeServer else { return nil }
-        return appEnvironment?.yatteeServerCredentialsManager.basicAuthHeader(for: server)
+        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     private var toggleBinding: Binding<Bool> {

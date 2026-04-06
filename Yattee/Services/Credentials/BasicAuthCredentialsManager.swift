@@ -1,24 +1,30 @@
 //
-//  YatteeServerCredentialsManager.swift
+//  BasicAuthCredentialsManager.swift
 //  Yattee
 //
-//  Manages Yattee Server credentials (username/password) stored securely in the Keychain.
+//  Manages HTTP Basic Auth credentials (username/password) stored securely in the Keychain.
+//  Works for any instance type (Invidious, Piped, PeerTube, Yattee Server) — used when an
+//  instance sits behind a reverse proxy that requires HTTP Basic Auth.
 //
 
 import Foundation
 import Security
 
-/// Credential structure for Yattee Server basic authentication.
-struct YatteeServerCredential: Codable {
+/// Credential structure for HTTP Basic authentication.
+struct BasicAuthCredential: Codable {
     let username: String
     let password: String
 }
 
-/// Manages Yattee Server credentials stored securely in the Keychain.
+/// Manages HTTP Basic Auth credentials stored securely in the Keychain.
 @MainActor
 @Observable
-final class YatteeServerCredentialsManager: InstanceCredentialsManager {
-    private let keychainServiceName = "com.yattee.yatteeserver"
+final class BasicAuthCredentialsManager: InstanceCredentialsManager {
+    private let keychainServiceName = "com.yattee.basicauth"
+
+    /// Legacy Keychain service name from when basic auth was Yattee-Server-only.
+    /// We migrate items from this service to `keychainServiceName` on init.
+    private let legacyKeychainServiceName = "com.yattee.yatteeserver"
 
     /// Tracks which instances have stored credentials (for reactive UI updates)
     private(set) var loggedInInstanceIDs: Set<UUID> = []
@@ -31,22 +37,24 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
         settingsManager?.iCloudSyncEnabled == true && settingsManager?.syncInstances == true
     }
 
-    init() {}
+    init() {
+        migrateLegacyKeychainItems()
+    }
 
     // MARK: - Public API
 
-    /// Stores credentials for a Yattee Server instance.
+    /// Stores credentials for an instance.
     /// Credentials sync to iCloud Keychain when iCloud sync is enabled for instances.
     /// - Parameters:
     ///   - username: The username for basic auth
     ///   - password: The password for basic auth
-    ///   - instance: The Yattee Server instance
+    ///   - instance: The instance
     func setCredentials(username: String, password: String, for instance: Instance) {
         let account = instance.id.uuidString
-        let credential = YatteeServerCredential(username: username, password: password)
+        let credential = BasicAuthCredential(username: username, password: password)
 
         guard let data = try? JSONEncoder().encode(credential) else {
-            LoggingService.shared.error("Failed to encode Yattee Server credentials", category: .keychain)
+            LoggingService.shared.error("Failed to encode basic auth credentials", category: .keychain)
             return
         }
 
@@ -74,7 +82,7 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
 
         if status == errSecSuccess {
             LoggingService.shared.info(
-                "Stored credentials for Yattee Server instance",
+                "Stored basic auth credentials for instance",
                 category: .keychain,
                 details: "instanceID=\(instance.id), iCloudSync=\(syncEnabled)"
             )
@@ -82,18 +90,18 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
             loggedInInstanceIDs.insert(instance.id)
         } else {
             LoggingService.shared.error(
-                "Failed to store credentials for Yattee Server instance",
+                "Failed to store basic auth credentials for instance",
                 category: .keychain,
                 details: "instanceID=\(instance.id), status=\(status)"
             )
         }
     }
 
-    /// Retrieves credentials for a Yattee Server instance.
+    /// Retrieves credentials for an instance.
     /// Searches both synced and non-synced items.
-    /// - Parameter instance: The Yattee Server instance
+    /// - Parameter instance: The instance
     /// - Returns: The credentials if stored, nil otherwise
-    func credentials(for instance: Instance) -> YatteeServerCredential? {
+    func credentials(for instance: Instance) -> BasicAuthCredential? {
         let account = instance.id.uuidString
 
         let query: [String: Any] = [
@@ -110,9 +118,9 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
 
         guard status == errSecSuccess,
               let data = result as? Data,
-              let credential = try? JSONDecoder().decode(YatteeServerCredential.self, from: data) else {
+              let credential = try? JSONDecoder().decode(BasicAuthCredential.self, from: data) else {
             LoggingService.shared.debug(
-                "No credentials found for Yattee Server instance",
+                "No basic auth credentials found for instance",
                 category: .keychain,
                 details: "instanceID=\(instance.id), status=\(status)"
             )
@@ -124,7 +132,7 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
 
     /// Deletes credentials for an instance.
     /// Deletes both synced and non-synced items.
-    /// - Parameter instance: The Yattee Server instance
+    /// - Parameter instance: The instance
     func deleteCredentials(for instance: Instance) {
         let account = instance.id.uuidString
 
@@ -139,13 +147,13 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
 
         if status == errSecSuccess || status == errSecItemNotFound {
             LoggingService.shared.info(
-                "Deleted credentials for Yattee Server instance",
+                "Deleted basic auth credentials for instance",
                 category: .keychain,
                 details: "instanceID=\(instance.id)"
             )
         } else {
             LoggingService.shared.error(
-                "Failed to delete credentials for Yattee Server instance",
+                "Failed to delete basic auth credentials for instance",
                 category: .keychain,
                 details: "instanceID=\(instance.id), status=\(status)"
             )
@@ -156,7 +164,7 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
     }
 
     /// Checks if an instance has stored credentials.
-    /// - Parameter instance: The Yattee Server instance
+    /// - Parameter instance: The instance
     /// - Returns: true if credentials exist, false otherwise
     func hasCredentials(for instance: Instance) -> Bool {
         // Check tracked set first for performance
@@ -184,15 +192,15 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
     // MARK: - InstanceCredentialsManager Protocol
 
     /// Stores a credential for an instance (protocol conformance).
-    /// The credential is expected to be a JSON-encoded YatteeServerCredential.
+    /// The credential is expected to be a JSON-encoded BasicAuthCredential.
     /// - Parameters:
     ///   - credential: JSON string containing {"username": "...", "password": "..."}
     ///   - instance: The instance to associate the credential with
     func setCredential(_ credential: String, for instance: Instance) {
         guard let data = credential.data(using: .utf8),
-              let creds = try? JSONDecoder().decode(YatteeServerCredential.self, from: data) else {
+              let creds = try? JSONDecoder().decode(BasicAuthCredential.self, from: data) else {
             LoggingService.shared.error(
-                "Failed to decode credential string for Yattee Server",
+                "Failed to decode basic auth credential string",
                 category: .keychain
             )
             return
@@ -229,12 +237,89 @@ final class YatteeServerCredentialsManager: InstanceCredentialsManager {
     // MARK: - Basic Auth Header Generation
 
     /// Generates the HTTP Basic Auth header value for an instance.
-    /// - Parameter instance: The Yattee Server instance
+    /// - Parameter instance: The instance
     /// - Returns: The Authorization header value (e.g., "Basic dXNlcjpwYXNz") or nil if no credentials
     func basicAuthHeader(for instance: Instance) -> String? {
         guard let creds = credentials(for: instance) else { return nil }
         let credentials = "\(creds.username):\(creds.password)"
         guard let data = credentials.data(using: .utf8) else { return nil }
         return "Basic \(data.base64EncodedString())"
+    }
+
+    // MARK: - Legacy Migration
+
+    /// One-time migration of credentials from the legacy Yattee-Server-only Keychain service
+    /// (`com.yattee.yatteeserver`) to the generic basic-auth service (`com.yattee.basicauth`).
+    /// Items are copied (preserving sync attribute) and then deleted from the legacy service.
+    private func migrateLegacyKeychainItems() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: legacyKeychainServiceName,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
+            kSecReturnAttributes as String: true,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitAll
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        guard status == errSecSuccess, let items = result as? [[String: Any]], !items.isEmpty else {
+            return
+        }
+
+        var migrated = 0
+        for item in items {
+            guard let account = item[kSecAttrAccount as String] as? String,
+                  let data = item[kSecValueData as String] as? Data else {
+                continue
+            }
+            let synchronizable = (item[kSecAttrSynchronizable as String] as? Bool) ?? false
+
+            // Skip add if a new-style item already exists for this account.
+            let existsQuery: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: keychainServiceName,
+                kSecAttrAccount as String: account,
+                kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
+                kSecMatchLimit as String: kSecMatchLimitOne
+            ]
+            if SecItemCopyMatching(existsQuery as CFDictionary, nil) != errSecSuccess {
+                let addQuery: [String: Any] = [
+                    kSecClass as String: kSecClassGenericPassword,
+                    kSecAttrService as String: keychainServiceName,
+                    kSecAttrAccount as String: account,
+                    kSecAttrSynchronizable as String: synchronizable,
+                    kSecValueData as String: data
+                ]
+                let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+                if addStatus != errSecSuccess {
+                    LoggingService.shared.error(
+                        "Failed to migrate legacy basic auth credential",
+                        category: .keychain,
+                        details: "account=\(account), status=\(addStatus)"
+                    )
+                    continue
+                }
+                migrated += 1
+            }
+
+            // Delete the legacy item for this account
+            let deleteQuery: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: legacyKeychainServiceName,
+                kSecAttrAccount as String: account,
+                kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
+            ]
+            SecItemDelete(deleteQuery as CFDictionary)
+        }
+
+        if migrated > 0 {
+            LoggingService.shared.info(
+                "Migrated legacy basic auth credentials to generic Keychain service",
+                category: .keychain,
+                details: "count=\(migrated)"
+            )
+        }
     }
 }
