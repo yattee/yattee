@@ -14560,6 +14560,17 @@
         }
       }
     },
+    "sources.retryDetection" : {
+      "comment" : "Button to retry instance detection after providing HTTP Basic Auth credentials",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Detection"
+          }
+        }
+      }
+    },
     "sources.editSource" : {
       "comment" : "Title for edit source view",
       "localizations" : {
@@ -15011,6 +15022,28 @@
         }
       }
     },
+    "sources.footer.basicAuth" : {
+      "comment" : "Footer text explaining optional HTTP Basic Auth credentials for instances behind a reverse proxy",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Provide a username and password if this instance sits behind a reverse proxy that requires HTTP Basic Auth."
+          }
+        }
+      }
+    },
+    "sources.footer.basicAuthRequired" : {
+      "comment" : "Footer text shown when the instance is behind HTTP Basic Auth and credentials are required to detect it",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This server is behind HTTP Basic Auth. Enter the username and password to continue."
+          }
+        }
+      }
+    },
     "sources.footer.yatteeServerAuth" : {
       "comment" : "Footer text explaining Yattee Server authentication",
       "localizations" : {
@@ -15051,6 +15084,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Authentication"
+          }
+        }
+      }
+    },
+    "sources.header.basicAuth" : {
+      "comment" : "Section header for HTTP Basic Auth credentials",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP Basic Authentication"
           }
         }
       }

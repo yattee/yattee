@@ -36,9 +36,13 @@ private struct EditRemoteServerContent: View {
     @State private var allowInvalidCertificates: Bool
     @State private var proxiesVideos: Bool
 
-    // Yattee Server credentials
-    @State private var yatteeServerUsername: String = ""
-    @State private var yatteeServerPassword: String = ""
+    // HTTP Basic Auth credentials (for any instance type behind a reverse proxy;
+    // required for Yattee Server, optional for Invidious/Piped/PeerTube).
+    @State private var basicAuthUsername: String = ""
+    @State private var basicAuthPassword: String = ""
+    /// Tracks whether credentials existed when the view loaded, so we can detect
+    /// "user cleared the fields" and delete the stored credentials on save.
+    @State private var hadStoredBasicAuth: Bool = false
 
     // Invidious login state
     @State private var showLoginSheet = false
@@ -137,28 +141,28 @@ private struct EditRemoteServerContent: View {
                 #endif
             }
 
-            if instance.type == .yatteeServer {
-                Section {
-                    #if os(tvOS)
-                    TVSettingsTextField(title: String(localized: "sources.field.username"), text: $yatteeServerUsername)
-                    TVSettingsTextField(title: String(localized: "sources.field.password"), text: $yatteeServerPassword, isSecure: true)
-                    #else
-                    TextField(String(localized: "sources.field.username"), text: $yatteeServerUsername)
-                        .textContentType(.username)
-                        #if os(iOS)
-                        .textInputAutocapitalization(.never)
-                        #endif
-                        .autocorrectionDisabled()
-
-                    SecureField(String(localized: "sources.field.password"), text: $yatteeServerPassword)
-                        .textContentType(.password)
+            Section {
+                #if os(tvOS)
+                TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
+                TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+                #else
+                TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
+                    .textContentType(.username)
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
                     #endif
-                } header: {
-                    Text(String(localized: "sources.header.auth"))
-                } footer: {
-                    Text(String(localized: "sources.footer.yatteeServerAuth"))
-                }
+                    .autocorrectionDisabled()
 
+                SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
+                    .textContentType(.password)
+                #endif
+            } header: {
+                Text(String(localized: instance.type == .yatteeServer ? "sources.header.auth" : "sources.header.basicAuth"))
+            } footer: {
+                Text(String(localized: instance.type == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
+            }
+
+            if instance.type == .yatteeServer {
                 // Server Info Section
                 Section {
                     if isLoadingServerInfo {
@@ -344,11 +348,11 @@ private struct EditRemoteServerContent: View {
         .onAppear {
             isLoggedIn = appEnvironment?.credentialsManager(for: instance)?.isLoggedIn(for: instance) ?? false
 
-            // Load existing Yattee Server credentials
-            if instance.type == .yatteeServer,
-               let credentials = appEnvironment?.basicAuthCredentialsManager.credentials(for: instance) {
-                yatteeServerUsername = credentials.username
-                yatteeServerPassword = credentials.password
+            // Load existing HTTP Basic Auth credentials (works for any instance type)
+            if let credentials = appEnvironment?.basicAuthCredentialsManager.credentials(for: instance) {
+                basicAuthUsername = credentials.username
+                basicAuthPassword = credentials.password
+                hadStoredBasicAuth = true
             }
         }
         .task {
@@ -436,13 +440,17 @@ private struct EditRemoteServerContent: View {
         updated.allowInvalidCertificates = allowInvalidCertificates
         updated.proxiesVideos = proxiesVideos
 
-        // Save Yattee Server credentials if provided
-        if instance.type == .yatteeServer && !yatteeServerUsername.isEmpty && !yatteeServerPassword.isEmpty {
+        // Save / clear HTTP Basic Auth credentials.
+        // Works for any instance type, but for Yattee Server we never auto-clear
+        // (credentials are required there; the user can re-enter to overwrite).
+        if !basicAuthUsername.isEmpty && !basicAuthPassword.isEmpty {
             appEnvironment?.basicAuthCredentialsManager.setCredentials(
-                username: yatteeServerUsername,
-                password: yatteeServerPassword,
+                username: basicAuthUsername,
+                password: basicAuthPassword,
                 for: instance
             )
+        } else if hadStoredBasicAuth && instance.type != .yatteeServer {
+            appEnvironment?.basicAuthCredentialsManager.deleteCredentials(for: instance)
         }
 
         appEnvironment?.instancesManager.update(updated)

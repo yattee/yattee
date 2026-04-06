@@ -19,6 +19,10 @@ private enum RemoteServerUIState: Equatable {
     case detected(InstanceType)
     /// Detection failed: fields auto-revealed with error message
     case error(String)
+    /// Detection hit a 401: the instance is fronted by HTTP Basic Auth.
+    /// The view exposes username/password fields and a "Retry detection" button.
+    /// `invalidCredentials` is true after a retry that also returned 401.
+    case basicAuthRequired(invalidCredentials: Bool)
 
     static func == (lhs: RemoteServerUIState, rhs: RemoteServerUIState) -> Bool {
         switch (lhs, rhs) {
@@ -26,6 +30,7 @@ private enum RemoteServerUIState: Equatable {
         case (.detecting, .detecting): return true
         case (.detected(let a), .detected(let b)): return a == b
         case (.error(let a), .error(let b)): return a == b
+        case (.basicAuthRequired(let a), .basicAuthRequired(let b)): return a == b
         default: return false
         }
     }
@@ -52,9 +57,10 @@ struct AddRemoteServerView: View {
     @State private var allowInvalidCertificates = false
     @State private var showSSLToggle = false
 
-    // Yattee Server authentication (always required)
-    @State private var yatteeServerUsername = ""
-    @State private var yatteeServerPassword = ""
+    // HTTP Basic Auth credentials. Required for Yattee Server, optional for any other
+    // instance type that sits behind a reverse proxy requiring HTTP Basic Auth.
+    @State private var basicAuthUsername = ""
+    @State private var basicAuthPassword = ""
     @State private var isValidatingCredentials = false
     @State private var credentialValidationError: String?
 
@@ -69,11 +75,16 @@ struct AddRemoteServerView: View {
 
     private var isFieldsRevealed: Bool {
         switch uiState {
-        case .initial, .detecting:
+        case .initial, .detecting, .basicAuthRequired:
             return false
         case .detected, .error:
             return true
         }
+    }
+
+    private var isAwaitingBasicAuth: Bool {
+        if case .basicAuthRequired = uiState { return true }
+        return false
     }
 
     private var canAdd: Bool {
@@ -81,7 +92,7 @@ struct AddRemoteServerView: View {
 
         // For detected Yattee Server, require credentials
         if detectedType == .yatteeServer {
-            return !yatteeServerUsername.isEmpty && !yatteeServerPassword.isEmpty
+            return !basicAuthUsername.isEmpty && !basicAuthPassword.isEmpty
         }
 
         return true
@@ -155,6 +166,10 @@ struct AddRemoteServerView: View {
                 errorSection(message)
             }
 
+            if case .basicAuthRequired(let invalidCredentials) = uiState {
+                basicAuthRequiredSection(invalidCredentials: invalidCredentials)
+            }
+
             if isFieldsRevealed {
                 serverConfigurationFields
                 actionSection
@@ -175,7 +190,7 @@ struct AddRemoteServerView: View {
                     handleURLChange()
                 }
 
-            if !isFieldsRevealed {
+            if !isFieldsRevealed && !isAwaitingBasicAuth {
                 Button {
                     startDetection()
                 } label: {
@@ -205,7 +220,7 @@ struct AddRemoteServerView: View {
                     handleURLChange()
                 }
 
-            if !isFieldsRevealed {
+            if !isFieldsRevealed && !isAwaitingBasicAuth {
                 Button {
                     startDetection()
                 } label: {
@@ -251,6 +266,58 @@ struct AddRemoteServerView: View {
             Label(message, systemImage: "exclamationmark.triangle.fill")
                 .foregroundStyle(.red)
                 .accessibilityIdentifier("addRemoteServer.detectionError")
+        }
+    }
+
+    // MARK: - Basic Auth Required Section
+
+    @ViewBuilder
+    private func basicAuthRequiredSection(invalidCredentials: Bool) -> some View {
+        Section {
+            #if os(tvOS)
+            TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
+            TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+            #else
+            TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
+                .textContentType(.username)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+                .autocorrectionDisabled()
+
+            SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
+                .textContentType(.password)
+            #endif
+        } header: {
+            Text(String(localized: "sources.header.basicAuth"))
+        } footer: {
+            if invalidCredentials {
+                Text(String(localized: "sources.error.basicAuthInvalid"))
+                    .foregroundStyle(.red)
+            } else {
+                Text(String(localized: "sources.footer.basicAuthRequired"))
+            }
+        }
+
+        Section {
+            Button {
+                retryDetectionWithBasicAuth()
+            } label: {
+                if case .detecting = uiState {
+                    HStack {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text(String(localized: "sources.detecting"))
+                    }
+                } else {
+                    Text(String(localized: "sources.retryDetection"))
+                }
+            }
+            .disabled(basicAuthUsername.isEmpty || basicAuthPassword.isEmpty || uiState == .detecting)
+            #if os(tvOS)
+            .buttonStyle(TVSettingsButtonStyle())
+            #endif
+            .accessibilityIdentifier("addRemoteServer.retryDetectionButton")
         }
     }
 
@@ -302,27 +369,33 @@ struct AddRemoteServerView: View {
             }
         }
 
-        // Authentication fields for Yattee Server (always required)
-        if detectedType == .yatteeServer {
+        // HTTP Basic Auth credentials.
+        // Required for Yattee Server (always shown). Optional for other types — show only
+        // when credentials were already provided (e.g., via the basic-auth-required retry
+        // path), so we don't clutter the form for the normal "no proxy" case.
+        let showBasicAuthSection = detectedType == .yatteeServer
+            || (!basicAuthUsername.isEmpty || !basicAuthPassword.isEmpty)
+
+        if showBasicAuthSection {
             Section {
                 #if os(tvOS)
-                TVSettingsTextField(title: String(localized: "sources.field.username"), text: $yatteeServerUsername)
-                TVSettingsTextField(title: String(localized: "sources.field.password"), text: $yatteeServerPassword, isSecure: true)
+                TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
+                TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
                 #else
-                TextField(String(localized: "sources.field.username"), text: $yatteeServerUsername)
+                TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
                     .textContentType(.username)
                     #if os(iOS)
                     .textInputAutocapitalization(.never)
                     #endif
                     .autocorrectionDisabled()
 
-                SecureField(String(localized: "sources.field.password"), text: $yatteeServerPassword)
+                SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
                     .textContentType(.password)
                 #endif
             } header: {
-                Text(String(localized: "sources.header.auth"))
+                Text(String(localized: detectedType == .yatteeServer ? "sources.header.auth" : "sources.header.basicAuth"))
             } footer: {
-                Text(String(localized: "sources.footer.yatteeServerAuth"))
+                Text(String(localized: detectedType == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
             }
 
             if let error = credentialValidationError {
@@ -364,12 +437,15 @@ struct AddRemoteServerView: View {
     private func handleURLChange() {
         cancelDetection()
 
-        if isFieldsRevealed {
+        if isFieldsRevealed || isAwaitingBasicAuth {
             withAnimation {
                 uiState = .initial
                 detectedType = nil
                 detectionResult = nil
                 showSSLToggle = false
+                basicAuthUsername = ""
+                basicAuthPassword = ""
+                credentialValidationError = nil
             }
         }
     }
@@ -400,7 +476,7 @@ struct AddRemoteServerView: View {
         }
     }
 
-    private func performDetection(url: URL) async {
+    private func performDetection(url: URL, basicAuthHeader: String? = nil) async {
         guard let appEnvironment else { return }
 
         let detector: InstanceDetector
@@ -411,7 +487,7 @@ struct AddRemoteServerView: View {
             detector = appEnvironment.instanceDetector
         }
 
-        let result = await detector.detectWithResult(url: url)
+        let result = await detector.detectWithResult(url: url, basicAuthHeader: basicAuthHeader)
 
         if Task.isCancelled { return }
 
@@ -425,6 +501,18 @@ struct AddRemoteServerView: View {
                     self.uiState = .detected(detectionResult.type)
                 }
 
+            case .failure(.basicAuthRequired):
+                LoggingService.shared.debug("[AddRemoteServerView] Detection requires basic auth credentials", category: .api)
+                withAnimation {
+                    self.uiState = .basicAuthRequired(invalidCredentials: false)
+                }
+
+            case .failure(.basicAuthInvalid):
+                LoggingService.shared.debug("[AddRemoteServerView] Basic auth credentials rejected by server", category: .api)
+                withAnimation {
+                    self.uiState = .basicAuthRequired(invalidCredentials: true)
+                }
+
             case .failure(let error):
                 LoggingService.shared.debug("[AddRemoteServerView] Detection failed: \(error)", category: .api)
                 withAnimation {
@@ -434,6 +522,30 @@ struct AddRemoteServerView: View {
                     self.uiState = .error(error.localizedDescription)
                 }
             }
+        }
+    }
+
+    private func retryDetectionWithBasicAuth() {
+        guard !basicAuthUsername.isEmpty, !basicAuthPassword.isEmpty else { return }
+        guard let url = Instance.normalizeSourceURL(urlString) else {
+            withAnimation {
+                uiState = .error(String(localized: "sources.validation.invalidURL"))
+            }
+            return
+        }
+
+        let credentials = "\(basicAuthUsername):\(basicAuthPassword)"
+        guard let credentialData = credentials.data(using: .utf8) else { return }
+        let authHeader = "Basic \(credentialData.base64EncodedString())"
+
+        cancelDetection()
+
+        withAnimation {
+            uiState = .detecting
+        }
+
+        detectionTask = Task {
+            await performDetection(url: url, basicAuthHeader: authHeader)
         }
     }
 
@@ -487,6 +599,16 @@ struct AddRemoteServerView: View {
                         addServer(type: detectionResult.type, url: url, appEnvironment: appEnvironment)
                     }
 
+                case .failure(.basicAuthRequired):
+                    withAnimation {
+                        self.uiState = .basicAuthRequired(invalidCredentials: false)
+                    }
+
+                case .failure(.basicAuthInvalid):
+                    withAnimation {
+                        self.uiState = .basicAuthRequired(invalidCredentials: true)
+                    }
+
                 case .failure(let error):
                     withAnimation {
                         if case .sslCertificateError = error {
@@ -502,7 +624,7 @@ struct AddRemoteServerView: View {
     private func addServer(type: InstanceType, url: URL, appEnvironment: AppEnvironment) {
         // For Yattee Server, always validate credentials first
         if type == .yatteeServer {
-            guard !yatteeServerUsername.isEmpty, !yatteeServerPassword.isEmpty else {
+            guard !basicAuthUsername.isEmpty, !basicAuthPassword.isEmpty else {
                 credentialValidationError = String(localized: "sources.error.credentialsRequired")
                 return
             }
@@ -513,8 +635,8 @@ struct AddRemoteServerView: View {
             Task {
                 let isValid = await validateYatteeServerCredentials(
                     url: url,
-                    username: yatteeServerUsername,
-                    password: yatteeServerPassword,
+                    username: basicAuthUsername,
+                    password: basicAuthPassword,
                     appEnvironment: appEnvironment
                 )
 
@@ -530,8 +652,8 @@ struct AddRemoteServerView: View {
                         )
 
                         appEnvironment.basicAuthCredentialsManager.setCredentials(
-                            username: yatteeServerUsername,
-                            password: yatteeServerPassword,
+                            username: basicAuthUsername,
+                            password: basicAuthPassword,
                             for: instance
                         )
 
@@ -554,13 +676,22 @@ struct AddRemoteServerView: View {
             return
         }
 
-        // For other instance types (no auth required)
+        // For other instance types: optionally store HTTP Basic Auth credentials
+        // (used when the instance is fronted by a reverse proxy that requires basic auth).
         let instance = Instance(
             type: type,
             url: url,
             name: name.isEmpty ? nil : name,
             allowInvalidCertificates: allowInvalidCertificates
         )
+
+        if !basicAuthUsername.isEmpty && !basicAuthPassword.isEmpty {
+            appEnvironment.basicAuthCredentialsManager.setCredentials(
+                username: basicAuthUsername,
+                password: basicAuthPassword,
+                for: instance
+            )
+        }
 
         appEnvironment.instancesManager.add(instance)
         if let dismissSheet {
