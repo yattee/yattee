@@ -297,11 +297,12 @@ actor PipedAPI: InstanceAPI {
     ///   - authToken: The auth token from login
     /// - Returns: Array of subscribed channels
     func subscriptions(instance: Instance, authToken: String) async throws -> [PipedSubscription] {
-        // Subscriptions endpoint uses Authorization header
+        // Piped accepts the auth token via the `authToken` query parameter, which keeps the
+        // `Authorization` header free for HTTP Basic Auth from a fronting reverse proxy.
         let endpoint = GenericEndpoint(
             path: "/subscriptions",
             method: .get,
-            headers: ["Authorization": authToken]
+            queryItems: [URLQueryItem(name: "authToken", value: authToken)]
         )
         let response: [PipedSubscription] = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return response
@@ -321,7 +322,8 @@ actor PipedAPI: InstanceAPI {
         let endpoint = GenericEndpoint(
             path: "/subscribe",
             method: .post,
-            headers: ["Authorization": authToken, "Content-Type": "application/json"],
+            queryItems: [URLQueryItem(name: "authToken", value: authToken)],
+            headers: ["Content-Type": "application/json"],
             body: bodyData
         )
 
@@ -343,7 +345,8 @@ actor PipedAPI: InstanceAPI {
         let endpoint = GenericEndpoint(
             path: "/unsubscribe",
             method: .post,
-            headers: ["Authorization": authToken, "Content-Type": "application/json"],
+            queryItems: [URLQueryItem(name: "authToken", value: authToken)],
+            headers: ["Content-Type": "application/json"],
             body: bodyData
         )
 
@@ -359,7 +362,7 @@ actor PipedAPI: InstanceAPI {
         let endpoint = GenericEndpoint(
             path: "/user/playlists",
             method: .get,
-            headers: ["Authorization": authToken]
+            queryItems: [URLQueryItem(name: "authToken", value: authToken)]
         )
         let response: [PipedUserPlaylist] = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return response.map { $0.toPlaylist() }
@@ -372,11 +375,11 @@ actor PipedAPI: InstanceAPI {
     ///   - authToken: The auth token from login
     /// - Returns: Playlist with videos
     func userPlaylist(id: String, instance: Instance, authToken: String) async throws -> Playlist {
-        let headers = ["Authorization": authToken]
+        let authQueryItem = URLQueryItem(name: "authToken", value: authToken)
         let firstEndpoint = GenericEndpoint(
             path: "/playlists/\(id)",
             method: .get,
-            headers: headers
+            queryItems: [authQueryItem]
         )
         let firstResponse: PipedPlaylistResponse = try await httpClient.fetch(firstEndpoint, baseURL: instance.url)
         var allStreams = firstResponse.relatedStreams ?? []
@@ -387,8 +390,7 @@ actor PipedAPI: InstanceAPI {
         while let token = nextpage, page < maxPages {
             let nextEndpoint = GenericEndpoint(
                 path: "/nextpage/playlists/\(id)",
-                queryItems: [URLQueryItem(name: "nextpage", value: token)],
-                headers: headers
+                queryItems: [URLQueryItem(name: "nextpage", value: token), authQueryItem]
             )
             let nextResponse: PipedPlaylistNextPageResponse = try await httpClient.fetch(nextEndpoint, baseURL: instance.url)
             let pageStreams = nextResponse.relatedStreams ?? []
