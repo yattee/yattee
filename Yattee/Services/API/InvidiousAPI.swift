@@ -348,7 +348,7 @@ actor InvidiousAPI: InstanceAPI {
     ///   - password: The user's password
     ///   - instance: The Invidious instance to log in to
     /// - Returns: The session ID (SID) cookie value
-    func login(email: String, password: String, instance: Instance) async throws -> String {
+    func login(email: String, password: String, instance: Instance, extraHeaders: [String: String]? = nil) async throws -> String {
         // Build form-urlencoded body using URLComponents for standard encoding
         var components = URLComponents()
         components.queryItems = [
@@ -369,6 +369,16 @@ actor InvidiousAPI: InstanceAPI {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = bodyData
+
+        // Apply any extra headers (e.g. an HTTP Basic Auth Authorization header
+        // for instances behind a reverse proxy). The login endpoint uses its own
+        // URLSession below to capture Set-Cookie, so it cannot inherit headers
+        // from the injected httpClient.
+        if let extraHeaders {
+            for (key, value) in extraHeaders {
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
 
         // Use a session that doesn't follow redirects so we can capture the Set-Cookie header
         let sessionConfig = URLSessionConfiguration.ephemeral

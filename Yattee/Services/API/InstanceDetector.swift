@@ -94,11 +94,17 @@ actor InstanceDetector {
         basicAuthHeader: String? = nil
     ) async -> Result<InstanceDetectionResult, DetectionError> {
         let extraHeaders: [String: String]? = basicAuthHeader.map { ["Authorization": $0] }
-        // If we already supplied credentials and still get 401, those credentials are wrong.
-        let unauthorizedError: DetectionError = basicAuthHeader == nil ? .basicAuthRequired : .basicAuthInvalid
 
-        // Try each detection method in order of specificity
-        // Check Yattee Server first as it's most specific
+        // A 401 from a single probe is *not* enough to conclude that credentials are
+        // invalid. Some probe paths (e.g. Yattee Server's `/info`) trigger an HTTP
+        // redirect on Invidious, and iOS URLSession strips the Authorization header
+        // when following redirects, so the redirected request 401s even when the
+        // credentials are valid. We instead consider credentials bad only if EVERY
+        // probe failed with 401 and none matched.
+        var sawUnauthorized = false
+
+        // Try each detection method in order of specificity.
+        // Check Yattee Server first as it's most specific.
         do {
             if let result = try await detectYatteeServerWithError(url: url, extraHeaders: extraHeaders) {
                 return .success(result)
@@ -106,7 +112,7 @@ actor InstanceDetector {
         } catch let error as DetectionError {
             return .failure(error)
         } catch APIError.unauthorized {
-            return .failure(unauthorizedError)
+            sawUnauthorized = true
         } catch {
             // Continue to next detection method
         }
@@ -116,7 +122,7 @@ actor InstanceDetector {
                 return .success(InstanceDetectionResult(type: .peertube))
             }
         } catch APIError.unauthorized {
-            return .failure(unauthorizedError)
+            sawUnauthorized = true
         } catch {
             // Continue to next detection method
         }
@@ -126,7 +132,7 @@ actor InstanceDetector {
                 return .success(InstanceDetectionResult(type: .invidious))
             }
         } catch APIError.unauthorized {
-            return .failure(unauthorizedError)
+            sawUnauthorized = true
         } catch {
             // Continue to next detection method
         }
@@ -136,11 +142,17 @@ actor InstanceDetector {
                 return .success(InstanceDetectionResult(type: .piped))
             }
         } catch APIError.unauthorized {
-            return .failure(unauthorizedError)
+            sawUnauthorized = true
         } catch {
             // Fall through
         }
 
+        // No probe matched. If at least one probe returned 401, the instance is
+        // (or appears to be) behind HTTP Basic Auth. Distinguish "needs creds" from
+        // "creds rejected" by whether the caller already supplied a header.
+        if sawUnauthorized {
+            return .failure(basicAuthHeader == nil ? .basicAuthRequired : .basicAuthInvalid)
+        }
         return .failure(.unknownType)
     }
 
