@@ -14,6 +14,12 @@ enum DetectionError: Error, Sendable {
     case unknownType
     case invalidURL
     case timeout
+    /// The instance is fronted by an HTTP Basic Auth challenge (401). The user must
+    /// supply credentials before detection can identify the backend type.
+    case basicAuthRequired
+    /// Detection was retried with HTTP Basic Auth credentials but the server still
+    /// returned 401 — the credentials are invalid.
+    case basicAuthInvalid
 
     var localizedDescription: String {
         switch self {
@@ -27,6 +33,10 @@ enum DetectionError: Error, Sendable {
             return String(localized: "sources.validation.invalidURL")
         case .timeout:
             return String(localized: "sources.error.timeout")
+        case .basicAuthRequired:
+            return String(localized: "sources.error.basicAuthRequired")
+        case .basicAuthInvalid:
+            return String(localized: "sources.error.basicAuthInvalid")
         }
     }
 }
@@ -73,31 +83,62 @@ actor InstanceDetector {
     }
 
     /// Detects the instance type with detailed error reporting.
-    /// - Parameter url: The base URL of the instance.
+    /// - Parameters:
+    ///   - url: The base URL of the instance.
+    ///   - basicAuthHeader: Optional HTTP Basic Auth header value (e.g., "Basic dXNlcjpwYXNz")
+    ///     to inject into every probe. Used to retry detection after the user provides
+    ///     credentials for an instance fronted by a reverse proxy.
     /// - Returns: Result containing either the detection result or a detailed error.
-    func detectWithResult(url: URL) async -> Result<InstanceDetectionResult, DetectionError> {
+    func detectWithResult(
+        url: URL,
+        basicAuthHeader: String? = nil
+    ) async -> Result<InstanceDetectionResult, DetectionError> {
+        let extraHeaders: [String: String]? = basicAuthHeader.map { ["Authorization": $0] }
+        // If we already supplied credentials and still get 401, those credentials are wrong.
+        let unauthorizedError: DetectionError = basicAuthHeader == nil ? .basicAuthRequired : .basicAuthInvalid
+
         // Try each detection method in order of specificity
         // Check Yattee Server first as it's most specific
         do {
-            if let result = try await detectYatteeServerWithError(url: url) {
+            if let result = try await detectYatteeServerWithError(url: url, extraHeaders: extraHeaders) {
                 return .success(result)
             }
         } catch let error as DetectionError {
             return .failure(error)
+        } catch APIError.unauthorized {
+            return .failure(unauthorizedError)
         } catch {
             // Continue to next detection method
         }
 
-        if await isPeerTube(url: url) {
-            return .success(InstanceDetectionResult(type: .peertube))
+        do {
+            if try await isPeerTube(url: url, extraHeaders: extraHeaders) {
+                return .success(InstanceDetectionResult(type: .peertube))
+            }
+        } catch APIError.unauthorized {
+            return .failure(unauthorizedError)
+        } catch {
+            // Continue to next detection method
         }
 
-        if await isInvidious(url: url) {
-            return .success(InstanceDetectionResult(type: .invidious))
+        do {
+            if try await isInvidious(url: url, extraHeaders: extraHeaders) {
+                return .success(InstanceDetectionResult(type: .invidious))
+            }
+        } catch APIError.unauthorized {
+            return .failure(unauthorizedError)
+        } catch {
+            // Continue to next detection method
         }
 
-        if await isPiped(url: url) {
-            return .success(InstanceDetectionResult(type: .piped))
+        do {
+            if try await isPiped(url: url, extraHeaders: extraHeaders) {
+                return .success(InstanceDetectionResult(type: .piped))
+            }
+        } catch APIError.unauthorized {
+            return .failure(unauthorizedError)
+        } catch {
+            // Fall through
         }
 
         return .failure(.unknownType)
@@ -105,21 +146,17 @@ actor InstanceDetector {
 
     // MARK: - Detection Methods
 
-    /// Detects if the instance is a Yattee Server.
-    /// Auth is always required for Yattee Server (after initial setup).
-    /// - Parameter url: The base URL to check.
-    /// - Returns: Detection result with type (always requiresAuth=true), or nil if not a Yattee Server.
-    private func detectYatteeServer(url: URL) async -> InstanceDetectionResult? {
-        try? await detectYatteeServerWithError(url: url)
-    }
-
     /// Detects if the instance is a Yattee Server with detailed error reporting.
-    private func detectYatteeServerWithError(url: URL) async throws -> InstanceDetectionResult? {
+    /// Throws `APIError.unauthorized` if the probe receives a 401, so the caller can prompt for credentials.
+    private func detectYatteeServerWithError(
+        url: URL,
+        extraHeaders: [String: String]? = nil
+    ) async throws -> InstanceDetectionResult? {
         let endpoint = GenericEndpoint.get("/info")
 
         do {
             // First, get raw data to debug the response
-            let rawData = try await httpClient.fetchData(endpoint, baseURL: url)
+            let rawData = try await httpClient.fetchData(endpoint, baseURL: url, customHeaders: extraHeaders)
             if let rawString = String(data: rawData, encoding: .utf8) {
                 LoggingService.shared.debug("[InstanceDetector] Raw /info response: \(rawString)", category: .api)
             }
@@ -138,6 +175,9 @@ actor InstanceDetector {
                 return result
             }
             return nil
+        } catch APIError.unauthorized {
+            LoggingService.shared.debug("[InstanceDetector] /info returned 401 — basic auth required", category: .api)
+            throw APIError.unauthorized
         } catch let urlError as URLError {
             LoggingService.shared.error("[InstanceDetector] detectYatteeServer URLError", category: .api, details: urlError.localizedDescription)
             // Check for SSL certificate errors
@@ -158,42 +198,51 @@ actor InstanceDetector {
         }
     }
 
-    /// Checks if the instance is PeerTube by calling /api/v1/config
-    private func isPeerTube(url: URL) async -> Bool {
+    /// Checks if the instance is PeerTube by calling /api/v1/config.
+    /// Re-throws `APIError.unauthorized` so the caller can prompt for basic-auth credentials.
+    private func isPeerTube(url: URL, extraHeaders: [String: String]? = nil) async throws -> Bool {
         let endpoint = GenericEndpoint.get("/api/v1/config")
 
         do {
-            let response: InstanceDetectorModels.PeerTubeConfig = try await httpClient.fetch(endpoint, baseURL: url)
+            let response: InstanceDetectorModels.PeerTubeConfig = try await httpClient.fetch(endpoint, baseURL: url, customHeaders: extraHeaders)
             // PeerTube config has specific fields
             return response.instance != nil || response.serverVersion != nil
+        } catch APIError.unauthorized {
+            throw APIError.unauthorized
         } catch {
             return false
         }
     }
 
-    /// Checks if the instance is Invidious by calling /api/v1/stats
-    private func isInvidious(url: URL) async -> Bool {
+    /// Checks if the instance is Invidious by calling /api/v1/stats.
+    /// Re-throws `APIError.unauthorized` so the caller can prompt for basic-auth credentials.
+    private func isInvidious(url: URL, extraHeaders: [String: String]? = nil) async throws -> Bool {
         let endpoint = GenericEndpoint.get("/api/v1/stats")
 
         do {
-            let response: InstanceDetectorModels.InvidiousStats = try await httpClient.fetch(endpoint, baseURL: url)
+            let response: InstanceDetectorModels.InvidiousStats = try await httpClient.fetch(endpoint, baseURL: url, customHeaders: extraHeaders)
             // Invidious stats has software.name = "invidious"
             return response.software?.name?.lowercased() == "invidious"
+        } catch APIError.unauthorized {
+            throw APIError.unauthorized
         } catch {
             return false
         }
     }
 
-    /// Checks if the instance is Piped by probing Piped-specific endpoints
-    private func isPiped(url: URL) async -> Bool {
+    /// Checks if the instance is Piped by probing Piped-specific endpoints.
+    /// Re-throws `APIError.unauthorized` so the caller can prompt for basic-auth credentials.
+    private func isPiped(url: URL, extraHeaders: [String: String]? = nil) async throws -> Bool {
         // Piped has a /healthcheck endpoint that returns "OK"
         let healthEndpoint = GenericEndpoint.get("/healthcheck")
 
         do {
-            let data = try await httpClient.fetchData(healthEndpoint, baseURL: url)
+            let data = try await httpClient.fetchData(healthEndpoint, baseURL: url, customHeaders: extraHeaders)
             if let text = String(data: data, encoding: .utf8), text.contains("OK") {
                 return true
             }
+        } catch APIError.unauthorized {
+            throw APIError.unauthorized
         } catch {
             // Continue to next check
         }
@@ -202,9 +251,11 @@ actor InstanceDetector {
         let configEndpoint = GenericEndpoint.get("/config")
 
         do {
-            let response: InstanceDetectorModels.PipedConfig = try await httpClient.fetch(configEndpoint, baseURL: url)
+            let response: InstanceDetectorModels.PipedConfig = try await httpClient.fetch(configEndpoint, baseURL: url, customHeaders: extraHeaders)
             // Piped config has specific fields
             return response.donationUrl != nil || response.statusPageUrl != nil
+        } catch APIError.unauthorized {
+            throw APIError.unauthorized
         } catch {
             return false
         }

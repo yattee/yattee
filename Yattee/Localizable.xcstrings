@@ -14593,6 +14593,28 @@
         }
       }
     },
+    "sources.error.basicAuthInvalid" : {
+      "comment" : "Error when HTTP Basic Auth credentials are rejected by the server",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid HTTP Basic Auth credentials. Check the username and password."
+          }
+        }
+      }
+    },
+    "sources.error.basicAuthRequired" : {
+      "comment" : "Error when an instance is fronted by HTTP Basic Auth and credentials are required to detect its type",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This instance requires HTTP Basic Auth. Enter a username and password to continue."
+          }
+        }
+      }
+    },
     "sources.error.couldNotDetect" : {
       "comment" : "Error when source type could not be detected",
       "localizations" : {
