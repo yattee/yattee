@@ -36,6 +36,7 @@ struct ViewOptionsSheet: View {
         NavigationStack {
             formContent
         }
+        .padding(.horizontal, 40)
         #else
         formContent
         #endif
