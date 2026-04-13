@@ -643,10 +643,12 @@ struct SearchView: View {
                                             }
                                         }
 
+                                        #if !os(tvOS)
                                         if history.id != displayedSearchHistory.last?.id {
                                             Divider()
                                                 .padding(.leading, 52)
                                         }
+                                        #endif
                                     }
                                 }
                                 #if os(tvOS)
