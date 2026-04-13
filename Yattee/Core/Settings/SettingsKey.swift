@@ -116,9 +116,26 @@ enum SettingsKey: String, CaseIterable {
     case onboardingCompleted
 
     /// Whether this key should have platform-specific prefixes.
+    /// Platform-specific keys are stored under a `iOS.` / `macOS.` / `tvOS.` prefix
+    /// in both UserDefaults and iCloud, so each platform family syncs independently.
     var isPlatformSpecific: Bool {
         switch self {
-        case .preferredQuality, .cellularQuality, .macPlayerMode, .listStyle:
+        case .preferredQuality, .cellularQuality, .macPlayerMode, .listStyle,
+             // Home layout — different UI paradigms per platform
+             .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout,
+             .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit,
+             // Tab bar (compact size class) layout
+             .tabBarItemOrder, .tabBarItemVisibility, .tabBarStartupTab,
+             // Sidebar layout/selection
+             .sidebarMainItemOrder, .sidebarMainItemVisibility, .sidebarStartupTab,
+             .sidebarSourcesEnabled, .sidebarSourceSort, .sidebarSourcesLimitEnabled, .sidebarMaxSources,
+             .sidebarChannelsEnabled, .sidebarMaxChannels, .sidebarChannelSort, .sidebarChannelsLimitEnabled,
+             .sidebarPlaylistsEnabled, .sidebarMaxPlaylists, .sidebarPlaylistSort, .sidebarPlaylistsLimitEnabled,
+             // Player details panel — iOS/iPadOS only, different on other platforms
+             .floatingDetailsPanelSide, .floatingDetailsPanelWidth,
+             .landscapeDetailsPanelVisible, .landscapeDetailsPanelPinned,
+             // Video swipe actions — touch-gesture feature
+             .videoSwipeActionOrder, .videoSwipeActionVisibility:
             return true
         default:
             return false

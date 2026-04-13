@@ -252,6 +252,12 @@ final class SettingsManager {
             }
         }
 
+        // One-shot migration: move legacy unprefixed values for keys that became
+        // platform-specific into their new iOS./macOS./tvOS. slots. Must run before
+        // the initial iCloud refresh so it can seed the prefixed iCloud slot from the
+        // current local value before any remote data is read.
+        migrateLayoutKeysToPlatformPrefixed()
+
         // Initial sync from iCloud to local storage (async to avoid blocking app launch)
         // This ensures local defaults have the latest iCloud values before any reads.
         // While sync is pending, suppress iCloud writes from set() to prevent stale
