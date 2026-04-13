@@ -907,19 +907,21 @@ struct SearchView: View {
     @ViewBuilder
     private var resultsViewWithLoading: some View {
         if searchViewModel != nil {
+            #if os(tvOS)
+            ProgressView()
+                .accessibilityIdentifier("search.loading")
+                .frame(maxWidth: .infinity)
+                .padding(.top, 40)
+            #else
             resultsBackgroundStyle.color
                 .ignoresSafeArea()
                 .overlay(
                     ScrollView {
                         VStack(spacing: 16) {
-                            #if !os(tvOS)
-                            // Filter strip at top (only for instances that support search filters)
                             if searchInstance?.supportsSearchFilters == true {
                                 searchFiltersStrip
                             }
-                            #endif
 
-                            // Loading indicator
                             ProgressView()
                                 .accessibilityIdentifier("search.loading")
                                 .frame(maxWidth: .infinity)
@@ -927,12 +929,34 @@ struct SearchView: View {
                         }
                     }
                 )
+            #endif
         }
     }
 
     @ViewBuilder
     private var resultsView: some View {
         if searchViewModel != nil {
+            #if os(tvOS)
+            ScrollView {
+                if layout == .list {
+                    listResultsContent
+                } else {
+                    gridResultsContent
+                }
+            }
+            .accessibilityLabel("search.results")
+            .background(
+                GeometryReader { geometry in
+                    Color.clear
+                        .onAppear {
+                            viewWidth = geometry.size.width
+                        }
+                        .onChange(of: geometry.size.width) { _, newWidth in
+                            viewWidth = newWidth
+                        }
+                }
+            )
+            #else
             resultsBackgroundStyle.color
                 .ignoresSafeArea()
                 .overlay(
@@ -956,6 +980,7 @@ struct SearchView: View {
                         }
                     )
                 )
+            #endif
         }
     }
 
