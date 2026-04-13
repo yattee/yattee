@@ -43,7 +43,7 @@ enum GridConstants {
     /// Spacing between grid items.
     static let spacing: CGFloat = {
         #if os(tvOS)
-        32
+        48
         #else
         12
         #endif
