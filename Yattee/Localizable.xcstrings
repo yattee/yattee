@@ -8131,6 +8131,16 @@
         }
       }
     },
+    "search.filters.type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        }
+      }
+    },
     "search.hint.description" : {
       "localizations" : {
         "en" : {
@@ -14560,17 +14570,6 @@
         }
       }
     },
-    "sources.retryDetection" : {
-      "comment" : "Button to retry instance detection after providing HTTP Basic Auth credentials",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retry Detection"
-          }
-        }
-      }
-    },
     "sources.editSource" : {
       "comment" : "Title for edit source view",
       "localizations" : {
@@ -14934,6 +14933,28 @@
         }
       }
     },
+    "sources.footer.basicAuth" : {
+      "comment" : "Footer text explaining optional HTTP Basic Auth credentials for instances behind a reverse proxy",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Provide a username and password if this instance sits behind a reverse proxy that requires HTTP Basic Auth."
+          }
+        }
+      }
+    },
+    "sources.footer.basicAuthRequired" : {
+      "comment" : "Footer text shown when the instance is behind HTTP Basic Auth and credentials are required to detect it",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This server is behind HTTP Basic Auth. Enter the username and password to continue."
+          }
+        }
+      }
+    },
     "sources.footer.discovery" : {
       "comment" : "Footer text for network discovery section",
       "localizations" : {
@@ -15018,28 +15039,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "WebDAV share address"
-          }
-        }
-      }
-    },
-    "sources.footer.basicAuth" : {
-      "comment" : "Footer text explaining optional HTTP Basic Auth credentials for instances behind a reverse proxy",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optional. Provide a username and password if this instance sits behind a reverse proxy that requires HTTP Basic Auth."
-          }
-        }
-      }
-    },
-    "sources.footer.basicAuthRequired" : {
-      "comment" : "Footer text shown when the instance is behind HTTP Basic Auth and credentials are required to detect it",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This server is behind HTTP Basic Auth. Enter the username and password to continue."
           }
         }
       }
@@ -15237,6 +15236,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Server URL"
+          }
+        }
+      }
+    },
+    "sources.retryDetection" : {
+      "comment" : "Button to retry instance detection after providing HTTP Basic Auth credentials",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry Detection"
           }
         }
       }
