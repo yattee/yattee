@@ -149,11 +149,12 @@ struct InstanceBrowseView: View {
                 .focusSection()
                 .padding(.horizontal, 48)
                 .padding(.top, 20)
-                .padding(.bottom, 10)
-
                 // Content
                 ScrollView {
                     VStack(spacing: 0) {
+                        Spacer()
+                            .frame(height: 20)
+
                         // Tab picker (hidden during search)
                         if !isInSearchMode {
                             Picker("", selection: $selectedTab) {
