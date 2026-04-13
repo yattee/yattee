@@ -117,7 +117,7 @@ struct InstanceBrowseView: View {
         GeometryReader { geometry in
             #if os(tvOS)
             VStack(spacing: 0) {
-                // tvOS: Inline search field and view options button
+                // tvOS: Search field, type filter, search filters, view options
                 HStack(spacing: 24) {
                     TextField("instance.browse.search.placeholder", text: $searchText)
                         .textFieldStyle(.plain)
@@ -125,6 +125,20 @@ struct InstanceBrowseView: View {
                             searchViewModel?.cancelSuggestions()
                             Task { await searchViewModel?.search(query: searchText) }
                         }
+
+                    // Type filter
+                    filterMenu(
+                        title: String(localized: "search.filters.type"),
+                        selection: Binding(
+                            get: { searchViewModel?.filters.type ?? .video },
+                            set: { searchViewModel?.filters.type = $0 }
+                        ),
+                        options: SearchContentType.allCases,
+                        labelForOption: { $0.title }
+                    )
+
+                    // Combined search filters menu
+                    tvOSFiltersMenu
 
                     Button {
                         showViewOptions = true
@@ -154,11 +168,6 @@ struct InstanceBrowseView: View {
                         // Feed channel filter strip (hidden during search)
                         if selectedTab == .feed && !feedSubscriptions.isEmpty && !isInSearchMode {
                             feedChannelFilterStrip
-                        }
-
-                        // Search filter strip (shown persistently after search submitted)
-                        if isInSearchMode && (searchViewModel?.hasSearched ?? false) && instance.supportsSearchFilters {
-                            searchFiltersStrip
                         }
 
                         // Content
@@ -510,81 +519,6 @@ struct InstanceBrowseView: View {
 
     // MARK: - Search Filters Strip
 
-    private var searchFiltersStrip: some View {
-        HStack(spacing: 12) {
-            #if os(tvOS)
-            // tvOS: Inline filter menus instead of sheet
-            filterMenu(
-                title: String(localized: "search.sort"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.sort ?? .relevance },
-                    set: { searchViewModel?.filters.sort = $0 }
-                ),
-                options: SearchSortOption.allCases,
-                labelForOption: { $0.title }
-            )
-            filterMenu(
-                title: String(localized: "search.uploadDate"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.date ?? .any },
-                    set: { searchViewModel?.filters.date = $0 }
-                ),
-                options: SearchDateFilter.allCases,
-                labelForOption: { $0.title }
-            )
-            filterMenu(
-                title: String(localized: "search.duration"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.duration ?? .any },
-                    set: { searchViewModel?.filters.duration = $0 }
-                ),
-                options: SearchDurationFilter.allCases,
-                labelForOption: { $0.title }
-            )
-            #else
-            // Filter button
-            Button {
-                showFilterSheet = true
-            } label: {
-                Image(systemName: (searchViewModel?.filters.isDefault ?? true)
-                    ? "line.3.horizontal.decrease.circle"
-                    : "line.3.horizontal.decrease.circle.fill")
-                    .font(.title2)
-            }
-            #endif
-
-            // Content type picker
-            #if os(tvOS)
-            filterMenu(
-                title: String(localized: "search.filters.type"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.type ?? .video },
-                    set: { searchViewModel?.filters.type = $0 }
-                ),
-                options: SearchContentType.allCases,
-                labelForOption: { $0.title }
-            )
-            #else
-            Picker("", selection: Binding(
-                get: { searchViewModel?.filters.type ?? .video },
-                set: { searchViewModel?.filters.type = $0 }
-            )) {
-                ForEach(SearchContentType.allCases) { type in
-                    Text(type.title).tag(type)
-                }
-            }
-            .pickerStyle(.segmented)
-            #endif
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .onChange(of: searchViewModel?.filters.type) { _, _ in
-            Task {
-                await searchViewModel?.search(query: searchText)
-            }
-        }
-    }
-
     #if os(tvOS)
     private func filterMenu<T: Hashable & Identifiable & CaseIterable>(
         title: String,
@@ -608,6 +542,100 @@ struct InstanceBrowseView: View {
         } label: {
             Text(title)
                 .font(.caption)
+        }
+    }
+
+    private var tvOSFiltersMenu: some View {
+        Menu {
+            Menu(String(localized: "search.sort")) {
+                ForEach(SearchSortOption.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.sort = option
+                        Task { await searchViewModel?.search(query: searchText) }
+                    } label: {
+                        if searchViewModel?.filters.sort == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            Menu(String(localized: "search.uploadDate")) {
+                ForEach(SearchDateFilter.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.date = option
+                        Task { await searchViewModel?.search(query: searchText) }
+                    } label: {
+                        if searchViewModel?.filters.date == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            Menu(String(localized: "search.duration")) {
+                ForEach(SearchDurationFilter.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.duration = option
+                        Task { await searchViewModel?.search(query: searchText) }
+                    } label: {
+                        if searchViewModel?.filters.duration == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            Divider()
+
+            Button(role: .destructive) {
+                let currentType = searchViewModel?.filters.type ?? .video
+                searchViewModel?.filters = .defaults
+                searchViewModel?.filters.type = currentType
+                Task { await searchViewModel?.search(query: searchText) }
+            } label: {
+                Label(String(localized: "search.filters.reset"), systemImage: "arrow.counterclockwise")
+            }
+            .disabled(searchViewModel?.filters.isDefault ?? true)
+        } label: {
+            Label(String(localized: "search.filters"), systemImage: "line.3.horizontal.decrease")
+                .font(.caption)
+        }
+    }
+    #else
+    private var searchFiltersStrip: some View {
+        HStack(spacing: 12) {
+            Button {
+                showFilterSheet = true
+            } label: {
+                Image(systemName: (searchViewModel?.filters.isDefault ?? true)
+                    ? "line.3.horizontal.decrease.circle"
+                    : "line.3.horizontal.decrease.circle.fill")
+                    .font(.title2)
+            }
+
+            Picker("", selection: Binding(
+                get: { searchViewModel?.filters.type ?? .video },
+                set: { searchViewModel?.filters.type = $0 }
+            )) {
+                ForEach(SearchContentType.allCases) { type in
+                    Text(type.title).tag(type)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .onChange(of: searchViewModel?.filters.type) { _, _ in
+            Task {
+                await searchViewModel?.search(query: searchText)
+            }
         }
     }
     #endif

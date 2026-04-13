@@ -179,7 +179,7 @@ struct SearchView: View {
     private var tvOSOrDefaultContent: some View {
         #if os(tvOS)
         VStack(spacing: 0) {
-            // tvOS: Inline search field and view options button
+            // tvOS: Search field, type filter, search filters, view options
             HStack(spacing: 24) {
                 TextField("search.placeholder", text: searchTextBinding)
                     .textFieldStyle(.plain)
@@ -191,6 +191,20 @@ struct SearchView: View {
                         }
                         Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
                     }
+
+                // Type filter
+                filterMenu(
+                    title: String(localized: "search.filters.type"),
+                    selection: Binding(
+                        get: { searchViewModel?.filters.type ?? .video },
+                        set: { searchViewModel?.filters.type = $0 }
+                    ),
+                    options: SearchContentType.allCases,
+                    labelForOption: { $0.title }
+                )
+
+                // Combined search filters menu
+                tvOSFiltersMenu
 
                 Button {
                     showViewOptions = true
@@ -382,38 +396,9 @@ struct SearchView: View {
         }
     }
 
+    #if !os(tvOS)
     private var searchFiltersStrip: some View {
         HStack(spacing: 12) {
-            #if os(tvOS)
-            // tvOS: Inline filter menus instead of sheet
-            filterMenu(
-                title: String(localized: "search.sort"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.sort ?? .relevance },
-                    set: { searchViewModel?.filters.sort = $0 }
-                ),
-                options: SearchSortOption.allCases,
-                labelForOption: { $0.title }
-            )
-            filterMenu(
-                title: String(localized: "search.uploadDate"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.date ?? .any },
-                    set: { searchViewModel?.filters.date = $0 }
-                ),
-                options: SearchDateFilter.allCases,
-                labelForOption: { $0.title }
-            )
-            filterMenu(
-                title: String(localized: "search.duration"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.duration ?? .any },
-                    set: { searchViewModel?.filters.duration = $0 }
-                ),
-                options: SearchDurationFilter.allCases,
-                labelForOption: { $0.title }
-            )
-            #else
             // Filter button
             Button {
                 showFilterSheet = true
@@ -423,20 +408,8 @@ struct SearchView: View {
                     : "line.3.horizontal.decrease.circle.fill")
                     .font(.title2)
             }
-            #endif
 
-            // Content type picker
-            #if os(tvOS)
-            filterMenu(
-                title: String(localized: "search.filters.type"),
-                selection: Binding(
-                    get: { searchViewModel?.filters.type ?? .video },
-                    set: { searchViewModel?.filters.type = $0 }
-                ),
-                options: SearchContentType.allCases,
-                labelForOption: { $0.title }
-            )
-            #else
+            // Content type segmented picker
             Picker("", selection: Binding(
                 get: { searchViewModel?.filters.type ?? .video },
                 set: { searchViewModel?.filters.type = $0 }
@@ -446,7 +419,6 @@ struct SearchView: View {
                 }
             }
             .pickerStyle(.segmented)
-            #endif
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
@@ -459,6 +431,7 @@ struct SearchView: View {
             }
         }
     }
+    #endif
 
     #if os(tvOS)
     private func filterMenu<T: Hashable & Identifiable & CaseIterable>(
@@ -485,6 +458,78 @@ struct SearchView: View {
             }
         } label: {
             Text(title)
+                .font(.caption)
+        }
+    }
+
+    private var tvOSFiltersMenu: some View {
+        Menu {
+            // Sort By
+            Menu(String(localized: "search.sort")) {
+                ForEach(SearchSortOption.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.sort = option
+                        if let filters = searchViewModel?.filters { saveFilters(filters) }
+                        Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+                    } label: {
+                        if searchViewModel?.filters.sort == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            // Upload Date
+            Menu(String(localized: "search.uploadDate")) {
+                ForEach(SearchDateFilter.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.date = option
+                        if let filters = searchViewModel?.filters { saveFilters(filters) }
+                        Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+                    } label: {
+                        if searchViewModel?.filters.date == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            // Duration
+            Menu(String(localized: "search.duration")) {
+                ForEach(SearchDurationFilter.allCases) { option in
+                    Button {
+                        searchViewModel?.filters.duration = option
+                        if let filters = searchViewModel?.filters { saveFilters(filters) }
+                        Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+                    } label: {
+                        if searchViewModel?.filters.duration == option {
+                            Label(option.title, systemImage: "checkmark")
+                        } else {
+                            Text(option.title)
+                        }
+                    }
+                }
+            }
+
+            Divider()
+
+            // Reset
+            Button(role: .destructive) {
+                let currentType = searchViewModel?.filters.type ?? .video
+                searchViewModel?.filters = .defaults
+                searchViewModel?.filters.type = currentType
+                if let filters = searchViewModel?.filters { saveFilters(filters) }
+                Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+            } label: {
+                Label(String(localized: "search.filters.reset"), systemImage: "arrow.counterclockwise")
+            }
+            .disabled(searchViewModel?.filters.isDefault ?? true)
+        } label: {
+            Label(String(localized: "search.filters"), systemImage: "line.3.horizontal.decrease")
                 .font(.caption)
         }
     }
@@ -867,10 +912,12 @@ struct SearchView: View {
                 .overlay(
                     ScrollView {
                         VStack(spacing: 16) {
+                            #if !os(tvOS)
                             // Filter strip at top (only for instances that support search filters)
                             if searchInstance?.supportsSearchFilters == true {
                                 searchFiltersStrip
                             }
+                            #endif
 
                             // Loading indicator
                             ProgressView()
@@ -928,9 +975,11 @@ struct SearchView: View {
         if let vm = searchViewModel {
             VStack(spacing: 0) {
                 // Filter strip at top (only for instances that support search filters)
+                #if !os(tvOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                 }
+                #endif
 
                 // Card container
                 VideoListContent(listStyle: .inset) {
@@ -954,9 +1003,11 @@ struct SearchView: View {
         if let vm = searchViewModel {
             VStack(spacing: 0) {
                 // Filter strip at top (only for instances that support search filters)
+                #if !os(tvOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                 }
+                #endif
 
                 VideoListContent(listStyle: .plain) {
                     ForEach(Array(unifiedResults.enumerated()), id: \.element.id) { resultIndex, item in
@@ -1042,10 +1093,12 @@ struct SearchView: View {
         if let vm = searchViewModel {
             LazyVStack(spacing: 16) {
                 // Filter strip at top (only for instances that support search filters)
+                #if !os(tvOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                         .padding(.bottom, 8)
                 }
+                #endif
 
                 // Single grid with mixed content preserving order
                 VideoGridContent(columns: gridConfig.effectiveColumns) {
