@@ -51,7 +51,9 @@ struct AboutView: View {
             versionInfoSection
             mpvInfoSection
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.about.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

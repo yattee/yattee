@@ -42,7 +42,9 @@ struct SourcesListView: View {
                 sourcesList
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "sources.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -56,12 +58,24 @@ struct SourcesListView: View {
                 .accessibilityIdentifier("sources.addButton")
             }
         }
+        #if os(tvOS)
+        .navigationDestination(isPresented: $showingAddSheet) {
+            TVSettingsContainer(systemImage: "plus.circle", title: String(localized: "sources.newSource")) { AddSourceView() }
+        }
+        #else
         .sheet(isPresented: $showingAddSheet) {
             AddSourceView()
         }
+        #endif
+        #if os(tvOS)
+        .navigationDestination(item: $sourceToEdit) { source in
+            TVSettingsContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) { EditSourceView(source: source) }
+        }
+        #else
         .sheet(item: $sourceToEdit) { source in
             EditSourceView(source: source)
         }
+        #endif
         .confirmationDialog(
             deleteConfirmationMessage,
             isPresented: $showingDeleteConfirmation,
@@ -98,6 +112,37 @@ struct SourcesListView: View {
     // MARK: - Sources List
 
     private var sourcesList: some View {
+        #if os(tvOS)
+        List {
+            if let manager = instancesManager, !manager.instances.isEmpty {
+                Section(String(localized: "sources.section.remoteServers")) {
+                    let instances = manager.instances.sorted { $0.dateAdded < $1.dateAdded }
+                    ForEach(instances) { instance in
+                        Button {
+                            sourceToEdit = .remoteServer(instance)
+                        } label: {
+                            instanceRow(instance)
+                        }
+                    }
+                }
+            }
+
+            let allFileSources = allMediaSources
+            if !allFileSources.isEmpty {
+                Section(String(localized: "sources.section.fileSources")) {
+                    ForEach(allFileSources) { source in
+                        let needsPassword = mediaSourcesManager?.needsPassword(for: source) ?? false
+                        Button {
+                            sourceToEdit = .fileSource(source)
+                        } label: {
+                            mediaSourceRow(source, needsPassword: needsPassword)
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.grouped)
+        #else
         (listStyle == .inset ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color)
             .ignoresSafeArea()
             .overlay(
@@ -108,6 +153,7 @@ struct SourcesListView: View {
                     }
                 }
             )
+        #endif
     }
 
     // MARK: - Section Header
@@ -131,9 +177,13 @@ struct SourcesListView: View {
             LazyVStack(spacing: 0) {
                 content()
             }
+            #if os(tvOS)
+            .padding(.horizontal, 16)
+            #else
             .background(ListBackgroundStyle.card.color)
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal, 16)
+            #endif
             .padding(.bottom, 16)
         } else {
             LazyVStack(spacing: 0) {

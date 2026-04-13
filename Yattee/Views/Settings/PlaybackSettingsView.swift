@@ -26,7 +26,9 @@ struct PlaybackSettingsView: View {
                 #endif
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.playback.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

@@ -35,7 +35,9 @@ struct AdvancedSettingsView: View {
             #endif
             developerSection
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.advanced.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

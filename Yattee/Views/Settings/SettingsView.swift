@@ -21,6 +21,8 @@ struct SettingsView: View {
         #if os(macOS)
         macOSSettings
             .frame(minWidth: 600, minHeight: 400)
+        #elseif os(tvOS)
+        tvOSSettings
         #else
         iOSSettings
         #endif
@@ -83,9 +85,107 @@ struct SettingsView: View {
     }
     #endif
 
-    // MARK: - iOS/tvOS Settings
+    // MARK: - tvOS Settings
 
-    #if os(iOS) || os(tvOS)
+    #if os(tvOS)
+    private var tvOSSettings: some View {
+        NavigationStack {
+            List {
+                if let appEnvironment {
+                    NavigationLink {
+                        TVSettingsContainer(systemImage: "server.rack", title: String(localized: "sources.title")) { SourcesListView() }
+                    } label: {
+                        HStack {
+                            Label(String(localized: "sources.title"), systemImage: "server.rack")
+                            Spacer()
+                            if appEnvironment.mediaSourcesManager.hasSourcesNeedingPassword {
+                                Image(systemName: "exclamationmark.circle.fill")
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("settings.row.sources")
+
+                    NavigationLink {
+                        TVSettingsContainer(systemImage: "icloud", title: String(localized: "settings.icloud.title")) { iCloudSettingsView() }
+                    } label: {
+                        HStack {
+                            Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
+                            #if DEBUG
+                            Spacer()
+                            Text(String(localized: "settings.icloud.dev.badge"))
+                                .font(.caption2.bold())
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.orange, in: Capsule())
+                            #endif
+                        }
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "paintbrush", title: String(localized: "settings.appearance.sectionTitle")) { AppearanceSettingsView() } } label: {
+                        Label(String(localized: "settings.appearance.sectionTitle"), systemImage: "paintbrush")
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "hand.tap", title: String(localized: "settings.layoutNavigation.title")) { LayoutNavigationSettingsView() } } label: {
+                        Label(String(localized: "settings.layoutNavigation.title"), systemImage: "hand.tap")
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "play.circle", title: String(localized: "settings.playback.sectionTitle")) { PlaybackSettingsView() } } label: {
+                        Label(String(localized: "settings.playback.sectionTitle"), systemImage: "play.circle")
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "hand.raised", title: String(localized: "settings.privacy.title")) { PrivacySettingsView() } } label: {
+                        Label(String(localized: "settings.privacy.title"), systemImage: "hand.raised")
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "gearshape.2", title: String(localized: "settings.advanced.title")) { AdvancedSettingsView() } } label: {
+                        Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
+                    }
+
+                    if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
+                        NavigationLink { TVSettingsContainer(systemImage: "play.rectangle", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
+                            Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "play.rectangle")
+                        }
+                    }
+
+                    NavigationLink { TVSettingsContainer(systemImage: "info.circle", title: String(localized: "settings.about.title")) { AboutView() } } label: {
+                        Label(String(localized: "settings.about.title"), systemImage: "info.circle")
+                    }
+                }
+            }
+            .listStyle(.grouped)
+            .safeAreaInset(edge: .leading) {
+                VStack(spacing: 20) {
+                    Spacer()
+
+                    Image("AppIconPreview")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: 46))
+
+                    Text(verbatim: "Yattee")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+
+                    Text("\(appVersion) (\(buildNumber))")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+
+                    Spacer()
+                }
+                .frame(width: 400)
+                .allowsHitTesting(false)
+            }
+            .accessibilityIdentifier("settings.view")
+        }
+    }
+    #endif
+
+    // MARK: - iOS Settings
+
+    #if os(iOS)
     private var iOSSettings: some View {
         NavigationStack {
             List {
@@ -206,12 +306,8 @@ struct SettingsView: View {
                     }
                 }
             }
-            #if !os(tvOS)
             .navigationTitle(String(localized: "settings.title"))
-            #endif
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 if showCloseButton {
                     ToolbarItem(placement: .confirmationAction) {
@@ -287,6 +383,50 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         }
     }
 }
+
+// MARK: - tvOS Settings Container
+
+#if os(tvOS)
+struct TVSettingsContainer<Content: View>: View {
+    let content: Content
+    var systemImage: String?
+    var title: String?
+
+    init(systemImage: String? = nil, title: String? = nil, @ViewBuilder content: () -> Content) {
+        self.content = content()
+        self.systemImage = systemImage
+        self.title = title
+    }
+
+    var body: some View {
+        content
+            .safeAreaInset(edge: .leading) {
+                if let systemImage {
+                    VStack(spacing: 16) {
+                        Spacer()
+                        Image(systemName: systemImage)
+                            .font(.system(size: 80))
+                            .foregroundStyle(.secondary)
+                        if let title {
+                            Text(title)
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        Spacer()
+                    }
+                    .frame(width: 400)
+                    .allowsHitTesting(false)
+                } else {
+                    Spacer()
+                        .frame(width: 400)
+                        .allowsHitTesting(false)
+                }
+            }
+    }
+}
+#endif
 
 #Preview {
     SettingsView()

@@ -77,31 +77,11 @@ private struct EditRemoteServerContent: View {
     }
 
     var body: some View {
+        #if os(tvOS)
+        formContent
+            .accessibilityIdentifier("editSource.view")
+        #else
         NavigationStack {
-            #if os(tvOS)
-            VStack(spacing: 0) {
-                HStack {
-                    Button(String(localized: "common.cancel")) {
-                        dismiss()
-                    }
-                    .buttonStyle(TVToolbarButtonStyle())
-                    Spacer()
-                    Text(String(localized: "sources.editSource"))
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    Spacer()
-                    Button(String(localized: "common.save")) {
-                        saveChanges()
-                    }
-                    .buttonStyle(TVToolbarButtonStyle())
-                }
-                .padding(.horizontal, 48)
-                .padding(.vertical, 24)
-
-                formContent
-                .accessibilityIdentifier("editSource.view")
-            }
-            #else
             formContent
                 .navigationTitle(String(localized: "sources.editSource"))
                 #if os(iOS)
@@ -120,8 +100,8 @@ private struct EditRemoteServerContent: View {
                     }
                 }
                 .accessibilityIdentifier("editSource.view")
-            #endif
         }
+        #endif
     }
 
     private var formContent: some View {
@@ -312,6 +292,17 @@ private struct EditRemoteServerContent: View {
             if let result = testResult {
                 testResultSection(result)
             }
+
+            #if os(tvOS)
+            Section {
+                Button {
+                    saveChanges()
+                } label: {
+                    Label(String(localized: "common.save"), systemImage: "checkmark.circle")
+                }
+                .buttonStyle(TVSettingsButtonStyle())
+            }
+            #endif
 
             Section {
                 Button(role: .destructive) {
@@ -529,35 +520,14 @@ private struct EditFileSourceContent: View {
     }
 
     var body: some View {
-        NavigationStack {
-            #if os(tvOS)
-            VStack(spacing: 0) {
-                HStack {
-                    Button(String(localized: "common.cancel")) {
-                        dismiss()
-                    }
-                    .buttonStyle(TVToolbarButtonStyle())
-                    Spacer()
-                    Text(String(localized: "sources.editSource"))
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    Spacer()
-                    Button(String(localized: "common.save")) {
-                        saveChanges()
-                    }
-                    .disabled(name.isEmpty)
-                    .buttonStyle(TVToolbarButtonStyle())
-                }
-                .padding(.horizontal, 48)
-                .padding(.vertical, 24)
-
-                formContent
-            }
+        #if os(tvOS)
+        formContent
             .onAppear {
                 hasExistingPassword = appEnvironment?.mediaSourcesManager.password(for: source) != nil
                 smbProtocolVersion = source.smbProtocolVersion ?? .auto
             }
-            #else
+        #else
+        NavigationStack {
             formContent
                 .navigationTitle(String(localized: "sources.editSource"))
                 #if os(iOS)
@@ -581,8 +551,8 @@ private struct EditFileSourceContent: View {
                     hasExistingPassword = appEnvironment?.mediaSourcesManager.password(for: source) != nil
                     smbProtocolVersion = source.smbProtocolVersion ?? .auto
                 }
-            #endif
         }
+        #endif
     }
 
     private var formContent: some View {
@@ -717,6 +687,18 @@ private struct EditFileSourceContent: View {
                     testResultSection(result)
                 }
             }
+
+            #if os(tvOS)
+            Section {
+                Button {
+                    saveChanges()
+                } label: {
+                    Label(String(localized: "common.save"), systemImage: "checkmark.circle")
+                }
+                .disabled(name.isEmpty)
+                .buttonStyle(TVSettingsButtonStyle())
+            }
+            #endif
 
             Section {
                 Button(role: .destructive) {

@@ -19,7 +19,9 @@ struct PrivacySettingsView: View {
             historySection
             searchSection
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.privacy.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

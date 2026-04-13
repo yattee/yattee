@@ -30,7 +30,9 @@ struct LayoutNavigationSettingsView: View {
                 HandoffSection(settings: settings)
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.layoutNavigation.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

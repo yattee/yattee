@@ -35,7 +35,9 @@ struct AppearanceSettingsView: View {
                 ThumbnailSection(settings: settings)
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.appearance.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

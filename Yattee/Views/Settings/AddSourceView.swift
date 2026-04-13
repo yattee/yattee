@@ -25,43 +25,28 @@ struct AddSourceView: View {
     @State private var discoveredAllowInvalidCerts = false
 
     var body: some View {
-        NavigationStack {
-            #if os(tvOS)
-            VStack(spacing: 0) {
-                HStack {
-                    Button(String(localized: "common.cancel")) {
-                        dismiss()
-                    }
-                    .buttonStyle(TVToolbarButtonStyle())
-                    Spacer()
-                    Text(String(localized: "sources.newSource"))
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    Spacer()
-                    Text(String(localized: "common.cancel"))
-                        .opacity(0)
-                }
-                .padding(.horizontal, 48)
-                .padding(.vertical, 24)
-
-                listContent
-            }
+        #if os(tvOS)
+        listContent
             .navigationDestination(isPresented: $navigateToWebDAV) {
                 AddWebDAVView(
                     prefillURL: discoveredWebDAVURL,
                     prefillName: discoveredName,
-                    prefillAllowInvalidCertificates: discoveredAllowInvalidCerts,
-                    dismissSheet: dismiss
+                    prefillAllowInvalidCertificates: discoveredAllowInvalidCerts
                 )
             }
             .navigationDestination(isPresented: $navigateToSMB) {
                 AddSMBView(
                     prefillServer: discoveredSMBServer,
-                    prefillName: discoveredName,
-                    dismissSheet: dismiss
+                    prefillName: discoveredName
                 )
             }
-            #else
+            .sheet(isPresented: $showingNetworkDiscovery) {
+                NetworkShareDiscoverySheet(filterType: selectedShareType) { share in
+                    handleSelectedShare(share)
+                }
+            }
+        #else
+        NavigationStack {
             listContent
                 .navigationTitle(String(localized: "sources.newSource"))
                 #if os(iOS)
@@ -92,13 +77,13 @@ struct AddSourceView: View {
                         dismissSheet: dismiss
                     )
                 }
-            #endif
         }
         .sheet(isPresented: $showingNetworkDiscovery) {
             NetworkShareDiscoverySheet(filterType: selectedShareType) { share in
                 handleSelectedShare(share)
             }
         }
+        #endif
     }
 
     private var listContent: some View {
@@ -113,19 +98,31 @@ struct AddSourceView: View {
                 #endif
 
                 NavigationLink {
+                    #if os(tvOS)
+                    AddWebDAVView()
+                    #else
                     AddWebDAVView(dismissSheet: dismiss)
+                    #endif
                 } label: {
                     Label(String(localized: "sources.addWebDAV"), systemImage: "externaldrive.connected.to.line.below")
                 }
 
                 NavigationLink {
+                    #if os(tvOS)
+                    AddSMBView()
+                    #else
                     AddSMBView(dismissSheet: dismiss)
+                    #endif
                 } label: {
                     Label(String(localized: "sources.addSMB"), systemImage: "server.rack")
                 }
 
                 NavigationLink {
+                    #if os(tvOS)
+                    AddRemoteServerView()
+                    #else
                     AddRemoteServerView(dismissSheet: dismiss)
+                    #endif
                 } label: {
                     Label(String(localized: "sources.addRemoteServer"), systemImage: "globe")
                 }

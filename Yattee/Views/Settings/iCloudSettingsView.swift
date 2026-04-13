@@ -82,7 +82,9 @@ struct iCloudSettingsView: View {
                 syncStatusSection
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.icloud.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

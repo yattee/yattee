@@ -18,7 +18,9 @@ struct YouTubeEnhancementsSettingsView: View {
                 DeArrowSection(settings: settings)
             }
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "settings.youtubeEnhancements.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
