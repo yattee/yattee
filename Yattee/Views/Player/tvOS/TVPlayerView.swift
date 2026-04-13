@@ -467,10 +467,10 @@ struct TVPlayerView: View {
     }
 
     private func dismissPlayer() {
-        // Save progress and stop player before dismissing (matches iOS/macOS pattern)
-        // This ensures watch history is updated when user exits player with Menu button
-        playerService?.stop()
-        
+        // Collapse the player but keep it alive so audio continues in the background
+        // and the "Now Playing" sidebar entry can restore the session. Matches the
+        // iOS/macOS ExpandedPlayerWindow dismissal path, which also does not stop()
+        // on dismiss.
         appEnvironment?.navigationCoordinator.isPlayerExpanded = false
         dismiss()
     }
