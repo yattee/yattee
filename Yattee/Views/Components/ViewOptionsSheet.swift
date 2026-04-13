@@ -32,6 +32,16 @@ struct ViewOptionsSheet: View {
     }
 
     var body: some View {
+        #if os(tvOS)
+        NavigationStack {
+            formContent
+        }
+        #else
+        formContent
+        #endif
+    }
+
+    private var formContent: some View {
         Form {
             // Single section with all options
             Section {
@@ -55,9 +65,6 @@ struct ViewOptionsSheet: View {
                         Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
                         Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
                     }
-                    #if os(tvOS)
-                    .pickerStyle(.menu)
-                    #endif
                 }
 
                 // Grid-specific options
@@ -68,7 +75,6 @@ struct ViewOptionsSheet: View {
                             Text("\(count)").tag(count)
                         }
                     }
-                    .pickerStyle(.menu)
                     #else
                     Stepper(
                         "viewOptions.columns \(effectiveColumns)",
@@ -90,9 +96,6 @@ struct ViewOptionsSheet: View {
                             Text(size.displayName).tag(size)
                         }
                     }
-                    #if os(tvOS)
-                    .pickerStyle(.menu)
-                    #endif
                 }
             }
         }
