@@ -94,55 +94,7 @@ struct SearchView: View {
     }
 
     var body: some View {
-        Group {
-            if searchTextBinding.wrappedValue.isEmpty {
-                emptySearchView
-            } else if let vm = searchViewModel {
-                    if !vm.hasSearched {
-                        // Not yet submitted - show suggestions, loading, or empty
-                        if !vm.suggestions.isEmpty && !hasResults {
-                            suggestionsView
-                        } else if vm.isFetchingSuggestions && !hasResults {
-                            // Show spinner while loading first suggestions
-                            ProgressView()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else {
-                            // No suggestions yet and not loading - show empty spacer to keep layout stable
-                            Spacer()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        }
-                    } else if vm.isSearching && !hasResults {
-                        // First search loading - show filter strip with loading indicator
-                        resultsViewWithLoading
-                    } else if let error = vm.errorMessage, !hasResults {
-                        errorView(error)
-                    } else if hasResults {
-                        // Show results even if searching - keeps filter strip visible
-                        resultsView
-                    } else {
-                        noResultsView
-                    }
-            } else {
-                Spacer()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        #if !os(tvOS)
-        .navigationTitle(String(localized: "tabs.search"))
-        .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
-        .toolbar {
-            // View options button - always visible
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showViewOptions = true
-                } label: {
-                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
-                }
-                .liquidGlassTransitionSource(id: "searchViewOptions", in: sheetTransition)
-            }
-        }
-        .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
+        tvOSOrDefaultContent
         .sheet(isPresented: $showFilterSheet) {
             SearchFiltersSheet(onApply: {
                 if hasResults {
@@ -155,7 +107,9 @@ struct SearchView: View {
                     saveFilters(newFilters)
                 }
             ))
+            #if !os(tvOS)
             .presentationDetents([.medium, .large])
+            #endif
         }
         .sheet(isPresented: $showViewOptions) {
             ViewOptionsSheet(
@@ -165,15 +119,9 @@ struct SearchView: View {
                 hideWatched: $hideWatched,
                 maxGridColumns: gridConfig.maxColumns
             )
+            #if !os(tvOS)
             .liquidGlassSheetContent(sourceID: "searchViewOptions", in: sheetTransition)
-        }
-        .onSubmit(of: .search) {
-            searchViewModel?.cancelSuggestions()
-            searchViewModel?.filters.type = .video
-            if let filters = searchViewModel?.filters {
-                saveFilters(filters)
-            }
-            Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+            #endif
         }
         .onChange(of: searchTextBinding.wrappedValue) { _, newValue in
             if newValue.isEmpty {
@@ -224,6 +172,94 @@ struct SearchView: View {
         }
         .onChange(of: saveRecentPlaylists) { _, _ in
             loadRecentPlaylists()
+        }
+    }
+
+    @ViewBuilder
+    private var tvOSOrDefaultContent: some View {
+        #if os(tvOS)
+        VStack(spacing: 0) {
+            // tvOS: Inline search field and view options button
+            HStack(spacing: 24) {
+                TextField("search.placeholder", text: searchTextBinding)
+                    .textFieldStyle(.plain)
+                    .onSubmit {
+                        searchViewModel?.cancelSuggestions()
+                        searchViewModel?.filters.type = .video
+                        if let filters = searchViewModel?.filters {
+                            saveFilters(filters)
+                        }
+                        Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+                    }
+
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
+            }
+            .focusSection()
+            .padding(.horizontal, 48)
+            .padding(.top, 20)
+
+            searchContent
+                .focusSection()
+        }
+        #else
+        searchContent
+        .navigationTitle(String(localized: "tabs.search"))
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
+                .liquidGlassTransitionSource(id: "searchViewOptions", in: sheetTransition)
+            }
+        }
+        .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
+        .onSubmit(of: .search) {
+            searchViewModel?.cancelSuggestions()
+            searchViewModel?.filters.type = .video
+            if let filters = searchViewModel?.filters {
+                saveFilters(filters)
+            }
+            Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+        }
+        #endif
+    }
+
+    @ViewBuilder
+    private var searchContent: some View {
+        Group {
+            if searchTextBinding.wrappedValue.isEmpty {
+                emptySearchView
+            } else if let vm = searchViewModel {
+                if !vm.hasSearched {
+                    if !vm.suggestions.isEmpty && !hasResults {
+                        suggestionsView
+                    } else if vm.isFetchingSuggestions && !hasResults {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        Spacer()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                } else if vm.isSearching && !hasResults {
+                    resultsViewWithLoading
+                } else if let error = vm.errorMessage, !hasResults {
+                    errorView(error)
+                } else if hasResults {
+                    resultsView
+                } else {
+                    noResultsView
+                }
+            } else {
+                Spacer()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
     }
 
@@ -495,8 +531,12 @@ struct SearchView: View {
                                         }
                                     }
                                 }
+                                #if os(tvOS)
+                                .background(.clear)
+                                #else
                                 .background(listStyle == .inset ? ListBackgroundStyle.card.color : Color.clear)
                                 .clipShape(.rect(cornerRadius: listStyle == .inset ? 10 : 0))
+                                #endif
                                 .padding(.horizontal)
                             }
                         }
