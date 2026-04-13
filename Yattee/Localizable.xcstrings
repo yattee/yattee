@@ -8131,16 +8131,6 @@
         }
       }
     },
-    "search.filters.type" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type"
-          }
-        }
-      }
-    },
     "search.hint.description" : {
       "localizations" : {
         "en" : {
