@@ -98,7 +98,7 @@ struct VideoListRow<Content: View>: View {
             .fill(Color(nsColor: .separatorColor))
             .frame(height: 1)
             .padding(.leading, dividerLeadingPadding)
-        #else
+        #elseif !os(tvOS)
         Divider()
             .padding(.leading, dividerLeadingPadding)
         #endif
