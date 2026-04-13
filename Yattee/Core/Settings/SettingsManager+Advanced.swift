@@ -208,6 +208,9 @@ extension SettingsManager {
     /// Default is plain. Synced per-platform via iCloud.
     var listStyle: VideoListStyle {
         get {
+            #if os(tvOS)
+            return .plain
+            #else
             if let cached = _listStyle { return cached }
             guard let rawValue = string(for: .listStyle),
                   let style = VideoListStyle(rawValue: rawValue) else {
@@ -215,6 +218,7 @@ extension SettingsManager {
             }
             _listStyle = style
             return style
+            #endif
         }
         set {
             _listStyle = newValue

@@ -29,7 +29,9 @@ struct AppearanceSettingsView: View {
                 #endif
 
                 // List style section
+                #if !os(tvOS)
                 ListStyleSection(settings: settings)
+                #endif
 
                 // Thumbnail section
                 ThumbnailSection(settings: settings)
