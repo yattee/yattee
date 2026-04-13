@@ -194,7 +194,7 @@ struct SearchView: View {
 
                 // Type filter
                 filterMenu(
-                    title: String(localized: "search.filters.type"),
+                    title: (searchViewModel?.filters.type ?? .video).title,
                     selection: Binding(
                         get: { searchViewModel?.filters.type ?? .video },
                         set: { searchViewModel?.filters.type = $0 }
