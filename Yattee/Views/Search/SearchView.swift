@@ -215,6 +215,7 @@ struct SearchView: View {
             .focusSection()
             .padding(.horizontal, 48)
             .padding(.top, 20)
+            .padding(.bottom, 10)
 
             searchContent
                 .focusSection()
