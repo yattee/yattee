@@ -1088,42 +1088,60 @@ private struct YatteeAdaptiveFormat: Decodable, Sendable {
     }
 
     private nonisolated func parseAudioInfo() -> (language: String?, trackName: String?, isOriginal: Bool) {
+        // When audioTrack object is available, use it for language/name but determine
+        // isOriginal from displayName and URL xtags (isDefault alone is not reliable
+        // because the server may mark locale-default dubs as isDefault too)
         if let audioTrack, audioTrack.id != nil || audioTrack.displayName != nil {
-            return (audioTrack.id, audioTrack.displayName, audioTrack.isDefault ?? false)
+            let displayNameIndicatesOriginal = audioTrack.displayName?
+                .localizedCaseInsensitiveContains("original") ?? false
+            let xtagsIndicateOriginal = checkXtagsForOriginal()
+            let isOriginal = displayNameIndicatesOriginal || xtagsIndicateOriginal
+            return (audioTrack.id, audioTrack.displayName, isOriginal)
         }
 
+        // Fall back to parsing from URL xtags parameter for audio streams
         guard isAudioOnly, let urlString = url else {
             return (nil, nil, false)
         }
 
-        guard let xtagsRange = urlString.range(of: "xtags=") else {
+        guard let xtags = parseXtags(from: urlString) else {
             return (nil, nil, false)
         }
+
+        guard let langCode = xtags["lang"] else {
+            return (nil, nil, false)
+        }
+
+        let contentType = xtags["acont"]
+        let isOriginal = contentType == "original"
+        let trackName = generateTrackName(langCode: langCode, contentType: contentType)
+
+        return (langCode, trackName, isOriginal)
+    }
+
+    /// Check if the stream URL's xtags indicate this is the original audio track.
+    private nonisolated func checkXtagsForOriginal() -> Bool {
+        guard isAudioOnly, let urlString = url else { return false }
+        guard let xtags = parseXtags(from: urlString) else { return false }
+        return xtags["acont"] == "original"
+    }
+
+    /// Parse xtags key=value pairs from a URL string.
+    private nonisolated func parseXtags(from urlString: String) -> [String: String]? {
+        guard let xtagsRange = urlString.range(of: "xtags=") else { return nil }
 
         let xtagsStart = xtagsRange.upperBound
         let xtagsEnd = urlString[xtagsStart...].firstIndex(of: "&") ?? urlString.endIndex
         let xtagsEncoded = String(urlString[xtagsStart..<xtagsEnd])
 
-        guard let xtags = xtagsEncoded.removingPercentEncoding else {
-            return (nil, nil, false)
-        }
+        guard let xtags = xtagsEncoded.removingPercentEncoding else { return nil }
 
-        let pairs = xtags.split(separator: ":").reduce(into: [String: String]()) { result, pair in
+        return xtags.split(separator: ":").reduce(into: [String: String]()) { result, pair in
             let parts = pair.split(separator: "=", maxSplits: 1)
             if parts.count == 2 {
                 result[String(parts[0])] = String(parts[1])
             }
         }
-
-        guard let langCode = pairs["lang"] else {
-            return (nil, nil, false)
-        }
-
-        let contentType = pairs["acont"]
-        let isOriginal = contentType == "original"
-        let trackName = generateTrackName(langCode: langCode, contentType: contentType)
-
-        return (langCode, trackName, isOriginal)
     }
 
     private nonisolated func generateTrackName(langCode: String, contentType: String?) -> String {

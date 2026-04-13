@@ -1243,52 +1243,60 @@ private struct InvidiousAdaptiveFormat: Decodable, Sendable {
     /// Parse audio language, track name, and whether it's original from audioTrack object or URL xtags.
     /// URL xtags format: xtags=acont%3Doriginal%3Alang%3Den-US or xtags=acont%3Ddubbed-auto%3Alang%3Dde-DE
     private nonisolated func parseAudioInfo() -> (language: String?, trackName: String?, isOriginal: Bool) {
-        // Prefer explicit audioTrack if available
+        // When audioTrack object is available, use it for language/name but determine
+        // isOriginal from displayName and URL xtags (audioTrack alone is not reliable)
         if let audioTrack, audioTrack.id != nil || audioTrack.displayName != nil {
-            // Can't determine if original from audioTrack alone, assume not
-            return (audioTrack.id, audioTrack.displayName, false)
+            let displayNameIndicatesOriginal = audioTrack.displayName?
+                .localizedCaseInsensitiveContains("original") ?? false
+            let xtagsIndicateOriginal = checkXtagsForOriginal()
+            let isOriginal = displayNameIndicatesOriginal || xtagsIndicateOriginal
+            return (audioTrack.id, audioTrack.displayName, isOriginal)
         }
 
-        // Parse from URL xtags parameter for audio streams
+        // Fall back to parsing from URL xtags parameter for audio streams
         guard isAudioOnly, let urlString = url else {
             return (nil, nil, false)
         }
 
-        // Find xtags parameter in URL
-        guard let xtagsRange = urlString.range(of: "xtags=") else {
+        guard let xtags = parseXtags(from: urlString) else {
             return (nil, nil, false)
         }
+
+        guard let langCode = xtags["lang"] else {
+            return (nil, nil, false)
+        }
+
+        let contentType = xtags["acont"]
+        let isOriginal = contentType == "original"
+        let trackName = generateTrackName(langCode: langCode, contentType: contentType)
+
+        return (langCode, trackName, isOriginal)
+    }
+
+    /// Check if the stream URL's xtags indicate this is the original audio track.
+    private nonisolated func checkXtagsForOriginal() -> Bool {
+        guard isAudioOnly, let urlString = url else { return false }
+        guard let xtags = parseXtags(from: urlString) else { return false }
+        return xtags["acont"] == "original"
+    }
+
+    /// Parse xtags key=value pairs from a URL string.
+    /// Example xtags: "acont=original:drc=1:lang=en-US"
+    private nonisolated func parseXtags(from urlString: String) -> [String: String]? {
+        guard let xtagsRange = urlString.range(of: "xtags=") else { return nil }
 
         let xtagsStart = xtagsRange.upperBound
         let xtagsEnd = urlString[xtagsStart...].firstIndex(of: "&") ?? urlString.endIndex
         let xtagsEncoded = String(urlString[xtagsStart..<xtagsEnd])
 
-        // URL decode the xtags value
-        guard let xtags = xtagsEncoded.removingPercentEncoding else {
-            return (nil, nil, false)
-        }
+        guard let xtags = xtagsEncoded.removingPercentEncoding else { return nil }
 
-        // Parse key=value pairs separated by colons
-        // Example: "acont=original:drc=1:lang=en-US" or "acont=dubbed-auto:lang=de-DE"
-        let pairs = xtags.split(separator: ":").reduce(into: [String: String]()) { result, pair in
+        return xtags.split(separator: ":").reduce(into: [String: String]()) { result, pair in
             let parts = pair.split(separator: "=", maxSplits: 1)
             if parts.count == 2 {
                 result[String(parts[0])] = String(parts[1])
             }
         }
-
-        guard let langCode = pairs["lang"] else {
-            return (nil, nil, false)
-        }
-
-        // Check if this is the original audio track
-        let contentType = pairs["acont"]
-        let isOriginal = contentType == "original"
-
-        // Generate display name from language code and content type
-        let trackName = generateTrackName(langCode: langCode, contentType: contentType)
-
-        return (langCode, trackName, isOriginal)
     }
 
     /// Generate a human-readable track name from language code and content type.
@@ -1322,6 +1330,7 @@ private struct InvidiousAdaptiveFormat: Decodable, Sendable {
 private struct InvidiousAudioTrack: Decodable, Sendable {
     let id: String?
     let displayName: String?
+    let isDefault: Bool?
 }
 
 private struct InvidiousThumbnail: Decodable, Sendable {
