@@ -33,14 +33,57 @@ struct ViewOptionsSheet: View {
 
     var body: some View {
         #if os(tvOS)
-        NavigationStack {
-            formContent
-        }
-        .padding(.horizontal, 40)
+        tvOSContent
         #else
         formContent
         #endif
     }
+
+    #if os(tvOS)
+    private var tvOSContent: some View {
+        List {
+            Section {
+                Picker(selection: $layout) {
+                    ForEach(VideoListLayout.allCases, id: \.self) { option in
+                        Label(option.displayName, systemImage: option.systemImage)
+                            .tag(option)
+                    }
+                } label: {
+                    Text("viewOptions.layout")
+                }
+                .pickerStyle(.segmented)
+
+                if layout == .list {
+                    Picker("viewOptions.rowSize", selection: $rowStyle) {
+                        Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
+                        Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
+                        Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
+                    }
+                }
+
+                if layout == .grid {
+                    Picker("viewOptions.columns.header", selection: $gridColumns) {
+                        ForEach(1...maxGridColumns, id: \.self) { count in
+                            Text("\(count)").tag(count)
+                        }
+                    }
+                }
+
+                if let hideWatched = hideWatched {
+                    Toggle("viewOptions.hideWatched", isOn: hideWatched)
+                }
+
+                if let channelStripSize = channelStripSize {
+                    Picker("viewOptions.channelStrip", selection: channelStripSize) {
+                        ForEach(ChannelStripSize.allCases, id: \.self) { size in
+                            Text(size.displayName).tag(size)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #endif
 
     private var formContent: some View {
         Form {
