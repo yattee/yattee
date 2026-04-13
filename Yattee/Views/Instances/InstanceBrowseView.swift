@@ -115,6 +115,114 @@ struct InstanceBrowseView: View {
     var body: some View {
         let backgroundStyle: ListBackgroundStyle = listStyle == .inset ? .grouped : .plain
         GeometryReader { geometry in
+            #if os(tvOS)
+            VStack(spacing: 0) {
+                // tvOS: Inline search field and view options button
+                HStack(spacing: 24) {
+                    TextField("instance.browse.search.placeholder", text: $searchText)
+                        .textFieldStyle(.plain)
+                        .onSubmit {
+                            searchViewModel?.cancelSuggestions()
+                            Task { await searchViewModel?.search(query: searchText) }
+                        }
+
+                    Button {
+                        showViewOptions = true
+                    } label: {
+                        Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                    }
+                }
+                .focusSection()
+                .padding(.horizontal, 48)
+                .padding(.top, 20)
+
+                // Content
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // Tab picker (hidden during search)
+                        if !isInSearchMode {
+                            Picker("", selection: $selectedTab) {
+                                ForEach(availableTabs) { tab in
+                                    Label(tab.title, systemImage: tab.systemImage)
+                                        .tag(tab)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding()
+                        }
+
+                        // Feed channel filter strip (hidden during search)
+                        if selectedTab == .feed && !feedSubscriptions.isEmpty && !isInSearchMode {
+                            feedChannelFilterStrip
+                        }
+
+                        // Search filter strip (shown persistently after search submitted)
+                        if isInSearchMode && (searchViewModel?.hasSearched ?? false) && instance.supportsSearchFilters {
+                            searchFiltersStrip
+                        }
+
+                        // Content
+                        Group {
+                            if isInSearchMode, let vm = searchViewModel {
+                                if !vm.hasSearched {
+                                    if vm.suggestions.isEmpty {
+                                        searchHintView
+                                    } else {
+                                        suggestionsView
+                                    }
+                                } else if vm.isSearching && !vm.hasResults {
+                                    ProgressView()
+                                        .frame(maxWidth: .infinity, minHeight: 200)
+                                } else if let error = vm.errorMessage, !vm.hasResults {
+                                    searchErrorView(error)
+                                } else if vm.hasResults {
+                                    searchResultsContent
+                                } else {
+                                    searchEmptyView
+                                }
+                            } else if selectedTab == .playlists {
+                                if isLoading && userPlaylists.isEmpty {
+                                    ProgressView()
+                                        .frame(maxWidth: .infinity, minHeight: 200)
+                                } else if let error = errorMessage, userPlaylists.isEmpty {
+                                    errorView(error)
+                                } else if !userPlaylists.isEmpty {
+                                    switch layout {
+                                    case .list:
+                                        playlistsListContent
+                                    case .grid:
+                                        playlistsGridContent
+                                    }
+                                } else {
+                                    playlistsEmptyView
+                                }
+                            } else if isLoading && currentVideos.isEmpty {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, minHeight: 200)
+                            } else if let error = errorMessage, currentVideos.isEmpty {
+                                errorView(error)
+                            } else if !currentVideos.isEmpty {
+                                switch layout {
+                                case .list:
+                                    listContent
+                                case .grid:
+                                    gridContent
+                                }
+                            } else {
+                                emptyView
+                            }
+                        }
+                    }
+                }
+                .refreshable {
+                    await startContentLoad(forceRefresh: true)
+                }
+                .focusSection()
+            }
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
+            #else
             backgroundStyle.color
                 .ignoresSafeArea()
                 .overlay(
@@ -206,11 +314,11 @@ struct InstanceBrowseView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            #endif
         }
-        .navigationTitle(instance.displayName)
         #if !os(tvOS)
+        .navigationTitle(instance.displayName)
         .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -221,6 +329,7 @@ struct InstanceBrowseView: View {
                 .liquidGlassTransitionSource(id: "instanceBrowseViewOptions", in: sheetTransition)
             }
         }
+        #endif
         .sheet(isPresented: $showViewOptions) {
             ViewOptionsSheet(
                 layout: $layout,
@@ -278,18 +387,24 @@ struct InstanceBrowseView: View {
             placement: .navigationBarDrawer(displayMode: .automatic),
             prompt: Text(String(localized: "instance.browse.search.placeholder"))
         )
-        #else
-        .searchable(
-            text: $searchText,
-            prompt: Text(String(localized: "instance.browse.search.placeholder"))
-        )
-        #endif
         .onSubmit(of: .search) {
             searchViewModel?.cancelSuggestions()
             Task {
                 await searchViewModel?.search(query: searchText)
             }
         }
+        #elseif !os(tvOS)
+        .searchable(
+            text: $searchText,
+            prompt: Text(String(localized: "instance.browse.search.placeholder"))
+        )
+        .onSubmit(of: .search) {
+            searchViewModel?.cancelSuggestions()
+            Task {
+                await searchViewModel?.search(query: searchText)
+            }
+        }
+        #endif
         .onChange(of: searchText) { _, newValue in
             if newValue.isEmpty {
                 searchViewModel?.clearResults()
