@@ -512,6 +512,36 @@ struct InstanceBrowseView: View {
 
     private var searchFiltersStrip: some View {
         HStack(spacing: 12) {
+            #if os(tvOS)
+            // tvOS: Inline filter menus instead of sheet
+            filterMenu(
+                title: String(localized: "search.sort"),
+                selection: Binding(
+                    get: { searchViewModel?.filters.sort ?? .relevance },
+                    set: { searchViewModel?.filters.sort = $0 }
+                ),
+                options: SearchSortOption.allCases,
+                labelForOption: { $0.title }
+            )
+            filterMenu(
+                title: String(localized: "search.uploadDate"),
+                selection: Binding(
+                    get: { searchViewModel?.filters.date ?? .any },
+                    set: { searchViewModel?.filters.date = $0 }
+                ),
+                options: SearchDateFilter.allCases,
+                labelForOption: { $0.title }
+            )
+            filterMenu(
+                title: String(localized: "search.duration"),
+                selection: Binding(
+                    get: { searchViewModel?.filters.duration ?? .any },
+                    set: { searchViewModel?.filters.duration = $0 }
+                ),
+                options: SearchDurationFilter.allCases,
+                labelForOption: { $0.title }
+            )
+            #else
             // Filter button
             Button {
                 showFilterSheet = true
@@ -521,6 +551,7 @@ struct InstanceBrowseView: View {
                     : "line.3.horizontal.decrease.circle.fill")
                     .font(.title2)
             }
+            #endif
 
             // Content type segmented picker
             Picker("", selection: Binding(
@@ -541,6 +572,33 @@ struct InstanceBrowseView: View {
             }
         }
     }
+
+    #if os(tvOS)
+    private func filterMenu<T: Hashable & Identifiable & CaseIterable>(
+        title: String,
+        selection: Binding<T>,
+        options: [T],
+        labelForOption: @escaping (T) -> String
+    ) -> some View {
+        Menu {
+            ForEach(options) { option in
+                Button {
+                    selection.wrappedValue = option
+                    Task { await searchViewModel?.search(query: searchText) }
+                } label: {
+                    if option == selection.wrappedValue {
+                        Label(labelForOption(option), systemImage: "checkmark")
+                    } else {
+                        Text(labelForOption(option))
+                    }
+                }
+            }
+        } label: {
+            Text(title)
+                .font(.caption)
+        }
+    }
+    #endif
 
     // MARK: - Feed Channel Filter Strip
 
