@@ -19,15 +19,17 @@ struct LayoutNavigationSettingsView: View {
                 #endif
                 #if !os(tvOS)
                 VideoActionsSection(settings: settings)
-                #endif
                 LinkActionSection(settings: settings)
                 ClipboardSection(settings: settings)
+                #endif
                 #if os(iOS)
                 if #available(iOS 26, *) {
                     MiniPlayerMinimizeBehaviorSection(settings: settings)
                 }
                 #endif
+                #if !os(tvOS)
                 HandoffSection(settings: settings)
+                #endif
             }
         }
         #if !os(tvOS)
