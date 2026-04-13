@@ -553,7 +553,18 @@ struct InstanceBrowseView: View {
             }
             #endif
 
-            // Content type segmented picker
+            // Content type picker
+            #if os(tvOS)
+            filterMenu(
+                title: String(localized: "search.filters.type"),
+                selection: Binding(
+                    get: { searchViewModel?.filters.type ?? .video },
+                    set: { searchViewModel?.filters.type = $0 }
+                ),
+                options: SearchContentType.allCases,
+                labelForOption: { $0.title }
+            )
+            #else
             Picker("", selection: Binding(
                 get: { searchViewModel?.filters.type ?? .video },
                 set: { searchViewModel?.filters.type = $0 }
@@ -563,6 +574,7 @@ struct InstanceBrowseView: View {
                 }
             }
             .pickerStyle(.segmented)
+            #endif
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
