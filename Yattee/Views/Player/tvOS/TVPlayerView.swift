@@ -66,6 +66,15 @@ struct TVPlayerView: View {
     /// Timer for the countdown.
     @State private var autoplayTimer: Timer?
 
+    /// Handler for seek accumulation when using remote arrows with controls hidden.
+    @State private var gestureActionHandler = PlayerGestureActionHandler()
+
+    /// Current tap-seek feedback to display.
+    @State private var currentTapFeedback: (action: TapGestureAction, position: TapZonePosition, accumulated: Int?)?
+
+    /// Pending seek to execute when feedback completes.
+    @State private var pendingSeek: (isForward: Bool, seconds: Int)?
+
     // MARK: - Computed Properties
 
     private var playerService: PlayerService? {
@@ -209,6 +218,20 @@ struct TVPlayerView: View {
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
 
+            // Arrow-key seek feedback (when controls are hidden)
+            if let feedback = currentTapFeedback {
+                TapGestureFeedbackView(
+                    action: feedback.action,
+                    accumulatedSeconds: feedback.accumulated,
+                    onComplete: {
+                        currentTapFeedback = nil
+                        executePendingSeek()
+                    }
+                )
+                .id("\(feedback.action.actionType.rawValue)-\(feedback.position.rawValue)")
+                .allowsHitTesting(false)
+            }
+
             // Autoplay countdown overlay
             if showAutoplayCountdown, let nextVideo = playerState?.nextQueuedVideo {
                 TVAutoplayCountdownView(
@@ -271,9 +294,8 @@ struct TVPlayerView: View {
             }
             .buttonStyle(TVBackgroundButtonStyle())
             .focused($focusedControl, equals: .background)
-            .onMoveCommand { _ in
-                // Any direction press shows controls
-                showControls()
+            .onMoveCommand { direction in
+                handleBackgroundMoveCommand(direction)
             }
         } else {
             // When controls visible, just a plain background
@@ -455,6 +477,73 @@ struct TVPlayerView: View {
             } else {
                 stopControlsTimer()
             }
+        }
+    }
+
+    /// Handles D-pad / arrow presses while controls are hidden.
+    /// Left/right trigger an accumulating seek with on-screen feedback; up/down reveal controls.
+    private func handleBackgroundMoveCommand(_ direction: MoveCommandDirection) {
+        switch direction {
+        case .left:
+            triggerRemoteSeek(forward: false)
+        case .right:
+            triggerRemoteSeek(forward: true)
+        case .up, .down:
+            showControls()
+        @unknown default:
+            showControls()
+        }
+    }
+
+    /// Triggers a seek action from the remote, accumulating across rapid presses.
+    private func triggerRemoteSeek(forward: Bool) {
+        let seekSeconds = 10
+        let action: TapGestureAction = forward
+            ? .seekForward(seconds: seekSeconds)
+            : .seekBackward(seconds: seekSeconds)
+        let position: TapZonePosition = forward ? .right : .left
+        let currentTime = playerState?.currentTime ?? 0
+        let duration = playerState?.duration ?? 0
+
+        Task {
+            await gestureActionHandler.updatePlayerState(
+                currentTime: currentTime,
+                duration: duration
+            )
+
+            // If switching seek direction, cancel any pending seek first.
+            if let pending = pendingSeek, pending.isForward != forward {
+                await MainActor.run {
+                    pendingSeek = nil
+                    currentTapFeedback = nil
+                }
+                await gestureActionHandler.cancelAccumulation()
+            }
+
+            let result = await gestureActionHandler.handleTapAction(action, position: position)
+            let accumulated = result.accumulatedSeconds ?? seekSeconds
+
+            await MainActor.run {
+                currentTapFeedback = (action, position, result.accumulatedSeconds)
+                pendingSeek = (isForward: forward, seconds: accumulated)
+            }
+        }
+    }
+
+    /// Commits the pending seek when the feedback overlay finishes its dismiss animation.
+    private func executePendingSeek() {
+        guard let seek = pendingSeek else { return }
+        pendingSeek = nil
+        guard seek.seconds > 0 else { return }
+
+        if seek.isForward {
+            playerService?.seekForward(by: TimeInterval(seek.seconds))
+        } else {
+            playerService?.seekBackward(by: TimeInterval(seek.seconds))
+        }
+
+        Task {
+            await gestureActionHandler.cancelAccumulation()
         }
     }
 

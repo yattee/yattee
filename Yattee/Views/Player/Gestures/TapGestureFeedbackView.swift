@@ -5,10 +5,21 @@
 //  Visual feedback overlay for tap gesture actions.
 //
 
-#if os(iOS)
 import SwiftUI
 
-
+#if os(tvOS)
+private let tapFeedbackIconSize: CGFloat = 88
+private let tapFeedbackTextSize: CGFloat = 32
+private let tapFeedbackCircleSize: CGFloat = 240
+private let tapFeedbackVStackSpacing: CGFloat = 16
+private let tapFeedbackPadding: CGFloat = 40
+#else
+private let tapFeedbackIconSize: CGFloat = 44
+private let tapFeedbackTextSize: CGFloat = 16
+private let tapFeedbackCircleSize: CGFloat = 120
+private let tapFeedbackVStackSpacing: CGFloat = 8
+private let tapFeedbackPadding: CGFloat = 20
+#endif
 
 /// Position for tap feedback display.
 enum TapFeedbackPosition {
@@ -105,22 +116,22 @@ struct TapGestureFeedbackView: View {
 
     @ViewBuilder
     private var feedbackContent: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: tapFeedbackVStackSpacing) {
             Image(systemName: iconName)
-                .font(.system(size: 44, weight: .medium))
+                .font(.system(size: tapFeedbackIconSize, weight: .medium))
                 .foregroundStyle(.white)
 
             if let text = feedbackText {
                 Text(text)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: tapFeedbackTextSize, weight: .semibold))
                     .foregroundStyle(.white)
             }
         }
-        .padding(20)
+        .padding(tapFeedbackPadding)
         .background(
             Circle()
                 .fill(Color.black.opacity(0.5))
-                .frame(width: 120, height: 120)
+                .frame(width: tapFeedbackCircleSize, height: tapFeedbackCircleSize)
         )
     }
 
@@ -278,4 +289,3 @@ private struct SeekRipple: View {
         )
     }
 }
-#endif

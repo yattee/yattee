@@ -5,8 +5,7 @@
 //  Handles execution of gesture actions on the player.
 //
 
-#if os(iOS)
-import UIKit
+import Foundation
 
 /// Result of executing a tap gesture action.
 struct TapActionResult: Sendable {
@@ -206,4 +205,3 @@ actor PlayerGestureActionHandler {
         self.duration = duration
     }
 }
-#endif
