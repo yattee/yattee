@@ -60,8 +60,21 @@ struct TVPlayerProgressBar: View {
     }
 
     var body: some View {
-        ZStack {
-            // Gesture capture layer (only when scrubbing)
+        Button {
+            if isScrubbing {
+                commitScrub()
+            } else if !isLive {
+                enterScrubMode()
+            }
+        } label: {
+            progressContent
+        }
+        .buttonStyle(TVProgressBarButtonStyle(isFocused: isFocused))
+        .disabled(isLive)
+        .overlay {
+            // Gesture capture layer (only when scrubbing). Siri Remote pan
+            // gestures are indirect touches, so matching the button's size
+            // is sufficient — no need to expand and disturb parent layout.
             if isScrubbing {
                 TVPanGestureView(
                     onPanChanged: { translation, velocity in
@@ -71,21 +84,7 @@ struct TVPlayerProgressBar: View {
                         handlePanEnded()
                     }
                 )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-
-            // Visual content with button for click-to-scrub (disabled for live)
-            Button {
-                if isScrubbing {
-                    commitScrub()
-                } else if !isLive {
-                    enterScrubMode()
-                }
-            } label: {
-                progressContent
-            }
-            .buttonStyle(TVProgressBarButtonStyle(isFocused: isFocused))
-            .disabled(isLive)
         }
         .focused($isFocused)
         .onMoveCommand { direction in
@@ -143,8 +142,12 @@ struct TVPlayerProgressBar: View {
                                 .animation(.easeOut(duration: 0.1), value: progress)
                         }
                     }
+                    .frame(maxHeight: .infinity, alignment: .center)
+                    .overlay(alignment: .top) {
+                        scrubPreviewOverlay(geometry: geometry)
+                    }
                 }
-                .frame(height: isFocused ? (isScrubbing ? 16 : 12) : 6)
+                .frame(height: 20)
             }
 
             // Time labels
@@ -191,17 +194,26 @@ struct TVPlayerProgressBar: View {
                 }
             }
 
-            // Scrub preview (storyboard thumbnail or large time display)
-            if isScrubbing {
+        }
+    }
+
+    @ViewBuilder
+    private func scrubPreviewOverlay(geometry: GeometryProxy) -> some View {
+        if isScrubbing {
+            let previewWidth: CGFloat = 352
+            let previewHeight: CGFloat = 260
+            let halfWidth = previewWidth / 2
+            let clampedX = max(halfWidth, min(geometry.size.width - halfWidth, geometry.size.width * progress))
+            let yPosition = -previewHeight / 2 - 16
+
+            Group {
                 if let storyboard {
                     TVSeekPreviewView(
                         storyboard: storyboard,
                         seekTime: scrubTime ?? currentTime,
                         chapters: showChapters ? chapters : []
                     )
-                    .transition(.scale.combined(with: .opacity))
                 } else {
-                    // Fallback when no storyboard available
                     Text((scrubTime ?? currentTime).formattedAsTimestamp)
                         .font(.system(size: 48, weight: .medium))
                         .monospacedDigit()
@@ -212,9 +224,11 @@ struct TVPlayerProgressBar: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(.ultraThinMaterial)
                         )
-                        .transition(.scale.combined(with: .opacity))
                 }
             }
+            .position(x: clampedX, y: yPosition)
+            .transition(.scale.combined(with: .opacity))
+            .allowsHitTesting(false)
         }
     }
 
