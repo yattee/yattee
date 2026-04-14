@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+#if os(tvOS)
+/// Padding used inside selection row buttons so the tvOS focus background
+/// fills the whole row.
+private let tvRowVerticalPadding: CGFloat = 14
+private let tvRowHorizontalPadding: CGFloat = 20
+#endif
+
 // MARK: - Adaptive Stream Row
 
 /// Row view for HLS/DASH adaptive streams.
@@ -61,9 +68,18 @@ struct AdaptiveStreamRowView: View {
                         .foregroundStyle(.tint)
                 }
             }
+            #if os(tvOS)
+            .padding(.vertical, tvRowVerticalPadding)
+            .padding(.horizontal, tvRowHorizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            #endif
             .contentShape(Rectangle())
         }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
         .buttonStyle(.plain)
+        #endif
     }
 }
 
@@ -97,9 +113,18 @@ struct VideoStreamRowView: View {
                 }
             }
             .frame(minHeight: showAdvancedDetails ? nil : 36)
+            #if os(tvOS)
+            .padding(.vertical, tvRowVerticalPadding)
+            .padding(.horizontal, tvRowHorizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            #endif
             .contentShape(Rectangle())
         }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
         .buttonStyle(.plain)
+        #endif
     }
 
     @ViewBuilder
@@ -251,9 +276,18 @@ struct AudioStreamRowView: View {
                 }
             }
             .frame(minHeight: showAdvancedDetails ? nil : 36)
+            #if os(tvOS)
+            .padding(.vertical, tvRowVerticalPadding)
+            .padding(.horizontal, tvRowHorizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            #endif
             .contentShape(Rectangle())
         }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
         .buttonStyle(.plain)
+        #endif
     }
 
     @ViewBuilder
@@ -341,9 +375,18 @@ struct CaptionRowView: View {
                 }
             }
             .frame(minHeight: 36)
+            #if os(tvOS)
+            .padding(.vertical, tvRowVerticalPadding)
+            .padding(.horizontal, tvRowHorizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            #endif
             .contentShape(Rectangle())
         }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
         .buttonStyle(.plain)
+        #endif
     }
 
     @ViewBuilder

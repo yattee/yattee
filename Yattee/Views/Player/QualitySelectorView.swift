@@ -191,6 +191,11 @@ struct QualitySelectorView: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            #if os(tvOS)
+            // Menu at the root dismisses; pushed detail views use NavigationStack's
+            // default pop-on-Menu behavior and won't hit this handler.
+            .onExitCommand { dismiss() }
+            #else
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .cancel) {
@@ -201,6 +206,7 @@ struct QualitySelectorView: View {
                     }
                 }
             }
+            #endif
             .navigationDestination(for: QualitySelectorDestination.self) { destination in
                 switch destination {
                 case .video:

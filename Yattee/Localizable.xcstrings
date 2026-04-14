@@ -6523,6 +6523,26 @@
         }
       }
     },
+    "player.controls.close" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "player.controls.comments" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        }
+      }
+    },
     "player.controls.info" : {
       "localizations" : {
         "en" : {
@@ -6534,6 +6554,7 @@
       }
     },
     "player.controls.quality" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6543,7 +6564,18 @@
         }
       }
     },
+    "player.controls.settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
     "player.controls.subtitles" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7052,6 +7084,7 @@
       }
     },
     "player.tvos.volumeDown" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7062,6 +7095,7 @@
       }
     },
     "player.tvos.volumeUp" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8689,6 +8723,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Debug Info"
+          }
+        }
+      }
+    },
+    "settings.advanced.debug.showTVDebugButton" : {
+      "comment" : "Toggle label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Debug Button in Player"
           }
         }
       }

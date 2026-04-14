@@ -15,13 +15,12 @@ enum TVPlayerFocusTarget: Hashable {
     case playPause
     case skipForward
     case progressBar
-    case qualityButton
-    case captionsButton
-    case debugButton
+    case settingsButton
     case infoButton
-    case volumeDown
-    case volumeUp
+    case commentsButton
+    case debugButton
     case playNext
+    case closeButton
 }
 
 /// Main tvOS fullscreen player view.
@@ -39,6 +38,9 @@ struct TVPlayerView: View {
 
     /// Whether the details panel is shown.
     @State private var isDetailsPanelVisible = false
+
+    /// Initial tab for the details panel when opened.
+    @State private var detailsPanelInitialTab: TVDetailsTab = .info
 
     /// Whether user is scrubbing the progress bar.
     @State private var isScrubbing = false
@@ -83,54 +85,75 @@ struct TVPlayerView: View {
         mpvPlayerContent
             .ignoresSafeArea()
             .playerToastOverlay()
-            // Quality selector sheet
-            .sheet(isPresented: $showingQualitySheet) {
-                if let playerService {
-                    let dashEnabled = appEnvironment?.settingsManager.dashEnabled ?? false
-                    let supportedFormats = playerService.currentBackendType.supportedFormats
-                    QualitySelectorView(
-                        streams: playerService.availableStreams.filter { stream in
-                            let format = StreamFormat.detect(from: stream)
-                            if format == .dash && !dashEnabled {
-                                return false
-                            }
-                            return supportedFormats.contains(format)
-                        },
-                        captions: playerService.availableCaptions,
-                        currentStream: playerState?.currentStream,
-                        currentAudioStream: playerState?.currentAudioStream,
-                        currentCaption: playerService.currentCaption,
-                        isLoading: playerState?.playbackState == .loading,
-                        currentDownload: playerService.currentDownload,
-                        isLoadingOnlineStreams: playerService.isLoadingOnlineStreams,
-                        localCaptionURL: playerService.currentDownload.flatMap { download in
-                            guard let path = download.localCaptionPath else { return nil }
-                            return appEnvironment?.downloadManager.downloadsDirectory().appendingPathComponent(path)
-                        },
-                        currentRate: playerState?.rate ?? .x1,
-                        onStreamSelected: { stream, audioStream in
-                            switchToStream(stream, audioStream: audioStream)
-                        },
-                        onCaptionSelected: { caption in
-                            playerService.loadCaption(caption)
-                        },
-                        onLoadOnlineStreams: {
-                            Task {
-                                await playerService.loadOnlineStreams()
-                            }
-                        },
-                        onSwitchToOnlineStream: { stream, audioStream in
-                            Task {
-                                await playerService.switchToOnlineStream(stream, audioStream: audioStream)
-                            }
-                        },
-                        onRateChanged: { rate in
-                            playerState?.rate = rate
-                            playerService.currentBackend?.rate = Float(rate.rawValue)
-                        }
-                    )
-                }
+            // Quality / Settings selector (fullscreen cover gives tvOS enough room)
+            .fullScreenCover(isPresented: $showingQualitySheet) {
+                qualitySheetContent
             }
+    }
+
+    // MARK: - Quality Sheet Content
+
+    @ViewBuilder
+    private var qualitySheetContent: some View {
+        if let playerService {
+            let dashEnabled = appEnvironment?.settingsManager.dashEnabled ?? false
+            let supportedFormats = playerService.currentBackendType.supportedFormats
+
+            ZStack {
+                // Dimmed backdrop over the video
+                Color.black.opacity(0.7)
+                    .ignoresSafeArea()
+
+                QualitySelectorView(
+                    streams: playerService.availableStreams.filter { stream in
+                        let format = StreamFormat.detect(from: stream)
+                        if format == .dash && !dashEnabled {
+                            return false
+                        }
+                        return supportedFormats.contains(format)
+                    },
+                    captions: playerService.availableCaptions,
+                    currentStream: playerState?.currentStream,
+                    currentAudioStream: playerState?.currentAudioStream,
+                    currentCaption: playerService.currentCaption,
+                    isLoading: playerState?.playbackState == .loading,
+                    currentDownload: playerService.currentDownload,
+                    isLoadingOnlineStreams: playerService.isLoadingOnlineStreams,
+                    localCaptionURL: playerService.currentDownload.flatMap { download in
+                        guard let path = download.localCaptionPath else { return nil }
+                        return appEnvironment?.downloadManager.downloadsDirectory().appendingPathComponent(path)
+                    },
+                    currentRate: playerState?.rate ?? .x1,
+                    onStreamSelected: { stream, audioStream in
+                        switchToStream(stream, audioStream: audioStream)
+                    },
+                    onCaptionSelected: { caption in
+                        playerService.loadCaption(caption)
+                    },
+                    onLoadOnlineStreams: {
+                        Task {
+                            await playerService.loadOnlineStreams()
+                        }
+                    },
+                    onSwitchToOnlineStream: { stream, audioStream in
+                        Task {
+                            await playerService.switchToOnlineStream(stream, audioStream: audioStream)
+                        }
+                    },
+                    onRateChanged: { rate in
+                        playerState?.rate = rate
+                        playerService.currentBackend?.rate = Float(rate.rawValue)
+                    }
+                )
+                .frame(maxWidth: 900, maxHeight: 700)
+                .background(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .padding(.horizontal, 200)
+                .padding(.vertical, 80)
+            }
+        }
     }
 
     // MARK: - MPV Content
@@ -151,10 +174,11 @@ struct TVPlayerView: View {
                     playerState: playerState,
                     playerService: playerService,
                     focusedControl: $focusedControl,
-                    onShowDetails: { showDetailsPanel() },
-                    onShowQuality: { showQualitySheet() },
+                    onShowSettings: { showQualitySheet() },
+                    onShowDetails: { showDetailsPanel(tab: .info) },
+                    onShowComments: { showDetailsPanel(tab: .comments) },
                     onShowDebug: { showDebugOverlay() },
-                    onDismiss: { dismissPlayer() },
+                    onClose: { closeVideo() },
                     onScrubbingChanged: { scrubbing in
                         isScrubbing = scrubbing
                         if scrubbing {
@@ -171,6 +195,7 @@ struct TVPlayerView: View {
             if isDetailsPanelVisible {
                 TVDetailsPanel(
                     video: playerState?.currentVideo,
+                    initialTab: detailsPanelInitialTab,
                     onDismiss: { hideDetailsPanel() }
                 )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -336,8 +361,9 @@ struct TVPlayerView: View {
 
     // MARK: - Details Panel
 
-    private func showDetailsPanel() {
+    private func showDetailsPanel(tab: TVDetailsTab = .info) {
         stopControlsTimer()
+        detailsPanelInitialTab = tab
         withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
             isDetailsPanelVisible = true
             controlsVisible = false
@@ -464,6 +490,14 @@ struct TVPlayerView: View {
             controlsVisible = false
             focusedControl = .background
         }
+    }
+
+    private func closeVideo() {
+        playerState?.isClosingVideo = true
+        appEnvironment?.queueManager.clearQueue()
+        playerService?.stop()
+        appEnvironment?.navigationCoordinator.isPlayerExpanded = false
+        dismiss()
     }
 
     private func dismissPlayer() {

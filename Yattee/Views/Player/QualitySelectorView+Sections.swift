@@ -77,65 +77,91 @@ extension QualitySelectorView {
 
     @ViewBuilder
     private var mediaSelectionRows: some View {
-        VStack(spacing: 0) {
-            NavigationLink(value: QualitySelectorDestination.video) {
-                HStack {
-                    Label(String(localized: "player.quality.video"), systemImage: "film")
-                        .font(.headline)
-                    Spacer()
-                    Text(currentVideoDisplayValue)
-                        .foregroundStyle(.secondary)
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 12)
-                .contentShape(Rectangle())
+        #if os(tvOS)
+        // tvOS: each row is its own rounded card with vertical spacing so the
+        // system focus hover effect has clean bounds (no clipped dividers).
+        VStack(spacing: 8) {
+            mediaSelectionRow(
+                destination: .video,
+                label: String(localized: "player.quality.video"),
+                systemImage: "film",
+                value: currentVideoDisplayValue
+            )
+            if availableTabs.contains(.audio) {
+                mediaSelectionRow(
+                    destination: .audio,
+                    label: String(localized: "stream.audio"),
+                    systemImage: "speaker.wave.2",
+                    value: currentAudioDisplayValue
+                )
             }
-            .buttonStyle(.plain)
-
+            if availableTabs.contains(.subtitles) {
+                mediaSelectionRow(
+                    destination: .subtitles,
+                    label: String(localized: "stream.subtitles"),
+                    systemImage: "captions.bubble",
+                    value: currentSubtitlesDisplayValue
+                )
+            }
+        }
+        #else
+        VStack(spacing: 0) {
+            mediaSelectionRow(
+                destination: .video,
+                label: String(localized: "player.quality.video"),
+                systemImage: "film",
+                value: currentVideoDisplayValue
+            )
             if availableTabs.contains(.audio) {
                 Divider()
-                NavigationLink(value: QualitySelectorDestination.audio) {
-                    HStack {
-                        Label(String(localized: "stream.audio"), systemImage: "speaker.wave.2")
-                            .font(.headline)
-                        Spacer()
-                        Text(currentAudioDisplayValue)
-                            .foregroundStyle(.secondary)
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 12)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+                mediaSelectionRow(
+                    destination: .audio,
+                    label: String(localized: "stream.audio"),
+                    systemImage: "speaker.wave.2",
+                    value: currentAudioDisplayValue
+                )
             }
-
             if availableTabs.contains(.subtitles) {
                 Divider()
-                NavigationLink(value: QualitySelectorDestination.subtitles) {
-                    HStack {
-                        Label(String(localized: "stream.subtitles"), systemImage: "captions.bubble")
-                            .font(.headline)
-                        Spacer()
-                        Text(currentSubtitlesDisplayValue)
-                            .foregroundStyle(.secondary)
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 12)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+                mediaSelectionRow(
+                    destination: .subtitles,
+                    label: String(localized: "stream.subtitles"),
+                    systemImage: "captions.bubble",
+                    value: currentSubtitlesDisplayValue
+                )
             }
         }
         .cardBackground()
+        #endif
+    }
+
+    @ViewBuilder
+    private func mediaSelectionRow(
+        destination: QualitySelectorDestination,
+        label: String,
+        systemImage: String,
+        value: String
+    ) -> some View {
+        NavigationLink(value: destination) {
+            HStack {
+                Label(label, systemImage: systemImage)
+                    .font(.headline)
+                Spacer()
+                Text(value)
+                    .foregroundStyle(.secondary)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 20)
+            .contentShape(Rectangle())
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
+        .buttonStyle(.plain)
+        #endif
     }
 
     // MARK: - Display Value Computed Properties
@@ -261,16 +287,19 @@ extension QualitySelectorView {
 
     @ViewBuilder
     var generalSectionContent: some View {
+        #if os(tvOS)
+        // tvOS only has the speed row here; style it to match the Settings rows.
+        playbackSpeedRow
+        #else
         VStack(spacing: 0) {
             playbackSpeedRow
 
             Divider()
 
-            #if !os(tvOS)
             lockControlsRow
-            #endif
         }
         .cardBackground()
+        #endif
     }
 
     @ViewBuilder
@@ -310,9 +339,15 @@ extension QualitySelectorView {
                 } label: {
                     Text(currentRate.displayText)
                         .font(.body.weight(.medium))
-                        .frame(minWidth: 60)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .frame(minWidth: 80)
                 }
+                #if os(tvOS)
+                // Default menu style on tvOS renders a focusable bordered pill.
+                #else
                 .menuStyle(.borderlessButton)
+                #endif
 
                 Button {
                     if let newRate = nextRate() {
@@ -328,8 +363,18 @@ extension QualitySelectorView {
                 .disabled(nextRate() == nil)
             }
         }
+        #if os(tvOS)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+        )
+        #else
         .padding(.vertical, 12)
         .padding(.horizontal, 12)
+        #endif
     }
 
     #if !os(tvOS)
@@ -455,6 +500,19 @@ extension QualitySelectorView {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
+            #if os(tvOS)
+            VStack(spacing: 8) {
+                ForEach(adaptiveStreams, id: \.url) { stream in
+                    AdaptiveStreamRowView(
+                        stream: stream,
+                        isSelected: stream.url == currentStream?.url,
+                        onTap: {
+                            handleAdaptiveStreamTap(stream)
+                        }
+                    )
+                }
+            }
+            #else
             VStack(spacing: 0) {
                 ForEach(Array(adaptiveStreams.enumerated()), id: \.element.url) { index, stream in
                     if index > 0 {
@@ -472,6 +530,7 @@ extension QualitySelectorView {
                 }
             }
             .cardBackground()
+            #endif
         }
     }
 
@@ -496,6 +555,13 @@ extension QualitySelectorView {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
 
+                    #if os(tvOS)
+                    VStack(spacing: 8) {
+                        ForEach(recommendedVideoStreams, id: \.url) { stream in
+                            videoStreamRow(stream)
+                        }
+                    }
+                    #else
                     VStack(spacing: 0) {
                         ForEach(Array(recommendedVideoStreams.enumerated()), id: \.element.url) { index, stream in
                             if index > 0 {
@@ -507,6 +573,7 @@ extension QualitySelectorView {
                         }
                     }
                     .cardBackground()
+                    #endif
                 }
             }
 
@@ -517,6 +584,13 @@ extension QualitySelectorView {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
 
+                    #if os(tvOS)
+                    VStack(spacing: 8) {
+                        ForEach(otherVideoStreams, id: \.url) { stream in
+                            videoStreamRow(stream)
+                        }
+                    }
+                    #else
                     VStack(spacing: 0) {
                         ForEach(Array(otherVideoStreams.enumerated()), id: \.element.url) { index, stream in
                             if index > 0 {
@@ -528,6 +602,7 @@ extension QualitySelectorView {
                         }
                     }
                     .cardBackground()
+                    #endif
                 }
             }
         }
@@ -603,6 +678,13 @@ extension QualitySelectorView {
             }
             .cardBackground()
         } else {
+            #if os(tvOS)
+            VStack(spacing: 8) {
+                ForEach(audioStreams, id: \.url) { stream in
+                    audioStreamRow(stream)
+                }
+            }
+            #else
             VStack(spacing: 0) {
                 ForEach(Array(audioStreams.enumerated()), id: \.element.url) { index, stream in
                     if index > 0 {
@@ -614,6 +696,7 @@ extension QualitySelectorView {
                 }
             }
             .cardBackground()
+            #endif
         }
     }
 
@@ -647,6 +730,29 @@ extension QualitySelectorView {
 
     @ViewBuilder
     var subtitlesSectionContent: some View {
+        #if os(tvOS)
+        VStack(spacing: 8) {
+            CaptionRowView(
+                caption: nil,
+                isSelected: currentCaption == nil,
+                isPreferred: false,
+                onTap: {
+                    handleCaptionTap(nil)
+                }
+            )
+
+            ForEach(sortedCaptions) { caption in
+                CaptionRowView(
+                    caption: caption,
+                    isSelected: caption.id == currentCaption?.id,
+                    isPreferred: isCaptionPreferred(caption),
+                    onTap: {
+                        handleCaptionTap(caption)
+                    }
+                )
+            }
+        }
+        #else
         VStack(spacing: 0) {
             CaptionRowView(
                 caption: nil,
@@ -675,6 +781,7 @@ extension QualitySelectorView {
             }
         }
         .cardBackground()
+        #endif
     }
 
     private func isCaptionPreferred(_ caption: Caption) -> Bool {
@@ -691,3 +798,27 @@ extension QualitySelectorView {
         dismiss()
     }
 }
+
+#if os(tvOS)
+/// Row button style for Settings-style navigation/selection rows on tvOS.
+/// Avoids the default focus lift/scale so rows stay aligned; focus state is
+/// communicated via a background tint and a thin stroke.
+struct TVSettingsRowButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.white)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(isFocused ? Color.white.opacity(0.22) : Color.white.opacity(0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isFocused ? Color.white.opacity(0.4) : .clear, lineWidth: 2)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+    }
+}
+#endif

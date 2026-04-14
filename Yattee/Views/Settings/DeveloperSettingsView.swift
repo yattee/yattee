@@ -156,6 +156,15 @@ struct DeveloperSettingsView: View {
                     Label(String(localized: "settings.advanced.debug.zoomTransitions"), systemImage: "arrow.up.left.and.arrow.down.right")
                 }
                 #endif
+
+                #if os(tvOS)
+                Toggle(isOn: Binding(
+                    get: { settingsManager.showTVDebugButton },
+                    set: { settingsManager.showTVDebugButton = $0 }
+                )) {
+                    Label(String(localized: "settings.advanced.debug.showTVDebugButton"), systemImage: "ant.circle")
+                }
+                #endif
             } header: {
                 Text(String(localized: "settings.advanced.debug.sectionTitle"))
             }

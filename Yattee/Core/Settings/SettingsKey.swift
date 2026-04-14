@@ -93,6 +93,7 @@ enum SettingsKey: String, CaseIterable {
     // Advanced
     case showAdvancedStreamDetails
     case showPlayerAreaDebug
+    case showTVDebugButton
     case verboseMPVLogging
     case verboseRemoteControlLogging
     case mpvBufferSeconds

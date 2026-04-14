@@ -12,12 +12,20 @@ import NukeUI
 /// Details panel that slides up from the bottom showing video information.
 struct TVDetailsPanel: View {
     let video: Video?
+    let initialTab: TVDetailsTab
     let onDismiss: () -> Void
 
     @Environment(\.appEnvironment) private var appEnvironment
 
     /// Tab selection for Info / Comments.
-    @State private var selectedTab: TVDetailsTab = .info
+    @State private var selectedTab: TVDetailsTab
+
+    init(video: Video?, initialTab: TVDetailsTab = .info, onDismiss: @escaping () -> Void) {
+        self.video = video
+        self.initialTab = initialTab
+        self.onDismiss = onDismiss
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     /// Focus state for interactive elements.
     @FocusState private var focusedItem: TVDetailsFocusItem?

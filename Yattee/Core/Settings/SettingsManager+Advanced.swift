@@ -39,6 +39,19 @@ extension SettingsManager {
         }
     }
 
+    /// Whether to show the Debug button in the tvOS player bottom controls.
+    /// Opens the MPV debug overlay. Default is false (hidden).
+    var showTVDebugButton: Bool {
+        get {
+            if let cached = _showTVDebugButton { return cached }
+            return bool(for: .showTVDebugButton, default: false)
+        }
+        set {
+            _showTVDebugButton = newValue
+            set(newValue, for: .showTVDebugButton)
+        }
+    }
+
     /// Whether verbose MPV rendering logging is enabled.
     /// When enabled, logs detailed OpenGL context, framebuffer, and display link state
     /// to help diagnose rendering issues. Default is false (disabled).

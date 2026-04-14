@@ -15,16 +15,17 @@ struct TVPlayerControlsView: View {
     let playerService: PlayerService?
     @FocusState.Binding var focusedControl: TVPlayerFocusTarget?
 
+    let onShowSettings: () -> Void
     let onShowDetails: () -> Void
-    let onShowQuality: () -> Void
+    let onShowComments: () -> Void
     let onShowDebug: () -> Void
-    let onDismiss: () -> Void
+    let onClose: () -> Void
     /// Called when scrubbing state changes - parent should stop auto-hide timer when true
     var onScrubbingChanged: ((Bool) -> Void)?
 
-    /// Whether to show in-app volume controls (only when volume mode is .mpv)
-    private var showVolumeControls: Bool {
-        GlobalLayoutSettings.cached.volumeMode == .mpv
+    /// Whether the Debug button should be visible (user-toggled in Developer settings).
+    private var showDebugButton: Bool {
+        appEnvironment?.settingsManager.showTVDebugButton ?? false
     }
 
     @State private var playNextTapCount = 0
@@ -212,47 +213,19 @@ struct TVPlayerControlsView: View {
 
     private var actionButtons: some View {
         HStack(spacing: 40) {
-            // Quality selector
+            // Settings (video / audio / subtitles / speed)
             Button {
-                onShowQuality()
+                onShowSettings()
             } label: {
                 VStack(spacing: 6) {
-                    Image(systemName: "slider.horizontal.3")
+                    Image(systemName: "gearshape")
                         .font(.system(size: 28))
-                    Text("player.controls.quality")
+                    Text("player.controls.settings")
                         .font(.caption)
                 }
             }
             .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .qualityButton)
-
-            // Captions
-            Button {
-                // TODO: Show captions picker
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "captions.bubble")
-                        .font(.system(size: 28))
-                    Text(String(localized: "player.controls.subtitles"))
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .captionsButton)
-
-            // Debug overlay
-            Button {
-                onShowDebug()
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "ant.circle")
-                        .font(.system(size: 28))
-                    Text(String(localized: "player.debug.titleShort"))
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .debugButton)
+            .focused($focusedControl, equals: .settingsButton)
 
             // Info / Details
             Button {
@@ -268,43 +241,36 @@ struct TVPlayerControlsView: View {
             .buttonStyle(TVActionButtonStyle())
             .focused($focusedControl, equals: .infoButton)
 
-            // Volume controls (only when in-app volume mode)
-            if showVolumeControls {
-                // Volume down
+            // Comments (opens details panel on Comments tab)
+            if playerState?.currentVideo?.supportsComments == true {
                 Button {
-                    guard let state = playerState else { return }
-                    let newVolume = max(0, state.volume - 0.1)
-                    playerService?.currentBackend?.volume = newVolume
-                    playerService?.state.volume = newVolume
-                    appEnvironment?.settingsManager.playerVolume = newVolume
+                    onShowComments()
                 } label: {
                     VStack(spacing: 6) {
-                        Image(systemName: "speaker.minus")
+                        Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 28))
-                        Text(String(localized: "player.tvos.volumeDown"))
+                        Text("player.controls.comments")
                             .font(.caption)
                     }
                 }
                 .buttonStyle(TVActionButtonStyle())
-                .focused($focusedControl, equals: .volumeDown)
+                .focused($focusedControl, equals: .commentsButton)
+            }
 
-                // Volume up
+            // Debug overlay (only when enabled in Developer settings)
+            if showDebugButton {
                 Button {
-                    guard let state = playerState else { return }
-                    let newVolume = min(1.0, state.volume + 0.1)
-                    playerService?.currentBackend?.volume = newVolume
-                    playerService?.state.volume = newVolume
-                    appEnvironment?.settingsManager.playerVolume = newVolume
+                    onShowDebug()
                 } label: {
                     VStack(spacing: 6) {
-                        Image(systemName: "speaker.plus")
+                        Image(systemName: "ant.circle")
                             .font(.system(size: 28))
-                        Text(String(localized: "player.tvos.volumeUp"))
+                        Text(String(localized: "player.debug.titleShort"))
                             .font(.caption)
                     }
                 }
                 .buttonStyle(TVActionButtonStyle())
-                .focused($focusedControl, equals: .volumeUp)
+                .focused($focusedControl, equals: .debugButton)
             }
 
             // Play next button (when queue has items)
@@ -324,6 +290,20 @@ struct TVPlayerControlsView: View {
                 .buttonStyle(TVActionButtonStyle())
                 .focused($focusedControl, equals: .playNext)
             }
+
+            // Close (stops playback and dismisses)
+            Button {
+                onClose()
+            } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 28))
+                    Text("player.controls.close")
+                        .font(.caption)
+                }
+            }
+            .buttonStyle(TVActionButtonStyle())
+            .focused($focusedControl, equals: .closeButton)
 
             Spacer()
 
@@ -365,7 +345,9 @@ struct TVActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(.white)
-            .frame(width: 100, height: 80)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(width: 140, height: 80)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isFocused ? .white.opacity(0.3) : .white.opacity(0.1))

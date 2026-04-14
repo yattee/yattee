@@ -140,6 +140,7 @@ final class SettingsManager {
     // Advanced settings
     var _showAdvancedStreamDetails: Bool?
     var _showPlayerAreaDebug: Bool?
+    var _showTVDebugButton: Bool?
     var _verboseMPVLogging: Bool?
     var _verboseRemoteControlLogging: Bool?
     var _mpvBufferSeconds: Double?
@@ -465,6 +466,7 @@ final class SettingsManager {
         _sidebarPlaylistsLimitEnabled = nil
         _showAdvancedStreamDetails = nil
         _showPlayerAreaDebug = nil
+        _showTVDebugButton = nil
         _verboseMPVLogging = nil
         _verboseRemoteControlLogging = nil
         _mpvBufferSeconds = nil
