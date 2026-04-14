@@ -343,11 +343,7 @@ extension QualitySelectorView {
                         .fixedSize(horizontal: true, vertical: false)
                         .frame(minWidth: 80)
                 }
-                #if os(tvOS)
-                // Default menu style on tvOS renders a focusable bordered pill.
-                #else
-                .menuStyle(.borderlessButton)
-                #endif
+                .playbackSpeedMenuStyle()
 
                 Button {
                     if let newRate = nextRate() {
@@ -822,3 +818,14 @@ struct TVSettingsRowButtonStyle: ButtonStyle {
     }
 }
 #endif
+
+private extension View {
+    @ViewBuilder
+    func playbackSpeedMenuStyle() -> some View {
+        #if os(tvOS)
+        self
+        #else
+        self.menuStyle(.borderlessButton)
+        #endif
+    }
+}
