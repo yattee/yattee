@@ -218,7 +218,11 @@ struct HomeView: View {
         .buttonStyle(.plain)
         .padding(.horizontal, listStyle == .inset ? 32 : 16)
         .padding(.top, 16)
+        #if os(tvOS)
+        .padding(.bottom, 24)
+        #else
         .padding(.bottom, 8)
+        #endif
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
