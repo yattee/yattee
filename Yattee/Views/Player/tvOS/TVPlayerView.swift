@@ -11,9 +11,6 @@ import SwiftUI
 /// Focus targets for tvOS player controls navigation.
 enum TVPlayerFocusTarget: Hashable {
     case background  // For capturing events when controls hidden
-    case skipBackward
-    case playPause
-    case skipForward
     case progressBar
     case settingsButton
     case infoButton
@@ -225,7 +222,7 @@ struct TVPlayerView: View {
         }
         .onAppear {
             startControlsTimer()
-            focusedControl = .playPause
+            focusedControl = .progressBar
         }
         .onDisappear {
             stopControlsTimer()
@@ -354,7 +351,7 @@ struct TVPlayerView: View {
             controlsVisible = true
         }
         if focusedControl == .background || focusedControl == nil {
-            focusedControl = .playPause
+            focusedControl = .progressBar
         }
         startControlsTimer()
     }

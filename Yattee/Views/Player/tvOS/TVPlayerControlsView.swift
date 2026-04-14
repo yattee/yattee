@@ -29,8 +29,6 @@ struct TVPlayerControlsView: View {
     }
 
     @State private var playNextTapCount = 0
-    @State private var seekBackwardTrigger = 0
-    @State private var seekForwardTrigger = 0
 
     var body: some View {
         ZStack {
@@ -42,14 +40,6 @@ struct TVPlayerControlsView: View {
                 topBar
                     .padding(.top, 60)
                     .padding(.horizontal, 88)
-
-                Spacer()
-
-                // Center transport controls - focus section for horizontal nav
-                transportControls
-                    .focusSection()
-                    // DEBUG: Uncomment to see focus section boundaries
-                    // .border(.blue, width: 2)
 
                 Spacer()
 
@@ -139,73 +129,6 @@ struct TVPlayerControlsView: View {
                     .progressViewStyle(.circular)
                     .scaleEffect(1.5)
             }
-        }
-    }
-
-    // MARK: - Transport Controls
-
-    private var transportControls: some View {
-        HStack(spacing: 80) {
-            // Skip backward
-            Button {
-                seekBackwardTrigger += 1
-                playerService?.seekBackward(by: 10)
-            } label: {
-                Image(systemName: "10.arrow.trianglehead.counterclockwise")
-                    .font(.system(size: 52, weight: .medium))
-                    .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekBackwardTrigger)
-            }
-            .buttonStyle(TVTransportButtonStyle())
-            .focused($focusedControl, equals: .skipBackward)
-            .disabled(isTransportDisabled)
-
-            // Play/Pause - hide when transport disabled, show spacer to maintain layout
-            if !isTransportDisabled {
-                Button {
-                    playerService?.togglePlayPause()
-                } label: {
-                    Image(systemName: playPauseIcon)
-                        .font(.system(size: 72, weight: .medium))
-                        .contentTransition(.symbolEffect(.replace, options: .speed(2)))
-                }
-                .buttonStyle(TVTransportButtonStyle())
-                .focused($focusedControl, equals: .playPause)
-            } else {
-                // Invisible spacer maintains layout stability
-                Color.clear
-                    .frame(width: 72, height: 72)
-                    .allowsHitTesting(false)
-            }
-
-            // Skip forward
-            Button {
-                seekForwardTrigger += 1
-                playerService?.seekForward(by: 10)
-            } label: {
-                Image(systemName: "10.arrow.trianglehead.clockwise")
-                    .font(.system(size: 52, weight: .medium))
-                    .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekForwardTrigger)
-            }
-            .buttonStyle(TVTransportButtonStyle())
-            .focused($focusedControl, equals: .skipForward)
-            .disabled(isTransportDisabled)
-        }
-    }
-
-    /// Whether transport controls should be disabled (during loading/buffering or buffer not ready)
-    private var isTransportDisabled: Bool {
-        playerState?.playbackState == .loading ||
-        playerState?.playbackState == .buffering ||
-        !(playerState?.isFirstFrameReady ?? false) ||
-        !(playerState?.isBufferReady ?? false)
-    }
-
-    private var playPauseIcon: String {
-        switch playerState?.playbackState {
-        case .playing:
-            return "pause.fill"
-        default:
-            return "play.fill"
         }
     }
 
@@ -322,21 +245,6 @@ struct TVPlayerControlsView: View {
 }
 
 // MARK: - Button Styles
-
-/// Button style for transport controls (play/pause, skip).
-struct TVTransportButtonStyle: ButtonStyle {
-    @Environment(\.isFocused) private var isFocused
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(.white)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .scaleEffect(configuration.isPressed ? 0.9 : (isFocused ? 1.15 : 1.0))
-            .shadow(color: isFocused ? .white.opacity(0.5) : .clear, radius: 20)
-            .animation(.easeInOut(duration: 0.15), value: isFocused)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
-    }
-}
 
 /// Button style for action buttons (quality, captions, info).
 struct TVActionButtonStyle: ButtonStyle {
