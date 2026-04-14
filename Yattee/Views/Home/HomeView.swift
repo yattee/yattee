@@ -188,9 +188,11 @@ struct HomeView: View {
 
     @ViewBuilder
     private var homeContent: some View {
+        #if !os(tvOS)
         if hasVisibleShortcuts {
             shortcutsSection
         }
+        #endif
 
         ForEach(settingsManager?.visibleSections() ?? HomeSectionItem.defaultOrder.filter { HomeSectionItem.defaultVisibility[$0] == true }) { section in
             sectionView(for: section)

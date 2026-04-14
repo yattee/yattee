@@ -31,8 +31,10 @@ struct HomeSettingsView: View {
 
     var body: some View {
         List {
+            #if !os(tvOS)
             shortcutsSection
             availableShortcutsSection
+            #endif
             sectionsSection
             availableSectionsSection
             itemsLimitSection
