@@ -198,19 +198,6 @@ struct TVPlayerProgressBar: View {
 
                 Spacer()
 
-                // Scrub hint when focused (only for non-live)
-                if !isLive && isFocused && !isScrubbing {
-                    Text(String(localized: "player.tvos.scrubHint"))
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.5))
-                } else if !isLive && isScrubbing {
-                    Text(String(localized: "player.tvos.seekHint"))
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-
-                Spacer()
-
                 // Remaining time (only for non-live)
                 if !isLive {
                     Text("-\(max(0, duration - displayTime).formattedAsTimestamp)")

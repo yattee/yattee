@@ -7063,26 +7063,6 @@
         }
       }
     },
-    "player.tvos.scrubHint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Press to scrub"
-          }
-        }
-      }
-    },
-    "player.tvos.seekHint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Swipe ← → • press to seek"
-          }
-        }
-      }
-    },
     "player.tvos.volumeDown" : {
       "extractionState" : "stale",
       "localizations" : {
