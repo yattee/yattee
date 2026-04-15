@@ -66,14 +66,24 @@ struct TVPlayerView: View {
     /// Timer for the countdown.
     @State private var autoplayTimer: Timer?
 
-    /// Handler for seek accumulation when using remote arrows with controls hidden.
-    @State private var gestureActionHandler = PlayerGestureActionHandler()
-
     /// Current tap-seek feedback to display.
     @State private var currentTapFeedback: (action: TapGestureAction, position: TapZonePosition, accumulated: Int?)?
 
     /// Pending seek to execute when feedback completes.
     @State private var pendingSeek: (isForward: Bool, seconds: Int)?
+
+    /// Pending target time for arrow-key seeks while the progress bar is
+    /// focused (controls visible). Mirrored onto the scrubber so the handle
+    /// moves without any extra overlay.
+    @State private var scrubberRemoteSeekTime: TimeInterval?
+
+    /// Most recent accumulated seek amount for the focused-bar flow; applied
+    /// on debounced commit.
+    @State private var scrubberRemoteSeek: (isForward: Bool, seconds: Int)?
+
+    /// Debounce task that commits the focused-bar arrow-key seek 1s after the
+    /// last press.
+    @State private var scrubberRemoteSeekTask: Task<Void, Never>?
 
     // MARK: - Computed Properties
 
@@ -192,6 +202,10 @@ struct TVPlayerView: View {
                         } else {
                             startControlsTimer()
                         }
+                    },
+                    remoteSeekTime: scrubberRemoteSeekTime,
+                    onRemoteSeek: { forward in
+                        triggerScrubberRemoteSeek(forward: forward)
                     }
                 )
                 .transition(.opacity.animation(.easeInOut(duration: 0.25)))
@@ -251,6 +265,10 @@ struct TVPlayerView: View {
             stopControlsTimer()
             stopDebugUpdates()
             stopAutoplayCountdown()
+            scrubberRemoteSeekTask?.cancel()
+            scrubberRemoteSeekTask = nil
+            scrubberRemoteSeek = nil
+            scrubberRemoteSeekTime = nil
         }
         // Remote event handling - these work globally
         .onPlayPauseCommand {
@@ -495,39 +513,90 @@ struct TVPlayerView: View {
         }
     }
 
-    /// Triggers a seek action from the remote, accumulating across rapid presses.
+    /// Triggers a seek action from the remote, accumulating a signed net
+    /// offset across rapid presses. A reverse press within the active window
+    /// subtracts from the pending offset instead of restarting from the
+    /// current playback time (e.g. right, right, left from 30s → +10s → 40s,
+    /// not −10s → 20s).
     private func triggerRemoteSeek(forward: Bool) {
-        let seekSeconds = 10
-        let action: TapGestureAction = forward
-            ? .seekForward(seconds: seekSeconds)
-            : .seekBackward(seconds: seekSeconds)
-        let position: TapZonePosition = forward ? .right : .left
+        let stepSeconds = 10
         let currentTime = playerState?.currentTime ?? 0
         let duration = playerState?.duration ?? 0
 
-        Task {
-            await gestureActionHandler.updatePlayerState(
-                currentTime: currentTime,
-                duration: duration
-            )
+        // Current signed offset from any in-flight accumulation.
+        let currentNet: Int = pendingSeek.map { $0.isForward ? $0.seconds : -$0.seconds } ?? 0
+        let step = forward ? stepSeconds : -stepSeconds
+        let rawNet = currentNet + step
 
-            // If switching seek direction, cancel any pending seek first.
-            if let pending = pendingSeek, pending.isForward != forward {
-                await MainActor.run {
-                    pendingSeek = nil
-                    currentTapFeedback = nil
-                }
-                await gestureActionHandler.cancelAccumulation()
-            }
+        // Clamp to the available seekable range in either direction.
+        let maxForward = Int(max(0, duration - currentTime))
+        let maxBackward = Int(max(0, currentTime))
+        let clampedNet = min(max(rawNet, -maxBackward), maxForward)
 
-            let result = await gestureActionHandler.handleTapAction(action, position: position)
-            let accumulated = result.accumulatedSeconds ?? seekSeconds
+        let netMagnitude = abs(clampedNet)
+        let netIsForward = clampedNet >= 0
 
-            await MainActor.run {
-                currentTapFeedback = (action, position, result.accumulatedSeconds)
-                pendingSeek = (isForward: forward, seconds: accumulated)
+        let action: TapGestureAction = netIsForward
+            ? .seekForward(seconds: stepSeconds)
+            : .seekBackward(seconds: stepSeconds)
+        let position: TapZonePosition = netIsForward ? .right : .left
+
+        currentTapFeedback = (action, position, netMagnitude)
+        pendingSeek = (isForward: netIsForward, seconds: netMagnitude)
+    }
+
+    /// Accumulating arrow-key seek for when the progress bar is focused and
+    /// controls are visible. Suppresses the circular feedback overlay — the
+    /// visible scrubber shows the pending target instead — and uses the same
+    /// signed net-offset accumulation as the hidden-controls flow.
+    private func triggerScrubberRemoteSeek(forward: Bool) {
+        let stepSeconds = 10
+        let currentTime = playerState?.currentTime ?? 0
+        let duration = playerState?.duration ?? 0
+
+        // Keep controls on-screen while the user is arrow-seeking.
+        stopControlsTimer()
+
+        // Current signed offset from any in-flight accumulation.
+        let currentNet: Int = scrubberRemoteSeek.map { $0.isForward ? $0.seconds : -$0.seconds } ?? 0
+        let step = forward ? stepSeconds : -stepSeconds
+        let rawNet = currentNet + step
+
+        let maxForward = Int(max(0, duration - currentTime))
+        let maxBackward = Int(max(0, currentTime))
+        let clampedNet = min(max(rawNet, -maxBackward), maxForward)
+
+        let netMagnitude = abs(clampedNet)
+        let netIsForward = clampedNet >= 0
+
+        scrubberRemoteSeek = (isForward: netIsForward, seconds: netMagnitude)
+        scrubberRemoteSeekTime = currentTime + TimeInterval(clampedNet)
+
+        scrubberRemoteSeekTask?.cancel()
+        scrubberRemoteSeekTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(1000))
+            guard !Task.isCancelled else { return }
+            commitScrubberRemoteSeek()
+        }
+    }
+
+    /// Commits the debounced accumulating arrow-key seek for the focused bar.
+    private func commitScrubberRemoteSeek() {
+        guard let seek = scrubberRemoteSeek else { return }
+        scrubberRemoteSeek = nil
+        scrubberRemoteSeekTime = nil
+        scrubberRemoteSeekTask = nil
+
+        if seek.seconds > 0 {
+            if seek.isForward {
+                playerService?.seekForward(by: TimeInterval(seek.seconds))
+            } else {
+                playerService?.seekBackward(by: TimeInterval(seek.seconds))
             }
         }
+
+        // Resume the auto-hide timer now that the user is done seeking.
+        startControlsTimer()
     }
 
     /// Commits the pending seek when the feedback overlay finishes its dismiss animation.
@@ -540,10 +609,6 @@ struct TVPlayerView: View {
             playerService?.seekForward(by: TimeInterval(seek.seconds))
         } else {
             playerService?.seekBackward(by: TimeInterval(seek.seconds))
-        }
-
-        Task {
-            await gestureActionHandler.cancelAccumulation()
         }
     }
 

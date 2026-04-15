@@ -29,6 +29,13 @@ struct TVPlayerProgressBar: View {
     var sponsorBlockSettings: SponsorBlockSegmentSettings = .default
     /// Color for the played portion of the progress bar.
     var playedColor: Color = .red
+    /// Pending target time from the parent's accumulating remote-seek flow
+    /// (arrow presses while the bar is focused but not in SELECT scrub mode).
+    /// When set, the handle and played portion reflect this value.
+    var remoteSeekTime: TimeInterval? = nil
+    /// Called when the bar is focused (not scrubbing) and user presses left/right.
+    /// Parameter: `forward` — true for right, false for left.
+    var onRemoteSeek: ((Bool) -> Void)? = nil
 
     /// Track focus state internally.
     @FocusState private var isFocused: Bool
@@ -42,9 +49,10 @@ struct TVPlayerProgressBar: View {
     /// Accumulated pan translation for scrubbing.
     @State private var panAccumulator: CGFloat = 0
 
-    /// The time to display (scrub time if scrubbing, else current time).
+    /// The time to display. SELECT-based scrub takes priority, then the
+    /// parent's pending remote-seek target, then the actual playback time.
     private var displayTime: TimeInterval {
-        scrubTime ?? currentTime
+        scrubTime ?? remoteSeekTime ?? currentTime
     }
 
     /// Progress as a fraction (0-1).
@@ -88,9 +96,13 @@ struct TVPlayerProgressBar: View {
         }
         .focused($isFocused)
         .onMoveCommand { direction in
-            // D-pad fallback for scrubbing
             if isScrubbing {
+                // D-pad fallback while in SELECT-based scrub mode.
                 handleDPad(direction: direction)
+            } else if !isLive, direction == .left || direction == .right {
+                // Focused but not scrubbing: delegate accumulating remote seek
+                // to parent. Up/down falls through to normal focus navigation.
+                onRemoteSeek?(direction == .right)
             }
         }
         .onChange(of: isFocused) { _, focused in

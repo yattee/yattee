@@ -22,6 +22,11 @@ struct TVPlayerControlsView: View {
     let onClose: () -> Void
     /// Called when scrubbing state changes - parent should stop auto-hide timer when true
     var onScrubbingChanged: ((Bool) -> Void)?
+    /// Pending target time for the bar's accumulating remote-seek flow (arrow
+    /// presses while focused but not in SELECT scrub mode).
+    var remoteSeekTime: TimeInterval? = nil
+    /// Called when user presses left/right on the focused bar outside SELECT scrub.
+    var onRemoteSeek: ((Bool) -> Void)? = nil
 
     /// Whether the Debug button should be visible (user-toggled in Developer settings).
     private var showDebugButton: Bool {
@@ -57,7 +62,9 @@ struct TVPlayerControlsView: View {
                     },
                     onScrubbingChanged: onScrubbingChanged,
                     isLive: playerState?.isLive ?? false,
-                    sponsorSegments: playerState?.sponsorSegments ?? []
+                    sponsorSegments: playerState?.sponsorSegments ?? [],
+                    remoteSeekTime: remoteSeekTime,
+                    onRemoteSeek: onRemoteSeek
                 )
                 .focusSection()
                 .padding(.horizontal, 88)
