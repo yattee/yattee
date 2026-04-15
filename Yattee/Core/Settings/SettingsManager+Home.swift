@@ -95,6 +95,21 @@ extension SettingsManager {
         }
     }
 
+    /// Layout mode for home sections (list or grid). Default is list on iOS/macOS, grid on tvOS.
+    var homeSectionLayout: HomeSectionLayout {
+        get {
+            if let cached = _homeSectionLayout { return cached }
+            guard let rawValue = string(for: .homeSectionLayout) else {
+                return HomeSectionLayout.platformDefault
+            }
+            return HomeSectionLayout(rawValue: rawValue) ?? HomeSectionLayout.platformDefault
+        }
+        set {
+            _homeSectionLayout = newValue
+            set(newValue.rawValue, for: .homeSectionLayout)
+        }
+    }
+
     // MARK: - Home Section Settings
 
     /// Ordered list of home sections. Default order is bookmarks, history, downloads.

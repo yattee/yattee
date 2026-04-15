@@ -107,6 +107,7 @@ final class SettingsManager {
     var _homeSectionOrder: [HomeSectionItem]?
     var _homeSectionVisibility: [HomeSectionItem: Bool]?
     var _homeSectionItemsLimit: Int?
+    var _homeSectionLayout: HomeSectionLayout?
 
     // Tab bar settings (compact size class only - iOS)
     var _tabBarItemOrder: [TabBarItem]?
@@ -446,6 +447,7 @@ final class SettingsManager {
         _homeSectionOrder = nil
         _homeSectionVisibility = nil
         _homeSectionItemsLimit = nil
+        _homeSectionLayout = nil
         _tabBarItemOrder = nil
         _tabBarItemVisibility = nil
         _sidebarMainItemOrder = nil

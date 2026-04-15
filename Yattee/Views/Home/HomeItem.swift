@@ -30,6 +30,36 @@ enum HomeShortcutLayout: String, CaseIterable, Sendable {
     }
 }
 
+// MARK: - Home Section Layout
+
+/// Layout mode for the configurable home sections (Continue Watching, Feed, etc.).
+enum HomeSectionLayout: String, CaseIterable, Sendable {
+    case list
+    case grid
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .list: return "home.sections.layout.list"
+        case .grid: return "home.sections.layout.grid"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .list: return "list.bullet"
+        case .grid: return "square.grid.2x2"
+        }
+    }
+
+    static var platformDefault: HomeSectionLayout {
+        #if os(tvOS)
+        return .grid
+        #else
+        return .list
+        #endif
+    }
+}
+
 // MARK: - Instance Content Type
 
 /// Content type for instance home items.

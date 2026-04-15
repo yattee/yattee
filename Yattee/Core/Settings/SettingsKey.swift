@@ -63,6 +63,7 @@ enum SettingsKey: String, CaseIterable {
     case homeSectionOrder
     case homeSectionVisibility
     case homeSectionItemsLimit
+    case homeSectionLayout
 
     // Tab Bar (compact size class)
     case tabBarItemOrder
@@ -124,7 +125,7 @@ enum SettingsKey: String, CaseIterable {
         case .preferredQuality, .cellularQuality, .macPlayerMode, .listStyle,
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout,
-             .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit,
+             .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit, .homeSectionLayout,
              // Tab bar (compact size class) layout
              .tabBarItemOrder, .tabBarItemVisibility, .tabBarStartupTab,
              // Sidebar layout/selection

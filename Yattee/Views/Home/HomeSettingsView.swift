@@ -17,6 +17,7 @@ struct HomeSettingsView: View {
     @State private var sectionOrder: [HomeSectionItem] = []
     @State private var sectionVisibility: [HomeSectionItem: Bool] = [:]
     @State private var sectionItemsLimit: Int = 5
+    @State private var sectionLayout: HomeSectionLayout = HomeSectionLayout.platformDefault
     
     // Available items (not yet added to Home)
     @State private var availableShortcutsByInstance: [(instance: Instance, cards: [HomeShortcutItem])] = []
@@ -125,6 +126,16 @@ struct HomeSettingsView: View {
 
     private var sectionsSection: some View {
         Section {
+            Picker(String(localized: "home.settings.sections.layout"), selection: $sectionLayout) {
+                ForEach(HomeSectionLayout.allCases, id: \.self) { layout in
+                    Label(layout.displayName, systemImage: layout.systemImage)
+                        .tag(layout)
+                }
+            }
+            #if !os(tvOS)
+            .pickerStyle(.segmented)
+            #endif
+
             #if os(tvOS)
             ForEach(Array(sectionOrder.enumerated()), id: \.element.id) { index, section in
                 if section != .downloads {
@@ -257,6 +268,7 @@ struct HomeSettingsView: View {
         sectionOrder = settings.homeSectionOrder
         sectionVisibility = settings.homeSectionVisibility
         sectionItemsLimit = settings.homeSectionItemsLimit
+        sectionLayout = settings.homeSectionLayout
 
         // Load available items
         let instances = env.instancesManager.instances
@@ -276,6 +288,7 @@ struct HomeSettingsView: View {
         settings.homeSectionOrder = sectionOrder
         settings.homeSectionVisibility = sectionVisibility
         settings.homeSectionItemsLimit = sectionItemsLimit
+        settings.homeSectionLayout = sectionLayout
     }
 
     // MARK: - Available Item Management

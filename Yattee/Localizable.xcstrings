@@ -4025,6 +4025,17 @@
         }
       }
     },
+    "home.settings.sections.layout" : {
+      "comment" : "Label for sections layout picker in library settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display sections as"
+          }
+        }
+      }
+    },
     "home.settings.shortcuts.layout" : {
       "comment" : "Label for shortcuts layout picker in library settings",
       "localizations" : {
@@ -4032,6 +4043,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Layout"
+          }
+        }
+      }
+    },
+    "home.sections.layout.grid" : {
+      "comment" : "Grid layout option for library sections",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid"
+          }
+        }
+      }
+    },
+    "home.sections.layout.list" : {
+      "comment" : "List layout option for library sections",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
           }
         }
       }

@@ -56,6 +56,11 @@ struct HomeView: View {
         settingsManager?.homeShortcutLayout ?? .cards
     }
 
+    /// The current layout for home sections (list or grid)
+    private var sectionLayout: HomeSectionLayout {
+        settingsManager?.homeSectionLayout ?? HomeSectionLayout.platformDefault
+    }
+
     /// List style from centralized settings.
     private var listStyle: VideoListStyle {
         appEnvironment?.settingsManager.listStyle ?? .inset
@@ -914,6 +919,14 @@ struct HomeView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .continueWatching)
             }
 
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: videoList,
+                    queueSource: continueWatchingQueueSource,
+                    sourceLabel: String(localized: "queue.source.continueWatching"),
+                    loadMoreVideos: loadMoreContinueWatchingCallback
+                )
+            } else {
             VideoListContent(listStyle: listStyle) {
                 ForEach(Array(limitedEntries.enumerated()), id: \.element.videoIdentifier) { index, entry in
                     VideoListRow(
@@ -952,6 +965,7 @@ struct HomeView: View {
                     #endif
                 }
             }
+            }
         }
     }
 
@@ -963,26 +977,35 @@ struct HomeView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .subscriptionsFeed)
             }
 
-            VideoListContent(listStyle: listStyle) {
-                ForEach(Array(limitedVideos.enumerated()), id: \.element.id) { index, video in
-                    VideoListRow(
-                        isLast: index == limitedVideos.count - 1,
-                        rowStyle: .regular,
-                        listStyle: listStyle
-                    ) {
-                        VideoRowView(video: video, style: .regular)
-                            .tappableVideo(
-                                video,
-                                queueSource: feedQueueSource,
-                                sourceLabel: String(localized: "queue.source.subscriptions"),
-                                videoList: limitedVideos,
-                                videoIndex: index,
-                                loadMoreVideos: loadMoreFeedCallback
-                            )
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: limitedVideos,
+                    queueSource: feedQueueSource,
+                    sourceLabel: String(localized: "queue.source.subscriptions"),
+                    loadMoreVideos: loadMoreFeedCallback
+                )
+            } else {
+                VideoListContent(listStyle: listStyle) {
+                    ForEach(Array(limitedVideos.enumerated()), id: \.element.id) { index, video in
+                        VideoListRow(
+                            isLast: index == limitedVideos.count - 1,
+                            rowStyle: .regular,
+                            listStyle: listStyle
+                        ) {
+                            VideoRowView(video: video, style: .regular)
+                                .tappableVideo(
+                                    video,
+                                    queueSource: feedQueueSource,
+                                    sourceLabel: String(localized: "queue.source.subscriptions"),
+                                    videoList: limitedVideos,
+                                    videoIndex: index,
+                                    loadMoreVideos: loadMoreFeedCallback
+                                )
+                        }
+                        #if !os(tvOS)
+                        .videoSwipeActions(video: video)
+                        #endif
                     }
-                    #if !os(tvOS)
-                    .videoSwipeActions(video: video)
-                    #endif
                 }
             }
         }
@@ -997,6 +1020,14 @@ struct HomeView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .bookmarks)
             }
 
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: videoList,
+                    queueSource: recentBookmarksQueueSource,
+                    sourceLabel: String(localized: "queue.source.bookmarks"),
+                    loadMoreVideos: loadMoreRecentBookmarksCallback
+                )
+            } else {
             VideoListContent(listStyle: listStyle) {
                 ForEach(Array(limitedBookmarks.enumerated()), id: \.element.videoID) { index, bookmark in
                     VideoListRow(
@@ -1035,6 +1066,7 @@ struct HomeView: View {
                     #endif
                 }
             }
+            }
         }
     }
 
@@ -1047,6 +1079,14 @@ struct HomeView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .history)
             }
 
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: videoList,
+                    queueSource: recentHistoryQueueSource,
+                    sourceLabel: String(localized: "queue.source.history"),
+                    loadMoreVideos: loadMoreRecentHistoryCallback
+                )
+            } else {
             VideoListContent(listStyle: listStyle) {
                 ForEach(Array(limitedHistory.enumerated()), id: \.element.videoID) { index, entry in
                     VideoListRow(
@@ -1085,6 +1125,7 @@ struct HomeView: View {
                     #endif
                 }
             }
+            }
         }
     }
 
@@ -1100,6 +1141,14 @@ struct HomeView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .downloads)
             }
 
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: videoList,
+                    queueSource: .manual,
+                    sourceLabel: String(localized: "queue.source.downloads"),
+                    loadMoreVideos: loadMoreRecentDownloadsCallback
+                )
+            } else {
             VideoListContent(listStyle: listStyle) {
                 ForEach(Array(limitedDownloads.enumerated()), id: \.element.id) { index, download in
                     VideoListRow(
@@ -1139,6 +1188,7 @@ struct HomeView: View {
                     )
                 }
             }
+            }
         }
     }
     #endif
@@ -1172,26 +1222,35 @@ struct HomeView: View {
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                VideoListContent(listStyle: listStyle) {
-                    ForEach(Array(limitedVideos.enumerated()), id: \.element.id) { index, video in
-                        VideoListRow(
-                            isLast: index == limitedVideos.count - 1,
-                            rowStyle: .regular,
-                            listStyle: listStyle
-                        ) {
-                            VideoRowView(video: video, style: .regular)
-                                .tappableVideo(
-                                    video,
-                                    queueSource: instanceQueueSource(instanceID: instanceID, contentType: contentType),
-                                    sourceLabel: contentType.localizedTitle,
-                                    videoList: limitedVideos,
-                                    videoIndex: index,
-                                    loadMoreVideos: loadMoreInstanceContentCallback
-                                )
+                if sectionLayout == .grid {
+                    HomeHorizontalCards(
+                        videos: limitedVideos,
+                        queueSource: instanceQueueSource(instanceID: instanceID, contentType: contentType),
+                        sourceLabel: contentType.localizedTitle,
+                        loadMoreVideos: loadMoreInstanceContentCallback
+                    )
+                } else {
+                    VideoListContent(listStyle: listStyle) {
+                        ForEach(Array(limitedVideos.enumerated()), id: \.element.id) { index, video in
+                            VideoListRow(
+                                isLast: index == limitedVideos.count - 1,
+                                rowStyle: .regular,
+                                listStyle: listStyle
+                            ) {
+                                VideoRowView(video: video, style: .regular)
+                                    .tappableVideo(
+                                        video,
+                                        queueSource: instanceQueueSource(instanceID: instanceID, contentType: contentType),
+                                        sourceLabel: contentType.localizedTitle,
+                                        videoList: limitedVideos,
+                                        videoIndex: index,
+                                        loadMoreVideos: loadMoreInstanceContentCallback
+                                    )
+                            }
+                            #if !os(tvOS)
+                            .videoSwipeActions(video: video)
+                            #endif
                         }
-                        #if !os(tvOS)
-                        .videoSwipeActions(video: video)
-                        #endif
                     }
                 }
             }
