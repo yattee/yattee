@@ -15,6 +15,8 @@ enum SidebarItem: Hashable, Identifiable {
     case sources
     case settings
     case nowPlaying
+    case openURL
+    case remoteControl
 
     // MARK: - Dynamic Channel Items
     case channel(channelID: String, name: String, source: ContentSource)
@@ -49,6 +51,10 @@ enum SidebarItem: Hashable, Identifiable {
             return "settings"
         case .nowPlaying:
             return "now-playing"
+        case .openURL:
+            return "open-url"
+        case .remoteControl:
+            return "remote-control"
         case .channel(let channelID, _, let source):
             return "channel-\(source.provider)-\(channelID)"
         case .playlist(let id, _):
@@ -84,6 +90,10 @@ enum SidebarItem: Hashable, Identifiable {
             return String(localized: "tabs.settings")
         case .nowPlaying:
             return String(localized: "sidebar.nowPlaying")
+        case .openURL:
+            return String(localized: "sidebar.mainItem.openURL")
+        case .remoteControl:
+            return String(localized: "sidebar.mainItem.remoteControl")
         case .channel(_, let name, _):
             return name
         case .playlist(_, let title):
@@ -117,6 +127,10 @@ enum SidebarItem: Hashable, Identifiable {
             return "gear"
         case .nowPlaying:
             return "play.circle.fill"
+        case .openURL:
+            return "link"
+        case .remoteControl:
+            return "antenna.radiowaves.left.and.right"
         case .channel:
             return "person.circle"
         case .playlist:
@@ -144,7 +158,7 @@ enum SidebarItem: Hashable, Identifiable {
     /// Returns nil for items that are root views (home, search) which don't push.
     func navigationDestination() -> NavigationDestination? {
         switch self {
-        case .home, .search, .sources, .settings, .nowPlaying:
+        case .home, .search, .sources, .settings, .nowPlaying, .openURL, .remoteControl:
             // These are root tabs, not push destinations
             return nil
         case .channel(let channelID, _, let source):
@@ -174,7 +188,7 @@ enum SidebarItem: Hashable, Identifiable {
     /// Whether this is a fixed navigation item (always visible).
     var isFixedNavigation: Bool {
         switch self {
-        case .home, .search, .sources, .settings, .nowPlaying:
+        case .home, .search, .sources, .settings, .nowPlaying, .openURL, .remoteControl:
             return true
         default:
             return false

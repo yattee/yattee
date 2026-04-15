@@ -35,6 +35,8 @@ struct UnifiedTabView: View {
     @State private var manageChannelsPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
+    @State private var openURLPath = NavigationPath()
+    @State private var remoteControlPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -199,6 +201,27 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.systemImage)
             }
+
+        case .openURL:
+            Tab(value: SidebarItem.openURL) {
+                NavigationStack(path: $openURLPath) {
+                    OpenLinkView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
+            }
+
+        case .remoteControl:
+            Tab(value: SidebarItem.remoteControl) {
+                NavigationStack(path: $remoteControlPath) {
+                    RemoteControlContentView(navigationStyle: .link)
+                        .navigationTitle(String(localized: "remoteControl.title"))
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
+            }
         }
     }
 
@@ -319,6 +342,8 @@ struct UnifiedTabView: View {
     @State private var manageChannelsPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
+    @State private var openURLPath = NavigationPath()
+    @State private var remoteControlPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -463,6 +488,26 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.systemImage)
             }
+
+        case .openURL:
+            Tab(value: SidebarItem.openURL) {
+                NavigationStack(path: $openURLPath) {
+                    OpenLinkView().withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
+            }
+
+        case .remoteControl:
+            Tab(value: SidebarItem.remoteControl) {
+                NavigationStack(path: $remoteControlPath) {
+                    RemoteControlContentView(navigationStyle: .link)
+                        .navigationTitle(String(localized: "remoteControl.title"))
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
+            }
         }
     }
 
@@ -538,6 +583,8 @@ struct UnifiedTabView: View {
     @State private var manageChannelsPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
+    @State private var openURLPath = NavigationPath()
+    @State private var remoteControlPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -700,6 +747,27 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.systemImage)
             }
+
+        case .openURL:
+            Tab(value: SidebarItem.openURL) {
+                NavigationStack(path: $openURLPath) {
+                    OpenLinkView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
+            }
+
+        case .remoteControl:
+            Tab(value: SidebarItem.remoteControl) {
+                NavigationStack(path: $remoteControlPath) {
+                    RemoteControlContentView(navigationStyle: .link)
+                        .navigationTitle(String(localized: "remoteControl.title"))
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
+            }
         }
     }
 
@@ -814,6 +882,10 @@ extension UnifiedTabView {
             settingsPath.append(destination)
         case .nowPlaying:
             break // Now Playing is a root tab, not a push destination
+        case .openURL:
+            openURLPath.append(destination)
+        case .remoteControl:
+            remoteControlPath.append(destination)
         }
         navigationCoordinator?.clearPendingNavigation()
     }

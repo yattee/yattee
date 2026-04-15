@@ -40,7 +40,44 @@ private enum ExtractionStatus {
 /// Supports multiple URLs (one per line, max 20).
 struct OpenLinkSheet: View {
     @Environment(\.dismiss) private var dismiss
+    let prefilledURL: URL?
+
+    init(prefilledURL: URL? = nil) {
+        self.prefilledURL = prefilledURL
+    }
+
+    var body: some View {
+        NavigationStack {
+            OpenLinkFormView(prefilledURL: prefilledURL, onRequestDismiss: { dismiss() })
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(String(localized: "common.cancel")) {
+                            dismiss()
+                        }
+                    }
+                }
+        }
+    }
+}
+
+// MARK: - OpenLinkView
+
+/// Standalone view for entering URLs — used as a tab root (e.g. tvOS sidebar).
+/// Not wrapped in a NavigationStack; the containing tab provides one.
+struct OpenLinkView: View {
+    var body: some View {
+        OpenLinkFormView(prefilledURL: nil, onRequestDismiss: nil)
+    }
+}
+
+// MARK: - OpenLinkFormView
+
+/// Shared form body used by both OpenLinkSheet (sheet) and OpenLinkView (tab root).
+struct OpenLinkFormView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+
+    let prefilledURL: URL?
+    let onRequestDismiss: (() -> Void)?
 
     @State private var urlText: String
     @State private var clipboardURLs: [URL] = []
@@ -56,54 +93,50 @@ struct OpenLinkSheet: View {
     @State private var pendingDownloadItems: [ExtractedItem] = []
 
     /// Maximum number of URLs allowed.
-    private static let maxURLs = 20
+    fileprivate static let maxURLs = 20
 
-    /// Initialize with optional pre-filled URL.
-    init(prefilledURL: URL? = nil) {
+    init(prefilledURL: URL?, onRequestDismiss: (() -> Void)?) {
+        self.prefilledURL = prefilledURL
+        self.onRequestDismiss = onRequestDismiss
         _urlText = State(initialValue: prefilledURL?.absoluteString ?? "")
     }
 
+    private func dismissIfRequested() {
+        onRequestDismiss?()
+    }
+
     var body: some View {
-        NavigationStack {
-            Form {
-                urlInputSection
-                extractionResultsSection
-                actionButtonsSection
-                yatteeServerWarningSection
-            }
-            .navigationTitle(String(localized: "openLink.title"))
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            .scrollDismissesKeyboard(.immediately)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "common.cancel")) {
-                        dismiss()
-                    }
-                }
-            }
-            .onAppear {
-                checkClipboard()
-                if urlText.isEmpty {
-                    isTextEditorFocused = true
-                }
-            }
-            #if !os(tvOS)
-            .sheet(isPresented: $showingDownloadSheet, onDismiss: {
-                // Close OpenLinkSheet when download sheet is dismissed (if no errors)
-                if !hasErrors {
-                    dismiss()
-                }
-            }) {
-                BatchDownloadQualitySheet(videoCount: pendingDownloadItems.count) { quality, includeSubtitles in
-                    Task {
-                        await downloadPendingItems(quality: quality, includeSubtitles: includeSubtitles)
-                    }
-                }
-            }
-            #endif
+        Form {
+            urlInputSection
+            extractionResultsSection
+            actionButtonsSection
+            yatteeServerWarningSection
         }
+        .navigationTitle(String(localized: "openLink.title"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        .scrollDismissesKeyboard(.immediately)
+        #endif
+        .onAppear {
+            checkClipboard()
+            if urlText.isEmpty {
+                isTextEditorFocused = true
+            }
+        }
+        #if !os(tvOS)
+        .sheet(isPresented: $showingDownloadSheet, onDismiss: {
+            // Close sheet when download sheet is dismissed (if no errors and we're in sheet mode)
+            if !hasErrors {
+                dismissIfRequested()
+            }
+        }) {
+            BatchDownloadQualitySheet(videoCount: pendingDownloadItems.count) { quality, includeSubtitles in
+                Task {
+                    await downloadPendingItems(quality: quality, includeSubtitles: includeSubtitles)
+                }
+            }
+        }
+        #endif
     }
 
     // MARK: - URL Input Section
@@ -456,7 +489,7 @@ struct OpenLinkSheet: View {
                     subtitle: String(localized: "openLink.queuedSuccess.subtitle \(successCount)")
                 )
             }
-            dismiss()
+            dismissIfRequested()
         } else if successCount > 0 {
             appEnvironment.toastManager.show(
                 category: .error,
@@ -595,7 +628,7 @@ struct OpenLinkSheet: View {
                         subtitle: String(localized: "openLink.downloadQueued.subtitle \(successCount)")
                     )
                 }
-                dismiss()
+                dismissIfRequested()
             } else if successCount > 0 {
                 appEnvironment.toastManager.show(
                     category: .error,
@@ -695,7 +728,7 @@ struct OpenLinkSheet: View {
                 )
             }
             if !hasErrors {
-                dismiss()
+                dismissIfRequested()
             }
         } else {
             appEnvironment.toastManager.show(

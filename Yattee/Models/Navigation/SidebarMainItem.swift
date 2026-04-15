@@ -18,16 +18,19 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
     case channels
     case sources
     case settings
+    case openURL
+    case remoteControl
 
     var id: String { rawValue }
 
     /// Default order for sidebar main items.
     static var defaultOrder: [SidebarMainItem] {
-        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .sources, .downloads, .settings]
+        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .sources, .openURL, .remoteControl, .downloads, .settings]
     }
 
     /// Default visibility (all visible except subscriptions and channels).
     static var defaultVisibility: [SidebarMainItem: Bool] {
+        #if os(tvOS)
         [
             .search: true,
             .home: true,
@@ -37,8 +40,25 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             .downloads: true,
             .channels: false,
             .sources: true,
-            .settings: true
+            .settings: true,
+            .openURL: false,
+            .remoteControl: true
         ]
+        #else
+        [
+            .search: true,
+            .home: true,
+            .subscriptions: false,
+            .bookmarks: false,
+            .history: false,
+            .downloads: true,
+            .channels: false,
+            .sources: true,
+            .settings: true,
+            .openURL: false,
+            .remoteControl: false
+        ]
+        #endif
     }
 
     /// SF Symbol icon name.
@@ -53,6 +73,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .channels: "person.2"
         case .sources: "server.rack"
         case .settings: "gear"
+        case .openURL: "link"
+        case .remoteControl: "antenna.radiowaves.left.and.right"
         }
     }
 
@@ -68,6 +90,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .channels: String(localized: "sidebar.mainItem.channels")
         case .sources: String(localized: "sidebar.mainItem.sources")
         case .settings: String(localized: "sidebar.mainItem.settings")
+        case .openURL: String(localized: "sidebar.mainItem.openURL")
+        case .remoteControl: String(localized: "sidebar.mainItem.remoteControl")
         }
     }
 
@@ -110,6 +134,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .channels: return TabBarItem.channels.rawValue
         case .sources: return TabBarItem.sources.rawValue
         case .settings: return TabBarItem.settings.rawValue
+        case .openURL: return "open-url"
+        case .remoteControl: return "remote-control"
         }
     }
 
@@ -125,6 +151,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .channels: return .manageChannels
         case .sources: return .sources
         case .settings: return .settings
+        case .openURL: return .openURL
+        case .remoteControl: return .remoteControl
         }
     }
 

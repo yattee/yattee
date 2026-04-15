@@ -14195,6 +14195,28 @@
         }
       }
     },
+    "sidebar.mainItem.openURL" : {
+      "comment" : "Sidebar main navigation item for opening a URL",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open URL"
+          }
+        }
+      }
+    },
+    "sidebar.mainItem.remoteControl" : {
+      "comment" : "Sidebar main navigation item for remote control",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remote Control"
+          }
+        }
+      }
+    },
     "sidebar.mainItem.search" : {
       "comment" : "Sidebar main navigation item for search",
       "localizations" : {
