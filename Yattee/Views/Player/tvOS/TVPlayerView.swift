@@ -201,34 +201,37 @@ struct TVPlayerView: View {
             // Video layer
             videoLayer
 
-            // Controls overlay
-            if controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible {
-                TVPlayerControlsView(
-                    playerState: playerState,
-                    playerService: playerService,
-                    focusedControl: $focusedControl,
-                    onShowSettings: { showQualitySheet() },
-                    onShowQueue: { showQueueSheet() },
-                    onShowDetails: { showDetailsPanel(tab: .info) },
-                    onShowComments: { showDetailsPanel(tab: .comments) },
-                    onShowDebug: { showDebugOverlay() },
-                    onClose: { closeVideo() },
-                    onScrubbingChanged: { scrubbing in
-                        isScrubbing = scrubbing
-                        if scrubbing {
-                            stopControlsTimer()
-                        } else {
-                            startControlsTimer()
-                        }
-                    },
-                    remoteSeekTime: scrubberRemoteSeekTime,
-                    onRemoteSeek: { forward in
-                        triggerScrubberRemoteSeek(forward: forward)
-                    },
-                    cancelScrubTrigger: cancelScrubTrigger
-                )
-                .transition(.opacity.animation(.easeInOut(duration: 0.25)))
-            }
+            // Controls overlay — always in tree, toggled via opacity so the fade-out
+            // isn't skipped by tvOS's focus engine forcibly tearing down a focused
+            // subview when the conditional flips to false.
+            TVPlayerControlsView(
+                playerState: playerState,
+                playerService: playerService,
+                focusedControl: $focusedControl,
+                onShowSettings: { showQualitySheet() },
+                onShowQueue: { showQueueSheet() },
+                onShowDetails: { showDetailsPanel(tab: .info) },
+                onShowComments: { showDetailsPanel(tab: .comments) },
+                onShowDebug: { showDebugOverlay() },
+                onClose: { closeVideo() },
+                onScrubbingChanged: { scrubbing in
+                    isScrubbing = scrubbing
+                    if scrubbing {
+                        stopControlsTimer()
+                    } else {
+                        startControlsTimer()
+                    }
+                },
+                remoteSeekTime: scrubberRemoteSeekTime,
+                onRemoteSeek: { forward in
+                    triggerScrubberRemoteSeek(forward: forward)
+                },
+                cancelScrubTrigger: cancelScrubTrigger
+            )
+            .opacity(shouldShowControls ? 1 : 0)
+            .allowsHitTesting(shouldShowControls)
+            .disabled(!shouldShowControls)
+            .animation(.easeInOut(duration: 0.25), value: shouldShowControls)
 
             // Swipe-up details panel
             if isDetailsPanelVisible {
@@ -382,6 +385,13 @@ struct TVPlayerView: View {
         }
     }
 
+    // MARK: - Derived State
+
+    /// Whether the primary controls overlay should be visible right now.
+    private var shouldShowControls: Bool {
+        controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible
+    }
+
     // MARK: - Controls Timer
 
     private func startControlsTimer() {
@@ -392,9 +402,8 @@ struct TVPlayerView: View {
 
         controlsHideTimer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
             Task { @MainActor in
-                withAnimation(.easeOut(duration: 0.3)) {
+                withAnimation(.easeOut(duration: 0.2)) {
                     controlsVisible = false
-                    focusedControl = .background
                 }
             }
         }
@@ -662,9 +671,8 @@ struct TVPlayerView: View {
 
     private func hideControls() {
         stopControlsTimer()
-        withAnimation(.easeOut(duration: 0.25)) {
+        withAnimation(.easeOut(duration: 0.2)) {
             controlsVisible = false
-            focusedControl = .background
         }
     }
 
