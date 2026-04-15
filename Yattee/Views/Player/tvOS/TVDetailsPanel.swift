@@ -198,7 +198,7 @@ struct TVDetailsPanel: View {
             Button {
                 // Navigate to channel
                 if let video {
-                    navigateToChannel(video.author)
+                    navigateToChannel(for: video)
                 }
             } label: {
                 Text(String(localized: "channel.view"))
@@ -284,13 +284,9 @@ struct TVDetailsPanel: View {
 
     // MARK: - Navigation
 
-    private func navigateToChannel(_ author: Author) {
-        // Close the player and navigate to channel
+    private func navigateToChannel(for video: Video) {
         onDismiss()
-        appEnvironment?.navigationCoordinator.isPlayerExpanded = false
-
-        // Navigate to channel view
-        // This would need to be implemented based on your navigation system
+        appEnvironment?.navigationCoordinator.navigateToChannel(for: video, collapsePlayer: true)
     }
 }
 
