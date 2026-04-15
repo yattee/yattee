@@ -10,6 +10,16 @@
     "%@" : {
 
     },
+    "%@\n%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@\n%2$@"
+          }
+        }
+      }
+    },
     "%@ - %@" : {
       "localizations" : {
         "en" : {
@@ -3885,6 +3895,28 @@
         }
       }
     },
+    "home.sections.layout.grid" : {
+      "comment" : "Grid layout option for library sections",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid"
+          }
+        }
+      }
+    },
+    "home.sections.layout.list" : {
+      "comment" : "List layout option for library sections",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
     "home.settings.availableSections.empty" : {
       "comment" : "Empty state message for available sections section",
       "localizations" : {
@@ -4014,17 +4046,6 @@
         }
       }
     },
-    "home.settings.shortcuts.header" : {
-      "comment" : "Header for shortcuts section in library settings",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shortcuts"
-          }
-        }
-      }
-    },
     "home.settings.sections.layout" : {
       "comment" : "Label for sections layout picker in library settings",
       "localizations" : {
@@ -4036,6 +4057,17 @@
         }
       }
     },
+    "home.settings.shortcuts.header" : {
+      "comment" : "Header for shortcuts section in library settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        }
+      }
+    },
     "home.settings.shortcuts.layout" : {
       "comment" : "Label for shortcuts layout picker in library settings",
       "localizations" : {
@@ -4043,28 +4075,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Layout"
-          }
-        }
-      }
-    },
-    "home.sections.layout.grid" : {
-      "comment" : "Grid layout option for library sections",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grid"
-          }
-        }
-      }
-    },
-    "home.sections.layout.list" : {
-      "comment" : "List layout option for library sections",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List"
           }
         }
       }
@@ -6860,17 +6870,6 @@
         }
       }
     },
-    "player.previous" : {
-      "comment" : "Previous track button",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Previous"
-          }
-        }
-      }
-    },
     "player.noDescription" : {
       "comment" : "Shown when video has no description",
       "localizations" : {
@@ -6906,6 +6905,17 @@
     },
     "player.playPauseButton" : {
 
+    },
+    "player.previous" : {
+      "comment" : "Previous track button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        }
+      }
     },
     "player.quality.audioFromVideo" : {
       "comment" : "Message shown when audio tab is selected but current stream is muxed",

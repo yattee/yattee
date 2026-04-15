@@ -640,7 +640,8 @@ struct UnifiedTabView: View {
     @TabContentBuilder<SidebarItem>
     private var mainTabs: some TabContent<SidebarItem> {
         // Now Playing (only shown when video is playing and player collapsed)
-        if shouldShowNowPlaying {
+        if shouldShowNowPlaying,
+           let currentVideo = appEnvironment?.playerService.state.currentVideo {
             Tab(value: SidebarItem.nowPlaying) {
                 Color.clear
                     .onAppear {
@@ -649,7 +650,7 @@ struct UnifiedTabView: View {
                         selection = .home
                     }
             } label: {
-                Label(SidebarItem.nowPlaying.title, systemImage: SidebarItem.nowPlaying.systemImage)
+                Label("\(currentVideo.title)\n\(currentVideo.author.name)", systemImage: SidebarItem.nowPlaying.systemImage)
             }
         }
 
