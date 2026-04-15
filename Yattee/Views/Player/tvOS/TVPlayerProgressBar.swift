@@ -213,21 +213,31 @@ struct TVPlayerProgressBar: View {
     @ViewBuilder
     private func scrubPreviewOverlay(geometry: GeometryProxy) -> some View {
         if isScrubbing {
-            let previewWidth: CGFloat = 352
-            let previewHeight: CGFloat = 260
+            let seekTime = scrubTime ?? currentTime
+            let currentChapter = showChapters ? chapters.last(where: { $0.startTime <= seekTime }) : nil
+            // Panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
+            // Use a slightly larger value for x-clamping to keep shadow inside screen.
+            let previewWidth: CGFloat = 344
+            // Panel height (thumbnail 180 + 6pt vertical padding * 2 = 192) plus
+            // optional chapter capsule (~36pt) and 8pt VStack spacing.
+            let previewHeight: CGFloat = currentChapter != nil ? 244 : 200
             let halfWidth = previewWidth / 2
             let clampedX = max(halfWidth, min(geometry.size.width - halfWidth, geometry.size.width * progress))
             let yPosition = -previewHeight / 2 - 16
 
-            Group {
+            VStack(spacing: 8) {
+                if let currentChapter {
+                    TVChapterCapsuleView(title: currentChapter.title)
+                        .frame(maxWidth: 320)
+                }
+
                 if let storyboard {
                     TVSeekPreviewView(
                         storyboard: storyboard,
-                        seekTime: scrubTime ?? currentTime,
-                        chapters: showChapters ? chapters : []
+                        seekTime: seekTime
                     )
                 } else {
-                    Text((scrubTime ?? currentTime).formattedAsTimestamp)
+                    Text(seekTime.formattedAsTimestamp)
                         .font(.system(size: 48, weight: .medium))
                         .monospacedDigit()
                         .foregroundStyle(.white)
@@ -239,6 +249,7 @@ struct TVPlayerProgressBar: View {
                         )
                 }
             }
+            .fixedSize()
             .position(x: clampedX, y: yPosition)
             .transition(.scale.combined(with: .opacity))
             .allowsHitTesting(false)
