@@ -38,6 +38,7 @@ struct TVPlayerControlsView: View {
     }
 
     @State private var playNextTapCount = 0
+    @State private var playPreviousTapCount = 0
 
     var body: some View {
         ZStack {
@@ -208,6 +209,26 @@ struct TVPlayerControlsView: View {
                 .focused($focusedControl, equals: .debugButton)
             }
 
+            // Play previous button (shown whenever a queue is present; disabled when no history)
+            if let state = playerState, state.hasNext || state.hasPrevious {
+                Button {
+                    playPreviousTapCount += 1
+                    Task { await playerService?.playPrevious() }
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: "backward.fill")
+                            .font(.system(size: 28))
+                            .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
+                        Text(String(localized: "player.previous"))
+                            .font(.caption)
+                    }
+                }
+                .buttonStyle(TVActionButtonStyle())
+                .focused($focusedControl, equals: .playPrevious)
+                .disabled(!state.hasPrevious)
+                .opacity(state.hasPrevious ? 1.0 : 0.4)
+            }
+
             // Play next button (when queue has items)
             if let state = playerState, state.hasNext {
                 Button {
@@ -226,20 +247,6 @@ struct TVPlayerControlsView: View {
                 .focused($focusedControl, equals: .playNext)
             }
 
-            // Close (stops playback and dismisses)
-            Button {
-                onClose()
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "xmark.circle")
-                        .font(.system(size: 28))
-                    Text("player.controls.close")
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .closeButton)
-
             Spacer()
 
             // Queue button (if videos in queue)
@@ -257,6 +264,20 @@ struct TVPlayerControlsView: View {
                 .buttonStyle(TVActionButtonStyle())
                 .focused($focusedControl, equals: .queueButton)
             }
+
+            // Close (stops playback and dismisses)
+            Button {
+                onClose()
+            } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 28))
+                    Text("player.controls.close")
+                        .font(.caption)
+                }
+            }
+            .buttonStyle(TVActionButtonStyle())
+            .focused($focusedControl, equals: .closeButton)
         }
     }
 }

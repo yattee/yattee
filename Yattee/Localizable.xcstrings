@@ -6827,6 +6827,17 @@
         }
       }
     },
+    "player.previous" : {
+      "comment" : "Previous track button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        }
+      }
+    },
     "player.noDescription" : {
       "comment" : "Shown when video has no description",
       "localizations" : {
