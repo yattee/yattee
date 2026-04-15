@@ -42,33 +42,19 @@ struct TVSeekPreviewView: View {
     private let thumbnailWidth: CGFloat = 320
 
     var body: some View {
-        // Thumbnail with timestamp overlay (scaled up for TV)
-        ZStack(alignment: .bottom) {
-            Group {
-                if let thumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } else {
-                    // Placeholder while loading
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                }
+        Group {
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                // Placeholder while loading
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
             }
-            .frame(width: thumbnailWidth, height: 180)
-            .clipped()
-
-            // Timestamp overlaid at bottom center (larger for TV)
-            Text(seekTime.formattedAsTimestamp)
-                .font(.system(size: 36, weight: .medium))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.black.opacity(0.7))
-                .clipShape(.rect(cornerRadius: 6))
-                .padding(.bottom, 8)
         }
+        .frame(width: thumbnailWidth, height: 180)
+        .clipped()
         .clipShape(.rect(cornerRadius: 4))
         .padding(4)
         .glassBackground(
