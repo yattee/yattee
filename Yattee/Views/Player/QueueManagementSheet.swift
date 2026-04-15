@@ -41,6 +41,7 @@ struct QueueManagementSheet: View {
                     queueModeMenu
                 }
 
+                #if !os(tvOS)
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .cancel) {
                         dismiss()
@@ -49,6 +50,7 @@ struct QueueManagementSheet: View {
                             .labelStyle(.iconOnly)
                     }
                 }
+                #endif
             }
         }
         .presentationDragIndicator(.visible)
@@ -209,6 +211,14 @@ struct QueueManagementSheet: View {
     /// Menu for selecting queue mode (shuffle, repeat, etc.)
     @ViewBuilder
     private var queueModeMenu: some View {
+        #if os(tvOS)
+        Button {
+            cycleQueueMode()
+        } label: {
+            Image(systemName: playerState?.queueMode.icon ?? "list.bullet")
+                .foregroundStyle(.tint)
+        }
+        #else
         Menu {
             ForEach(QueueMode.allCases, id: \.self) { mode in
                 Button {
@@ -226,6 +236,15 @@ struct QueueManagementSheet: View {
             }
             .foregroundStyle(.tint)
         }
+        #endif
+    }
+
+    private func cycleQueueMode() {
+        guard let playerState else { return }
+        let modes = QueueMode.allCases
+        let currentIndex = modes.firstIndex(of: playerState.queueMode) ?? 0
+        let nextIndex = (currentIndex + 1) % modes.count
+        playerState.queueMode = modes[nextIndex]
     }
 
     // MARK: - Actions

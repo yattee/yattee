@@ -18,6 +18,7 @@ enum TVPlayerFocusTarget: Hashable {
     case debugButton
     case playNext
     case closeButton
+    case queueButton
 }
 
 /// Main tvOS fullscreen player view.
@@ -44,6 +45,9 @@ struct TVPlayerView: View {
 
     /// Whether the quality sheet is shown.
     @State private var showingQualitySheet = false
+
+    /// Whether the queue sheet is shown.
+    @State private var showingQueueSheet = false
 
     /// Whether the debug overlay is shown.
     @State private var isDebugOverlayVisible = false
@@ -108,6 +112,14 @@ struct TVPlayerView: View {
             // Quality / Settings selector (fullscreen cover gives tvOS enough room)
             .fullScreenCover(isPresented: $showingQualitySheet) {
                 qualitySheetContent
+            }
+            .fullScreenCover(isPresented: $showingQueueSheet) {
+                ZStack {
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .ignoresSafeArea()
+                    QueueManagementSheet()
+                }
             }
     }
 
@@ -195,6 +207,7 @@ struct TVPlayerView: View {
                     playerService: playerService,
                     focusedControl: $focusedControl,
                     onShowSettings: { showQualitySheet() },
+                    onShowQueue: { showQueueSheet() },
                     onShowDetails: { showDetailsPanel(tab: .info) },
                     onShowComments: { showDetailsPanel(tab: .comments) },
                     onShowDebug: { showDebugOverlay() },
@@ -417,6 +430,11 @@ struct TVPlayerView: View {
     private func showQualitySheet() {
         stopControlsTimer()
         showingQualitySheet = true
+    }
+
+    private func showQueueSheet() {
+        stopControlsTimer()
+        showingQueueSheet = true
     }
 
     private func switchToStream(_ stream: Stream, audioStream: Stream? = nil) {

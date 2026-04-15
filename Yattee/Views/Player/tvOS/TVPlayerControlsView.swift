@@ -16,6 +16,7 @@ struct TVPlayerControlsView: View {
     @FocusState.Binding var focusedControl: TVPlayerFocusTarget?
 
     let onShowSettings: () -> Void
+    let onShowQueue: () -> Void
     let onShowDetails: () -> Void
     let onShowComments: () -> Void
     let onShowDebug: () -> Void
@@ -241,15 +242,20 @@ struct TVPlayerControlsView: View {
 
             Spacer()
 
-            // Queue indicator (if videos in queue)
+            // Queue button (if videos in queue)
             if let state = playerState, state.hasNext {
-                HStack(spacing: 8) {
-                    Image(systemName: "list.bullet")
-                        .font(.system(size: 20))
-                    Text(String(localized: "queue.section.count \(state.queue.count)"))
-                        .font(.subheadline)
+                Button {
+                    onShowQueue()
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 28))
+                        Text(String(localized: "queue.section.count \(state.queue.count)"))
+                            .font(.caption)
+                    }
                 }
-                .foregroundStyle(.white.opacity(0.6))
+                .buttonStyle(TVActionButtonStyle())
+                .focused($focusedControl, equals: .queueButton)
             }
         }
     }
