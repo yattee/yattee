@@ -235,6 +235,57 @@ struct VideoContextMenuContent: View {
         appEnvironment?.dataManager.watchEntry(for: video.id.videoID)?.isFinished ?? false
     }
 
+    @ViewBuilder
+    private var playDownloadShareButtons: some View {
+        // Play (hidden in player context since video is already playing)
+        if showPlayAction {
+            Button {
+                if let startTime {
+                    appEnvironment?.playerService.openVideo(video, startTime: startTime)
+                } else {
+                    appEnvironment?.playerService.openVideo(video)
+                }
+            } label: {
+                Label(String(localized: "video.context.play"), systemImage: "play.fill")
+            }
+        }
+
+        #if !os(tvOS)
+        // Download / Cancel download / Downloaded
+        if showDownloadOption {
+            if isDownloading, let download = activeDownload {
+                Button(role: .destructive) {
+                    Task {
+                        await appEnvironment?.downloadManager.cancel(download)
+                    }
+                } label: {
+                    Label(String(localized: "video.context.cancelDownload"), systemImage: "xmark.circle")
+                }
+            } else if isDownloaded, let download = snapshotDownload {
+                Button {
+                    downloadToDelete = download
+                    showingDeleteDownloadConfirmation = true
+                } label: {
+                    Label(String(localized: "video.context.downloaded"), systemImage: "checkmark.circle.fill")
+                }
+            } else {
+                Button {
+                    startDownload(for: video)
+                } label: {
+                    Label(String(localized: "video.context.download"), systemImage: "arrow.down.circle")
+                }
+            }
+        }
+        #endif
+
+        // Share
+        #if !os(tvOS)
+        ShareLink(item: video.shareURL) {
+            Label(String(localized: "video.context.share"), systemImage: "square.and.arrow.up")
+        }
+        #endif
+    }
+
     var body: some View {
         // Custom actions at the top
         ForEach(customActions.indices, id: \.self) { index in
@@ -251,55 +302,13 @@ struct VideoContextMenuContent: View {
             Divider()
         }
         
+        #if os(iOS)
         ControlGroup {
-            // Play (hidden in player context since video is already playing)
-            if showPlayAction {
-                Button {
-                    if let startTime {
-                        appEnvironment?.playerService.openVideo(video, startTime: startTime)
-                    } else {
-                        appEnvironment?.playerService.openVideo(video)
-                    }
-                } label: {
-                    Label(String(localized: "video.context.play"), systemImage: "play.fill")
-                }
-            }
-            
-            #if !os(tvOS)
-            // Download / Cancel download / Downloaded
-            if showDownloadOption {
-                if isDownloading, let download = activeDownload {
-                    Button(role: .destructive) {
-                        Task {
-                            await appEnvironment?.downloadManager.cancel(download)
-                        }
-                    } label: {
-                        Label(String(localized: "video.context.cancelDownload"), systemImage: "xmark.circle")
-                    }
-                } else if isDownloaded, let download = snapshotDownload {
-                    Button {
-                        downloadToDelete = download
-                        showingDeleteDownloadConfirmation = true
-                    } label: {
-                        Label(String(localized: "video.context.downloaded"), systemImage: "checkmark.circle.fill")
-                    }
-                } else {
-                    Button {
-                        startDownload(for: video)
-                    } label: {
-                        Label(String(localized: "video.context.download"), systemImage: "arrow.down.circle")
-                    }
-                }
-            }
-            #endif
-
-            // Share
-            #if !os(tvOS)
-            ShareLink(item: video.shareURL) {
-                Label(String(localized: "video.context.share"), systemImage: "square.and.arrow.up")
-            }
-            #endif
+            playDownloadShareButtons
         }
+        #else
+        playDownloadShareButtons
+        #endif
 
         // Play from Beginning (only shown when there's saved progress)
         if showPlayAction, let startTime, startTime > 0 {
