@@ -215,42 +215,54 @@ struct TVPlayerProgressBar: View {
         if isScrubbing {
             let seekTime = scrubTime ?? currentTime
             let currentChapter = showChapters ? chapters.last(where: { $0.startTime <= seekTime }) : nil
-            // Panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
-            // Use a slightly larger value for x-clamping to keep shadow inside screen.
-            let previewWidth: CGFloat = 344
-            // Panel height (thumbnail 180 + 6pt vertical padding * 2 = 192) plus
-            // optional chapter capsule (~36pt) and 8pt VStack spacing.
-            let previewHeight: CGFloat = currentChapter != nil ? 244 : 200
-            let halfWidth = previewWidth / 2
-            let clampedX = max(halfWidth, min(geometry.size.width - halfWidth, geometry.size.width * progress))
-            let yPosition = -previewHeight / 2 - 16
+            // Storyboard panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
+            // Use a slightly larger clamp width so the shadow stays on screen.
+            let panelWidth: CGFloat = 344
+            // Panel height: thumbnail 180 + 4pt vertical padding * 2 = 188 (round up for shadow).
+            let panelHeight: CGFloat = 200
+            let capsuleSpacing: CGFloat = 8
+            // Approximate capsule height (24pt text + 6pt padding * 2 + shadow) — used only
+            // for vertical positioning, not for layout sizing.
+            let capsuleApproxHeight: CGFloat = 44
 
-            VStack(spacing: 8) {
+            let xTarget = geometry.size.width * progress
+            let halfPanel = panelWidth / 2
+            let clampedPanelX = max(halfPanel, min(geometry.size.width - halfPanel, xTarget))
+            let panelCenterY = -panelHeight / 2 - 16
+            let capsuleCenterY = -panelHeight - 16 - capsuleSpacing - capsuleApproxHeight / 2
+
+            ZStack {
+                // Storyboard panel — follows scrub handle, tight horizontal clamp.
+                Group {
+                    if let storyboard {
+                        TVSeekPreviewView(
+                            storyboard: storyboard,
+                            seekTime: seekTime
+                        )
+                    } else {
+                        Text(seekTime.formattedAsTimestamp)
+                            .font(.system(size: 48, weight: .medium))
+                            .monospacedDigit()
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 32)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.ultraThinMaterial)
+                            )
+                    }
+                }
+                .fixedSize()
+                .position(x: clampedPanelX, y: panelCenterY)
+
+                // Chapter capsule — sized to its title (up to screen width minus margin),
+                // positioned to follow the scrub handle and clamped to stay on screen.
                 if let currentChapter {
                     TVChapterCapsuleView(title: currentChapter.title)
-                        .frame(maxWidth: 320)
-                }
-
-                if let storyboard {
-                    TVSeekPreviewView(
-                        storyboard: storyboard,
-                        seekTime: seekTime
-                    )
-                } else {
-                    Text(seekTime.formattedAsTimestamp)
-                        .font(.system(size: 48, weight: .medium))
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 32)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(.ultraThinMaterial)
-                        )
+                        .positioned(xTarget: xTarget, availableWidth: geometry.size.width)
+                        .position(x: geometry.size.width / 2, y: capsuleCenterY)
                 }
             }
-            .fixedSize()
-            .position(x: clampedX, y: yPosition)
             .transition(.scale.combined(with: .opacity))
             .allowsHitTesting(false)
         }

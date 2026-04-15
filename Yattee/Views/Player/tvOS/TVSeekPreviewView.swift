@@ -28,6 +28,21 @@ struct TVChapterCapsuleView: View {
             )
             .shadow(radius: 4)
     }
+
+    /// Returns this capsule horizontally positioned so its center follows `xTarget`
+    /// and clamped to stay within `margin` of each edge of `availableWidth`. The
+    /// capsule keeps its intrinsic text width (single-line, truncated if it cannot
+    /// fit). Wrap the result in `.position(...)` to place it vertically; it occupies
+    /// the full `availableWidth` horizontally.
+    func positioned(xTarget: CGFloat, availableWidth: CGFloat, margin: CGFloat = 40) -> some View {
+        self
+            .alignmentGuide(.leading) { d in
+                let targetLeading = xTarget - d.width / 2
+                let clampedLeading = max(margin, min(availableWidth - d.width - margin, targetLeading))
+                return -clampedLeading
+            }
+            .frame(width: availableWidth, alignment: .leading)
+    }
 }
 
 /// Preview thumbnail displayed during scrubbing on tvOS.
