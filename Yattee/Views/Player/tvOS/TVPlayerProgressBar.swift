@@ -49,6 +49,13 @@ struct TVPlayerProgressBar: View {
     /// Accumulated pan translation for scrubbing.
     @State private var panAccumulator: CGFloat = 0
 
+    /// Consecutive-event streak for rapid D-pad/touchpad scrubbing.
+    /// tvOS routes touchpad swipes as rapid `onMoveCommand` events, so we
+    /// amplify step size when events arrive in quick succession.
+    @State private var dpadStreakCount: Int = 0
+    @State private var lastDPadTime: Date?
+    @State private var lastDPadDirection: MoveCommandDirection?
+
     /// The time to display. SELECT-based scrub takes priority, then the
     /// parent's pending remote-seek target, then the actual playback time.
     private var displayTime: TimeInterval {
@@ -256,16 +263,16 @@ struct TVPlayerProgressBar: View {
         // Lower values = slower/finer scrubbing
         let baseSensitivity: CGFloat
         if duration > 3600 {
-            baseSensitivity = duration / 2000  // ~1.8 sec per unit for 1hr video
+            baseSensitivity = duration / 1500
         } else if duration > 600 {
-            baseSensitivity = duration / 3000  // ~0.2 sec per unit for 10min video
+            baseSensitivity = duration / 2000
         } else {
-            baseSensitivity = duration / 4000  // very fine control for short videos
+            baseSensitivity = duration / 3000
         }
 
-        // Apply velocity multiplier (faster swipe = faster scrub)
-        // Reduced range: 0.3x to 2.0x
-        let velocityMultiplier = min(max(abs(velocity) / 800, 0.3), 2.0)
+        // Non-linear velocity response: slow swipes stay precise, fast flicks accelerate.
+        let normalizedVelocity = abs(velocity) / 500
+        let velocityMultiplier = min(max(pow(normalizedVelocity, 1.4), 0.3), 6.0)
         let adjustedSensitivity = baseSensitivity * velocityMultiplier
 
         // Update scrub time based on translation delta
@@ -306,15 +313,35 @@ struct TVPlayerProgressBar: View {
 
         switch direction {
         case .left, .right:
-            // Determine scrub increment based on video length
-            let scrubAmount: TimeInterval
-            if duration > 3600 {
-                scrubAmount = 30
-            } else if duration > 600 {
-                scrubAmount = 15
+            // Track event rate. When events arrive quickly in the same
+            // direction (i.e. a touchpad swipe being rasterized into move
+            // commands), grow the streak and scale the step size up.
+            let now = Date()
+            let gap = lastDPadTime.map { now.timeIntervalSince($0) } ?? .infinity
+
+            // tvOS throttles onMoveCommand at ~300-400ms even during a fast
+            // swipe, so we need a generous window to still recognize a burst.
+            if gap < 0.5, lastDPadDirection == direction {
+                dpadStreakCount = min(dpadStreakCount + 1, 30)
             } else {
-                scrubAmount = 10
+                dpadStreakCount = 1
             }
+            lastDPadTime = now
+            lastDPadDirection = direction
+
+            // Base step based on video length.
+            let baseStep: TimeInterval
+            if duration > 3600 {
+                baseStep = 15
+            } else if duration > 600 {
+                baseStep = 8
+            } else {
+                baseStep = 5
+            }
+
+            // Steeper curve so a swipe (few events) actually covers ground.
+            let streakMultiplier = pow(Double(dpadStreakCount), 1.6)
+            let scrubAmount = baseStep * streakMultiplier
 
             let currentScrubTime = scrubTime ?? currentTime
             if direction == .left {
@@ -322,10 +349,14 @@ struct TVPlayerProgressBar: View {
             } else {
                 scrubTime = min(duration, currentScrubTime + scrubAmount)
             }
+            scheduleSeek()
 
         case .up, .down:
             // Exit scrub mode and let navigation happen
             commitScrub()
+            dpadStreakCount = 0
+            lastDPadTime = nil
+            lastDPadDirection = nil
 
         @unknown default:
             break
@@ -349,6 +380,9 @@ struct TVPlayerProgressBar: View {
             isScrubbing = false
         }
         panAccumulator = 0
+        dpadStreakCount = 0
+        lastDPadTime = nil
+        lastDPadDirection = nil
 
         if wasScrubbing {
             onScrubbingChanged?(false)
