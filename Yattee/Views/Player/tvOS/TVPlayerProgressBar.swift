@@ -36,6 +36,9 @@ struct TVPlayerProgressBar: View {
     /// Called when the bar is focused (not scrubbing) and user presses left/right.
     /// Parameter: `forward` — true for right, false for left.
     var onRemoteSeek: ((Bool) -> Void)? = nil
+    /// Parent bumps this to request the bar to cancel any in-progress scrub
+    /// without performing a seek (used for the Menu button).
+    var cancelScrubTrigger: UUID? = nil
 
     /// Track focus state internally.
     @FocusState private var isFocused: Bool
@@ -116,6 +119,10 @@ struct TVPlayerProgressBar: View {
             if !focused {
                 commitScrub()
             }
+        }
+        .onChange(of: cancelScrubTrigger) { _, newValue in
+            guard newValue != nil, isScrubbing else { return }
+            cancelScrub()
         }
         .animation(.easeInOut(duration: 0.2), value: isFocused)
         .animation(.easeInOut(duration: 0.1), value: isScrubbing)
@@ -374,6 +381,26 @@ struct TVPlayerProgressBar: View {
         if let time = scrubTime {
             onSeek(time)
         }
+
+        withAnimation(.easeOut(duration: 0.15)) {
+            scrubTime = nil
+            isScrubbing = false
+        }
+        panAccumulator = 0
+        dpadStreakCount = 0
+        lastDPadTime = nil
+        lastDPadDirection = nil
+
+        if wasScrubbing {
+            onScrubbingChanged?(false)
+        }
+    }
+
+    private func cancelScrub() {
+        seekTask?.cancel()
+        seekTask = nil
+
+        let wasScrubbing = isScrubbing
 
         withAnimation(.easeOut(duration: 0.15)) {
             scrubTime = nil

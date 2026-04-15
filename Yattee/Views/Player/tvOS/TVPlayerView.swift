@@ -85,6 +85,10 @@ struct TVPlayerView: View {
     /// last press.
     @State private var scrubberRemoteSeekTask: Task<Void, Never>?
 
+    /// Bumped to signal `TVPlayerProgressBar` to cancel an in-progress scrub
+    /// without performing the seek (used when Menu is pressed during scrub).
+    @State private var cancelScrubTrigger: UUID?
+
     // MARK: - Computed Properties
 
     private var playerService: PlayerService? {
@@ -206,7 +210,8 @@ struct TVPlayerView: View {
                     remoteSeekTime: scrubberRemoteSeekTime,
                     onRemoteSeek: { forward in
                         triggerScrubberRemoteSeek(forward: forward)
-                    }
+                    },
+                    cancelScrubTrigger: cancelScrubTrigger
                 )
                 .transition(.opacity.animation(.easeInOut(duration: 0.25)))
             }
@@ -623,8 +628,9 @@ struct TVPlayerView: View {
             // Third: hide details panel
             hideDetailsPanel()
         } else if isScrubbing {
-            // Fourth: exit scrub mode (handled by progress bar losing focus)
-            // Just hide controls
+            // Fourth: cancel scrub without seeking, then hide controls. The
+            // subsequent focus-loss path sees cleared scrub state and no-ops.
+            cancelScrubTrigger = UUID()
             hideControls()
         } else if controlsVisible {
             // Fifth: hide controls

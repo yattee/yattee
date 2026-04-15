@@ -27,6 +27,9 @@ struct TVPlayerControlsView: View {
     var remoteSeekTime: TimeInterval? = nil
     /// Called when user presses left/right on the focused bar outside SELECT scrub.
     var onRemoteSeek: ((Bool) -> Void)? = nil
+    /// Bumped by the parent to cancel any in-progress scrub without seeking
+    /// (used when the Menu button is pressed while scrubbing).
+    var cancelScrubTrigger: UUID? = nil
 
     /// Whether the Debug button should be visible (user-toggled in Developer settings).
     private var showDebugButton: Bool {
@@ -64,7 +67,8 @@ struct TVPlayerControlsView: View {
                     isLive: playerState?.isLive ?? false,
                     sponsorSegments: playerState?.sponsorSegments ?? [],
                     remoteSeekTime: remoteSeekTime,
-                    onRemoteSeek: onRemoteSeek
+                    onRemoteSeek: onRemoteSeek,
+                    cancelScrubTrigger: cancelScrubTrigger
                 )
                 .focusSection()
                 .padding(.horizontal, 88)
