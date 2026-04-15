@@ -117,7 +117,17 @@ struct TVPlayerControlsView: View {
     // MARK: - Top Bar
 
     private var topBar: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .center, spacing: 20) {
+            // Channel avatar
+            if let video = playerState?.currentVideo {
+                ChannelAvatarView(
+                    author: video.author,
+                    size: 110,
+                    yatteeServerURL: yatteeServerURL,
+                    source: video.id.source
+                )
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 // Video title
                 Text(playerState?.currentVideo?.title ?? "")
@@ -143,6 +153,10 @@ struct TVPlayerControlsView: View {
                     .scaleEffect(1.5)
             }
         }
+    }
+
+    private var yatteeServerURL: URL? {
+        appEnvironment?.instancesManager.yatteeServerInstances.first { $0.isEnabled }?.url
     }
 
     // MARK: - Action Buttons
