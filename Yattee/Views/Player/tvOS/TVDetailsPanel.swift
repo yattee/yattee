@@ -40,12 +40,6 @@ struct TVDetailsPanel: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Drag indicator
-            Capsule()
-                .fill(.white.opacity(0.4))
-                .frame(width: 80, height: 6)
-                .padding(.top, 20)
-
             // Tab picker (hidden when description scroll is locked)
             if !isDescriptionScrollLocked {
                 Picker("", selection: $selectedTab) {
@@ -56,7 +50,7 @@ struct TVDetailsPanel: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 120)
-                .padding(.top, 24)
+                .padding(.top, 60)
                 .padding(.bottom, 20)
                 .focused($focusedItem, equals: .tabPicker)
                 .transition(.opacity.combined(with: .move(edge: .top)))
@@ -72,17 +66,14 @@ struct TVDetailsPanel: View {
                 }
             }
             .padding(.horizontal, 88)
-
-            Spacer()
+            .frame(maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: UIScreen.main.bounds.height * 0.65)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
+            Rectangle()
                 .fill(.ultraThinMaterial)
-                .ignoresSafeArea(edges: .bottom)
+                .ignoresSafeArea()
         )
-        .frame(maxHeight: .infinity, alignment: .bottom)
         .onExitCommand {
             // If description scroll is locked, unlock it first
             if isDescriptionScrollLocked {
@@ -120,24 +111,22 @@ struct TVDetailsPanel: View {
         VStack(spacing: 0) {
             // Top section with title, channel, stats (hidden when description expanded)
             if !isDescriptionScrollLocked {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Video title
-                        Text(video?.title ?? "")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .lineLimit(3)
-                            .foregroundStyle(.white)
+                VStack(alignment: .leading, spacing: 24) {
+                    // Video title
+                    Text(video?.title ?? "")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .lineLimit(3)
+                        .foregroundStyle(.white)
 
-                        // Channel info row
-                        channelRow
+                    // Channel info row
+                    channelRow
 
-                        // Stats row
-                        statsRow
-                    }
-                    .padding(.vertical, 16)
+                    // Stats row
+                    statsRow
                 }
-                .frame(height: 180)
+                .padding(.vertical, 16)
+                .fixedSize(horizontal: false, vertical: true)
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
@@ -151,9 +140,6 @@ struct TVDetailsPanel: View {
                 .padding(.top, isDescriptionScrollLocked ? 24 : 8)
             }
 
-            if isDescriptionScrollLocked {
-                Spacer()
-            }
         }
         .animation(.easeInOut(duration: 0.25), value: isDescriptionScrollLocked)
     }
@@ -334,11 +320,6 @@ struct TVScrollableDescription: View {
     private let scrollStep: CGFloat = 80
     private let maxScroll: CGFloat = 5000
 
-    /// Height of description area - expands when locked
-    private var descriptionHeight: CGFloat {
-        isScrollLocked ? 500 : 200
-    }
-
     private var isFocused: Bool {
         focusedItem == .description
     }
@@ -400,16 +381,22 @@ struct TVScrollableDescription: View {
                 }
             }
 
-            // Clipped container for scrollable text
-            Text(description)
-                .font(.body)
-                .foregroundStyle(.white.opacity(0.9))
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .offset(y: -scrollOffset)
-                .frame(height: descriptionHeight, alignment: .top)
+            // Clipped container for scrollable text. The Rectangle owns the
+            // layout size (fills available space) so the Text's intrinsic
+            // height from .fixedSize doesn't push parents.
+            Rectangle()
+                .fill(Color.clear)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topLeading) {
+                    Text(description)
+                        .font(.body)
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .offset(y: -scrollOffset)
+                }
                 .clipped()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
