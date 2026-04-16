@@ -186,7 +186,14 @@ struct QualitySelectorView: View {
                     streamsContent
                 }
             }
+            #if os(tvOS)
+            // On tvOS the quality sheet is presented over the player with an outer
+            // ultraThinMaterial backdrop (see TVPlayerView.qualitySheetContent), so
+            // the list itself must be transparent to let the glass show through.
+            .background(Color.clear)
+            #else
             .background(ListBackgroundStyle.grouped.color)
+            #endif
             .navigationTitle(navigationTitle)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

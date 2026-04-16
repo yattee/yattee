@@ -133,8 +133,9 @@ struct TVPlayerView: View {
             let supportedFormats = playerService.currentBackendType.supportedFormats
 
             ZStack {
-                // Dimmed backdrop over the video
-                Color.black.opacity(0.7)
+                // Glass backdrop — matches info/comments panel for visual uniformity
+                Rectangle()
+                    .fill(.ultraThinMaterial)
                     .ignoresSafeArea()
 
                 QualitySelectorView(
@@ -179,10 +180,6 @@ struct TVPlayerView: View {
                     }
                 )
                 .frame(maxWidth: 900, maxHeight: 700)
-                .background(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                )
                 .padding(.horizontal, 200)
                 .padding(.vertical, 80)
             }

@@ -206,7 +206,11 @@ extension QualitySelectorView {
             }
             .padding()
         }
+        #if os(tvOS)
+        .background(Color.clear)
+        #else
         .background(ListBackgroundStyle.grouped.color)
+        #endif
         .navigationTitle(String(localized: "player.quality.video"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -221,7 +225,11 @@ extension QualitySelectorView {
             }
             .padding()
         }
+        #if os(tvOS)
+        .background(Color.clear)
+        #else
         .background(ListBackgroundStyle.grouped.color)
+        #endif
         .navigationTitle(String(localized: "stream.audio"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -236,7 +244,11 @@ extension QualitySelectorView {
             }
             .padding()
         }
+        #if os(tvOS)
+        .background(Color.clear)
+        #else
         .background(ListBackgroundStyle.grouped.color)
+        #endif
         .navigationTitle(String(localized: "stream.subtitles"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
