@@ -60,7 +60,7 @@ struct SourcesListView: View {
         }
         #if os(tvOS)
         .navigationDestination(isPresented: $showingAddSheet) {
-            TVSettingsContainer(systemImage: "plus.circle", title: String(localized: "sources.newSource")) { AddSourceView() }
+            TVSidebarDetailContainer(systemImage: "plus.circle", title: String(localized: "sources.newSource")) { AddSourceView() }
         }
         #else
         .sheet(isPresented: $showingAddSheet) {
@@ -69,7 +69,7 @@ struct SourcesListView: View {
         #endif
         #if os(tvOS)
         .navigationDestination(item: $sourceToEdit) { source in
-            TVSettingsContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) { EditSourceView(source: source) }
+            TVSidebarDetailContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) { EditSourceView(source: source) }
         }
         #else
         .sheet(item: $sourceToEdit) { source in

@@ -93,7 +93,7 @@ struct SettingsView: View {
             List {
                 if let appEnvironment {
                     NavigationLink {
-                        TVSettingsContainer(systemImage: "server.rack", title: String(localized: "sources.title")) { SourcesListView() }
+                        TVSidebarDetailContainer(systemImage: "server.rack", title: String(localized: "sources.title")) { SourcesListView() }
                     } label: {
                         HStack {
                             Label(String(localized: "sources.title"), systemImage: "server.rack")
@@ -107,7 +107,7 @@ struct SettingsView: View {
                     .accessibilityIdentifier("settings.row.sources")
 
                     NavigationLink {
-                        TVSettingsContainer(systemImage: "icloud", title: String(localized: "settings.icloud.title")) { iCloudSettingsView() }
+                        TVSidebarDetailContainer(systemImage: "icloud", title: String(localized: "settings.icloud.title")) { iCloudSettingsView() }
                     } label: {
                         HStack {
                             Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
@@ -123,33 +123,33 @@ struct SettingsView: View {
                         }
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "paintbrush", title: String(localized: "settings.appearance.sectionTitle")) { AppearanceSettingsView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "paintbrush", title: String(localized: "settings.appearance.sectionTitle")) { AppearanceSettingsView() } } label: {
                         Label(String(localized: "settings.appearance.sectionTitle"), systemImage: "paintbrush")
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "hand.tap", title: String(localized: "settings.layoutNavigation.title")) { LayoutNavigationSettingsView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "hand.tap", title: String(localized: "settings.layoutNavigation.title")) { LayoutNavigationSettingsView() } } label: {
                         Label(String(localized: "settings.layoutNavigation.title"), systemImage: "hand.tap")
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "play.circle", title: String(localized: "settings.playback.sectionTitle")) { PlaybackSettingsView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "play.circle", title: String(localized: "settings.playback.sectionTitle")) { PlaybackSettingsView() } } label: {
                         Label(String(localized: "settings.playback.sectionTitle"), systemImage: "play.circle")
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "hand.raised", title: String(localized: "settings.privacy.title")) { PrivacySettingsView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "hand.raised", title: String(localized: "settings.privacy.title")) { PrivacySettingsView() } } label: {
                         Label(String(localized: "settings.privacy.title"), systemImage: "hand.raised")
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "gearshape.2", title: String(localized: "settings.advanced.title")) { AdvancedSettingsView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "gearshape.2", title: String(localized: "settings.advanced.title")) { AdvancedSettingsView() } } label: {
                         Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
                     }
 
                     if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
-                        NavigationLink { TVSettingsContainer(systemImage: "play.rectangle", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
+                        NavigationLink { TVSidebarDetailContainer(systemImage: "play.rectangle", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
                             Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "play.rectangle")
                         }
                     }
 
-                    NavigationLink { TVSettingsContainer(systemImage: "info.circle", title: String(localized: "settings.about.title")) { AboutView() } } label: {
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "info.circle", title: String(localized: "settings.about.title")) { AboutView() } } label: {
                         Label(String(localized: "settings.about.title"), systemImage: "info.circle")
                     }
                 }
@@ -384,10 +384,10 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - tvOS Settings Container
+// MARK: - tvOS Sidebar Detail Container
 
 #if os(tvOS)
-struct TVSettingsContainer<Content: View>: View {
+struct TVSidebarDetailContainer<Content: View>: View {
     let content: Content
     var systemImage: String?
     var title: String?

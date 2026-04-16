@@ -752,7 +752,7 @@ struct UnifiedTabView: View {
         case .openURL:
             Tab(value: SidebarItem.openURL) {
                 NavigationStack(path: $openURLPath) {
-                    TVSettingsContainer(
+                    TVSidebarDetailContainer(
                         systemImage: SidebarItem.openURL.systemImage,
                         title: SidebarItem.openURL.title
                     ) {
@@ -767,7 +767,7 @@ struct UnifiedTabView: View {
         case .remoteControl:
             Tab(value: SidebarItem.remoteControl) {
                 NavigationStack(path: $remoteControlPath) {
-                    TVSettingsContainer(
+                    TVSidebarDetailContainer(
                         systemImage: SidebarItem.remoteControl.systemImage,
                         title: SidebarItem.remoteControl.title
                     ) {
