@@ -772,7 +772,6 @@ struct UnifiedTabView: View {
                         title: SidebarItem.remoteControl.title
                     ) {
                         RemoteControlContentView(navigationStyle: .link)
-                            .navigationTitle(String(localized: "remoteControl.title"))
                     }
                     .withNavigationDestinations()
                 }

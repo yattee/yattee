@@ -112,7 +112,9 @@ struct OpenLinkFormView: View {
             actionButtonsSection
             yatteeServerWarningSection
         }
+        #if !os(tvOS)
         .navigationTitle(String(localized: "openLink.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.immediately)
