@@ -675,7 +675,8 @@ struct VideoInfoView: View {
                     } else if let description = displayedVideo?.description, !description.isEmpty {
                         TVScrollableDescription(
                             description: description,
-                            isScrollLocked: $isDescriptionScrollLocked
+                            isScrollLocked: $isDescriptionScrollLocked,
+                            showsHeader: false
                         )
                         .frame(height: isDescriptionScrollLocked ? geometry.size.height : 450)
                         .padding(.horizontal)

@@ -309,6 +309,7 @@ enum TVDetailsFocusItem: Hashable {
 struct TVScrollableDescription: View {
     let description: String
     @Binding var isScrollLocked: Bool
+    var showsHeader: Bool = true
 
     @FocusState private var isFocused: Bool
     @State private var scrollOffset: CGFloat = 0
@@ -358,17 +359,19 @@ struct TVScrollableDescription: View {
 
     private var descriptionContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("player.description")
-                    .font(.headline)
-                    .foregroundStyle(.white.opacity(0.7))
+            if showsHeader {
+                HStack {
+                    Text("player.description")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.7))
 
-                Spacer()
+                    Spacer()
 
-                if isFocused {
-                    Text(isScrollLocked ? "player.description.scrollToClose" : "player.description.clickToExpand")
-                        .font(.callout)
-                        .foregroundStyle(.white.opacity(0.5))
+                    if isFocused {
+                        Text(isScrollLocked ? "player.description.scrollToClose" : "player.description.clickToExpand")
+                            .font(.callout)
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
                 }
             }
 
