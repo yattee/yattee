@@ -11,7 +11,7 @@ struct SubscriptionsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
     #if os(tvOS)
-    @Namespace private var defaultFocusNamespace
+    @FocusState private var focusedVideoID: String?
     #endif
     @State private var feedCache = SubscriptionFeedCache.shared
     @State private var subscriptions: [Subscription] = []
@@ -203,33 +203,24 @@ struct SubscriptionsView: View {
             ScrollViewReader { proxy in
                 ZStack {
                     #if os(tvOS)
-                    Group {
-                        switch layout {
-                        case .list:
-                            listContent
-                        case .grid:
-                            gridContent
-                        }
-                    }
-                    .focusSection()
-                    .prefersDefaultFocus(in: defaultFocusNamespace)
-                    .safeAreaInset(edge: .top, spacing: 0) {
-                        HStack(spacing: 24) {
-                            feedSectionHeaderLabel
-                            Spacer()
-                            Button {
-                                showViewOptions = true
-                            } label: {
-                                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                    HStack(alignment: .top, spacing: 24) {
+                        tvOSChannelsSidebar
+                            .frame(width: max(geometry.size.width * 0.28, 360), alignment: .leading)
+                            .focusSection()
+
+                        Group {
+                            switch layout {
+                            case .list:
+                                listContent
+                            case .grid:
+                                gridContent
                             }
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .focusSection()
-                        .padding(.horizontal, 48)
-                        .padding(.top, 40)
-                        .padding(.bottom, 40)
-                        .frame(maxWidth: .infinity)
                     }
-                    .focusScope(defaultFocusNamespace)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
                     #else
                     Group {
                         switch layout {
@@ -313,11 +304,13 @@ struct SubscriptionsView: View {
 
                                     Toggle("viewOptions.hideWatched", isOn: $hideWatched)
 
+                                    #if !os(tvOS)
                                     Picker("viewOptions.channelStrip", selection: $channelStripSize) {
                                         ForEach(ChannelStripSize.allCases, id: \.self) { size in
                                             Text(size.displayName).tag(size)
                                         }
                                     }
+                                    #endif
                                 }
 
                                 #if !os(tvOS)
@@ -394,6 +387,16 @@ struct SubscriptionsView: View {
                         proxy.scrollTo("top", anchor: .top)
                     }
                 }
+                #if os(tvOS)
+                .onChange(of: filteredVideos.first?.id.videoID, initial: true) { _, newValue in
+                    // Work around tvOS ScrollView + prefersDefaultFocus bug: set initial focus
+                    // (and refocus after channel filter changes) to the first video once cells materialize.
+                    guard let newValue else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        focusedVideoID = newValue
+                    }
+                }
+                #endif
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
@@ -481,11 +484,13 @@ struct SubscriptionsView: View {
                             loadMoreVideos: loadMoreSubscriptionsCallback
                         )
                     }
-                    #if !os(tvOS)
+                    #if os(tvOS)
+                    .focused($focusedVideoID, equals: video.id.videoID)
+                    #else
                     .videoSwipeActions(video: video)
                     #endif
                 }
-                
+
                 // Infinite scroll trigger for Invidious feed
                 if feedCache.hasMorePages && !feedCache.isLoading {
                     Color.clear
@@ -622,6 +627,84 @@ struct SubscriptionsView: View {
         }
     }
 
+    // MARK: - tvOS Channels Sidebar
+
+    #if os(tvOS)
+    private var tvOSChannelsSidebar: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Button {
+                showViewOptions = true
+            } label: {
+                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.bordered)
+
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 20) {
+                    TVSubscriptionsSidebarRow(
+                        name: String(localized: "subscriptions.allChannels"),
+                        avatarURL: nil,
+                        serverURL: nil,
+                        authHeader: nil,
+                        channelID: nil,
+                        isAllChannels: true,
+                        isSelected: selectedChannelID == nil,
+                        onTap: {
+                            if selectedChannelID != nil {
+                                selectedChannelID = nil
+                            }
+                        }
+                    )
+                    .contextMenu {
+                        Button {
+                            appEnvironment?.navigationCoordinator.navigate(to: .manageChannels)
+                        } label: {
+                            Label(String(localized: "sidebar.manageChannels"), systemImage: "person.2.badge.gearshape")
+                        }
+                    }
+
+                    ForEach(sortedSubscriptions, id: \.channelID) { subscription in
+                        TVSubscriptionsSidebarRow(
+                            name: subscription.name,
+                            avatarURL: subscription.avatarURL,
+                            serverURL: yatteeServerURL,
+                            authHeader: yatteeServerAuthHeader,
+                            channelID: subscription.channelID,
+                            isAllChannels: false,
+                            isSelected: selectedChannelID == subscription.channelID,
+                            onTap: {
+                                if selectedChannelID == subscription.channelID {
+                                    selectedChannelID = nil
+                                } else {
+                                    selectedChannelID = subscription.channelID
+                                }
+                            }
+                        )
+                        .contextMenu {
+                            Button {
+                                appEnvironment?.navigationCoordinator.navigate(
+                                    to: .channel(subscription.channelID, subscription.contentSource)
+                                )
+                            } label: {
+                                Label(String(localized: "subscriptions.goToChannel"), systemImage: "person.circle")
+                            }
+                            Button(role: .destructive) {
+                                unsubscribeChannel(subscription.channelID)
+                            } label: {
+                                Label(String(localized: "channel.unsubscribe"), systemImage: "person.badge.minus")
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 8)
+            }
+            .scrollClipDisabled()
+        }
+    }
+    #endif
+
     // MARK: - Content Views
 
     private var subscriptionsQueueSource: QueueSource {
@@ -654,9 +737,12 @@ struct SubscriptionsView: View {
                         videoIndex: index,
                         loadMoreVideos: loadMoreSubscriptionsCallback
                     )
+                    #if os(tvOS)
+                    .focused($focusedVideoID, equals: video.id.videoID)
+                    #endif
                 }
             }
-            
+
             // Infinite scroll trigger for Invidious feed
             if feedCache.hasMorePages && !feedCache.isLoading {
                 Color.clear
