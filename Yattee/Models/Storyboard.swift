@@ -99,7 +99,12 @@ struct Storyboard: Hashable, Sendable, Codable {
     /// - Returns: Direct URL for the sprite sheet, or nil if invalid
     func directSheetURL(for index: Int) -> URL? {
         guard index >= 0, index < storyboardCount else { return nil }
-        let urlString = templateUrl.replacingOccurrences(of: "M$M", with: "\(index)")
+        // YouTube storyboard filenames are `M{N}.jpg` and the templateUrl encodes the
+        // slot as `M$M`. The leading `M` is literal, so replace `M$M` with `M{index}`
+        // (not bare `\(index)`) — otherwise the file becomes `0.jpg` instead of `M0.jpg`
+        // and YouTube returns 404. Matching the full `M$M` token also avoids accidentally
+        // rewriting any `$M` that appears later in query params such as `sigh=rs$...`.
+        let urlString = templateUrl.replacingOccurrences(of: "M$M", with: "M\(index)")
         return URL(string: urlString)
     }
 

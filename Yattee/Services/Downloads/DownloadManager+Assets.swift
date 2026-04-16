@@ -12,6 +12,21 @@ import Foundation
 extension DownloadManager {
     // MARK: - Storyboard Download
 
+    /// Returns true if `proxyUrl` clearly points at a direct image (e.g. a YouTube CDN
+    /// `.jpg` URL returned by yattee-server) rather than a VTT proxy path.
+    /// In that case fetching it and trying to parse as WebVTT would be wasted bandwidth
+    /// and produces an empty URL list, so we skip straight to the templateUrl fallback.
+    static func proxyUrlLooksLikeImage(_ urlString: String) -> Bool {
+        // Strip the query string; common YouTube URLs carry huge `sqp` / `sigh` params.
+        let pathOnly = urlString.split(separator: "?", maxSplits: 1).first.map(String.init) ?? urlString
+        let lower = pathOnly.lowercased()
+        return lower.hasSuffix(".jpg")
+            || lower.hasSuffix(".jpeg")
+            || lower.hasSuffix(".png")
+            || lower.hasSuffix(".webp")
+    }
+
+
     /// Start downloading storyboard sprite sheets sequentially
     func startStoryboardDownload(downloadID: UUID) {
         guard let index = activeDownloads.firstIndex(where: { $0.id == downloadID }),
@@ -43,53 +58,106 @@ extension DownloadManager {
                 return
             }
 
-            // First, try to get VTT from proxy URL to extract actual image URLs
+            // Diagnostic: log the selected storyboard variant so we can tell
+            // which server shape we are dealing with (Invidious VTT vs yattee-server direct URLs).
+            let proxySample = storyboard.proxyUrl.map { String($0.prefix(120)) } ?? "<nil>"
+            let templateSample = String(storyboard.templateUrl.prefix(120))
+            LoggingService.shared.debug(
+                "[Storyboard] Starting download for \(videoID): \(storyboard.width)x\(storyboard.height), sheets=\(storyboard.storyboardCount)",
+                category: .downloads,
+                details: "proxyUrl=\(proxySample) templateUrl=\(templateSample)"
+            )
+
+            // First, try to get VTT from proxy URL to extract actual image URLs.
+            // Some backends (yattee-server after innertube switch) return a direct image
+            // URL in the `url` field instead of a VTT proxy path, so skip the VTT round-trip
+            // when the URL obviously points at an image resource.
             var imageURLs: [URL] = []
 
             if let proxyUrl = storyboard.proxyUrl {
-                // Construct absolute VTT URL
-                let vttURL: URL?
-                if proxyUrl.hasPrefix("http://") || proxyUrl.hasPrefix("https://") {
-                    // Already an absolute URL
-                    vttURL = URL(string: proxyUrl)
-                } else if let baseURL = storyboard.instanceBaseURL {
-                    // Relative URL - prepend base URL
-                    var baseString = baseURL.absoluteString
-                    if baseString.hasSuffix("/"), proxyUrl.hasPrefix("/") {
-                        baseString = String(baseString.dropLast())
-                    }
-                    vttURL = URL(string: baseString + proxyUrl)
+                if Self.proxyUrlLooksLikeImage(proxyUrl) {
+                    LoggingService.shared.debug(
+                        "[Storyboard] Skipping VTT fetch — proxyUrl looks like a direct image, using templateUrl fallback",
+                        category: .downloads
+                    )
                 } else {
-                    vttURL = nil
-                }
+                    // Construct absolute VTT URL
+                    let vttURL: URL?
+                    if proxyUrl.hasPrefix("http://") || proxyUrl.hasPrefix("https://") {
+                        // Already an absolute URL
+                        vttURL = URL(string: proxyUrl)
+                    } else if let baseURL = storyboard.instanceBaseURL {
+                        // Relative URL - prepend base URL
+                        var baseString = baseURL.absoluteString
+                        if baseString.hasSuffix("/"), proxyUrl.hasPrefix("/") {
+                            baseString = String(baseString.dropLast())
+                        }
+                        vttURL = URL(string: baseString + proxyUrl)
+                    } else {
+                        vttURL = nil
+                    }
 
-                if let vttURL {
-                    do {
-                        let (vttData, _) = try await URLSession.shared.data(from: vttURL)
-                        imageURLs = parseVTTForImageURLs(vttData, baseURL: vttURL)
-                    } catch {
-                        // VTT fetch failed, will fall back to direct URLs
+                    if let vttURL {
+                        do {
+                            let (vttData, response) = try await URLSession.shared.data(from: vttURL)
+                            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+                            imageURLs = parseVTTForImageURLs(vttData, baseURL: vttURL)
+                            LoggingService.shared.debug(
+                                "[Storyboard] VTT fetch OK (status=\(status), bytes=\(vttData.count)) parsed \(imageURLs.count) URLs",
+                                category: .downloads
+                            )
+                        } catch {
+                            LoggingService.shared.debug(
+                                "[Storyboard] VTT fetch failed: \(error.localizedDescription) — will fall back to direct URLs",
+                                category: .downloads
+                            )
+                        }
+                    } else {
+                        LoggingService.shared.debug(
+                            "[Storyboard] Could not construct VTT URL from proxyUrl, falling back to direct URLs",
+                            category: .downloads
+                        )
                     }
                 }
             }
 
             // If VTT parsing failed, fall back to direct URLs (may not work if blocked)
             if imageURLs.isEmpty, storyboard.storyboardCount > 0 {
+                var nilCount = 0
                 for sheetIndex in 0..<storyboard.storyboardCount {
                     if let url = storyboard.directSheetURL(for: sheetIndex) {
                         imageURLs.append(url)
+                    } else {
+                        nilCount += 1
                     }
                 }
+                let firstSample = imageURLs.first.map { String($0.absoluteString.prefix(160)) } ?? "<none>"
+                LoggingService.shared.debug(
+                    "[Storyboard] directSheetURL fallback produced \(imageURLs.count)/\(storyboard.storyboardCount) URLs (nil: \(nilCount))",
+                    category: .downloads,
+                    details: "first=\(firstSample)"
+                )
             }
 
             let totalSheets = imageURLs.count
             var completedSheets = 0
 
+            if totalSheets == 0 {
+                LoggingService.shared.debug(
+                    "[Storyboard] No sheet URLs to download after VTT + fallback — will mark as failed",
+                    category: .downloads
+                )
+            }
+
             // Download each sprite sheet sequentially
             for (sheetIndex, sheetURL) in imageURLs.enumerated() {
                 guard !Task.isCancelled else { return }
 
-                let fileName = "sb_\(sheetIndex).jpg"
+                // Filename must match the `sb_M$M.jpg` template used by
+                // `Storyboard.localStoryboard(...)` after `M$M` → `M{index}` substitution
+                // in `Storyboard.directSheetURL(for:)`, otherwise local playback won't
+                // resolve the sheets.
+                let fileName = "sb_M\(sheetIndex).jpg"
                 let fileURL = storyboardDir.appendingPathComponent(fileName)
 
                 // Skip if already downloaded
@@ -104,6 +172,12 @@ extension DownloadManager {
 
                     guard let httpResponse = response as? HTTPURLResponse,
                           httpResponse.statusCode == 200 else {
+                        let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+                        LoggingService.shared.debug(
+                            "[Storyboard] Sheet \(sheetIndex) skipped — HTTP \(status) (bytes=\(data.count))",
+                            category: .downloads,
+                            details: String(sheetURL.absoluteString.prefix(160))
+                        )
                         continue
                     }
 
@@ -111,6 +185,10 @@ extension DownloadManager {
 
                     // Verify it's actually an image
                     guard contentType.contains("image") || data.count > 50000 else {
+                        LoggingService.shared.debug(
+                            "[Storyboard] Sheet \(sheetIndex) skipped — unexpected content (type=\(contentType), bytes=\(data.count))",
+                            category: .downloads
+                        )
                         continue
                     }
 
@@ -119,12 +197,20 @@ extension DownloadManager {
                     updateStoryboardProgress(downloadID: downloadID, completed: completedSheets, total: totalSheets)
 
                 } catch {
-                    // Continue with next sheet - non-fatal
+                    LoggingService.shared.debug(
+                        "[Storyboard] Sheet \(sheetIndex) errored: \(error.localizedDescription)",
+                        category: .downloads,
+                        details: String(sheetURL.absoluteString.prefix(160))
+                    )
                 }
             }
 
             // Complete storyboard phase
             let success = completedSheets > 0
+            LoggingService.shared.debug(
+                "[Storyboard] Download phase finished: \(completedSheets)/\(totalSheets) sheets succeeded",
+                category: .downloads
+            )
             finalizeStoryboardDownload(
                 downloadID: downloadID,
                 storyboardDirName: storyboardDirName,
