@@ -10,6 +10,9 @@ import SwiftUI
 struct SubscriptionsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
+    #if os(tvOS)
+    @Namespace private var defaultFocusNamespace
+    #endif
     @State private var feedCache = SubscriptionFeedCache.shared
     @State private var subscriptions: [Subscription] = []
     @State private var subscriptionsLoaded = false
@@ -199,6 +202,35 @@ struct SubscriptionsView: View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
                 ZStack {
+                    #if os(tvOS)
+                    Group {
+                        switch layout {
+                        case .list:
+                            listContent
+                        case .grid:
+                            gridContent
+                        }
+                    }
+                    .focusSection()
+                    .prefersDefaultFocus(in: defaultFocusNamespace)
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        HStack(spacing: 24) {
+                            feedSectionHeaderLabel
+                            Spacer()
+                            Button {
+                                showViewOptions = true
+                            } label: {
+                                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                            }
+                        }
+                        .focusSection()
+                        .padding(.horizontal, 48)
+                        .padding(.top, 40)
+                        .padding(.bottom, 40)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .focusScope(defaultFocusNamespace)
+                    #else
                     Group {
                         switch layout {
                         case .list:
@@ -214,21 +246,35 @@ struct SubscriptionsView: View {
                         await feedCache.refresh(using: appEnvironment)
                         LoggingService.shared.info("Pull-to-refresh completed", category: .general)
                     }
-                    #if !os(tvOS)
-                    .navigationTitle(String(localized: "tabs.subscriptions"))
-                    .toolbarTitleDisplayMode(.inlineLarge)
                     #endif
-                    .toolbar {
-                        ToolbarItem(placement: .primaryAction) {
-                            Button {
-                                showViewOptions = true
-                            } label: {
-                                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
-                            }
-                            .liquidGlassTransitionSource(id: "subscriptionsViewOptions", in: sheetTransition)
+
+                    // Bottom overlay for filter strip
+                    #if !os(tvOS)
+                    VStack {
+                        Spacer()
+
+                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError {
+                            bottomFloatingFilterStrip
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     }
-                    .sheet(isPresented: $showViewOptions) {
+                    #endif
+                }
+                #if !os(tvOS)
+                .navigationTitle(String(localized: "tabs.subscriptions"))
+                .toolbarTitleDisplayMode(.inlineLarge)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showViewOptions = true
+                        } label: {
+                            Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                        }
+                        .liquidGlassTransitionSource(id: "subscriptionsViewOptions", in: sheetTransition)
+                    }
+                }
+                #endif
+                .sheet(isPresented: $showViewOptions) {
                         NavigationStack {
                             Form {
                                 Section {
@@ -317,43 +363,30 @@ struct SubscriptionsView: View {
                             await feedCache.refresh(using: appEnvironment)
                         }
                     }
-                    .task(id: instanceConfigurationID) {
-                        LoggingService.shared.debug("SubscriptionsView task triggered, instanceConfigurationID: \(instanceConfigurationID)", category: .general)
-                        await loadSubscriptionsAsync()
+                .task(id: instanceConfigurationID) {
+                    LoggingService.shared.debug("SubscriptionsView task triggered, instanceConfigurationID: \(instanceConfigurationID)", category: .general)
+                    await loadSubscriptionsAsync()
 
-                        await feedCache.loadFromDiskIfNeeded()
+                    await feedCache.loadFromDiskIfNeeded()
 
-                        let hasYatteeServer = appEnvironment?.instancesManager.instances.contains {
-                            $0.type == .yatteeServer && $0.isEnabled
-                        } ?? false
+                    let hasYatteeServer = appEnvironment?.instancesManager.instances.contains {
+                        $0.type == .yatteeServer && $0.isEnabled
+                    } ?? false
 
-                        let cacheValid = feedCache.isCacheValid(using: appEnvironment?.settingsManager)
-                        LoggingService.shared.debug(
-                            "hasYatteeServer: \(hasYatteeServer), cacheValid: \(cacheValid), isLoading: \(feedCache.isLoading)",
-                            category: .general
-                        )
+                    let cacheValid = feedCache.isCacheValid(using: appEnvironment?.settingsManager)
+                    LoggingService.shared.debug(
+                        "hasYatteeServer: \(hasYatteeServer), cacheValid: \(cacheValid), isLoading: \(feedCache.isLoading)",
+                        category: .general
+                    )
 
-                        if hasYatteeServer {
-                            LoggingService.shared.info("Yattee Server detected, forcing feed refresh", category: .general)
-                            await loadFeed(forceRefresh: true)
-                        } else if !cacheValid && !feedCache.isLoading {
-                            LoggingService.shared.info("Cache invalid and not loading, refreshing feed", category: .general)
-                            await loadFeed(forceRefresh: false)
-                        } else {
-                            LoggingService.shared.debug("Using cached feed, no refresh needed", category: .general)
-                        }
-                    }
-
-                    // Bottom overlay for filter strip
-                    VStack {
-                        Spacer()
-
-                        #if !os(tvOS)
-                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError {
-                            bottomFloatingFilterStrip
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
-                        #endif
+                    if hasYatteeServer {
+                        LoggingService.shared.info("Yattee Server detected, forcing feed refresh", category: .general)
+                        await loadFeed(forceRefresh: true)
+                    } else if !cacheValid && !feedCache.isLoading {
+                        LoggingService.shared.info("Cache invalid and not loading, refreshing feed", category: .general)
+                        await loadFeed(forceRefresh: false)
+                    } else {
+                        LoggingService.shared.debug("Using cached feed, no refresh needed", category: .general)
                     }
                 }
                 .onChange(of: selectedChannelID) { _, _ in
@@ -376,8 +409,10 @@ struct SubscriptionsView: View {
             feedStatusBanner
                 .id("top")
 
-            // Section header
+            // Section header (channel link is shown in the inline header on tvOS)
+            #if !os(tvOS)
             sectionHeaderView
+            #endif
         } content: {
             feedContentRows
         } footer: {
@@ -478,7 +513,8 @@ struct SubscriptionsView: View {
                 feedStatusBanner
                     .id("top")
 
-                // Section header
+                // Section header (channel link is shown in the inline header on tvOS)
+                #if !os(tvOS)
                 HStack {
                     feedSectionHeader
                     Spacer()
@@ -486,6 +522,7 @@ struct SubscriptionsView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 .padding(.bottom, 12)
+                #endif
 
                 // Content
                 if case .error(let feedError) = feedCache.feedLoadState, feedCache.videos.isEmpty {
@@ -516,6 +553,9 @@ struct SubscriptionsView: View {
                 }
             }
         }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
     }
 
     // MARK: - Channel Filter Strip
@@ -633,38 +673,43 @@ struct SubscriptionsView: View {
 
     private var feedSectionHeader: some View {
         HStack {
-            if feedCache.isLoading, let progress = feedCache.loadingProgress {
-                Text("subscriptions.updatingChannels \(progress.loaded) \(progress.total)")
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            } else if let subscription = selectedSubscription {
-                Button {
-                    appEnvironment?.navigationCoordinator.navigate(
-                        to: .channel(subscription.channelID, subscription.contentSource)
-                    )
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(subscription.name)
-                            .fontWeight(.semibold)
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                    }
-                    .foregroundStyle(Color.accentColor)
-                }
-                .buttonStyle(.plain)
-            } else {
-                NavigationLink(value: NavigationDestination.manageChannels) {
-                    HStack(spacing: 4) {
-                        Text(String(localized: "subscriptions.allChannels"))
-                            .fontWeight(.semibold)
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                    }
-                    .foregroundStyle(Color.accentColor)
-                }
-                .buttonStyle(.plain)
-            }
+            feedSectionHeaderLabel
             Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var feedSectionHeaderLabel: some View {
+        if feedCache.isLoading, let progress = feedCache.loadingProgress {
+            Text("subscriptions.updatingChannels \(progress.loaded) \(progress.total)")
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+        } else if let subscription = selectedSubscription {
+            Button {
+                appEnvironment?.navigationCoordinator.navigate(
+                    to: .channel(subscription.channelID, subscription.contentSource)
+                )
+            } label: {
+                HStack(spacing: 4) {
+                    Text(subscription.name)
+                        .fontWeight(.semibold)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                }
+                .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.plain)
+        } else {
+            NavigationLink(value: NavigationDestination.manageChannels) {
+                HStack(spacing: 4) {
+                    Text(String(localized: "subscriptions.allChannels"))
+                        .fontWeight(.semibold)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                }
+                .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.plain)
         }
     }
 

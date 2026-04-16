@@ -58,6 +58,7 @@ struct VideoListContainer<Header: View, Content: View, Footer: View>: View {
                 footer()
             }
         }
+        .scrollClipDisabled()
         #else
         // iOS/macOS: Background overlay pattern
         backgroundStyle.color
