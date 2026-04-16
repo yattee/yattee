@@ -65,18 +65,27 @@ struct PeerTubeInstancesExploreView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
+            #if os(tvOS)
             content
-                .navigationTitle(String(localized: "peertube.explore.title"))
-                #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-                #endif
-                .toolbar { toolbarContent }
-                .searchable(text: $searchText, prompt: Text(String(localized: "peertube.explore.search")))
                 .onChange(of: searchText) { _, _ in
-                    // Reset display limit when search changes
                     displayLimit = pageSize
                 }
+            #else
+            NavigationStack {
+                content
+                    .navigationTitle(String(localized: "peertube.explore.title"))
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .toolbar { toolbarContent }
+                    .searchable(text: $searchText, prompt: Text(String(localized: "peertube.explore.search")))
+                    .onChange(of: searchText) { _, _ in
+                        // Reset display limit when search changes
+                        displayLimit = pageSize
+                    }
+            }
+            #endif
         }
         #if os(macOS)
         .frame(minWidth: 500, minHeight: 400)
@@ -101,6 +110,20 @@ struct PeerTubeInstancesExploreView: View {
 
     @ViewBuilder
     private var content: some View {
+        #if os(tvOS)
+        VStack(spacing: 0) {
+            if !allInstances.isEmpty {
+                tvOSSearchHeader
+            }
+            contentBody
+        }
+        #else
+        contentBody
+        #endif
+    }
+
+    @ViewBuilder
+    private var contentBody: some View {
         if isLoading && allInstances.isEmpty {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -129,6 +152,33 @@ struct PeerTubeInstancesExploreView: View {
             instancesList
         }
     }
+
+    #if os(tvOS)
+    @ViewBuilder
+    private var tvOSSearchHeader: some View {
+        HStack(spacing: 16) {
+            TextField(
+                "",
+                text: $searchText,
+                prompt: Text(String(localized: "peertube.explore.search"))
+            )
+            .textFieldStyle(.plain)
+            .focusSection()
+
+            Button {
+                showFiltersSheet = true
+            } label: {
+                Label(
+                    String(localized: "peertube.explore.filters"),
+                    systemImage: filters.isDefault ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill"
+                )
+            }
+            .focusSection()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+    #endif
 
     private var instancesList: some View {
         List {
@@ -164,6 +214,7 @@ struct PeerTubeInstancesExploreView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        #if !os(tvOS)
         ToolbarItem(placement: .confirmationAction) {
             Button(role: .cancel) {
                 dismiss()
@@ -172,6 +223,7 @@ struct PeerTubeInstancesExploreView: View {
                     .labelStyle(.iconOnly)
             }
         }
+        #endif
 
         ToolbarItem(placement: .primaryAction) {
             Button {

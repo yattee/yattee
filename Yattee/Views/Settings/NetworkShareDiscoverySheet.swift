@@ -29,6 +29,11 @@ struct NetworkShareDiscoverySheet: View {
     var body: some View {
         NavigationStack {
             content
+                #if os(tvOS)
+                .scrollClipDisabled()
+                .padding(.horizontal, 40)
+                .padding(.vertical, 40)
+                #else
                 .navigationTitle(String(localized: "discovery.title"))
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
@@ -41,6 +46,7 @@ struct NetworkShareDiscoverySheet: View {
                         }
                     }
                 }
+                #endif
                 .onAppear {
                     discoveryService?.startDiscovery()
                 }

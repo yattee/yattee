@@ -55,6 +55,13 @@ struct PeerTubeFiltersSheet: View {
                     .disabled(filters.isDefault)
                 }
             }
+            #if os(tvOS)
+            .scrollClipDisabled()
+            .padding(.horizontal, 40)
+            .padding(.vertical, 40)
+            .onChange(of: filters.language) { _, _ in onApply() }
+            .onChange(of: filters.country) { _, _ in onApply() }
+            #else
             .navigationTitle(String(localized: "peertube.explore.filters"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -72,6 +79,7 @@ struct PeerTubeFiltersSheet: View {
                     }
                 }
             }
+            #endif
         }
         #if os(iOS)
         .presentationDetents([.medium])
