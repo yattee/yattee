@@ -122,7 +122,7 @@ struct TVPlayerControlsView: View {
             if let video = playerState?.currentVideo {
                 ChannelAvatarView(
                     author: video.author,
-                    size: 110,
+                    size: 80,
                     yatteeServerURL: yatteeServerURL,
                     source: video.id.source
                 )
@@ -131,7 +131,7 @@ struct TVPlayerControlsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 // Video title
                 Text(playerState?.currentVideo?.title ?? "")
-                    .font(.title2)
+                    .font(.headline)
                     .fontWeight(.semibold)
                     .lineLimit(2)
                     .foregroundStyle(.white)
@@ -139,7 +139,7 @@ struct TVPlayerControlsView: View {
                 // Channel name
                 if let channelName = playerState?.currentVideo?.author.name {
                     Text(channelName)
-                        .font(.headline)
+                        .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.7))
                 }
             }
