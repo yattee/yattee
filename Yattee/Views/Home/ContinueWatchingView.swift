@@ -40,6 +40,56 @@ struct ContinueWatchingView: View {
 
     var body: some View {
         GeometryReader { geometry in
+            #if os(tvOS)
+            VStack(spacing: 0) {
+                if !inProgressEntries.isEmpty {
+                    HStack(spacing: 24) {
+                        Text(String(localized: "home.continueWatching.title"))
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        Spacer()
+
+                        Button {
+                            showViewOptions = true
+                        } label: {
+                            Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                        }
+
+                        Menu {
+                            Button(role: .destructive) {
+                                clearAllProgress()
+                            } label: {
+                                Label(String(localized: "continueWatching.clearAll"), systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                    }
+                    .focusSection()
+                    .padding(.horizontal, 48)
+                    .padding(.top, 40)
+                    .padding(.bottom, 40)
+                }
+
+                Group {
+                    if inProgressEntries.isEmpty {
+                        emptyState
+                    } else {
+                        switch layout {
+                        case .list:
+                            listContent
+                        case .grid:
+                            gridContent
+                        }
+                    }
+                }
+                .focusSection()
+            }
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
+            #else
             Group {
                 if inProgressEntries.isEmpty {
                     emptyState
@@ -55,11 +105,11 @@ struct ContinueWatchingView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            #endif
         }
-        .navigationTitle(String(localized: "home.continueWatching.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "home.continueWatching.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
         .toolbar {
             if !inProgressEntries.isEmpty {
                 ToolbarItem(placement: .primaryAction) {
@@ -83,6 +133,7 @@ struct ContinueWatchingView: View {
                 }
             }
         }
+        #endif
         .sheet(isPresented: $showViewOptions) {
             ViewOptionsSheet(
                 layout: $layout,
@@ -187,6 +238,9 @@ struct ContinueWatchingView: View {
                 }
             }
         }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
     }
 
     // MARK: - Actions
