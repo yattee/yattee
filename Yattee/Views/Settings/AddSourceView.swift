@@ -28,17 +28,27 @@ struct AddSourceView: View {
         #if os(tvOS)
         listContent
             .navigationDestination(isPresented: $navigateToWebDAV) {
-                AddWebDAVView(
-                    prefillURL: discoveredWebDAVURL,
-                    prefillName: discoveredName,
-                    prefillAllowInvalidCertificates: discoveredAllowInvalidCerts
-                )
+                TVSidebarDetailContainer(
+                    systemImage: "externaldrive.connected.to.line.below",
+                    title: String(localized: "sources.addWebDAV")
+                ) {
+                    AddWebDAVView(
+                        prefillURL: discoveredWebDAVURL,
+                        prefillName: discoveredName,
+                        prefillAllowInvalidCertificates: discoveredAllowInvalidCerts
+                    )
+                }
             }
             .navigationDestination(isPresented: $navigateToSMB) {
-                AddSMBView(
-                    prefillServer: discoveredSMBServer,
-                    prefillName: discoveredName
-                )
+                TVSidebarDetailContainer(
+                    systemImage: "server.rack",
+                    title: String(localized: "sources.addSMB")
+                ) {
+                    AddSMBView(
+                        prefillServer: discoveredSMBServer,
+                        prefillName: discoveredName
+                    )
+                }
             }
             .sheet(isPresented: $showingNetworkDiscovery) {
                 NetworkShareDiscoverySheet(filterType: selectedShareType) { share in
@@ -99,7 +109,12 @@ struct AddSourceView: View {
 
                 NavigationLink {
                     #if os(tvOS)
-                    AddWebDAVView()
+                    TVSidebarDetailContainer(
+                        systemImage: "externaldrive.connected.to.line.below",
+                        title: String(localized: "sources.addWebDAV")
+                    ) {
+                        AddWebDAVView()
+                    }
                     #else
                     AddWebDAVView(dismissSheet: dismiss)
                     #endif
@@ -109,7 +124,12 @@ struct AddSourceView: View {
 
                 NavigationLink {
                     #if os(tvOS)
-                    AddSMBView()
+                    TVSidebarDetailContainer(
+                        systemImage: "server.rack",
+                        title: String(localized: "sources.addSMB")
+                    ) {
+                        AddSMBView()
+                    }
                     #else
                     AddSMBView(dismissSheet: dismiss)
                     #endif
@@ -119,7 +139,12 @@ struct AddSourceView: View {
 
                 NavigationLink {
                     #if os(tvOS)
-                    AddRemoteServerView()
+                    TVSidebarDetailContainer(
+                        systemImage: "globe",
+                        title: String(localized: "sources.addRemoteServer")
+                    ) {
+                        AddRemoteServerView()
+                    }
                     #else
                     AddRemoteServerView(dismissSheet: dismiss)
                     #endif
@@ -128,10 +153,22 @@ struct AddSourceView: View {
                 }
 
                 NavigationLink {
+                    #if os(tvOS)
+                    TVSidebarDetailContainer(
+                        systemImage: "globe",
+                        title: String(localized: "sources.browsePeerTube")
+                    ) {
+                        if let appEnvironment {
+                            PeerTubeInstancesExploreView()
+                                .appEnvironment(appEnvironment)
+                        }
+                    }
+                    #else
                     if let appEnvironment {
                         PeerTubeInstancesExploreView()
                             .appEnvironment(appEnvironment)
                     }
+                    #endif
                 } label: {
                     Label {
                         Text(String(localized: "sources.browsePeerTube"))

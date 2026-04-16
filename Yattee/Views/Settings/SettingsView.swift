@@ -93,7 +93,7 @@ struct SettingsView: View {
             List {
                 if let appEnvironment {
                     NavigationLink {
-                        TVSidebarDetailContainer(systemImage: "server.rack", title: String(localized: "sources.title")) { SourcesListView() }
+                        SourcesListView()
                     } label: {
                         HStack {
                             Label(String(localized: "sources.title"), systemImage: "server.rack")

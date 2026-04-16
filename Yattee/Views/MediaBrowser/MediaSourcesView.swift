@@ -38,21 +38,23 @@ struct MediaSourcesView: View {
 
     var body: some View {
         Group {
-            if isEmpty {
-                ContentUnavailableView {
-                    Label(String(localized: "sources.empty.title"), systemImage: "server.rack")
-                } description: {
-                    Text(String(localized: "sources.empty.description"))
-                } actions: {
-                    Button(String(localized: "sources.addSource")) {
+            #if os(tvOS)
+            TVSidebarDetailContainer(
+                systemImage: "server.rack",
+                title: String(localized: "sources.title"),
+                bottomAction: {
+                    Button {
                         showingAddSheet = true
+                    } label: {
+                        Label(String(localized: "sources.addSource"), systemImage: "plus")
                     }
-                    .buttonStyle(.borderedProminent)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                sourcesList
+            ) {
+                mediaSourcesInner
             }
+            #else
+            mediaSourcesInner
+            #endif
         }
         #if !os(tvOS)
         .navigationTitle(String(localized: "sources.title"))
@@ -72,12 +74,25 @@ struct MediaSourcesView: View {
             }
         }
         #endif
+        #if os(tvOS)
+        .navigationDestination(item: $sourceToEdit) { source in
+            TVSidebarDetailContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) {
+                EditSourceView(source: source)
+            }
+        }
+        .navigationDestination(isPresented: $showingAddSheet) {
+            TVSidebarDetailContainer(systemImage: "plus.circle", title: String(localized: "sources.newSource")) {
+                AddSourceView()
+            }
+        }
+        #else
         .sheet(item: $sourceToEdit) { source in
             EditSourceView(source: source)
         }
         .sheet(isPresented: $showingAddSheet) {
             AddSourceView()
         }
+        #endif
         .confirmationDialog(
             deleteConfirmationMessage,
             isPresented: $showingDeleteConfirmation,
@@ -91,7 +106,28 @@ struct MediaSourcesView: View {
                 pendingDeleteSource = nil
             }
         }
+        #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
+        #endif
+    }
+
+    @ViewBuilder
+    private var mediaSourcesInner: some View {
+        if isEmpty {
+            ContentUnavailableView {
+                Label(String(localized: "sources.empty.title"), systemImage: "server.rack")
+            } description: {
+                Text(String(localized: "sources.empty.description"))
+            } actions: {
+                Button(String(localized: "sources.addSource")) {
+                    showingAddSheet = true
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            sourcesList
+        }
     }
 
     // MARK: - Private
@@ -388,7 +424,12 @@ struct MediaSourcesView: View {
     }
 
     private func instanceRow(_ instance: Instance) -> some View {
-        HStack(spacing: 12) {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        return HStack(spacing: rowSpacing) {
             Image(systemName: instance.type.systemImage)
                 .font(.title2)
                 .foregroundStyle(.tint)
@@ -413,7 +454,12 @@ struct MediaSourcesView: View {
     }
 
     private func mediaSourceRow(_ source: MediaSource, needsPassword: Bool) -> some View {
-        HStack(spacing: 12) {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        return HStack(spacing: rowSpacing) {
             Image(systemName: source.type.systemImage)
                 .font(.title2)
                 .foregroundStyle(.tint)

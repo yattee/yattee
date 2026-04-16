@@ -36,11 +36,24 @@ struct SourcesListView: View {
 
     var body: some View {
         Group {
-            if isEmpty {
-                emptyState
-            } else {
-                sourcesList
+            #if os(tvOS)
+            TVSidebarDetailContainer(
+                systemImage: "server.rack",
+                title: String(localized: "sources.title"),
+                bottomAction: {
+                    Button {
+                        showingAddSheet = true
+                    } label: {
+                        Label(String(localized: "sources.addSource"), systemImage: "plus")
+                    }
+                    .accessibilityIdentifier("sources.addButton")
+                }
+            ) {
+                sourcesInner
             }
+            #else
+            sourcesInner
+            #endif
         }
         #if !os(tvOS)
         .navigationTitle(String(localized: "sources.title"))
@@ -48,6 +61,7 @@ struct SourcesListView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -58,6 +72,7 @@ struct SourcesListView: View {
                 .accessibilityIdentifier("sources.addButton")
             }
         }
+        #endif
         #if os(tvOS)
         .navigationDestination(isPresented: $showingAddSheet) {
             TVSidebarDetailContainer(systemImage: "plus.circle", title: String(localized: "sources.newSource")) { AddSourceView() }
@@ -89,7 +104,18 @@ struct SourcesListView: View {
                 pendingDeleteSource = nil
             }
         }
+        #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
+        #endif
+    }
+
+    @ViewBuilder
+    private var sourcesInner: some View {
+        if isEmpty {
+            emptyState
+        } else {
+            sourcesList
+        }
     }
 
     // MARK: - Empty State
@@ -112,37 +138,6 @@ struct SourcesListView: View {
     // MARK: - Sources List
 
     private var sourcesList: some View {
-        #if os(tvOS)
-        List {
-            if let manager = instancesManager, !manager.instances.isEmpty {
-                Section(String(localized: "sources.section.remoteServers")) {
-                    let instances = manager.instances.sorted { $0.dateAdded < $1.dateAdded }
-                    ForEach(instances) { instance in
-                        Button {
-                            sourceToEdit = .remoteServer(instance)
-                        } label: {
-                            instanceRow(instance)
-                        }
-                    }
-                }
-            }
-
-            let allFileSources = allMediaSources
-            if !allFileSources.isEmpty {
-                Section(String(localized: "sources.section.fileSources")) {
-                    ForEach(allFileSources) { source in
-                        let needsPassword = mediaSourcesManager?.needsPassword(for: source) ?? false
-                        Button {
-                            sourceToEdit = .fileSource(source)
-                        } label: {
-                            mediaSourceRow(source, needsPassword: needsPassword)
-                        }
-                    }
-                }
-            }
-        }
-        .listStyle(.grouped)
-        #else
         (listStyle == .inset ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color)
             .ignoresSafeArea()
             .overlay(
@@ -153,7 +148,6 @@ struct SourcesListView: View {
                     }
                 }
             )
-        #endif
     }
 
     // MARK: - Section Header
@@ -220,7 +214,7 @@ struct SourcesListView: View {
             } label: {
                 instanceRow(instance)
             }
-            .buttonStyle(.card)
+            .foregroundStyle(.primary)
         }
         #else
         SourceListRow(isLast: isLast, listStyle: listStyle) {
@@ -260,7 +254,12 @@ struct SourcesListView: View {
     }
 
     private func instanceRow(_ instance: Instance) -> some View {
-        HStack(spacing: 12) {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        return HStack(spacing: rowSpacing) {
             Image(systemName: instance.type.systemImage)
                 .font(.title2)
                 .foregroundStyle(.tint)
@@ -349,7 +348,7 @@ struct SourcesListView: View {
             } label: {
                 mediaSourceRow(source, needsPassword: needsPassword)
             }
-            .buttonStyle(.card)
+            .foregroundStyle(.primary)
         }
         #else
         SourceListRow(isLast: isLast, listStyle: listStyle) {
@@ -389,7 +388,12 @@ struct SourcesListView: View {
     }
 
     private func mediaSourceRow(_ source: MediaSource, needsPassword: Bool) -> some View {
-        HStack(spacing: 12) {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        return HStack(spacing: rowSpacing) {
             Image(systemName: source.type.systemImage)
                 .font(.title2)
                 .foregroundStyle(.tint)
