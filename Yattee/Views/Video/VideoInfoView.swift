@@ -51,6 +51,10 @@ struct VideoInfoView: View {
     @State private var isEditingBookmarkNote = false
     @State private var isEditingBookmarkTags = false
     @FocusState private var isBookmarkNoteFocused: Bool
+    #if os(tvOS)
+    @FocusState private var isPlayFocused: Bool
+    @State private var isDescriptionScrollLocked = false
+    #endif
 
     // Comments state (independent from PlayerState)
     @State private var comments: [Comment] = []
@@ -258,7 +262,11 @@ struct VideoInfoView: View {
         .task {
             await loadInitialVideoIfNeeded()
         }
+        #if os(tvOS)
+        .navigationTitle("")
+        #else
         .navigationTitle(displayTitle)
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -278,8 +286,11 @@ struct VideoInfoView: View {
                 watchEntry = dataManager?.watchEntry(for: video.id.videoID)
             }
             loadComments()
+            DispatchQueue.main.async {
+                isPlayFocused = true
+            }
             #endif
-            
+
             // Load full video details from API
             Task {
                 await loadVideoDetails()
@@ -322,8 +333,11 @@ struct VideoInfoView: View {
                 watchEntry = dataManager?.watchEntry(for: video.id.videoID)
             }
             loadComments()
+            DispatchQueue.main.async {
+                isPlayFocused = true
+            }
             #endif
-            
+
             // Load full video details from API
             Task {
                 await loadVideoDetails()
@@ -334,9 +348,15 @@ struct VideoInfoView: View {
                 PlaylistSelectorSheet(video: video)
             }
         }
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $showingCommentsSheet) {
+            commentsSheetContent
+        }
+        #else
         .sheet(isPresented: $showingCommentsSheet) {
             commentsSheetContent
         }
+        #endif
         .sheet(item: $resumeSheetData) { data in
             ResumeActionSheet(
                 video: data.video,
@@ -393,6 +413,16 @@ struct VideoInfoView: View {
     /// Main video content view (shown after video is loaded).
     @ViewBuilder
     private var videoContent: some View {
+        #if os(tvOS)
+        tvOSVideoContent
+        #else
+        iOSVideoContent
+        #endif
+    }
+
+    #if !os(tvOS)
+    @ViewBuilder
+    private var iOSVideoContent: some View {
         GeometryReader { geometry in
             let safeAreaTop = geometry.safeAreaInsets.top
 
@@ -504,7 +534,205 @@ struct VideoInfoView: View {
             }
         }
     }
-    
+    #endif
+
+    #if os(tvOS)
+    // MARK: - tvOS Two-Column Layout
+
+    @ViewBuilder
+    private var tvOSVideoContent: some View {
+        GeometryReader { geometry in
+            let leftWidth = geometry.size.width * 0.30
+            HStack(alignment: .top, spacing: 40) {
+                tvOSLeftColumn
+                    .frame(width: leftWidth, alignment: .leading)
+                    .focusSection()
+
+                tvOSRightColumn
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .focusSection()
+            }
+            .padding(.horizontal, 60)
+            .padding(.vertical, 40)
+        }
+    }
+
+    private var tvOSLeftColumn: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            if let video = displayedVideo {
+                tvOSThumbnail(for: video)
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                tvOSChannelRow(for: video)
+
+                Button(action: playVideo) {
+                    Label(playButtonLabel, systemImage: "play.fill")
+                        .frame(maxWidth: .infinity, minHeight: 60)
+                        .font(.headline)
+                }
+                .buttonStyle(.borderedProminent)
+                .focused($isPlayFocused)
+
+                Button {
+                    showingPlaylistSheet = true
+                } label: {
+                    Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                }
+                .buttonStyle(.bordered)
+
+                Button {
+                    toggleBookmark()
+                } label: {
+                    Label(
+                        isBookmarked ? String(localized: "video.removeBookmark") : String(localized: "video.bookmark"),
+                        systemImage: isBookmarked ? "bookmark.fill" : "bookmark"
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                }
+                .buttonStyle(.bordered)
+            }
+
+            Spacer(minLength: 0)
+        }
+    }
+
+    @ViewBuilder
+    private func tvOSThumbnail(for video: Video) -> some View {
+        let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: video)
+        let thumbnailURL = deArrowURL ?? video.bestThumbnail?.url
+
+        LazyImage(url: thumbnailURL) { state in
+            if let image = state.image {
+                image
+                    .resizable()
+                    .aspectRatio(16.0 / 9.0, contentMode: .fill)
+            } else {
+                Rectangle()
+                    .fill(.quaternary)
+                    .overlay {
+                        if video.bestThumbnail?.url == nil, video.isFromMediaSource {
+                            Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .padding(8)
+                        }
+                    }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func tvOSChannelRow(for video: Video) -> some View {
+        if video.author.hasRealChannelInfo {
+            Button {
+                navigationCoordinator?.navigateToChannel(for: video)
+            } label: {
+                channelRowContent(for: video)
+            }
+            .buttonStyle(.plain)
+        } else {
+            channelRowContent(for: video)
+        }
+    }
+
+    private var tvOSRightColumn: some View {
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    if !isDescriptionScrollLocked, isBookmarked, let bookmark = currentBookmark {
+                        bookmarkDetailsSection(bookmark)
+
+                        Divider()
+                            .padding(.horizontal)
+                            .padding(.vertical, 16)
+                    }
+
+                    if isLoadingVideoDetails {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        }
+                        .frame(height: 450)
+                        .padding(.horizontal)
+
+                        Divider()
+                            .padding(.horizontal)
+                            .padding(.vertical, 16)
+                    } else if let description = displayedVideo?.description, !description.isEmpty {
+                        TVScrollableDescription(
+                            description: description,
+                            isScrollLocked: $isDescriptionScrollLocked
+                        )
+                        .frame(height: isDescriptionScrollLocked ? geometry.size.height : 450)
+                        .padding(.horizontal)
+
+                        if !isDescriptionScrollLocked {
+                            Divider()
+                                .padding(.horizontal)
+                                .padding(.vertical, 16)
+                        }
+                    }
+
+                    if !isDescriptionScrollLocked {
+                        if shouldShowOriginalTitleSection {
+                            originalTitleSection
+
+                            Divider()
+                                .padding(.horizontal)
+                                .padding(.vertical, 16)
+                        }
+
+                        if shouldShowStatsSection {
+                            statsSection
+
+                            Divider()
+                                .padding(.horizontal)
+                                .padding(.vertical, 16)
+                        }
+
+                        commentsSection
+
+                        if let relatedVideos = displayedVideo?.relatedVideos, !relatedVideos.isEmpty {
+                            Divider()
+                                .padding(.horizontal)
+                                .padding(.vertical, 16)
+
+                            relatedVideosSection(relatedVideos)
+                        }
+
+                        if let entry = watchEntry {
+                            Divider()
+                                .padding(.horizontal)
+                                .padding(.vertical, 16)
+
+                            watchHistorySection(entry)
+                        }
+                    }
+                }
+                .padding(.vertical, 20)
+                .id(currentVideoIndex)
+                .animation(.easeInOut(duration: 0.25), value: isDescriptionScrollLocked)
+            }
+            .scrollClipDisabled()
+            .scrollDisabled(isDescriptionScrollLocked)
+        }
+    }
+    #endif
+
     /// Error view shown when video fails to load (videoID init mode only).
     @ViewBuilder
     private func videoLoadErrorView(_ message: String) -> some View {
@@ -1426,8 +1654,13 @@ struct VideoInfoView: View {
     // MARK: - Related Videos Section
 
     private func relatedVideosSection(_ videos: [Video]) -> some View {
-        CollapsibleSection(title: String(localized: "videoInfo.section.relatedVideos"), isExpanded: $isRelatedExpanded) {
-            LazyVStack(spacing: 12) {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 32
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        return CollapsibleSection(title: String(localized: "videoInfo.section.relatedVideos"), isExpanded: $isRelatedExpanded) {
+            LazyVStack(spacing: rowSpacing) {
                 ForEach(Array(videos.enumerated()), id: \.element.id) { index, relatedVideo in
                     VideoRowView(video: relatedVideo, style: .regular)
                         .tappableVideo(
@@ -1442,10 +1675,12 @@ struct VideoInfoView: View {
                         .videoSwipeActions(video: relatedVideo)
                         #endif
 
+                    #if !os(tvOS)
                     if index < videos.count - 1 {
                         Divider()
                             .padding(.leading, VideoRowStyle.regular.thumbnailWidth + 12)
                     }
+                    #endif
                 }
             }
         }
@@ -1530,10 +1765,16 @@ struct VideoInfoView: View {
                                         Image(systemName: "chevron.right")
                                     }
                                     .font(.subheadline)
+                                    #if !os(tvOS)
                                     .foregroundStyle(accentColor)
+                                    #endif
                                 }
                                 .buttonStyle(.plain)
+                                #if os(tvOS)
+                                .padding(.vertical, 16)
+                                #else
                                 .padding(.top, 12)
+                                #endif
                             }
                         }
                     }
@@ -1578,10 +1819,14 @@ struct VideoInfoView: View {
                         }
                     }
                 }
+                #if os(tvOS)
+                .background(Color.black.ignoresSafeArea())
+                #endif
                 .navigationTitle(String(localized: "videoInfo.section.comments"))
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
                 #endif
+                #if !os(tvOS)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         Button(role: .cancel) {
@@ -1592,6 +1837,7 @@ struct VideoInfoView: View {
                         }
                     }
                 }
+                #endif
             }
         }
     }

@@ -134,7 +134,6 @@ struct TVDetailsPanel: View {
             if let description = video?.description, !description.isEmpty {
                 TVScrollableDescription(
                     description: description,
-                    focusedItem: $focusedItem,
                     isScrollLocked: $isDescriptionScrollLocked
                 )
                 .padding(.top, isDescriptionScrollLocked ? 24 : 8)
@@ -309,16 +308,12 @@ enum TVDetailsFocusItem: Hashable {
 /// When locked, expands to fill available space for easier reading.
 struct TVScrollableDescription: View {
     let description: String
-    @FocusState.Binding var focusedItem: TVDetailsFocusItem?
     @Binding var isScrollLocked: Bool
 
+    @FocusState private var isFocused: Bool
     @State private var scrollOffset: CGFloat = 0
     private let scrollStep: CGFloat = 80
     private let maxScroll: CGFloat = 5000
-
-    private var isFocused: Bool {
-        focusedItem == .description
-    }
 
     var body: some View {
         Button {
@@ -333,7 +328,7 @@ struct TVScrollableDescription: View {
             descriptionContent
         }
         .buttonStyle(TVDescriptionButtonStyle(isFocused: isFocused, isLocked: isScrollLocked))
-        .focused($focusedItem, equals: .description)
+        .focused($isFocused)
         .onMoveCommand { direction in
             guard isScrollLocked else { return }
 

@@ -67,29 +67,38 @@ struct CommentView: View {
 
     @ViewBuilder
     private var authorAvatar: some View {
+        #if os(tvOS)
+        authorAvatarImage
+        #else
         Button {
             navigateToChannel()
         } label: {
-            LazyImage(url: comment.author.thumbnailURL) { state in
-                if let image = state.image {
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } else {
-                    Circle()
-                        .fill(.quaternary)
-                        .overlay {
-                            Text(String(comment.author.name.prefix(1)))
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.secondary)
-                        }
-                }
-            }
-            .frame(width: 32, height: 32)
-            .clipShape(Circle())
+            authorAvatarImage
         }
         .buttonStyle(.plain)
+        #endif
+    }
+
+    @ViewBuilder
+    private var authorAvatarImage: some View {
+        LazyImage(url: comment.author.thumbnailURL) { state in
+            if let image = state.image {
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                Circle()
+                    .fill(.quaternary)
+                    .overlay {
+                        Text(String(comment.author.name.prefix(1)))
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .frame(width: 32, height: 32)
+        .clipShape(Circle())
     }
 
     @ViewBuilder
@@ -178,7 +187,9 @@ struct CommentView: View {
                         .font(.caption)
                         .fontWeight(.medium)
                 }
+                #if !os(tvOS)
                 .foregroundStyle(accentColor)
+                #endif
             }
             .buttonStyle(.plain)
             .padding(.leading, 44) // Align with comment content (avatar width + spacing)
@@ -213,7 +224,9 @@ struct CommentView: View {
                             Text(String(localized: "comments.loadMoreReplies"))
                                 .font(.caption)
                                 .fontWeight(.medium)
+                                #if !os(tvOS)
                                 .foregroundStyle(accentColor)
+                                #endif
                         }
                         .buttonStyle(.plain)
                         .padding(.leading, 44)
