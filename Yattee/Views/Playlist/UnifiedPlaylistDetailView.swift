@@ -80,6 +80,10 @@ struct UnifiedPlaylistDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isDescriptionExpanded = false
 
+    #if os(tvOS)
+    @State private var isDescriptionScrollLocked = false
+    #endif
+
     #if !os(tvOS)
     @State private var downloadCoordinator = BatchDownloadCoordinator()
     // Cache download state to avoid triggering @Observable tracking on every render.
@@ -139,19 +143,10 @@ struct UnifiedPlaylistDetailView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle(title.isEmpty ? String(localized: "playlist.title") : title)
         #if !os(tvOS)
+        .navigationTitle(title.isEmpty ? String(localized: "playlist.title") : title)
         .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
         .navigationSubtitleIfAvailable(playlistSummaryText)
-        #if os(tvOS)
-        .toolbar {
-            if !videos.isEmpty || localPlaylist != nil {
-                ToolbarItem(placement: .primaryAction) {
-                    toolbarMenu
-                }
-            }
-        }
         #endif
         .sheet(isPresented: $showingEditSheet) {
             if let localPlaylist {
@@ -194,30 +189,44 @@ struct UnifiedPlaylistDetailView: View {
 
     @ViewBuilder
     private var playlistContent: some View {
+        #if os(tvOS)
+        tvOSTwoColumnContent
+        #else
+        scrollablePlaylistContent()
+        #endif
+    }
+
+    @ViewBuilder
+    private func scrollablePlaylistContent() -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                playlistHeader
+                playlistHeader()
 
                 Divider()
                     .padding(.horizontal)
 
-                if videos.isEmpty {
-                    if isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 40)
-                    } else {
-                        emptyPlaylistView
-                    }
-                } else {
-                    videoList
-                }
+                playlistBody
             }
         }
         .refreshable {
             if case .remote = source {
                 await loadPlaylist()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var playlistBody: some View {
+        if videos.isEmpty {
+            if isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 40)
+            } else {
+                emptyPlaylistView
+            }
+        } else {
+            videoList
         }
     }
 
@@ -241,7 +250,7 @@ struct UnifiedPlaylistDetailView: View {
         }
     }
 
-    private var playlistHeader: some View {
+    private func playlistHeader() -> some View {
         playlistHeader(
             thumbnailURL: thumbnailURL,
             videoCount: videoCount,
@@ -278,8 +287,7 @@ struct UnifiedPlaylistDetailView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            #else
-            // Show on non-iOS platforms (macOS, tvOS)
+            #elseif os(macOS)
             if let summaryText {
                 Text(summaryText)
                     .font(.subheadline)
@@ -294,8 +302,8 @@ struct UnifiedPlaylistDetailView: View {
                     .foregroundStyle(.secondary)
             }
 
-            #if !os(tvOS)
             // Action buttons row (iOS/macOS only)
+            #if !os(tvOS)
             if !videos.isEmpty || localPlaylist != nil {
                 playlistActionButtons
             }
@@ -404,82 +412,159 @@ struct UnifiedPlaylistDetailView: View {
     }
     #endif
 
-    // MARK: - Toolbar Menu
+    // MARK: - tvOS Two-Column Layout
+
+    #if os(tvOS)
+    @ViewBuilder
+    private var tvOSTwoColumnContent: some View {
+        GeometryReader { geometry in
+            let leftWidth = geometry.size.width * 0.30
+            HStack(alignment: .top, spacing: 40) {
+                tvOSLeftColumn
+                    .frame(width: leftWidth, alignment: .leading)
+                    .focusSection()
+
+                tvOSRightColumn
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .focusSection()
+            }
+            .padding(.horizontal, 60)
+            .padding(.vertical, 40)
+        }
+    }
 
     @ViewBuilder
-    private var toolbarMenu: some View {
-        Menu {
+    private var tvOSLeftColumn: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            tvOSPlaylistThumbnail
+                .frame(maxWidth: .infinity)
+
+            if !title.isEmpty {
+                Text(title)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if let summaryText = playlistSummaryText {
+                Text(summaryText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            if !isDescriptionScrollLocked, !videos.isEmpty || localPlaylist != nil {
+                tvOSPlaylistActionButtons
+            }
+
+            if let descriptionText, !descriptionText.isEmpty {
+                TVScrollableDescription(
+                    description: descriptionText,
+                    isScrollLocked: $isDescriptionScrollLocked,
+                    showsHeader: false
+                )
+                .frame(maxHeight: .infinity)
+            } else {
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.vertical, 8)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .animation(.easeInOut(duration: 0.25), value: isDescriptionScrollLocked)
+    }
+
+    @ViewBuilder
+    private var tvOSPlaylistThumbnail: some View {
+        let url = videos.first?.bestThumbnail?.url ?? thumbnailURL
+        LazyImage(url: url) { state in
+            if let image = state.image {
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 56, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.4), radius: 10, y: 5)
+    }
+
+    @ViewBuilder
+    private var tvOSRightColumn: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                playlistBody
+            }
+            .padding(.vertical, 20)
+        }
+        .scrollClipDisabled()
+    }
+
+    @ViewBuilder
+    private var tvOSPlaylistActionButtons: some View {
+        VStack(spacing: 12) {
             // Play (only when queue is enabled)
             if isQueueEnabled {
                 Button {
                     playAll()
                 } label: {
                     Label(String(localized: "playlist.play"), systemImage: "play.fill")
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .font(.headline)
                 }
+                .buttonStyle(.borderedProminent)
             }
 
-            #if !os(tvOS)
-            // Download All
-            if downloadCoordinator.isDownloading {
-                Label {
-                    if let progress = downloadCoordinator.progress {
-                        Text("\(progress.current)/\(progress.total)")
-                    } else {
-                        Text(String(localized: "common.downloading"))
-                    }
-                } icon: {
-                    Image(systemName: "arrow.down.circle")
-                }
-            } else {
-                Button {
-                    downloadCoordinator.startDownload(videos: videos)
-                } label: {
-                    Label(String(localized: "playlist.downloadAll"), systemImage: "arrow.down.circle")
-                }
-                .disabled(cachedAllVideosDownloaded)
-            }
-            #endif
-
-            // Remote-only: Save to Library, Share
+            // Remote-only: Save to Library
             if case .remote = source, let remotePlaylist, !remotePlaylist.isLocal {
                 Button {
                     Task { await importToLocal() }
                 } label: {
-                    if isImporting, let progress = importProgress {
-                        Label(String(localized: "playlist.savingToLibrary \(progress.current) \(progress.total)"), systemImage: "plus.rectangle.on.folder")
-                    } else {
-                        Label(String(localized: "playlist.saveToLibrary"), systemImage: "plus.rectangle.on.folder")
+                    Group {
+                        if isImporting, let progress = importProgress {
+                            Label(String(localized: "playlist.savingToLibrary \(progress.current) \(progress.total)"), systemImage: "plus.rectangle.on.folder")
+                        } else {
+                            Label(String(localized: "playlist.saveToLibrary"), systemImage: "plus.rectangle.on.folder")
+                        }
                     }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .font(.headline)
                 }
+                .buttonStyle(.bordered)
                 .disabled(isImporting)
-
-                #if !os(tvOS)
-                ShareLink(item: playlistShareURL()) {
-                    Label(String(localized: "common.share"), systemImage: "square.and.arrow.up")
-                }
-                #endif
             }
 
             // Local-only: Edit, Delete
             if isLocal, localPlaylist != nil {
-                Divider()
-
                 Button {
                     showingEditSheet = true
                 } label: {
                     Label(String(localized: "playlist.edit"), systemImage: "pencil")
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .font(.headline)
                 }
+                .buttonStyle(.bordered)
 
                 Button(role: .destructive) {
                     showingDeleteConfirmation = true
                 } label: {
                     Label(String(localized: "playlist.delete"), systemImage: "trash")
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .font(.headline)
                 }
+                .buttonStyle(.bordered)
             }
-        } label: {
-            Image(systemName: "ellipsis")
         }
     }
+    #endif
 
     #if !os(tvOS)
     /// Loads download state once on appear to avoid continuous re-renders from @Observable.
@@ -514,13 +599,18 @@ struct UnifiedPlaylistDetailView: View {
     }
 
     private var videoList: some View {
-        LazyVStack(spacing: 0) {
+        #if os(tvOS)
+        let indexColumnWidth: CGFloat = 60
+        #else
+        let indexColumnWidth: CGFloat = 32
+        #endif
+        return LazyVStack(spacing: 0) {
             ForEach(Array(videos.enumerated()), id: \.element.id) { index, video in
                 VideoListRow(
                     isLast: index == videos.count - 1,
                     rowStyle: .regular,
                     listStyle: .plain,
-                    indexWidth: 32  // Index column width in VideoRowView
+                    indexWidth: indexColumnWidth  // Index column width in VideoRowView
                 ) {
                     Button {
                         playFromIndex(index)

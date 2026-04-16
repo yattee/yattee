@@ -67,7 +67,12 @@ struct VideoRowView: View {
                 Text("\(index)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    #if os(tvOS)
+                    .lineLimit(1)
+                    .frame(width: 60, alignment: .trailing)
+                    #else
                     .frame(width: 32)
+                    #endif
             }
             
             // Thumbnail
