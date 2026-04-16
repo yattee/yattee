@@ -130,8 +130,14 @@ struct RemoteControlView: View {
     }
 
     var body: some View {
+        #if os(tvOS)
+        let sectionSpacing: CGFloat = 28
+        #else
+        let sectionSpacing: CGFloat = 12
+        #endif
+
         ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: sectionSpacing) {
                 // Show controls if we're connected OR if we have local state that says we were connected
                 if previewMode || isActuallyConnected || isConnected {
                     nowPlayingSection
@@ -140,15 +146,25 @@ struct RemoteControlView: View {
                         volumeControls
                     }
                     playbackRateControls
+                    #if os(tvOS)
+                    closeVideoSection
+                    #endif
                 } else if case .recentlySeen = deviceStatus {
                     // Device went offline - show reconnect option
                     offlineView
                 }
             }
             .padding()
+            #if os(tvOS)
+            .frame(maxWidth: 1100)
+            .frame(maxWidth: .infinity, alignment: .center)
+            #endif
         }
+        #if os(tvOS)
+        .safeAreaInset(edge: .leading) { tvOSSidebar }
+        #else
         .navigationTitle(device.name)
-        
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -181,11 +197,13 @@ struct RemoteControlView: View {
                 isConnected = false
             }
         }
+        #if !os(tvOS)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 deviceHeader
             }
         }
+        #endif
     }
 
     // MARK: - Offline View
@@ -436,9 +454,12 @@ struct RemoteControlView: View {
                 }
             }
             .padding()
+            #if !os(tvOS)
             .padding(.top, 8)
+            #endif
 
-            // Close video button
+            #if !os(tvOS)
+            // Close video button (tvOS has a dedicated closeVideoSection below the controls)
             Button(role: .destructive) {
                 Task {
                     await remoteControl?.closeVideo(on: device)
@@ -451,6 +472,7 @@ struct RemoteControlView: View {
             }
             .disabled(remoteState.videoID == nil)
             .padding(12)
+            #endif
         }
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
@@ -472,8 +494,18 @@ struct RemoteControlView: View {
 
     @ViewBuilder
     private var playbackControls: some View {
+        #if os(tvOS)
+        let controlSpacing: CGFloat = 48
+        let secondaryFont: Font = .system(size: 34, weight: .semibold)
+        let primaryFont: Font = .system(size: 56, weight: .semibold)
+        #else
+        let controlSpacing: CGFloat = 24
+        let secondaryFont: Font = .title
+        let primaryFont: Font = .system(size: 64)
+        #endif
+
         VStack {
-            HStack(spacing: 24) {
+            HStack(spacing: controlSpacing) {
                 // Play previous
                 Button {
                     playPreviousTapCount += 1
@@ -482,13 +514,13 @@ struct RemoteControlView: View {
                     }
                 } label: {
                     Image(systemName: "backward.fill")
-                        .font(.title)
+                        .font(secondaryFont)
                         .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
                 }
-                .buttonStyle(.plain)
+                .remoteTransportButtonStyle()
                 .disabled(!remoteState.hasPrevious)
                 .opacity(remoteState.hasPrevious ? 1.0 : 0.3)
-                
+
                 // Seek backward
                 Button {
                     seekBackwardTrigger += 1
@@ -498,11 +530,11 @@ struct RemoteControlView: View {
                     }
                 } label: {
                     Image(systemName: "10.arrow.trianglehead.counterclockwise")
-                        .font(.title)
+                        .font(secondaryFont)
                         .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekBackwardTrigger)
                 }
-                .buttonStyle(.plain)
-                
+                .remoteTransportButtonStyle()
+
                 // Play/Pause
                 Button {
                     Task {
@@ -510,11 +542,11 @@ struct RemoteControlView: View {
                     }
                 } label: {
                     Image(systemName: remoteState.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 64))
+                        .font(primaryFont)
                         .contentTransition(.symbolEffect(.replace, options: .speed(2)))
                 }
-                .buttonStyle(.plain)
-                
+                .remoteTransportButtonStyle(primary: true)
+
                 // Seek forward
                 Button {
                     seekForwardTrigger += 1
@@ -524,11 +556,11 @@ struct RemoteControlView: View {
                     }
                 } label: {
                     Image(systemName: "10.arrow.trianglehead.clockwise")
-                        .font(.title)
+                        .font(secondaryFont)
                         .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekForwardTrigger)
                 }
-                .buttonStyle(.plain)
-                
+                .remoteTransportButtonStyle()
+
                 // Play next
                 Button {
                     playNextTapCount += 1
@@ -537,14 +569,18 @@ struct RemoteControlView: View {
                     }
                 } label: {
                     Image(systemName: "forward.fill")
-                        .font(.title)
+                        .font(secondaryFont)
                         .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playNextTapCount)
                 }
-                .buttonStyle(.plain)
+                .remoteTransportButtonStyle()
                 .disabled(!remoteState.hasNext)
                 .opacity(remoteState.hasNext ? 1.0 : 0.3)
             }
+            #if os(tvOS)
+            .padding(.vertical, 24)
+            #else
             .padding()
+            #endif
         }
     }
 
@@ -662,6 +698,95 @@ struct RemoteControlView: View {
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
+    // MARK: - tvOS Sidebar
+
+    #if os(tvOS)
+    @ViewBuilder
+    private var tvOSSidebar: some View {
+        // refreshTick drives a re-render roughly once per second so the status badge stays fresh.
+        let _ = refreshTick
+
+        VStack(spacing: 16) {
+            Spacer()
+
+            Image(systemName: device.platform.iconName)
+                .font(.system(size: 80))
+                .foregroundStyle(.secondary)
+
+            Text(device.name)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+
+            sidebarStatusBadge
+                .padding(.top, 4)
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .frame(width: 400)
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private var sidebarStatusBadge: some View {
+        switch deviceStatus {
+        case .connected:
+            HStack(spacing: 6) {
+                Image(systemName: "circle.fill")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.green)
+                Text(String(localized: "remoteControl.status.discoverable"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        case .recentlySeen(let ago):
+            VStack(spacing: 2) {
+                HStack(spacing: 6) {
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.orange)
+                    Text(String(localized: "remoteControl.status.offline"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("remoteControl.lastSeen \(Int(ago))")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.tertiary)
+            }
+        case .discoveredOnly:
+            HStack(spacing: 6) {
+                Image(systemName: "antenna.radiowaves.left.and.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(String(localized: "remoteControl.status.discovered"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    // MARK: - Close Video Section (tvOS)
+
+    @ViewBuilder
+    private var closeVideoSection: some View {
+        Button {
+            Task {
+                await remoteControl?.closeVideo(on: device)
+                dismiss()
+            }
+        } label: {
+            Label(String(localized: "remoteControl.closeVideo"), systemImage: "xmark")
+                .font(.subheadline.weight(.semibold))
+        }
+        .buttonStyle(TVRemoteCloseButtonStyle())
+        .disabled(remoteState.videoID == nil)
+        .padding(.top, 8)
+    }
+    #endif
+
     // MARK: - Actions
 
     private func connect() async {
@@ -703,6 +828,64 @@ struct RemoteControlView: View {
         return allRates[currentIndex + 1]
     }
 }
+
+// MARK: - Transport Button Style
+
+private extension View {
+    /// Applies the platform-appropriate button style for the remote-transport controls.
+    /// - Parameter primary: `true` for the large play/pause button; `false` for the four secondary icons.
+    @ViewBuilder
+    func remoteTransportButtonStyle(primary: Bool = false) -> some View {
+        #if os(tvOS)
+        self.buttonStyle(TVRemoteIconButtonStyle(size: primary ? 130 : 100))
+        #else
+        self.buttonStyle(.plain)
+        #endif
+    }
+}
+
+#if os(tvOS)
+/// Circular tvOS button style for icon-only transport controls, providing a visible
+/// focus ring and press feedback that `.buttonStyle(.plain)` would otherwise strip away.
+private struct TVRemoteIconButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+    var size: CGFloat = 100
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: size, height: size)
+            .background(
+                Circle()
+                    .fill(isFocused ? Color.white.opacity(0.25) : Color.white.opacity(0.08))
+            )
+            .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.08 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Capsule tvOS button style for the "Close Video" action. Uses a legible red label
+/// on a subtle background rather than the default `role: .destructive` full-red fill
+/// that makes the title hard to read from across the room.
+private struct TVRemoteCloseButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(isEnabled ? Color.red : Color.red.opacity(0.4))
+            .padding(.horizontal, 32)
+            .padding(.vertical, 16)
+            .background(
+                Capsule()
+                    .fill(isFocused ? Color.white.opacity(0.28) : Color.white.opacity(0.10))
+            )
+            .scaleEffect(configuration.isPressed ? 0.96 : (isFocused ? 1.05 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+#endif
 
 // MARK: - Preview
 
