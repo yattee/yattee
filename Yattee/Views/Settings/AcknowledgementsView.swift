@@ -26,7 +26,11 @@ struct AcknowledgementsView: View {
         #endif
     }
 
+    @ViewBuilder
     private func dependencyLink(_ name: String, url: String) -> some View {
+        #if os(tvOS)
+        Text(name)
+        #else
         Button {
             if let url = URL(string: url) {
                 openURL(url)
@@ -39,6 +43,7 @@ struct AcknowledgementsView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        #endif
     }
 }
 

@@ -13,12 +13,14 @@ struct AboutView: View {
 
     var body: some View {
         Form {
+            #if !os(tvOS)
             Section {
                 communityLink("GitHub", icon: "github", url: "https://github.com/yattee/yattee")
                 communityLink("Discord", icon: "discord", url: "https://yattee.stream/discord")
             } header: {
                 Text(String(localized: "settings.about.community"))
             }
+            #endif
 
             Section {
                 NavigationLink {
