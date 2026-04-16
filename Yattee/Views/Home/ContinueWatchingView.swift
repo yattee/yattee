@@ -10,6 +10,9 @@ import SwiftUI
 struct ContinueWatchingView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
+    #if os(tvOS)
+    @FocusState private var focusedVideoID: String?
+    #endif
     @State private var watchHistory: [WatchEntry] = []
 
     // View options (persisted)
@@ -149,6 +152,16 @@ struct ContinueWatchingView: View {
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadHistory()
         }
+        #if os(tvOS)
+        .onChange(of: inProgressEntries.first?.videoID, initial: true) { _, newValue in
+            // Work around tvOS ScrollView + prefersDefaultFocus bug: set initial focus
+            // to the first video after LazyVGrid has time to materialize cells.
+            guard let newValue else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                focusedVideoID = newValue
+            }
+        }
+        #endif
     }
 
     // MARK: - Content
@@ -176,7 +189,9 @@ struct ContinueWatchingView: View {
                 ) {
                     entryRowView(entry: entry, index: index)
                 }
-                #if !os(tvOS)
+                #if os(tvOS)
+                .focused($focusedVideoID, equals: entry.videoID)
+                #else
                 .videoSwipeActions(
                     video: entry.toVideo(),
                     fixedActions: [
@@ -235,6 +250,9 @@ struct ContinueWatchingView: View {
                     TappableContinueWatchingGridCard(entry: entry, onRemove: {
                         removeEntry(entry)
                     })
+                    #if os(tvOS)
+                    .focused($focusedVideoID, equals: entry.videoID)
+                    #endif
                 }
             }
         }
