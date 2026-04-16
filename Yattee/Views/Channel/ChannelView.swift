@@ -81,6 +81,12 @@ struct ChannelView: View {
     // External channel state (page-based pagination for extracted channels)
     @State private var externalCurrentPage = 1
 
+    #if os(tvOS)
+    // tvOS-specific state
+    @State private var isDescriptionScrollLocked = false
+    @FocusState private var isSubscribeFocused: Bool
+    #endif
+
     // Header configuration
     private let baseHeaderHeight: CGFloat = 280
     private let searchBarExtraHeight: CGFloat = 70
@@ -191,6 +197,16 @@ struct ChannelView: View {
 
     @ViewBuilder
     private func channelContent(_ channel: Channel) -> some View {
+        #if os(tvOS)
+        tvOSChannelContent(channel)
+        #else
+        iOSChannelContent(channel)
+        #endif
+    }
+
+    #if !os(tvOS)
+    @ViewBuilder
+    private func iOSChannelContent(_ channel: Channel) -> some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
                 ScrollView {
@@ -370,12 +386,23 @@ struct ChannelView: View {
         }
         .presentationCompactAdaptation(.sheet)
     }
+    #endif
 
     // MARK: - Loading Content
 
     /// Shows cached header with a spinner below while loading full channel data.
     @ViewBuilder
     private func loadingContent(_ cached: CachedChannelData) -> some View {
+        #if os(tvOS)
+        tvOSLoadingContent(cached)
+        #else
+        iOSLoadingContent(cached)
+        #endif
+    }
+
+    #if !os(tvOS)
+    @ViewBuilder
+    private func iOSLoadingContent(_ cached: CachedChannelData) -> some View {
         GeometryReader { geometry in
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -478,6 +505,236 @@ struct ChannelView: View {
         }
         .presentationCompactAdaptation(.sheet)
     }
+    #endif
+
+    #if os(tvOS)
+    // MARK: - tvOS Two-Column Layout
+
+    @ViewBuilder
+    private func tvOSChannelContent(_ channel: Channel) -> some View {
+        GeometryReader { geometry in
+            let leftWidth = geometry.size.width * 0.30
+            HStack(alignment: .top, spacing: 40) {
+                tvOSLeftColumn(channel: channel, geometry: geometry)
+                    .frame(width: leftWidth, alignment: .leading)
+                    .focusSection()
+
+                tvOSRightColumn
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .focusSection()
+            }
+            .padding(.horizontal, 60)
+            .padding(.vertical, 40)
+        }
+        .confirmationDialog(
+            String(localized: "channel.unsubscribe.confirmation.title"),
+            isPresented: $showingUnsubscribeConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "channel.unsubscribe.confirmation.action"), role: .destructive) {
+                unsubscribe()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "channel.unsubscribe.confirmation.message"))
+        }
+    }
+
+    @ViewBuilder
+    private func tvOSLeftColumn(channel: Channel, geometry: GeometryProxy) -> some View {
+        VStack(alignment: .leading, spacing: 24) {
+            tvOSAvatar(for: channel)
+                .frame(maxWidth: .infinity)
+
+            Text(channel.name)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if let subscriberCount = channel.subscriberCount {
+                Text(CountFormatter.compact(subscriberCount))
+                    .fontWeight(.bold)
+                + Text(verbatim: " ")
+                + Text(String(localized: "channel.subscribers"))
+            }
+
+            if !isDescriptionScrollLocked {
+                tvOSSubscribeButton
+            }
+
+            if let description = channel.description, !description.isEmpty {
+                TVScrollableDescription(
+                    description: description,
+                    isScrollLocked: $isDescriptionScrollLocked
+                )
+                .frame(maxHeight: .infinity)
+            } else {
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.vertical, 8)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .animation(.easeInOut(duration: 0.25), value: isDescriptionScrollLocked)
+    }
+
+    @ViewBuilder
+    private func tvOSAvatar(for channel: Channel) -> some View {
+        LazyImage(url: channel.thumbnailURL) { state in
+            if let image = state.image {
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        Text(String(channel.name.prefix(1)))
+                            .font(.system(size: 56, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .frame(width: 140, height: 140)
+        .clipShape(Circle())
+        .overlay(
+            Circle()
+                .stroke(.white.opacity(0.8), lineWidth: 3)
+        )
+        .shadow(color: .black.opacity(0.4), radius: 10, y: 5)
+    }
+
+    private var tvOSSubscribeButton: some View {
+        Button {
+            toggleSubscription()
+        } label: {
+            Label(
+                isSubscribed
+                    ? String(localized: "channel.menu.unsubscribe")
+                    : String(localized: "channel.menu.subscribe"),
+                systemImage: isSubscribed ? "person.fill.xmark" : "person.badge.plus"
+            )
+            .frame(maxWidth: .infinity, minHeight: 60)
+            .font(.headline)
+        }
+        .buttonStyle(.borderedProminent)
+        .focused($isSubscribeFocused)
+    }
+
+    private var tvOSTabButtons: some View {
+        HStack(spacing: 12) {
+            ForEach([ChannelTab.videos, .shorts, .streams, .playlists]) { tab in
+                tvOSTabButton(for: tab)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func tvOSTabButton(for tab: ChannelTab) -> some View {
+        let isSelected = selectedTab == tab
+        let action = {
+            if selectedTab != tab {
+                selectedTab = tab
+                Task {
+                    await loadTabContentIfNeeded(tab)
+                }
+            }
+        }
+        let label = Label(tab.title, systemImage: tab.systemImage)
+            .fontWeight(isSelected ? .bold : .regular)
+
+        if isSelected {
+            Button(action: action) { label }
+                .buttonStyle(.borderedProminent)
+                .tint(accentColor)
+        } else {
+            Button(action: action) { label }
+                .buttonStyle(.bordered)
+        }
+    }
+
+    private var tvOSRightColumn: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if supportsChannelTabs {
+                tvOSTabButtons
+            }
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Group {
+                        switch selectedTab {
+                        case .videos:
+                            videosGrid
+                        case .shorts:
+                            shortsGrid
+                        case .streams:
+                            streamsGrid
+                        case .playlists:
+                            playlistsGrid
+                        case .about:
+                            videosGrid
+                        }
+                    }
+                    .id(selectedTab)
+                }
+                .padding(.vertical, 20)
+            }
+            .scrollClipDisabled()
+        }
+    }
+
+    @ViewBuilder
+    private func tvOSLoadingContent(_ cached: CachedChannelData) -> some View {
+        GeometryReader { geometry in
+            let leftWidth = geometry.size.width * 0.30
+            HStack(alignment: .top, spacing: 40) {
+                VStack(alignment: .leading, spacing: 24) {
+                    LazyImage(url: cached.thumbnailURL) { state in
+                        if let image = state.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .overlay {
+                                    Text(String(cached.name.prefix(1)))
+                                        .font(.system(size: 56, weight: .semibold))
+                                        .foregroundStyle(.secondary)
+                                }
+                        }
+                    }
+                    .frame(width: 140, height: 140)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(.white.opacity(0.8), lineWidth: 3)
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    Text(cached.name)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Spacer(minLength: 0)
+                }
+                .frame(width: leftWidth, alignment: .leading)
+
+                VStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .padding(.horizontal, 60)
+            .padding(.vertical, 40)
+        }
+    }
+    #endif
 
     // MARK: - Header
 
