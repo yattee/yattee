@@ -384,50 +384,6 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - tvOS Sidebar Detail Container
-
-#if os(tvOS)
-struct TVSidebarDetailContainer<Content: View>: View {
-    let content: Content
-    var systemImage: String?
-    var title: String?
-
-    init(systemImage: String? = nil, title: String? = nil, @ViewBuilder content: () -> Content) {
-        self.content = content()
-        self.systemImage = systemImage
-        self.title = title
-    }
-
-    var body: some View {
-        content
-            .safeAreaInset(edge: .leading) {
-                if let systemImage {
-                    VStack(spacing: 16) {
-                        Spacer()
-                        Image(systemName: systemImage)
-                            .font(.system(size: 80))
-                            .foregroundStyle(.secondary)
-                        if let title {
-                            Text(title)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        Spacer()
-                    }
-                    .frame(width: 400)
-                    .allowsHitTesting(false)
-                } else {
-                    Spacer()
-                        .frame(width: 400)
-                        .allowsHitTesting(false)
-                }
-            }
-    }
-}
-#endif
-
 #Preview {
     SettingsView()
         .appEnvironment(.preview)
