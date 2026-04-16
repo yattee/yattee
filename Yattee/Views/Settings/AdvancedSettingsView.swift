@@ -99,7 +99,7 @@ struct AdvancedSettingsView: View {
     @ViewBuilder
     private func feedSection(settingsManager: SettingsManager) -> some View {
         Section {
-            Picker(selection: Binding(
+            PlatformMenuPicker(selection: Binding(
                 get: { settingsManager.feedCacheValidityMinutes },
                 set: { settingsManager.feedCacheValidityMinutes = $0 }
             )) {
@@ -192,7 +192,7 @@ struct AdvancedSettingsView: View {
     private var mpvSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
             Section {
-                Picker(selection: Binding(
+                PlatformMenuPicker(selection: Binding(
                     get: { settingsManager.mpvBufferSeconds },
                     set: { settingsManager.mpvBufferSeconds = $0 }
                 )) {

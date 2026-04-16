@@ -37,7 +37,7 @@ struct SubtitlesSettingsView: View {
 
     private var fontSection: some View {
         Section {
-            Picker(
+            PlatformMenuPicker(
                 String(localized: "settings.subtitles.font"),
                 selection: $settings.font
             ) {
@@ -49,7 +49,7 @@ struct SubtitlesSettingsView: View {
 
             #if os(tvOS)
             // tvOS uses Picker instead of Slider (Slider unavailable)
-            Picker(String(localized: "settings.subtitles.fontSize"), selection: $settings.fontSize) {
+            PlatformMenuPicker(String(localized: "settings.subtitles.fontSize"), selection: $settings.fontSize) {
                 ForEach([20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100], id: \.self) { size in
                     Text("settings.subtitles.fontSize \(size)").tag(size)
                 }

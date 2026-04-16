@@ -54,7 +54,7 @@ struct PrivacySettingsView: View {
                     isOn: Bindable(settingsManager).saveWatchHistory
                 )
 
-                Picker(
+                PlatformMenuPicker(
                     String(localized: "settings.behavior.historyRetention"),
                     selection: Binding(
                         get: { settingsManager.historyRetentionDays },
@@ -104,7 +104,7 @@ struct PrivacySettingsView: View {
                     isOn: Bindable(settingsManager).saveRecentPlaylists
                 )
 
-                Picker(
+                PlatformMenuPicker(
                     String(localized: "settings.behavior.searchHistoryLimit"),
                     selection: Binding(
                         get: { settingsManager.searchHistoryLimit },

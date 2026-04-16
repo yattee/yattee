@@ -153,7 +153,7 @@ struct SidebarSettingsView: View {
 
     private var startupSection: some View {
         Section {
-            Picker(String(localized: "settings.sidebar.startup.tab"), selection: startupTabBinding) {
+            PlatformMenuPicker(String(localized: "settings.sidebar.startup.tab"), selection: startupTabBinding) {
                 ForEach(validStartupTabs) { item in
                     Text(item.localizedTitle).tag(item)
                 }
@@ -288,7 +288,7 @@ struct SidebarSettingsView: View {
                 }
 
             // Source sort order
-            Picker(String(localized: "settings.sidebar.sourceSort"), selection: sourceSortBinding) {
+            PlatformMenuPicker(String(localized: "settings.sidebar.sourceSort"), selection: sourceSortBinding) {
                 ForEach(SidebarSourceSort.allCases) { sort in
                     Text(sort.localizedTitle).tag(sort)
                 }
@@ -309,7 +309,7 @@ struct SidebarSettingsView: View {
             if sourcesLimitEnabledBinding.wrappedValue {
                 #if os(tvOS)
                 // tvOS uses Picker instead of Slider (Slider/Stepper unavailable)
-                Picker(String(localized: "settings.sidebar.maxSources"), selection: maxSourcesBinding) {
+                PlatformMenuPicker(String(localized: "settings.sidebar.maxSources"), selection: maxSourcesBinding) {
                     ForEach([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100], id: \.self) { value in
                         Text("\(value)").tag(value)
                     }
@@ -360,7 +360,7 @@ struct SidebarSettingsView: View {
                 }
 
             // Channel sort order
-            Picker(String(localized: "settings.sidebar.channelSort"), selection: channelSortBinding) {
+            PlatformMenuPicker(String(localized: "settings.sidebar.channelSort"), selection: channelSortBinding) {
                 ForEach(SidebarChannelSort.allCases.filter { $0 != .custom }) { sort in
                     Text(sort.localizedTitle).tag(sort)
                 }
@@ -381,7 +381,7 @@ struct SidebarSettingsView: View {
             if channelsLimitEnabledBinding.wrappedValue {
                 #if os(tvOS)
                 // tvOS uses Picker instead of Slider (Slider/Stepper unavailable)
-                Picker(String(localized: "settings.sidebar.maxChannels"), selection: maxChannelsBinding) {
+                PlatformMenuPicker(String(localized: "settings.sidebar.maxChannels"), selection: maxChannelsBinding) {
                     ForEach([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100], id: \.self) { value in
                         Text("\(value)").tag(value)
                     }
@@ -432,7 +432,7 @@ struct SidebarSettingsView: View {
                 }
 
             // Playlist sort order
-            Picker(String(localized: "settings.sidebar.playlistSort"), selection: playlistSortBinding) {
+            PlatformMenuPicker(String(localized: "settings.sidebar.playlistSort"), selection: playlistSortBinding) {
                 ForEach(SidebarPlaylistSort.allCases) { sort in
                     Text(sort.localizedTitle).tag(sort)
                 }
@@ -453,7 +453,7 @@ struct SidebarSettingsView: View {
             if playlistsLimitEnabledBinding.wrappedValue {
                 #if os(tvOS)
                 // tvOS uses Picker instead of Slider (Slider/Stepper unavailable)
-                Picker(String(localized: "settings.sidebar.maxPlaylists"), selection: maxPlaylistsBinding) {
+                PlatformMenuPicker(String(localized: "settings.sidebar.maxPlaylists"), selection: maxPlaylistsBinding) {
                     ForEach([5, 10, 15, 20, 25, 30], id: \.self) { value in
                         Text("\(value)").tag(value)
                     }

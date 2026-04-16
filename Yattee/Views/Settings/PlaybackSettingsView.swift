@@ -42,7 +42,7 @@ private struct QualitySection: View {
 
     var body: some View {
         Section {
-            Picker(
+            PlatformMenuPicker(
                 String(localized: "settings.playback.quality.preferred"),
                 selection: $settings.preferredQuality
             ) {
@@ -241,7 +241,7 @@ private struct BehaviorSection: View {
 
     var body: some View {
         Section(String(localized: "settings.playback.behavior.header")) {
-            Picker(
+            PlatformMenuPicker(
                 String(localized: "settings.playback.resumeAction"),
                 selection: $settings.resumeAction
             ) {
@@ -273,7 +273,7 @@ private struct QueueSection: View {
             )
 
             #if os(tvOS)
-            Picker(
+            PlatformMenuPicker(
                 String(localized: "settings.playback.queue.autoPlayCountdown"),
                 selection: $settings.queueAutoPlayCountdown
             ) {
