@@ -136,7 +136,9 @@ struct SidebarSettingsView: View {
             #if os(iOS)
             .environment(\.editMode, .constant(.active))
             #endif
+            #if !os(tvOS)
             .navigationTitle(String(localized: "settings.sidebar.title"))
+            #endif
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif

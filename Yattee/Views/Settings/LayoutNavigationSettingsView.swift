@@ -79,7 +79,14 @@ private struct CustomizationSection: View {
     var body: some View {
         Section {
             NavigationLink {
+                #if os(tvOS)
+                TVSidebarDetailContainer(
+                    systemImage: SidebarItem.home.systemImage,
+                    title: String(localized: "settings.appearance.home.customize")
+                ) { HomeSettingsView() }
+                #else
                 HomeSettingsView()
+                #endif
             } label: {
                 Label(String(localized: "settings.appearance.home.customize"), systemImage: SidebarItem.home.systemImage)
             }
@@ -101,9 +108,18 @@ private struct CustomizationSection: View {
             }
             #endif
 
-            #if os(macOS) || os(tvOS)
+            #if os(macOS)
             NavigationLink {
                 SidebarSettingsView()
+            } label: {
+                Label(String(localized: "settings.sidebar.title"), systemImage: "sidebar.leading")
+            }
+            #elseif os(tvOS)
+            NavigationLink {
+                TVSidebarDetailContainer(
+                    systemImage: "sidebar.leading",
+                    title: String(localized: "settings.sidebar.title")
+                ) { SidebarSettingsView() }
             } label: {
                 Label(String(localized: "settings.sidebar.title"), systemImage: "sidebar.leading")
             }
