@@ -752,8 +752,13 @@ struct UnifiedTabView: View {
         case .openURL:
             Tab(value: SidebarItem.openURL) {
                 NavigationStack(path: $openURLPath) {
-                    OpenLinkView()
-                        .withNavigationDestinations()
+                    TVSettingsContainer(
+                        systemImage: SidebarItem.openURL.systemImage,
+                        title: SidebarItem.openURL.title
+                    ) {
+                        OpenLinkView()
+                    }
+                    .withNavigationDestinations()
                 }
             } label: {
                 Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
@@ -762,9 +767,14 @@ struct UnifiedTabView: View {
         case .remoteControl:
             Tab(value: SidebarItem.remoteControl) {
                 NavigationStack(path: $remoteControlPath) {
-                    RemoteControlContentView(navigationStyle: .link)
-                        .navigationTitle(String(localized: "remoteControl.title"))
-                        .withNavigationDestinations()
+                    TVSettingsContainer(
+                        systemImage: SidebarItem.remoteControl.systemImage,
+                        title: SidebarItem.remoteControl.title
+                    ) {
+                        RemoteControlContentView(navigationStyle: .link)
+                            .navigationTitle(String(localized: "remoteControl.title"))
+                    }
+                    .withNavigationDestinations()
                 }
             } label: {
                 Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
