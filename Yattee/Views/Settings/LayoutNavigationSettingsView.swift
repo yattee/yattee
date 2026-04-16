@@ -17,7 +17,9 @@ struct LayoutNavigationSettingsView: View {
                 #if os(iOS)
                 HapticsSection(settings: settings)
                 #endif
-                #if !os(tvOS)
+                #if os(tvOS)
+                TVVideoActionsSection(settings: settings)
+                #else
                 VideoActionsSection(settings: settings)
                 LinkActionSection(settings: settings)
                 ClipboardSection(settings: settings)
@@ -182,6 +184,32 @@ private struct VideoActionsSection: View {
                 SwipeActionsSettingsView()
             } label: {
                 Label(String(localized: "settings.appearance.swipeActions"), systemImage: "hand.draw")
+            }
+        } header: {
+            Text(String(localized: "settings.videoActions.header"))
+        }
+    }
+}
+#endif
+
+// MARK: - TV Video Actions Section
+
+#if os(tvOS)
+private struct TVVideoActionsSection: View {
+    @Bindable var settings: SettingsManager
+
+    var body: some View {
+        Section {
+            LabeledContent(String(localized: "settings.behavior.tvOSVideoTapAction")) {
+                Picker(
+                    String(localized: "settings.behavior.tvOSVideoTapAction"),
+                    selection: $settings.tvOSVideoTapAction
+                ) {
+                    Text(VideoTapAction.openInfo.displayName).tag(VideoTapAction.openInfo)
+                    Text(VideoTapAction.playVideo.displayName).tag(VideoTapAction.playVideo)
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
             }
         } header: {
             Text(String(localized: "settings.videoActions.header"))

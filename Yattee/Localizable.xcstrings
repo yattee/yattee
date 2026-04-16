@@ -10256,6 +10256,16 @@
         }
       }
     },
+    "settings.behavior.tvOSVideoTapAction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On Click"
+          }
+        }
+      }
+    },
     "settings.behavior.videoTap.none" : {
       "localizations" : {
         "en" : {

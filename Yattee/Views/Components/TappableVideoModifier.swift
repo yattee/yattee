@@ -58,7 +58,18 @@ struct TappableVideoModifier: ViewModifier {
     func body(content: Content) -> some View {
         Button {
             dismissKeyboard()
+            #if os(tvOS)
+            let tapAction = appEnvironment?.settingsManager.tvOSVideoTapAction ?? .openInfo
+            if tapAction == .openInfo {
+                appEnvironment?.navigationCoordinator.navigate(
+                    to: .video(.loaded(video), queueContext: queueContext)
+                )
+            } else {
+                checkPasswordAndPlay()
+            }
+            #else
             checkPasswordAndPlay()
+            #endif
         } label: {
             content
                 .contentShape(Rectangle())

@@ -506,6 +506,26 @@ extension SettingsManager {
     }
     #endif
 
+    // MARK: - Video Tap Action (tvOS only)
+
+    #if os(tvOS)
+    /// Action to perform when clicking a video cell on tvOS. Default is openInfo.
+    var tvOSVideoTapAction: VideoTapAction {
+        get {
+            if let cached = _tvOSVideoTapAction { return cached }
+            guard let rawValue = localDefaults.string(forKey: "tvOSVideoTapAction"),
+                  let action = VideoTapAction(rawValue: rawValue) else {
+                return .openInfo
+            }
+            return action
+        }
+        set {
+            _tvOSVideoTapAction = newValue
+            localDefaults.set(newValue.rawValue, forKey: "tvOSVideoTapAction")
+        }
+    }
+    #endif
+
     // MARK: - Onboarding
 
     /// Whether onboarding has been completed on this device.

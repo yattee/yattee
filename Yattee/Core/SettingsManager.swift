@@ -190,6 +190,11 @@ final class SettingsManager {
     var _textAreaTapAction: VideoTapAction?
     #endif
 
+    // Video tap action (tvOS only)
+    #if os(tvOS)
+    var _tvOSVideoTapAction: VideoTapAction?
+    #endif
+
     // Player Controls settings (controlsButtonSize moved to preset)
 
     // Appearance settings
@@ -499,6 +504,9 @@ final class SettingsManager {
         #if !os(tvOS)
         _thumbnailTapAction = nil
         _textAreaTapAction = nil
+        #endif
+        #if os(tvOS)
+        _tvOSVideoTapAction = nil
         #endif
         _listStyle = nil
         #if os(iOS)
