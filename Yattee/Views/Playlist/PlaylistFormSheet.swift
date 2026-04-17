@@ -136,31 +136,12 @@ struct PlaylistFormSheet: View {
     #if os(tvOS)
     private var tvOSContent: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                Button(String(localized: "common.cancel")) {
-                    dismiss()
-                }
-                .buttonStyle(TVToolbarButtonStyle())
+            Text(navigationTitle)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .padding(.top, 16)
 
-                Spacer()
-
-                Text(navigationTitle)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-
-                Spacer()
-
-                Button(saveButtonTitle) {
-                    save()
-                }
-                .buttonStyle(TVToolbarButtonStyle())
-                .disabled(!canSave)
-            }
-            .padding(.horizontal, 48)
-            .padding(.vertical, 24)
-
-            // Form
             Form {
                 Section {
                     TVSettingsTextField(
@@ -187,7 +168,21 @@ struct PlaylistFormSheet: View {
                     }
                     .foregroundStyle(.secondary)
                 }
+
+                Section {
+                    Button(saveButtonTitle) {
+                        save()
+                    }
+                    .buttonStyle(TVToolbarButtonStyle())
+                    .lineLimit(1)
+                    .disabled(!canSave)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .listRowBackground(Color.clear)
+                }
             }
+            .scrollClipDisabled()
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
         }
     }
     #endif

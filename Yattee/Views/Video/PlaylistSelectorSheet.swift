@@ -79,6 +79,11 @@ struct PlaylistSelectorSheet: View {
                     }
                 }
             }
+            #if os(tvOS)
+            .scrollClipDisabled()
+            .padding(.horizontal, 40)
+            .padding(.vertical, 24)
+            #else
             .navigationTitle(String(localized: "playlist.addTo"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -93,6 +98,7 @@ struct PlaylistSelectorSheet: View {
                     }
                 }
             }
+            #endif
             .sheet(isPresented: $showingNewPlaylist) {
                 PlaylistFormSheet(mode: .create) { title, description in
                     pendingPlaylistTitle = title
