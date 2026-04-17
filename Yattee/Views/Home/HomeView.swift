@@ -1142,7 +1142,8 @@ struct HomeView: View {
         let limitedDownloads = Array(downloads.prefix(sectionItemsLimit))
         // Use toVideo() instead of videoAndStream() to avoid O(n²) file I/O on main thread
         // Downloads are looked up by video.id at playback time in PlayerService.playPreferringDownloaded()
-        let videoList = limitedDownloads.map { $0.toVideo() }
+        let downloadsDir = downloadManager?.downloadsDirectory()
+        let videoList = limitedDownloads.map { $0.toVideo(downloadsDirectory: downloadsDir) }
 
         return VStack(alignment: .leading, spacing: 0) {
             sectionHeader(title: "home.recentDownloads.title") {

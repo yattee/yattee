@@ -32,7 +32,7 @@ struct DownloadRowView: View {
     @State private var hasLoadedWatchData = false
 
     private var video: Video {
-        download.toVideo()
+        download.toVideo(downloadsDirectory: appEnvironment?.downloadManager.downloadsDirectory())
     }
 
     /// Watch progress for this video (0.0 to 1.0), or nil if not watched.

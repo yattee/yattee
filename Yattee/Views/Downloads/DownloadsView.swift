@@ -375,7 +375,8 @@ private struct CompletedDownloadsSectionContentView: View {
     private func groupedByChannelContent(_ downloads: [Download]) -> some View {
         let grouped = settings.groupedByChannel(downloads)
         let allDownloadsInOrder = grouped.flatMap { $0.downloads }
-        let videoList = allDownloadsInOrder.map { $0.toVideo() }
+        let downloadsDir = manager.downloadsDirectory()
+        let videoList = allDownloadsInOrder.map { $0.toVideo(downloadsDirectory: downloadsDir) }
         var runningIndex = 0
 
         ForEach(Array(grouped.enumerated()), id: \.element.channelID) { groupIndex, group in
@@ -420,7 +421,8 @@ private struct CompletedDownloadsSectionContentView: View {
         let sortedDownloads = settings.sorted(downloads)
         let groupedByLetter = groupDownloadsByFirstLetter(sortedDownloads, ascending: settings.sortDirection == .ascending)
         let allDownloadsInOrder = groupedByLetter.flatMap { $0.downloads }
-        let videoList = allDownloadsInOrder.map { $0.toVideo() }
+        let downloadsDir = manager.downloadsDirectory()
+        let videoList = allDownloadsInOrder.map { $0.toVideo(downloadsDirectory: downloadsDir) }
         var runningIndex = 0
 
         ForEach(Array(groupedByLetter.enumerated()), id: \.element.letter) { groupIndex, group in
@@ -463,7 +465,8 @@ private struct CompletedDownloadsSectionContentView: View {
     @ViewBuilder
     private func flatListContent(_ downloads: [Download]) -> some View {
         let sortedDownloads = settings.sorted(downloads)
-        let videoList = sortedDownloads.map { $0.toVideo() }
+        let downloadsDir = manager.downloadsDirectory()
+        let videoList = sortedDownloads.map { $0.toVideo(downloadsDirectory: downloadsDir) }
 
         // Flat list content wrapped in its own card
         VideoListContent(listStyle: listStyle) {
@@ -530,7 +533,7 @@ private struct CompletedDownloadsSectionContentView: View {
             )
         }
         .videoSwipeActions(
-            video: download.toVideo(),
+            video: download.toVideo(downloadsDirectory: manager.downloadsDirectory()),
             fixedActions: [
                 SwipeAction(
                     symbolImage: "trash.fill",

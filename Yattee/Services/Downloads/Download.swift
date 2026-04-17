@@ -298,9 +298,29 @@ struct Download: Identifiable, Codable, Sendable, Equatable {
         self.audioBitrate = audioBitrate
     }
 
+    /// Resolves the local thumbnail file URL, if the thumbnail has been
+    /// downloaded to disk. Remote `thumbnailURL`s for proxied sources
+    /// (Invidious / Piped / Yattee server) expire, so prefer the local copy
+    /// whenever it is available.
+    func localThumbnailURL(in downloadsDirectory: URL) -> URL? {
+        guard let localThumbnailPath else { return nil }
+        return downloadsDirectory.appendingPathComponent(localThumbnailPath)
+    }
+
     /// Convert to a Video model for display purposes.
-    func toVideo() -> Video {
-        Video(
+    /// - Parameter downloadsDirectory: When provided and a local thumbnail
+    ///   exists on disk, the resulting `Video` uses a `file://` URL pointing
+    ///   at the local thumbnail instead of the (potentially expired) remote
+    ///   `thumbnailURL` captured at download time.
+    func toVideo(downloadsDirectory: URL? = nil) -> Video {
+        let resolvedThumbnailURL: URL? = {
+            if let downloadsDirectory, let localURL = localThumbnailURL(in: downloadsDirectory) {
+                return localURL
+            }
+            return thumbnailURL
+        }()
+
+        return Video(
             id: videoID,
             title: title,
             description: description,
@@ -316,7 +336,7 @@ struct Download: Identifiable, Codable, Sendable, Equatable {
             publishedText: publishedText,
             viewCount: viewCount,
             likeCount: likeCount,
-            thumbnails: thumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
+            thumbnails: resolvedThumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
             isLive: false,
             isUpcoming: false,
             scheduledStartTime: nil

@@ -63,6 +63,15 @@ final class ImageLoadingService: Sendable {
         )
     }
 
+    /// Remove a specific URL from both the memory and disk image caches.
+    /// Use when a previously cached URL is known to return stale or broken
+    /// data (e.g. an expired proxied thumbnail URL).
+    func removeCachedImage(for url: URL) {
+        let request = ImageRequest(url: url)
+        ImagePipeline.shared.cache.removeCachedImage(for: request)
+        ImagePipeline.shared.cache.removeCachedData(for: request)
+    }
+
     /// Clear all image caches (memory and disk).
     func clearCache() {
         // Clear memory cache

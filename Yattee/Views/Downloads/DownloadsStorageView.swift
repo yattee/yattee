@@ -161,7 +161,7 @@ struct DownloadsStorageView: View {
 
     @ViewBuilder
     private func storageRow(_ download: Download, isLast: Bool) -> some View {
-        let video = download.toVideo()
+        let video = download.toVideo(downloadsDirectory: downloadManager?.downloadsDirectory())
         let isWatched = dataManager?.watchEntry(for: download.videoID.videoID)?.isFinished ?? false
 
         VideoListRow(

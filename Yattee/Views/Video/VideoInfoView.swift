@@ -855,9 +855,10 @@ struct VideoInfoView: View {
                     if let videos = allVideos {
                         ForEach(Array(videos.enumerated()), id: \.element.id) { index, video in
                             let isCurrent = index == currentVideoIndex
-                            // Use original video for thumbnail (stable), get author from detailed video for avatar
-                            let authorSource = loadedVideoDetails[video.id.videoID]
-                            videoCard(for: video, authorFrom: authorSource, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
+                            // Prefer freshly loaded details for thumbnail (so expired proxy URLs get replaced) and avatar.
+                            // Keep `video` as the card's stable identity so title/channel don't flicker.
+                            let detailedVideo = loadedVideoDetails[video.id.videoID]
+                            videoCard(for: video, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
                                 .opacity(isCurrent ? 1.0 : peekOpacity)
                                 .containerRelativeFrame(.horizontal)
                                 .id(index)
@@ -914,14 +915,16 @@ struct VideoInfoView: View {
     
     /// A single video card with thumbnail, title, and channel info
     /// - Parameters:
-    ///   - video: The video to display (used for thumbnail - stable reference)
+    ///   - video: The video to display (used for title/channel - stable reference across carousel scrolls)
+    ///   - thumbnailFrom: Optional video to source the thumbnail URL from (use the freshly loaded details so expired proxy URLs get replaced)
     ///   - authorFrom: Optional video to get author info from (for avatar URL from detailed video)
     ///   - isLoadingMore: Whether to show loading overlay for continuation loading
     ///   - showTitle: Whether to show the title and channel (animates in/out)
     ///   - isCurrent: Whether this is the currently selected video (thumbnail tap plays video)
-    private func videoCard(for video: Video, authorFrom: Video? = nil, isLoadingMore: Bool, showTitle: Bool, isCurrent: Bool) -> some View {
-        let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: video)
-        let bestThumb = video.bestThumbnail
+    private func videoCard(for video: Video, thumbnailFrom: Video? = nil, authorFrom: Video? = nil, isLoadingMore: Bool, showTitle: Bool, isCurrent: Bool) -> some View {
+        let thumbnailSource = thumbnailFrom ?? video
+        let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: thumbnailSource)
+        let bestThumb = thumbnailSource.bestThumbnail
         let thumbnailURL = deArrowURL ?? bestThumb?.url
         return VStack(spacing: 12) {
             // Thumbnail with loading overlay
@@ -2035,6 +2038,7 @@ struct VideoInfoView: View {
             do {
                 // Use extractURL method - just use the video part
                 let (fullVideo, _, _) = try await contentService.extractURL(originalURL, instance: instance)
+                invalidateStaleThumbnails(old: base, new: fullVideo)
                 loadedVideoDetails[videoID] = fullVideo
                 CachedChannelData.cacheAuthor(fullVideo.author)
             } catch {
@@ -2059,6 +2063,7 @@ struct VideoInfoView: View {
                 id: videoID,
                 instance: instance
             )
+            invalidateStaleThumbnails(old: base, new: fullVideo)
             loadedVideoDetails[videoID] = fullVideo
             CachedChannelData.cacheAuthor(fullVideo.author)
         } catch {
@@ -2066,6 +2071,18 @@ struct VideoInfoView: View {
         }
 
         isLoadingVideoDetails = false
+    }
+
+    /// Evicts image cache entries for thumbnails whose URLs changed between
+    /// the queued/list copy of the video and the freshly fetched details, so
+    /// other views holding the old URLs re-fetch instead of reusing broken
+    /// payloads from Nuke's cache.
+    @MainActor
+    private func invalidateStaleThumbnails(old: Video, new: Video) {
+        let newURLs = Set(new.thumbnails.map(\.url))
+        for thumb in old.thumbnails where !newURLs.contains(thumb.url) {
+            ImageLoadingService.shared.removeCachedImage(for: thumb.url)
+        }
     }
     
     /// Load initial video from API (for videoID init mode).
