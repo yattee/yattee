@@ -174,7 +174,7 @@ platform :tvos do
     match(
       type: 'appstore',
       platform: 'tvos',
-      app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+      app_identifier: ["#{DEVELOPER_APP_IDENTIFIER}", "#{DEVELOPER_APP_IDENTIFIER}.TopShelf"],
       git_basic_authorization: Base64.strict_encode64(GIT_AUTHORIZATION),
       readonly: true,
       keychain_name: TEMP_KEYCHAIN_USER,
@@ -191,6 +191,15 @@ platform :tvos do
       targets: [SCHEME]
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: XCODEPROJ,
+      team_id: TEAM_ID,
+      code_sign_identity: "Apple Distribution",
+      profile_name: "match AppStore #{DEVELOPER_APP_IDENTIFIER}.TopShelf tvos",
+      targets: ["YatteeTopShelf"]
+    )
+
     build_app(
       scheme: SCHEME,
       destination: "generic/platform=tvOS",
@@ -199,7 +208,8 @@ platform :tvos do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER} tvos"
+          "#{DEVELOPER_APP_IDENTIFIER}" => "match AppStore #{DEVELOPER_APP_IDENTIFIER} tvos",
+          "#{DEVELOPER_APP_IDENTIFIER}.TopShelf" => "match AppStore #{DEVELOPER_APP_IDENTIFIER}.TopShelf tvos"
         }
       }
     )
