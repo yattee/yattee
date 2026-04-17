@@ -4953,6 +4953,26 @@
         }
       }
     },
+    "mediaBrowser.unsupportedFile.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsupported file"
+          }
+        }
+      }
+    },
+    "mediaBrowser.unsupportedFile.message %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ cannot be played. This file type is not supported."
+          }
+        }
+      }
+    },
     "mediaBrowser.sort.dateCreated" : {
       "localizations" : {
         "en" : {

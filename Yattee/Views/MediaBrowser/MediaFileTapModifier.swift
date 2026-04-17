@@ -35,6 +35,17 @@ struct MediaFileTVOSTapButton<Label: View>: View {
         .buttonStyle(.plain)
     }
 }
+
+/// tvOS-only: wraps an unplayable row in a Button so the focus engine can land on it.
+struct MediaFileTVOSUnsupportedButton<Label: View>: View {
+    let onTap: () -> Void
+    @ViewBuilder let label: () -> Label
+
+    var body: some View {
+        Button(action: onTap) { label() }
+            .buttonStyle(.plain)
+    }
+}
 #else
 /// iOS/macOS: per-region gesture used by MediaFileRow's icon and text areas.
 /// Only attaches a gesture when the action differs from `.playVideo`, letting

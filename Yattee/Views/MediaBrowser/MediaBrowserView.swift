@@ -22,6 +22,9 @@ struct MediaBrowserView: View {
     @State private var sortOrder: MediaBrowserSortOrder
     @State private var sortAscending: Bool
     @State private var showViewOptions = false
+    #if os(tvOS)
+    @State private var unsupportedFile: MediaFile?
+    #endif
 
     private var listStyle: VideoListStyle {
         appEnvironment?.settingsManager.listStyle ?? .inset
@@ -165,7 +168,13 @@ struct MediaBrowserView: View {
                                     } else if file.isPlayable {
                                         playableFileRow(for: file)
                                     } else {
+                                        #if os(tvOS)
+                                        MediaFileTVOSUnsupportedButton(onTap: { unsupportedFile = file }) {
+                                            MediaFileRow(file: file, sortOrder: sortOrder)
+                                        }
+                                        #else
                                         MediaFileRow(file: file, sortOrder: sortOrder)
+                                        #endif
                                     }
                                 }
                             }
@@ -174,6 +183,20 @@ struct MediaBrowserView: View {
                     .padding(.top, 16)
                 }
             )
+            #if os(tvOS)
+            .alert(
+                String(localized: "mediaBrowser.unsupportedFile.title"),
+                isPresented: Binding(
+                    get: { unsupportedFile != nil },
+                    set: { if !$0 { unsupportedFile = nil } }
+                ),
+                presenting: unsupportedFile
+            ) { _ in
+                Button(String(localized: "common.ok"), role: .cancel) { unsupportedFile = nil }
+            } message: { file in
+                Text(String(localized: "mediaBrowser.unsupportedFile.message \(file.name)"))
+            }
+            #endif
     }
 
     @ViewBuilder
