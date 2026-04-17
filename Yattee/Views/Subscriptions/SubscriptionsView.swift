@@ -284,7 +284,7 @@ struct SubscriptionsView: View {
 
                                     // List-specific options
                                     if layout == .list {
-                                        Picker("viewOptions.rowSize", selection: $rowStyle) {
+                                        PlatformMenuPicker(String(localized: "viewOptions.rowSize"), selection: $rowStyle) {
                                             Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
                                             Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
                                             Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)

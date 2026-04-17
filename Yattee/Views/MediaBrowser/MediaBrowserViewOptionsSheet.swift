@@ -25,7 +25,7 @@ struct MediaBrowserViewOptionsSheet: View {
             Form {
                 Section {
                     Toggle("mediaBrowser.viewOptions.showOnlyPlayable", isOn: $showOnlyPlayable)
-                    Picker("mediaBrowser.viewOptions.sortBy", selection: $sortOrder) {
+                    PlatformMenuPicker(String(localized: "mediaBrowser.viewOptions.sortBy"), selection: $sortOrder) {
                         ForEach(availableSortOptions) { order in
                             Label(order.displayName, systemImage: order.systemImage)
                                 .tag(order)

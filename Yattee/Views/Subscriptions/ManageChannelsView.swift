@@ -135,7 +135,7 @@ struct ManageChannelsView: View {
 
                         // List-specific options
                         if layout == .list {
-                            Picker("viewOptions.rowSize", selection: $rowStyle) {
+                            PlatformMenuPicker(String(localized: "viewOptions.rowSize"), selection: $rowStyle) {
                                 Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
                                 Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
                                 Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
@@ -160,7 +160,7 @@ struct ManageChannelsView: View {
                             #endif
                         }
 
-                        Picker("manageChannels.sortBy", selection: $sortOrder) {
+                        PlatformMenuPicker(String(localized: "manageChannels.sortBy"), selection: $sortOrder) {
                             Text("manageChannels.sortBy.name").tag(SidebarChannelSort.alphabetical)
                             Text("manageChannels.sortBy.recentlySubscribed").tag(SidebarChannelSort.recentlySubscribed)
                             Text("manageChannels.sortBy.lastUploaded").tag(SidebarChannelSort.lastUploaded)
