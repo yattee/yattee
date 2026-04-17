@@ -87,6 +87,12 @@ struct ChannelView: View {
     @State private var tvOSShowSearchTab = false
     @FocusState private var isSubscribeFocused: Bool
     @FocusState private var isTVSearchFieldFocused: Bool
+    @FocusState private var tvOSFocusedTab: TvOSChannelFocusTarget?
+
+    private enum TvOSChannelFocusTarget: Hashable {
+        case tab(ChannelTab)
+        case searchTab
+    }
     #endif
 
     // Header configuration
@@ -642,6 +648,7 @@ struct ChannelView: View {
     private var tvOSSearchTabButton: some View {
         let isSelected = tvOSShowSearchTab
         let action = {
+            tvOSFocusedTab = .searchTab
             if !tvOSShowSearchTab {
                 tvOSShowSearchTab = true
                 isSearchActive = true
@@ -651,20 +658,17 @@ struct ChannelView: View {
             .fontWeight(isSelected ? .bold : .regular)
             .lineLimit(1)
 
-        if isSelected {
-            Button(action: action) { label }
-                .buttonStyle(.borderedProminent)
-                .tint(accentColor)
-        } else {
-            Button(action: action) { label }
-                .buttonStyle(.bordered)
-        }
+        Button(action: action) { label }
+            .buttonStyle(.borderedProminent)
+            .tint(isSelected ? accentColor : Color.gray.opacity(0.3))
+            .focused($tvOSFocusedTab, equals: .searchTab)
     }
 
     @ViewBuilder
     private func tvOSTabButton(for tab: ChannelTab) -> some View {
         let isSelected = !tvOSShowSearchTab && selectedTab == tab
         let action = {
+            tvOSFocusedTab = .tab(tab)
             if tvOSShowSearchTab {
                 tvOSShowSearchTab = false
                 isSearchActive = false
@@ -680,14 +684,10 @@ struct ChannelView: View {
             .fontWeight(isSelected ? .bold : .regular)
             .lineLimit(1)
 
-        if isSelected {
-            Button(action: action) { label }
-                .buttonStyle(.borderedProminent)
-                .tint(accentColor)
-        } else {
-            Button(action: action) { label }
-                .buttonStyle(.bordered)
-        }
+        Button(action: action) { label }
+            .buttonStyle(.borderedProminent)
+            .tint(isSelected ? accentColor : Color.gray.opacity(0.3))
+            .focused($tvOSFocusedTab, equals: .tab(tab))
     }
 
     private var tvOSRightColumn: some View {
