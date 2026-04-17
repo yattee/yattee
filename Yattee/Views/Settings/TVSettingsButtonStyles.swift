@@ -144,6 +144,18 @@ struct TVSettingsToggle: View {
     }
 }
 
+/// Label style for source rows - explicit icon/text spacing
+struct TVSourceRowLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 20) {
+            configuration.icon
+                .frame(width: 36, height: 36)
+            configuration.title
+            Spacer(minLength: 0)
+        }
+    }
+}
+
 /// Button style for form rows (toggles, pickers) - matches form appearance
 struct TVFormRowButtonStyle: ButtonStyle {
     @Environment(\.isFocused) private var isFocused

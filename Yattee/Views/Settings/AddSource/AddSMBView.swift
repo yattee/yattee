@@ -54,9 +54,11 @@ struct AddSMBView: View {
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
         #endif
+        #if !os(tvOS)
         .navigationTitle(String(localized: "sources.addSMB"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         #endif
         .onAppear {
             if let prefillServer {

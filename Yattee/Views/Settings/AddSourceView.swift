@@ -120,6 +120,9 @@ struct AddSourceView: View {
                     #endif
                 } label: {
                     Label(String(localized: "sources.addWebDAV"), systemImage: "externaldrive.connected.to.line.below")
+                    #if os(tvOS)
+                        .labelStyle(TVSourceRowLabelStyle())
+                    #endif
                 }
 
                 NavigationLink {
@@ -135,6 +138,9 @@ struct AddSourceView: View {
                     #endif
                 } label: {
                     Label(String(localized: "sources.addSMB"), systemImage: "server.rack")
+                    #if os(tvOS)
+                        .labelStyle(TVSourceRowLabelStyle())
+                    #endif
                 }
 
                 NavigationLink {
@@ -150,6 +156,9 @@ struct AddSourceView: View {
                     #endif
                 } label: {
                     Label(String(localized: "sources.addRemoteServer"), systemImage: "globe")
+                    #if os(tvOS)
+                        .labelStyle(TVSourceRowLabelStyle())
+                    #endif
                 }
 
                 NavigationLink {
@@ -178,6 +187,9 @@ struct AddSourceView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 24, height: 24)
                     }
+                    #if os(tvOS)
+                    .labelStyle(TVSourceRowLabelStyle())
+                    #endif
                 }
             }
 
@@ -187,9 +199,12 @@ struct AddSourceView: View {
                     showingNetworkDiscovery = true
                 } label: {
                     Label(String(localized: "discovery.scanNetwork"), systemImage: "wifi")
+                    #if os(tvOS)
+                        .labelStyle(TVSourceRowLabelStyle())
+                    #endif
                 }
                 #if os(tvOS)
-                .buttonStyle(TVSettingsButtonStyle())
+                .buttonStyle(TVFormRowButtonStyle())
                 #endif
             } footer: {
                 Text(String(localized: "sources.footer.discovery"))

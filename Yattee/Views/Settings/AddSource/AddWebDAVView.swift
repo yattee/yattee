@@ -55,9 +55,11 @@ struct AddWebDAVView: View {
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
         #endif
+        #if !os(tvOS)
         .navigationTitle(String(localized: "sources.addWebDAV"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         #endif
         .onAppear {
             if let url = prefillURL {
