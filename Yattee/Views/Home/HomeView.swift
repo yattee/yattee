@@ -211,16 +211,24 @@ struct HomeView: View {
     // MARK: - Section Header Helper
 
     private func sectionHeader(title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Text(title)
-                    .fontWeight(.semibold)
-                Image(systemName: "chevron.right")
-                    .font(.caption)
+        Group {
+            #if os(tvOS)
+            Text(title)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.accentColor)
+            #else
+            Button(action: action) {
+                HStack(spacing: 4) {
+                    Text(title)
+                        .fontWeight(.semibold)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                }
+                .foregroundStyle(Color.accentColor)
             }
-            .foregroundStyle(Color.accentColor)
+            .buttonStyle(.plain)
+            #endif
         }
-        .buttonStyle(.plain)
         .padding(.horizontal, listStyle == .inset ? 32 : 16)
         .padding(.top, 16)
         #if os(tvOS)
@@ -1203,23 +1211,35 @@ struct HomeView: View {
             let limitedVideos = Array(videos.prefix(sectionItemsLimit))
 
             VStack(alignment: .leading, spacing: 0) {
-                Button {
-                    appEnvironment?.navigationCoordinator.navigate(
-                        to: .instanceBrowse(instance, initialTab: contentType.toBrowseTab())
-                    )
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(verbatim: "\(contentType.localizedTitle) - \(instance.displayName)")
-                            .fontWeight(.semibold)
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
+                Group {
+                    #if os(tvOS)
+                    Text(verbatim: "\(contentType.localizedTitle) - \(instance.displayName)")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.accentColor)
+                    #else
+                    Button {
+                        appEnvironment?.navigationCoordinator.navigate(
+                            to: .instanceBrowse(instance, initialTab: contentType.toBrowseTab())
+                        )
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(verbatim: "\(contentType.localizedTitle) - \(instance.displayName)")
+                                .fontWeight(.semibold)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                        }
+                        .foregroundStyle(Color.accentColor)
                     }
-                    .foregroundStyle(Color.accentColor)
+                    .buttonStyle(.plain)
+                    #endif
                 }
-                .buttonStyle(.plain)
                 .padding(.horizontal, listStyle == .inset ? 32 : 16)
                 .padding(.top, 16)
+                #if os(tvOS)
+                .padding(.bottom, 24)
+                #else
                 .padding(.bottom, 8)
+                #endif
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 if sectionLayout == .grid {
