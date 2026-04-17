@@ -59,6 +59,11 @@ struct TVPlayerProgressBar: View {
     @State private var lastDPadTime: Date?
     @State private var lastDPadDirection: MoveCommandDirection?
 
+    /// Whether the arrow-seek storyboard/chapter preview is currently shown.
+    @State private var showArrowSeekPreview = false
+    /// Delayed-hide task for the arrow-seek preview after the user stops pressing arrows.
+    @State private var arrowSeekPreviewHideTask: Task<Void, Never>?
+
     /// The time to display. SELECT-based scrub takes priority, then the
     /// parent's pending remote-seek target, then the actual playback time.
     private var displayTime: TimeInterval {
@@ -123,6 +128,30 @@ struct TVPlayerProgressBar: View {
         .onChange(of: cancelScrubTrigger) { _, newValue in
             guard newValue != nil, isScrubbing else { return }
             cancelScrub()
+        }
+        .onChange(of: remoteSeekTime) { _, newValue in
+            if newValue != nil {
+                arrowSeekPreviewHideTask?.cancel()
+                arrowSeekPreviewHideTask = nil
+                if !showArrowSeekPreview {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        showArrowSeekPreview = true
+                    }
+                }
+            } else {
+                scheduleArrowSeekPreviewHide()
+            }
+        }
+        .onChange(of: isScrubbing) { _, scrubbing in
+            if scrubbing {
+                arrowSeekPreviewHideTask?.cancel()
+                arrowSeekPreviewHideTask = nil
+                if showArrowSeekPreview {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        showArrowSeekPreview = false
+                    }
+                }
+            }
         }
         .animation(.easeInOut(duration: 0.2), value: isFocused)
         .animation(.easeInOut(duration: 0.1), value: isScrubbing)
@@ -212,8 +241,8 @@ struct TVPlayerProgressBar: View {
 
     @ViewBuilder
     private func scrubPreviewOverlay(geometry: GeometryProxy) -> some View {
-        if isScrubbing {
-            let seekTime = scrubTime ?? currentTime
+        if isScrubbing || showArrowSeekPreview {
+            let seekTime = displayTime
             let currentChapter = showChapters ? chapters.last(where: { $0.startTime <= seekTime }) : nil
             // Storyboard panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
             // Use a slightly larger clamp width so the shadow stays on screen.
@@ -395,11 +424,14 @@ struct TVPlayerProgressBar: View {
         withAnimation(.easeOut(duration: 0.15)) {
             scrubTime = nil
             isScrubbing = false
+            showArrowSeekPreview = false
         }
         panAccumulator = 0
         dpadStreakCount = 0
         lastDPadTime = nil
         lastDPadDirection = nil
+        arrowSeekPreviewHideTask?.cancel()
+        arrowSeekPreviewHideTask = nil
 
         if wasScrubbing {
             onScrubbingChanged?(false)
@@ -415,14 +447,28 @@ struct TVPlayerProgressBar: View {
         withAnimation(.easeOut(duration: 0.15)) {
             scrubTime = nil
             isScrubbing = false
+            showArrowSeekPreview = false
         }
         panAccumulator = 0
         dpadStreakCount = 0
         lastDPadTime = nil
         lastDPadDirection = nil
+        arrowSeekPreviewHideTask?.cancel()
+        arrowSeekPreviewHideTask = nil
 
         if wasScrubbing {
             onScrubbingChanged?(false)
+        }
+    }
+
+    private func scheduleArrowSeekPreviewHide() {
+        arrowSeekPreviewHideTask?.cancel()
+        arrowSeekPreviewHideTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(2000))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.2)) {
+                showArrowSeekPreview = false
+            }
         }
     }
 
