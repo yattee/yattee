@@ -553,12 +553,13 @@ struct UnifiedPlaylistDetailView: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button(role: .destructive) {
+                Button {
                     showingDeleteConfirmation = true
                 } label: {
                     Label(String(localized: "playlist.delete"), systemImage: "trash")
                         .frame(maxWidth: .infinity, minHeight: 50)
                         .font(.headline)
+                        .foregroundStyle(.red)
                 }
                 .buttonStyle(.bordered)
             }
