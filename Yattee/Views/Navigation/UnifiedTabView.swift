@@ -577,6 +577,7 @@ struct UnifiedTabView: View {
     @State private var channelPaths: [String: NavigationPath] = [:]
     @State private var playlistPaths: [UUID: NavigationPath] = [:]
     @State private var instancePaths: [UUID: NavigationPath] = [:]
+    @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
     @State private var bookmarksPath = NavigationPath()
     @State private var historyPath = NavigationPath()
     @State private var subscriptionsFeedPath = NavigationPath()
@@ -783,8 +784,7 @@ struct UnifiedTabView: View {
 
     @TabContentBuilder<SidebarItem>
     private var sidebarSections: some TabContent<SidebarItem> {
-        // Sources Section (shows configured instances)
-        // Note: Media sources are only shown on iOS/macOS
+        // Sources Section (shows configured instances and media sources)
         if !sidebarManager.sortedSourceItems.isEmpty && (settingsManager?.sidebarSourcesEnabled ?? true) {
             TabSection(String(localized: "sidebar.section.sources")) {
                 ForEach(sidebarManager.sortedSourceItems) { item in
@@ -916,14 +916,12 @@ extension UnifiedTabView {
         )
     }
 
-    #if os(iOS) || os(macOS)
     func mediaSourcePathBinding(for id: UUID) -> Binding<NavigationPath> {
         Binding(
             get: { mediaSourcePaths[id] ?? NavigationPath() },
             set: { mediaSourcePaths[id] = $0 }
         )
     }
-    #endif
 
     func instancePathBinding(for id: UUID) -> Binding<NavigationPath> {
         Binding(
@@ -984,7 +982,6 @@ extension UnifiedTabView {
 
     // MARK: - Media Source Content
 
-    #if os(iOS) || os(macOS)
     @ViewBuilder
     func mediaSourceContent(for item: SidebarItem) -> some View {
         if case .mediaSource(let id, _, _) = item,
@@ -995,7 +992,6 @@ extension UnifiedTabView {
             }
         }
     }
-    #endif
 
     // MARK: - Instance Content
 
@@ -1019,11 +1015,7 @@ extension UnifiedTabView {
         case .instance:
             instanceContent(for: item)
         case .mediaSource:
-            #if os(iOS) || os(macOS)
             mediaSourceContent(for: item)
-            #else
-            EmptyView()
-            #endif
         default:
             EmptyView()
         }
