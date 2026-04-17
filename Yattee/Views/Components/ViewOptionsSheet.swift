@@ -68,6 +68,7 @@ struct ViewOptionsSheet: View {
                                 Text("\(count)").tag(count)
                             }
                         }
+                        .pickerStyle(.segmented)
                     }
 
                     if let hideWatched = hideWatched {

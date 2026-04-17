@@ -150,6 +150,7 @@ struct ManageChannelsView: View {
                                     Text("\(count)").tag(count)
                                 }
                             }
+                            .pickerStyle(.segmented)
                             #else
                             Stepper(
                                 "viewOptions.columns \(min(max(1, gridColumns), gridConfig.maxColumns))",
