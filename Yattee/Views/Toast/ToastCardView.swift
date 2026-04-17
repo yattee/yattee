@@ -16,7 +16,7 @@ struct ToastCardView: View {
     @State private var isAnimating = false
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Self.iconSpacing) {
             // Leading icon or progress indicator
             leadingIcon
 
@@ -43,7 +43,7 @@ struct ToastCardView: View {
             dismissButton
             #endif
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Self.horizontalPadding)
         .padding(.vertical, 12)
         .frame(maxWidth: 400, alignment: .leading)
         .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
@@ -74,7 +74,31 @@ struct ToastCardView: View {
                     #endif
             }
         }
-        .frame(width: 22, height: 22)
+        .frame(width: Self.iconSize, height: Self.iconSize)
+    }
+
+    private static var iconSpacing: CGFloat {
+        #if os(tvOS)
+        20
+        #else
+        12
+        #endif
+    }
+
+    private static var horizontalPadding: CGFloat {
+        #if os(tvOS)
+        20
+        #else
+        16
+        #endif
+    }
+
+    private static var iconSize: CGFloat {
+        #if os(tvOS)
+        32
+        #else
+        22
+        #endif
     }
 
     @ViewBuilder
