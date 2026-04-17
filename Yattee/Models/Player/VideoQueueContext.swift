@@ -10,30 +10,43 @@ import Foundation
 /// Closure type for loading more videos via continuation
 typealias LoadMoreVideosCallback = @Sendable () async throws -> ([Video], String?)
 
+/// Extra payload required to play files from a media source (WebDAV/SMB/local folder)
+/// via `QueueManager.playFromMediaBrowser`. Without this, playback falls back to
+/// `openVideo` / `playFromList`, which do not set up on-demand stream and caption
+/// resolution for media-browser files.
+struct MediaBrowserPlaybackInfo: Equatable, Hashable {
+    let source: MediaSource
+    let allFilesInFolder: [MediaFile]
+}
+
 /// Context information for playing a video with queue support.
 /// Used when navigating from list views (subscriptions, search, etc.) to video info pages.
 struct VideoQueueContext {
     /// The video being viewed
     let video: Video
-    
+
     /// Queue source for continuation loading
     let queueSource: QueueSource?
-    
+
     /// Display label for the queue source (e.g., "Subscriptions", "Search Results")
     let sourceLabel: String?
-    
+
     /// All videos in the current list
     let videoList: [Video]?
-    
+
     /// Index of the current video in the list
     let videoIndex: Int?
-    
+
     /// Optional start time in seconds
     let startTime: TimeInterval?
-    
+
     /// Callback to load more videos when reaching the end of the current list
     /// Returns new videos and updated continuation token
     let loadMoreVideos: LoadMoreVideosCallback?
+
+    /// When set, playback from VideoInfoView must route through
+    /// `QueueManager.playFromMediaBrowser` using this payload.
+    var mediaBrowserPlayback: MediaBrowserPlaybackInfo? = nil
     
     /// Whether this context has valid queue information
     var hasQueueInfo: Bool {
@@ -77,7 +90,8 @@ extension VideoQueueContext: Equatable {
         lhs.sourceLabel == rhs.sourceLabel &&
         lhs.videoList == rhs.videoList &&
         lhs.videoIndex == rhs.videoIndex &&
-        lhs.startTime == rhs.startTime
+        lhs.startTime == rhs.startTime &&
+        lhs.mediaBrowserPlayback == rhs.mediaBrowserPlayback
     }
 }
 
@@ -89,5 +103,6 @@ extension VideoQueueContext: Hashable {
         hasher.combine(videoList)
         hasher.combine(videoIndex)
         hasher.combine(startTime)
+        hasher.combine(mediaBrowserPlayback)
     }
 }

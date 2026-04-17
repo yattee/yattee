@@ -2144,7 +2144,27 @@ struct VideoInfoView: View {
     /// Plays the video with the specified start time.
     private func playVideoWithStartTime(_ time: TimeInterval) {
         guard let video = displayedVideo else { return }
-        
+
+        // Media-browser playback must go through `playFromMediaBrowser` so the
+        // queue manager sets up on-demand stream/caption resolution — otherwise
+        // Samba/WebDAV files cannot play.
+        if let ctx = videoQueueContext,
+           let mb = ctx.mediaBrowserPlayback,
+           let queueManager = queueManager {
+            let playableFiles = mb.allFilesInFolder.filter { $0.isPlayable }
+            let index = playableFiles.firstIndex(where: { $0.toVideo().id.videoID == video.id.videoID })
+                ?? currentVideoIndex
+                ?? ctx.videoIndex
+                ?? 0
+            queueManager.playFromMediaBrowser(
+                files: playableFiles,
+                index: index,
+                source: mb.source,
+                allFilesInFolder: mb.allFilesInFolder
+            )
+            return
+        }
+
         guard let context = videoQueueContext,
               context.hasQueueInfo,
               let queueManager = queueManager,

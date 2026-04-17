@@ -162,12 +162,10 @@ struct MediaBrowserView: View {
                                             MediaFileRow(file: file, sortOrder: sortOrder)
                                         }
                                         .foregroundStyle(.primary)
+                                    } else if file.isPlayable {
+                                        playableFileRow(for: file)
                                     } else {
-                                        MediaFileRow(file: file, sortOrder: sortOrder) {
-                                            if file.isPlayable {
-                                                playFile(file)
-                                            }
-                                        }
+                                        MediaFileRow(file: file, sortOrder: sortOrder)
                                     }
                                 }
                             }
@@ -274,7 +272,76 @@ struct MediaBrowserView: View {
         }
     }
 
+    // MARK: - Playable row composition
+
+    @ViewBuilder
+    private func playableFileRow(for file: MediaFile) -> some View {
+        #if os(tvOS)
+        MediaFileTVOSTapButton(
+            onPlay: { playFile(file) },
+            onOpenInfo: { openInfo(for: file) }
+        ) {
+            MediaFileRow(file: file, sortOrder: sortOrder)
+        }
+        .videoContextMenu(video: file.toVideo(), context: .mediaBrowser)
+        #else
+        MediaFileRow(
+            file: file,
+            sortOrder: sortOrder,
+            iconAreaModifier: { view in
+                AnyView(
+                    view.mediaFileRegionTap(
+                        action: appEnvironment?.settingsManager.thumbnailTapAction ?? .playVideo,
+                        onPlay: { playFile(file) },
+                        onOpenInfo: { openInfo(for: file) }
+                    )
+                )
+            },
+            textAreaModifier: { view in
+                AnyView(
+                    view.mediaFileRegionTap(
+                        action: appEnvironment?.settingsManager.textAreaTapAction ?? .openInfo,
+                        onPlay: { playFile(file) },
+                        onOpenInfo: { openInfo(for: file) }
+                    )
+                )
+            }
+        )
+        .contentShape(Rectangle())
+        .onTapGesture { playFile(file) }
+        .videoContextMenu(video: file.toVideo(), context: .mediaBrowser)
+        #endif
+    }
+
     // MARK: - Playback
+
+    private func openInfo(for file: MediaFile) {
+        guard let appEnvironment else { return }
+
+        let playableFiles = displayedFiles.filter { $0.isPlayable }
+        let videos = playableFiles.map { $0.toVideo() }
+        let index = playableFiles.firstIndex(where: { $0.id == file.id }) ?? 0
+        let folderPath = (file.path as NSString).deletingLastPathComponent
+        let folderName = (folderPath as NSString).lastPathComponent
+
+        let context = VideoQueueContext(
+            video: file.toVideo(),
+            queueSource: .mediaBrowser(sourceID: source.id, folderPath: folderPath),
+            sourceLabel: folderName.isEmpty ? source.name : folderName,
+            videoList: videos,
+            videoIndex: index,
+            startTime: nil,
+            loadMoreVideos: nil,
+            mediaBrowserPlayback: MediaBrowserPlaybackInfo(
+                source: source,
+                allFilesInFolder: files
+            )
+        )
+
+        appEnvironment.navigationCoordinator.navigate(
+            to: .video(.loaded(file.toVideo()), queueContext: context)
+        )
+    }
 
     private func playFile(_ file: MediaFile) {
         guard let appEnvironment else { return }

@@ -10,20 +10,22 @@ import SwiftUI
 struct MediaFileRow: View {
     let file: MediaFile
     let sortOrder: MediaBrowserSortOrder
-    let action: (() -> Void)?
 
-    /// Initialize with an action (for playable files).
-    init(file: MediaFile, sortOrder: MediaBrowserSortOrder = .name, action: @escaping () -> Void) {
+    /// Optional transforms applied to the icon and text regions so callers
+    /// (e.g. MediaFileTapModifier) can attach per-region gestures.
+    var iconAreaModifier: (AnyView) -> AnyView = { $0 }
+    var textAreaModifier: (AnyView) -> AnyView = { $0 }
+
+    init(
+        file: MediaFile,
+        sortOrder: MediaBrowserSortOrder = .name,
+        iconAreaModifier: @escaping (AnyView) -> AnyView = { $0 },
+        textAreaModifier: @escaping (AnyView) -> AnyView = { $0 }
+    ) {
         self.file = file
         self.sortOrder = sortOrder
-        self.action = action
-    }
-
-    /// Initialize without action (for use inside NavigationLink).
-    init(file: MediaFile, sortOrder: MediaBrowserSortOrder = .name) {
-        self.file = file
-        self.sortOrder = sortOrder
-        self.action = nil
+        self.iconAreaModifier = iconAreaModifier
+        self.textAreaModifier = textAreaModifier
     }
 
     /// The date to display based on current sort order.
@@ -37,60 +39,44 @@ struct MediaFileRow: View {
     }
 
     var body: some View {
-        if let action {
-            Button(action: action) {
-                rowContent
-            }
-            .buttonStyle(.plain)
-            .if(file.isPlayable) { view in
-                view.videoContextMenu(
-                    video: file.toVideo(),
-                    context: .mediaBrowser
-                )
-            }
-        } else {
-            rowContent
-                .if(file.isPlayable) { view in
-                    view.videoContextMenu(
-                        video: file.toVideo(),
-                        context: .mediaBrowser
-                    )
-                }
+        HStack(spacing: 12) {
+            iconAreaModifier(AnyView(iconView))
+            textAreaModifier(AnyView(textView))
+            Spacer(minLength: 0)
         }
+        .contentShape(Rectangle())
     }
 
-    private var rowContent: some View {
-        HStack(spacing: 12) {
-            // Icon
-            Image(systemName: file.systemImage)
-                .font(.title2)
-                .foregroundStyle(iconColor)
-                .frame(width: 32)
+    private var iconView: some View {
+        Image(systemName: file.systemImage)
+            .font(.title2)
+            .foregroundStyle(iconColor)
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
+    }
 
-            // File info
-            VStack(alignment: .leading, spacing: 2) {
-                Text(file.name)
-                    .font(.body)
-                    .lineLimit(2)
-                    .foregroundStyle(.primary)
+    private var textView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(file.name)
+                .font(.body)
+                .lineLimit(2)
+                .foregroundStyle(.primary)
 
-                HStack(spacing: 8) {
-                    if let size = file.formattedSize {
-                        Text(size)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+            HStack(spacing: 8) {
+                if let size = file.formattedSize {
+                    Text(size)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
-                    if let date = displayDate {
-                        Text(date, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                if let date = displayDate {
+                    Text(date, style: .date)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-
-            Spacer()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
     }
 
@@ -112,8 +98,8 @@ struct MediaFileRow: View {
 
 #Preview {
     List {
-        MediaFileRow(file: .folderPreview) {}
-        MediaFileRow(file: .preview) {}
+        MediaFileRow(file: .folderPreview)
+        MediaFileRow(file: .preview)
         MediaFileRow(
             file: MediaFile(
                 source: .webdav(name: "NAS", url: URL(string: "https://nas.local")!),
@@ -123,6 +109,6 @@ struct MediaFileRow: View {
                 size: 5_000_000,
                 modifiedDate: Date()
             )
-        ) {}
+        )
     }
 }
