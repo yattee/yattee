@@ -240,7 +240,7 @@ private struct BehaviorSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section(String(localized: "settings.playback.behavior.header")) {
+        Section {
             PlatformMenuPicker(
                 String(localized: "settings.playback.resumeAction"),
                 selection: $settings.resumeAction
@@ -255,6 +255,21 @@ private struct BehaviorSection: View {
                 String(localized: "settings.playback.backgroundPlayback"),
                 isOn: $settings.backgroundPlaybackEnabled
             )
+            #endif
+
+            #if os(tvOS)
+            Toggle(
+                String(localized: "settings.playback.tvOSMenuButtonClosesVideo"),
+                isOn: $settings.tvOSMenuButtonClosesVideo
+            )
+            #endif
+        } header: {
+            Text(String(localized: "settings.playback.behavior.header"))
+        } footer: {
+            #if os(tvOS)
+            Text(String(localized: "settings.playback.tvOSMenuButtonClosesVideo.footer"))
+            #else
+            EmptyView()
             #endif
         }
     }

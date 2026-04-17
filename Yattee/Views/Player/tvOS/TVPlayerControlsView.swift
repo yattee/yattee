@@ -170,15 +170,19 @@ struct TVPlayerControlsView: View {
             // Close button — stops playback and dismisses.
             // Menu button only hides the player (keeps background playback),
             // so an explicit Close is kept here, icon-only in the top bar.
-            Button {
-                onClose()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 26, weight: .semibold))
+            // When `tvOSMenuButtonClosesVideo` is enabled, the Menu button
+            // takes over this role and the explicit button is hidden.
+            if appEnvironment?.settingsManager.tvOSMenuButtonClosesVideo != true {
+                Button {
+                    onClose()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 26, weight: .semibold))
+                }
+                .buttonStyle(TVCloseButtonStyle())
+                .focused($focusedControl, equals: .closeButton)
+                .accessibilityLabel(Text("player.controls.close"))
             }
-            .buttonStyle(TVCloseButtonStyle())
-            .focused($focusedControl, equals: .closeButton)
-            .accessibilityLabel(Text("player.controls.close"))
         }
     }
 

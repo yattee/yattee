@@ -11845,6 +11845,26 @@
         }
       }
     },
+    "settings.playback.tvOSMenuButtonClosesVideo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu Button Closes Video"
+          }
+        }
+      }
+    },
+    "settings.playback.tvOSMenuButtonClosesVideo.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, the Siri remote Menu button stops playback and clears the queue. The close (X) button is hidden from the player. When disabled, Menu collapses the player and playback continues in the background."
+          }
+        }
+      }
+    },
     "settings.playback.behavior.header" : {
       "localizations" : {
         "en" : {

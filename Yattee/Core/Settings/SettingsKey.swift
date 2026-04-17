@@ -24,6 +24,7 @@ enum SettingsKey: String, CaseIterable {
     case preferredAudioLanguage
     case preferredSubtitlesLanguage
     case resumeAction
+    case tvOSMenuButtonClosesVideo
 
     // SponsorBlock
     case sponsorBlockEnabled

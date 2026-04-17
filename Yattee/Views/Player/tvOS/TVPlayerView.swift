@@ -667,6 +667,9 @@ struct TVPlayerView: View {
         } else if controlsVisible {
             // Fifth: hide controls
             hideControls()
+        } else if appEnvironment?.settingsManager.tvOSMenuButtonClosesVideo == true {
+            // Sixth (Menu-closes mode): fully close the video like the xmark button
+            closeVideo()
         } else {
             // Sixth: dismiss player (controls already hidden)
             dismissPlayer()

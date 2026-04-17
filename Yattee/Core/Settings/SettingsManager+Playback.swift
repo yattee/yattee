@@ -48,6 +48,20 @@ extension SettingsManager {
         }
     }
 
+    /// tvOS only: when enabled, the Siri remote Menu button closes the video
+    /// (clears queue, stops playback) instead of only collapsing the player.
+    /// When enabled, the explicit top-bar close button is hidden.
+    var tvOSMenuButtonClosesVideo: Bool {
+        get {
+            if let cached = _tvOSMenuButtonClosesVideo { return cached }
+            return bool(for: .tvOSMenuButtonClosesVideo, default: false)
+        }
+        set {
+            _tvOSMenuButtonClosesVideo = newValue
+            set(newValue, for: .tvOSMenuButtonClosesVideo)
+        }
+    }
+
     /// Whether DASH streams are enabled (MPV only).
     /// Disabled by default as DASH can be unreliable with some Invidious instances.
     var dashEnabled: Bool {
