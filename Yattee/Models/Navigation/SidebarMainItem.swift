@@ -181,6 +181,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .downloads: self = .downloads
         case .sources: self = .sources
         case .settings: self = .settings
+        case .continueWatching: self = .continueWatching
         }
     }
 }

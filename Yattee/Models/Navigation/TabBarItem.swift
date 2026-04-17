@@ -17,17 +17,18 @@ enum TabBarItem: String, CaseIterable, Codable, Identifiable, Sendable {
     case downloads
     case sources
     case settings
+    case continueWatching
 
     var id: String { rawValue }
 
     /// Default order for tab bar items.
     static var defaultOrder: [TabBarItem] {
-        [.subscriptions, .channels, .bookmarks, .playlists, .history, .sources, .downloads, .settings]
+        [.subscriptions, .channels, .bookmarks, .playlists, .history, .continueWatching, .sources, .downloads, .settings]
     }
 
     /// Default visibility (only subscriptions visible by default).
     static var defaultVisibility: [TabBarItem: Bool] {
-        [.subscriptions: false, .channels: false, .bookmarks: false, .playlists: false, .history: false, .downloads: true, .sources: true, .settings: false]
+        [.subscriptions: false, .channels: false, .bookmarks: false, .playlists: false, .history: false, .downloads: true, .sources: true, .settings: false, .continueWatching: false]
     }
 
     /// SF Symbol icon name.
@@ -41,6 +42,7 @@ enum TabBarItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .downloads: "arrow.down.circle"
         case .sources: "server.rack"
         case .settings: "gear"
+        case .continueWatching: "play.circle"
         }
     }
 
@@ -55,6 +57,7 @@ enum TabBarItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .downloads: String(localized: "tabBar.item.downloads")
         case .sources: String(localized: "tabBar.item.sources")
         case .settings: String(localized: "tabBar.item.settings")
+        case .continueWatching: String(localized: "tabBar.item.continueWatching")
         }
     }
 }

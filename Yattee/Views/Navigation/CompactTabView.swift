@@ -25,6 +25,7 @@ struct CompactTabView: View {
     @State private var downloadsPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
+    @State private var continueWatchingPath = NavigationPath()
 
     // Tab selection - using String to support both fixed and dynamic tabs
     // Initial value is a placeholder; actual startup tab is applied in onAppear
@@ -241,6 +242,8 @@ struct CompactTabView: View {
             sourcesPath.append(destination)
         case TabBarItem.settings.rawValue:
             settingsPath.append(destination)
+        case TabBarItem.continueWatching.rawValue:
+            continueWatchingPath.append(destination)
         default:
             homePath.append(destination)
         }
@@ -291,6 +294,11 @@ struct CompactTabView: View {
                 SettingsView(showCloseButton: false)
                     .withNavigationDestinations()
             }
+        case .continueWatching:
+            NavigationStack(path: $continueWatchingPath) {
+                ContinueWatchingView()
+                    .withNavigationDestinations()
+            }
         }
     }
 
@@ -321,6 +329,8 @@ struct CompactTabView: View {
             sourcesPath.append(destination)
         case TabBarItem.settings.rawValue:
             settingsPath.append(destination)
+        case TabBarItem.continueWatching.rawValue:
+            continueWatchingPath.append(destination)
         default:
             // Fallback to home
             homePath.append(destination)

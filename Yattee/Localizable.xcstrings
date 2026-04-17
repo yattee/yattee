@@ -16712,6 +16712,17 @@
         }
       }
     },
+    "tabBar.item.continueWatching" : {
+      "comment" : "Tab bar item title for continue watching (short title)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
     "tabBar.item.sources" : {
       "comment" : "Tab bar item title for sources",
       "localizations" : {
