@@ -24,6 +24,7 @@ struct MediaBrowserView: View {
     @State private var showViewOptions = false
     #if os(tvOS)
     @State private var unsupportedFile: MediaFile?
+    @FocusState private var firstFileFocused: Bool
     #endif
 
     private var listStyle: VideoListStyle {
@@ -59,6 +60,115 @@ struct MediaBrowserView: View {
     }
 
     var body: some View {
+        content
+            #if !os(tvOS)
+            .navigationTitle(navigationTitle)
+            .toolbarTitleDisplayMode(.inlineLarge)
+            #endif
+            .toolbar {
+                #if !os(tvOS)
+                ToolbarItem(placement: .primaryAction) {
+                    if isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Button {
+                            Task { await loadFiles() }
+                        } label: {
+                            Label(String(localized: "common.refresh"), systemImage: "arrow.clockwise")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showViewOptions = true
+                    } label: {
+                        Label(
+                            String(localized: "viewOptions.title"),
+                            systemImage: showOnlyPlayable
+                                ? "line.3.horizontal.decrease.circle.fill"
+                                : "line.3.horizontal.decrease.circle"
+                        )
+                    }
+                    .liquidGlassTransitionSource(id: "mediaBrowserViewOptions", in: sheetTransition)
+                }
+                #endif
+            }
+            .sheet(isPresented: $showViewOptions) {
+                MediaBrowserViewOptionsSheet(
+                    sourceType: source.type,
+                    sortOrder: $sortOrder,
+                    sortAscending: $sortAscending,
+                    showOnlyPlayable: $showOnlyPlayable
+                )
+                .liquidGlassSheetContent(sourceID: "mediaBrowserViewOptions", in: sheetTransition)
+            }
+            .task {
+                await loadFiles()
+            }
+            .onChange(of: sortOrder) { _, newValue in
+                savePreference(newValue.rawValue, forKey: "sortOrder")
+            }
+            .onChange(of: sortAscending) { _, newValue in
+                savePreference(newValue, forKey: "sortAscending")
+            }
+            .onChange(of: showOnlyPlayable) { _, newValue in
+                savePreference(newValue, forKey: "showOnlyPlayable")
+            }
+            #if os(tvOS)
+            .onChange(of: displayedFiles.isEmpty) { wasEmpty, isEmpty in
+                if wasEmpty && !isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        firstFileFocused = true
+                    }
+                }
+            }
+            #endif
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        #if os(tvOS)
+        TVSidebarDetailContainer(
+            systemImage: "folder",
+            title: navigationTitle
+        ) {
+            VStack(spacing: 0) {
+                if !(isLoading && files.isEmpty) {
+                    HStack(spacing: 24) {
+                        Button {
+                            Task { await loadFiles() }
+                        } label: {
+                            Label(String(localized: "common.refresh"), systemImage: "arrow.clockwise")
+                        }
+                        Button {
+                            showViewOptions = true
+                        } label: {
+                            Label(
+                                String(localized: "viewOptions.title"),
+                                systemImage: showOnlyPlayable
+                                    ? "line.3.horizontal.decrease.circle.fill"
+                                    : "line.3.horizontal.decrease.circle"
+                            )
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
+                    .focusSection()
+                }
+                inner
+                    .focusSection()
+            }
+        }
+        #else
+        inner
+        #endif
+    }
+
+    @ViewBuilder
+    private var inner: some View {
         Group {
             if isLoading && files.isEmpty {
                 ProgressView()
@@ -86,60 +196,6 @@ struct MediaBrowserView: View {
                 fileList
             }
         }
-        .navigationTitle(navigationTitle)
-        #if !os(tvOS)
-        .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
-        .toolbar {
-            #if !os(tvOS)
-            ToolbarItem(placement: .primaryAction) {
-                if isLoading {
-                    ProgressView()
-                        .controlSize(.small)
-                } else {
-                    Button {
-                        Task { await loadFiles() }
-                    } label: {
-                        Label(String(localized: "common.refresh"), systemImage: "arrow.clockwise")
-                    }
-                }
-            }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showViewOptions = true
-                } label: {
-                    Label(
-                        String(localized: "viewOptions.title"),
-                        systemImage: showOnlyPlayable
-                            ? "line.3.horizontal.decrease.circle.fill"
-                            : "line.3.horizontal.decrease.circle"
-                    )
-                }
-                .liquidGlassTransitionSource(id: "mediaBrowserViewOptions", in: sheetTransition)
-            }
-            #endif
-        }
-        .sheet(isPresented: $showViewOptions) {
-            MediaBrowserViewOptionsSheet(
-                sourceType: source.type,
-                sortOrder: $sortOrder,
-                sortAscending: $sortAscending,
-                showOnlyPlayable: $showOnlyPlayable
-            )
-            .liquidGlassSheetContent(sourceID: "mediaBrowserViewOptions", in: sheetTransition)
-        }
-        .task {
-            await loadFiles()
-        }
-        .onChange(of: sortOrder) { _, newValue in
-            savePreference(newValue.rawValue, forKey: "sortOrder")
-        }
-        .onChange(of: sortAscending) { _, newValue in
-            savePreference(newValue, forKey: "sortAscending")
-        }
-        .onChange(of: showOnlyPlayable) { _, newValue in
-            savePreference(newValue, forKey: "showOnlyPlayable")
-        }
     }
 
     private var navigationTitle: String {
@@ -149,41 +205,55 @@ struct MediaBrowserView: View {
         return (currentPath as NSString).lastPathComponent
     }
 
-    private var fileList: some View {
-        (listStyle == .inset ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color)
-            .ignoresSafeArea()
-            .overlay(
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        sectionCard {
-                            ForEach(Array(displayedFiles.enumerated()), id: \.element.id) { index, file in
-                                let isLast = index == displayedFiles.count - 1
+    private var fileListBackground: Color {
+        listStyle == .inset ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color
+    }
 
-                                SourceListRow(isLast: isLast, listStyle: listStyle) {
-                                    if file.isDirectory {
-                                        NavigationLink(value: NavigationDestination.mediaBrowser(source, path: file.path, showOnlyPlayable: showOnlyPlayable)) {
-                                            MediaFileRow(file: file, sortOrder: sortOrder)
-                                        }
-                                        .foregroundStyle(.primary)
-                                    } else if file.isPlayable {
-                                        playableFileRow(for: file)
-                                    } else {
-                                        #if os(tvOS)
-                                        MediaFileTVOSUnsupportedButton(onTap: { unsupportedFile = file }) {
-                                            MediaFileRow(file: file, sortOrder: sortOrder)
-                                        }
-                                        #else
-                                        MediaFileRow(file: file, sortOrder: sortOrder)
-                                        #endif
-                                    }
+    private var fileListScrollView: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                sectionCard {
+                    ForEach(Array(displayedFiles.enumerated()), id: \.element.id) { index, file in
+                        let isLast = index == displayedFiles.count - 1
+                        let isFirst = index == 0
+
+                        SourceListRow(isLast: isLast, listStyle: listStyle) {
+                            if file.isDirectory {
+                                NavigationLink(value: NavigationDestination.mediaBrowser(source, path: file.path, showOnlyPlayable: showOnlyPlayable)) {
+                                    MediaFileRow(file: file, sortOrder: sortOrder)
                                 }
+                                .foregroundStyle(.primary)
+                            } else if file.isPlayable {
+                                playableFileRow(for: file)
+                            } else {
+                                #if os(tvOS)
+                                MediaFileTVOSUnsupportedButton(onTap: { unsupportedFile = file }) {
+                                    MediaFileRow(file: file, sortOrder: sortOrder)
+                                }
+                                #else
+                                MediaFileRow(file: file, sortOrder: sortOrder)
+                                #endif
                             }
                         }
+                        #if os(tvOS)
+                        .modifier(FirstRowFocusModifier(isFirst: isFirst, focus: $firstFileFocused))
+                        #endif
                     }
-                    .padding(.top, 16)
                 }
-            )
-            #if os(tvOS)
+            }
+            .padding(.top, 16)
+        }
+    }
+
+    @ViewBuilder
+    private var fileList: some View {
+        #if os(tvOS)
+        // On tvOS do NOT ignoreSafeArea — otherwise the ScrollView extends
+        // under TVSidebarDetailContainer's 400pt leading inset, and left-press
+        // from a file row escapes to the outer sidebarAdaptable TabView
+        // instead of reaching the inline Refresh / View Options buttons.
+        fileListBackground
+            .overlay(fileListScrollView)
             .alert(
                 String(localized: "mediaBrowser.unsupportedFile.title"),
                 isPresented: Binding(
@@ -196,7 +266,11 @@ struct MediaBrowserView: View {
             } message: { file in
                 Text(String(localized: "mediaBrowser.unsupportedFile.message \(file.name)"))
             }
-            #endif
+        #else
+        fileListBackground
+            .ignoresSafeArea()
+            .overlay(fileListScrollView)
+        #endif
     }
 
     @ViewBuilder
@@ -387,6 +461,21 @@ struct MediaBrowserView: View {
         )
     }
 }
+
+#if os(tvOS)
+private struct FirstRowFocusModifier: ViewModifier {
+    let isFirst: Bool
+    var focus: FocusState<Bool>.Binding
+
+    func body(content: Content) -> some View {
+        if isFirst {
+            content.focused(focus)
+        } else {
+            content
+        }
+    }
+}
+#endif
 
 // MARK: - Preview
 

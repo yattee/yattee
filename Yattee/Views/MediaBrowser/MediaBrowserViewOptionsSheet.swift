@@ -22,47 +22,11 @@ struct MediaBrowserViewOptionsSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Toggle("mediaBrowser.viewOptions.showOnlyPlayable", isOn: $showOnlyPlayable)
-                    PlatformMenuPicker(String(localized: "mediaBrowser.viewOptions.sortBy"), selection: $sortOrder) {
-                        ForEach(availableSortOptions) { order in
-                            Label(order.displayName, systemImage: order.systemImage)
-                                .tag(order)
-                        }
-                    }
-
-                    Picker("mediaBrowser.viewOptions.order", selection: $sortAscending) {
-                        Label(String(localized: "mediaBrowser.viewOptions.ascending"), systemImage: "arrow.up")
-                            .tag(true)
-                        Label(String(localized: "mediaBrowser.viewOptions.descending"), systemImage: "arrow.down")
-                            .tag(false)
-                    }
-                    .pickerStyle(.segmented)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                }
-            }
             #if os(tvOS)
-            .scrollClipDisabled()
-            .padding(.horizontal, 40)
-            .padding(.vertical, 24)
+            listContent
             #else
-            .navigationTitle("mediaBrowser.viewOptions.title")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            formContent
             #endif
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-            }
         }
         #if os(iOS)
         .presentationDetents([.height(280)])
@@ -72,6 +36,62 @@ struct MediaBrowserViewOptionsSheet: View {
             // Reset sort order if current selection is not available for this source type
             if !availableSortOptions.contains(sortOrder) {
                 sortOrder = .name
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var sharedOptions: some View {
+        Toggle("mediaBrowser.viewOptions.showOnlyPlayable", isOn: $showOnlyPlayable)
+        PlatformMenuPicker(String(localized: "mediaBrowser.viewOptions.sortBy"), selection: $sortOrder) {
+            ForEach(availableSortOptions) { order in
+                Label(order.displayName, systemImage: order.systemImage)
+                    .tag(order)
+            }
+        }
+
+        Picker("mediaBrowser.viewOptions.order", selection: $sortAscending) {
+            Label(String(localized: "mediaBrowser.viewOptions.ascending"), systemImage: "arrow.up")
+                .tag(true)
+            Label(String(localized: "mediaBrowser.viewOptions.descending"), systemImage: "arrow.down")
+                .tag(false)
+        }
+        .pickerStyle(.segmented)
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+    }
+
+    #if os(tvOS)
+    private var listContent: some View {
+        List {
+            Section {
+                sharedOptions
+            }
+        }
+        .scrollClipDisabled()
+        .padding(.horizontal, 40)
+        .padding(.vertical, 24)
+    }
+    #endif
+
+    private var formContent: some View {
+        Form {
+            Section {
+                sharedOptions
+            }
+        }
+        .navigationTitle("mediaBrowser.viewOptions.title")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(role: .cancel) {
+                    dismiss()
+                } label: {
+                    Label(String(localized: "common.close"), systemImage: "xmark")
+                        .labelStyle(.iconOnly)
+                }
             }
         }
     }
