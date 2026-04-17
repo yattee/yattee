@@ -57,10 +57,25 @@ final class RecentPlaylist {
             title: playlist.title,
             authorName: playlist.authorName,
             videoCount: playlist.videoCount,
-            thumbnailURLString: playlist.thumbnailURL?.absoluteString
+            thumbnailURLString: upgradedThumbnailURLString(playlist.thumbnailURL)
         )
     }
-    
+
+    /// Rewrites YouTube `/vi/ID/{default|mq|hq|sd}default.jpg` thumbnails to `maxresdefault.jpg`
+    /// so recent playlist cards show a higher-quality image.
+    static func upgradedThumbnailURLString(_ url: URL?) -> String? {
+        guard let url else { return nil }
+        let path = url.path
+        let upgradable = ["default.jpg", "mqdefault.jpg", "hqdefault.jpg", "sddefault.jpg"]
+        guard path.range(of: #"/vi/[^/]+/"#, options: .regularExpression) != nil,
+              let match = upgradable.first(where: { path.hasSuffix($0) }),
+              var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return url.absoluteString
+        }
+        components.path = String(path.dropLast(match.count)) + "maxresdefault.jpg"
+        return components.url?.absoluteString ?? url.absoluteString
+    }
+
     private static func extractSourceInfo(from source: ContentSource) -> (String, String?) {
         switch source {
         case .global:
