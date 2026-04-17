@@ -227,6 +227,7 @@ struct InstanceBrowseView: View {
                         }
                     }
                 }
+                .scrollClipDisabled()
                 .refreshable {
                     await startContentLoad(forceRefresh: true)
                 }

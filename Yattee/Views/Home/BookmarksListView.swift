@@ -259,6 +259,9 @@ struct BookmarksListView: View {
                 }
             }
         }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
     }
 
     // MARK: - Helper Views

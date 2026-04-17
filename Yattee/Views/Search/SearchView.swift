@@ -946,6 +946,7 @@ struct SearchView: View {
                     gridResultsContent
                 }
             }
+            .scrollClipDisabled()
             .accessibilityLabel("search.results")
             .background(
                 GeometryReader { geometry in

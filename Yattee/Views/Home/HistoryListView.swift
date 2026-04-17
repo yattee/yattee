@@ -317,6 +317,9 @@ struct HistoryListView: View {
                 }
             }
         }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
     }
 
     private var confirmationTitle: String {
