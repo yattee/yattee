@@ -13,6 +13,7 @@
 		378CF3012EF21783002C1CD7 /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = 378CF3002EF21783002C1CD7 /* MPVKit-GPL */; };
 		37BA19A62EE4DFEE001D7B0F /* Yattee2.icon in Resources */ = {isa = PBXBuildFile; fileRef = 37BA19A52EE4DFEE001D7B0F /* Yattee2.icon */; };
 		37BA19B52EE4EB7F001D7B0F /* YatteeShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37BA19AB2EE4EB7F001D7B0F /* YatteeShareExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37C0AAAA00000000AAAA000C /* YatteeTopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,6 +23,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 37BA19AA2EE4EB7F001D7B0F;
 			remoteInfo = YatteeShareExtension;
+		};
+		37C0AAAA00000000AAAA0008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 372D1A1F2EDB163800F58F7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37C0AAAA00000000AAAA0001;
+			remoteInfo = YatteeTopShelf;
 		};
 		37D0B2982EDB23BD00B9C4ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -40,6 +48,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				37BA19B52EE4EB7F001D7B0F /* YatteeShareExtension.appex in Embed Foundation Extensions */,
+				37C0AAAA00000000AAAA000C /* YatteeTopShelf.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,6 +59,7 @@
 		372D1A272EDB163800F58F7A /* Yattee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yattee.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BA19A52EE4DFEE001D7B0F /* Yattee2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Yattee2.icon; sourceTree = "<group>"; };
 		37BA19AB2EE4EB7F001D7B0F /* YatteeShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = YatteeShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = YatteeTopShelf.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D0B2942EDB23BD00B9C4ED /* YatteeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YatteeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -68,6 +78,13 @@
 			);
 			target = 37BA19AA2EE4EB7F001D7B0F /* YatteeShareExtension */;
 		};
+		37C0AAAA00000000AAAA000D /* Exceptions for "YatteeTopShelf" folder in "YatteeTopShelf" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 37C0AAAA00000000AAAA0001 /* YatteeTopShelf */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,6 +102,14 @@
 				37BA19B92EE4EB7F001D7B0F /* Exceptions for "YatteeShareExtension" folder in "YatteeShareExtension" target */,
 			);
 			path = YatteeShareExtension;
+			sourceTree = "<group>";
+		};
+		37C0AAAA00000000AAAA0003 /* YatteeTopShelf */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				37C0AAAA00000000AAAA000D /* Exceptions for "YatteeTopShelf" folder in "YatteeTopShelf" target */,
+			);
+			path = YatteeTopShelf;
 			sourceTree = "<group>";
 		};
 		37D0B2952EDB23BD00B9C4ED /* YatteeTests */ = {
@@ -113,6 +138,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		37C0AAAA00000000AAAA0005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37D0B2912EDB23BD00B9C4ED /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -129,6 +161,7 @@
 				372D1A292EDB163800F58F7A /* Yattee */,
 				37D0B2952EDB23BD00B9C4ED /* YatteeTests */,
 				37BA19AC2EE4EB7F001D7B0F /* YatteeShareExtension */,
+				37C0AAAA00000000AAAA0003 /* YatteeTopShelf */,
 				372D1A282EDB163800F58F7A /* Products */,
 				37BA19A52EE4DFEE001D7B0F /* Yattee2.icon */,
 			);
@@ -140,6 +173,7 @@
 				372D1A272EDB163800F58F7A /* Yattee.app */,
 				37D0B2942EDB23BD00B9C4ED /* YatteeTests.xctest */,
 				37BA19AB2EE4EB7F001D7B0F /* YatteeShareExtension.appex */,
+				37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,6 +194,7 @@
 			);
 			dependencies = (
 				37BA19B42EE4EB7F001D7B0F /* PBXTargetDependency */,
+				37C0AAAA00000000AAAA0007 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				372D1A292EDB163800F58F7A /* Yattee */,
@@ -196,6 +231,28 @@
 			productName = YatteeShareExtension;
 			productReference = 37BA19AB2EE4EB7F001D7B0F /* YatteeShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		37C0AAAA00000000AAAA0001 /* YatteeTopShelf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37C0AAAA00000000AAAA0009 /* Build configuration list for PBXNativeTarget "YatteeTopShelf" */;
+			buildPhases = (
+				37C0AAAA00000000AAAA0004 /* Sources */,
+				37C0AAAA00000000AAAA0005 /* Frameworks */,
+				37C0AAAA00000000AAAA0006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				37C0AAAA00000000AAAA0003 /* YatteeTopShelf */,
+			);
+			name = YatteeTopShelf;
+			packageProductDependencies = (
+			);
+			productName = YatteeTopShelf;
+			productReference = 37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */;
+			productType = "com.apple.product-type.tv-app-extension";
 		};
 		37D0B2932EDB23BD00B9C4ED /* YatteeTests */ = {
 			isa = PBXNativeTarget;
@@ -236,6 +293,9 @@
 					37BA19AA2EE4EB7F001D7B0F = {
 						CreatedOnToolsVersion = 26.2;
 					};
+					37C0AAAA00000000AAAA0001 = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					37D0B2932EDB23BD00B9C4ED = {
 						CreatedOnToolsVersion = 26.1.1;
 						TestTargetID = 372D1A262EDB163800F58F7A;
@@ -263,6 +323,7 @@
 				372D1A262EDB163800F58F7A /* Yattee */,
 				37D0B2932EDB23BD00B9C4ED /* YatteeTests */,
 				37BA19AA2EE4EB7F001D7B0F /* YatteeShareExtension */,
+				37C0AAAA00000000AAAA0001 /* YatteeTopShelf */,
 			);
 		};
 /* End PBXProject section */
@@ -277,6 +338,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		37BA19A92EE4EB7F001D7B0F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37C0AAAA00000000AAAA0006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -307,6 +375,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		37C0AAAA00000000AAAA0004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		37D0B2902EDB23BD00B9C4ED /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -322,6 +397,11 @@
 			platformFilter = ios;
 			target = 37BA19AA2EE4EB7F001D7B0F /* YatteeShareExtension */;
 			targetProxy = 37BA19B32EE4EB7F001D7B0F /* PBXContainerItemProxy */;
+		};
+		37C0AAAA00000000AAAA0007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37C0AAAA00000000AAAA0001 /* YatteeTopShelf */;
+			targetProxy = 37C0AAAA00000000AAAA0008 /* PBXContainerItemProxy */;
 		};
 		37D0B2992EDB23BD00B9C4ED /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -674,6 +754,75 @@
 			};
 			name = Release;
 		};
+		37C0AAAA00000000AAAA000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YatteeTopShelf/YatteeTopShelf.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 256;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yattee Top Shelf";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.TopShelf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				LD_ENTRY_POINT = _NSExtensionMain;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Debug;
+		};
+		37C0AAAA00000000AAAA000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YatteeTopShelf/YatteeTopShelf.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 256;
+				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yattee Top Shelf";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = stream.yattee.app.TopShelf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				LD_ENTRY_POINT = _NSExtensionMain;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		37D0B29B2EDB23BD00B9C4ED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -758,6 +907,15 @@
 			buildConfigurations = (
 				37BA19B72EE4EB7F001D7B0F /* Debug */,
 				37BA19B82EE4EB7F001D7B0F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37C0AAAA00000000AAAA0009 /* Build configuration list for PBXNativeTarget "YatteeTopShelf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37C0AAAA00000000AAAA000A /* Debug */,
+				37C0AAAA00000000AAAA000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

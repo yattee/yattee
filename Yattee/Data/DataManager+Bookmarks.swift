@@ -140,6 +140,7 @@ extension DataManager {
             modelContext.insert(bookmark)
             save()
         }
+        TopShelfSnapshotWriter.writeBookmarks(dataManager: self)
     }
     
     /// Updates bookmark tags and note for a video.

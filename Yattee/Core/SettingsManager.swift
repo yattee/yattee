@@ -109,6 +109,9 @@ final class SettingsManager {
     var _homeSectionItemsLimit: Int?
     var _homeSectionLayout: HomeSectionLayout?
 
+    // Top Shelf (tvOS)
+    var _topShelfSections: [TopShelfSection]?
+
     // Tab bar settings (compact size class only - iOS)
     var _tabBarItemOrder: [TabBarItem]?
     var _tabBarItemVisibility: [TabBarItem: Bool]?
@@ -453,6 +456,7 @@ final class SettingsManager {
         _homeSectionVisibility = nil
         _homeSectionItemsLimit = nil
         _homeSectionLayout = nil
+        _topShelfSections = nil
         _tabBarItemOrder = nil
         _tabBarItemVisibility = nil
         _sidebarMainItemOrder = nil

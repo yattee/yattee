@@ -65,6 +65,9 @@ enum SettingsKey: String, CaseIterable {
     case homeSectionItemsLimit
     case homeSectionLayout
 
+    // Top Shelf (tvOS)
+    case topShelfSections
+
     // Tab Bar (compact size class)
     case tabBarItemOrder
     case tabBarItemVisibility
@@ -126,6 +129,8 @@ enum SettingsKey: String, CaseIterable {
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout,
              .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit, .homeSectionLayout,
+             // Top Shelf — tvOS only
+             .topShelfSections,
              // Tab bar (compact size class) layout
              .tabBarItemOrder, .tabBarItemVisibility, .tabBarStartupTab,
              // Sidebar layout/selection

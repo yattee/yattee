@@ -131,6 +131,10 @@ struct SettingsView: View {
                         Label(String(localized: "settings.layoutNavigation.title"), systemImage: "hand.tap")
                     }
 
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "rectangle.on.rectangle.angled", title: String(localized: "settings.topShelf.title", defaultValue: "Top Shelf")) { TopShelfSettingsView() } } label: {
+                        Label(String(localized: "settings.topShelf.title", defaultValue: "Top Shelf"), systemImage: "rectangle.on.rectangle.angled")
+                    }
+
                     NavigationLink { TVSidebarDetailContainer(systemImage: "play.circle", title: String(localized: "settings.playback.sectionTitle")) { PlaybackSettingsView() } } label: {
                         Label(String(localized: "settings.playback.sectionTitle"), systemImage: "play.circle")
                     }

@@ -76,6 +76,13 @@ struct YatteeApp: App {
                 }
                 .onAppear {
                     registerBackgroundTasksIfNeeded()
+                    #if os(tvOS)
+                    TopShelfSnapshotWriter.startObserving(dataManager: appEnvironment.dataManager)
+                    TopShelfSnapshotWriter.writeAll(
+                        dataManager: appEnvironment.dataManager,
+                        settingsManager: appEnvironment.settingsManager
+                    )
+                    #endif
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .continueUserActivity)) { notification in
                     if let activity = notification.object as? NSUserActivity {
@@ -373,15 +380,51 @@ struct YatteeApp: App {
 
     /// Play a video from a deep link.
     private func playVideoFromDeepLink(videoID: VideoID) async {
-        guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else { return }
+        LoggingService.shared.info(
+            "Deep link play: videoID=\(videoID.videoID) source=\(videoID.source)",
+            category: .general
+        )
+        guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
+            LoggingService.shared.warning(
+                "Deep link play: no instance configured for source \(videoID.source) — aborting",
+                category: .general
+            )
+            appEnvironment.toastManager.showError(
+                String(localized: "deepLink.noInstance.title", defaultValue: "Can't open video"),
+                subtitle: String(
+                    localized: "deepLink.noInstance.subtitle",
+                    defaultValue: "No source is configured for this video."
+                )
+            )
+            return
+        }
+        LoggingService.shared.info(
+            "Deep link play: using instance \(instance.url.absoluteString)",
+            category: .general
+        )
+
+        let toastID = appEnvironment.toastManager.show(
+            scopes: [.main, .player],
+            category: .loading,
+            title: String(localized: "deepLink.loading.title", defaultValue: "Loading video…"),
+            subtitle: instance.name,
+            autoDismissDelay: 30.0
+        )
 
         do {
             let video = try await appEnvironment.contentService.video(
                 id: videoID.videoID,
                 instance: instance
             )
+            LoggingService.shared.info("Deep link play: fetched video, opening player", category: .general)
+            appEnvironment.toastManager.dismiss(id: toastID)
             appEnvironment.playerService.openVideo(video)
         } catch {
+            LoggingService.shared.error(
+                "Deep link play: video fetch failed (\(error.localizedDescription)), falling back to info view",
+                category: .general
+            )
+            appEnvironment.toastManager.dismiss(id: toastID)
             // If video fetch fails, fall back to navigating to the video info view
             appEnvironment.navigationCoordinator.navigate(to: .video(.id(videoID)))
         }

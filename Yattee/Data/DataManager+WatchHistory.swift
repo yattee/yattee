@@ -69,6 +69,7 @@ extension DataManager {
 
             // Queue for CloudKit sync
             cloudKitSync?.queueWatchEntrySave(entry)
+            TopShelfSnapshotWriter.writeContinueWatching(dataManager: self)
         } catch {
             LoggingService.shared.logCloudKitError("Failed to update watch progress", error: error)
         }
@@ -148,6 +149,7 @@ extension DataManager {
             modelContext.insert(watchEntry)
             save()
         }
+        TopShelfSnapshotWriter.writeContinueWatching(dataManager: self)
     }
 
     /// Clears all watch history.

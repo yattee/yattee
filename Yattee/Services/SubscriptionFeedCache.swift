@@ -188,6 +188,7 @@ final class SubscriptionFeedCache {
             category: .general
         )
         saveToDisk()
+        TopShelfSnapshotWriter.writeFeed()
     }
 
     /// Appends videos to the existing cache (for pagination).
