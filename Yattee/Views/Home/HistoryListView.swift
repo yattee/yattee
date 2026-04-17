@@ -93,6 +93,21 @@ struct HistoryListView: View {
                     } label: {
                         Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                     }
+
+                    if !history.isEmpty {
+                        Menu {
+                            ForEach(ClearHistoryOption.allCases, id: \.self) { option in
+                                Button(role: .destructive) {
+                                    selectedClearOption = option
+                                    showingClearConfirmation = true
+                                } label: {
+                                    Label(option.localizedTitle, systemImage: option.systemImage)
+                                }
+                            }
+                        } label: {
+                            Label(String(localized: "home.history.clear"), systemImage: "trash")
+                        }
+                    }
                 }
                 .focusSection()
                 .padding(.horizontal, 48)
