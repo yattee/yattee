@@ -97,6 +97,7 @@ struct HistoryListView: View {
                 .focusSection()
                 .padding(.horizontal, 48)
                 .padding(.top, 20)
+                .padding(.bottom, 20)
 
                 // Content
                 Group {

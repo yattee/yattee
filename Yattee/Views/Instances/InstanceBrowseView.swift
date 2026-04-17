@@ -151,6 +151,7 @@ struct InstanceBrowseView: View {
                 .focusSection()
                 .padding(.horizontal, 48)
                 .padding(.top, 20)
+                .padding(.bottom, 20)
                 // Content
                 ScrollView {
                     VStack(spacing: 0) {
