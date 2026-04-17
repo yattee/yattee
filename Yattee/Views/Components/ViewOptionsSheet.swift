@@ -41,50 +41,54 @@ struct ViewOptionsSheet: View {
 
     #if os(tvOS)
     private var tvOSContent: some View {
-        List {
-            Section {
-                Picker(selection: $layout) {
-                    ForEach(VideoListLayout.allCases, id: \.self) { option in
-                        Label(option.displayName, systemImage: option.systemImage)
-                            .tag(option)
+        NavigationStack {
+            List {
+                Section {
+                    Picker(selection: $layout) {
+                        ForEach(VideoListLayout.allCases, id: \.self) { option in
+                            Label(option.displayName, systemImage: option.systemImage)
+                                .tag(option)
+                        }
+                    } label: {
+                        Text("viewOptions.layout")
                     }
-                } label: {
-                    Text("viewOptions.layout")
-                }
-                .pickerStyle(.segmented)
+                    .pickerStyle(.segmented)
 
-                if layout == .list {
-                    Picker("viewOptions.rowSize", selection: $rowStyle) {
-                        Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
-                        Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
-                        Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
-                    }
-                }
-
-                if layout == .grid {
-                    Picker("viewOptions.columns.header", selection: $gridColumns) {
-                        ForEach(1...maxGridColumns, id: \.self) { count in
-                            Text("\(count)").tag(count)
+                    if layout == .list {
+                        Picker("viewOptions.rowSize", selection: $rowStyle) {
+                            Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
+                            Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
+                            Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
                         }
                     }
-                }
 
-                if let hideWatched = hideWatched {
-                    Toggle("viewOptions.hideWatched", isOn: hideWatched)
-                }
+                    if layout == .grid {
+                        Picker("viewOptions.columns.header", selection: $gridColumns) {
+                            ForEach(1...maxGridColumns, id: \.self) { count in
+                                Text("\(count)").tag(count)
+                            }
+                        }
+                    }
 
-                if let channelStripSize = channelStripSize {
-                    Picker("viewOptions.channelStrip", selection: channelStripSize) {
-                        ForEach(ChannelStripSize.allCases, id: \.self) { size in
-                            Text(size.displayName).tag(size)
+                    if let hideWatched = hideWatched {
+                        Toggle("viewOptions.hideWatched", isOn: hideWatched)
+                    }
+
+                    if let channelStripSize = channelStripSize {
+                        Picker("viewOptions.channelStrip", selection: channelStripSize) {
+                            ForEach(ChannelStripSize.allCases, id: \.self) { size in
+                                Text(size.displayName).tag(size)
+                            }
                         }
                     }
                 }
             }
+            .scrollClipDisabled()
+            .padding(.horizontal, 40)
+            .padding(.vertical, 24)
         }
-        .scrollClipDisabled()
-        .padding(.horizontal, 40)
-        .padding(.vertical, 24)
+        .presentationDetents([.height(360), .large])
+        .presentationDragIndicator(.visible)
     }
     #endif
 
