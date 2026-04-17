@@ -12,6 +12,9 @@ struct PlaylistsListView: View {
     @State private var playlists: [LocalPlaylist] = []
     @State private var showingNewPlaylist = false
     @State private var playlistToEdit: LocalPlaylist?
+    #if os(tvOS)
+    @FocusState private var focusedPlaylistID: UUID?
+    #endif
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
 
@@ -22,16 +25,19 @@ struct PlaylistsListView: View {
 
     var body: some View {
         Group {
+            #if os(tvOS)
+            tvOSContent
+            #else
             if playlists.isEmpty {
                 emptyView
             } else {
                 listContent
             }
+            #endif
         }
-        .navigationTitle(String(localized: "home.playlists.title"))
         #if !os(tvOS)
+        .navigationTitle(String(localized: "home.playlists.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
-        #endif
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -41,6 +47,7 @@ struct PlaylistsListView: View {
                 }
             }
         }
+        #endif
         .sheet(isPresented: $showingNewPlaylist) {
             PlaylistFormSheet(mode: .create) { title, description in
                 _ = dataManager?.createPlaylist(title: title, description: description)
@@ -60,6 +67,42 @@ struct PlaylistsListView: View {
             loadPlaylists()
         }
     }
+
+    #if os(tvOS)
+    // MARK: - tvOS Content
+
+    private var tvOSContent: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
+                Button {
+                    showingNewPlaylist = true
+                } label: {
+                    Label(String(localized: "home.playlists.new"), systemImage: "plus")
+                }
+            }
+            .focusSection()
+            .padding(.horizontal, 48)
+            .padding(.top, 20)
+
+            Group {
+                if playlists.isEmpty {
+                    emptyView
+                } else {
+                    listContent
+                }
+            }
+            .focusSection()
+        }
+        .onChange(of: playlists.first?.id, initial: true) { _, newValue in
+            // Work around tvOS focus bug: set initial focus to first playlist once cells materialize.
+            guard let newValue else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                focusedPlaylistID = newValue
+            }
+        }
+    }
+    #endif
 
     // MARK: - Empty View
 
@@ -95,6 +138,7 @@ struct PlaylistsListView: View {
                 ) {
                     playlistRow(playlist: playlist)
                 }
+                #if !os(tvOS)
                 .swipeActions {
                     SwipeAction(
                         symbolImage: "pencil",
@@ -114,6 +158,7 @@ struct PlaylistsListView: View {
                         reset()
                     }
                 }
+                #endif
             }
         }
     }
@@ -122,6 +167,16 @@ struct PlaylistsListView: View {
 
     @ViewBuilder
     private func playlistRow(playlist: LocalPlaylist) -> some View {
+        #if os(tvOS)
+        NavigationLink(value: NavigationDestination.playlist(.local(playlist.id, title: playlist.title))) {
+            PlaylistRowView(playlist: playlist)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .zoomTransitionSource(id: playlist.id)
+        .focused($focusedPlaylistID, equals: playlist.id)
+        #else
         PlaylistRowView(playlist: playlist)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
@@ -129,6 +184,7 @@ struct PlaylistsListView: View {
                 appEnvironment?.navigationCoordinator.navigate(to: .playlist(.local(playlist.id, title: playlist.title)))
             }
             .zoomTransitionSource(id: playlist.id)
+        #endif
     }
 
     private func loadPlaylists() {
