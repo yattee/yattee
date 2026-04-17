@@ -17,6 +17,74 @@ struct ResumeActionSheet: View {
     let onStartOver: () -> Void
 
     var body: some View {
+        #if os(tvOS)
+        tvOSContent
+        #else
+        iOSContent
+        #endif
+    }
+
+    #if os(tvOS)
+    private var tvOSContent: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(spacing: 16) {
+                        DeArrowVideoThumbnail(
+                            video: video,
+                            duration: video.formattedDuration
+                        )
+                        .frame(width: 480, height: 270)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(video.title)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .lineLimit(3)
+
+                            Text(video.author.name)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+
+                Section {
+                    Button {
+                        onContinue()
+                        dismiss()
+                    } label: {
+                        Label(
+                            String(localized: "resume.action.continueAt \(formattedResumeTime)"),
+                            systemImage: "play.fill"
+                        )
+                        .labelStyle(.titleAndIcon)
+                    }
+
+                    Button {
+                        onStartOver()
+                        dismiss()
+                    } label: {
+                        Label(
+                            String(localized: "resume.action.startFromBeginning"),
+                            systemImage: "arrow.counterclockwise"
+                        )
+                        .labelStyle(.titleAndIcon)
+                    }
+                }
+            }
+            .scrollClipDisabled()
+            .padding(.horizontal, 40)
+            .padding(.vertical, 24)
+        }
+    }
+    #else
+    private var iOSContent: some View {
         VStack(spacing: 0) {
             // Drag indicator
             RoundedRectangle(cornerRadius: 2.5)
@@ -104,6 +172,7 @@ struct ResumeActionSheet: View {
         .presentationDragIndicator(.hidden)
         .presentationCornerRadius(16)
     }
+    #endif
 
     // MARK: - Formatting
 
