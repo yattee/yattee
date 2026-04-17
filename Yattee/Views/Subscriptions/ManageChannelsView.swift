@@ -143,15 +143,21 @@ struct ManageChannelsView: View {
                         }
 
                         // Grid-specific options
-                        #if !os(tvOS)
                         if layout == .grid {
+                            #if os(tvOS)
+                            Picker("viewOptions.columns.header", selection: $gridColumns) {
+                                ForEach(1...max(1, gridConfig.maxColumns), id: \.self) { count in
+                                    Text("\(count)").tag(count)
+                                }
+                            }
+                            #else
                             Stepper(
                                 "viewOptions.columns \(min(max(1, gridColumns), gridConfig.maxColumns))",
                                 value: $gridColumns,
                                 in: 1...gridConfig.maxColumns
                             )
+                            #endif
                         }
-                        #endif
 
                         Picker("manageChannels.sortBy", selection: $sortOrder) {
                             Text("manageChannels.sortBy.name").tag(SidebarChannelSort.alphabetical)

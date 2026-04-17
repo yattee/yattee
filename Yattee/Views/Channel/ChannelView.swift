@@ -525,6 +525,9 @@ struct ChannelView: View {
             }
             .padding(.horizontal, 60)
             .padding(.vertical, 40)
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
         }
         .confirmationDialog(
             String(localized: "channel.unsubscribe.confirmation.title"),
@@ -732,6 +735,9 @@ struct ChannelView: View {
             }
             .padding(.horizontal, 60)
             .padding(.vertical, 40)
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
         }
     }
     #endif
