@@ -60,8 +60,7 @@ struct SourceListRow<Content: View>: View {
             .frame(height: 1)
             .padding(.leading, dividerLeadingPadding)
         #else
-        Divider()
-            .padding(.leading, dividerLeadingPadding)
+        EmptyView()
         #endif
     }
 }

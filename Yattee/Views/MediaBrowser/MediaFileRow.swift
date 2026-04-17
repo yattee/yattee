@@ -38,8 +38,16 @@ struct MediaFileRow: View {
         }
     }
 
+    private static let iconTextSpacing: CGFloat = {
+        #if os(tvOS)
+        return 24
+        #else
+        return 12
+        #endif
+    }()
+
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Self.iconTextSpacing) {
             iconAreaModifier(AnyView(iconView))
             textAreaModifier(AnyView(textView))
             Spacer(minLength: 0)
