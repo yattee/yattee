@@ -283,6 +283,15 @@ struct VideoInfoView: View {
             #else
             if let video = displayedVideo {
                 isBookmarked = dataManager?.isBookmarked(videoID: video.id.videoID) ?? false
+                if isBookmarked, let bookmark = dataManager?.bookmark(for: video.id.videoID) {
+                    currentBookmark = bookmark
+                    bookmarkTags = bookmark.tags
+                    bookmarkNote = bookmark.note ?? ""
+                } else {
+                    currentBookmark = nil
+                    bookmarkTags = []
+                    bookmarkNote = ""
+                }
                 watchEntry = dataManager?.watchEntry(for: video.id.videoID)
             }
             loadComments()
@@ -330,6 +339,15 @@ struct VideoInfoView: View {
             #else
             if let video = displayedVideo {
                 isBookmarked = dataManager?.isBookmarked(videoID: video.id.videoID) ?? false
+                if isBookmarked, let bookmark = dataManager?.bookmark(for: video.id.videoID) {
+                    currentBookmark = bookmark
+                    bookmarkTags = bookmark.tags
+                    bookmarkNote = bookmark.note ?? ""
+                } else {
+                    currentBookmark = nil
+                    bookmarkTags = []
+                    bookmarkNote = ""
+                }
                 watchEntry = dataManager?.watchEntry(for: video.id.videoID)
             }
             loadComments()
