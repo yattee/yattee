@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import CloudKit
 import Nuke
 #if canImport(UIKit)
 import UIKit
@@ -42,8 +43,9 @@ struct YatteeApp: App {
     @State private var showingDeepLinkDownloadSheet = false
     #endif
 
-    // Onboarding state
-    @State private var showingOnboarding = false
+    // First-launch state
+    @State private var showingICloudAlert = false
+    @State private var showingICloudProgress = false
     @State private var showingSettings = false
     @State private var showingOpenLinkSheet = false
 
@@ -119,23 +121,33 @@ struct YatteeApp: App {
                 }
                 #endif
                 #endif
-                // Onboarding sheet
-                #if os(tvOS)
-                .fullScreenCover(isPresented: $showingOnboarding) {
-                    NavigationStack {
-                        OnboardingSheetView()
-                            .appEnvironment(appEnvironment)
+                // First-launch iCloud sync prompt
+                .alert(
+                    String(localized: "settings.icloud.enable.confirmation.title"),
+                    isPresented: $showingICloudAlert
+                ) {
+                    Button(String(localized: "settings.icloud.enable.confirmation.action")) {
+                        enableICloudAndWait()
                     }
+                    Button(String(localized: "common.cancel"), role: .cancel) {
+                        appEnvironment.settingsManager.onboardingCompleted = true
+                    }
+                } message: {
+                    Text(String(localized: "settings.icloud.enable.confirmation.message"))
+                }
+                #if os(macOS)
+                .sheet(isPresented: $showingICloudProgress) {
+                    ICloudSyncProgressView()
+                        .appEnvironment(appEnvironment)
+                        .interactiveDismissDisabled()
                 }
                 #else
-                .sheet(isPresented: $showingOnboarding) {
-                    NavigationStack {
-                        OnboardingSheetView()
-                            .appEnvironment(appEnvironment)
-                    }
-                    .presentationDetents([.large])
-                    .interactiveDismissDisabled()
+                .fullScreenCover(isPresented: $showingICloudProgress) {
+                    ICloudSyncProgressView()
+                        .appEnvironment(appEnvironment)
                 }
+                #endif
+                #if !os(tvOS)
                 .sheet(isPresented: $showingSettings) {
                     SettingsView()
                         .appEnvironment(appEnvironment)
@@ -145,9 +157,6 @@ struct YatteeApp: App {
                         .appEnvironment(appEnvironment)
                 }
                 #endif
-                .onReceive(NotificationCenter.default.publisher(for: .showOnboarding)) { _ in
-                    showingOnboarding = true
-                }
                 .onReceive(NotificationCenter.default.publisher(for: .showSettings)) { _ in
                     showingSettings = true
                 }
@@ -276,12 +285,43 @@ struct YatteeApp: App {
         // Auto-delete old history entries based on retention setting
         performHistoryCleanup()
 
-        // Show onboarding on first launch
+        // Run first-launch tasks: silently import v1 data, then offer iCloud sync.
         if !appEnvironment.settingsManager.onboardingCompleted {
-            // Small delay to let the main UI settle
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                showingOnboarding = true
+            Task {
+                await appEnvironment.legacyMigrationService.autoImportIfNeeded()
+                await appEnvironment.cloudKitSync.refreshAccountStatus()
+
+                if appEnvironment.cloudKitSync.accountStatus == .available {
+                    // Small delay so the main UI has time to settle before the alert.
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    showingICloudAlert = true
+                } else {
+                    appEnvironment.settingsManager.onboardingCompleted = true
+                }
             }
+        }
+    }
+
+    /// Enables iCloud sync and waits for the initial upload to complete,
+    /// showing a blocking progress overlay while sync runs.
+    private func enableICloudAndWait() {
+        showingICloudProgress = true
+        Task {
+            let settings = appEnvironment.settingsManager
+            let cloudKit = appEnvironment.cloudKitSync
+
+            settings.iCloudSyncEnabled = true
+            settings.enableAllSyncCategories()
+
+            await cloudKit.enable()
+            await cloudKit.performInitialUpload()
+
+            settings.replaceWithiCloudData()
+            appEnvironment.instancesManager.replaceWithiCloudData()
+            appEnvironment.mediaSourcesManager.replaceWithiCloudData()
+
+            settings.onboardingCompleted = true
+            showingICloudProgress = false
         }
     }
 

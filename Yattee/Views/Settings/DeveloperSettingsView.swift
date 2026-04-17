@@ -176,15 +176,6 @@ struct DeveloperSettingsView: View {
         #if !os(tvOS)
         notificationTestingSection
         #endif
-
-        Section {
-            Button {
-                NotificationCenter.default.post(name: .showOnboarding, object: nil)
-                appEnvironment?.navigationCoordinator.dismissSettings()
-            } label: {
-                Label(String(localized: "settings.advanced.showOnboarding"), systemImage: "hand.wave")
-            }
-        }
     }
 
     @ViewBuilder

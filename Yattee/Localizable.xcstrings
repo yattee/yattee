@@ -5532,6 +5532,7 @@
       }
     },
     "migration.skip" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5542,6 +5543,7 @@
       }
     },
     "migration.subtitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5552,6 +5554,7 @@
       }
     },
     "migration.title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5733,6 +5736,7 @@
     },
     "onboarding.cloud.complete.description" : {
       "comment" : "iCloud sync complete description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5744,6 +5748,7 @@
     },
     "onboarding.cloud.complete.title" : {
       "comment" : "iCloud sync complete title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5755,6 +5760,7 @@
     },
     "onboarding.cloud.description" : {
       "comment" : "iCloud sync description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5766,6 +5772,7 @@
     },
     "onboarding.cloud.enable" : {
       "comment" : "Enable iCloud button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5777,6 +5784,7 @@
     },
     "onboarding.cloud.error.title" : {
       "comment" : "iCloud sync error title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5788,6 +5796,7 @@
     },
     "onboarding.cloud.skip" : {
       "comment" : "Skip iCloud button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5799,6 +5808,7 @@
     },
     "onboarding.cloud.syncing.downloading" : {
       "comment" : "Download progress text on iCloud onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5832,6 +5842,7 @@
     },
     "onboarding.cloud.title" : {
       "comment" : "iCloud sync title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5843,6 +5854,7 @@
     },
     "onboarding.cloud.unavailable" : {
       "comment" : "iCloud unavailable message on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5854,6 +5866,7 @@
     },
     "onboarding.continue" : {
       "comment" : "Continue button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5865,6 +5878,7 @@
     },
     "onboarding.skip" : {
       "comment" : "Skip button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5876,6 +5890,7 @@
     },
     "onboarding.sources.description" : {
       "comment" : "Settings description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5887,6 +5902,7 @@
     },
     "onboarding.sources.goToSettings" : {
       "comment" : "Explore settings button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5898,6 +5914,7 @@
     },
     "onboarding.sources.later" : {
       "comment" : "Get started button on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5909,6 +5926,7 @@
     },
     "onboarding.sources.title" : {
       "comment" : "Settings title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5920,6 +5938,7 @@
     },
     "onboarding.title.privacy.description" : {
       "comment" : "Privacy feature description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5931,6 +5950,7 @@
     },
     "onboarding.title.privacy.title" : {
       "comment" : "Privacy feature title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5942,6 +5962,7 @@
     },
     "onboarding.title.sources.description" : {
       "comment" : "Sources feature description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5953,6 +5974,7 @@
     },
     "onboarding.title.sources.title" : {
       "comment" : "Sources feature title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5964,6 +5986,7 @@
     },
     "onboarding.title.sync.description" : {
       "comment" : "Sync feature description on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5975,6 +5998,7 @@
     },
     "onboarding.title.sync.title" : {
       "comment" : "Sync feature title on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5986,6 +6010,7 @@
     },
     "onboarding.title.tagline" : {
       "comment" : "App tagline on onboarding",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9410,17 +9435,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remote Control"
-          }
-        }
-      }
-    },
-    "settings.advanced.showOnboarding" : {
-      "comment" : "Button to show onboarding again",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Onboarding"
           }
         }
       }

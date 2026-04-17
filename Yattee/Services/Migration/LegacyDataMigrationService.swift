@@ -24,6 +24,7 @@ final class LegacyDataMigrationService {
     // MARK: - Dependencies
 
     private let instancesManager: InstancesManager
+    private let basicAuthCredentialsManager: BasicAuthCredentialsManager
     private let httpClient: HTTPClient
 
     // MARK: - State
@@ -38,9 +39,11 @@ final class LegacyDataMigrationService {
 
     init(
         instancesManager: InstancesManager,
+        basicAuthCredentialsManager: BasicAuthCredentialsManager,
         httpClient: HTTPClient = HTTPClient()
     ) {
         self.instancesManager = instancesManager
+        self.basicAuthCredentialsManager = basicAuthCredentialsManager
         self.httpClient = httpClient
     }
 
@@ -178,30 +181,72 @@ final class LegacyDataMigrationService {
     }
 
     /// Imports a single item into the v2 system.
+    /// If the legacy URL contains embedded basic-auth credentials
+    /// (e.g. `https://user:pass@host`), they are stripped from the URL
+    /// and stored in the Keychain via `BasicAuthCredentialsManager`.
     private func importItem(_ item: LegacyImportItem) throws {
-        // Create the new Instance (without credentials - user needs to sign in again)
+        let (cleanURL, credentials) = Self.splitCredentials(from: item.url)
+
         let instance = Instance(
             id: UUID(),
             type: item.instanceType,
-            url: item.url,
+            url: cleanURL,
             name: item.name,
             isEnabled: true,
             proxiesVideos: item.proxiesVideos
         )
 
-        // Add to instances manager
         instancesManager.add(instance)
+
+        if let credentials {
+            basicAuthCredentialsManager.setCredentials(
+                username: credentials.username,
+                password: credentials.password,
+                for: instance
+            )
+        }
     }
 
     /// Checks if an import item would be a duplicate of an existing instance.
     private func isDuplicate(_ item: LegacyImportItem) -> Bool {
-        // Check if an instance with the same URL and type already exists
+        let (cleanURL, _) = Self.splitCredentials(from: item.url)
         for existing in instancesManager.instances {
-            if existing.url.host == item.url.host && existing.type == item.instanceType {
+            if existing.url.host == cleanURL.host && existing.type == item.instanceType {
                 return true
             }
         }
         return false
+    }
+
+    // MARK: - Credential Splitting
+
+    /// Splits embedded basic-auth credentials out of a URL.
+    /// v1 supported credentials embedded directly in the URL (e.g. `https://user:pass@host`);
+    /// v2 stores them separately in the Keychain.
+    /// - Returns: The cleaned URL (no user/password) and the extracted credentials, if any.
+    static func splitCredentials(from url: URL) -> (cleanURL: URL, credentials: BasicAuthCredential?) {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let user = components.user, !user.isEmpty else {
+            return (url, nil)
+        }
+
+        let password = components.password ?? ""
+        components.user = nil
+        components.password = nil
+
+        let cleaned = components.url ?? url
+        return (cleaned, BasicAuthCredential(username: user, password: password))
+    }
+
+    // MARK: - Auto-Import
+
+    /// Silently imports any legacy v1 data on first launch.
+    /// Skips unreachable-checks and UI; just imports everything and deletes the legacy keys.
+    /// Safe to call repeatedly — if there is no legacy data left, this is a no-op.
+    func autoImportIfNeeded() async {
+        guard let items = parseLegacyData() else { return }
+        _ = await importItems(items)
+        deleteLegacyData()
     }
 
     // MARK: - Cleanup
