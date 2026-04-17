@@ -192,19 +192,21 @@ struct SearchView: View {
                         Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
                     }
 
-                // Type filter
-                filterMenu(
-                    title: (searchViewModel?.filters.type ?? .video).title,
-                    selection: Binding(
-                        get: { searchViewModel?.filters.type ?? .video },
-                        set: { searchViewModel?.filters.type = $0 }
-                    ),
-                    options: SearchContentType.allCases,
-                    labelForOption: { $0.title }
-                )
+                if !searchTextBinding.wrappedValue.isEmpty {
+                    // Type filter
+                    filterMenu(
+                        title: (searchViewModel?.filters.type ?? .video).title,
+                        selection: Binding(
+                            get: { searchViewModel?.filters.type ?? .video },
+                            set: { searchViewModel?.filters.type = $0 }
+                        ),
+                        options: SearchContentType.allCases,
+                        labelForOption: { $0.title }
+                    )
 
-                // Combined search filters menu
-                tvOSFiltersMenu
+                    // Combined search filters menu
+                    tvOSFiltersMenu
+                }
 
                 Button {
                     showViewOptions = true
@@ -458,7 +460,6 @@ struct SearchView: View {
             }
         } label: {
             Text(title)
-                .font(.caption)
         }
     }
 
@@ -530,7 +531,6 @@ struct SearchView: View {
             .disabled(searchViewModel?.filters.isDefault ?? true)
         } label: {
             Label(String(localized: "search.filters"), systemImage: "line.3.horizontal.decrease")
-                .font(.caption)
         }
     }
     #endif

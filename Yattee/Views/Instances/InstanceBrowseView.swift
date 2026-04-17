@@ -126,19 +126,21 @@ struct InstanceBrowseView: View {
                             Task { await searchViewModel?.search(query: searchText) }
                         }
 
-                    // Type filter
-                    filterMenu(
-                        title: (searchViewModel?.filters.type ?? .video).title,
-                        selection: Binding(
-                            get: { searchViewModel?.filters.type ?? .video },
-                            set: { searchViewModel?.filters.type = $0 }
-                        ),
-                        options: SearchContentType.allCases,
-                        labelForOption: { $0.title }
-                    )
+                    if isInSearchMode {
+                        // Type filter
+                        filterMenu(
+                            title: (searchViewModel?.filters.type ?? .video).title,
+                            selection: Binding(
+                                get: { searchViewModel?.filters.type ?? .video },
+                                set: { searchViewModel?.filters.type = $0 }
+                            ),
+                            options: SearchContentType.allCases,
+                            labelForOption: { $0.title }
+                        )
 
-                    // Combined search filters menu
-                    tvOSFiltersMenu
+                        // Combined search filters menu
+                        tvOSFiltersMenu
+                    }
 
                     Button {
                         showViewOptions = true
@@ -543,7 +545,6 @@ struct InstanceBrowseView: View {
             }
         } label: {
             Text(title)
-                .font(.caption)
         }
     }
 
@@ -607,7 +608,6 @@ struct InstanceBrowseView: View {
             .disabled(searchViewModel?.filters.isDefault ?? true)
         } label: {
             Label(String(localized: "search.filters"), systemImage: "line.3.horizontal.decrease")
-                .font(.caption)
         }
     }
     #else
