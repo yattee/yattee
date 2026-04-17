@@ -36,6 +36,7 @@ enum SidebarItem: Hashable, Identifiable {
     case downloads
     case subscriptionsFeed
     case manageChannels
+    case playlistsList
 
     // MARK: - Identifiable
 
@@ -73,6 +74,8 @@ enum SidebarItem: Hashable, Identifiable {
             return "subscriptions-feed"
         case .manageChannels:
             return "manage-channels"
+        case .playlistsList:
+            return "playlists-list"
         }
     }
 
@@ -112,6 +115,8 @@ enum SidebarItem: Hashable, Identifiable {
             return String(localized: "home.subscriptions.title")
         case .manageChannels:
             return String(localized: "sidebar.manageChannels")
+        case .playlistsList:
+            return String(localized: "home.playlists.title")
         }
     }
 
@@ -149,6 +154,8 @@ enum SidebarItem: Hashable, Identifiable {
             return "play.square.stack.fill"
         case .manageChannels:
             return "person.2"
+        case .playlistsList:
+            return "list.bullet.rectangle"
         }
     }
 
@@ -180,6 +187,8 @@ enum SidebarItem: Hashable, Identifiable {
             return .subscriptionsFeed
         case .manageChannels:
             return .manageChannels
+        case .playlistsList:
+            return .playlists
         }
     }
 

@@ -16,6 +16,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
     case history
     case downloads
     case channels
+    case playlists
     case sources
     case settings
     case openURL
@@ -25,7 +26,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
 
     /// Default order for sidebar main items.
     static var defaultOrder: [SidebarMainItem] {
-        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .sources, .openURL, .remoteControl, .downloads, .settings]
+        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .playlists, .sources, .openURL, .remoteControl, .downloads, .settings]
     }
 
     /// Default visibility (all visible except subscriptions and channels).
@@ -39,6 +40,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             .history: false,
             .downloads: true,
             .channels: false,
+            .playlists: false,
             .sources: true,
             .settings: true,
             .openURL: false,
@@ -53,6 +55,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             .history: false,
             .downloads: true,
             .channels: false,
+            .playlists: false,
             .sources: true,
             .settings: true,
             .openURL: false,
@@ -71,6 +74,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .history: "clock"
         case .downloads: "arrow.down.circle"
         case .channels: "person.2"
+        case .playlists: "list.bullet.rectangle"
         case .sources: "server.rack"
         case .settings: "gear"
         case .openURL: "link"
@@ -88,6 +92,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .history: String(localized: "sidebar.mainItem.history")
         case .downloads: String(localized: "sidebar.mainItem.downloads")
         case .channels: String(localized: "sidebar.mainItem.channels")
+        case .playlists: String(localized: "sidebar.mainItem.playlists")
         case .sources: String(localized: "sidebar.mainItem.sources")
         case .settings: String(localized: "sidebar.mainItem.settings")
         case .openURL: String(localized: "sidebar.mainItem.openURL")
@@ -132,6 +137,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .history: return TabBarItem.history.rawValue
         case .downloads: return TabBarItem.downloads.rawValue
         case .channels: return TabBarItem.channels.rawValue
+        case .playlists: return TabBarItem.playlists.rawValue
         case .sources: return TabBarItem.sources.rawValue
         case .settings: return TabBarItem.settings.rawValue
         case .openURL: return "open-url"
@@ -149,6 +155,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .history: return .history
         case .downloads: return .downloads
         case .channels: return .manageChannels
+        case .playlists: return .playlistsList
         case .sources: return .sources
         case .settings: return .settings
         case .openURL: return .openURL
@@ -162,7 +169,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .subscriptions: self = .subscriptions
         case .channels: self = .channels
         case .bookmarks: self = .bookmarks
-        case .playlists: return nil  // No direct mapping - playlists isn't a SidebarMainItem
+        case .playlists: self = .playlists
         case .history: self = .history
         case .downloads: self = .downloads
         case .sources: self = .sources

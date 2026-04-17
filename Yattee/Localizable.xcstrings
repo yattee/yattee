@@ -14212,6 +14212,17 @@
         }
       }
     },
+    "sidebar.mainItem.playlists" : {
+      "comment" : "Sidebar main navigation item for playlists",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists"
+          }
+        }
+      }
+    },
     "sidebar.mainItem.downloads" : {
       "comment" : "Sidebar main navigation item for downloads",
       "localizations" : {

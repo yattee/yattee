@@ -33,6 +33,7 @@ struct UnifiedTabView: View {
     @State private var downloadsPath = NavigationPath()
     @State private var subscriptionsFeedPath = NavigationPath()
     @State private var manageChannelsPath = NavigationPath()
+    @State private var playlistsListPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
@@ -180,6 +181,16 @@ struct UnifiedTabView: View {
                 }
             } label: {
                 Label(SidebarItem.manageChannels.title, systemImage: SidebarItem.manageChannels.systemImage)
+            }
+
+        case .playlists:
+            Tab(value: SidebarItem.playlistsList) {
+                NavigationStack(path: $playlistsListPath) {
+                    PlaylistsListView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.playlistsList.title, systemImage: SidebarItem.playlistsList.systemImage)
             }
 
         case .sources:
@@ -340,6 +351,7 @@ struct UnifiedTabView: View {
     @State private var downloadsPath = NavigationPath()
     @State private var subscriptionsFeedPath = NavigationPath()
     @State private var manageChannelsPath = NavigationPath()
+    @State private var playlistsListPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
@@ -471,6 +483,15 @@ struct UnifiedTabView: View {
                 Label(SidebarItem.manageChannels.title, systemImage: SidebarItem.manageChannels.systemImage)
             }
 
+        case .playlists:
+            Tab(value: SidebarItem.playlistsList) {
+                NavigationStack(path: $playlistsListPath) {
+                    PlaylistsListView().withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.playlistsList.title, systemImage: SidebarItem.playlistsList.systemImage)
+            }
+
         case .sources:
             Tab(value: SidebarItem.sources) {
                 NavigationStack(path: $sourcesPath) {
@@ -582,6 +603,7 @@ struct UnifiedTabView: View {
     @State private var historyPath = NavigationPath()
     @State private var subscriptionsFeedPath = NavigationPath()
     @State private var manageChannelsPath = NavigationPath()
+    @State private var playlistsListPath = NavigationPath()
     @State private var sourcesPath = NavigationPath()
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
@@ -728,6 +750,16 @@ struct UnifiedTabView: View {
                 }
             } label: {
                 Label(SidebarItem.manageChannels.title, systemImage: SidebarItem.manageChannels.systemImage)
+            }
+
+        case .playlists:
+            Tab(value: SidebarItem.playlistsList) {
+                NavigationStack(path: $playlistsListPath) {
+                    PlaylistsListView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.playlistsList.title, systemImage: SidebarItem.playlistsList.systemImage)
             }
 
         case .sources:
@@ -886,6 +918,8 @@ extension UnifiedTabView {
             subscriptionsFeedPath.append(destination)
         case .manageChannels:
             manageChannelsPath.append(destination)
+        case .playlistsList:
+            playlistsListPath.append(destination)
         case .sources:
             sourcesPath.append(destination)
         case .settings:
