@@ -67,10 +67,10 @@ struct DeArrowVideoThumbnail: View {
     private var downloadProgressIndeterminate: Bool { false }
     #endif
 
-    /// Title to show on placeholder for media source videos without thumbnails.
+    /// Title to show on placeholder while the thumbnail is loading or absent.
     private var placeholderTitle: String? {
-        guard displayThumbnailURL == nil, video.isFromMediaSource else { return nil }
-        return video.title
+        let title = video.displayTitle(using: deArrowProvider)
+        return title.isEmpty ? nil : title
     }
 
     /// Whether to show watched checkmark from settings.

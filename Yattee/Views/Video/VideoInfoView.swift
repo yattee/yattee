@@ -638,15 +638,13 @@ struct VideoInfoView: View {
                 Rectangle()
                     .fill(.quaternary)
                     .overlay {
-                        if video.bestThumbnail?.url == nil, video.isFromMediaSource {
-                            Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(3)
-                                .padding(8)
-                        }
+                        Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .padding(8)
                     }
             }
         }
@@ -939,15 +937,13 @@ struct VideoInfoView: View {
                             .fill(.quaternary)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             .overlay {
-                                if video.bestThumbnail?.url == nil, video.isFromMediaSource {
-                                    Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundStyle(.secondary)
-                                        .multilineTextAlignment(.center)
-                                        .lineLimit(3)
-                                        .padding(8)
-                                }
+                                Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(3)
+                                    .padding(8)
                             }
                     }
                 }
