@@ -362,6 +362,22 @@ struct SearchView: View {
 
     // MARK: - Views
 
+    private var recentItemsSpacing: CGFloat {
+        #if os(tvOS)
+        16
+        #else
+        0
+        #endif
+    }
+
+    private var horizontalCardSpacing: CGFloat {
+        #if os(tvOS)
+        48
+        #else
+        16
+        #endif
+    }
+
     /// Instance picker for selecting search source when multiple instances are available
     @ViewBuilder
     private var instancePickerView: some View {
@@ -393,7 +409,9 @@ struct SearchView: View {
             }
             .padding(listStyle == .inset ? 4 : 0)
             .background(listStyle == .inset ? ListBackgroundStyle.card.color : .clear)
+            #if !os(tvOS)
             .clipShape(.rect(cornerRadius: 10))
+            #endif
             .padding(.horizontal)
         }
     }
@@ -580,6 +598,16 @@ struct SearchView: View {
                         if !searchHistory.isEmpty {
                             VStack(alignment: .leading, spacing: 0) {
                                 // Header - tappable to expand/collapse when more than 5 items
+                                #if os(tvOS)
+                                HStack {
+                                    Text(String(localized: "search.recentSearches.title"))
+                                        .font(.headline)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                }
+                                .padding(.horizontal)
+                                .padding(.bottom, 8)
+                                #else
                                 Button {
                                     if hasMoreSearchHistory {
                                         withAnimation(.easeInOut(duration: 0.2)) {
@@ -604,9 +632,10 @@ struct SearchView: View {
                                 .disabled(!hasMoreSearchHistory)
                                 .padding(.horizontal)
                                 .padding(.bottom, 8)
+                                #endif
 
                                 // Items
-                                VStack(spacing: 0) {
+                                VStack(spacing: recentItemsSpacing) {
                                     ForEach(displayedSearchHistory) { history in
                                         Button {
                                             executeSearch(history.query)
@@ -674,7 +703,7 @@ struct SearchView: View {
 
                                 // Horizontal scroll
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    LazyHStack(spacing: 16) {
+                                    LazyHStack(spacing: horizontalCardSpacing) {
                                         ForEach(recentChannels) { recentChannel in
                                             NavigationLink(
                                                 value: NavigationDestination.channel(
@@ -689,7 +718,11 @@ struct SearchView: View {
                                                     channel: channelFromRecent(recentChannel),
                                                     isCompact: false
                                                 )
+                                                #if os(tvOS)
+                                                .frame(width: 240)
+                                                #else
                                                 .frame(width: 160)
+                                                #endif
                                             }
                                             .zoomTransitionSource(id: recentChannel.channelID)
                                             .buttonStyle(.plain)
@@ -704,6 +737,9 @@ struct SearchView: View {
                                     }
                                     .padding(.horizontal)
                                 }
+                                #if os(tvOS)
+                                .scrollClipDisabled()
+                                #endif
                             }
                         }
 
@@ -720,14 +756,18 @@ struct SearchView: View {
 
                                 // Horizontal scroll
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    LazyHStack(spacing: 16) {
+                                    LazyHStack(spacing: horizontalCardSpacing) {
                                         ForEach(recentPlaylists) { recentPlaylist in
                                             NavigationLink(value: NavigationDestination.playlist(.remote(playlistIDFromRecent(recentPlaylist), instance: nil, title: recentPlaylist.title))) {
                                                 PlaylistCardView(
                                                     playlist: playlistFromRecent(recentPlaylist),
                                                     isCompact: false
                                                 )
+                                                #if os(tvOS)
+                                                .frame(width: 320)
+                                                #else
                                                 .frame(width: 200)
+                                                #endif
                                             }
                                             .zoomTransitionSource(id: playlistIDFromRecent(recentPlaylist))
                                             .buttonStyle(.plain)
@@ -742,6 +782,9 @@ struct SearchView: View {
                                     }
                                     .padding(.horizontal)
                                 }
+                                #if os(tvOS)
+                                .scrollClipDisabled()
+                                #endif
                             }
                         }
 
@@ -763,6 +806,9 @@ struct SearchView: View {
                     }
                     .padding(.vertical)
                 }
+                #if os(tvOS)
+                .scrollClipDisabled()
+                #endif
                 .background(listStyle == .inset ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color)
                 .accessibilityLabel("search.recents")
                 .confirmationDialog(

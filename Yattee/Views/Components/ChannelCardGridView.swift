@@ -22,7 +22,13 @@ struct ChannelCardGridView: View {
     private var subscriberFont: Font { isCompact ? .caption2 : .caption }
 
     /// Minimum height for channel name to reserve space for 2 lines
-    private var titleMinHeight: CGFloat { isCompact ? 32 : 40 }
+    private var titleMinHeight: CGFloat {
+        #if os(tvOS)
+        isCompact ? 56 : 80
+        #else
+        isCompact ? 32 : 40
+        #endif
+    }
 
     var body: some View {
         VStack(alignment: .center, spacing: isCompact ? 8 : 12) {
@@ -46,7 +52,9 @@ struct ChannelCardGridView: View {
                     .fontWeight(.medium)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .frame(minHeight: titleMinHeight, alignment: .top)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: titleMinHeight, alignment: .top)
                 
                 // Subscriber count row - reserve space even when nil
                 HStack(spacing: 4) {

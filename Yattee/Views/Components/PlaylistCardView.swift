@@ -17,6 +17,14 @@ struct PlaylistCardView: View {
     
     private var titleFont: Font { isCompact ? .caption : .subheadline }
     private var authorFont: Font { isCompact ? .caption2 : .caption }
+
+    private var metadataHeight: CGFloat {
+        #if os(tvOS)
+        isCompact ? 90 : 110
+        #else
+        isCompact ? 50 : 58
+        #endif
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: isCompact ? 4 : 8) {
@@ -61,15 +69,17 @@ struct PlaylistCardView: View {
                     .fontWeight(.medium)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
                 Text(playlist.authorName)
                     .font(authorFont)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                
+
                 Spacer(minLength: 0)
             }
-            .frame(height: isCompact ? 50 : 58)
+            .frame(height: metadataHeight)
         }
         .contentShape(Rectangle())
     }
